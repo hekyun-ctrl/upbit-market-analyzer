@@ -6,6 +6,7 @@ import os
 from typing import Any
 
 from mcp.server import MCPServer
+from mcp.types import ToolAnnotations
 
 from analysis import analyze_candles
 from upbit_client import UpbitPublicClient
@@ -20,11 +21,19 @@ mcp = MCPServer(
 )
 
 
+READ_ONLY_ANNOTATIONS = ToolAnnotations(
+    readOnlyHint=True,
+    destructiveHint=False,
+    idempotentHint=True,
+    openWorldHint=True,
+)
+
+
 def _client() -> UpbitPublicClient:
     return UpbitPublicClient()
 
 
-@mcp.tool()
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
 async def list_krw_markets() -> list[dict[str, Any]]:
     """List publicly available KRW trading markets."""
     client = _client()
@@ -43,7 +52,7 @@ async def list_krw_markets() -> list[dict[str, Any]]:
         await client.close()
 
 
-@mcp.tool()
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
 async def get_ticker(market: str) -> dict[str, Any]:
     """Get a public ticker snapshot, for example market='KRW-BTC'."""
     client = _client()
@@ -62,7 +71,7 @@ async def get_ticker(market: str) -> dict[str, Any]:
         await client.close()
 
 
-@mcp.tool()
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
 async def get_orderbook(market: str) -> dict[str, Any]:
     """Get the public orderbook snapshot for a KRW market."""
     client = _client()
@@ -80,7 +89,7 @@ async def get_orderbook(market: str) -> dict[str, Any]:
         await client.close()
 
 
-@mcp.tool()
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
 async def get_candles(
     market: str, interval: str = "day", count: int = 120
 ) -> list[dict[str, Any]]:
@@ -104,7 +113,7 @@ async def get_candles(
         await client.close()
 
 
-@mcp.tool()
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
 async def analyze_market(
     market: str, interval: str = "day", count: int = 120
 ) -> dict[str, Any]:
