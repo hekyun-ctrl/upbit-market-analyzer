@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any
 
 from mcp.server import MCPServer
@@ -118,3 +119,13 @@ async def analyze_market(
         }
     finally:
         await client.close()
+
+
+if __name__ == "__main__":
+    mcp.run(
+        transport="streamable-http",
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", "8000")),
+        streamable_http_path="/mcp",
+        stateless_http=True,
+    )
