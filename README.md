@@ -44,7 +44,7 @@ Python 3.11 이상이 필요합니다.
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-mcp run server.py --transport streamable-http --host 0.0.0.0 --port 8000
+python server.py
 ```
 
 MCP 클라이언트에서 `http://localhost:8000/mcp`에 연결합니다.
