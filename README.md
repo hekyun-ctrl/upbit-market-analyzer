@@ -32,8 +32,7 @@ MCP 엔드포인트는 배포 주소의 `/mcp`입니다. 서버 자체는 거래
 - JWT/주문 서명: 생성하지 않음
 - 주문·잔액·입출금 API: 코드에서 차단
 - GitHub/Railway 토큰: 각 서비스의 연결 계층에서 관리하며 저장소에 저장하지 않음
-- 선택적 `MCP_API_KEY`: 서버를 비공개로 제한할 때만 Railway 환경변수로 지정(코드나 GitHub에 커밋 금지)
-- 로그: 요청 URL과 오류 상태만 기록하고 Authorization 헤더나 환경변수 값은 기록하지 않음
+- 로그: 환경변수 값, 인증 헤더 또는 비밀정보를 기록하지 않음
 
 자세한 내용은 [SECURITY.md](SECURITY.md)와 [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md)를 참고하세요.
 
@@ -48,7 +47,7 @@ pip install -r requirements.txt
 mcp run server.py --transport streamable-http --host 0.0.0.0 --port 8000
 ```
 
-상태 확인: `GET /health` 대신 MCP 클라이언트에서 `http://localhost:8000/mcp`에 연결합니다.
+MCP 클라이언트에서 `http://localhost:8000/mcp`에 연결합니다.
 
 ## Railway 배포
 
