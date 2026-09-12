@@ -46,6 +46,10 @@ class CandidateConfig:
     max_rsi_5m: float
     min_orderbook_ratio: float
     max_price_extension_pct: float
+    extended_target_min_score: int
+    extended_target_min_volume_ratio: float
+    extended_target_1_pct: float
+    extended_target_2_pct: float
 
     @classmethod
     def from_env(cls) -> "CandidateConfig":
@@ -69,6 +73,18 @@ class CandidateConfig:
             ),
             max_price_extension_pct=_env_float(
                 "CANDIDATE_MAX_PRICE_EXTENSION_PCT", 2.5
+            ),
+            extended_target_min_score=max(
+                80, min(100, _env_int("CANDIDATE_EXTENDED_TARGET_MIN_SCORE", 90))
+            ),
+            extended_target_min_volume_ratio=_env_float(
+                "CANDIDATE_EXTENDED_TARGET_MIN_VOLUME_RATIO", 1.5
+            ),
+            extended_target_1_pct=_env_float(
+                "CANDIDATE_EXTENDED_TARGET_1_PCT", 7.0
+            ),
+            extended_target_2_pct=_env_float(
+                "CANDIDATE_EXTENDED_TARGET_2_PCT", 10.0
             ),
         )
 
@@ -251,8 +267,27 @@ def evaluate_candidate(
     stop_raw = min(stop_raw, entry_low * 0.992)
     stop = _round_tick(stop_raw, tick, "down")
     risk = max(entry_mid - stop, tick * 2)
-    target_1 = _round_tick(entry_mid + risk * 1.3, tick, "up")
-    target_2 = _round_tick(entry_mid + risk * 2.0, tick, "up")
+    extended_target = (
+        alert.get("signal") in {"breakout", "consolidation_rebreakout"}
+        and score >= config.extended_target_min_score
+        and volume_ratio >= config.extended_target_min_volume_ratio
+        and float(one["ma20"]) >= float(one["ma60"])
+        and float(five["ma20"]) >= float(five["ma60"])
+        and rsi_1m <= 70
+        and rsi_5m <= 68
+    )
+    if extended_target:
+        target_1 = _round_tick(
+            entry_mid * (1 + config.extended_target_1_pct / 100), tick, "up"
+        )
+        target_2 = _round_tick(
+            entry_mid * (1 + config.extended_target_2_pct / 100), tick, "up"
+        )
+        target_mode = "강한 추세 확장형"
+    else:
+        target_1 = _round_tick(entry_mid + risk * 1.3, tick, "up")
+        target_2 = _round_tick(entry_mid + risk * 2.0, tick, "up")
+        target_mode = "기본 위험비형"
     chase_limit = _round_tick(entry_high + risk * 0.5, tick, "up")
 
     return {
@@ -269,6 +304,9 @@ def evaluate_candidate(
         "stop_price": stop,
         "target_1": target_1,
         "target_2": target_2,
+        "target_1_pct": round((target_1 / entry_mid - 1) * 100, 2),
+        "target_2_pct": round((target_2 / entry_mid - 1) * 100, 2),
+        "target_mode": target_mode,
         "valid_seconds": config.valid_seconds,
         "suggested_position_pct": 20 if score >= 90 else 15,
         "day_change_pct": round(day_change_pct, 2),
