@@ -56,6 +56,11 @@ class MonitorConfig:
     min_trade_value_krw: float
     alert_cooldown_seconds: int
     max_alerts_per_minute: int
+    rebreakout_enabled: bool
+    rebreakout_consolidation_seconds: int
+    rebreakout_max_range_pct: float
+    rebreakout_price_buffer_pct: float
+    rebreakout_min_volume_ratio: float
 
     @classmethod
     def from_env(cls) -> "MonitorConfig":
@@ -81,6 +86,23 @@ class MonitorConfig:
             ),
             max_alerts_per_minute=max(
                 1, _env_int("MONITOR_MAX_ALERTS_PER_MINUTE", 5)
+            ),
+            rebreakout_enabled=_enabled("MONITOR_REBREAKOUT_ENABLED", True),
+            rebreakout_consolidation_seconds=max(
+                900,
+                min(
+                    7200,
+                    _env_int("MONITOR_REBREAKOUT_CONSOLIDATION_SECONDS", 1800),
+                ),
+            ),
+            rebreakout_max_range_pct=max(
+                0.5, _env_float("MONITOR_REBREAKOUT_MAX_RANGE_PCT", 3.0)
+            ),
+            rebreakout_price_buffer_pct=max(
+                0.1, _env_float("MONITOR_REBREAKOUT_PRICE_BUFFER_PCT", 0.3)
+            ),
+            rebreakout_min_volume_ratio=max(
+                1.5, _env_float("MONITOR_REBREAKOUT_MIN_VOLUME_RATIO", 3.0)
             ),
         )
 
@@ -215,7 +237,10 @@ class SignalEngine:
                 _SecondBucket(second, price, price, price, price, trade_value)
             )
 
-        while window and window[0].second < second - 360:
+        history_seconds = max(
+            360, self.config.rebreakout_consolidation_seconds + 120
+        )
+        while window and window[0].second < second - history_seconds:
             window.popleft()
 
         if self._last_evaluated_second.get(market) == second:
@@ -243,20 +268,84 @@ class SignalEngine:
         previous_value = sum(bucket.trade_value for bucket in previous)
         volume_ratio = value_1m / previous_value if previous_value > 0 else 0.0
 
-        signals: list[tuple[str, str]] = []
+        signals: list[tuple[str, str, dict[str, Any]]] = []
+
+        # Prefer a renewed breakout after a long, narrow consolidation over the
+        # shorter generic surge signals. The most recent minute is excluded from
+        # the baseline so its volume can be compared with the preceding range.
+        if (
+            self.config.rebreakout_enabled
+            and now - window[0].second
+            >= self.config.rebreakout_consolidation_seconds + 55
+        ):
+            consolidation_start = (
+                now - self.config.rebreakout_consolidation_seconds - 60
+            )
+            consolidation = [
+                bucket
+                for bucket in window
+                if consolidation_start <= bucket.second < now - 60
+            ]
+            if len(consolidation) >= 30:
+                range_high = max(bucket.high_price for bucket in consolidation)
+                range_low = min(bucket.low_price for bucket in consolidation)
+                range_pct = (
+                    ((range_high / range_low) - 1.0) * 100 if range_low > 0 else 0.0
+                )
+                baseline_value = sum(
+                    bucket.trade_value for bucket in consolidation
+                )
+                baseline_value_1m = baseline_value * 60 / (
+                    self.config.rebreakout_consolidation_seconds
+                )
+                rebreakout_volume_ratio = (
+                    value_1m / baseline_value_1m
+                    if baseline_value_1m > 0
+                    else 0.0
+                )
+                rebreakout_level = range_high * (
+                    1 + self.config.rebreakout_price_buffer_pct / 100
+                )
+                if (
+                    range_pct <= self.config.rebreakout_max_range_pct
+                    and current_price >= rebreakout_level
+                    and change_1m_pct
+                    >= self.config.rebreakout_price_buffer_pct
+                    and value_1m >= self.config.min_trade_value_krw
+                    and rebreakout_volume_ratio
+                    >= self.config.rebreakout_min_volume_ratio
+                ):
+                    minutes = int(
+                        self.config.rebreakout_consolidation_seconds / 60
+                    )
+                    signals.append(
+                        (
+                            "consolidation_rebreakout",
+                            f"{minutes}분 횡보 후 거래량 재돌파",
+                            {
+                                "consolidation_minutes": minutes,
+                                "consolidation_range_pct": round(range_pct, 2),
+                                "consolidation_high": range_high,
+                                "volume_ratio_vs_consolidation": round(
+                                    rebreakout_volume_ratio, 2
+                                ),
+                            },
+                        )
+                    )
+
         if (
             change_1m_pct >= self.config.price_surge_1m_pct
             and value_1m >= self.config.min_trade_value_krw
             and volume_ratio >= self.config.volume_ratio
         ):
-            signals.append(("price_volume_surge", "가격·거래대금 급증"))
+            signals.append(("price_volume_surge", "가격·거래대금 급증", {}))
 
         if (
             change_1m_pct <= -self.config.price_surge_1m_pct
             and value_1m >= self.config.min_trade_value_krw
             and volume_ratio >= self.config.volume_ratio
         ):
-            signals.append(("rapid_drop", "단기 급락 위험"))
+            signals.append(("rapid_drop", "단기 급락 위험", {}))
 
         prior = [
             bucket
@@ -272,10 +361,10 @@ class SignalEngine:
                 and value_1m >= self.config.min_trade_value_krw
                 and volume_ratio >= max(1.5, self.config.volume_ratio * 0.75)
             ):
-                signals.append(("breakout", "5분 고점 돌파"))
+                signals.append(("breakout", "5분 고점 돌파", {}))
 
         alerts = []
-        for signal_type, label in signals:
+        for signal_type, label, details in signals:
             if not self._can_alert(market, signal_type, now):
                 continue
             alerts.append(
@@ -290,6 +379,7 @@ class SignalEngine:
                     "change_1m_pct": round(change_1m_pct, 2),
                     "trade_value_1m_krw": round(value_1m),
                     "volume_ratio_vs_previous_1m": round(volume_ratio, 2),
+                    **details,
                 }
             )
         return alerts
@@ -314,12 +404,21 @@ def _format_price(price: float) -> str:
 
 
 def _alert_text(alert: dict[str, Any]) -> str:
+    extra = ""
+    if alert.get("signal") == "consolidation_rebreakout":
+        extra = (
+            f"횡보 구간: {alert['consolidation_minutes']}분 / "
+            f"가격폭 {alert['consolidation_range_pct']:.2f}%\n"
+            f"횡보 평균 대비 1분 거래대금: "
+            f"{alert['volume_ratio_vs_consolidation']:.2f}배\n"
+        )
     return (
         f"[업비트 실시간 감시] {alert['market']} {alert['label']}\n"
         f"현재가: {_format_price(float(alert['price']))}\n"
         f"1분 등락: {alert['change_1m_pct']:+.2f}%\n"
         f"1분 거래대금: {alert['trade_value_1m_krw']:,.0f}원\n"
         f"직전 1분 대비 거래대금: {alert['volume_ratio_vs_previous_1m']:.2f}배\n"
+        f"{extra}"
         "자동 주문 신호가 아니라 관찰 알림입니다. 호가와 지지·저항을 확인하세요."
     )
 
@@ -405,7 +504,11 @@ class CandidateAnalyzer:
     def schedule(self, alert: dict[str, Any]) -> bool:
         if not self.config.enabled:
             return False
-        if alert.get("signal") not in {"price_volume_surge", "breakout"}:
+        if alert.get("signal") not in {
+            "price_volume_surge",
+            "breakout",
+            "consolidation_rebreakout",
+        }:
             return False
         market = str(alert["market"])
         now = time.time()
