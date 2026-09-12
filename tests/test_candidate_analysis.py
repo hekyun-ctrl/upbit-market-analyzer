@@ -13,6 +13,10 @@ def _config(**overrides):
         "max_rsi_5m": 75.0,
         "min_orderbook_ratio": 0.65,
         "max_price_extension_pct": 2.5,
+        "extended_target_min_score": 90,
+        "extended_target_min_volume_ratio": 1.5,
+        "extended_target_1_pct": 7.0,
+        "extended_target_2_pct": 10.0,
     }
     values.update(overrides)
     return CandidateConfig(**values)
@@ -82,6 +86,31 @@ def test_healthy_signal_builds_orderable_risk_plan():
     assert candidate["stop_price"] < candidate["entry_low"]
     assert candidate["target_1"] > candidate["entry_high"]
     assert candidate["target_2"] > candidate["target_1"]
+    assert candidate["target_mode"] == "강한 추세 확장형"
+    assert 7.0 <= candidate["target_1_pct"] <= 7.2
+    assert 10.0 <= candidate["target_2_pct"] <= 10.2
+
+
+def test_price_surge_keeps_standard_risk_targets():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    alert = {
+        "time_utc": "2026-09-12T10:00:00+00:00",
+        "market": "KRW-TEST",
+        "signal": "price_volume_surge",
+        "price": current,
+    }
+    ticker = {"trade_price": current, "signed_change_rate": 0.08}
+
+    candidate, rejected = evaluate_candidate(
+        alert, ticker, _orderbook(current), one, five, _config()
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["target_mode"] == "기본 위험비형"
+    assert candidate["target_2_pct"] < 7.0
 
 
 def test_consolidation_rebreakout_is_accepted_and_explained():
