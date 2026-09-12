@@ -9,6 +9,7 @@ from mcp.server import MCPServer
 from mcp.types import ToolAnnotations
 
 from analysis import analyze_candles
+from monitor import MONITOR_STATE, public_config, start_monitor_thread
 from upbit_client import UpbitPublicClient
 
 mcp = MCPServer(
@@ -130,7 +131,24 @@ async def analyze_market(
         await client.close()
 
 
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
+async def get_monitor_status() -> dict[str, Any]:
+    """Get the operational status and non-secret settings of the live monitor."""
+    return {**MONITOR_STATE.snapshot(), "config": public_config()}
+
+
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
+async def get_recent_alerts(
+    limit: int = 20, market: str | None = None
+) -> list[dict[str, Any]]:
+    """Get recent signals detected by the live monitor, newest first."""
+    if market is not None:
+        market = UpbitPublicClient.normalize_market(market)
+    return MONITOR_STATE.alerts(limit=limit, market=market)
+
+
 if __name__ == "__main__":
+    start_monitor_thread()
     mcp.run(
         transport="streamable-http",
         host="0.0.0.0",
