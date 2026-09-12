@@ -133,7 +133,11 @@ def evaluate_candidate(
     config: CandidateConfig,
 ) -> tuple[dict[str, Any] | None, list[str]]:
     """Return a conditional entry plan only when all safety filters pass."""
-    if alert.get("signal") not in {"price_volume_surge", "breakout"}:
+    if alert.get("signal") not in {
+        "price_volume_surge",
+        "breakout",
+        "consolidation_rebreakout",
+    }:
         return None, ["상승 후보 신호가 아님"]
     if len(candles_1m) < 60 or len(candles_5m) < 60:
         return None, ["분봉 데이터 부족"]
@@ -173,6 +177,10 @@ def evaluate_candidate(
 
     score = 0
     reasons: list[str] = []
+    if alert.get("signal") == "consolidation_rebreakout":
+        score += 10
+        minutes = int(alert.get("consolidation_minutes") or 0)
+        reasons.append(f"{minutes}분 횡보 상단 재돌파")
     if current >= float(one["ma20"]):
         score += 15
         reasons.append("1분 추세 상승")
