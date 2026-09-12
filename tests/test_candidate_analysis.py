@@ -84,6 +84,29 @@ def test_healthy_signal_builds_orderable_risk_plan():
     assert candidate["target_2"] > candidate["target_1"]
 
 
+def test_consolidation_rebreakout_is_accepted_and_explained():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    alert = {
+        "time_utc": "2026-09-12T10:00:00+00:00",
+        "market": "KRW-TEST",
+        "signal": "consolidation_rebreakout",
+        "price": current,
+        "consolidation_minutes": 30,
+    }
+    ticker = {"trade_price": current, "signed_change_rate": 0.08}
+
+    candidate, rejected = evaluate_candidate(
+        alert, ticker, _orderbook(current), one, five, _config()
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["source_signal"] == "consolidation_rebreakout"
+    assert "30분 횡보 상단 재돌파" in candidate["reasons"]
+
+
 def test_overheated_signal_is_rejected():
     one = _candles(monotonic=True)
     five = _candles(monotonic=True)
