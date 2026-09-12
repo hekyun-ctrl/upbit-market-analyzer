@@ -13,6 +13,25 @@
 | `get_orderbook` | 최우선 호가와 호가 잔량 |
 | `get_candles` | 분/일봉 OHLCV |
 | `analyze_market` | 이동평균·RSI·변동성·거래량 기반의 객관적 요약 |
+| `get_monitor_status` | WebSocket 연결·수신·재접속 상태 |
+| `get_recent_alerts` | 최근 탐지 신호 목록 |
+
+## 실시간 감시
+
+`ENABLE_MARKET_MONITOR=true`이면 서버 시작과 함께 업비트 공개 WebSocket
+`wss://api.upbit.com/websocket/v1`의 체결 스트림을 계속 수신합니다. 기본값은 모든
+KRW 마켓이며 다음 조건을 탐지합니다.
+
+- 1분 가격과 거래대금 동시 급증
+- 직전 5분 고점을 거래대금 증가와 함께 돌파
+- 거래대금을 동반한 1분 급락 위험
+
+연결이 끊기면 1~60초 지수 백오프로 자동 재연결합니다. 같은 종목·같은 신호는
+기본 10분 동안 다시 알리지 않으며, 전체 알림은 분당 5건으로 제한합니다.
+
+Telegram을 사용하려면 `TELEGRAM_BOT_TOKEN`과 `TELEGRAM_CHAT_ID`를 Railway
+환경변수에만 등록합니다. 두 값이 없을 때도 탐지는 계속되며 Railway 로그와
+`get_recent_alerts`에서 확인할 수 있습니다. 이 감시기는 자동 주문을 하지 않습니다.
 
 ## 요청 흐름
 
@@ -33,6 +52,7 @@ MCP 엔드포인트는 배포 주소의 `/mcp`입니다. 서버 자체는 거래
 - 주문·잔액·입출금 API: 코드에서 차단
 - GitHub/Railway 토큰: 각 서비스의 연결 계층에서 관리하며 저장소에 저장하지 않음
 - 로그: 환경변수 값, 인증 헤더 또는 비밀정보를 기록하지 않음
+- Telegram Bot Token: 선택 사항이며 Railway 환경변수에서만 읽음
 
 자세한 내용은 [SECURITY.md](SECURITY.md)와 [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md)를 참고하세요.
 
