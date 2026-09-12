@@ -17,6 +17,7 @@ from typing import Any
 import httpx
 import websockets
 
+from candidate_analysis import CandidateConfig, evaluate_candidate
 from upbit_client import UpbitPublicClient
 
 
@@ -165,6 +166,21 @@ class MonitorState:
             items = [item for item in items if item.get("market") == normalized]
         return items[: max(1, min(limit, 100))]
 
+    def has_recent_signal(self, market: str, signal: str, seconds: int) -> bool:
+        cutoff = time.time() - seconds
+        with self._lock:
+            items = list(self.recent_alerts)
+        for item in items:
+            if item.get("market") != market or item.get("signal") != signal:
+                continue
+            try:
+                observed = datetime.fromisoformat(str(item["time_utc"])).timestamp()
+            except (KeyError, TypeError, ValueError):
+                continue
+            if observed >= cutoff:
+                return True
+        return False
+
 
 MONITOR_STATE = MonitorState()
 
@@ -308,6 +324,25 @@ def _alert_text(alert: dict[str, Any]) -> str:
     )
 
 
+def _candidate_text(candidate: dict[str, Any]) -> str:
+    reasons = "·".join(candidate.get("reasons", [])) or "공개 시세 조건 충족"
+    return (
+        f"[조건부 진입 후보 | 점수 {candidate['score']}/100] "
+        f"{candidate['market']}\n"
+        f"현재가: {_format_price(float(candidate['current_price']))}\n"
+        f"진입구간: {_format_price(float(candidate['entry_low']))} ~ "
+        f"{_format_price(float(candidate['entry_high']))}\n"
+        f"추격금지: {_format_price(float(candidate['chase_limit']))} 이상\n"
+        f"손절가: {_format_price(float(candidate['stop_price']))}\n"
+        f"1차 목표: {_format_price(float(candidate['target_1']))}\n"
+        f"2차 목표: {_format_price(float(candidate['target_2']))}\n"
+        f"추천 비중: 투자 가능금액의 {candidate['suggested_position_pct']}% 이내\n"
+        f"신호 유효시간: {int(candidate['valid_seconds'] / 60)}분\n"
+        f"선정 근거: {reasons}\n"
+        "자동 주문이나 수익 보장이 아닌 공개 시세 기반 조건부 관찰 정보입니다."
+    )
+
+
 class AlertDispatcher:
     def __init__(self) -> None:
         self._telegram_token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
@@ -336,6 +371,99 @@ class AlertDispatcher:
             )
             response.raise_for_status()
 
+    async def send_candidate(self, candidate: dict[str, Any]) -> None:
+        MONITOR_STATE.add_alert(candidate)
+        LOGGER.warning(
+            "ENTRY_CANDIDATE %s", json.dumps(candidate, ensure_ascii=False)
+        )
+        if self.mode != "telegram":
+            return
+        url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
+        async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
+            response = await client.post(
+                url,
+                json={
+                    "chat_id": self._telegram_chat_id,
+                    "text": _candidate_text(candidate),
+                    "disable_web_page_preview": True,
+                },
+            )
+            response.raise_for_status()
+
+
+class CandidateAnalyzer:
+    """Confirm positive WebSocket signals with fresh REST market snapshots."""
+
+    def __init__(self, config: CandidateConfig, dispatcher: AlertDispatcher) -> None:
+        self.config = config
+        self.dispatcher = dispatcher
+        self._last_checked_at: dict[str, float] = {}
+        self._inflight_markets: set[str] = set()
+        self._tasks: set[asyncio.Task[None]] = set()
+        self._semaphore = asyncio.Semaphore(2)
+
+    def schedule(self, alert: dict[str, Any]) -> bool:
+        if not self.config.enabled:
+            return False
+        if alert.get("signal") not in {"price_volume_surge", "breakout"}:
+            return False
+        market = str(alert["market"])
+        now = time.time()
+        if market in self._inflight_markets:
+            return False
+        if now - self._last_checked_at.get(market, 0) < self.config.cooldown_seconds:
+            return False
+        if MONITOR_STATE.has_recent_signal(market, "rapid_drop", 600):
+            LOGGER.info("Candidate skipped after recent rapid drop: %s", market)
+            return False
+
+        self._last_checked_at[market] = now
+        self._inflight_markets.add(market)
+        task = asyncio.create_task(self._analyze(alert))
+        self._tasks.add(task)
+
+        def completed(done: asyncio.Task[None]) -> None:
+            self._tasks.discard(done)
+            self._inflight_markets.discard(market)
+
+        task.add_done_callback(completed)
+        return True
+
+    async def _analyze(self, alert: dict[str, Any]) -> None:
+        market = str(alert["market"])
+        try:
+            await asyncio.sleep(self.config.confirm_seconds)
+            async with self._semaphore:
+                client = UpbitPublicClient()
+                try:
+                    ticker, orderbook, candles_1m, candles_5m = await asyncio.gather(
+                        client.ticker(market),
+                        client.orderbook(market),
+                        client.candles(market, "minute1", 120),
+                        client.candles(market, "minute5", 120),
+                    )
+                finally:
+                    await client.close()
+            candidate, rejected = evaluate_candidate(
+                alert,
+                ticker,
+                orderbook,
+                candles_1m,
+                candles_5m,
+                self.config,
+            )
+            if candidate is None:
+                LOGGER.info(
+                    "Candidate rejected for %s: %s", market, "; ".join(rejected)
+                )
+                return
+            candidate["analysis_time_utc"] = datetime.now(timezone.utc).isoformat()
+            await self.dispatcher.send_candidate(candidate)
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            LOGGER.error("Candidate analysis failed for %s: %s", market, exc)
+
 
 async def _resolve_markets(config: MonitorConfig) -> list[str]:
     if not config.all_krw_markets:
@@ -356,6 +484,7 @@ async def run_monitor_forever() -> None:
     config = MonitorConfig.from_env()
     dispatcher = AlertDispatcher()
     engine = SignalEngine(config)
+    candidate_analyzer = CandidateAnalyzer(CandidateConfig.from_env(), dispatcher)
     backoff = 1
 
     while True:
@@ -403,6 +532,7 @@ async def run_monitor_forever() -> None:
                         ),
                     )
                     for alert in alerts:
+                        candidate_analyzer.schedule(alert)
                         try:
                             await dispatcher.send(alert)
                         except Exception as exc:  # keep market monitoring alive
@@ -439,4 +569,7 @@ def start_monitor_thread() -> bool:
 
 def public_config() -> dict[str, Any]:
     """Return non-secret threshold configuration for inspection."""
-    return asdict(MonitorConfig.from_env())
+    return {
+        **asdict(MonitorConfig.from_env()),
+        "candidate_analysis": CandidateConfig.from_env().public(),
+    }
