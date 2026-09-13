@@ -141,10 +141,12 @@ def test_telegram_delivery_filters_default_to_enabled(monkeypatch):
     monkeypatch.delenv("TELEGRAM_SEND_OBSERVATION_ALERTS", raising=False)
     monkeypatch.delenv("TELEGRAM_SEND_CANDIDATE_ALERTS", raising=False)
     monkeypatch.delenv("TELEGRAM_CANDIDATE_MIN_TARGET_1_PCT", raising=False)
+    monkeypatch.delenv("TELEGRAM_CANDIDATE_MIN_SCORE", raising=False)
     dispatcher = AlertDispatcher()
     assert dispatcher.observation_delivery_enabled is True
     assert dispatcher.candidate_delivery_enabled is True
     assert dispatcher.candidate_min_target_1_pct == 0.0
+    assert dispatcher.candidate_min_score == 0
 
 
 def test_candidate_below_minimum_target_is_not_sent(monkeypatch):
@@ -163,6 +165,38 @@ def test_candidate_below_minimum_target_is_not_sent(monkeypatch):
     monkeypatch.setattr("monitor.httpx.AsyncClient", UnexpectedClient)
     asyncio.run(
         dispatcher.send_candidate(
-            {"market": "KRW-IQ", "signal": "entry_candidate", "target_1_pct": 4.9}
+            {
+                "market": "KRW-IQ",
+                "signal": "entry_candidate",
+                "score": 100,
+                "target_1_pct": 4.9,
+            }
+        )
+    )
+
+
+def test_candidate_below_minimum_score_is_not_sent(monkeypatch):
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "test-chat")
+    monkeypatch.setenv("TELEGRAM_SEND_CANDIDATE_ALERTS", "true")
+    monkeypatch.setenv("TELEGRAM_CANDIDATE_MIN_TARGET_1_PCT", "5")
+    monkeypatch.setenv("TELEGRAM_CANDIDATE_MIN_SCORE", "90")
+
+    dispatcher = AlertDispatcher()
+    assert dispatcher.candidate_min_score == 90
+
+    class UnexpectedClient:
+        def __init__(self, *args, **kwargs):
+            raise AssertionError("candidate below score 90 must not call Telegram")
+
+    monkeypatch.setattr("monitor.httpx.AsyncClient", UnexpectedClient)
+    asyncio.run(
+        dispatcher.send_candidate(
+            {
+                "market": "KRW-IQ",
+                "signal": "entry_candidate",
+                "score": 89,
+                "target_1_pct": 7.0,
+            }
         )
     )
