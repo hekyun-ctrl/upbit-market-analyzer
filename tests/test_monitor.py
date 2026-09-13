@@ -141,31 +141,28 @@ def test_observation_telegram_delivery_can_be_disabled(monkeypatch):
 def test_telegram_delivery_filters_default_to_enabled(monkeypatch):
     monkeypatch.delenv("TELEGRAM_SEND_OBSERVATION_ALERTS", raising=False)
     monkeypatch.delenv("TELEGRAM_SEND_CANDIDATE_ALERTS", raising=False)
-    monkeypatch.delenv("TELEGRAM_CANDIDATE_MIN_TARGET_1_PCT", raising=False)
-    monkeypatch.delenv("TELEGRAM_CANDIDATE_MIN_RESISTANCE_ROOM_PCT", raising=False)
+    monkeypatch.delenv("TELEGRAM_CANDIDATE_MIN_TARGET_2_PCT", raising=False)
     monkeypatch.delenv("TELEGRAM_CANDIDATE_MIN_SCORE", raising=False)
     dispatcher = AlertDispatcher()
     assert dispatcher.observation_delivery_enabled is True
     assert dispatcher.candidate_delivery_enabled is True
-    assert dispatcher.candidate_min_target_1_pct == 0.0
-    assert dispatcher.candidate_min_resistance_room_pct == 0.0
+    assert dispatcher.candidate_min_target_2_pct == 5.0
     assert dispatcher.candidate_min_score == 0
 
 
-def test_candidate_without_minimum_resistance_room_is_not_sent(monkeypatch):
+def test_candidate_without_minimum_second_target_is_not_sent(monkeypatch):
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
     monkeypatch.setenv("TELEGRAM_CHAT_ID", "test-chat")
     monkeypatch.setenv("TELEGRAM_SEND_CANDIDATE_ALERTS", "true")
-    monkeypatch.setenv("TELEGRAM_CANDIDATE_MIN_TARGET_1_PCT", "5")
+    monkeypatch.setenv("TELEGRAM_CANDIDATE_MIN_TARGET_2_PCT", "5")
 
     dispatcher = AlertDispatcher()
-    assert dispatcher.candidate_min_target_1_pct == 5.0
-    assert dispatcher.candidate_min_resistance_room_pct == 5.0
+    assert dispatcher.candidate_min_target_2_pct == 5.0
 
     class UnexpectedClient:
         def __init__(self, *args, **kwargs):
             raise AssertionError(
-                "candidate without 5% resistance room must not call Telegram"
+                "candidate without a 5% second target must not call Telegram"
             )
 
     monkeypatch.setattr("monitor.httpx.AsyncClient", UnexpectedClient)
@@ -175,8 +172,8 @@ def test_candidate_without_minimum_resistance_room_is_not_sent(monkeypatch):
                 "market": "KRW-IQ",
                 "signal": "entry_candidate",
                 "score": 100,
-                "target_1_pct": 7.0,
-                "resistance_room_pct": 4.9,
+                "target_1_pct": 3.0,
+                "target_2_pct": 4.9,
             }
         )
     )
@@ -186,7 +183,7 @@ def test_candidate_below_minimum_score_is_not_sent(monkeypatch):
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
     monkeypatch.setenv("TELEGRAM_CHAT_ID", "test-chat")
     monkeypatch.setenv("TELEGRAM_SEND_CANDIDATE_ALERTS", "true")
-    monkeypatch.setenv("TELEGRAM_CANDIDATE_MIN_TARGET_1_PCT", "5")
+    monkeypatch.setenv("TELEGRAM_CANDIDATE_MIN_TARGET_2_PCT", "5")
     monkeypatch.setenv("TELEGRAM_CANDIDATE_MIN_SCORE", "90")
 
     dispatcher = AlertDispatcher()
@@ -203,8 +200,8 @@ def test_candidate_below_minimum_score_is_not_sent(monkeypatch):
                 "market": "KRW-IQ",
                 "signal": "entry_candidate",
                 "score": 89,
-                "target_1_pct": 7.0,
-                "resistance_room_pct": 7.0,
+                "target_1_pct": 3.0,
+                "target_2_pct": 5.0,
             }
         )
     )
