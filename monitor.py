@@ -458,6 +458,9 @@ class AlertDispatcher:
         self._candidate_min_target_1_pct = max(
             0.0, _env_float("TELEGRAM_CANDIDATE_MIN_TARGET_1_PCT", 0.0)
         )
+        self._candidate_min_score = max(
+            0, min(100, _env_int("TELEGRAM_CANDIDATE_MIN_SCORE", 0))
+        )
 
     @property
     def mode(self) -> str:
@@ -476,6 +479,10 @@ class AlertDispatcher:
     @property
     def candidate_min_target_1_pct(self) -> float:
         return self._candidate_min_target_1_pct
+
+    @property
+    def candidate_min_score(self) -> int:
+        return self._candidate_min_score
 
     async def send(self, alert: dict[str, Any]) -> None:
         MONITOR_STATE.add_alert(alert)
@@ -501,12 +508,18 @@ class AlertDispatcher:
         )
         if self.mode != "telegram" or not self._send_candidate_alerts:
             return
+        score = int(candidate.get("score", 0))
         target_1_pct = float(candidate.get("target_1_pct", 0.0))
-        if target_1_pct < self._candidate_min_target_1_pct:
+        if (
+            score < self._candidate_min_score
+            or target_1_pct < self._candidate_min_target_1_pct
+        ):
             LOGGER.info(
                 "ENTRY_CANDIDATE_TELEGRAM_SUPPRESSED market=%s "
-                "target_1_pct=%.2f minimum=%.2f",
+                "score=%d minimum_score=%d target_1_pct=%.2f minimum_target_1_pct=%.2f",
                 candidate.get("market"),
+                score,
+                self._candidate_min_score,
                 target_1_pct,
                 self._candidate_min_target_1_pct,
             )
