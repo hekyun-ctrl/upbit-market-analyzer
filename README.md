@@ -45,6 +45,11 @@ Telegram을 사용하려면 `TELEGRAM_BOT_TOKEN`과 `TELEGRAM_CHAT_ID`를 Railwa
 로그 기록과 조건부 후보 분석은 계속됩니다. `ENABLE_CANDIDATE_ANALYSIS=true`도 유지해야
 후보 메시지가 생성됩니다.
 
+조건부 후보 중 1차 목표 상승폭이 일정 기준 이상인 메시지만 받으려면
+`TELEGRAM_CANDIDATE_MIN_TARGET_1_PCT`를 사용합니다. 예를 들어 `5`로 설정하면
+`target_1_pct`가 5% 이상인 후보만 Telegram에 전송됩니다. 기준 미달 후보도 서버 내부
+로그와 `get_recent_alerts`에는 남지만 Telegram 메시지는 보내지 않습니다.
+
 ### 조건부 진입 후보 분석
 
 `ENABLE_CANDIDATE_ANALYSIS=true`이면 상승 알림 발생 30초 후 해당 종목의 공개
