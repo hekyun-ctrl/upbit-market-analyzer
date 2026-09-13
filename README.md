@@ -39,6 +39,12 @@ Telegram을 사용하려면 `TELEGRAM_BOT_TOKEN`과 `TELEGRAM_CHAT_ID`를 Railwa
 환경변수에만 등록합니다. 두 값이 없을 때도 탐지는 계속되며 Railway 로그와
 `get_recent_alerts`에서 확인할 수 있습니다. 이 감시기는 자동 주문을 하지 않습니다.
 
+일반 `[업비트 실시간 감시]` 관찰 메시지를 Telegram에서 숨기고 확인을 통과한
+`[조건부 진입 후보]`만 받으려면 `TELEGRAM_SEND_OBSERVATION_ALERTS=false`,
+`TELEGRAM_SEND_CANDIDATE_ALERTS=true`로 설정합니다. 일반 메시지를 숨겨도 내부 감시,
+로그 기록과 조건부 후보 분석은 계속됩니다. `ENABLE_CANDIDATE_ANALYSIS=true`도 유지해야
+후보 메시지가 생성됩니다.
+
 ### 조건부 진입 후보 분석
 
 `ENABLE_CANDIDATE_ANALYSIS=true`이면 상승 알림 발생 30초 후 해당 종목의 공개
