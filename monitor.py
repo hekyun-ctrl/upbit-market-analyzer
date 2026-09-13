@@ -498,15 +498,8 @@ class AlertDispatcher:
             "TELEGRAM_SEND_OBSERVATION_ALERTS", True
         )
         self._send_candidate_alerts = _enabled("TELEGRAM_SEND_CANDIDATE_ALERTS", True)
-        self._candidate_min_target_1_pct = max(
-            0.0, _env_float("TELEGRAM_CANDIDATE_MIN_TARGET_1_PCT", 0.0)
-        )
-        self._candidate_min_resistance_room_pct = max(
-            0.0,
-            _env_float(
-                "TELEGRAM_CANDIDATE_MIN_RESISTANCE_ROOM_PCT",
-                self._candidate_min_target_1_pct,
-            ),
+        self._candidate_min_target_2_pct = max(
+            0.0, _env_float("TELEGRAM_CANDIDATE_MIN_TARGET_2_PCT", 5.0)
         )
         self._candidate_min_score = max(
             0, min(100, _env_int("TELEGRAM_CANDIDATE_MIN_SCORE", 0))
@@ -527,16 +520,12 @@ class AlertDispatcher:
         return self._send_candidate_alerts
 
     @property
-    def candidate_min_target_1_pct(self) -> float:
-        return self._candidate_min_target_1_pct
+    def candidate_min_target_2_pct(self) -> float:
+        return self._candidate_min_target_2_pct
 
     @property
     def candidate_min_score(self) -> int:
         return self._candidate_min_score
-
-    @property
-    def candidate_min_resistance_room_pct(self) -> float:
-        return self._candidate_min_resistance_room_pct
 
     async def send(self, alert: dict[str, Any]) -> None:
         MONITOR_STATE.add_alert(alert)
@@ -561,20 +550,20 @@ class AlertDispatcher:
         if self.mode != "telegram" or not self._send_candidate_alerts:
             return
         score = int(candidate.get("score", 0))
-        resistance_room_pct = float(candidate.get("resistance_room_pct", 0.0))
+        target_2_pct = float(candidate.get("target_2_pct", 0.0))
         if (
             score < self._candidate_min_score
-            or resistance_room_pct < self._candidate_min_resistance_room_pct
+            or target_2_pct < self._candidate_min_target_2_pct
         ):
             LOGGER.info(
                 "ENTRY_CANDIDATE_TELEGRAM_SUPPRESSED market=%s "
-                "score=%d minimum_score=%d resistance_room_pct=%.2f "
-                "minimum_resistance_room_pct=%.2f",
+                "score=%d minimum_score=%d target_2_pct=%.2f "
+                "minimum_target_2_pct=%.2f",
                 candidate.get("market"),
                 score,
                 self._candidate_min_score,
-                resistance_room_pct,
-                self._candidate_min_resistance_room_pct,
+                target_2_pct,
+                self._candidate_min_target_2_pct,
             )
             return
         url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
