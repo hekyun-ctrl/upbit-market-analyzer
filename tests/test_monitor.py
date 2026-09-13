@@ -7,6 +7,7 @@ from monitor import (
     CandidateAnalyzer,
     MonitorConfig,
     SignalEngine,
+    _candidate_text,
 )
 
 
@@ -275,3 +276,91 @@ def test_candidate_outcome_records_target_before_stop(monkeypatch):
     assert performance["stop_first"] == 0
     assert performance["target_1_first_rate_pct"] == 100.0
     assert "KRW-IQ" not in analyzer._lifecycles
+
+
+def test_rejected_candidate_is_rechecked_on_consolidation_breakout(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    analyzer._watchlist["KRW-IQ"] = {
+        "market": "KRW-IQ",
+        "created_at": 1_800_000_000.0,
+        "first_signal_time_utc": "2026-09-12T10:00:00+00:00",
+        "first_signal_price": 100.0,
+        "recheck_count": 0,
+        "expires_at": 9_999_999_999.0,
+    }
+    analyzer._last_checked_at["KRW-IQ"] = 9_999_999_998.0
+    seen = []
+
+    async def fake_analyze(alert):
+        seen.append(alert)
+
+    monkeypatch.setattr(analyzer, "_analyze", fake_analyze)
+
+    async def run():
+        assert analyzer.schedule(
+            {
+                "time_utc": "2026-09-12T11:00:00+00:00",
+                "market": "KRW-IQ",
+                "signal": "consolidation_rebreakout",
+                "price": 101.0,
+                "breakout_level": 100.8,
+            }
+        )
+        await asyncio.sleep(0)
+
+    asyncio.run(run())
+    assert len(seen) == 1
+    assert seen[0]["is_reentry"] is True
+    assert seen[0]["watchlist_recheck"] is True
+
+
+def test_every_screened_signal_tracks_five_percent_before_three_percent(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    MONITOR_STATE.signal_outcomes.clear()
+    analyzer._start_signal_track(
+        {
+            "time_utc": "2026-09-12T10:00:00+00:00",
+            "market": "KRW-IQ",
+            "signal": "breakout",
+            "price": 100.0,
+        },
+        1_800_000_000.0,
+    )
+
+    analyzer._observe_signal_track("KRW-IQ", 105.0, 1_800_000_120.0)
+
+    performance = MONITOR_STATE.candidate_performance()["raw_signal_performance"]
+    assert performance["sample_count"] == 1
+    assert performance["target_first"] == 1
+    assert performance["stop_first"] == 0
+    assert performance["target_first_rate_pct"] == 100.0
+
+
+def test_candidate_message_labels_score_as_condition_score():
+    text = _candidate_text(
+        {
+            "market": "KRW-IQ",
+            "score": 92,
+            "current_price": 100.0,
+            "entry_low": 99.0,
+            "entry_high": 100.0,
+            "chase_limit": 101.0,
+            "stop_price": 97.0,
+            "target_1": 105.0,
+            "target_2": 108.0,
+            "target_1_pct": 5.5,
+            "target_2_pct": 8.5,
+            "target_mode": "구조적 저항 기반",
+            "resistance_room_pct": 5.5,
+            "risk_reward": 2.1,
+            "suggested_position_pct": 5,
+            "valid_seconds": 300,
+            "risk_notes": ["BTC 약세 감점 -10점"],
+            "reasons": ["완료 1분봉 돌파 확정"],
+        }
+    )
+
+    assert "조건점수 92/100" in text
+    assert "위험 감점: BTC 약세 감점 -10점" in text
