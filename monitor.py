@@ -126,6 +126,7 @@ class MonitorState:
         self.notification_mode = "log_only"
         self.recent_alerts: deque[dict[str, Any]] = deque(maxlen=100)
         self.candidate_outcomes: deque[dict[str, Any]] = deque(maxlen=500)
+        self.signal_outcomes: deque[dict[str, Any]] = deque(maxlen=1000)
 
     @staticmethod
     def _now() -> str:
@@ -163,9 +164,33 @@ class MonitorState:
             self.candidate_outcomes.appendleft(dict(outcome))
         LOGGER.warning("CANDIDATE_OUTCOME %s", json.dumps(outcome, ensure_ascii=False))
 
+    def add_signal_outcome(self, outcome: dict[str, Any]) -> None:
+        """Record every screened raw signal, including candidates not sent."""
+        with self._lock:
+            self.signal_outcomes.appendleft(dict(outcome))
+        LOGGER.warning("RAW_SIGNAL_OUTCOME %s", json.dumps(outcome, ensure_ascii=False))
+
+    @staticmethod
+    def _performance_summary(outcomes: list[dict[str, Any]]) -> dict[str, Any]:
+        targets = sum(item.get("result") == "target_first" for item in outcomes)
+        stops = sum(item.get("result") == "stop_first" for item in outcomes)
+        decided = targets + stops
+        return {
+            "sample_count": len(outcomes),
+            "decided_count": decided,
+            "target_first": targets,
+            "stop_first": stops,
+            "expired": sum(item.get("result") == "expired" for item in outcomes),
+            "target_first_rate_pct": (
+                round(targets / decided * 100, 2) if decided else None
+            ),
+            "recent": outcomes[:100],
+        }
+
     def candidate_performance(self) -> dict[str, Any]:
         with self._lock:
             outcomes = list(self.candidate_outcomes)
+            signal_outcomes = list(self.signal_outcomes)
         targets = sum(item.get("result") == "target_1_first" for item in outcomes)
         stops = sum(item.get("result") == "stop_first" for item in outcomes)
         decided = targets + stops
@@ -179,6 +204,7 @@ class MonitorState:
                 round(targets / decided * 100, 2) if decided else None
             ),
             "recent": outcomes[:100],
+            "raw_signal_performance": self._performance_summary(signal_outcomes),
         }
 
     def snapshot(self) -> dict[str, Any]:
@@ -196,6 +222,7 @@ class MonitorState:
                 "notification_mode": self.notification_mode,
                 "recent_alert_count": len(self.recent_alerts),
                 "candidate_outcome_count": len(self.candidate_outcomes),
+                "raw_signal_outcome_count": len(self.signal_outcomes),
             }
 
     def alerts(self, limit: int, market: str | None = None) -> list[dict[str, Any]]:
@@ -437,9 +464,11 @@ def _alert_text(alert: dict[str, Any]) -> str:
 
 def _candidate_text(candidate: dict[str, Any]) -> str:
     reasons = "·".join(candidate.get("reasons", [])) or "공개 시세 조건 충족"
+    risk_notes = "·".join(candidate.get("risk_notes", []))
+    risk_line = f"위험 감점: {risk_notes}\n" if risk_notes else ""
     reentry = " | 재지지" if candidate.get("is_reentry") else ""
     return (
-        f"[조건부 진입 후보{reentry} | 점수 {candidate['score']}/100] "
+        f"[조건부 진입 후보{reentry} | 조건점수 {candidate['score']}/100] "
         f"{candidate['market']}\n"
         f"현재가: {_format_price(float(candidate['current_price']))}\n"
         f"진입구간: {_format_price(float(candidate['entry_low']))} ~ "
@@ -455,6 +484,7 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"예상 손익비: {candidate.get('risk_reward', 0):.2f}\n"
         f"추천 비중: 투자 가능금액의 {candidate['suggested_position_pct']}% 이내\n"
         f"신호 유효시간: {int(candidate['valid_seconds'] / 60)}분\n"
+        f"{risk_line}"
         f"선정 근거: {reasons}\n"
         "자동 주문이나 수익 보장이 아닌 공개 시세 기반 조건부 관찰 정보입니다."
     )
@@ -569,9 +599,123 @@ class CandidateAnalyzer:
         self._last_checked_at: dict[str, float] = {}
         self._last_reentry_at: dict[str, float] = {}
         self._lifecycles: dict[str, dict[str, Any]] = {}
+        self._watchlist: dict[str, dict[str, Any]] = {}
+        self._signal_tracks: dict[str, dict[str, Any]] = {}
         self._inflight_markets: set[str] = set()
         self._tasks: set[asyncio.Task[None]] = set()
         self._semaphore = asyncio.Semaphore(2)
+
+    def _active_watch(self, market: str, now: float) -> dict[str, Any] | None:
+        state = self._watchlist.get(market)
+        if state and now >= float(state["expires_at"]):
+            self._watchlist.pop(market, None)
+            return None
+        return state
+
+    def _start_signal_track(self, alert: dict[str, Any], now: float) -> None:
+        """Track +5% versus -3% first-touch outcomes for every screened signal."""
+        market = str(alert["market"])
+        existing = self._signal_tracks.get(market)
+        if existing and now < float(existing["expires_at"]):
+            return
+        price = float(alert["price"])
+        self._signal_tracks[market] = {
+            "market": market,
+            "source_signal": alert["signal"],
+            "signal_price": price,
+            "target_price": price * (1 + self.config.raw_signal_target_pct / 100),
+            "stop_price": price * (1 - self.config.raw_signal_stop_pct / 100),
+            "target_pct": self.config.raw_signal_target_pct,
+            "stop_pct": self.config.raw_signal_stop_pct,
+            "max_price": price,
+            "min_price": price,
+            "created_at": now,
+            "signal_time_utc": alert.get("time_utc"),
+            "expires_at": now + self.config.watchlist_window_seconds,
+            "approved_candidate": False,
+        }
+
+    def _finish_signal_track(
+        self,
+        market: str,
+        state: dict[str, Any],
+        result: str,
+        exit_price: float,
+        now: float,
+    ) -> None:
+        entry = float(state["signal_price"])
+        MONITOR_STATE.add_signal_outcome(
+            {
+                "market": market,
+                "source_signal": state["source_signal"],
+                "result": result,
+                "approved_candidate": bool(state["approved_candidate"]),
+                "signal_price": entry,
+                "exit_price": exit_price,
+                "target_price": state["target_price"],
+                "stop_price": state["stop_price"],
+                "mfe_pct": round((float(state["max_price"]) / entry - 1) * 100, 2),
+                "mae_pct": round((float(state["min_price"]) / entry - 1) * 100, 2),
+                "elapsed_seconds": round(now - float(state["created_at"]), 1),
+                "signal_time_utc": state.get("signal_time_utc"),
+                "completed_at_utc": datetime.now(timezone.utc).isoformat(),
+            }
+        )
+        self._signal_tracks.pop(market, None)
+
+    def _observe_signal_track(self, market: str, price: float, now: float) -> None:
+        state = self._signal_tracks.get(market)
+        if not state:
+            return
+        state["max_price"] = max(float(state["max_price"]), price)
+        state["min_price"] = min(float(state["min_price"]), price)
+        if price >= float(state["target_price"]):
+            self._finish_signal_track(market, state, "target_first", price, now)
+        elif price <= float(state["stop_price"]):
+            self._finish_signal_track(market, state, "stop_first", price, now)
+        elif now >= float(state["expires_at"]):
+            self._finish_signal_track(market, state, "expired", price, now)
+
+    def _remember_rejected(
+        self,
+        alert: dict[str, Any],
+        rejected: list[str],
+        current_price: float,
+    ) -> None:
+        market = str(alert["market"])
+        now = time.time()
+        state = self._active_watch(market, now)
+        if state is None:
+            state = {
+                "market": market,
+                "created_at": now,
+                "first_signal_time_utc": alert.get("time_utc"),
+                "first_signal_price": float(alert["price"]),
+                "recheck_count": 0,
+            }
+        elif alert.get("watchlist_recheck"):
+            state["recheck_count"] = int(state.get("recheck_count", 0)) + 1
+        state.update(
+            {
+                "source_signal": alert["signal"],
+                "breakout_level": float(
+                    alert.get("breakout_level")
+                    or alert.get("consolidation_high")
+                    or alert["price"]
+                ),
+                "last_price": current_price,
+                "last_rejected": list(rejected),
+                "last_checked_at": now,
+                "expires_at": float(state["created_at"])
+                + self.config.watchlist_window_seconds,
+            }
+        )
+        self._watchlist[market] = state
+        LOGGER.info(
+            "Candidate retained on 12h watchlist: %s rechecks=%d",
+            market,
+            state["recheck_count"],
+        )
 
     def schedule(self, alert: dict[str, Any]) -> bool:
         if not self.config.enabled:
@@ -584,17 +728,32 @@ class CandidateAnalyzer:
             return False
         market = str(alert["market"])
         now = time.time()
+        watch = self._active_watch(market, now)
+        watchlist_recheck = bool(
+            watch and alert.get("signal") == "consolidation_rebreakout"
+        )
         if market in self._inflight_markets:
             return False
-        if now - self._last_checked_at.get(market, 0) < self.config.cooldown_seconds:
+        if (
+            not watchlist_recheck
+            and now - self._last_checked_at.get(market, 0) < self.config.cooldown_seconds
+        ):
             return False
         if MONITOR_STATE.has_recent_signal(market, "rapid_drop", 600):
             LOGGER.info("Candidate skipped after recent rapid drop: %s", market)
             return False
 
+        scheduled = dict(alert)
+        if watchlist_recheck:
+            scheduled["is_reentry"] = True
+            scheduled["watchlist_recheck"] = True
+            scheduled["original_signal_time_utc"] = watch.get(
+                "first_signal_time_utc"
+            )
+        self._start_signal_track(scheduled, now)
         self._last_checked_at[market] = now
         self._inflight_markets.add(market)
-        task = asyncio.create_task(self._analyze(alert))
+        task = asyncio.create_task(self._analyze(scheduled))
         self._tasks.add(task)
 
         def completed(done: asyncio.Task[None]) -> None:
@@ -606,10 +765,12 @@ class CandidateAnalyzer:
 
     def observe_price(self, market: str, price: float) -> bool:
         """Schedule one fresh recheck after price leaves and retakes the entry zone."""
+        now = time.time()
+        self._observe_signal_track(market, price, now)
+        self._active_watch(market, now)
         state = self._lifecycles.get(market)
         if not state:
             return False
-        now = time.time()
         state["max_price"] = max(float(state["max_price"]), price)
         state["min_price"] = min(float(state["min_price"]), price)
         if price >= float(state["target_1"]):
@@ -739,9 +900,15 @@ class CandidateAnalyzer:
                 LOGGER.info(
                     "Candidate rejected for %s: %s", market, "; ".join(rejected)
                 )
+                self._remember_rejected(
+                    alert, rejected, float(ticker["trade_price"])
+                )
                 return
             candidate["analysis_time_utc"] = datetime.now(timezone.utc).isoformat()
             await self.dispatcher.send_candidate(candidate)
+            self._watchlist.pop(market, None)
+            if market in self._signal_tracks:
+                self._signal_tracks[market]["approved_candidate"] = True
             self._lifecycles[market] = {
                 "source_signal": candidate["source_signal"],
                 "entry_low": candidate["entry_low"],
