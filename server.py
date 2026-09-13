@@ -62,7 +62,9 @@ async def get_ticker(market: str) -> dict[str, Any]:
         return {
             "market": row.get("market"),
             "trade_price": row.get("trade_price"),
-            "signed_change_rate_pct": round(float(row.get("signed_change_rate", 0)) * 100, 3),
+            "signed_change_rate_pct": round(
+                float(row.get("signed_change_rate", 0)) * 100, 3
+            ),
             "acc_trade_price_24h": row.get("acc_trade_price_24h"),
             "high_price": row.get("high_price"),
             "low_price": row.get("low_price"),
@@ -145,6 +147,12 @@ async def get_recent_alerts(
     if market is not None:
         market = UpbitPublicClient.normalize_market(market)
     return MONITOR_STATE.alerts(limit=limit, market=market)
+
+
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
+async def get_candidate_performance() -> dict[str, Any]:
+    """Summarize whether tracked candidates reached target 1 or stop first."""
+    return MONITOR_STATE.candidate_performance()
 
 
 if __name__ == "__main__":
