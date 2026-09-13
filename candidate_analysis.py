@@ -57,13 +57,18 @@ class CandidateConfig:
     orderbook_sample_interval_seconds: float
     reentry_window_seconds: int
     reentry_cooldown_seconds: int
+    watchlist_window_seconds: int
+    raw_signal_target_pct: float
+    raw_signal_stop_pct: float
+    btc_weak_score_penalty: int
+    day_overheat_score_penalty: int
 
     @classmethod
     def from_env(cls) -> "CandidateConfig":
         return cls(
             enabled=_enabled("ENABLE_CANDIDATE_ANALYSIS"),
             confirm_seconds=max(5, min(120, _env_int("CANDIDATE_CONFIRM_SECONDS", 30))),
-            min_score=max(50, min(100, _env_int("CANDIDATE_MIN_SCORE", 80))),
+            min_score=max(50, min(100, _env_int("CANDIDATE_MIN_SCORE", 90))),
             cooldown_seconds=max(300, _env_int("CANDIDATE_COOLDOWN_SECONDS", 900)),
             valid_seconds=max(60, min(900, _env_int("CANDIDATE_VALID_SECONDS", 300))),
             max_day_change_pct=_env_float("CANDIDATE_MAX_DAY_CHANGE_PCT", 20.0),
@@ -103,6 +108,21 @@ class CandidateConfig:
             ),
             reentry_cooldown_seconds=max(
                 60, _env_int("CANDIDATE_REENTRY_COOLDOWN_SECONDS", 300)
+            ),
+            watchlist_window_seconds=max(
+                3600, _env_int("CANDIDATE_WATCHLIST_WINDOW_SECONDS", 43200)
+            ),
+            raw_signal_target_pct=max(
+                1.0, _env_float("CANDIDATE_RAW_SIGNAL_TARGET_PCT", 5.0)
+            ),
+            raw_signal_stop_pct=max(
+                0.5, _env_float("CANDIDATE_RAW_SIGNAL_STOP_PCT", 3.0)
+            ),
+            btc_weak_score_penalty=max(
+                0, _env_int("CANDIDATE_BTC_WEAK_SCORE_PENALTY", 10)
+            ),
+            day_overheat_score_penalty=max(
+                0, _env_int("CANDIDATE_DAY_OVERHEAT_SCORE_PENALTY", 8)
             ),
         )
 
@@ -329,8 +349,7 @@ def evaluate_candidate(
         rejected.append("완료 1분봉이 돌파선 아래 마감")
     if current < breakout * 0.998:
         rejected.append("돌파선 재지지 실패")
-    if day_change > config.max_day_change_pct:
-        rejected.append(f"일간 상승률 과다({day_change:.1f}%)")
+    day_overheated = day_change > config.max_day_change_pct
     if rsi1 > config.max_rsi_1m or rsi5 > config.max_rsi_5m:
         rejected.append(f"RSI 과열(1분 {rsi1:.1f}/5분 {rsi5:.1f})")
     if not book_persistent:
@@ -351,8 +370,7 @@ def evaluate_candidate(
         rejected.append(f"완료봉 종가 위치 약함({close_position:.2f})")
     if upper_wick > config.max_upper_wick_ratio:
         rejected.append(f"긴 윗꼬리({upper_wick:.2f})")
-    if btc_change <= config.max_btc_decline_pct or btc_bearish:
-        rejected.append(f"BTC 약세 환경({btc_change:.2f}%)")
+    btc_weak = btc_change <= config.max_btc_decline_pct or btc_bearish
 
     resistance_levels = _resistances(current, ticker, c5, c15)
     if not resistance_levels:
@@ -410,14 +428,22 @@ def evaluate_candidate(
         and _ma20_slope(b5) >= 0
     )
     liquid_market = trade_value_24h >= config.min_trade_value_24h_krw * 5
+    market_score = 15 if btc_strong else 10
+    if btc_weak:
+        market_score = max(0, market_score - config.btc_weak_score_penalty)
+    score_penalty = config.day_overheat_score_penalty if day_overheated else 0
     score = min(
         100,
-        setup_score
-        + volume_score
-        + trend_score
-        + (15 if btc_strong else 10)
-        + (10 if room >= 7 and risk_reward >= 2.5 else 8)
-        + (10 if book_ratio >= 1.2 and spread <= 0.2 and liquid_market else 7),
+        max(
+            0,
+            setup_score
+            + volume_score
+            + trend_score
+            + market_score
+            + (10 if room >= 7 and risk_reward >= 2.5 else 8)
+            + (10 if book_ratio >= 1.2 and spread <= 0.2 and liquid_market else 7)
+            - score_penalty,
+        ),
     )
     if score < config.min_score:
         return None, [f"후보 점수 부족({score}/{config.min_score})"]
@@ -442,6 +468,17 @@ def evaluate_candidate(
     if alert.get("is_reentry"):
         reasons.insert(0, "돌파선 재지지 후 재진입")
 
+    risk_notes: list[str] = []
+    if btc_weak:
+        risk_notes.append(
+            f"BTC 약세 감점 -{config.btc_weak_score_penalty}점({btc_change:.2f}%)"
+        )
+    if day_overheated:
+        risk_notes.append(
+            f"당일 과열 감점 -{config.day_overheat_score_penalty}점({day_change:.1f}%)"
+        )
+    suggested_position_pct = 5 if risk_notes else 15 if score >= 95 else 10
+
     return {
         "time_utc": alert.get("time_utc"),
         "market": alert["market"],
@@ -449,7 +486,9 @@ def evaluate_candidate(
         "label": "조건부 진입 후보",
         "source_signal": alert["signal"],
         "is_reentry": bool(alert.get("is_reentry")),
+        "watchlist_recheck": bool(alert.get("watchlist_recheck")),
         "score": score,
+        "condition_score": score,
         "current_price": current,
         "entry_low": entry_low,
         "entry_high": entry_high,
@@ -465,7 +504,7 @@ def evaluate_candidate(
         "risk_reward": round(risk_reward, 2),
         "breakout_level": breakout,
         "valid_seconds": config.valid_seconds,
-        "suggested_position_pct": 15 if score >= 95 else 10,
+        "suggested_position_pct": suggested_position_pct,
         "day_change_pct": round(day_change, 2),
         "rsi_1m": round(rsi1, 1),
         "rsi_5m": round(rsi5, 1),
@@ -476,6 +515,9 @@ def evaluate_candidate(
         "close_position": round(close_position, 2),
         "upper_wick_ratio": round(upper_wick, 2),
         "btc_day_change_pct": round(btc_change, 2),
+        "btc_weak": btc_weak,
+        "day_overheated": day_overheated,
+        "risk_notes": risk_notes,
         "reasons": reasons[:5],
         "trade_value_24h_krw": round(trade_value_24h),
     }, []
