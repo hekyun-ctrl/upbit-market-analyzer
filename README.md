@@ -50,6 +50,10 @@ Telegram을 사용하려면 `TELEGRAM_BOT_TOKEN`과 `TELEGRAM_CHAT_ID`를 Railwa
 `target_1_pct`가 5% 이상인 후보만 Telegram에 전송됩니다. 기준 미달 후보도 서버 내부
 로그와 `get_recent_alerts`에는 남지만 Telegram 메시지는 보내지 않습니다.
 
+점수 기준도 함께 적용하려면 `TELEGRAM_CANDIDATE_MIN_SCORE`를 사용합니다. 예를 들어
+`90`으로 설정하면 점수 90점 이상이면서 위 목표 상승폭 기준까지 충족한 후보만
+Telegram에 전송됩니다.
+
 ### 조건부 진입 후보 분석
 
 `ENABLE_CANDIDATE_ANALYSIS=true`이면 상승 알림 발생 30초 후 해당 종목의 공개
