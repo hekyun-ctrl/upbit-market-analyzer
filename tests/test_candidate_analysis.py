@@ -27,6 +27,11 @@ def _config(**overrides):
         "orderbook_sample_interval_seconds": 2.0,
         "reentry_window_seconds": 1800,
         "reentry_cooldown_seconds": 300,
+        "watchlist_window_seconds": 43200,
+        "raw_signal_target_pct": 5.0,
+        "raw_signal_stop_pct": 3.0,
+        "btc_weak_score_penalty": 10,
+        "day_overheat_score_penalty": 8,
     }
     values.update(overrides)
     return CandidateConfig(**values)
@@ -353,3 +358,59 @@ def test_orderbook_support_must_persist_across_samples():
 
     assert candidate is None
     assert any("호가 지지 지속성 부족" in reason for reason in rejected)
+
+
+def test_btc_weakness_is_a_score_penalty_not_an_automatic_rejection():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "consolidation_rebreakout", "price": current},
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80),
+        btc_ticker={"signed_change_rate": -0.02},
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["btc_weak"] is True
+    assert candidate["suggested_position_pct"] == 5
+    assert any("BTC 약세 감점" in note for note in candidate["risk_notes"])
+
+
+def test_high_day_change_is_a_score_penalty_not_an_automatic_rejection():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.25,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "consolidation_rebreakout", "price": current},
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["day_overheated"] is True
+    assert candidate["condition_score"] == candidate["score"]
+    assert candidate["suggested_position_pct"] == 5
+    assert any("당일 과열 감점" in note for note in candidate["risk_notes"])
