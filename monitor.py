@@ -449,6 +449,12 @@ class AlertDispatcher:
     def __init__(self) -> None:
         self._telegram_token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
         self._telegram_chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+        self._send_observation_alerts = _enabled(
+            "TELEGRAM_SEND_OBSERVATION_ALERTS", True
+        )
+        self._send_candidate_alerts = _enabled(
+            "TELEGRAM_SEND_CANDIDATE_ALERTS", True
+        )
 
     @property
     def mode(self) -> str:
@@ -456,10 +462,18 @@ class AlertDispatcher:
             return "telegram"
         return "log_only"
 
+    @property
+    def observation_delivery_enabled(self) -> bool:
+        return self._send_observation_alerts
+
+    @property
+    def candidate_delivery_enabled(self) -> bool:
+        return self._send_candidate_alerts
+
     async def send(self, alert: dict[str, Any]) -> None:
         MONITOR_STATE.add_alert(alert)
         LOGGER.warning("MARKET_ALERT %s", json.dumps(alert, ensure_ascii=False))
-        if self.mode != "telegram":
+        if self.mode != "telegram" or not self._send_observation_alerts:
             return
         url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
         async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
@@ -478,7 +492,7 @@ class AlertDispatcher:
         LOGGER.warning(
             "ENTRY_CANDIDATE %s", json.dumps(candidate, ensure_ascii=False)
         )
-        if self.mode != "telegram":
+        if self.mode != "telegram" or not self._send_candidate_alerts:
             return
         url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
         async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
