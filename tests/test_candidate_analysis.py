@@ -11,15 +11,18 @@ def _config(**overrides):
         "max_day_change_pct": 20.0,
         "max_rsi_1m": 78.0,
         "max_rsi_5m": 75.0,
-        "min_orderbook_ratio": 0.65,
+        "min_orderbook_ratio": 0.8,
+        "hard_min_orderbook_ratio": 0.4,
         "max_price_extension_pct": 2.5,
         "min_completed_volume_ratio": 1.2,
         "min_volume_vs_previous": 0.65,
         "min_close_position": 0.6,
         "max_upper_wick_ratio": 0.4,
         "max_spread_pct": 0.5,
+        "hard_max_spread_pct": 1.2,
         "min_trade_value_24h_krw": 1_000_000_000,
         "min_resistance_room_pct": 5.0,
+        "hard_min_resistance_room_pct": 2.5,
         "min_risk_reward": 2.0,
         "max_stop_loss_pct": 3.0,
         "max_btc_decline_pct": -1.5,
@@ -32,6 +35,9 @@ def _config(**overrides):
         "raw_signal_stop_pct": 3.0,
         "btc_weak_score_penalty": 10,
         "day_overheat_score_penalty": 8,
+        "orderbook_score_penalty": 4,
+        "spread_score_penalty": 4,
+        "resistance_score_penalty": 6,
     }
     values.update(overrides)
     return CandidateConfig(**values)
@@ -110,7 +116,7 @@ def test_healthy_signal_builds_orderable_risk_plan():
     assert candidate["stop_price"] < candidate["entry_low"]
     assert candidate["target_1"] > candidate["entry_high"]
     assert candidate["target_2"] > candidate["target_1"]
-    assert candidate["target_mode"] == "구조적 저항 기반"
+    assert candidate["target_mode"] in {"균형 위험비형", "강한 추세 확장형"}
     assert candidate["resistance_room_pct"] >= 5.0
     assert candidate["risk_reward"] >= 2.0
 
@@ -142,7 +148,7 @@ def test_price_surge_uses_structural_resistance_targets():
 
     assert rejected == []
     assert candidate is not None
-    assert candidate["target_mode"] == "구조적 저항 기반"
+    assert candidate["target_mode"] == "균형 위험비형"
 
 
 def test_consolidation_rebreakout_is_accepted_and_explained():
@@ -170,6 +176,9 @@ def test_consolidation_rebreakout_is_accepted_and_explained():
     assert candidate is not None
     assert candidate["source_signal"] == "consolidation_rebreakout"
     assert "30분 횡보 상단 재돌파" in candidate["reasons"]
+    assert candidate["target_mode"] == "강한 추세 확장형"
+    assert 6.8 <= candidate["target_1_pct"] <= 7.1
+    assert 9.8 <= candidate["target_2_pct"] <= 10.1
 
 
 def test_overheated_signal_is_rejected():
@@ -213,11 +222,80 @@ def test_weak_orderbook_is_rejected():
     }
 
     candidate, rejected = evaluate_candidate(
-        alert, ticker, _orderbook(current, bid_ratio=0.4), one, five, _config()
+        alert, ticker, _orderbook(current, bid_ratio=0.2), one, five, _config()
     )
 
     assert candidate is None
-    assert any("호가 지지 지속성 부족" in reason for reason in rejected)
+    assert any("호가 지지 극단적 부족" in reason for reason in rejected)
+
+
+def test_moderately_weak_orderbook_is_a_score_penalty():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "breakout", "price": current},
+        ticker,
+        _orderbook(current, bid_ratio=0.6),
+        one,
+        five,
+        _config(min_score=80),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["suggested_position_pct"] == 5
+    assert any("호가 지지 약함" in note for note in candidate["risk_notes"])
+
+
+def test_moderate_spread_is_a_score_penalty_but_extreme_spread_is_rejected():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+
+    moderate = _orderbook(current)
+    for index, unit in enumerate(moderate["orderbook_units"]):
+        unit["bid_price"] = current - 0.4 - index * 0.1
+        unit["ask_price"] = current + 0.4 + index * 0.1
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "breakout", "price": current},
+        ticker,
+        moderate,
+        one,
+        five,
+        _config(min_score=80),
+    )
+    assert rejected == []
+    assert candidate is not None
+    assert any("호가 스프레드 주의" in note for note in candidate["risk_notes"])
+
+    extreme = _orderbook(current)
+    for index, unit in enumerate(extreme["orderbook_units"]):
+        unit["bid_price"] = current - 0.8 - index * 0.1
+        unit["ask_price"] = current + 0.8 + index * 0.1
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "breakout", "price": current},
+        ticker,
+        extreme,
+        one,
+        five,
+        _config(min_score=80),
+    )
+    assert candidate is None
+    assert any("스프레드 극단적 과다" in reason for reason in rejected)
 
 
 def test_in_progress_candle_is_excluded_from_indicators():
@@ -251,7 +329,11 @@ def test_in_progress_candle_is_excluded_from_indicators():
         _orderbook(current),
         one,
         five,
-        _config(min_resistance_room_pct=0.0, min_risk_reward=0.0),
+        _config(
+            min_resistance_room_pct=0.0,
+            hard_min_resistance_room_pct=0.0,
+            min_risk_reward=0.0,
+        ),
     )
 
     assert rejected == []
@@ -310,7 +392,7 @@ def test_collapsing_completed_volume_is_rejected():
     assert any("거래량" in reason for reason in rejected)
 
 
-def test_nearby_resistance_without_five_percent_room_is_rejected():
+def test_three_percent_resistance_room_is_scored_with_a_warning():
     one = _candles()
     five = _candles()
     current = float(one[0]["trade_price"])
@@ -318,6 +400,32 @@ def test_nearby_resistance_without_five_percent_room_is_rejected():
         "trade_price": current,
         "signed_change_rate": 0.08,
         "high_price": current * 1.03,
+    }
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "breakout", "price": current},
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["resistance_room_pct"] < 5.0
+    assert candidate["target_1_pct"] <= 3.1
+    assert candidate["target_2_pct"] >= 4.9
+    assert any("저항 여유 제한" in note for note in candidate["risk_notes"])
+
+
+def test_resistance_room_below_hard_floor_is_rejected():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.02,
     }
     candidate, rejected = evaluate_candidate(
         {"market": "KRW-TEST", "signal": "breakout", "price": current},
@@ -343,8 +451,8 @@ def test_orderbook_support_must_persist_across_samples():
     }
     samples = [
         _orderbook(current, bid_ratio=1.2),
-        _orderbook(current, bid_ratio=0.4),
-        _orderbook(current, bid_ratio=0.4),
+        _orderbook(current, bid_ratio=0.2),
+        _orderbook(current, bid_ratio=0.2),
     ]
     candidate, rejected = evaluate_candidate(
         {"market": "KRW-TEST", "signal": "breakout", "price": current},
@@ -357,7 +465,7 @@ def test_orderbook_support_must_persist_across_samples():
     )
 
     assert candidate is None
-    assert any("호가 지지 지속성 부족" in reason for reason in rejected)
+    assert any("호가 지지 극단적 부족" in reason for reason in rejected)
 
 
 def test_btc_weakness_is_a_score_penalty_not_an_automatic_rejection():
