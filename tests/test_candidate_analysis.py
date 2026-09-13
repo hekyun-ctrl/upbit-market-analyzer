@@ -1,4 +1,7 @@
-from candidate_analysis import CandidateConfig, evaluate_candidate
+from datetime import datetime, timedelta, timezone
+
+import candidate_analysis
+from candidate_analysis import CandidateConfig, _completed, _resistances, evaluate_candidate
 
 
 def _config(**overrides):
@@ -11,6 +14,8 @@ def _config(**overrides):
         "max_day_change_pct": 20.0,
         "max_rsi_1m": 78.0,
         "max_rsi_5m": 75.0,
+        "hard_max_rsi_1m": 88.0,
+        "hard_max_rsi_5m": 85.0,
         "min_orderbook_ratio": 0.8,
         "hard_min_orderbook_ratio": 0.4,
         "max_price_extension_pct": 2.5,
@@ -38,6 +43,7 @@ def _config(**overrides):
         "orderbook_score_penalty": 4,
         "spread_score_penalty": 4,
         "resistance_score_penalty": 6,
+        "rsi_score_penalty": 4,
     }
     values.update(overrides)
     return CandidateConfig(**values)
@@ -205,7 +211,7 @@ def test_overheated_signal_is_rejected():
     assert any("RSI 과열" in reason for reason in rejected)
 
 
-def test_weak_orderbook_is_rejected():
+def test_extremely_weak_orderbook_is_only_a_score_penalty():
     one = _candles()
     five = _candles()
     current = float(one[0]["trade_price"])
@@ -219,14 +225,22 @@ def test_weak_orderbook_is_rejected():
         "trade_price": current,
         "signed_change_rate": 0.08,
         "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
     }
 
     candidate, rejected = evaluate_candidate(
-        alert, ticker, _orderbook(current, bid_ratio=0.2), one, five, _config()
+        alert,
+        ticker,
+        _orderbook(current, bid_ratio=0.2),
+        one,
+        five,
+        _config(min_score=80),
     )
 
-    assert candidate is None
-    assert any("호가 지지 극단적 부족" in reason for reason in rejected)
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["suggested_position_pct"] == 5
+    assert any("호가 지지 매우 약함" in note for note in candidate["risk_notes"])
 
 
 def test_moderately_weak_orderbook_is_a_score_penalty():
@@ -418,7 +432,7 @@ def test_three_percent_resistance_room_is_scored_with_a_warning():
     assert any("저항 여유 제한" in note for note in candidate["risk_notes"])
 
 
-def test_resistance_room_below_hard_floor_is_rejected():
+def test_confirmed_resistance_room_below_hard_floor_is_rejected(monkeypatch):
     one = _candles()
     five = _candles()
     current = float(one[0]["trade_price"])
@@ -427,6 +441,9 @@ def test_resistance_room_below_hard_floor_is_rejected():
         "signed_change_rate": 0.08,
         "high_price": current * 1.02,
     }
+    monkeypatch.setattr(
+        candidate_analysis, "_resistances", lambda *args: [current * 1.02]
+    )
     candidate, rejected = evaluate_candidate(
         {"market": "KRW-TEST", "signal": "breakout", "price": current},
         ticker,
@@ -440,7 +457,7 @@ def test_resistance_room_below_hard_floor_is_rejected():
     assert any("저항까지 여유 부족" in reason for reason in rejected)
 
 
-def test_orderbook_support_must_persist_across_samples():
+def test_orderbook_support_must_persist_to_avoid_penalty():
     one = _candles()
     five = _candles()
     current = float(one[0]["trade_price"])
@@ -448,6 +465,7 @@ def test_orderbook_support_must_persist_across_samples():
         "trade_price": current,
         "signed_change_rate": 0.08,
         "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
     }
     samples = [
         _orderbook(current, bid_ratio=1.2),
@@ -460,12 +478,160 @@ def test_orderbook_support_must_persist_across_samples():
         samples[-1],
         one,
         five,
-        _config(),
+        _config(min_score=80),
         orderbook_samples=samples,
     )
 
+    assert rejected == []
+    assert candidate is not None
+    assert any("호가 지지 매우 약함" in note for note in candidate["risk_notes"])
+
+
+def test_moderate_rsi_overheat_is_penalized_and_extreme_is_rejected():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+    alert = {"market": "KRW-TEST", "signal": "breakout", "price": current}
+
+    candidate, rejected = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80, max_rsi_1m=50.0),
+    )
+    assert rejected == []
+    assert candidate is not None
+    assert any("RSI 주의" in note for note in candidate["risk_notes"])
+
+    candidate, rejected = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(current),
+        _candles(monotonic=True),
+        _candles(monotonic=True),
+        _config(min_score=80),
+    )
     assert candidate is None
-    assert any("호가 지지 극단적 부족" in reason for reason in rejected)
+    assert any("RSI 과열" in reason for reason in rejected)
+
+
+def test_strong_price_volume_impulse_adds_six_points():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+    base = {
+        "market": "KRW-TEST",
+        "signal": "price_volume_surge",
+        "price": current,
+    }
+    plain, plain_rejected = evaluate_candidate(
+        base,
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=50),
+    )
+    impulse, impulse_rejected = evaluate_candidate(
+        {**base, "change_1m_pct": 2.5, "volume_ratio_vs_previous_1m": 6.0},
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=50),
+    )
+
+    assert plain_rejected == [] and impulse_rejected == []
+    assert plain is not None and impulse is not None
+    assert impulse["score"] == min(100, plain["score"] + 6)
+    assert any("강한 가격·거래대금 유입" in reason for reason in impulse["reasons"])
+
+
+def test_single_five_minute_micro_high_is_not_significant_resistance():
+    current = 100.0
+    chronological = [
+        {"high_price": 99.0},
+        {"high_price": 99.2},
+        {"high_price": 101.0},
+        {"high_price": 99.3},
+        {"high_price": 99.1},
+        {"high_price": 99.0},
+    ]
+    five = list(reversed(chronological))
+    fifteen = [{"high_price": 99.0} for _ in range(8)]
+
+    levels = _resistances(current, {"high_price": 108.0}, five, fifteen)
+
+    assert levels == [108.0]
+
+
+def test_fresh_nearby_day_high_is_not_treated_as_confirmed_resistance():
+    current = 100.0
+    flat = [{"high_price": 99.0} for _ in range(8)]
+
+    levels = _resistances(current, {"high_price": 100.4}, flat, flat)
+
+    assert levels == []
+
+
+def test_no_confirmed_overhead_resistance_uses_conservative_expansion_reference(
+    monkeypatch,
+):
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.004,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+    alert = {"market": "KRW-TEST", "signal": "breakout", "price": current}
+    monkeypatch.setattr(candidate_analysis, "_resistances", lambda *args: [])
+
+    candidate, rejected = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["resistance_confirmed"] is False
+    assert candidate["target_2_pct"] >= 4.9
+    assert any("상단 구조 저항 없음" in note for note in candidate["risk_notes"])
+
+
+def test_completed_keeps_latest_candle_when_no_current_interval_trade_exists():
+    now = datetime(2026, 9, 14, 0, 10, tzinfo=timezone.utc)
+    stale = [
+        {"candle_date_time_utc": (now - timedelta(minutes=2)).isoformat()},
+        {"candle_date_time_utc": (now - timedelta(minutes=3)).isoformat()},
+    ]
+    active = [
+        {"candle_date_time_utc": (now - timedelta(seconds=30)).isoformat()},
+        {"candle_date_time_utc": (now - timedelta(minutes=1)).isoformat()},
+    ]
+
+    assert _completed(stale, 1, now) == stale
+    assert _completed(active, 1, now) == active[1:]
 
 
 def test_btc_weakness_is_a_score_penalty_not_an_automatic_rejection():

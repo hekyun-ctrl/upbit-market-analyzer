@@ -41,6 +41,8 @@ class CandidateConfig:
     max_day_change_pct: float
     max_rsi_1m: float
     max_rsi_5m: float
+    hard_max_rsi_1m: float
+    hard_max_rsi_5m: float
     min_orderbook_ratio: float
     hard_min_orderbook_ratio: float
     max_price_extension_pct: float
@@ -68,6 +70,7 @@ class CandidateConfig:
     orderbook_score_penalty: int
     spread_score_penalty: int
     resistance_score_penalty: int
+    rsi_score_penalty: int
 
     @classmethod
     def from_env(cls) -> "CandidateConfig":
@@ -80,6 +83,8 @@ class CandidateConfig:
             max_day_change_pct=_env_float("CANDIDATE_MAX_DAY_CHANGE_PCT", 20.0),
             max_rsi_1m=_env_float("CANDIDATE_MAX_RSI_1M", 78.0),
             max_rsi_5m=_env_float("CANDIDATE_MAX_RSI_5M", 75.0),
+            hard_max_rsi_1m=_env_float("CANDIDATE_HARD_MAX_RSI_1M", 88.0),
+            hard_max_rsi_5m=_env_float("CANDIDATE_HARD_MAX_RSI_5M", 85.0),
             min_orderbook_ratio=_env_float("CANDIDATE_MIN_ORDERBOOK_RATIO", 0.8),
             hard_min_orderbook_ratio=_env_float(
                 "CANDIDATE_HARD_MIN_ORDERBOOK_RATIO", 0.4
@@ -148,15 +153,28 @@ class CandidateConfig:
             resistance_score_penalty=max(
                 0, _env_int("CANDIDATE_RESISTANCE_SCORE_PENALTY", 6)
             ),
+            rsi_score_penalty=max(
+                0, _env_int("CANDIDATE_RSI_SCORE_PENALTY", 4)
+            ),
         )
 
     def public(self) -> dict[str, Any]:
         return asdict(self)
 
 
-def _completed(candles: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Upbit returns newest first; index zero can still be in progress."""
-    return candles[1:]
+def _completed(
+    candles: list[dict[str, Any]], minutes: int, now: datetime | None = None
+) -> list[dict[str, Any]]:
+    """Return completed candles without discarding a stale latest candle."""
+    if not candles:
+        return []
+    opened = _parse_time(
+        candles[0].get("candle_date_time_utc") or candles[0].get("time_utc")
+    )
+    if opened is None:
+        return candles[1:]
+    current_time = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    return candles if opened + timedelta(minutes=minutes) <= current_time else candles[1:]
 
 
 def _volume_metrics(candles: list[dict[str, Any]]) -> tuple[float, float]:
@@ -241,11 +259,23 @@ def _resistances(
     five: list[dict[str, Any]],
     fifteen: list[dict[str, Any]],
 ) -> list[float]:
-    levels = [
-        *_swing_highs(five[:80]),
-        *_swing_highs(fifteen[:80]),
-        float(ticker.get("high_price") or 0),
+    five_swings = _swing_highs(five[:80])
+    repeated_five = [
+        level
+        for index, level in enumerate(five_swings)
+        if any(
+            abs(other / level - 1) <= 0.004
+            for other_index, other in enumerate(five_swings)
+            if other_index != index
+        )
     ]
+    fifteen_swings = _swing_highs(fifteen[:80])
+    structural = [*repeated_five, *fifteen_swings]
+    day_high = float(ticker.get("high_price") or 0)
+    day_high_confirmed = day_high > current * 1.025 or any(
+        abs(level / day_high - 1) <= 0.004 for level in structural if day_high > 0
+    )
+    levels = [*structural, *([day_high] if day_high_confirmed else [])]
     return sorted({round(x, 12) for x in levels if x > current * 1.001})
 
 
@@ -328,11 +358,11 @@ def evaluate_candidate(
     btc_candles_15m = btc_candles_15m or btc_candles_5m
     btc_ticker = btc_ticker or {"signed_change_rate": 0.0}
     c1, c5, c15 = (
-        _completed(candles_1m),
-        _completed(candles_5m),
-        _completed(candles_15m),
+        _completed(candles_1m, 1),
+        _completed(candles_5m, 5),
+        _completed(candles_15m, 15),
     )
-    b5, b15 = _completed(btc_candles_5m), _completed(btc_candles_15m)
+    b5, b15 = _completed(btc_candles_5m, 5), _completed(btc_candles_15m, 15)
     if min(map(len, (c1, c5, c15, b5, b15))) < 60:
         return None, ["완료봉 데이터 부족"]
 
@@ -377,10 +407,8 @@ def evaluate_candidate(
     if current < breakout * 0.998:
         rejected.append("돌파선 재지지 실패")
     day_overheated = day_change > config.max_day_change_pct
-    if rsi1 > config.max_rsi_1m or rsi5 > config.max_rsi_5m:
+    if rsi1 > config.hard_max_rsi_1m or rsi5 > config.hard_max_rsi_5m:
         rejected.append(f"RSI 과열(1분 {rsi1:.1f}/5분 {rsi5:.1f})")
-    if not hard_book_persistent:
-        rejected.append(f"호가 지지 극단적 부족({book_ratio:.2f}배)")
     if spread > config.hard_max_spread_pct:
         rejected.append(f"호가 스프레드 극단적 과다({spread:.2f}%)")
     if trade_value_24h < config.min_trade_value_24h_krw:
@@ -400,12 +428,14 @@ def evaluate_candidate(
     btc_weak = btc_change <= config.max_btc_decline_pct or btc_bearish
 
     resistance_levels = _resistances(current, ticker, c5, c15)
-    if not resistance_levels:
-        rejected.append("검증 가능한 상단 저항 부재")
-        return None, rejected
-    resistance = resistance_levels[0]
+    resistance_confirmed = bool(resistance_levels)
+    resistance = (
+        resistance_levels[0]
+        if resistance_confirmed
+        else current * (1 + config.min_resistance_room_pct / 100)
+    )
     room = (resistance / current - 1) * 100
-    if room < config.hard_min_resistance_room_pct:
+    if resistance_confirmed and room < config.hard_min_resistance_room_pct:
         rejected.append(f"가까운 저항까지 여유 부족({room:.1f}%)")
     if rejected:
         return None, rejected
@@ -432,7 +462,7 @@ def evaluate_candidate(
     setup_score = {
         "consolidation_rebreakout": 25,
         "breakout": 22,
-        "price_volume_surge": 15,
+        "price_volume_surge": 20,
     }[str(alert["signal"])]
     volume_score = (
         20
@@ -455,15 +485,18 @@ def evaluate_candidate(
         and _ma20_slope(b5) >= 0
     )
     liquid_market = trade_value_24h >= config.min_trade_value_24h_krw * 5
-    market_score = 15 if btc_strong else 10
+    market_score = 15 if btc_strong else 12
     if btc_weak:
         market_score = max(0, market_score - config.btc_weak_score_penalty)
     risk_notes: list[str] = []
+    if not resistance_confirmed:
+        risk_notes.append("반복 확인된 상단 구조 저항 없음")
     score_penalty = config.day_overheat_score_penalty if day_overheated else 0
     if not book_persistent:
         score_penalty += config.orderbook_score_penalty
+        book_label = "매우 약함" if not hard_book_persistent else "약함"
         risk_notes.append(
-            f"호가 지지 약함 -{config.orderbook_score_penalty}점({book_ratio:.2f}배)"
+            f"호가 지지 {book_label} -{config.orderbook_score_penalty}점({book_ratio:.2f}배)"
         )
     if spread > config.max_spread_pct:
         score_penalty += config.spread_score_penalty
@@ -475,6 +508,19 @@ def evaluate_candidate(
         risk_notes.append(
             f"저항 여유 제한 -{config.resistance_score_penalty}점({room:.1f}%)"
         )
+    rsi_soft = rsi1 > config.max_rsi_1m or rsi5 > config.max_rsi_5m
+    if rsi_soft:
+        score_penalty += config.rsi_score_penalty
+        risk_notes.append(
+            f"RSI 주의 -{config.rsi_score_penalty}점(1분 {rsi1:.1f}/5분 {rsi5:.1f})"
+        )
+    raw_change = float(alert.get("change_1m_pct") or 0.0)
+    raw_volume_ratio = float(alert.get("volume_ratio_vs_previous_1m") or 0.0)
+    impulse_bonus = (
+        6
+        if raw_change >= 2.0 and raw_volume_ratio >= 5.0
+        else 3 if raw_change >= 1.5 and raw_volume_ratio >= 3.0 else 0
+    )
     score = min(
         100,
         max(
@@ -485,6 +531,7 @@ def evaluate_candidate(
             + market_score
             + (12 if room >= 7 and risk_reward >= 2.5 else 10)
             + (12 if book_ratio >= 1.2 and spread <= 0.2 and liquid_market else 10)
+            + impulse_bonus
             - score_penalty,
         ),
     )
@@ -515,9 +562,15 @@ def evaluate_candidate(
     reasons = [
         "완료 1분봉 돌파 확정",
         "거래량 유지",
-        "호가 지지 지속",
-        f"저항 여유 {room:.1f}%",
+        "호가 지지 지속" if book_persistent else "호가는 감점 보조지표",
+        (
+            f"저항 여유 {room:.1f}%"
+            if resistance_confirmed
+            else "신선한 당일 고가는 미확정 저항으로 분리"
+        ),
     ]
+    if impulse_bonus:
+        reasons.insert(0, f"강한 가격·거래대금 유입 +{impulse_bonus}점")
     if alert.get("signal") == "consolidation_rebreakout":
         reasons.insert(
             0, f"{int(alert.get('consolidation_minutes') or 0)}분 횡보 상단 재돌파"
@@ -556,6 +609,7 @@ def evaluate_candidate(
         "target_2_pct": round((target2 / entry_mid - 1) * 100, 2),
         "target_mode": target_mode,
         "resistance_price": resistance,
+        "resistance_confirmed": resistance_confirmed,
         "resistance_room_pct": round(room, 2),
         "risk_reward": round(risk_reward, 2),
         "breakout_level": breakout,
