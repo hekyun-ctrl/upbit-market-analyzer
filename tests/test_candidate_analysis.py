@@ -13,10 +13,20 @@ def _config(**overrides):
         "max_rsi_5m": 75.0,
         "min_orderbook_ratio": 0.65,
         "max_price_extension_pct": 2.5,
-        "extended_target_min_score": 90,
-        "extended_target_min_volume_ratio": 1.5,
-        "extended_target_1_pct": 7.0,
-        "extended_target_2_pct": 10.0,
+        "min_completed_volume_ratio": 1.2,
+        "min_volume_vs_previous": 0.65,
+        "min_close_position": 0.6,
+        "max_upper_wick_ratio": 0.4,
+        "max_spread_pct": 0.5,
+        "min_trade_value_24h_krw": 1_000_000_000,
+        "min_resistance_room_pct": 5.0,
+        "min_risk_reward": 2.0,
+        "max_stop_loss_pct": 3.0,
+        "max_btc_decline_pct": -1.5,
+        "orderbook_sample_count": 3,
+        "orderbook_sample_interval_seconds": 2.0,
+        "reentry_window_seconds": 1800,
+        "reentry_cooldown_seconds": 300,
     }
     values.update(overrides)
     return CandidateConfig(**values)
@@ -36,8 +46,8 @@ def _candles(count=120, monotonic=False):
             volume = 300.0
         result.append(
             {
-                "opening_price": close - 0.05,
-                "high_price": close + 0.1,
+                "opening_price": close - 0.06,
+                "high_price": close + 0.02,
                 "low_price": close - 0.1,
                 "trade_price": close,
                 "candle_acc_trade_volume": volume,
@@ -73,10 +83,19 @@ def test_healthy_signal_builds_orderable_risk_plan():
         "signal": "breakout",
         "price": current,
     }
-    ticker = {"trade_price": current, "signed_change_rate": 0.08}
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+    }
 
     candidate, rejected = evaluate_candidate(
-        alert, ticker, _orderbook(current), one, five, _config()
+        alert,
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(),
     )
 
     assert rejected == []
@@ -86,12 +105,12 @@ def test_healthy_signal_builds_orderable_risk_plan():
     assert candidate["stop_price"] < candidate["entry_low"]
     assert candidate["target_1"] > candidate["entry_high"]
     assert candidate["target_2"] > candidate["target_1"]
-    assert candidate["target_mode"] == "강한 추세 확장형"
-    assert 7.0 <= candidate["target_1_pct"] <= 7.2
-    assert 10.0 <= candidate["target_2_pct"] <= 10.2
+    assert candidate["target_mode"] == "구조적 저항 기반"
+    assert candidate["resistance_room_pct"] >= 5.0
+    assert candidate["risk_reward"] >= 2.0
 
 
-def test_price_surge_keeps_standard_risk_targets():
+def test_price_surge_uses_structural_resistance_targets():
     one = _candles()
     five = _candles()
     current = float(one[0]["trade_price"])
@@ -101,16 +120,24 @@ def test_price_surge_keeps_standard_risk_targets():
         "signal": "price_volume_surge",
         "price": current,
     }
-    ticker = {"trade_price": current, "signed_change_rate": 0.08}
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+    }
 
     candidate, rejected = evaluate_candidate(
-        alert, ticker, _orderbook(current), one, five, _config()
+        alert,
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(),
     )
 
     assert rejected == []
     assert candidate is not None
-    assert candidate["target_mode"] == "기본 위험비형"
-    assert candidate["target_2_pct"] < 7.0
+    assert candidate["target_mode"] == "구조적 저항 기반"
 
 
 def test_consolidation_rebreakout_is_accepted_and_explained():
@@ -124,7 +151,11 @@ def test_consolidation_rebreakout_is_accepted_and_explained():
         "price": current,
         "consolidation_minutes": 30,
     }
-    ticker = {"trade_price": current, "signed_change_rate": 0.08}
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+    }
 
     candidate, rejected = evaluate_candidate(
         alert, ticker, _orderbook(current), one, five, _config()
@@ -146,7 +177,11 @@ def test_overheated_signal_is_rejected():
         "signal": "price_volume_surge",
         "price": current,
     }
-    ticker = {"trade_price": current, "signed_change_rate": 0.12}
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.12,
+        "high_price": current * 1.08,
+    }
 
     candidate, rejected = evaluate_candidate(
         alert, ticker, _orderbook(current), one, five, _config()
@@ -166,11 +201,155 @@ def test_weak_orderbook_is_rejected():
         "signal": "breakout",
         "price": current,
     }
-    ticker = {"trade_price": current, "signed_change_rate": 0.08}
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+    }
 
     candidate, rejected = evaluate_candidate(
         alert, ticker, _orderbook(current, bid_ratio=0.4), one, five, _config()
     )
 
     assert candidate is None
-    assert any("매도호가 우세" in reason for reason in rejected)
+    assert any("호가 지지 지속성 부족" in reason for reason in rejected)
+
+
+def test_in_progress_candle_is_excluded_from_indicators():
+    one = _candles()
+    five = _candles()
+    current = float(one[1]["trade_price"])
+    one[0].update(
+        {
+            "opening_price": current,
+            "high_price": current * 1.5,
+            "low_price": current,
+            "trade_price": current * 1.5,
+            "candle_acc_trade_volume": 1_000_000,
+        }
+    )
+    alert = {
+        "market": "KRW-TEST",
+        "signal": "breakout",
+        "price": current,
+        "breakout_level": current * 0.999,
+    }
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_resistance_room_pct=0.0, min_risk_reward=0.0),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["rsi_1m"] < 78
+
+
+def test_completed_close_below_breakout_is_rejected():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    breakout = current * 1.002
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+    }
+    candidate, rejected = evaluate_candidate(
+        {
+            "market": "KRW-TEST",
+            "signal": "breakout",
+            "price": current,
+            "breakout_level": breakout,
+        },
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(),
+    )
+
+    assert candidate is None
+    assert any("돌파선 아래" in reason for reason in rejected)
+
+
+def test_collapsing_completed_volume_is_rejected():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    one[1]["candle_acc_trade_volume"] = 10.0
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+    }
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "breakout", "price": current},
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(),
+    )
+
+    assert candidate is None
+    assert any("거래량" in reason for reason in rejected)
+
+
+def test_nearby_resistance_without_five_percent_room_is_rejected():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.03,
+    }
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "breakout", "price": current},
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(),
+    )
+
+    assert candidate is None
+    assert any("저항까지 여유 부족" in reason for reason in rejected)
+
+
+def test_orderbook_support_must_persist_across_samples():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+    }
+    samples = [
+        _orderbook(current, bid_ratio=1.2),
+        _orderbook(current, bid_ratio=0.4),
+        _orderbook(current, bid_ratio=0.4),
+    ]
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "breakout", "price": current},
+        ticker,
+        samples[-1],
+        one,
+        five,
+        _config(),
+        orderbook_samples=samples,
+    )
+
+    assert candidate is None
+    assert any("호가 지지 지속성 부족" in reason for reason in rejected)
