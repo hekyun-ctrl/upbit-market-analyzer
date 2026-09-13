@@ -20,7 +20,6 @@ import websockets
 from candidate_analysis import CandidateConfig, evaluate_candidate
 from upbit_client import UpbitPublicClient
 
-
 LOGGER = logging.getLogger("upbit-monitor")
 _WS_URL = "wss://api.upbit.com/websocket/v1"
 
@@ -66,9 +65,7 @@ class MonitorConfig:
     def from_env(cls) -> "MonitorConfig":
         raw_markets = os.getenv("MONITOR_MARKETS", "ALL_KRW")
         values = tuple(
-            value.strip().upper()
-            for value in raw_markets.split(",")
-            if value.strip()
+            value.strip().upper() for value in raw_markets.split(",") if value.strip()
         )
         all_markets = not values or "ALL_KRW" in values
         selected = tuple(value for value in values if value != "ALL_KRW")
@@ -78,15 +75,11 @@ class MonitorConfig:
             price_surge_1m_pct=_env_float("MONITOR_PRICE_SURGE_1M_PCT", 1.5),
             breakout_pct=_env_float("MONITOR_BREAKOUT_PCT", 0.4),
             volume_ratio=_env_float("MONITOR_VOLUME_RATIO", 2.0),
-            min_trade_value_krw=_env_float(
-                "MONITOR_MIN_TRADE_VALUE_KRW", 50_000_000
-            ),
+            min_trade_value_krw=_env_float("MONITOR_MIN_TRADE_VALUE_KRW", 50_000_000),
             alert_cooldown_seconds=max(
                 60, _env_int("MONITOR_ALERT_COOLDOWN_SECONDS", 600)
             ),
-            max_alerts_per_minute=max(
-                1, _env_int("MONITOR_MAX_ALERTS_PER_MINUTE", 5)
-            ),
+            max_alerts_per_minute=max(1, _env_int("MONITOR_MAX_ALERTS_PER_MINUTE", 5)),
             rebreakout_enabled=_enabled("MONITOR_REBREAKOUT_ENABLED", True),
             rebreakout_consolidation_seconds=max(
                 900,
@@ -132,6 +125,7 @@ class MonitorState:
         self.market_count = 0
         self.notification_mode = "log_only"
         self.recent_alerts: deque[dict[str, Any]] = deque(maxlen=100)
+        self.candidate_outcomes: deque[dict[str, Any]] = deque(maxlen=500)
 
     @staticmethod
     def _now() -> str:
@@ -164,6 +158,29 @@ class MonitorState:
         with self._lock:
             self.recent_alerts.appendleft(dict(alert))
 
+    def add_candidate_outcome(self, outcome: dict[str, Any]) -> None:
+        with self._lock:
+            self.candidate_outcomes.appendleft(dict(outcome))
+        LOGGER.warning("CANDIDATE_OUTCOME %s", json.dumps(outcome, ensure_ascii=False))
+
+    def candidate_performance(self) -> dict[str, Any]:
+        with self._lock:
+            outcomes = list(self.candidate_outcomes)
+        targets = sum(item.get("result") == "target_1_first" for item in outcomes)
+        stops = sum(item.get("result") == "stop_first" for item in outcomes)
+        decided = targets + stops
+        return {
+            "sample_count": len(outcomes),
+            "decided_count": decided,
+            "target_1_first": targets,
+            "stop_first": stops,
+            "expired": sum(item.get("result") == "expired" for item in outcomes),
+            "target_1_first_rate_pct": (
+                round(targets / decided * 100, 2) if decided else None
+            ),
+            "recent": outcomes[:100],
+        }
+
     def snapshot(self) -> dict[str, Any]:
         with self._lock:
             return {
@@ -178,6 +195,7 @@ class MonitorState:
                 "market_count": self.market_count,
                 "notification_mode": self.notification_mode,
                 "recent_alert_count": len(self.recent_alerts),
+                "candidate_outcome_count": len(self.candidate_outcomes),
             }
 
     def alerts(self, limit: int, market: str | None = None) -> list[dict[str, Any]]:
@@ -237,9 +255,7 @@ class SignalEngine:
                 _SecondBucket(second, price, price, price, price, trade_value)
             )
 
-        history_seconds = max(
-            360, self.config.rebreakout_consolidation_seconds + 120
-        )
+        history_seconds = max(360, self.config.rebreakout_consolidation_seconds + 120)
         while window and window[0].second < second - history_seconds:
             window.popleft()
 
@@ -292,16 +308,12 @@ class SignalEngine:
                 range_pct = (
                     ((range_high / range_low) - 1.0) * 100 if range_low > 0 else 0.0
                 )
-                baseline_value = sum(
-                    bucket.trade_value for bucket in consolidation
-                )
-                baseline_value_1m = baseline_value * 60 / (
-                    self.config.rebreakout_consolidation_seconds
+                baseline_value = sum(bucket.trade_value for bucket in consolidation)
+                baseline_value_1m = (
+                    baseline_value * 60 / (self.config.rebreakout_consolidation_seconds)
                 )
                 rebreakout_volume_ratio = (
-                    value_1m / baseline_value_1m
-                    if baseline_value_1m > 0
-                    else 0.0
+                    value_1m / baseline_value_1m if baseline_value_1m > 0 else 0.0
                 )
                 rebreakout_level = range_high * (
                     1 + self.config.rebreakout_price_buffer_pct / 100
@@ -309,15 +321,12 @@ class SignalEngine:
                 if (
                     range_pct <= self.config.rebreakout_max_range_pct
                     and current_price >= rebreakout_level
-                    and change_1m_pct
-                    >= self.config.rebreakout_price_buffer_pct
+                    and change_1m_pct >= self.config.rebreakout_price_buffer_pct
                     and value_1m >= self.config.min_trade_value_krw
                     and rebreakout_volume_ratio
                     >= self.config.rebreakout_min_volume_ratio
                 ):
-                    minutes = int(
-                        self.config.rebreakout_consolidation_seconds / 60
-                    )
+                    minutes = int(self.config.rebreakout_consolidation_seconds / 60)
                     signals.append(
                         (
                             "consolidation_rebreakout",
@@ -326,6 +335,7 @@ class SignalEngine:
                                 "consolidation_minutes": minutes,
                                 "consolidation_range_pct": round(range_pct, 2),
                                 "consolidation_high": range_high,
+                                "breakout_level": rebreakout_level,
                                 "volume_ratio_vs_consolidation": round(
                                     rebreakout_volume_ratio, 2
                                 ),
@@ -347,11 +357,7 @@ class SignalEngine:
         ):
             signals.append(("rapid_drop", "단기 급락 위험", {}))
 
-        prior = [
-            bucket
-            for bucket in window
-            if now - 300 <= bucket.second < now - 10
-        ]
+        prior = [bucket for bucket in window if now - 300 <= bucket.second < now - 10]
         if prior and now - window[0].second >= 180:
             prior_high = max(bucket.high_price for bucket in prior)
             breakout_level = prior_high * (1 + self.config.breakout_pct / 100)
@@ -361,7 +367,13 @@ class SignalEngine:
                 and value_1m >= self.config.min_trade_value_krw
                 and volume_ratio >= max(1.5, self.config.volume_ratio * 0.75)
             ):
-                signals.append(("breakout", "5분 고점 돌파", {}))
+                signals.append(
+                    (
+                        "breakout",
+                        "5분 고점 돌파",
+                        {"prior_high": prior_high, "breakout_level": breakout_level},
+                    )
+                )
 
         alerts = []
         for signal_type, label, details in signals:
@@ -425,8 +437,9 @@ def _alert_text(alert: dict[str, Any]) -> str:
 
 def _candidate_text(candidate: dict[str, Any]) -> str:
     reasons = "·".join(candidate.get("reasons", [])) or "공개 시세 조건 충족"
+    reentry = " | 재지지" if candidate.get("is_reentry") else ""
     return (
-        f"[조건부 진입 후보 | 점수 {candidate['score']}/100] "
+        f"[조건부 진입 후보{reentry} | 점수 {candidate['score']}/100] "
         f"{candidate['market']}\n"
         f"현재가: {_format_price(float(candidate['current_price']))}\n"
         f"진입구간: {_format_price(float(candidate['entry_low']))} ~ "
@@ -438,6 +451,8 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"2차 목표: {_format_price(float(candidate['target_2']))} "
         f"(약 +{candidate['target_2_pct']:.1f}%)\n"
         f"목표 방식: {candidate['target_mode']}\n"
+        f"가까운 저항 여유: {candidate.get('resistance_room_pct', 0):.1f}%\n"
+        f"예상 손익비: {candidate.get('risk_reward', 0):.2f}\n"
         f"추천 비중: 투자 가능금액의 {candidate['suggested_position_pct']}% 이내\n"
         f"신호 유효시간: {int(candidate['valid_seconds'] / 60)}분\n"
         f"선정 근거: {reasons}\n"
@@ -452,11 +467,16 @@ class AlertDispatcher:
         self._send_observation_alerts = _enabled(
             "TELEGRAM_SEND_OBSERVATION_ALERTS", True
         )
-        self._send_candidate_alerts = _enabled(
-            "TELEGRAM_SEND_CANDIDATE_ALERTS", True
-        )
+        self._send_candidate_alerts = _enabled("TELEGRAM_SEND_CANDIDATE_ALERTS", True)
         self._candidate_min_target_1_pct = max(
             0.0, _env_float("TELEGRAM_CANDIDATE_MIN_TARGET_1_PCT", 0.0)
+        )
+        self._candidate_min_resistance_room_pct = max(
+            0.0,
+            _env_float(
+                "TELEGRAM_CANDIDATE_MIN_RESISTANCE_ROOM_PCT",
+                self._candidate_min_target_1_pct,
+            ),
         )
         self._candidate_min_score = max(
             0, min(100, _env_int("TELEGRAM_CANDIDATE_MIN_SCORE", 0))
@@ -484,6 +504,10 @@ class AlertDispatcher:
     def candidate_min_score(self) -> int:
         return self._candidate_min_score
 
+    @property
+    def candidate_min_resistance_room_pct(self) -> float:
+        return self._candidate_min_resistance_room_pct
+
     async def send(self, alert: dict[str, Any]) -> None:
         MONITOR_STATE.add_alert(alert)
         LOGGER.warning("MARKET_ALERT %s", json.dumps(alert, ensure_ascii=False))
@@ -503,25 +527,24 @@ class AlertDispatcher:
 
     async def send_candidate(self, candidate: dict[str, Any]) -> None:
         MONITOR_STATE.add_alert(candidate)
-        LOGGER.warning(
-            "ENTRY_CANDIDATE %s", json.dumps(candidate, ensure_ascii=False)
-        )
+        LOGGER.warning("ENTRY_CANDIDATE %s", json.dumps(candidate, ensure_ascii=False))
         if self.mode != "telegram" or not self._send_candidate_alerts:
             return
         score = int(candidate.get("score", 0))
-        target_1_pct = float(candidate.get("target_1_pct", 0.0))
+        resistance_room_pct = float(candidate.get("resistance_room_pct", 0.0))
         if (
             score < self._candidate_min_score
-            or target_1_pct < self._candidate_min_target_1_pct
+            or resistance_room_pct < self._candidate_min_resistance_room_pct
         ):
             LOGGER.info(
                 "ENTRY_CANDIDATE_TELEGRAM_SUPPRESSED market=%s "
-                "score=%d minimum_score=%d target_1_pct=%.2f minimum_target_1_pct=%.2f",
+                "score=%d minimum_score=%d resistance_room_pct=%.2f "
+                "minimum_resistance_room_pct=%.2f",
                 candidate.get("market"),
                 score,
                 self._candidate_min_score,
-                target_1_pct,
-                self._candidate_min_target_1_pct,
+                resistance_room_pct,
+                self._candidate_min_resistance_room_pct,
             )
             return
         url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
@@ -544,6 +567,8 @@ class CandidateAnalyzer:
         self.config = config
         self.dispatcher = dispatcher
         self._last_checked_at: dict[str, float] = {}
+        self._last_reentry_at: dict[str, float] = {}
+        self._lifecycles: dict[str, dict[str, Any]] = {}
         self._inflight_markets: set[str] = set()
         self._tasks: set[asyncio.Task[None]] = set()
         self._semaphore = asyncio.Semaphore(2)
@@ -579,28 +604,136 @@ class CandidateAnalyzer:
         task.add_done_callback(completed)
         return True
 
+    def observe_price(self, market: str, price: float) -> bool:
+        """Schedule one fresh recheck after price leaves and retakes the entry zone."""
+        state = self._lifecycles.get(market)
+        if not state:
+            return False
+        now = time.time()
+        state["max_price"] = max(float(state["max_price"]), price)
+        state["min_price"] = min(float(state["min_price"]), price)
+        if price >= float(state["target_1"]):
+            self._finish_lifecycle(market, state, "target_1_first", price, now)
+            return False
+        if price <= float(state["stop_price"]):
+            self._finish_lifecycle(market, state, "stop_first", price, now)
+            return False
+        if now >= float(state["expires_at"]):
+            self._finish_lifecycle(market, state, "expired", price, now)
+            return False
+        entry_low = float(state["entry_low"])
+        entry_high = float(state["entry_high"])
+        if price < entry_low or price > entry_high:
+            state["waiting_retest"] = True
+            return False
+        if not state.get("waiting_retest") or not entry_low <= price <= entry_high:
+            return False
+        if market in self._inflight_markets:
+            return False
+        if (
+            now - self._last_reentry_at.get(market, 0)
+            < self.config.reentry_cooldown_seconds
+        ):
+            return False
+        self._last_reentry_at[market] = now
+        state["waiting_retest"] = False
+        alert = {
+            "time_utc": datetime.now(timezone.utc).isoformat(),
+            "market": market,
+            "signal": state["source_signal"],
+            "price": price,
+            "breakout_level": state["breakout_level"],
+            "is_reentry": True,
+        }
+        self._inflight_markets.add(market)
+        task = asyncio.create_task(self._analyze(alert))
+        self._tasks.add(task)
+
+        def completed(done: asyncio.Task[None]) -> None:
+            self._tasks.discard(done)
+            self._inflight_markets.discard(market)
+
+        task.add_done_callback(completed)
+        return True
+
+    def _finish_lifecycle(
+        self,
+        market: str,
+        state: dict[str, Any],
+        result: str,
+        exit_price: float,
+        now: float,
+    ) -> None:
+        entry = float(state["entry_price"])
+        MONITOR_STATE.add_candidate_outcome(
+            {
+                "market": market,
+                "result": result,
+                "score": state["score"],
+                "is_reentry": state["is_reentry"],
+                "entry_price": entry,
+                "exit_price": exit_price,
+                "target_1": state["target_1"],
+                "stop_price": state["stop_price"],
+                "mfe_pct": round((float(state["max_price"]) / entry - 1) * 100, 2),
+                "mae_pct": round((float(state["min_price"]) / entry - 1) * 100, 2),
+                "elapsed_seconds": round(now - float(state["created_at"]), 1),
+                "completed_at_utc": datetime.now(timezone.utc).isoformat(),
+            }
+        )
+        self._lifecycles.pop(market, None)
+
+    async def _orderbook_samples(
+        self, client: UpbitPublicClient, market: str
+    ) -> list[dict[str, Any]]:
+        samples: list[dict[str, Any]] = []
+        for index in range(self.config.orderbook_sample_count):
+            samples.append(await client.orderbook(market))
+            if index + 1 < self.config.orderbook_sample_count:
+                await asyncio.sleep(self.config.orderbook_sample_interval_seconds)
+        return samples
+
     async def _analyze(self, alert: dict[str, Any]) -> None:
         market = str(alert["market"])
         try:
-            await asyncio.sleep(self.config.confirm_seconds)
+            seconds_to_next_close = 62 - (time.time() % 60)
+            await asyncio.sleep(max(self.config.confirm_seconds, seconds_to_next_close))
             async with self._semaphore:
                 client = UpbitPublicClient()
                 try:
-                    ticker, orderbook, candles_1m, candles_5m = await asyncio.gather(
+                    (
+                        ticker,
+                        orderbooks,
+                        candles_1m,
+                        candles_5m,
+                        candles_15m,
+                        btc_ticker,
+                        btc_candles_5m,
+                        btc_candles_15m,
+                    ) = await asyncio.gather(
                         client.ticker(market),
-                        client.orderbook(market),
+                        self._orderbook_samples(client, market),
                         client.candles(market, "minute1", 120),
                         client.candles(market, "minute5", 120),
+                        client.candles(market, "minute15", 120),
+                        client.ticker("KRW-BTC"),
+                        client.candles("KRW-BTC", "minute5", 120),
+                        client.candles("KRW-BTC", "minute15", 120),
                     )
                 finally:
                     await client.close()
             candidate, rejected = evaluate_candidate(
                 alert,
                 ticker,
-                orderbook,
+                orderbooks[-1],
                 candles_1m,
                 candles_5m,
                 self.config,
+                candles_15m=candles_15m,
+                btc_ticker=btc_ticker,
+                btc_candles_5m=btc_candles_5m,
+                btc_candles_15m=btc_candles_15m,
+                orderbook_samples=orderbooks,
             )
             if candidate is None:
                 LOGGER.info(
@@ -609,6 +742,23 @@ class CandidateAnalyzer:
                 return
             candidate["analysis_time_utc"] = datetime.now(timezone.utc).isoformat()
             await self.dispatcher.send_candidate(candidate)
+            self._lifecycles[market] = {
+                "source_signal": candidate["source_signal"],
+                "entry_low": candidate["entry_low"],
+                "entry_high": candidate["entry_high"],
+                "chase_limit": candidate["chase_limit"],
+                "stop_price": candidate["stop_price"],
+                "target_1": candidate["target_1"],
+                "entry_price": (candidate["entry_low"] + candidate["entry_high"]) / 2,
+                "max_price": candidate["current_price"],
+                "min_price": candidate["current_price"],
+                "score": candidate["score"],
+                "is_reentry": candidate["is_reentry"],
+                "created_at": time.time(),
+                "breakout_level": candidate["breakout_level"],
+                "waiting_retest": False,
+                "expires_at": time.time() + self.config.reentry_window_seconds,
+            }
         except asyncio.CancelledError:
             raise
         except Exception as exc:
@@ -673,9 +823,12 @@ async def run_monitor_forever() -> None:
                         raise RuntimeError(str(message["error"]))
                     if message.get("type") != "trade":
                         continue
+                    market = str(message["code"])
+                    price = float(message["trade_price"])
+                    candidate_analyzer.observe_price(market, price)
                     alerts = engine.update(
-                        market=str(message["code"]),
-                        price=float(message["trade_price"]),
+                        market=market,
+                        price=price,
                         volume=float(message["trade_volume"]),
                         timestamp_ms=int(
                             message.get("trade_timestamp") or message["timestamp"]
