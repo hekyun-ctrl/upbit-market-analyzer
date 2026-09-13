@@ -455,6 +455,9 @@ class AlertDispatcher:
         self._send_candidate_alerts = _enabled(
             "TELEGRAM_SEND_CANDIDATE_ALERTS", True
         )
+        self._candidate_min_target_1_pct = max(
+            0.0, _env_float("TELEGRAM_CANDIDATE_MIN_TARGET_1_PCT", 0.0)
+        )
 
     @property
     def mode(self) -> str:
@@ -469,6 +472,10 @@ class AlertDispatcher:
     @property
     def candidate_delivery_enabled(self) -> bool:
         return self._send_candidate_alerts
+
+    @property
+    def candidate_min_target_1_pct(self) -> float:
+        return self._candidate_min_target_1_pct
 
     async def send(self, alert: dict[str, Any]) -> None:
         MONITOR_STATE.add_alert(alert)
@@ -493,6 +500,16 @@ class AlertDispatcher:
             "ENTRY_CANDIDATE %s", json.dumps(candidate, ensure_ascii=False)
         )
         if self.mode != "telegram" or not self._send_candidate_alerts:
+            return
+        target_1_pct = float(candidate.get("target_1_pct", 0.0))
+        if target_1_pct < self._candidate_min_target_1_pct:
+            LOGGER.info(
+                "ENTRY_CANDIDATE_TELEGRAM_SUPPRESSED market=%s "
+                "target_1_pct=%.2f minimum=%.2f",
+                candidate.get("market"),
+                target_1_pct,
+                self._candidate_min_target_1_pct,
+            )
             return
         url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
         async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
