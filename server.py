@@ -151,7 +151,7 @@ async def get_recent_alerts(
 
 @mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
 async def get_candidate_performance() -> dict[str, Any]:
-    """Summarize whether tracked candidates reached target 1 or stop first."""
+    """Summarize sent candidates and all screened raw-signal outcomes."""
     return MONITOR_STATE.candidate_performance()
 
 
