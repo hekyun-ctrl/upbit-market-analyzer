@@ -42,14 +42,17 @@ class CandidateConfig:
     max_rsi_1m: float
     max_rsi_5m: float
     min_orderbook_ratio: float
+    hard_min_orderbook_ratio: float
     max_price_extension_pct: float
     min_completed_volume_ratio: float
     min_volume_vs_previous: float
     min_close_position: float
     max_upper_wick_ratio: float
     max_spread_pct: float
+    hard_max_spread_pct: float
     min_trade_value_24h_krw: float
     min_resistance_room_pct: float
+    hard_min_resistance_room_pct: float
     min_risk_reward: float
     max_stop_loss_pct: float
     max_btc_decline_pct: float
@@ -62,6 +65,9 @@ class CandidateConfig:
     raw_signal_stop_pct: float
     btc_weak_score_penalty: int
     day_overheat_score_penalty: int
+    orderbook_score_penalty: int
+    spread_score_penalty: int
+    resistance_score_penalty: int
 
     @classmethod
     def from_env(cls) -> "CandidateConfig":
@@ -75,6 +81,9 @@ class CandidateConfig:
             max_rsi_1m=_env_float("CANDIDATE_MAX_RSI_1M", 78.0),
             max_rsi_5m=_env_float("CANDIDATE_MAX_RSI_5M", 75.0),
             min_orderbook_ratio=_env_float("CANDIDATE_MIN_ORDERBOOK_RATIO", 0.8),
+            hard_min_orderbook_ratio=_env_float(
+                "CANDIDATE_HARD_MIN_ORDERBOOK_RATIO", 0.4
+            ),
             max_price_extension_pct=_env_float(
                 "CANDIDATE_MAX_PRICE_EXTENSION_PCT", 2.0
             ),
@@ -85,11 +94,17 @@ class CandidateConfig:
             min_close_position=_env_float("CANDIDATE_MIN_CLOSE_POSITION", 0.6),
             max_upper_wick_ratio=_env_float("CANDIDATE_MAX_UPPER_WICK_RATIO", 0.4),
             max_spread_pct=_env_float("CANDIDATE_MAX_SPREAD_PCT", 0.5),
+            hard_max_spread_pct=_env_float(
+                "CANDIDATE_HARD_MAX_SPREAD_PCT", 1.2
+            ),
             min_trade_value_24h_krw=_env_float(
                 "CANDIDATE_MIN_TRADE_VALUE_24H_KRW", 1_000_000_000
             ),
             min_resistance_room_pct=_env_float(
                 "CANDIDATE_MIN_RESISTANCE_ROOM_PCT", 5.0
+            ),
+            hard_min_resistance_room_pct=_env_float(
+                "CANDIDATE_HARD_MIN_RESISTANCE_ROOM_PCT", 2.5
             ),
             min_risk_reward=_env_float("CANDIDATE_MIN_RISK_REWARD", 2.0),
             max_stop_loss_pct=_env_float("CANDIDATE_MAX_STOP_LOSS_PCT", 3.0),
@@ -123,6 +138,15 @@ class CandidateConfig:
             ),
             day_overheat_score_penalty=max(
                 0, _env_int("CANDIDATE_DAY_OVERHEAT_SCORE_PENALTY", 8)
+            ),
+            orderbook_score_penalty=max(
+                0, _env_int("CANDIDATE_ORDERBOOK_SCORE_PENALTY", 4)
+            ),
+            spread_score_penalty=max(
+                0, _env_int("CANDIDATE_SPREAD_SCORE_PENALTY", 4)
+            ),
+            resistance_score_penalty=max(
+                0, _env_int("CANDIDATE_RESISTANCE_SCORE_PENALTY", 6)
             ),
         )
 
@@ -328,6 +352,9 @@ def evaluate_candidate(
     book_persistent = sum(x >= config.min_orderbook_ratio for x in ratios) >= max(
         1, len(ratios) // 2 + 1
     )
+    hard_book_persistent = sum(
+        x >= config.hard_min_orderbook_ratio for x in ratios
+    ) >= max(1, len(ratios) // 2 + 1)
     completed_close = float(c1[0]["trade_price"])
     breakout = float(
         alert.get("breakout_level")
@@ -352,10 +379,10 @@ def evaluate_candidate(
     day_overheated = day_change > config.max_day_change_pct
     if rsi1 > config.max_rsi_1m or rsi5 > config.max_rsi_5m:
         rejected.append(f"RSI 과열(1분 {rsi1:.1f}/5분 {rsi5:.1f})")
-    if not book_persistent:
-        rejected.append(f"호가 지지 지속성 부족({book_ratio:.2f}배)")
-    if spread > config.max_spread_pct:
-        rejected.append(f"호가 스프레드 과다({spread:.2f}%)")
+    if not hard_book_persistent:
+        rejected.append(f"호가 지지 극단적 부족({book_ratio:.2f}배)")
+    if spread > config.hard_max_spread_pct:
+        rejected.append(f"호가 스프레드 극단적 과다({spread:.2f}%)")
     if trade_value_24h < config.min_trade_value_24h_krw:
         rejected.append(f"24시간 거래대금 부족({trade_value_24h:,.0f}원)")
     if extension > config.max_price_extension_pct:
@@ -378,7 +405,7 @@ def evaluate_candidate(
         return None, rejected
     resistance = resistance_levels[0]
     room = (resistance / current - 1) * 100
-    if room < config.min_resistance_room_pct:
+    if room < config.hard_min_resistance_room_pct:
         rejected.append(f"가까운 저항까지 여유 부족({room:.1f}%)")
     if rejected:
         return None, rejected
@@ -431,7 +458,23 @@ def evaluate_candidate(
     market_score = 15 if btc_strong else 10
     if btc_weak:
         market_score = max(0, market_score - config.btc_weak_score_penalty)
+    risk_notes: list[str] = []
     score_penalty = config.day_overheat_score_penalty if day_overheated else 0
+    if not book_persistent:
+        score_penalty += config.orderbook_score_penalty
+        risk_notes.append(
+            f"호가 지지 약함 -{config.orderbook_score_penalty}점({book_ratio:.2f}배)"
+        )
+    if spread > config.max_spread_pct:
+        score_penalty += config.spread_score_penalty
+        risk_notes.append(
+            f"호가 스프레드 주의 -{config.spread_score_penalty}점({spread:.2f}%)"
+        )
+    if room < config.min_resistance_room_pct:
+        score_penalty += config.resistance_score_penalty
+        risk_notes.append(
+            f"저항 여유 제한 -{config.resistance_score_penalty}점({room:.1f}%)"
+        )
     score = min(
         100,
         max(
@@ -440,21 +483,35 @@ def evaluate_candidate(
             + volume_score
             + trend_score
             + market_score
-            + (10 if room >= 7 and risk_reward >= 2.5 else 8)
-            + (10 if book_ratio >= 1.2 and spread <= 0.2 and liquid_market else 7)
+            + (12 if room >= 7 and risk_reward >= 2.5 else 10)
+            + (12 if book_ratio >= 1.2 and spread <= 0.2 and liquid_market else 10)
             - score_penalty,
         ),
     )
     if score < config.min_score:
         return None, [f"후보 점수 부족({score}/{config.min_score})"]
 
-    target1 = _round_tick(resistance, tick, "down")
-    higher = [x for x in resistance_levels[1:] if x > resistance]
-    target2 = _round_tick(
-        higher[0] if higher else entry_mid + (resistance - entry_mid) * 1.5,
-        tick,
-        "down",
+    strong_extension = (
+        alert.get("signal") == "consolidation_rebreakout"
+        and score >= 95
+        and room >= 7
+        and risk_reward >= 2.5
+        and volume_ratio >= 2
+        and volume_previous >= 0.8
+        and trend_score >= 18
+        and not btc_weak
+        and not day_overheated
+        and book_persistent
+        and spread <= config.max_spread_pct
     )
+    if strong_extension:
+        target1 = _round_tick(min(resistance, entry_mid * 1.07), tick, "down")
+        target2 = _round_tick(entry_mid * 1.10, tick, "up")
+        target_mode = "강한 추세 확장형"
+    else:
+        target1 = _round_tick(min(resistance, entry_mid * 1.03), tick, "down")
+        target2 = _round_tick(entry_mid * 1.05, tick, "up")
+        target_mode = "균형 위험비형"
     reasons = [
         "완료 1분봉 돌파 확정",
         "거래량 유지",
@@ -468,7 +525,6 @@ def evaluate_candidate(
     if alert.get("is_reentry"):
         reasons.insert(0, "돌파선 재지지 후 재진입")
 
-    risk_notes: list[str] = []
     if btc_weak:
         risk_notes.append(
             f"BTC 약세 감점 -{config.btc_weak_score_penalty}점({btc_change:.2f}%)"
@@ -498,7 +554,7 @@ def evaluate_candidate(
         "target_2": target2,
         "target_1_pct": round((target1 / entry_mid - 1) * 100, 2),
         "target_2_pct": round((target2 / entry_mid - 1) * 100, 2),
-        "target_mode": "구조적 저항 기반",
+        "target_mode": target_mode,
         "resistance_price": resistance,
         "resistance_room_pct": round(room, 2),
         "risk_reward": round(risk_reward, 2),
