@@ -1,4 +1,6 @@
-from monitor import MonitorConfig, SignalEngine
+import asyncio
+
+from monitor import AlertDispatcher, MonitorConfig, SignalEngine
 
 
 def _config(**overrides):
@@ -114,3 +116,30 @@ def test_rebreakout_requires_volume_expansion():
     assert not any(
         alert["signal"] == "consolidation_rebreakout" for alert in alerts
     )
+
+
+def test_observation_telegram_delivery_can_be_disabled(monkeypatch):
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "test-chat")
+    monkeypatch.setenv("TELEGRAM_SEND_OBSERVATION_ALERTS", "false")
+    monkeypatch.setenv("TELEGRAM_SEND_CANDIDATE_ALERTS", "true")
+
+    dispatcher = AlertDispatcher()
+    assert dispatcher.mode == "telegram"
+    assert dispatcher.observation_delivery_enabled is False
+    assert dispatcher.candidate_delivery_enabled is True
+
+    class UnexpectedClient:
+        def __init__(self, *args, **kwargs):
+            raise AssertionError("suppressed observation must not call Telegram")
+
+    monkeypatch.setattr("monitor.httpx.AsyncClient", UnexpectedClient)
+    asyncio.run(dispatcher.send({"market": "KRW-IQ", "signal": "breakout"}))
+
+
+def test_telegram_delivery_filters_default_to_enabled(monkeypatch):
+    monkeypatch.delenv("TELEGRAM_SEND_OBSERVATION_ALERTS", raising=False)
+    monkeypatch.delenv("TELEGRAM_SEND_CANDIDATE_ALERTS", raising=False)
+    dispatcher = AlertDispatcher()
+    assert dispatcher.observation_delivery_enabled is True
+    assert dispatcher.candidate_delivery_enabled is True
