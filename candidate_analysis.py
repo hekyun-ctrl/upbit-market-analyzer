@@ -71,6 +71,14 @@ class CandidateConfig:
     spread_score_penalty: int
     resistance_score_penalty: int
     rsi_score_penalty: int
+    availability_balance_enabled: bool
+    availability_max_soft_warnings: int
+    availability_soft_penalty: int
+    availability_min_volume_ratio: float
+    availability_min_volume_vs_previous: float
+    availability_min_close_position: float
+    availability_max_upper_wick_ratio: float
+    availability_resistance_floor_pct: float
 
     @classmethod
     def from_env(cls) -> "CandidateConfig":
@@ -156,6 +164,30 @@ class CandidateConfig:
             rsi_score_penalty=max(
                 0, _env_int("CANDIDATE_RSI_SCORE_PENALTY", 4)
             ),
+            availability_balance_enabled=_enabled(
+                "CANDIDATE_AVAILABILITY_BALANCE_ENABLED", True
+            ),
+            availability_max_soft_warnings=max(
+                0, min(3, _env_int("CANDIDATE_AVAILABILITY_MAX_SOFT_WARNINGS", 2))
+            ),
+            availability_soft_penalty=max(
+                0, _env_int("CANDIDATE_AVAILABILITY_SOFT_PENALTY", 4)
+            ),
+            availability_min_volume_ratio=_env_float(
+                "CANDIDATE_AVAILABILITY_MIN_VOLUME_RATIO", 0.85
+            ),
+            availability_min_volume_vs_previous=_env_float(
+                "CANDIDATE_AVAILABILITY_MIN_VOLUME_VS_PREVIOUS", 0.45
+            ),
+            availability_min_close_position=_env_float(
+                "CANDIDATE_AVAILABILITY_MIN_CLOSE_POSITION", 0.35
+            ),
+            availability_max_upper_wick_ratio=_env_float(
+                "CANDIDATE_AVAILABILITY_MAX_UPPER_WICK_RATIO", 0.65
+            ),
+            availability_resistance_floor_pct=_env_float(
+                "CANDIDATE_AVAILABILITY_RESISTANCE_FLOOR_PCT", 1.5
+            ),
         )
 
     def public(self) -> dict[str, Any]:
@@ -214,14 +246,22 @@ def _parse_time(value: Any) -> datetime | None:
     ).astimezone(timezone.utc)
 
 
-def _completed_after_signal(candle: dict[str, Any], alert_time: Any) -> bool:
+def _completed_after_signal(
+    candle: dict[str, Any], alert_time: Any, minimum_exposure_seconds: int = 20
+) -> bool:
+    """Require meaningful post-signal trading time in the confirming candle.
+
+    A signal arriving just before a minute close must not reuse that almost
+    entirely pre-signal candle as confirmation. Requiring a short exposure
+    window preserves early-signal availability without the delay of always
+    waiting for a second full candle.
+    """
     signal = _parse_time(alert_time)
     opened = _parse_time(candle.get("candle_date_time_utc") or candle.get("time_utc"))
-    return (
-        True
-        if signal is None or opened is None
-        else opened + timedelta(minutes=1) > signal
-    )
+    if signal is None or opened is None:
+        return True
+    completed_at = opened + timedelta(minutes=1)
+    return completed_at >= signal + timedelta(seconds=minimum_exposure_seconds)
 
 
 def _ma20_slope(candles: list[dict[str, Any]]) -> float:
@@ -400,13 +440,16 @@ def evaluate_candidate(
     )
 
     rejected: list[str] = []
+    soft_warnings: list[str] = []
     if not _completed_after_signal(c1[0], alert.get("time_utc")):
-        rejected.append("신호 이후 완료된 1분봉 없음")
+        rejected.append("신호 이후 확인시간 20초를 채운 완료 1분봉 없음")
     if completed_close < breakout:
         rejected.append("완료 1분봉이 돌파선 아래 마감")
     if current < breakout * 0.998:
         rejected.append("돌파선 재지지 실패")
     day_overheated = day_change > config.max_day_change_pct
+    elevated_risk = day_change >= 10.0 or rsi1 >= 70.0 or rsi5 >= 68.0
+    strict_quality = elevated_risk or not config.availability_balance_enabled
     if rsi1 > config.hard_max_rsi_1m or rsi5 > config.hard_max_rsi_5m:
         rejected.append(f"RSI 과열(1분 {rsi1:.1f}/5분 {rsi5:.1f})")
     if spread > config.hard_max_spread_pct:
@@ -415,16 +458,36 @@ def evaluate_candidate(
         rejected.append(f"24시간 거래대금 부족({trade_value_24h:,.0f}원)")
     if extension > config.max_price_extension_pct:
         rejected.append(f"신호가 대비 추격 구간(+{extension:.1f}%)")
-    if current < float(one["ma20"]) or current < float(five["ma20"]):
-        rejected.append("완료봉 기준 단기 20이평 아래")
-    if volume_ratio < config.min_completed_volume_ratio:
-        rejected.append(f"완료 1분봉 거래량 부족({volume_ratio:.2f}배)")
-    if volume_previous < config.min_volume_vs_previous:
+    if current < float(five["ma20"]):
+        rejected.append("완료봉 기준 5분 20이평 아래")
+    elif current < float(one["ma20"]):
+        message = "완료봉 기준 1분 20이평 아래"
+        (rejected if strict_quality else soft_warnings).append(message)
+
+    if volume_ratio < config.availability_min_volume_ratio:
+        rejected.append(f"완료 1분봉 거래량 절대 부족({volume_ratio:.2f}배)")
+    elif volume_ratio < config.min_completed_volume_ratio:
+        message = f"완료 1분봉 거래량 다소 부족({volume_ratio:.2f}배)"
+        (rejected if strict_quality else soft_warnings).append(message)
+
+    if volume_previous < config.availability_min_volume_vs_previous:
         rejected.append(f"직전 봉 대비 거래량 급감({volume_previous:.2f}배)")
-    if close_position < config.min_close_position:
-        rejected.append(f"완료봉 종가 위치 약함({close_position:.2f})")
-    if upper_wick > config.max_upper_wick_ratio:
+    elif volume_previous < config.min_volume_vs_previous:
+        message = f"직전 봉 대비 거래량 감소({volume_previous:.2f}배)"
+        (rejected if strict_quality else soft_warnings).append(message)
+
+    if close_position < config.availability_min_close_position:
+        rejected.append(f"완료봉 종가 위치 매우 약함({close_position:.2f})")
+    elif close_position < config.min_close_position:
+        message = f"완료봉 종가 위치 다소 약함({close_position:.2f})"
+        (rejected if strict_quality else soft_warnings).append(message)
+
+    if upper_wick > config.availability_max_upper_wick_ratio:
         rejected.append(f"긴 윗꼬리({upper_wick:.2f})")
+    elif upper_wick > config.max_upper_wick_ratio:
+        message = f"윗꼬리 주의({upper_wick:.2f})"
+        (rejected if strict_quality else soft_warnings).append(message)
+
     btc_weak = btc_change <= config.max_btc_decline_pct or btc_bearish
 
     resistance_levels = _resistances(current, ticker, c5, c15)
@@ -435,8 +498,28 @@ def evaluate_candidate(
         else current * (1 + config.min_resistance_room_pct / 100)
     )
     room = (resistance / current - 1) * 100
+    resistance_rescued = False
     if resistance_confirmed and room < config.hard_min_resistance_room_pct:
-        rejected.append(f"가까운 저항까지 여유 부족({room:.1f}%)")
+        resistance_rescued = bool(
+            config.availability_balance_enabled
+            and room >= config.availability_resistance_floor_pct
+            and alert.get("signal") == "consolidation_rebreakout"
+            and not elevated_risk
+            and not btc_weak
+            and volume_ratio >= 1.5
+            and volume_previous >= 0.7
+            and close_position >= 0.65
+            and upper_wick <= 0.35
+        )
+        if not resistance_rescued:
+            rejected.append(f"가까운 저항까지 여유 부족({room:.1f}%)")
+        else:
+            soft_warnings.append(f"가까운 저항 제한적 여유({room:.1f}%)")
+    if len(soft_warnings) > config.availability_max_soft_warnings:
+        rejected.append(
+            "완화 가능 품질조건 동시 미달"
+            f"({len(soft_warnings)}개/{config.availability_max_soft_warnings}개 허용)"
+        )
     if rejected:
         return None, rejected
 
@@ -445,17 +528,28 @@ def evaluate_candidate(
     entry_low = _round_tick(
         min(entry_high, max(float(one["ma20"]), breakout * 0.998)), tick
     )
-    entry_mid = (entry_low + entry_high) / 2
+    entry_tolerance = tick / 2
+    if current < entry_low - entry_tolerance or current > entry_high + entry_tolerance:
+        return None, [
+            "분석 시점 현재가가 진입구간 밖"
+            f"({current:g}원, {entry_low:g}~{entry_high:g}원)"
+        ]
+    entry_reference = current
     support = min(
         min(float(c["low_price"]) for c in c1[:6]), breakout, float(one["ma20"])
     )
     atr_risk = max(_atr(c1) * 1.2, _atr(c5) * 0.35)
-    stop_raw = min(support * 0.998, entry_mid - atr_risk)
+    stop_raw = min(support * 0.998, entry_reference - atr_risk)
     stop = _round_tick(
-        max(stop_raw, entry_mid * (1 - config.max_stop_loss_pct / 100)), tick, "down"
+        max(
+            stop_raw,
+            entry_reference * (1 - config.max_stop_loss_pct / 100),
+        ),
+        tick,
+        "down",
     )
-    risk = max(entry_mid - stop, tick * 2)
-    risk_reward = (resistance - entry_mid) / risk
+    risk = max(entry_reference - stop, tick * 2)
+    risk_reward = (resistance - entry_reference) / risk
     if risk_reward < config.min_risk_reward:
         return None, [f"가까운 저항 기준 손익비 부족({risk_reward:.2f})"]
 
@@ -488,10 +582,11 @@ def evaluate_candidate(
     market_score = 15 if btc_strong else 12
     if btc_weak:
         market_score = max(0, market_score - config.btc_weak_score_penalty)
-    risk_notes: list[str] = []
+    risk_notes: list[str] = list(soft_warnings)
     if not resistance_confirmed:
         risk_notes.append("반복 확인된 상단 구조 저항 없음")
     score_penalty = config.day_overheat_score_penalty if day_overheated else 0
+    score_penalty += len(soft_warnings) * config.availability_soft_penalty
     if not book_persistent:
         score_penalty += config.orderbook_score_penalty
         book_label = "매우 약함" if not hard_book_persistent else "약함"
@@ -552,12 +647,16 @@ def evaluate_candidate(
         and spread <= config.max_spread_pct
     )
     if strong_extension:
-        target1 = _round_tick(min(resistance, entry_mid * 1.07), tick, "down")
-        target2 = _round_tick(entry_mid * 1.10, tick, "up")
+        target1 = _round_tick(
+            min(resistance, entry_reference * 1.07), tick, "down"
+        )
+        target2 = _round_tick(entry_reference * 1.10, tick, "up")
         target_mode = "강한 추세 확장형"
     else:
-        target1 = _round_tick(min(resistance, entry_mid * 1.03), tick, "down")
-        target2 = _round_tick(entry_mid * 1.05, tick, "up")
+        target1 = _round_tick(
+            min(resistance, entry_reference * 1.03), tick, "down"
+        )
+        target2 = _round_tick(entry_reference * 1.05, tick, "up")
         target_mode = "균형 위험비형"
     reasons = [
         "완료 1분봉 돌파 확정",
@@ -599,14 +698,15 @@ def evaluate_candidate(
         "score": score,
         "condition_score": score,
         "current_price": current,
+        "entry_reference_price": entry_reference,
         "entry_low": entry_low,
         "entry_high": entry_high,
         "chase_limit": _round_tick(entry_high + risk * 0.35, tick, "up"),
         "stop_price": stop,
         "target_1": target1,
         "target_2": target2,
-        "target_1_pct": round((target1 / entry_mid - 1) * 100, 2),
-        "target_2_pct": round((target2 / entry_mid - 1) * 100, 2),
+        "target_1_pct": round((target1 / entry_reference - 1) * 100, 2),
+        "target_2_pct": round((target2 / entry_reference - 1) * 100, 2),
         "target_mode": target_mode,
         "resistance_price": resistance,
         "resistance_confirmed": resistance_confirmed,
@@ -627,6 +727,8 @@ def evaluate_candidate(
         "btc_day_change_pct": round(btc_change, 2),
         "btc_weak": btc_weak,
         "day_overheated": day_overheated,
+        "elevated_risk": elevated_risk,
+        "availability_balanced": bool(soft_warnings),
         "risk_notes": risk_notes,
         "reasons": reasons[:5],
         "trade_value_24h_krw": round(trade_value_24h),

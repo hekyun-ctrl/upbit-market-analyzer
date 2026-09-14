@@ -21,6 +21,10 @@ from candidate_analysis import CandidateConfig, evaluate_candidate
 from upbit_client import UpbitPublicClient
 
 LOGGER = logging.getLogger("upbit-monitor")
+# Telegram places the bot token in the request URL. Disable transport-level
+# logging so the token can never be copied into Railway's persistent logs.
+logging.getLogger("httpx").disabled = True
+logging.getLogger("httpcore").disabled = True
 _WS_URL = "wss://api.upbit.com/websocket/v1"
 
 
@@ -490,6 +494,45 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     )
 
 
+def _revalidate_candidate_for_dispatch(
+    candidate: dict[str, Any], live_price: float
+) -> tuple[dict[str, Any] | None, str | None]:
+    """Keep Telegram counts meaningful by sending only actionable entries."""
+    entry_low = float(candidate["entry_low"])
+    entry_high = float(candidate["entry_high"])
+    chase_limit = float(candidate["chase_limit"])
+    stop = float(candidate["stop_price"])
+    target_1 = float(candidate["target_1"])
+    target_2 = float(candidate["target_2"])
+    tolerance = max(abs(entry_high) * 1e-9, 1e-12)
+    if live_price < entry_low - tolerance or live_price > entry_high + tolerance:
+        return None, (
+            f"전송 직전 현재가가 진입구간 밖({live_price:g}원, "
+            f"{entry_low:g}~{entry_high:g}원)"
+        )
+    if live_price >= chase_limit:
+        return None, f"전송 직전 추격금지선 도달({live_price:g}원)"
+    if live_price <= stop or live_price >= target_1:
+        return None, f"전송 전 손절·1차 목표 구간 도달({live_price:g}원)"
+
+    refreshed = dict(candidate)
+    risk = live_price - stop
+    resistance = float(candidate.get("resistance_price") or target_1)
+    refreshed.update(
+        {
+            "current_price": live_price,
+            "entry_reference_price": live_price,
+            "target_1_pct": round((target_1 / live_price - 1) * 100, 2),
+            "target_2_pct": round((target_2 / live_price - 1) * 100, 2),
+            "resistance_room_pct": round((resistance / live_price - 1) * 100, 2),
+            "risk_reward": round(
+                (resistance - live_price) / risk if risk > 0 else 0.0, 2
+            ),
+        }
+    )
+    return refreshed, None
+
+
 class AlertDispatcher:
     def __init__(self) -> None:
         self._telegram_token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
@@ -847,6 +890,12 @@ class CandidateAnalyzer:
         market = str(alert["market"])
         try:
             seconds_to_next_close = 62 - (time.time() % 60)
+            # If the signal arrived in the final 20 seconds of a candle, wait
+            # for the following close. This avoids counting a candle that had
+            # almost no post-signal trading while retaining faster confirmation
+            # for signals detected earlier in the minute.
+            if seconds_to_next_close < 22:
+                seconds_to_next_close += 60
             await asyncio.sleep(max(self.config.confirm_seconds, seconds_to_next_close))
             async with self._semaphore:
                 client = UpbitPublicClient()
@@ -893,6 +942,21 @@ class CandidateAnalyzer:
                     alert, rejected, float(ticker["trade_price"])
                 )
                 return
+            verification_client = UpbitPublicClient()
+            try:
+                latest_ticker = await verification_client.ticker(market)
+            finally:
+                await verification_client.close()
+            candidate, dispatch_rejection = _revalidate_candidate_for_dispatch(
+                candidate, float(latest_ticker["trade_price"])
+            )
+            if candidate is None:
+                LOGGER.info(
+                    "Candidate dispatch cancelled for %s: %s",
+                    market,
+                    dispatch_rejection,
+                )
+                return
             candidate["analysis_time_utc"] = datetime.now(timezone.utc).isoformat()
             await self.dispatcher.send_candidate(candidate)
             self._watchlist.pop(market, None)
@@ -905,7 +969,7 @@ class CandidateAnalyzer:
                 "chase_limit": candidate["chase_limit"],
                 "stop_price": candidate["stop_price"],
                 "target_1": candidate["target_1"],
-                "entry_price": (candidate["entry_low"] + candidate["entry_high"]) / 2,
+                "entry_price": candidate["entry_reference_price"],
                 "max_price": candidate["current_price"],
                 "min_price": candidate["current_price"],
                 "score": candidate["score"],

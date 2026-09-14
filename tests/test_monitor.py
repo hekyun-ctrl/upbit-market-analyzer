@@ -8,6 +8,7 @@ from monitor import (
     MonitorConfig,
     SignalEngine,
     _candidate_text,
+    _revalidate_candidate_for_dispatch,
 )
 
 
@@ -205,6 +206,30 @@ def test_candidate_below_minimum_score_is_not_sent(monkeypatch):
             }
         )
     )
+
+
+def test_dispatch_revalidation_rejects_stale_entry_and_refreshes_metrics():
+    candidate = {
+        "entry_low": 100.0,
+        "entry_high": 101.0,
+        "chase_limit": 102.0,
+        "stop_price": 98.0,
+        "target_1": 104.0,
+        "target_2": 106.0,
+        "resistance_price": 105.0,
+        "current_price": 100.0,
+    }
+
+    rejected, reason = _revalidate_candidate_for_dispatch(candidate, 101.5)
+    assert rejected is None
+    assert "진입구간 밖" in str(reason)
+
+    refreshed, reason = _revalidate_candidate_for_dispatch(candidate, 100.5)
+    assert reason is None
+    assert refreshed is not None
+    assert refreshed["current_price"] == 100.5
+    assert refreshed["entry_reference_price"] == 100.5
+    assert refreshed["target_2_pct"] == round((106.0 / 100.5 - 1) * 100, 2)
 
 
 def test_price_retake_schedules_one_reentry_check(monkeypatch):

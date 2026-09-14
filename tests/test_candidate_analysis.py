@@ -1,7 +1,13 @@
 from datetime import datetime, timedelta, timezone
 
 import candidate_analysis
-from candidate_analysis import CandidateConfig, _completed, _resistances, evaluate_candidate
+from candidate_analysis import (
+    CandidateConfig,
+    _completed,
+    _completed_after_signal,
+    _resistances,
+    evaluate_candidate,
+)
 
 
 def _config(**overrides):
@@ -44,6 +50,14 @@ def _config(**overrides):
         "spread_score_penalty": 4,
         "resistance_score_penalty": 6,
         "rsi_score_penalty": 4,
+        "availability_balance_enabled": True,
+        "availability_max_soft_warnings": 2,
+        "availability_soft_penalty": 4,
+        "availability_min_volume_ratio": 0.85,
+        "availability_min_volume_vs_previous": 0.45,
+        "availability_min_close_position": 0.35,
+        "availability_max_upper_wick_ratio": 0.65,
+        "availability_resistance_floor_pct": 1.5,
     }
     values.update(overrides)
     return CandidateConfig(**values)
@@ -632,6 +646,90 @@ def test_completed_keeps_latest_candle_when_no_current_interval_trade_exists():
 
     assert _completed(stale, 1, now) == stale
     assert _completed(active, 1, now) == active[1:]
+
+
+def test_confirmation_requires_twenty_seconds_after_signal():
+    candle = {"candle_date_time_utc": "2026-09-14T01:00:00+00:00"}
+
+    assert not _completed_after_signal(candle, "2026-09-14T01:00:41+00:00")
+    assert _completed_after_signal(candle, "2026-09-14T01:00:40+00:00")
+
+
+def test_non_overheated_signal_can_use_one_mild_quality_warning():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    one[1]["candle_acc_trade_volume"] = 115.0
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.04,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "consolidation_rebreakout", "price": current},
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["availability_balanced"] is True
+    assert any("거래량 다소 부족" in note for note in candidate["risk_notes"])
+
+
+def test_elevated_risk_signal_keeps_strict_quality_thresholds():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    one[1]["candle_acc_trade_volume"] = 115.0
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.12,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "consolidation_rebreakout", "price": current},
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80),
+    )
+
+    assert candidate is None
+    assert any("거래량 다소 부족" in reason for reason in rejected)
+
+
+def test_quality_below_availability_floor_is_still_rejected():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    one[1]["candle_acc_trade_volume"] = 70.0
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.04,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "consolidation_rebreakout", "price": current},
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80),
+    )
+
+    assert candidate is None
+    assert any("거래량 절대 부족" in reason for reason in rejected)
 
 
 def test_btc_weakness_is_a_score_penalty_not_an_automatic_rejection():
