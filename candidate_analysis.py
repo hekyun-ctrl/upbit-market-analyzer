@@ -79,6 +79,7 @@ class CandidateConfig:
     availability_min_close_position: float
     availability_max_upper_wick_ratio: float
     availability_resistance_floor_pct: float
+    availability_min_score: int
 
     @classmethod
     def from_env(cls) -> "CandidateConfig":
@@ -187,6 +188,10 @@ class CandidateConfig:
             ),
             availability_resistance_floor_pct=_env_float(
                 "CANDIDATE_AVAILABILITY_RESISTANCE_FLOOR_PCT", 1.5
+            ),
+            availability_min_score=max(
+                50,
+                min(100, _env_int("CANDIDATE_AVAILABILITY_MIN_SCORE", 84)),
             ),
         )
 
@@ -653,8 +658,39 @@ def evaluate_candidate(
             - score_penalty,
         ),
     )
-    if score < config.min_score:
-        return None, [f"후보 점수 부족({score}/{config.min_score})"]
+    effective_min_score = config.min_score
+    if config.availability_balance_enabled:
+        effective_min_score = min(
+            config.min_score, config.availability_min_score
+        )
+    if score < effective_min_score:
+        return None, [f"후보 점수 부족({score}/{effective_min_score})"]
+
+    availability_tier = score < config.min_score
+    if availability_tier:
+        # The lower score tier exists only to restore a small number of usable
+        # messages. It must still pass every direct entry-safety boundary and
+        # cannot borrow points from an overheated or weak market environment.
+        availability_safe = bool(
+            not elevated_risk
+            and not btc_weak
+            and not day_overheated
+            and book_persistent
+            and spread <= config.max_spread_pct
+            and (
+                not resistance_confirmed
+                or room >= config.hard_min_resistance_room_pct
+            )
+            and len(soft_warnings) <= config.availability_max_soft_warnings
+        )
+        if not availability_safe:
+            return None, [
+                "가용성 보완 후보 안전조건 미달"
+                f"({score}/{config.min_score})"
+            ]
+        risk_notes.append(
+            f"가용성 보완형 - 정규 {config.min_score}점 미만, 직접 안전선 통과"
+        )
 
     strong_extension = (
         alert.get("signal") == "consolidation_rebreakout"
@@ -708,7 +744,9 @@ def evaluate_candidate(
         risk_notes.append(
             f"당일 과열 감점 -{config.day_overheat_score_penalty}점({day_change:.1f}%)"
         )
-    suggested_position_pct = 5 if risk_notes else 15 if score >= 95 else 10
+    suggested_position_pct = (
+        5 if availability_tier or risk_notes else 15 if score >= 95 else 10
+    )
 
     return {
         "time_utc": alert.get("time_utc"),
@@ -753,6 +791,7 @@ def evaluate_candidate(
         "elevated_risk": elevated_risk,
         "elevated_candle_balance": elevated_candle_balance,
         "availability_balanced": bool(soft_warnings),
+        "availability_tier": availability_tier,
         "risk_notes": risk_notes,
         "reasons": reasons[:5],
         "trade_value_24h_krw": round(trade_value_24h),

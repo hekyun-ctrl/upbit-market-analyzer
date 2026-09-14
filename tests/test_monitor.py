@@ -149,6 +149,8 @@ def test_telegram_delivery_filters_default_to_enabled(monkeypatch):
     assert dispatcher.candidate_delivery_enabled is True
     assert dispatcher.candidate_min_target_2_pct == 5.0
     assert dispatcher.candidate_min_score == 0
+    assert dispatcher.daily_candidate_min == 5
+    assert dispatcher.daily_candidate_max == 10
     assert dispatcher.inactivity_status_enabled is True
     assert dispatcher.inactivity_status_seconds == 3600
 
@@ -324,6 +326,126 @@ def test_candidate_below_minimum_score_is_not_sent(monkeypatch):
             }
         )
     )
+
+
+def _telegram_candidate(*, market="KRW-IQ", availability_tier=False):
+    return {
+        "market": market,
+        "signal": "entry_candidate",
+        "score": 86 if availability_tier else 95,
+        "current_price": 100.0,
+        "entry_low": 99.0,
+        "entry_high": 100.0,
+        "chase_limit": 101.0,
+        "stop_price": 97.0,
+        "target_1": 103.0,
+        "target_2": 105.0,
+        "target_1_pct": 3.0,
+        "target_2_pct": 5.0,
+        "target_mode": "균형 위험비형",
+        "resistance_room_pct": 5.0,
+        "risk_reward": 2.0,
+        "suggested_position_pct": 5 if availability_tier else 15,
+        "valid_seconds": 300,
+        "risk_notes": [],
+        "reasons": ["완료 1분봉 돌파 확정"],
+        "availability_tier": availability_tier,
+    }
+
+
+def test_daily_candidate_max_caps_all_telegram_candidates(monkeypatch):
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "test-chat")
+    monkeypatch.setenv("TELEGRAM_DAILY_CANDIDATE_MIN", "1")
+    monkeypatch.setenv("TELEGRAM_DAILY_CANDIDATE_MAX", "2")
+    dispatcher = AlertDispatcher()
+    sent = []
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+    class Client:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return None
+
+        async def post(self, url, json):
+            sent.append(json)
+            return Response()
+
+    monkeypatch.setattr("monitor.httpx.AsyncClient", Client)
+
+    assert asyncio.run(dispatcher.send_candidate(_telegram_candidate(market="KRW-A")))
+    assert asyncio.run(dispatcher.send_candidate(_telegram_candidate(market="KRW-B")))
+    assert not asyncio.run(
+        dispatcher.send_candidate(_telegram_candidate(market="KRW-C"))
+    )
+    assert len(sent) == 2
+    assert MONITOR_STATE.snapshot()["candidate_delivery_count_today"] == 2
+
+
+def test_availability_candidates_are_paced_and_stop_at_daily_minimum(monkeypatch):
+    clock = {"now": 1_000.0}
+    monkeypatch.setattr("monitor.time.monotonic", lambda: clock["now"])
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "test-chat")
+    monkeypatch.setenv("TELEGRAM_DAILY_CANDIDATE_MIN", "2")
+    monkeypatch.setenv("TELEGRAM_DAILY_CANDIDATE_MAX", "4")
+    monkeypatch.setenv("TELEGRAM_AVAILABILITY_MIN_INTERVAL_SECONDS", "5400")
+    dispatcher = AlertDispatcher()
+    sent = []
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+    class Client:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return None
+
+        async def post(self, url, json):
+            sent.append(json)
+            return Response()
+
+    monkeypatch.setattr("monitor.httpx.AsyncClient", Client)
+
+    assert asyncio.run(
+        dispatcher.send_candidate(
+            _telegram_candidate(market="KRW-A", availability_tier=True)
+        )
+    )
+    clock["now"] = 2_000.0
+    assert not asyncio.run(
+        dispatcher.send_candidate(
+            _telegram_candidate(market="KRW-B", availability_tier=True)
+        )
+    )
+    assert asyncio.run(dispatcher.send_candidate(_telegram_candidate(market="KRW-C")))
+    clock["now"] = 7_000.0
+    assert not asyncio.run(
+        dispatcher.send_candidate(
+            _telegram_candidate(market="KRW-D", availability_tier=True)
+        )
+    )
+    assert len(sent) == 2
+
+
+def test_availability_candidate_is_labeled_in_telegram_message():
+    text = _candidate_text(_telegram_candidate(availability_tier=True))
+
+    assert "[조건부 진입 후보 | 보완형 | 조건점수 86/100]" in text
 
 
 def test_dispatch_revalidation_rejects_stale_entry_and_refreshes_metrics():

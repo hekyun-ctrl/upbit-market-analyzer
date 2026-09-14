@@ -58,6 +58,7 @@ def _config(**overrides):
         "availability_min_close_position": 0.35,
         "availability_max_upper_wick_ratio": 0.65,
         "availability_resistance_floor_pct": 1.5,
+        "availability_min_score": 84,
     }
     values.update(overrides)
     return CandidateConfig(**values)
@@ -680,6 +681,67 @@ def test_non_overheated_signal_can_use_one_mild_quality_warning():
     assert candidate is not None
     assert candidate["availability_balanced"] is True
     assert any("거래량 다소 부족" in note for note in candidate["risk_notes"])
+
+
+def test_safe_mid_80s_signal_becomes_limited_availability_candidate(monkeypatch):
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    one[1]["candle_acc_trade_volume"] = 115.0
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.04,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+    monkeypatch.setattr(
+        candidate_analysis, "_resistances", lambda *args: [current * 1.03]
+    )
+
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "consolidation_rebreakout", "price": current},
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=90, availability_min_score=84),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert 84 <= candidate["score"] < 90
+    assert candidate["availability_tier"] is True
+    assert candidate["suggested_position_pct"] == 5
+    assert any("가용성 보완형" in note for note in candidate["risk_notes"])
+
+
+def test_availability_candidate_never_uses_overheated_market_to_fill_count(
+    monkeypatch,
+):
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.25,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+    monkeypatch.setattr(
+        candidate_analysis, "_resistances", lambda *args: [current * 1.03]
+    )
+
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "consolidation_rebreakout", "price": current},
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=90, availability_min_score=84),
+    )
+
+    assert candidate is None
+    assert any("가용성 보완 후보 안전조건 미달" in reason for reason in rejected)
 
 
 def test_elevated_risk_signal_keeps_volume_quality_strict():

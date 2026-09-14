@@ -11,7 +11,7 @@ import time
 import uuid
 from collections import Counter, defaultdict, deque
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import httpx
@@ -26,6 +26,7 @@ LOGGER = logging.getLogger("upbit-monitor")
 logging.getLogger("httpx").disabled = True
 logging.getLogger("httpcore").disabled = True
 _WS_URL = "wss://api.upbit.com/websocket/v1"
+_KST = timezone(timedelta(hours=9))
 
 
 def _env_float(name: str, default: float) -> float:
@@ -131,6 +132,11 @@ class MonitorState:
         self.recent_alerts: deque[dict[str, Any]] = deque(maxlen=100)
         self.candidate_outcomes: deque[dict[str, Any]] = deque(maxlen=500)
         self.signal_outcomes: deque[dict[str, Any]] = deque(maxlen=1000)
+        self.candidate_delivery_day_kst: str | None = None
+        self.candidate_delivery_count_today = 0
+        self.candidate_delivery_min_daily = 0
+        self.candidate_delivery_max_daily = 0
+        self.last_candidate_delivery_at: str | None = None
 
     @staticmethod
     def _now() -> str:
@@ -173,6 +179,23 @@ class MonitorState:
         with self._lock:
             self.signal_outcomes.appendleft(dict(outcome))
         LOGGER.warning("RAW_SIGNAL_OUTCOME %s", json.dumps(outcome, ensure_ascii=False))
+
+    def update_candidate_delivery(
+        self,
+        *,
+        day_kst: str,
+        count: int,
+        minimum: int,
+        maximum: int,
+        delivered: bool = False,
+    ) -> None:
+        with self._lock:
+            self.candidate_delivery_day_kst = day_kst
+            self.candidate_delivery_count_today = count
+            self.candidate_delivery_min_daily = minimum
+            self.candidate_delivery_max_daily = maximum
+            if delivered:
+                self.last_candidate_delivery_at = self._now()
 
     @staticmethod
     def _performance_summary(outcomes: list[dict[str, Any]]) -> dict[str, Any]:
@@ -227,6 +250,13 @@ class MonitorState:
                 "recent_alert_count": len(self.recent_alerts),
                 "candidate_outcome_count": len(self.candidate_outcomes),
                 "raw_signal_outcome_count": len(self.signal_outcomes),
+                "candidate_delivery_day_kst": self.candidate_delivery_day_kst,
+                "candidate_delivery_count_today": self.candidate_delivery_count_today,
+                "candidate_delivery_target_daily": {
+                    "minimum": self.candidate_delivery_min_daily,
+                    "maximum": self.candidate_delivery_max_daily,
+                },
+                "last_candidate_delivery_at_utc": self.last_candidate_delivery_at,
             }
 
     def alerts(self, limit: int, market: str | None = None) -> list[dict[str, Any]]:
@@ -470,9 +500,14 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     reasons = "·".join(candidate.get("reasons", [])) or "공개 시세 조건 충족"
     risk_notes = "·".join(candidate.get("risk_notes", []))
     risk_line = f"위험 감점: {risk_notes}\n" if risk_notes else ""
-    reentry = " | 재지지" if candidate.get("is_reentry") else ""
+    labels = []
+    if candidate.get("is_reentry"):
+        labels.append("재지지")
+    if candidate.get("availability_tier"):
+        labels.append("보완형")
+    suffix = f" | {'·'.join(labels)}" if labels else ""
     return (
-        f"[조건부 진입 후보{reentry} | 조건점수 {candidate['score']}/100] "
+        f"[조건부 진입 후보{suffix} | 조건점수 {candidate['score']}/100] "
         f"{candidate['market']}\n"
         f"현재가: {_format_price(float(candidate['current_price']))}\n"
         f"진입구간: {_format_price(float(candidate['entry_low']))} ~ "
@@ -547,6 +582,17 @@ class AlertDispatcher:
         self._candidate_min_score = max(
             0, min(100, _env_int("TELEGRAM_CANDIDATE_MIN_SCORE", 0))
         )
+        self._daily_candidate_min = max(
+            0, min(10, _env_int("TELEGRAM_DAILY_CANDIDATE_MIN", 5))
+        )
+        self._daily_candidate_max = max(
+            self._daily_candidate_min,
+            min(20, _env_int("TELEGRAM_DAILY_CANDIDATE_MAX", 10)),
+        )
+        self._availability_min_interval_seconds = max(
+            900,
+            _env_int("TELEGRAM_AVAILABILITY_MIN_INTERVAL_SECONDS", 5400),
+        )
         self._send_inactivity_status = _enabled(
             "TELEGRAM_SEND_INACTIVITY_STATUS", True
         )
@@ -556,9 +602,35 @@ class AlertDispatcher:
         now = time.monotonic()
         self._last_candidate_delivery_at = now
         self._last_inactivity_status_at = now
+        self._candidate_delivery_day = self._today_kst()
+        self._candidate_delivery_count = 0
+        self._last_availability_delivery_at = 0.0
         self._raw_signal_times: deque[float] = deque(maxlen=5000)
         self._candidate_rejections: deque[tuple[float, tuple[str, ...]]] = deque(
             maxlen=5000
+        )
+        self._publish_candidate_delivery_state()
+
+    @staticmethod
+    def _today_kst() -> str:
+        return datetime.now(_KST).date().isoformat()
+
+    def _refresh_candidate_delivery_day(self) -> None:
+        day = self._today_kst()
+        if day == self._candidate_delivery_day:
+            return
+        self._candidate_delivery_day = day
+        self._candidate_delivery_count = 0
+        self._last_availability_delivery_at = 0.0
+        self._publish_candidate_delivery_state()
+
+    def _publish_candidate_delivery_state(self, *, delivered: bool = False) -> None:
+        MONITOR_STATE.update_candidate_delivery(
+            day_kst=self._candidate_delivery_day,
+            count=self._candidate_delivery_count,
+            minimum=self._daily_candidate_min,
+            maximum=self._daily_candidate_max,
+            delivered=delivered,
         )
 
     @property
@@ -582,6 +654,14 @@ class AlertDispatcher:
     @property
     def candidate_min_score(self) -> int:
         return self._candidate_min_score
+
+    @property
+    def daily_candidate_min(self) -> int:
+        return self._daily_candidate_min
+
+    @property
+    def daily_candidate_max(self) -> int:
+        return self._daily_candidate_max
 
     @property
     def inactivity_status_enabled(self) -> bool:
@@ -690,11 +770,10 @@ class AlertDispatcher:
             )
             response.raise_for_status()
 
-    async def send_candidate(self, candidate: dict[str, Any]) -> None:
-        MONITOR_STATE.add_alert(candidate)
+    async def send_candidate(self, candidate: dict[str, Any]) -> bool:
         LOGGER.warning("ENTRY_CANDIDATE %s", json.dumps(candidate, ensure_ascii=False))
         if self.mode != "telegram" or not self._send_candidate_alerts:
-            return
+            return False
         score = int(candidate.get("score", 0))
         target_2_pct = float(candidate.get("target_2_pct", 0.0))
         if (
@@ -711,20 +790,73 @@ class AlertDispatcher:
                 target_2_pct,
                 self._candidate_min_target_2_pct,
             )
-            return
-        url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
-        async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
-            response = await client.post(
-                url,
-                json={
-                    "chat_id": self._telegram_chat_id,
-                    "text": _candidate_text(candidate),
-                    "disable_web_page_preview": True,
-                },
+            return False
+        self._refresh_candidate_delivery_day()
+        availability_tier = bool(candidate.get("availability_tier"))
+        now = time.monotonic()
+        if self._candidate_delivery_count >= self._daily_candidate_max:
+            LOGGER.info(
+                "ENTRY_CANDIDATE_DAILY_MAX_SUPPRESSED market=%s count=%d max=%d",
+                candidate.get("market"),
+                self._candidate_delivery_count,
+                self._daily_candidate_max,
             )
-            response.raise_for_status()
+            return False
+        if (
+            availability_tier
+            and self._candidate_delivery_count >= self._daily_candidate_min
+        ):
+            LOGGER.info(
+                "ENTRY_CANDIDATE_AVAILABILITY_TARGET_REACHED market=%s count=%d target=%d",
+                candidate.get("market"),
+                self._candidate_delivery_count,
+                self._daily_candidate_min,
+            )
+            return False
+        if (
+            availability_tier
+            and self._last_availability_delivery_at
+            and now - self._last_availability_delivery_at
+            < self._availability_min_interval_seconds
+        ):
+            LOGGER.info(
+                "ENTRY_CANDIDATE_AVAILABILITY_PACED market=%s remaining_seconds=%d",
+                candidate.get("market"),
+                int(
+                    self._availability_min_interval_seconds
+                    - (now - self._last_availability_delivery_at)
+                ),
+            )
+            return False
+
+        # Reserve the slot before the network await so concurrent analyses
+        # cannot exceed the daily maximum. Roll it back if Telegram fails.
+        self._candidate_delivery_count += 1
+        if availability_tier:
+            self._last_availability_delivery_at = now
+        url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
+        try:
+            async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
+                response = await client.post(
+                    url,
+                    json={
+                        "chat_id": self._telegram_chat_id,
+                        "text": _candidate_text(candidate),
+                        "disable_web_page_preview": True,
+                    },
+                )
+                response.raise_for_status()
+        except Exception:
+            self._candidate_delivery_count -= 1
+            if availability_tier:
+                self._last_availability_delivery_at = 0.0
+            self._publish_candidate_delivery_state()
+            raise
+        MONITOR_STATE.add_alert(candidate)
         self._last_candidate_delivery_at = time.monotonic()
         self._last_inactivity_status_at = self._last_candidate_delivery_at
+        self._publish_candidate_delivery_state(delivered=True)
+        return True
 
 
 class CandidateAnalyzer:
@@ -1068,7 +1200,14 @@ class CandidateAnalyzer:
                 )
                 return
             candidate["analysis_time_utc"] = datetime.now(timezone.utc).isoformat()
-            await self.dispatcher.send_candidate(candidate)
+            delivered = await self.dispatcher.send_candidate(candidate)
+            if not delivered:
+                self._remember_rejected(
+                    alert,
+                    ["Telegram 일일 가용성·상한 정책으로 전송 보류"],
+                    float(latest_ticker["trade_price"]),
+                )
+                return
             self._watchlist.pop(market, None)
             if market in self._signal_tracks:
                 self._signal_tracks[market]["approved_candidate"] = True
