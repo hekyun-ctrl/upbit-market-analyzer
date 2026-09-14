@@ -66,6 +66,12 @@ def _config(**overrides):
         "early_trend_required": True,
         "require_first_retest": True,
         "retest_tolerance_pct": 0.8,
+        "leader_watch_enabled": True,
+        "leader_watch_max_rechecks": 3,
+        "leader_pullback_min_pct": 1.0,
+        "leader_pullback_max_pct": 5.0,
+        "leader_reclaim_pct": 0.5,
+        "leader_recheck_cooldown_seconds": 300,
         "trend_target_2_pct": 8.0,
         "trend_target_3_pct": 15.0,
         "trend_target_4_pct": 20.0,
@@ -291,6 +297,10 @@ def test_default_candidate_config_is_accuracy_first(monkeypatch):
         "CANDIDATE_RELATIVE_STRENGTH_TOP_PERCENT",
         "CANDIDATE_RELATIVE_STRENGTH_MIN_5M_PCT",
         "CANDIDATE_EARLY_TREND_REQUIRED",
+        "CANDIDATE_LEADER_WATCH_ENABLED",
+        "CANDIDATE_LEADER_PULLBACK_MIN_PCT",
+        "CANDIDATE_LEADER_PULLBACK_MAX_PCT",
+        "CANDIDATE_LEADER_RECLAIM_PCT",
         "CANDIDATE_TREND_TARGET_2_PCT",
     ):
         monkeypatch.delenv(name, raising=False)
@@ -302,6 +312,10 @@ def test_default_candidate_config_is_accuracy_first(monkeypatch):
     assert config.relative_strength_top_percent == 10.0
     assert config.relative_strength_min_5m_pct == 1.0
     assert config.early_trend_required is True
+    assert config.leader_watch_enabled is True
+    assert config.leader_pullback_min_pct == 1.0
+    assert config.leader_pullback_max_pct == 5.0
+    assert config.leader_reclaim_pct == 0.5
     assert config.trend_target_2_pct == 10.0
 
 

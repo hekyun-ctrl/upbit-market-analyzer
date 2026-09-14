@@ -684,7 +684,9 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     risk_notes = "·".join(candidate.get("risk_notes", []))
     risk_line = f"위험 감점: {risk_notes}\n" if risk_notes else ""
     labels = []
-    if candidate.get("is_reentry"):
+    if candidate.get("leader_pullback_recheck"):
+        labels.append("선도주 눌림")
+    elif candidate.get("is_reentry"):
         labels.append("재지지")
     if candidate.get("availability_tier"):
         labels.append("보완형")
@@ -1081,6 +1083,7 @@ class CandidateAnalyzer:
         self._relative_strength_provider = relative_strength_provider
         self._last_checked_at: dict[str, float] = {}
         self._last_reentry_at: dict[str, float] = {}
+        self._last_leader_recheck_at: dict[str, float] = {}
         self._lifecycles: dict[str, dict[str, Any]] = {}
         self._watchlist: dict[str, dict[str, Any]] = {}
         self._signal_tracks: dict[str, dict[str, Any]] = {}
@@ -1364,6 +1367,35 @@ class CandidateAnalyzer:
                 "last_checked_at": now,
                 "expires_at": float(state["created_at"])
                 + self.config.watchlist_window_seconds,
+                "leader_peak_price": max(
+                    float(state.get("leader_peak_price") or 0),
+                    float(alert["price"]),
+                    current_price,
+                ),
+                "leader_pullback_low": float(
+                    state.get("leader_pullback_low") or current_price
+                ),
+                "leader_pullback_seen": bool(
+                    state.get("leader_pullback_seen", False)
+                ),
+                "leader_pullback_invalidated": bool(
+                    state.get("leader_pullback_invalidated", False)
+                ),
+                "leader_recheck_count": int(
+                    state.get("leader_recheck_count", 0)
+                ),
+                "relative_strength_rank": alert.get(
+                    "relative_strength_rank",
+                    state.get("relative_strength_rank"),
+                ),
+                "relative_strength_universe": alert.get(
+                    "relative_strength_universe",
+                    state.get("relative_strength_universe"),
+                ),
+                "relative_strength_percentile": alert.get(
+                    "relative_strength_percentile",
+                    state.get("relative_strength_percentile"),
+                ),
             }
         )
         self._watchlist[market] = state
@@ -1420,40 +1452,170 @@ class CandidateAnalyzer:
         task.add_done_callback(completed)
         return True
 
+    def _observe_leader_watchlist(
+        self, market: str, price: float, now: float
+    ) -> bool:
+        """Recheck a rejected market after a controlled leader pullback/reclaim."""
+        if not self.config.leader_watch_enabled:
+            return False
+        state = self._active_watch(market, now)
+        if not state or price <= 0:
+            return False
+
+        previous_peak = float(state.get("leader_peak_price") or price)
+        if state.get("leader_pullback_invalidated"):
+            if price <= previous_peak:
+                return False
+            state["leader_pullback_invalidated"] = False
+            state["leader_pullback_seen"] = False
+            state["leader_pullback_low"] = price
+
+        peak = max(previous_peak, price)
+        state["leader_peak_price"] = peak
+        drawdown_pct = max(0.0, (peak / price - 1) * 100)
+        max_pullback = max(
+            self.config.leader_pullback_min_pct,
+            self.config.leader_pullback_max_pct,
+        )
+
+        if drawdown_pct > max_pullback:
+            # A deep slide invalidates the impulse. Do not call a later bounce
+            # a first dip unless price establishes a genuinely fresh high.
+            state["leader_pullback_invalidated"] = True
+            state["leader_pullback_seen"] = False
+            return False
+
+        if not state.get("leader_pullback_seen"):
+            if drawdown_pct < self.config.leader_pullback_min_pct:
+                return False
+            state["leader_pullback_seen"] = True
+            state["leader_pullback_low"] = price
+            return False
+
+        pullback_low = min(float(state.get("leader_pullback_low") or price), price)
+        state["leader_pullback_low"] = pullback_low
+        reclaim_level = pullback_low * (1 + self.config.leader_reclaim_pct / 100)
+        if price < reclaim_level:
+            return False
+        if market in self._inflight_markets:
+            return False
+        if (
+            int(state.get("leader_recheck_count", 0))
+            >= self.config.leader_watch_max_rechecks
+        ):
+            return False
+        if (
+            now - self._last_leader_recheck_at.get(market, 0)
+            < self.config.leader_recheck_cooldown_seconds
+        ):
+            return False
+
+        relative = (
+            self._relative_strength_provider(market, int(now))
+            if self._relative_strength_provider is not None
+            else {
+                "relative_strength_ready": False,
+                "relative_strength_eligible": False,
+            }
+        )
+        percentile = float(relative.get("relative_strength_percentile") or 100.0)
+        still_a_leader = bool(
+            relative.get("relative_strength_ready")
+            and relative.get("relative_strength_eligible")
+            and percentile <= self.config.relative_strength_top_percent
+            and (
+                not self.config.early_trend_required
+                or relative.get("early_trend")
+            )
+        )
+        if not still_a_leader:
+            # A later fresh high can establish another pullback cycle while the
+            # original raw signal remains on the 12-hour watchlist.
+            if price >= peak:
+                state["leader_pullback_seen"] = False
+                state["leader_pullback_low"] = price
+            return False
+
+        self._last_leader_recheck_at[market] = now
+        state["leader_recheck_count"] = int(
+            state.get("leader_recheck_count", 0)
+        ) + 1
+        state["leader_pullback_seen"] = False
+        state["leader_pullback_invalidated"] = False
+        state["leader_pullback_low"] = price
+        state["leader_peak_price"] = price
+        alert = {
+            "time_utc": datetime.now(timezone.utc).isoformat(),
+            "market": market,
+            "signal": state["source_signal"],
+            "price": price,
+            "breakout_level": reclaim_level,
+            "is_reentry": True,
+            "pullback_retest": True,
+            "watchlist_recheck": True,
+            "leader_pullback_recheck": True,
+            "original_signal_time_utc": state.get("first_signal_time_utc"),
+            **relative,
+        }
+        MONITOR_STATE.add_screening_record(
+            self._screening_record(alert, "leader_recheck_scheduled", [])
+        )
+        self._inflight_markets.add(market)
+        task = asyncio.create_task(self._analyze(alert))
+        self._tasks.add(task)
+
+        def completed(done: asyncio.Task[None]) -> None:
+            self._tasks.discard(done)
+            self._inflight_markets.discard(market)
+
+        task.add_done_callback(completed)
+        LOGGER.info(
+            "Leader pullback recheck scheduled: %s pullback=%.2f%% "
+            "reclaim=%.2f%% rank=%s/%s",
+            market,
+            drawdown_pct,
+            (price / pullback_low - 1) * 100,
+            relative.get("relative_strength_rank"),
+            relative.get("relative_strength_universe"),
+        )
+        return True
+
     def observe_price(self, market: str, price: float) -> bool:
         """Schedule one fresh recheck after price leaves and retakes the entry zone."""
         now = time.time()
         self._observe_signal_track(market, price, now)
         self._observe_trend_track(market, price, now)
-        self._active_watch(market, now)
+        leader_recheck_scheduled = self._observe_leader_watchlist(
+            market, price, now
+        )
         state = self._lifecycles.get(market)
         if not state:
-            return False
+            return leader_recheck_scheduled
         state["max_price"] = max(float(state["max_price"]), price)
         state["min_price"] = min(float(state["min_price"]), price)
         if price >= float(state["target_1"]):
             self._finish_lifecycle(market, state, "target_1_first", price, now)
-            return False
+            return leader_recheck_scheduled
         if price <= float(state["stop_price"]):
             self._finish_lifecycle(market, state, "stop_first", price, now)
-            return False
+            return leader_recheck_scheduled
         if now >= float(state["expires_at"]):
             self._finish_lifecycle(market, state, "expired", price, now)
-            return False
+            return leader_recheck_scheduled
         entry_low = float(state["entry_low"])
         entry_high = float(state["entry_high"])
         if price < entry_low or price > entry_high:
             state["waiting_retest"] = True
-            return False
+            return leader_recheck_scheduled
         if not state.get("waiting_retest") or not entry_low <= price <= entry_high:
-            return False
+            return leader_recheck_scheduled
         if market in self._inflight_markets:
-            return False
+            return leader_recheck_scheduled
         if (
             now - self._last_reentry_at.get(market, 0)
             < self.config.reentry_cooldown_seconds
         ):
-            return False
+            return leader_recheck_scheduled
         self._last_reentry_at[market] = now
         state["waiting_retest"] = False
         alert = {
@@ -1560,6 +1722,13 @@ class CandidateAnalyzer:
                     )
                 finally:
                     await client.close()
+            if self._relative_strength_provider is not None:
+                # Reconfirm leadership after the completed-candle wait. A coin
+                # that lost its rank during the pullback must not pass on stale
+                # raw-signal momentum.
+                alert.update(
+                    self._relative_strength_provider(market, int(time.time()))
+                )
             candidate, rejected = evaluate_candidate(
                 alert,
                 ticker,

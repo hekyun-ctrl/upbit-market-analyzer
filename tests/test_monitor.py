@@ -694,6 +694,136 @@ def test_rejected_candidate_is_rechecked_on_consolidation_breakout(monkeypatch):
     assert seen[0]["watchlist_recheck"] is True
 
 
+def test_rejected_leader_is_rechecked_after_pullback_and_reclaim(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+
+    def relative_strength(_market, _now):
+        return {
+            "relative_strength_ready": True,
+            "relative_strength_eligible": True,
+            "relative_strength_rank": 2,
+            "relative_strength_universe": 100,
+            "relative_strength_percentile": 2.0,
+            "momentum_5m_pct": 2.4,
+            "momentum_15m_pct": 5.0,
+            "momentum_60m_pct": 8.0,
+            "early_trend": True,
+        }
+
+    analyzer = CandidateAnalyzer(
+        CandidateConfig.from_env(), AlertDispatcher(), relative_strength
+    )
+    analyzer._watchlist["KRW-IQ"] = {
+        "market": "KRW-IQ",
+        "created_at": 1_800_000_000.0,
+        "first_signal_time_utc": "2026-09-12T10:00:00+00:00",
+        "first_signal_price": 100.0,
+        "source_signal": "breakout",
+        "breakout_level": 100.0,
+        "leader_peak_price": 110.0,
+        "leader_pullback_seen": False,
+        "leader_recheck_count": 0,
+        "recheck_count": 0,
+        "expires_at": 9_999_999_999.0,
+    }
+    seen = []
+
+    async def fake_analyze(alert):
+        seen.append(alert)
+
+    monkeypatch.setattr(analyzer, "_analyze", fake_analyze)
+
+    async def run():
+        assert analyzer._observe_leader_watchlist(
+            "KRW-IQ", 108.5, 1_800_000_100.0
+        ) is False
+        assert analyzer._observe_leader_watchlist(
+            "KRW-IQ", 109.1, 1_800_000_110.0
+        ) is True
+        await asyncio.sleep(0)
+
+    asyncio.run(run())
+
+    assert len(seen) == 1
+    assert seen[0]["leader_pullback_recheck"] is True
+    assert seen[0]["pullback_retest"] is True
+    assert seen[0]["relative_strength_rank"] == 2
+    assert seen[0]["breakout_level"] > 108.5
+
+
+def test_pullback_reclaim_is_not_rechecked_after_leadership_is_lost(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(
+        CandidateConfig.from_env(),
+        AlertDispatcher(),
+        lambda _market, _now: {
+            "relative_strength_ready": True,
+            "relative_strength_eligible": False,
+            "relative_strength_rank": 40,
+            "relative_strength_universe": 100,
+            "relative_strength_percentile": 40.0,
+            "early_trend": False,
+        },
+    )
+    analyzer._watchlist["KRW-IQ"] = {
+        "market": "KRW-IQ",
+        "created_at": 1_800_000_000.0,
+        "first_signal_time_utc": "2026-09-12T10:00:00+00:00",
+        "first_signal_price": 100.0,
+        "source_signal": "breakout",
+        "leader_peak_price": 110.0,
+        "leader_pullback_seen": True,
+        "leader_pullback_low": 108.0,
+        "leader_recheck_count": 0,
+        "expires_at": 9_999_999_999.0,
+    }
+
+    async def run():
+        assert analyzer._observe_leader_watchlist(
+            "KRW-IQ", 108.6, 1_800_000_100.0
+        ) is False
+
+    asyncio.run(run())
+    assert "KRW-IQ" not in analyzer._inflight_markets
+
+
+def test_deep_leader_pullback_stays_invalid_until_a_fresh_high(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(
+        CandidateConfig.from_env(),
+        AlertDispatcher(),
+        lambda _market, _now: {
+            "relative_strength_ready": True,
+            "relative_strength_eligible": True,
+            "relative_strength_rank": 1,
+            "relative_strength_universe": 100,
+            "relative_strength_percentile": 1.0,
+            "early_trend": True,
+        },
+    )
+    analyzer._watchlist["KRW-IQ"] = {
+        "market": "KRW-IQ",
+        "created_at": 1_800_000_000.0,
+        "source_signal": "breakout",
+        "leader_peak_price": 110.0,
+        "leader_pullback_seen": False,
+        "leader_recheck_count": 0,
+        "expires_at": 9_999_999_999.0,
+    }
+
+    async def run():
+        assert analyzer._observe_leader_watchlist(
+            "KRW-IQ", 104.0, 1_800_000_100.0
+        ) is False
+        assert analyzer._observe_leader_watchlist(
+            "KRW-IQ", 105.0, 1_800_000_110.0
+        ) is False
+
+    asyncio.run(run())
+    assert analyzer._watchlist["KRW-IQ"]["leader_pullback_invalidated"] is True
+    assert "KRW-IQ" not in analyzer._inflight_markets
+
+
 def test_every_screened_signal_tracks_five_percent_before_three_percent(monkeypatch):
     monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
     analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
@@ -765,3 +895,17 @@ def test_candidate_message_displays_fifteen_and_twenty_percent_extensions():
     assert "추세 확장 관찰:" in text
     assert "(+15%)" in text
     assert "(+20%)" in text
+
+
+def test_candidate_message_labels_leader_pullback_recheck():
+    candidate = _telegram_candidate()
+    candidate.update(
+        {
+            "is_reentry": True,
+            "leader_pullback_recheck": True,
+        }
+    )
+
+    text = _candidate_text(candidate)
+
+    assert "[조건부 진입 후보 | 선도주 눌림 |" in text

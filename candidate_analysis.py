@@ -87,6 +87,12 @@ class CandidateConfig:
     early_trend_required: bool
     require_first_retest: bool
     retest_tolerance_pct: float
+    leader_watch_enabled: bool
+    leader_watch_max_rechecks: int
+    leader_pullback_min_pct: float
+    leader_pullback_max_pct: float
+    leader_reclaim_pct: float
+    leader_recheck_cooldown_seconds: int
     trend_target_2_pct: float
     trend_target_3_pct: float
     trend_target_4_pct: float
@@ -226,6 +232,23 @@ class CandidateConfig:
             require_first_retest=_enabled("CANDIDATE_REQUIRE_FIRST_RETEST", True),
             retest_tolerance_pct=max(
                 0.1, _env_float("CANDIDATE_RETEST_TOLERANCE_PCT", 0.8)
+            ),
+            leader_watch_enabled=_enabled("CANDIDATE_LEADER_WATCH_ENABLED", True),
+            leader_watch_max_rechecks=max(
+                1, min(10, _env_int("CANDIDATE_LEADER_WATCH_MAX_RECHECKS", 3))
+            ),
+            leader_pullback_min_pct=max(
+                0.3, _env_float("CANDIDATE_LEADER_PULLBACK_MIN_PCT", 1.0)
+            ),
+            leader_pullback_max_pct=max(
+                1.0, _env_float("CANDIDATE_LEADER_PULLBACK_MAX_PCT", 5.0)
+            ),
+            leader_reclaim_pct=max(
+                0.2, _env_float("CANDIDATE_LEADER_RECLAIM_PCT", 0.5)
+            ),
+            leader_recheck_cooldown_seconds=max(
+                60,
+                _env_int("CANDIDATE_LEADER_RECHECK_COOLDOWN_SECONDS", 300),
             ),
             trend_target_2_pct=max(
                 5.0, _env_float("CANDIDATE_TREND_TARGET_2_PCT", 10.0)
@@ -871,6 +894,8 @@ def evaluate_candidate(
         reasons.insert(0, "상승 초기 가속 구간")
     if alert.get("is_reentry"):
         reasons.insert(0, "돌파선 재지지 후 재진입")
+    if alert.get("leader_pullback_recheck"):
+        reasons.insert(0, "상대강도 선도주 첫 눌림 후 재돌파")
 
     if btc_weak:
         risk_notes.append(
@@ -892,6 +917,9 @@ def evaluate_candidate(
         "source_signal": alert["signal"],
         "is_reentry": bool(alert.get("is_reentry")),
         "watchlist_recheck": bool(alert.get("watchlist_recheck")),
+        "leader_pullback_recheck": bool(
+            alert.get("leader_pullback_recheck")
+        ),
         "score": score,
         "condition_score": score,
         "current_price": current,
