@@ -59,6 +59,14 @@ def _config(**overrides):
         "availability_max_upper_wick_ratio": 0.65,
         "availability_resistance_floor_pct": 1.5,
         "availability_min_score": 84,
+        "relative_strength_required": True,
+        "relative_strength_top_percent": 15.0,
+        "relative_strength_min_5m_pct": 0.8,
+        "relative_strength_score_bonus": 8,
+        "require_first_retest": True,
+        "retest_tolerance_pct": 0.8,
+        "trend_target_2_pct": 8.0,
+        "trend_tracking_seconds": 21600,
     }
     values.update(overrides)
     return CandidateConfig(**values)
@@ -137,7 +145,11 @@ def test_healthy_signal_builds_orderable_risk_plan():
     assert candidate["stop_price"] < candidate["entry_low"]
     assert candidate["target_1"] > candidate["entry_high"]
     assert candidate["target_2"] > candidate["target_1"]
-    assert candidate["target_mode"] in {"균형 위험비형", "강한 추세 확장형"}
+    assert candidate["target_mode"] in {
+        "균형 위험비형",
+        "강한 추세 확장형",
+        "상대강도 추세추적형",
+    }
     assert candidate["resistance_room_pct"] >= 5.0
     assert candidate["risk_reward"] >= 2.0
 
@@ -200,6 +212,100 @@ def test_consolidation_rebreakout_is_accepted_and_explained():
     assert candidate["target_mode"] == "강한 추세 확장형"
     assert 6.8 <= candidate["target_1_pct"] <= 7.1
     assert 9.8 <= candidate["target_2_pct"] <= 10.1
+
+
+def test_ready_relative_strength_rejects_non_leader():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    alert = {
+        "market": "KRW-TEST",
+        "signal": "breakout",
+        "price": current,
+        "relative_strength_ready": True,
+        "relative_strength_eligible": False,
+        "relative_strength_rank": 80,
+        "relative_strength_universe": 100,
+        "relative_strength_percentile": 80.0,
+        "momentum_5m_pct": 0.2,
+        "momentum_15m_pct": -0.1,
+    }
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        alert, ticker, _orderbook(current), one, five, _config()
+    )
+
+    assert candidate is None
+    assert any("상대강도 상위권 아님" in reason for reason in rejected)
+
+
+def test_relative_strength_retest_uses_trend_tracking_targets():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    alert = {
+        "market": "KRW-TEST",
+        "signal": "breakout",
+        "price": current,
+        "breakout_level": current * 0.997,
+        "relative_strength_ready": True,
+        "relative_strength_eligible": True,
+        "relative_strength_rank": 3,
+        "relative_strength_universe": 100,
+        "relative_strength_percentile": 3.0,
+        "momentum_5m_pct": 2.0,
+        "momentum_15m_pct": 4.0,
+        "momentum_60m_pct": 6.0,
+    }
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        alert, ticker, _orderbook(current), one, five, _config(min_score=80)
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["target_mode"] == "상대강도 추세추적형"
+    assert 7.8 <= candidate["target_2_pct"] <= 8.2
+    assert candidate["first_retest_confirmed"] is True
+    assert any("상대강도 3/100위" in reason for reason in candidate["reasons"])
+
+
+def test_rebreakout_reason_never_displays_zero_minutes():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    candidate, rejected = evaluate_candidate(
+        {
+            "market": "KRW-TEST",
+            "signal": "consolidation_rebreakout",
+            "price": current,
+            "is_reentry": True,
+        },
+        {
+            "trade_price": current,
+            "signed_change_rate": 0.08,
+            "high_price": current * 1.08,
+        },
+        _orderbook(current),
+        one,
+        five,
+        _config(),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert "0분 횡보 상단 재돌파" not in candidate["reasons"]
+    assert "횡보 상단 재돌파" in candidate["reasons"]
 
 
 def test_overheated_signal_is_rejected():

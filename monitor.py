@@ -12,7 +12,7 @@ import uuid
 from collections import Counter, defaultdict, deque
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from typing import Any, Callable
 
 import httpx
 import websockets
@@ -65,6 +65,11 @@ class MonitorConfig:
     rebreakout_max_range_pct: float
     rebreakout_price_buffer_pct: float
     rebreakout_min_volume_ratio: float
+    relative_strength_enabled: bool
+    relative_strength_min_universe: int
+    relative_strength_top_percent: float
+    relative_strength_min_5m_pct: float
+    relative_strength_stale_seconds: int
 
     @classmethod
     def from_env(cls) -> "MonitorConfig":
@@ -102,6 +107,25 @@ class MonitorConfig:
             rebreakout_min_volume_ratio=max(
                 1.5, _env_float("MONITOR_REBREAKOUT_MIN_VOLUME_RATIO", 3.0)
             ),
+            relative_strength_enabled=_enabled(
+                "MONITOR_RELATIVE_STRENGTH_ENABLED", True
+            ),
+            relative_strength_min_universe=max(
+                20, _env_int("MONITOR_RELATIVE_STRENGTH_MIN_UNIVERSE", 80)
+            ),
+            relative_strength_top_percent=max(
+                5.0,
+                min(
+                    40.0,
+                    _env_float("MONITOR_RELATIVE_STRENGTH_TOP_PERCENT", 15.0),
+                ),
+            ),
+            relative_strength_min_5m_pct=_env_float(
+                "MONITOR_RELATIVE_STRENGTH_MIN_5M_PCT", 0.8
+            ),
+            relative_strength_stale_seconds=max(
+                30, _env_int("MONITOR_RELATIVE_STRENGTH_STALE_SECONDS", 120)
+            ),
         )
 
 
@@ -132,6 +156,8 @@ class MonitorState:
         self.recent_alerts: deque[dict[str, Any]] = deque(maxlen=100)
         self.candidate_outcomes: deque[dict[str, Any]] = deque(maxlen=500)
         self.signal_outcomes: deque[dict[str, Any]] = deque(maxlen=1000)
+        self.trend_outcomes: deque[dict[str, Any]] = deque(maxlen=500)
+        self.screening_records: deque[dict[str, Any]] = deque(maxlen=2000)
         self.candidate_delivery_day_kst: str | None = None
         self.candidate_delivery_count_today = 0
         self.candidate_delivery_min_daily = 0
@@ -180,6 +206,16 @@ class MonitorState:
             self.signal_outcomes.appendleft(dict(outcome))
         LOGGER.warning("RAW_SIGNAL_OUTCOME %s", json.dumps(outcome, ensure_ascii=False))
 
+    def add_trend_outcome(self, outcome: dict[str, Any]) -> None:
+        with self._lock:
+            self.trend_outcomes.appendleft(dict(outcome))
+        LOGGER.warning("TREND_OUTCOME %s", json.dumps(outcome, ensure_ascii=False))
+
+    def add_screening_record(self, record: dict[str, Any]) -> None:
+        with self._lock:
+            self.screening_records.appendleft(dict(record))
+        LOGGER.info("CANDIDATE_SCREENING %s", json.dumps(record, ensure_ascii=False))
+
     def update_candidate_delivery(
         self,
         *,
@@ -218,6 +254,8 @@ class MonitorState:
         with self._lock:
             outcomes = list(self.candidate_outcomes)
             signal_outcomes = list(self.signal_outcomes)
+            trend_outcomes = list(self.trend_outcomes)
+            screening_records = list(self.screening_records)
         targets = sum(item.get("result") == "target_1_first" for item in outcomes)
         stops = sum(item.get("result") == "stop_first" for item in outcomes)
         decided = targets + stops
@@ -232,6 +270,38 @@ class MonitorState:
             ),
             "recent": outcomes[:100],
             "raw_signal_performance": self._performance_summary(signal_outcomes),
+            "six_hour_trend_performance": {
+                "sample_count": len(trend_outcomes),
+                "target_1_reached": sum(
+                    bool(item.get("target_1_reached")) for item in trend_outcomes
+                ),
+                "target_2_reached": sum(
+                    item.get("result") == "target_2_reached"
+                    for item in trend_outcomes
+                ),
+                "stop_before_target_1": sum(
+                    item.get("result") == "stop_before_target_1"
+                    for item in trend_outcomes
+                ),
+                "protected_after_target_1": sum(
+                    item.get("result") == "protected_after_target_1"
+                    for item in trend_outcomes
+                ),
+                "expired": sum(
+                    item.get("result") == "expired" for item in trend_outcomes
+                ),
+                "recent": trend_outcomes[:100],
+            },
+            "screening": {
+                "sample_count": len(screening_records),
+                "accepted": sum(
+                    item.get("decision") == "accepted" for item in screening_records
+                ),
+                "rejected": sum(
+                    item.get("decision") != "accepted" for item in screening_records
+                ),
+                "recent": screening_records[:100],
+            },
         }
 
     def snapshot(self) -> dict[str, Any]:
@@ -250,6 +320,8 @@ class MonitorState:
                 "recent_alert_count": len(self.recent_alerts),
                 "candidate_outcome_count": len(self.candidate_outcomes),
                 "raw_signal_outcome_count": len(self.signal_outcomes),
+                "six_hour_trend_outcome_count": len(self.trend_outcomes),
+                "candidate_screening_count": len(self.screening_records),
                 "candidate_delivery_day_kst": self.candidate_delivery_day_kst,
                 "candidate_delivery_count_today": self.candidate_delivery_count_today,
                 "candidate_delivery_target_daily": {
@@ -295,6 +367,102 @@ class SignalEngine:
         self._last_evaluated_second: dict[str, int] = {}
         self._last_alert_at: dict[tuple[str, str], int] = {}
         self._global_alerts: deque[int] = deque()
+        self._momentum_prices: dict[str, deque[tuple[int, float]]] = defaultdict(
+            deque
+        )
+
+    @staticmethod
+    def _rolling_return(
+        samples: deque[tuple[int, float]], now: int, seconds: int
+    ) -> float | None:
+        """Return a rolling change from five-second price samples."""
+        if not samples or now - samples[0][0] < seconds * 0.9:
+            return None
+        cutoff = now - seconds
+        reference = None
+        for sample_second, sample_price in reversed(samples):
+            if sample_second <= cutoff:
+                reference = sample_price
+                break
+        if not reference:
+            return None
+        return (samples[-1][1] / reference - 1.0) * 100
+
+    def _update_momentum_price(self, market: str, second: int, price: float) -> None:
+        samples = self._momentum_prices[market]
+        sample_second = second - second % 5
+        if not samples or samples[-1][0] != sample_second:
+            samples.append((sample_second, price))
+        else:
+            samples[-1] = (sample_second, price)
+        while samples and samples[0][0] < second - 3720:
+            samples.popleft()
+
+    def relative_strength_snapshot(self, market: str, now: int) -> dict[str, Any]:
+        """Rank the current market against fresh KRW-market rolling momentum."""
+        if not self.config.relative_strength_enabled:
+            return {"relative_strength_ready": False}
+
+        snapshots: list[tuple[str, float, float, float | None, float | None]] = []
+        for code, samples in self._momentum_prices.items():
+            if (
+                not samples
+                or now - samples[-1][0]
+                > self.config.relative_strength_stale_seconds
+            ):
+                continue
+            change_5m = self._rolling_return(samples, now, 300)
+            if change_5m is None:
+                continue
+            change_15m = self._rolling_return(samples, now, 900)
+            change_60m = self._rolling_return(samples, now, 3600)
+            weighted: list[tuple[float, float]] = [(change_5m, 0.55)]
+            if change_15m is not None:
+                weighted.append((change_15m, 0.30))
+            if change_60m is not None:
+                weighted.append((change_60m, 0.15))
+            total_weight = sum(weight for _, weight in weighted)
+            score = sum(value * weight for value, weight in weighted) / total_weight
+            snapshots.append((code, score, change_5m, change_15m, change_60m))
+
+        snapshots.sort(key=lambda item: item[1], reverse=True)
+        universe = len(snapshots)
+        ready = universe >= self.config.relative_strength_min_universe
+        selected = next((item for item in snapshots if item[0] == market), None)
+        if selected is None:
+            return {
+                "relative_strength_ready": ready,
+                "relative_strength_universe": universe,
+            }
+        rank = snapshots.index(selected) + 1
+        percentile = rank / universe * 100 if universe else 100.0
+        _, score, change_5m, change_15m, change_60m = selected
+        eligible = bool(
+            ready
+            and percentile <= self.config.relative_strength_top_percent
+            and change_5m >= self.config.relative_strength_min_5m_pct
+            and (change_15m is None or change_15m > 0)
+        )
+        return {
+            "relative_strength_ready": ready,
+            "relative_strength_eligible": eligible,
+            "relative_strength_rank": rank,
+            "relative_strength_universe": universe,
+            "relative_strength_percentile": round(percentile, 2),
+            "relative_strength_score": round(score, 3),
+            "momentum_5m_pct": round(change_5m, 2),
+            "momentum_15m_pct": (
+                round(change_15m, 2) if change_15m is not None else None
+            ),
+            "momentum_60m_pct": (
+                round(change_60m, 2) if change_60m is not None else None
+            ),
+            "early_trend": bool(
+                eligible
+                and change_5m >= self.config.relative_strength_min_5m_pct
+                and (change_15m is None or change_15m < change_5m * 4)
+            ),
+        }
 
     def update(
         self, market: str, price: float, volume: float, timestamp_ms: int
@@ -302,6 +470,7 @@ class SignalEngine:
         if price <= 0 or volume < 0:
             return []
         second = int(timestamp_ms / 1000)
+        self._update_momentum_price(market, second, price)
         window = self._windows[market]
         trade_value = price * volume
 
@@ -436,6 +605,9 @@ class SignalEngine:
                     )
                 )
 
+        relative_strength = (
+            self.relative_strength_snapshot(market, now) if signals else {}
+        )
         alerts = []
         for signal_type, label, details in signals:
             if not self._can_alert(market, signal_type, now):
@@ -452,6 +624,7 @@ class SignalEngine:
                     "change_1m_pct": round(change_1m_pct, 2),
                     "trade_value_1m_krw": round(value_1m),
                     "volume_ratio_vs_previous_1m": round(volume_ratio, 2),
+                    **relative_strength,
                     **details,
                 }
             )
@@ -506,6 +679,19 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     if candidate.get("availability_tier"):
         labels.append("보완형")
     suffix = f" | {'·'.join(labels)}" if labels else ""
+    relative_line = ""
+    if candidate.get("relative_strength_ready"):
+        relative_line = (
+            "상대강도: "
+            f"{int(candidate.get('relative_strength_rank') or 0)}/"
+            f"{int(candidate.get('relative_strength_universe') or 0)}위 · "
+            f"5분 {float(candidate.get('momentum_5m_pct') or 0):+.1f}%"
+        )
+        if candidate.get("momentum_15m_pct") is not None:
+            relative_line += (
+                f" · 15분 {float(candidate['momentum_15m_pct']):+.1f}%"
+            )
+        relative_line += "\n"
     return (
         f"[조건부 진입 후보{suffix} | 조건점수 {candidate['score']}/100] "
         f"{candidate['market']}\n"
@@ -519,13 +705,16 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"2차 목표: {_format_price(float(candidate['target_2']))} "
         f"(약 +{candidate['target_2_pct']:.1f}%)\n"
         f"목표 방식: {candidate['target_mode']}\n"
+        f"추세 관리: {candidate.get('trend_management', '고정 목표 관리')}\n"
+        f"{relative_line}"
         f"가까운 저항 여유: {candidate.get('resistance_room_pct', 0):.1f}%\n"
         f"예상 손익비: {candidate.get('risk_reward', 0):.2f}\n"
         f"추천 비중: 투자 가능금액의 {candidate['suggested_position_pct']}% 이내\n"
         f"신호 유효시간: {int(candidate['valid_seconds'] / 60)}분\n"
         f"{risk_line}"
         f"선정 근거: {reasons}\n"
-        "자동 주문이나 수익 보장이 아닌 공개 시세 기반 조건부 관찰 정보입니다."
+        "조건점수는 적중 확률이 아닙니다. 자동 주문이나 수익 보장이 아닌 "
+        "공개 시세 기반 조건부 관찰 정보입니다."
     )
 
 
@@ -862,14 +1051,21 @@ class AlertDispatcher:
 class CandidateAnalyzer:
     """Confirm positive WebSocket signals with fresh REST market snapshots."""
 
-    def __init__(self, config: CandidateConfig, dispatcher: AlertDispatcher) -> None:
+    def __init__(
+        self,
+        config: CandidateConfig,
+        dispatcher: AlertDispatcher,
+        relative_strength_provider: Callable[[str, int], dict[str, Any]] | None = None,
+    ) -> None:
         self.config = config
         self.dispatcher = dispatcher
+        self._relative_strength_provider = relative_strength_provider
         self._last_checked_at: dict[str, float] = {}
         self._last_reentry_at: dict[str, float] = {}
         self._lifecycles: dict[str, dict[str, Any]] = {}
         self._watchlist: dict[str, dict[str, Any]] = {}
         self._signal_tracks: dict[str, dict[str, Any]] = {}
+        self._trend_tracks: dict[str, dict[str, Any]] = {}
         self._inflight_markets: set[str] = set()
         self._tasks: set[asyncio.Task[None]] = set()
         self._semaphore = asyncio.Semaphore(2)
@@ -902,6 +1098,14 @@ class CandidateAnalyzer:
             "signal_time_utc": alert.get("time_utc"),
             "expires_at": now + self.config.watchlist_window_seconds,
             "approved_candidate": False,
+            "relative_strength_rank": alert.get("relative_strength_rank"),
+            "relative_strength_universe": alert.get("relative_strength_universe"),
+            "relative_strength_percentile": alert.get(
+                "relative_strength_percentile"
+            ),
+            "momentum_5m_pct": alert.get("momentum_5m_pct"),
+            "momentum_15m_pct": alert.get("momentum_15m_pct"),
+            "momentum_60m_pct": alert.get("momentum_60m_pct"),
         }
 
     def _finish_signal_track(
@@ -928,9 +1132,139 @@ class CandidateAnalyzer:
                 "elapsed_seconds": round(now - float(state["created_at"]), 1),
                 "signal_time_utc": state.get("signal_time_utc"),
                 "completed_at_utc": datetime.now(timezone.utc).isoformat(),
+                "relative_strength_rank": state.get("relative_strength_rank"),
+                "relative_strength_universe": state.get(
+                    "relative_strength_universe"
+                ),
+                "relative_strength_percentile": state.get(
+                    "relative_strength_percentile"
+                ),
+                "momentum_5m_pct": state.get("momentum_5m_pct"),
+                "momentum_15m_pct": state.get("momentum_15m_pct"),
+                "momentum_60m_pct": state.get("momentum_60m_pct"),
             }
         )
         self._signal_tracks.pop(market, None)
+
+    @staticmethod
+    def _screening_record(
+        alert: dict[str, Any], decision: str, reasons: list[str]
+    ) -> dict[str, Any]:
+        return {
+            "time_utc": datetime.now(timezone.utc).isoformat(),
+            "market": alert.get("market"),
+            "source_signal": alert.get("signal"),
+            "decision": decision,
+            "reasons": list(reasons),
+            "relative_strength_rank": alert.get("relative_strength_rank"),
+            "relative_strength_universe": alert.get("relative_strength_universe"),
+            "relative_strength_percentile": alert.get(
+                "relative_strength_percentile"
+            ),
+            "momentum_5m_pct": alert.get("momentum_5m_pct"),
+            "momentum_15m_pct": alert.get("momentum_15m_pct"),
+            "momentum_60m_pct": alert.get("momentum_60m_pct"),
+            "change_1m_pct": alert.get("change_1m_pct"),
+            "volume_ratio_vs_previous_1m": alert.get(
+                "volume_ratio_vs_previous_1m"
+            ),
+        }
+
+    def _start_trend_track(self, candidate: dict[str, Any], now: float) -> None:
+        market = str(candidate["market"])
+        entry = float(candidate["entry_reference_price"])
+        self._trend_tracks[market] = {
+            "market": market,
+            "source_signal": candidate["source_signal"],
+            "entry_price": entry,
+            "stop_price": float(candidate["stop_price"]),
+            "target_1": float(candidate["target_1"]),
+            "target_2": float(candidate["target_2"]),
+            "target_1_reached": False,
+            "max_price": entry,
+            "min_price": entry,
+            "created_at": now,
+            "expires_at": now + self.config.trend_tracking_seconds,
+            "score": candidate["score"],
+            "target_mode": candidate["target_mode"],
+            "relative_strength_rank": candidate.get("relative_strength_rank"),
+            "relative_strength_universe": candidate.get(
+                "relative_strength_universe"
+            ),
+            "relative_strength_percentile": candidate.get(
+                "relative_strength_percentile"
+            ),
+            "momentum_5m_pct": candidate.get("momentum_5m_pct"),
+            "momentum_15m_pct": candidate.get("momentum_15m_pct"),
+            "momentum_60m_pct": candidate.get("momentum_60m_pct"),
+        }
+
+    def _finish_trend_track(
+        self,
+        market: str,
+        state: dict[str, Any],
+        result: str,
+        exit_price: float,
+        now: float,
+    ) -> None:
+        entry = float(state["entry_price"])
+        MONITOR_STATE.add_trend_outcome(
+            {
+                "market": market,
+                "source_signal": state["source_signal"],
+                "result": result,
+                "score": state["score"],
+                "target_mode": state["target_mode"],
+                "entry_price": entry,
+                "exit_price": exit_price,
+                "target_1": state["target_1"],
+                "target_2": state["target_2"],
+                "stop_price": state["stop_price"],
+                "target_1_reached": bool(state["target_1_reached"]),
+                "mfe_pct": round((float(state["max_price"]) / entry - 1) * 100, 2),
+                "mae_pct": round((float(state["min_price"]) / entry - 1) * 100, 2),
+                "elapsed_seconds": round(now - float(state["created_at"]), 1),
+                "completed_at_utc": datetime.now(timezone.utc).isoformat(),
+                "relative_strength_rank": state.get("relative_strength_rank"),
+                "relative_strength_universe": state.get(
+                    "relative_strength_universe"
+                ),
+                "relative_strength_percentile": state.get(
+                    "relative_strength_percentile"
+                ),
+                "momentum_5m_pct": state.get("momentum_5m_pct"),
+                "momentum_15m_pct": state.get("momentum_15m_pct"),
+                "momentum_60m_pct": state.get("momentum_60m_pct"),
+            }
+        )
+        self._trend_tracks.pop(market, None)
+
+    def _observe_trend_track(self, market: str, price: float, now: float) -> None:
+        state = self._trend_tracks.get(market)
+        if not state:
+            return
+        state["max_price"] = max(float(state["max_price"]), price)
+        state["min_price"] = min(float(state["min_price"]), price)
+        if price >= float(state["target_2"]):
+            state["target_1_reached"] = True
+            self._finish_trend_track(market, state, "target_2_reached", price, now)
+            return
+        if price >= float(state["target_1"]):
+            state["target_1_reached"] = True
+        protected_stop = (
+            float(state["entry_price"])
+            if state["target_1_reached"]
+            else float(state["stop_price"])
+        )
+        if price <= protected_stop:
+            result = (
+                "protected_after_target_1"
+                if state["target_1_reached"]
+                else "stop_before_target_1"
+            )
+            self._finish_trend_track(market, state, result, price, now)
+        elif now >= float(state["expires_at"]):
+            self._finish_trend_track(market, state, "expired", price, now)
 
     def _observe_signal_track(self, market: str, price: float, now: float) -> None:
         state = self._signal_tracks.get(market)
@@ -1037,6 +1371,7 @@ class CandidateAnalyzer:
         """Schedule one fresh recheck after price leaves and retakes the entry zone."""
         now = time.time()
         self._observe_signal_track(market, price, now)
+        self._observe_trend_track(market, price, now)
         self._active_watch(market, now)
         state = self._lifecycles.get(market)
         if not state:
@@ -1075,7 +1410,20 @@ class CandidateAnalyzer:
             "price": price,
             "breakout_level": state["breakout_level"],
             "is_reentry": True,
+            "consolidation_minutes": state.get("consolidation_minutes"),
+            "relative_strength_ready": state.get("relative_strength_ready"),
+            "relative_strength_eligible": state.get("relative_strength_eligible"),
+            "relative_strength_rank": state.get("relative_strength_rank"),
+            "relative_strength_universe": state.get("relative_strength_universe"),
+            "relative_strength_percentile": state.get(
+                "relative_strength_percentile"
+            ),
+            "momentum_5m_pct": state.get("momentum_5m_pct"),
+            "momentum_15m_pct": state.get("momentum_15m_pct"),
+            "momentum_60m_pct": state.get("momentum_60m_pct"),
         }
+        if self._relative_strength_provider is not None:
+            alert.update(self._relative_strength_provider(market, int(now)))
         self._inflight_markets.add(market)
         task = asyncio.create_task(self._analyze(alert))
         self._tasks.add(task)
@@ -1180,6 +1528,9 @@ class CandidateAnalyzer:
                     alert, rejected, float(ticker["trade_price"])
                 )
                 self.dispatcher.record_candidate_rejection(rejected)
+                MONITOR_STATE.add_screening_record(
+                    self._screening_record(alert, "rejected", rejected)
+                )
                 return
             verification_client = UpbitPublicClient()
             try:
@@ -1198,6 +1549,13 @@ class CandidateAnalyzer:
                 self.dispatcher.record_candidate_rejection(
                     [str(dispatch_rejection or "전송 직전 재검증 실패")]
                 )
+                MONITOR_STATE.add_screening_record(
+                    self._screening_record(
+                        alert,
+                        "dispatch_rejected",
+                        [str(dispatch_rejection or "전송 직전 재검증 실패")],
+                    )
+                )
                 return
             candidate["analysis_time_utc"] = datetime.now(timezone.utc).isoformat()
             delivered = await self.dispatcher.send_candidate(candidate)
@@ -1207,10 +1565,38 @@ class CandidateAnalyzer:
                     ["Telegram 일일 가용성·상한 정책으로 전송 보류"],
                     float(latest_ticker["trade_price"]),
                 )
+                MONITOR_STATE.add_screening_record(
+                    self._screening_record(
+                        alert,
+                        "delivery_suppressed",
+                        ["Telegram 일일 가용성·상한 정책으로 전송 보류"],
+                    )
+                )
                 return
+            accepted_record = self._screening_record(alert, "accepted", [])
+            for key in (
+                "score",
+                "target_mode",
+                "day_change_pct",
+                "rsi_1m",
+                "rsi_5m",
+                "completed_1m_volume_ratio",
+                "volume_vs_previous",
+                "close_position",
+                "upper_wick_ratio",
+                "orderbook_bid_ask_ratio",
+                "spread_pct",
+                "resistance_room_pct",
+                "risk_reward",
+                "first_retest_confirmed",
+            ):
+                accepted_record[key] = candidate.get(key)
+            MONITOR_STATE.add_screening_record(accepted_record)
             self._watchlist.pop(market, None)
             if market in self._signal_tracks:
                 self._signal_tracks[market]["approved_candidate"] = True
+            lifecycle_now = time.time()
+            self._start_trend_track(candidate, lifecycle_now)
             self._lifecycles[market] = {
                 "source_signal": candidate["source_signal"],
                 "entry_low": candidate["entry_low"],
@@ -1225,8 +1611,27 @@ class CandidateAnalyzer:
                 "is_reentry": candidate["is_reentry"],
                 "created_at": time.time(),
                 "breakout_level": candidate["breakout_level"],
+                "consolidation_minutes": alert.get("consolidation_minutes"),
+                "relative_strength_ready": candidate.get(
+                    "relative_strength_ready"
+                ),
+                "relative_strength_eligible": candidate.get(
+                    "relative_strength_eligible"
+                ),
+                "relative_strength_rank": candidate.get(
+                    "relative_strength_rank"
+                ),
+                "relative_strength_universe": candidate.get(
+                    "relative_strength_universe"
+                ),
+                "relative_strength_percentile": candidate.get(
+                    "relative_strength_percentile"
+                ),
+                "momentum_5m_pct": candidate.get("momentum_5m_pct"),
+                "momentum_15m_pct": candidate.get("momentum_15m_pct"),
+                "momentum_60m_pct": candidate.get("momentum_60m_pct"),
                 "waiting_retest": False,
-                "expires_at": time.time() + self.config.reentry_window_seconds,
+                "expires_at": lifecycle_now + self.config.reentry_window_seconds,
             }
         except asyncio.CancelledError:
             raise
@@ -1253,7 +1658,9 @@ async def run_monitor_forever() -> None:
     config = MonitorConfig.from_env()
     dispatcher = AlertDispatcher()
     engine = SignalEngine(config)
-    candidate_analyzer = CandidateAnalyzer(CandidateConfig.from_env(), dispatcher)
+    candidate_analyzer = CandidateAnalyzer(
+        CandidateConfig.from_env(), dispatcher, engine.relative_strength_snapshot
+    )
     backoff = 1
     inactivity_status_task = asyncio.create_task(
         dispatcher.run_inactivity_status_loop()

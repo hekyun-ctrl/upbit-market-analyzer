@@ -27,6 +27,11 @@ def _config(**overrides):
         "rebreakout_max_range_pct": 3.0,
         "rebreakout_price_buffer_pct": 0.3,
         "rebreakout_min_volume_ratio": 3.0,
+        "relative_strength_enabled": True,
+        "relative_strength_min_universe": 20,
+        "relative_strength_top_percent": 15.0,
+        "relative_strength_min_5m_pct": 0.8,
+        "relative_strength_stale_seconds": 120,
     }
     values.update(overrides)
     return MonitorConfig(**values)
@@ -118,6 +123,37 @@ def test_rebreakout_requires_volume_expansion():
         alerts.extend(engine.update("KRW-IQ", price, 0.2, base_ms + second * 1000))
 
     assert not any(alert["signal"] == "consolidation_rebreakout" for alert in alerts)
+
+
+def test_relative_strength_ranks_the_leading_market():
+    engine = SignalEngine(
+        _config(
+            price_surge_1m_pct=100.0,
+            breakout_pct=100.0,
+            rebreakout_enabled=False,
+            relative_strength_min_universe=20,
+        )
+    )
+    base_ms = 1_800_000_000_000
+    for market_index in range(20):
+        market = f"KRW-T{market_index:02d}"
+        gain = 0.02 if market_index == 0 else market_index * 0.0001
+        for second in range(306):
+            engine.update(
+                market,
+                100.0 + second * gain,
+                0.1,
+                base_ms + second * 1000,
+            )
+
+    details = engine.relative_strength_snapshot(
+        "KRW-T00", int(base_ms / 1000) + 305
+    )
+
+    assert details["relative_strength_ready"] is True
+    assert details["relative_strength_eligible"] is True
+    assert details["relative_strength_rank"] == 1
+    assert details["relative_strength_universe"] == 20
 
 
 def test_observation_telegram_delivery_can_be_disabled(monkeypatch):
@@ -540,6 +576,43 @@ def test_candidate_outcome_records_target_before_stop(monkeypatch):
     assert "KRW-IQ" not in analyzer._lifecycles
 
 
+def test_six_hour_trend_track_protects_entry_after_target_one(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    MONITOR_STATE.trend_outcomes.clear()
+    analyzer._start_trend_track(
+        {
+            "market": "KRW-IQ",
+            "source_signal": "breakout",
+            "entry_reference_price": 100.0,
+            "stop_price": 97.0,
+            "target_1": 103.0,
+            "target_2": 108.0,
+            "score": 95,
+            "target_mode": "상대강도 추세추적형",
+            "relative_strength_rank": 2,
+            "relative_strength_universe": 100,
+            "relative_strength_percentile": 2.0,
+            "momentum_5m_pct": 2.0,
+            "momentum_15m_pct": 4.0,
+            "momentum_60m_pct": 6.0,
+        },
+        1_800_000_000.0,
+    )
+
+    analyzer._observe_trend_track("KRW-IQ", 103.0, 1_800_000_120.0)
+    analyzer._observe_trend_track("KRW-IQ", 100.0, 1_800_000_240.0)
+
+    performance = MONITOR_STATE.candidate_performance()[
+        "six_hour_trend_performance"
+    ]
+    assert performance["sample_count"] == 1
+    assert performance["target_1_reached"] == 1
+    assert performance["protected_after_target_1"] == 1
+    assert performance["recent"][0]["relative_strength_rank"] == 2
+    assert "KRW-IQ" not in analyzer._trend_tracks
+
+
 def test_rejected_candidate_is_rechecked_on_consolidation_breakout(monkeypatch):
     monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
     analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
@@ -626,3 +699,4 @@ def test_candidate_message_labels_score_as_condition_score():
 
     assert "조건점수 92/100" in text
     assert "위험 감점: BTC 약세 감점 -10점" in text
+    assert "조건점수는 적중 확률이 아닙니다" in text

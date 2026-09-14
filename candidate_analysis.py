@@ -80,6 +80,14 @@ class CandidateConfig:
     availability_max_upper_wick_ratio: float
     availability_resistance_floor_pct: float
     availability_min_score: int
+    relative_strength_required: bool
+    relative_strength_top_percent: float
+    relative_strength_min_5m_pct: float
+    relative_strength_score_bonus: int
+    require_first_retest: bool
+    retest_tolerance_pct: float
+    trend_target_2_pct: float
+    trend_tracking_seconds: int
 
     @classmethod
     def from_env(cls) -> "CandidateConfig":
@@ -192,6 +200,32 @@ class CandidateConfig:
             availability_min_score=max(
                 50,
                 min(100, _env_int("CANDIDATE_AVAILABILITY_MIN_SCORE", 84)),
+            ),
+            relative_strength_required=_enabled(
+                "CANDIDATE_RELATIVE_STRENGTH_REQUIRED", True
+            ),
+            relative_strength_top_percent=max(
+                5.0,
+                min(
+                    40.0,
+                    _env_float("CANDIDATE_RELATIVE_STRENGTH_TOP_PERCENT", 15.0),
+                ),
+            ),
+            relative_strength_min_5m_pct=_env_float(
+                "CANDIDATE_RELATIVE_STRENGTH_MIN_5M_PCT", 0.8
+            ),
+            relative_strength_score_bonus=max(
+                0, _env_int("CANDIDATE_RELATIVE_STRENGTH_SCORE_BONUS", 8)
+            ),
+            require_first_retest=_enabled("CANDIDATE_REQUIRE_FIRST_RETEST", True),
+            retest_tolerance_pct=max(
+                0.1, _env_float("CANDIDATE_RETEST_TOLERANCE_PCT", 0.8)
+            ),
+            trend_target_2_pct=max(
+                5.0, _env_float("CANDIDATE_TREND_TARGET_2_PCT", 8.0)
+            ),
+            trend_tracking_seconds=max(
+                3600, _env_int("CANDIDATE_TREND_TRACKING_SECONDS", 21600)
             ),
         )
 
@@ -443,9 +477,44 @@ def evaluate_candidate(
         and _ma20_slope(b5) < 0
         and _ma20_slope(b15) < 0
     )
+    relative_ready = bool(alert.get("relative_strength_ready"))
+    relative_eligible = bool(alert.get("relative_strength_eligible"))
+    relative_percentile = float(alert.get("relative_strength_percentile") or 100.0)
+    momentum_5m = float(alert.get("momentum_5m_pct") or 0.0)
+    momentum_15m_value = alert.get("momentum_15m_pct")
+    momentum_15m = (
+        float(momentum_15m_value) if momentum_15m_value is not None else None
+    )
+    # The confirming candle must itself test the breakout area. Older lows may
+    # predate the signal and would incorrectly classify a late chase as a retest.
+    recent_retest_low = float(c1[0]["low_price"])
+    retest_confirmed = bool(
+        alert.get("is_reentry")
+        or alert.get("pullback_retest")
+        or (
+            recent_retest_low
+            <= breakout * (1 + config.retest_tolerance_pct / 100)
+            and completed_close >= breakout
+        )
+    )
 
     rejected: list[str] = []
     soft_warnings: list[str] = []
+    if relative_ready and config.relative_strength_required:
+        if (
+            not relative_eligible
+            or relative_percentile > config.relative_strength_top_percent
+        ):
+            rejected.append(
+                "전체 시장 상대강도 상위권 아님"
+                f"({relative_percentile:.1f}백분위)"
+            )
+        if momentum_5m < config.relative_strength_min_5m_pct:
+            rejected.append(f"5분 상대 모멘텀 부족({momentum_5m:+.2f}%)")
+        if momentum_15m is not None and momentum_15m <= 0:
+            rejected.append(f"15분 추세 미확인({momentum_15m:+.2f}%)")
+        if config.require_first_retest and not retest_confirmed:
+            rejected.append("첫 눌림·돌파선 재지지 미확인")
     if not _completed_after_signal(c1[0], alert.get("time_utc")):
         rejected.append("신호 이후 확인시간 20초를 채운 완료 1분봉 없음")
     if completed_close < breakout:
@@ -644,6 +713,11 @@ def evaluate_candidate(
         if raw_change >= 2.0 and raw_volume_ratio >= 5.0
         else 3 if raw_change >= 1.5 and raw_volume_ratio >= 3.0 else 0
     )
+    relative_strength_bonus = 0
+    if relative_ready and relative_eligible:
+        relative_strength_bonus = config.relative_strength_score_bonus
+        if relative_percentile > 5.0:
+            relative_strength_bonus = max(1, relative_strength_bonus - 2)
     score = min(
         100,
         max(
@@ -655,6 +729,7 @@ def evaluate_candidate(
             + (12 if room >= 7 and risk_reward >= 2.5 else 10)
             + (12 if book_ratio >= 1.2 and spread <= 0.2 and liquid_market else 10)
             + impulse_bonus
+            + relative_strength_bonus
             - score_penalty,
         ),
     )
@@ -692,6 +767,18 @@ def evaluate_candidate(
             f"가용성 보완형 - 정규 {config.min_score}점 미만, 직접 안전선 통과"
         )
 
+    relative_trend_extension = bool(
+        relative_ready
+        and relative_eligible
+        and relative_percentile <= 10.0
+        and momentum_5m >= config.relative_strength_min_5m_pct
+        and (momentum_15m is None or momentum_15m > 0)
+        and retest_confirmed
+        and score >= 90
+        and trend_score >= 16
+        and not btc_weak
+        and not day_overheated
+    )
     strong_extension = (
         alert.get("signal") == "consolidation_rebreakout"
         and score >= 95
@@ -705,7 +792,15 @@ def evaluate_candidate(
         and book_persistent
         and spread <= config.max_spread_pct
     )
-    if strong_extension:
+    if relative_trend_extension:
+        target1 = _round_tick(
+            min(resistance, entry_reference * 1.03), tick, "down"
+        )
+        target2 = _round_tick(
+            entry_reference * (1 + config.trend_target_2_pct / 100), tick, "up"
+        )
+        target_mode = "상대강도 추세추적형"
+    elif strong_extension:
         target1 = _round_tick(
             min(resistance, entry_reference * 1.07), tick, "down"
         )
@@ -730,9 +825,24 @@ def evaluate_candidate(
     if impulse_bonus:
         reasons.insert(0, f"강한 가격·거래대금 유입 +{impulse_bonus}점")
     if alert.get("signal") == "consolidation_rebreakout":
+        consolidation_minutes = int(alert.get("consolidation_minutes") or 0)
         reasons.insert(
-            0, f"{int(alert.get('consolidation_minutes') or 0)}분 횡보 상단 재돌파"
+            0,
+            (
+                f"{consolidation_minutes}분 횡보 상단 재돌파"
+                if consolidation_minutes > 0
+                else "횡보 상단 재돌파"
+            ),
         )
+    if relative_ready and relative_eligible:
+        reasons.insert(
+            0,
+            "상대강도 "
+            f"{int(alert.get('relative_strength_rank') or 0)}/"
+            f"{int(alert.get('relative_strength_universe') or 0)}위",
+        )
+    if retest_confirmed and relative_ready:
+        reasons.insert(0, "첫 눌림·돌파선 재지지 확인")
     if alert.get("is_reentry"):
         reasons.insert(0, "돌파선 재지지 후 재진입")
 
@@ -769,6 +879,11 @@ def evaluate_candidate(
         "target_1_pct": round((target1 / entry_reference - 1) * 100, 2),
         "target_2_pct": round((target2 / entry_reference - 1) * 100, 2),
         "target_mode": target_mode,
+        "trend_management": (
+            "1차 목표 후 진입가 보호, 2차까지 추세 추적"
+            if relative_trend_extension
+            else "고정 목표 관리"
+        ),
         "resistance_price": resistance,
         "resistance_confirmed": resistance_confirmed,
         "resistance_room_pct": round(room, 2),
@@ -777,6 +892,21 @@ def evaluate_candidate(
         "valid_seconds": config.valid_seconds,
         "suggested_position_pct": suggested_position_pct,
         "day_change_pct": round(day_change, 2),
+        "relative_strength_ready": relative_ready,
+        "relative_strength_eligible": relative_eligible,
+        "relative_strength_rank": alert.get("relative_strength_rank"),
+        "relative_strength_universe": alert.get("relative_strength_universe"),
+        "relative_strength_percentile": (
+            round(relative_percentile, 2) if relative_ready else None
+        ),
+        "momentum_5m_pct": (
+            round(momentum_5m, 2) if relative_ready else None
+        ),
+        "momentum_15m_pct": (
+            round(momentum_15m, 2) if momentum_15m is not None else None
+        ),
+        "momentum_60m_pct": alert.get("momentum_60m_pct"),
+        "first_retest_confirmed": retest_confirmed,
         "rsi_1m": round(rsi1, 1),
         "rsi_5m": round(rsi5, 1),
         "orderbook_bid_ask_ratio": round(book_ratio, 2),
