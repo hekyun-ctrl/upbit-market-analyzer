@@ -84,9 +84,12 @@ class CandidateConfig:
     relative_strength_top_percent: float
     relative_strength_min_5m_pct: float
     relative_strength_score_bonus: int
+    early_trend_required: bool
     require_first_retest: bool
     retest_tolerance_pct: float
     trend_target_2_pct: float
+    trend_target_3_pct: float
+    trend_target_4_pct: float
     trend_tracking_seconds: int
 
     @classmethod
@@ -174,7 +177,7 @@ class CandidateConfig:
                 0, _env_int("CANDIDATE_RSI_SCORE_PENALTY", 4)
             ),
             availability_balance_enabled=_enabled(
-                "CANDIDATE_AVAILABILITY_BALANCE_ENABLED", True
+                "CANDIDATE_AVAILABILITY_BALANCE_ENABLED", False
             ),
             availability_max_soft_warnings=max(
                 0, min(3, _env_int("CANDIDATE_AVAILABILITY_MAX_SOFT_WARNINGS", 2))
@@ -199,7 +202,7 @@ class CandidateConfig:
             ),
             availability_min_score=max(
                 50,
-                min(100, _env_int("CANDIDATE_AVAILABILITY_MIN_SCORE", 84)),
+                min(100, _env_int("CANDIDATE_AVAILABILITY_MIN_SCORE", 90)),
             ),
             relative_strength_required=_enabled(
                 "CANDIDATE_RELATIVE_STRENGTH_REQUIRED", True
@@ -208,21 +211,30 @@ class CandidateConfig:
                 5.0,
                 min(
                     40.0,
-                    _env_float("CANDIDATE_RELATIVE_STRENGTH_TOP_PERCENT", 15.0),
+                    _env_float("CANDIDATE_RELATIVE_STRENGTH_TOP_PERCENT", 10.0),
                 ),
             ),
             relative_strength_min_5m_pct=_env_float(
-                "CANDIDATE_RELATIVE_STRENGTH_MIN_5M_PCT", 0.8
+                "CANDIDATE_RELATIVE_STRENGTH_MIN_5M_PCT", 1.0
             ),
             relative_strength_score_bonus=max(
                 0, _env_int("CANDIDATE_RELATIVE_STRENGTH_SCORE_BONUS", 8)
+            ),
+            early_trend_required=_enabled(
+                "CANDIDATE_EARLY_TREND_REQUIRED", True
             ),
             require_first_retest=_enabled("CANDIDATE_REQUIRE_FIRST_RETEST", True),
             retest_tolerance_pct=max(
                 0.1, _env_float("CANDIDATE_RETEST_TOLERANCE_PCT", 0.8)
             ),
             trend_target_2_pct=max(
-                5.0, _env_float("CANDIDATE_TREND_TARGET_2_PCT", 8.0)
+                5.0, _env_float("CANDIDATE_TREND_TARGET_2_PCT", 10.0)
+            ),
+            trend_target_3_pct=max(
+                10.0, _env_float("CANDIDATE_TREND_TARGET_3_PCT", 15.0)
+            ),
+            trend_target_4_pct=max(
+                15.0, _env_float("CANDIDATE_TREND_TARGET_4_PCT", 20.0)
             ),
             trend_tracking_seconds=max(
                 3600, _env_int("CANDIDATE_TREND_TRACKING_SECONDS", 21600)
@@ -479,6 +491,7 @@ def evaluate_candidate(
     )
     relative_ready = bool(alert.get("relative_strength_ready"))
     relative_eligible = bool(alert.get("relative_strength_eligible"))
+    early_trend = bool(alert.get("early_trend"))
     relative_percentile = float(alert.get("relative_strength_percentile") or 100.0)
     momentum_5m = float(alert.get("momentum_5m_pct") or 0.0)
     momentum_15m_value = alert.get("momentum_15m_pct")
@@ -513,6 +526,8 @@ def evaluate_candidate(
             rejected.append(f"5분 상대 모멘텀 부족({momentum_5m:+.2f}%)")
         if momentum_15m is not None and momentum_15m <= 0:
             rejected.append(f"15분 추세 미확인({momentum_15m:+.2f}%)")
+        if config.early_trend_required and not early_trend:
+            rejected.append("상승 초기 가속 구간 아님")
         if config.require_first_retest and not retest_confirmed:
             rejected.append("첫 눌림·돌파선 재지지 미확인")
     if not _completed_after_signal(c1[0], alert.get("time_utc")):
@@ -792,6 +807,8 @@ def evaluate_candidate(
         and book_persistent
         and spread <= config.max_spread_pct
     )
+    target3 = None
+    target4 = None
     if relative_trend_extension:
         target1 = _round_tick(
             min(resistance, entry_reference * 1.03), tick, "down"
@@ -812,6 +829,13 @@ def evaluate_candidate(
         )
         target2 = _round_tick(entry_reference * 1.05, tick, "up")
         target_mode = "균형 위험비형"
+    if relative_trend_extension or strong_extension:
+        target3 = _round_tick(
+            entry_reference * (1 + config.trend_target_3_pct / 100), tick, "up"
+        )
+        target4 = _round_tick(
+            entry_reference * (1 + config.trend_target_4_pct / 100), tick, "up"
+        )
     reasons = [
         "완료 1분봉 돌파 확정",
         "거래량 유지",
@@ -843,6 +867,8 @@ def evaluate_candidate(
         )
     if retest_confirmed and relative_ready:
         reasons.insert(0, "첫 눌림·돌파선 재지지 확인")
+    if early_trend and relative_ready:
+        reasons.insert(0, "상승 초기 가속 구간")
     if alert.get("is_reentry"):
         reasons.insert(0, "돌파선 재지지 후 재진입")
 
@@ -876,12 +902,24 @@ def evaluate_candidate(
         "stop_price": stop,
         "target_1": target1,
         "target_2": target2,
+        "target_3": target3,
+        "target_4": target4,
         "target_1_pct": round((target1 / entry_reference - 1) * 100, 2),
         "target_2_pct": round((target2 / entry_reference - 1) * 100, 2),
+        "target_3_pct": (
+            round((target3 / entry_reference - 1) * 100, 2)
+            if target3 is not None
+            else None
+        ),
+        "target_4_pct": (
+            round((target4 / entry_reference - 1) * 100, 2)
+            if target4 is not None
+            else None
+        ),
         "target_mode": target_mode,
         "trend_management": (
-            "1차 목표 후 진입가 보호, 2차까지 추세 추적"
-            if relative_trend_extension
+            "1차 목표 후 진입가 보호, 10%·15%·20% 추세 관찰"
+            if relative_trend_extension or strong_extension
             else "고정 목표 관리"
         ),
         "resistance_price": resistance,
@@ -894,6 +932,7 @@ def evaluate_candidate(
         "day_change_pct": round(day_change, 2),
         "relative_strength_ready": relative_ready,
         "relative_strength_eligible": relative_eligible,
+        "early_trend": early_trend,
         "relative_strength_rank": alert.get("relative_strength_rank"),
         "relative_strength_universe": alert.get("relative_strength_universe"),
         "relative_strength_percentile": (

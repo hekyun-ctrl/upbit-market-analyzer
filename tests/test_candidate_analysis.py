@@ -63,9 +63,12 @@ def _config(**overrides):
         "relative_strength_top_percent": 15.0,
         "relative_strength_min_5m_pct": 0.8,
         "relative_strength_score_bonus": 8,
+        "early_trend_required": True,
         "require_first_retest": True,
         "retest_tolerance_pct": 0.8,
         "trend_target_2_pct": 8.0,
+        "trend_target_3_pct": 15.0,
+        "trend_target_4_pct": 20.0,
         "trend_tracking_seconds": 21600,
     }
     values.update(overrides)
@@ -261,6 +264,7 @@ def test_relative_strength_retest_uses_trend_tracking_targets():
         "momentum_5m_pct": 2.0,
         "momentum_15m_pct": 4.0,
         "momentum_60m_pct": 6.0,
+        "early_trend": True,
     }
     ticker = {
         "trade_price": current,
@@ -278,6 +282,27 @@ def test_relative_strength_retest_uses_trend_tracking_targets():
     assert 7.8 <= candidate["target_2_pct"] <= 8.2
     assert candidate["first_retest_confirmed"] is True
     assert any("상대강도 3/100위" in reason for reason in candidate["reasons"])
+
+
+def test_default_candidate_config_is_accuracy_first(monkeypatch):
+    for name in (
+        "CANDIDATE_AVAILABILITY_BALANCE_ENABLED",
+        "CANDIDATE_AVAILABILITY_MIN_SCORE",
+        "CANDIDATE_RELATIVE_STRENGTH_TOP_PERCENT",
+        "CANDIDATE_RELATIVE_STRENGTH_MIN_5M_PCT",
+        "CANDIDATE_EARLY_TREND_REQUIRED",
+        "CANDIDATE_TREND_TARGET_2_PCT",
+    ):
+        monkeypatch.delenv(name, raising=False)
+
+    config = CandidateConfig.from_env()
+
+    assert config.availability_balance_enabled is False
+    assert config.availability_min_score == 90
+    assert config.relative_strength_top_percent == 10.0
+    assert config.relative_strength_min_5m_pct == 1.0
+    assert config.early_trend_required is True
+    assert config.trend_target_2_pct == 10.0
 
 
 def test_rebreakout_reason_never_displays_zero_minutes():

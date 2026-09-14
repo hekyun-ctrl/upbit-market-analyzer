@@ -117,11 +117,11 @@ class MonitorConfig:
                 5.0,
                 min(
                     40.0,
-                    _env_float("MONITOR_RELATIVE_STRENGTH_TOP_PERCENT", 15.0),
+                    _env_float("MONITOR_RELATIVE_STRENGTH_TOP_PERCENT", 10.0),
                 ),
             ),
             relative_strength_min_5m_pct=_env_float(
-                "MONITOR_RELATIVE_STRENGTH_MIN_5M_PCT", 0.8
+                "MONITOR_RELATIVE_STRENGTH_MIN_5M_PCT", 1.0
             ),
             relative_strength_stale_seconds=max(
                 30, _env_int("MONITOR_RELATIVE_STRENGTH_STALE_SECONDS", 120)
@@ -276,7 +276,17 @@ class MonitorState:
                     bool(item.get("target_1_reached")) for item in trend_outcomes
                 ),
                 "target_2_reached": sum(
-                    item.get("result") == "target_2_reached"
+                    bool(item.get("target_2_reached"))
+                    or item.get("result") == "target_2_reached"
+                    for item in trend_outcomes
+                ),
+                "target_3_reached": sum(
+                    bool(item.get("target_3_reached"))
+                    for item in trend_outcomes
+                ),
+                "target_4_reached": sum(
+                    bool(item.get("target_4_reached"))
+                    or item.get("result") == "target_4_reached"
                     for item in trend_outcomes
                 ),
                 "stop_before_target_1": sum(
@@ -692,6 +702,14 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
                 f" · 15분 {float(candidate['momentum_15m_pct']):+.1f}%"
             )
         relative_line += "\n"
+    extension_line = ""
+    if candidate.get("target_3") and candidate.get("target_4"):
+        extension_line = (
+            f"추세 확장 관찰: {_format_price(float(candidate['target_3']))} "
+            f"(+{float(candidate['target_3_pct']):.0f}%) · "
+            f"{_format_price(float(candidate['target_4']))} "
+            f"(+{float(candidate['target_4_pct']):.0f}%)\n"
+        )
     return (
         f"[조건부 진입 후보{suffix} | 조건점수 {candidate['score']}/100] "
         f"{candidate['market']}\n"
@@ -704,6 +722,7 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"(약 +{candidate['target_1_pct']:.1f}%)\n"
         f"2차 목표: {_format_price(float(candidate['target_2']))} "
         f"(약 +{candidate['target_2_pct']:.1f}%)\n"
+        f"{extension_line}"
         f"목표 방식: {candidate['target_mode']}\n"
         f"추세 관리: {candidate.get('trend_management', '고정 목표 관리')}\n"
         f"{relative_line}"
@@ -769,7 +788,7 @@ class AlertDispatcher:
             0.0, _env_float("TELEGRAM_CANDIDATE_MIN_TARGET_2_PCT", 5.0)
         )
         self._candidate_min_score = max(
-            0, min(100, _env_int("TELEGRAM_CANDIDATE_MIN_SCORE", 0))
+            0, min(100, _env_int("TELEGRAM_CANDIDATE_MIN_SCORE", 90))
         )
         self._daily_candidate_min = max(
             0, min(10, _env_int("TELEGRAM_DAILY_CANDIDATE_MIN", 5))
@@ -1106,6 +1125,7 @@ class CandidateAnalyzer:
             "momentum_5m_pct": alert.get("momentum_5m_pct"),
             "momentum_15m_pct": alert.get("momentum_15m_pct"),
             "momentum_60m_pct": alert.get("momentum_60m_pct"),
+            "early_trend": alert.get("early_trend"),
         }
 
     def _finish_signal_track(
@@ -1142,6 +1162,7 @@ class CandidateAnalyzer:
                 "momentum_5m_pct": state.get("momentum_5m_pct"),
                 "momentum_15m_pct": state.get("momentum_15m_pct"),
                 "momentum_60m_pct": state.get("momentum_60m_pct"),
+                "early_trend": state.get("early_trend"),
             }
         )
         self._signal_tracks.pop(market, None)
@@ -1164,6 +1185,7 @@ class CandidateAnalyzer:
             "momentum_5m_pct": alert.get("momentum_5m_pct"),
             "momentum_15m_pct": alert.get("momentum_15m_pct"),
             "momentum_60m_pct": alert.get("momentum_60m_pct"),
+            "early_trend": alert.get("early_trend"),
             "change_1m_pct": alert.get("change_1m_pct"),
             "volume_ratio_vs_previous_1m": alert.get(
                 "volume_ratio_vs_previous_1m"
@@ -1180,7 +1202,16 @@ class CandidateAnalyzer:
             "stop_price": float(candidate["stop_price"]),
             "target_1": float(candidate["target_1"]),
             "target_2": float(candidate["target_2"]),
+            "target_3": (
+                float(candidate["target_3"]) if candidate.get("target_3") else None
+            ),
+            "target_4": (
+                float(candidate["target_4"]) if candidate.get("target_4") else None
+            ),
             "target_1_reached": False,
+            "target_2_reached": False,
+            "target_3_reached": False,
+            "target_4_reached": False,
             "max_price": entry,
             "min_price": entry,
             "created_at": now,
@@ -1219,8 +1250,13 @@ class CandidateAnalyzer:
                 "exit_price": exit_price,
                 "target_1": state["target_1"],
                 "target_2": state["target_2"],
+                "target_3": state.get("target_3"),
+                "target_4": state.get("target_4"),
                 "stop_price": state["stop_price"],
                 "target_1_reached": bool(state["target_1_reached"]),
+                "target_2_reached": bool(state.get("target_2_reached")),
+                "target_3_reached": bool(state.get("target_3_reached")),
+                "target_4_reached": bool(state.get("target_4_reached")),
                 "mfe_pct": round((float(state["max_price"]) / entry - 1) * 100, 2),
                 "mae_pct": round((float(state["min_price"]) / entry - 1) * 100, 2),
                 "elapsed_seconds": round(now - float(state["created_at"]), 1),
@@ -1245,10 +1281,27 @@ class CandidateAnalyzer:
             return
         state["max_price"] = max(float(state["max_price"]), price)
         state["min_price"] = min(float(state["min_price"]), price)
+        target_3 = state.get("target_3")
+        target_4 = state.get("target_4")
+        if target_4 is not None and price >= float(target_4):
+            state["target_1_reached"] = True
+            state["target_2_reached"] = True
+            state["target_3_reached"] = True
+            state["target_4_reached"] = True
+            self._finish_trend_track(market, state, "target_4_reached", price, now)
+            return
+        if target_3 is not None and price >= float(target_3):
+            state["target_1_reached"] = True
+            state["target_2_reached"] = True
+            state["target_3_reached"] = True
         if price >= float(state["target_2"]):
             state["target_1_reached"] = True
-            self._finish_trend_track(market, state, "target_2_reached", price, now)
-            return
+            state["target_2_reached"] = True
+            if target_4 is None:
+                self._finish_trend_track(
+                    market, state, "target_2_reached", price, now
+                )
+                return
         if price >= float(state["target_1"]):
             state["target_1_reached"] = True
         protected_stop = (
@@ -1589,6 +1642,7 @@ class CandidateAnalyzer:
                 "resistance_room_pct",
                 "risk_reward",
                 "first_retest_confirmed",
+                "early_trend",
             ):
                 accepted_record[key] = candidate.get(key)
             MONITOR_STATE.add_screening_record(accepted_record)

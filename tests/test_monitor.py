@@ -156,6 +156,16 @@ def test_relative_strength_ranks_the_leading_market():
     assert details["relative_strength_universe"] == 20
 
 
+def test_default_monitor_config_uses_accuracy_first_relative_strength(monkeypatch):
+    monkeypatch.delenv("MONITOR_RELATIVE_STRENGTH_TOP_PERCENT", raising=False)
+    monkeypatch.delenv("MONITOR_RELATIVE_STRENGTH_MIN_5M_PCT", raising=False)
+
+    config = MonitorConfig.from_env()
+
+    assert config.relative_strength_top_percent == 10.0
+    assert config.relative_strength_min_5m_pct == 1.0
+
+
 def test_observation_telegram_delivery_can_be_disabled(monkeypatch):
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
     monkeypatch.setenv("TELEGRAM_CHAT_ID", "test-chat")
@@ -184,7 +194,7 @@ def test_telegram_delivery_filters_default_to_enabled(monkeypatch):
     assert dispatcher.observation_delivery_enabled is True
     assert dispatcher.candidate_delivery_enabled is True
     assert dispatcher.candidate_min_target_2_pct == 5.0
-    assert dispatcher.candidate_min_score == 0
+    assert dispatcher.candidate_min_score == 90
     assert dispatcher.daily_candidate_min == 5
     assert dispatcher.daily_candidate_max == 10
     assert dispatcher.inactivity_status_enabled is True
@@ -434,6 +444,7 @@ def test_availability_candidates_are_paced_and_stop_at_daily_minimum(monkeypatch
     monkeypatch.setenv("TELEGRAM_DAILY_CANDIDATE_MIN", "2")
     monkeypatch.setenv("TELEGRAM_DAILY_CANDIDATE_MAX", "4")
     monkeypatch.setenv("TELEGRAM_AVAILABILITY_MIN_INTERVAL_SECONDS", "5400")
+    monkeypatch.setenv("TELEGRAM_CANDIDATE_MIN_SCORE", "0")
     dispatcher = AlertDispatcher()
     sent = []
 
@@ -613,6 +624,39 @@ def test_six_hour_trend_track_protects_entry_after_target_one(monkeypatch):
     assert "KRW-IQ" not in analyzer._trend_tracks
 
 
+def test_six_hour_trend_track_records_ten_fifteen_twenty_percent(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    MONITOR_STATE.trend_outcomes.clear()
+    analyzer._start_trend_track(
+        {
+            "market": "KRW-IQ",
+            "source_signal": "breakout",
+            "entry_reference_price": 100.0,
+            "stop_price": 97.0,
+            "target_1": 103.0,
+            "target_2": 110.0,
+            "target_3": 115.0,
+            "target_4": 120.0,
+            "score": 96,
+            "target_mode": "상대강도 추세추적형",
+        },
+        1_800_000_000.0,
+    )
+
+    analyzer._observe_trend_track("KRW-IQ", 115.0, 1_800_000_300.0)
+    assert "KRW-IQ" in analyzer._trend_tracks
+    analyzer._observe_trend_track("KRW-IQ", 120.0, 1_800_000_600.0)
+
+    performance = MONITOR_STATE.candidate_performance()[
+        "six_hour_trend_performance"
+    ]
+    assert performance["target_2_reached"] == 1
+    assert performance["target_3_reached"] == 1
+    assert performance["target_4_reached"] == 1
+    assert performance["recent"][0]["result"] == "target_4_reached"
+
+
 def test_rejected_candidate_is_rechecked_on_consolidation_breakout(monkeypatch):
     monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
     analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
@@ -700,3 +744,24 @@ def test_candidate_message_labels_score_as_condition_score():
     assert "조건점수 92/100" in text
     assert "위험 감점: BTC 약세 감점 -10점" in text
     assert "조건점수는 적중 확률이 아닙니다" in text
+
+
+def test_candidate_message_displays_fifteen_and_twenty_percent_extensions():
+    candidate = _telegram_candidate()
+    candidate.update(
+        {
+            "target_2": 110.0,
+            "target_2_pct": 10.0,
+            "target_3": 115.0,
+            "target_3_pct": 15.0,
+            "target_4": 120.0,
+            "target_4_pct": 20.0,
+            "target_mode": "상대강도 추세추적형",
+        }
+    )
+
+    text = _candidate_text(candidate)
+
+    assert "추세 확장 관찰:" in text
+    assert "(+15%)" in text
+    assert "(+20%)" in text
