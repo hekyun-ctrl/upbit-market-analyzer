@@ -449,7 +449,10 @@ def evaluate_candidate(
         rejected.append("돌파선 재지지 실패")
     day_overheated = day_change > config.max_day_change_pct
     elevated_risk = day_change >= 10.0 or rsi1 >= 70.0 or rsi5 >= 68.0
-    strict_quality = elevated_risk or not config.availability_balance_enabled
+    # Availability balancing is allowed to collect mild misses first. Elevated
+    # setups are narrowed again below to candle-shape warnings only, so volume,
+    # trend and resistance safety floors remain strict.
+    strict_quality = not config.availability_balance_enabled
     if rsi1 > config.hard_max_rsi_1m or rsi5 > config.hard_max_rsi_5m:
         rejected.append(f"RSI 과열(1분 {rsi1:.1f}/5분 {rsi5:.1f})")
     if spread > config.hard_max_spread_pct:
@@ -520,6 +523,24 @@ def evaluate_candidate(
             "완화 가능 품질조건 동시 미달"
             f"({len(soft_warnings)}개/{config.availability_max_soft_warnings}개 허용)"
         )
+    elevated_candle_balance = False
+    if elevated_risk and soft_warnings:
+        mild_candle_warnings = (
+            "완료봉 종가 위치 다소 약함",
+            "윗꼬리 주의",
+        )
+        elevated_candle_balance = bool(
+            len(soft_warnings) <= config.availability_max_soft_warnings
+            and all(
+                warning.startswith(mild_candle_warnings)
+                for warning in soft_warnings
+            )
+            and room >= config.min_resistance_room_pct
+        )
+        if not elevated_candle_balance:
+            # Moderate heat must never soften volume, moving-average or nearby
+            # resistance deficiencies. Preserve the concrete reasons in logs.
+            rejected.extend(soft_warnings)
     if rejected:
         return None, rejected
 
@@ -583,6 +604,8 @@ def evaluate_candidate(
     if btc_weak:
         market_score = max(0, market_score - config.btc_weak_score_penalty)
     risk_notes: list[str] = list(soft_warnings)
+    if elevated_candle_balance:
+        risk_notes.append("중간 과열 구간의 경미한 완료봉 품질 감점 허용")
     if not resistance_confirmed:
         risk_notes.append("반복 확인된 상단 구조 저항 없음")
     score_penalty = config.day_overheat_score_penalty if day_overheated else 0
@@ -728,6 +751,7 @@ def evaluate_candidate(
         "btc_weak": btc_weak,
         "day_overheated": day_overheated,
         "elevated_risk": elevated_risk,
+        "elevated_candle_balance": elevated_candle_balance,
         "availability_balanced": bool(soft_warnings),
         "risk_notes": risk_notes,
         "reasons": reasons[:5],

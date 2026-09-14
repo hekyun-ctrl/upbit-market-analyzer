@@ -149,6 +149,124 @@ def test_telegram_delivery_filters_default_to_enabled(monkeypatch):
     assert dispatcher.candidate_delivery_enabled is True
     assert dispatcher.candidate_min_target_2_pct == 5.0
     assert dispatcher.candidate_min_score == 0
+    assert dispatcher.inactivity_status_enabled is True
+    assert dispatcher.inactivity_status_seconds == 3600
+
+
+def test_inactivity_status_reports_screening_without_creating_candidate(monkeypatch):
+    clock = {"now": 1_000.0}
+    monkeypatch.setattr("monitor.time.monotonic", lambda: clock["now"])
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "test-chat")
+    monkeypatch.setenv("TELEGRAM_SEND_OBSERVATION_ALERTS", "false")
+    monkeypatch.setenv("TELEGRAM_SEND_CANDIDATE_ALERTS", "true")
+    monkeypatch.setenv("TELEGRAM_SEND_INACTIVITY_STATUS", "true")
+    monkeypatch.setenv("TELEGRAM_INACTIVITY_STATUS_SECONDS", "3600")
+    dispatcher = AlertDispatcher()
+    MONITOR_STATE.connected = True
+
+    asyncio.run(
+        dispatcher.send(
+            {
+                "market": "KRW-NEAR",
+                "signal": "consolidation_rebreakout",
+            }
+        )
+    )
+    dispatcher.record_candidate_rejection(
+        ["완료봉 종가 위치 다소 약함(0.50)", "윗꼬리 주의(0.50)"]
+    )
+    clock["now"] = 4_600.0
+    sent = []
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+    class Client:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return None
+
+        async def post(self, url, json):
+            sent.append(json)
+            return Response()
+
+    monkeypatch.setattr("monitor.httpx.AsyncClient", Client)
+
+    assert asyncio.run(dispatcher.send_inactivity_status_if_due()) is True
+    assert asyncio.run(dispatcher.send_inactivity_status_if_due()) is False
+    assert len(sent) == 1
+    text = sent[0]["text"]
+    assert "[운영상태 | 최근 60분]" in text
+    assert "원시 상승신호: 1건" in text
+    assert "심층검증 탈락: 1건" in text
+    assert "조건부 진입 후보: 0건" in text
+    assert "매수 신호가 아닙니다" in text
+
+
+def test_delivered_candidate_resets_inactivity_clock(monkeypatch):
+    clock = {"now": 1_000.0}
+    monkeypatch.setattr("monitor.time.monotonic", lambda: clock["now"])
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "test-chat")
+    monkeypatch.setenv("TELEGRAM_SEND_CANDIDATE_ALERTS", "true")
+    monkeypatch.setenv("TELEGRAM_CANDIDATE_MIN_TARGET_2_PCT", "5")
+    monkeypatch.setenv("TELEGRAM_SEND_INACTIVITY_STATUS", "true")
+    monkeypatch.setenv("TELEGRAM_INACTIVITY_STATUS_SECONDS", "3600")
+    dispatcher = AlertDispatcher()
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+    class Client:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return None
+
+        async def post(self, url, json):
+            return Response()
+
+    monkeypatch.setattr("monitor.httpx.AsyncClient", Client)
+    clock["now"] = 4_601.0
+    asyncio.run(
+        dispatcher.send_candidate(
+            {
+                "market": "KRW-ONDO",
+                "score": 97,
+                "current_price": 481.0,
+                "entry_low": 479.0,
+                "entry_high": 481.0,
+                "chase_limit": 483.0,
+                "stop_price": 476.0,
+                "target_1": 495.0,
+                "target_2": 506.0,
+                "target_1_pct": 2.9,
+                "target_2_pct": 5.2,
+                "target_mode": "균형 위험비형",
+                "resistance_room_pct": 5.0,
+                "risk_reward": 4.81,
+                "suggested_position_pct": 5,
+                "valid_seconds": 300,
+                "risk_notes": [],
+                "reasons": ["30분 횡보 상단 재돌파"],
+            }
+        )
+    )
+
+    clock["now"] = 8_000.0
+    assert asyncio.run(dispatcher.send_inactivity_status_if_due()) is False
 
 
 def test_candidate_without_minimum_second_target_is_not_sent(monkeypatch):

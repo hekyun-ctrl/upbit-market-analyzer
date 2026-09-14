@@ -682,7 +682,7 @@ def test_non_overheated_signal_can_use_one_mild_quality_warning():
     assert any("거래량 다소 부족" in note for note in candidate["risk_notes"])
 
 
-def test_elevated_risk_signal_keeps_strict_quality_thresholds():
+def test_elevated_risk_signal_keeps_volume_quality_strict():
     one = _candles()
     five = _candles()
     current = float(one[0]["trade_price"])
@@ -705,6 +705,48 @@ def test_elevated_risk_signal_keeps_strict_quality_thresholds():
 
     assert candidate is None
     assert any("거래량 다소 부족" in reason for reason in rejected)
+
+
+def test_elevated_risk_can_balance_only_mild_candle_shape_warnings():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    completed = float(one[1]["trade_price"])
+    one[1].update(
+        {
+            "opening_price": completed - 0.1,
+            "high_price": completed + 0.2,
+            "low_price": completed - 0.2,
+            "trade_price": completed,
+            "candle_acc_trade_volume": 200.0,
+        }
+    )
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.12,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        {
+            "market": "KRW-TEST",
+            "signal": "consolidation_rebreakout",
+            "price": current,
+        },
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=90),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["elevated_candle_balance"] is True
+    assert candidate["suggested_position_pct"] == 5
+    assert any("종가 위치 다소 약함" in note for note in candidate["risk_notes"])
+    assert any("윗꼬리 주의" in note for note in candidate["risk_notes"])
 
 
 def test_quality_below_availability_floor_is_still_rejected():

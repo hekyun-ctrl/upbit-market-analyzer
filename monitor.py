@@ -9,7 +9,7 @@ import os
 import threading
 import time
 import uuid
-from collections import defaultdict, deque
+from collections import Counter, defaultdict, deque
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from typing import Any
@@ -547,6 +547,19 @@ class AlertDispatcher:
         self._candidate_min_score = max(
             0, min(100, _env_int("TELEGRAM_CANDIDATE_MIN_SCORE", 0))
         )
+        self._send_inactivity_status = _enabled(
+            "TELEGRAM_SEND_INACTIVITY_STATUS", True
+        )
+        self._inactivity_status_seconds = max(
+            1800, _env_int("TELEGRAM_INACTIVITY_STATUS_SECONDS", 3600)
+        )
+        now = time.monotonic()
+        self._last_candidate_delivery_at = now
+        self._last_inactivity_status_at = now
+        self._raw_signal_times: deque[float] = deque(maxlen=5000)
+        self._candidate_rejections: deque[tuple[float, tuple[str, ...]]] = deque(
+            maxlen=5000
+        )
 
     @property
     def mode(self) -> str:
@@ -570,7 +583,97 @@ class AlertDispatcher:
     def candidate_min_score(self) -> int:
         return self._candidate_min_score
 
+    @property
+    def inactivity_status_enabled(self) -> bool:
+        return self._send_inactivity_status
+
+    @property
+    def inactivity_status_seconds(self) -> int:
+        return self._inactivity_status_seconds
+
+    def record_candidate_rejection(self, reasons: list[str]) -> None:
+        self._candidate_rejections.append((time.monotonic(), tuple(reasons)))
+
+    def _prune_activity(self, now: float) -> None:
+        cutoff = now - self._inactivity_status_seconds
+        while self._raw_signal_times and self._raw_signal_times[0] < cutoff:
+            self._raw_signal_times.popleft()
+        while self._candidate_rejections and self._candidate_rejections[0][0] < cutoff:
+            self._candidate_rejections.popleft()
+
+    @staticmethod
+    def _reason_label(reason: str) -> str:
+        return reason.split("(", 1)[0].strip()
+
+    def _inactivity_status_text(self, now: float) -> str:
+        self._prune_activity(now)
+        reason_counts = Counter(
+            self._reason_label(reason)
+            for _, reasons in self._candidate_rejections
+            for reason in reasons
+        )
+        top_reasons = " · ".join(
+            f"{reason} {count}건" for reason, count in reason_counts.most_common(3)
+        ) or "심층검증 대상 없음"
+        status = MONITOR_STATE.snapshot()
+        connection = "정상" if status["connected"] else "재연결 중"
+        minutes = max(1, self._inactivity_status_seconds // 60)
+        return (
+            f"[운영상태 | 최근 {minutes}분]\n"
+            f"공개 시세 감시: {connection}\n"
+            f"원시 상승신호: {len(self._raw_signal_times)}건\n"
+            f"심층검증 탈락: {len(self._candidate_rejections)}건\n"
+            f"주요 탈락 사유: {top_reasons}\n"
+            "조건부 진입 후보: 0건\n"
+            "서비스는 계속 감시 중이며, 이 메시지는 매수 신호가 아닙니다."
+        )
+
+    async def send_inactivity_status_if_due(self) -> bool:
+        if (
+            self.mode != "telegram"
+            or not self._send_candidate_alerts
+            or not self._send_inactivity_status
+        ):
+            return False
+        now = time.monotonic()
+        if (
+            now - self._last_candidate_delivery_at < self._inactivity_status_seconds
+            or now - self._last_inactivity_status_at < self._inactivity_status_seconds
+        ):
+            return False
+        # Throttle retries even when Telegram is temporarily unavailable.
+        self._last_inactivity_status_at = now
+        url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
+        async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
+            response = await client.post(
+                url,
+                json={
+                    "chat_id": self._telegram_chat_id,
+                    "text": self._inactivity_status_text(now),
+                    "disable_web_page_preview": True,
+                },
+            )
+            response.raise_for_status()
+        LOGGER.info("Telegram inactivity status delivered")
+        return True
+
+    async def run_inactivity_status_loop(self) -> None:
+        while True:
+            await asyncio.sleep(60)
+            try:
+                await self.send_inactivity_status_if_due()
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:
+                LOGGER.error("Inactivity status delivery failed: %s", exc)
+
     async def send(self, alert: dict[str, Any]) -> None:
+        if alert.get("signal") in {
+            "price_volume_surge",
+            "breakout",
+            "consolidation_rebreakout",
+        }:
+            self._raw_signal_times.append(time.monotonic())
         MONITOR_STATE.add_alert(alert)
         LOGGER.warning("MARKET_ALERT %s", json.dumps(alert, ensure_ascii=False))
         if self.mode != "telegram" or not self._send_observation_alerts:
@@ -620,6 +723,8 @@ class AlertDispatcher:
                 },
             )
             response.raise_for_status()
+        self._last_candidate_delivery_at = time.monotonic()
+        self._last_inactivity_status_at = self._last_candidate_delivery_at
 
 
 class CandidateAnalyzer:
@@ -773,6 +878,7 @@ class CandidateAnalyzer:
             return False
         if MONITOR_STATE.has_recent_signal(market, "rapid_drop", 600):
             LOGGER.info("Candidate skipped after recent rapid drop: %s", market)
+            self.dispatcher.record_candidate_rejection(["최근 급락 발생"])
             return False
 
         scheduled = dict(alert)
@@ -941,6 +1047,7 @@ class CandidateAnalyzer:
                 self._remember_rejected(
                     alert, rejected, float(ticker["trade_price"])
                 )
+                self.dispatcher.record_candidate_rejection(rejected)
                 return
             verification_client = UpbitPublicClient()
             try:
@@ -955,6 +1062,9 @@ class CandidateAnalyzer:
                     "Candidate dispatch cancelled for %s: %s",
                     market,
                     dispatch_rejection,
+                )
+                self.dispatcher.record_candidate_rejection(
+                    [str(dispatch_rejection or "전송 직전 재검증 실패")]
                 )
                 return
             candidate["analysis_time_utc"] = datetime.now(timezone.utc).isoformat()
@@ -1006,67 +1116,77 @@ async def run_monitor_forever() -> None:
     engine = SignalEngine(config)
     candidate_analyzer = CandidateAnalyzer(CandidateConfig.from_env(), dispatcher)
     backoff = 1
+    inactivity_status_task = asyncio.create_task(
+        dispatcher.run_inactivity_status_loop()
+    )
 
-    while True:
-        try:
-            markets = await _resolve_markets(config)
-            if not markets:
-                raise RuntimeError("No KRW markets were resolved")
-            MONITOR_STATE.mark_started(len(markets), dispatcher.mode)
-            request = [
-                {"ticket": f"upbit-monitor-{uuid.uuid4()}"},
-                {
-                    "type": "trade",
-                    "codes": markets,
-                    "is_only_realtime": True,
-                },
-                {"format": "DEFAULT"},
-            ]
-            async with websockets.connect(
-                _WS_URL,
-                ping_interval=30,
-                ping_timeout=20,
-                close_timeout=5,
-                open_timeout=15,
-                max_size=2**20,
-            ) as websocket:
-                await websocket.send(json.dumps(request))
-                MONITOR_STATE.mark_connected()
-                LOGGER.info("Connected to Upbit WebSocket for %d markets", len(markets))
-                backoff = 1
-                async for raw in websocket:
-                    MONITOR_STATE.mark_message()
-                    if isinstance(raw, bytes):
-                        raw = raw.decode("utf-8")
-                    message = json.loads(raw)
-                    if "error" in message:
-                        raise RuntimeError(str(message["error"]))
-                    if message.get("type") != "trade":
-                        continue
-                    market = str(message["code"])
-                    price = float(message["trade_price"])
-                    candidate_analyzer.observe_price(market, price)
-                    alerts = engine.update(
-                        market=market,
-                        price=price,
-                        volume=float(message["trade_volume"]),
-                        timestamp_ms=int(
-                            message.get("trade_timestamp") or message["timestamp"]
-                        ),
+    try:
+        while True:
+            try:
+                markets = await _resolve_markets(config)
+                if not markets:
+                    raise RuntimeError("No KRW markets were resolved")
+                MONITOR_STATE.mark_started(len(markets), dispatcher.mode)
+                request = [
+                    {"ticket": f"upbit-monitor-{uuid.uuid4()}"},
+                    {
+                        "type": "trade",
+                        "codes": markets,
+                        "is_only_realtime": True,
+                    },
+                    {"format": "DEFAULT"},
+                ]
+                async with websockets.connect(
+                    _WS_URL,
+                    ping_interval=30,
+                    ping_timeout=20,
+                    close_timeout=5,
+                    open_timeout=15,
+                    max_size=2**20,
+                ) as websocket:
+                    await websocket.send(json.dumps(request))
+                    MONITOR_STATE.mark_connected()
+                    LOGGER.info(
+                        "Connected to Upbit WebSocket for %d markets", len(markets)
                     )
-                    for alert in alerts:
-                        candidate_analyzer.schedule(alert)
-                        try:
-                            await dispatcher.send(alert)
-                        except Exception as exc:  # keep market monitoring alive
-                            LOGGER.error("Alert delivery failed: %s", exc)
-        except asyncio.CancelledError:
-            raise
-        except Exception as exc:
-            MONITOR_STATE.mark_disconnected(exc)
-            LOGGER.exception("Upbit monitor disconnected; retrying in %ss", backoff)
-            await asyncio.sleep(backoff)
-            backoff = min(backoff * 2, 60)
+                    backoff = 1
+                    async for raw in websocket:
+                        MONITOR_STATE.mark_message()
+                        if isinstance(raw, bytes):
+                            raw = raw.decode("utf-8")
+                        message = json.loads(raw)
+                        if "error" in message:
+                            raise RuntimeError(str(message["error"]))
+                        if message.get("type") != "trade":
+                            continue
+                        market = str(message["code"])
+                        price = float(message["trade_price"])
+                        candidate_analyzer.observe_price(market, price)
+                        alerts = engine.update(
+                            market=market,
+                            price=price,
+                            volume=float(message["trade_volume"]),
+                            timestamp_ms=int(
+                                message.get("trade_timestamp")
+                                or message["timestamp"]
+                            ),
+                        )
+                        for alert in alerts:
+                            candidate_analyzer.schedule(alert)
+                            try:
+                                await dispatcher.send(alert)
+                            except Exception as exc:  # keep market monitoring alive
+                                LOGGER.error("Alert delivery failed: %s", exc)
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:
+                MONITOR_STATE.mark_disconnected(exc)
+                LOGGER.exception("Upbit monitor disconnected; retrying in %ss", backoff)
+                await asyncio.sleep(backoff)
+                backoff = min(backoff * 2, 60)
+    finally:
+        inactivity_status_task.cancel()
+        await asyncio.gather(inactivity_status_task, return_exceptions=True)
 
 
 _MONITOR_THREAD: threading.Thread | None = None
