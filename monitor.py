@@ -18,7 +18,11 @@ from typing import Any, Callable
 import httpx
 import websockets
 
-from candidate_analysis import CandidateConfig, evaluate_candidate
+from candidate_analysis import (
+    CandidateConfig,
+    evaluate_candidate,
+    validate_candidate_survival,
+)
 from upbit_client import UpbitPublicClient
 
 LOGGER = logging.getLogger("upbit-monitor")
@@ -1054,6 +1058,8 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     risk_notes = "·".join(candidate.get("risk_notes", []))
     risk_line = f"위험 감점: {risk_notes}\n" if risk_notes else ""
     labels = []
+    if candidate.get("selection_lane") == "early_leader":
+        labels.append("선도주 정밀형")
     if candidate.get("leader_pullback_recheck"):
         labels.append("선도주 눌림")
     elif candidate.get("is_reentry"):
@@ -1223,6 +1229,9 @@ def _revalidate_candidate_for_dispatch(
     refreshed = dict(candidate)
     risk = live_price - stop
     resistance = float(candidate.get("resistance_price") or target_1)
+    risk_reward_reference = float(
+        candidate.get("risk_reward_reference_price") or resistance
+    )
     refreshed.update(
         {
             "current_price": live_price,
@@ -1231,7 +1240,8 @@ def _revalidate_candidate_for_dispatch(
             "target_2_pct": round((target_2 / live_price - 1) * 100, 2),
             "resistance_room_pct": round((resistance / live_price - 1) * 100, 2),
             "risk_reward": round(
-                (resistance - live_price) / risk if risk > 0 else 0.0, 2
+                (risk_reward_reference - live_price) / risk if risk > 0 else 0.0,
+                2,
             ),
         }
     )
@@ -1876,6 +1886,7 @@ class CandidateAnalyzer:
             "expires_at": now + self.config.trend_tracking_seconds,
             "score": candidate["score"],
             "target_mode": candidate["target_mode"],
+            "selection_lane": candidate.get("selection_lane", "standard"),
             "relative_strength_rank": candidate.get("relative_strength_rank"),
             "relative_strength_universe": candidate.get(
                 "relative_strength_universe"
@@ -1904,6 +1915,7 @@ class CandidateAnalyzer:
                 "result": result,
                 "score": state["score"],
                 "target_mode": state["target_mode"],
+                "selection_lane": state.get("selection_lane", "standard"),
                 "entry_price": entry,
                 "exit_price": exit_price,
                 "target_1": state["target_1"],
@@ -2393,6 +2405,7 @@ class CandidateAnalyzer:
                 "result": result,
                 "score": state["score"],
                 "is_reentry": state["is_reentry"],
+                "selection_lane": state.get("selection_lane", "standard"),
                 "entry_price": entry,
                 "exit_price": exit_price,
                 "target_1": state["target_1"],
@@ -2514,14 +2527,20 @@ class CandidateAnalyzer:
             )
             await asyncio.sleep(self.config.survival_confirm_seconds)
             survival_snapshot = await self._market_snapshot(market)
-            if self._relative_strength_provider is not None:
-                alert.update(
-                    self._relative_strength_provider(market, int(time.time()))
-                )
-            candidate, survival_rejected = self._evaluate_snapshot(
-                alert, survival_snapshot
+            live_price = float(survival_snapshot["ticker"]["trade_price"])
+            candidate, original_range_rejection = _revalidate_candidate_for_dispatch(
+                first_candidate, live_price
             )
-            if candidate is None:
+            survival_metrics, survival_rejected = validate_candidate_survival(
+                first_candidate,
+                survival_snapshot["ticker"],
+                survival_snapshot["orderbooks"],
+                survival_snapshot["candles_1m"],
+                self.config,
+            )
+            if original_range_rejection:
+                survival_rejected.insert(0, original_range_rejection)
+            if candidate is None or survival_rejected:
                 reasons = [f"생존 재검증: {reason}" for reason in survival_rejected]
                 LOGGER.info(
                     "Candidate survival rejected for %s: %s",
@@ -2538,22 +2557,7 @@ class CandidateAnalyzer:
                     self._screening_record(alert, "survival_rejected", reasons)
                 )
                 return
-            _, original_range_rejection = _revalidate_candidate_for_dispatch(
-                first_candidate, float(survival_snapshot["ticker"]["trade_price"])
-            )
-            if original_range_rejection:
-                reason = f"생존 재검증: {original_range_rejection}"
-                LOGGER.info("Candidate survival cancelled for %s: %s", market, reason)
-                self._remember_rejected(
-                    alert,
-                    [reason],
-                    float(survival_snapshot["ticker"]["trade_price"]),
-                )
-                self.dispatcher.record_candidate_rejection([reason])
-                MONITOR_STATE.add_screening_record(
-                    self._screening_record(alert, "survival_rejected", [reason])
-                )
-                return
+            candidate.update(survival_metrics)
             candidate["survival_confirmed"] = True
             candidate["survival_seconds"] = self.config.survival_confirm_seconds
             verification_client = UpbitPublicClient()
@@ -2614,6 +2618,9 @@ class CandidateAnalyzer:
                 "risk_reward",
                 "first_retest_confirmed",
                 "early_trend",
+                "early_leader_lane",
+                "selection_lane",
+                "leader_resistance_override",
             ):
                 accepted_record[key] = candidate.get(key)
             MONITOR_STATE.add_screening_record(accepted_record)
@@ -2635,6 +2642,7 @@ class CandidateAnalyzer:
                 "min_price": candidate["current_price"],
                 "score": candidate["score"],
                 "is_reentry": candidate["is_reentry"],
+                "selection_lane": candidate.get("selection_lane", "standard"),
                 "created_at": time.time(),
                 "breakout_level": candidate["breakout_level"],
                 "consolidation_minutes": alert.get("consolidation_minutes"),

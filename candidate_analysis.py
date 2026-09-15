@@ -90,6 +90,10 @@ class CandidateConfig:
     relative_strength_min_5m_pct: float
     relative_strength_score_bonus: int
     early_trend_required: bool
+    early_leader_lane_enabled: bool
+    early_leader_max_percentile: float
+    early_leader_score_bonus: int
+    early_leader_resistance_floor_pct: float
     require_first_retest: bool
     retest_tolerance_pct: float
     leader_watch_enabled: bool
@@ -254,6 +258,25 @@ class CandidateConfig:
             ),
             early_trend_required=_enabled(
                 "CANDIDATE_EARLY_TREND_REQUIRED", True
+            ),
+            early_leader_lane_enabled=_enabled(
+                "CANDIDATE_EARLY_LEADER_LANE_ENABLED", True
+            ),
+            early_leader_max_percentile=max(
+                1.0,
+                min(
+                    10.0,
+                    _env_float("CANDIDATE_EARLY_LEADER_MAX_PERCENTILE", 5.0),
+                ),
+            ),
+            early_leader_score_bonus=max(
+                0, _env_int("CANDIDATE_EARLY_LEADER_SCORE_BONUS", 8)
+            ),
+            early_leader_resistance_floor_pct=max(
+                0.5,
+                _env_float(
+                    "CANDIDATE_EARLY_LEADER_RESISTANCE_FLOOR_PCT", 1.0
+                ),
             ),
             require_first_retest=_enabled("CANDIDATE_REQUIRE_FIRST_RETEST", True),
             retest_tolerance_pct=max(
@@ -472,6 +495,58 @@ def _book_metrics(samples: list[dict[str, Any]]) -> tuple[float, float, list[flo
     )
 
 
+def validate_candidate_survival(
+    candidate: dict[str, Any],
+    ticker: dict[str, Any],
+    orderbook_samples: list[dict[str, Any]],
+    candles_1m: list[dict[str, Any]],
+    config: CandidateConfig,
+) -> tuple[dict[str, Any], list[str]]:
+    """Recheck only the conditions that can invalidate an already-built setup.
+
+    Relative rank and short-window momentum naturally cool after the initial
+    impulse. Requiring the complete entry screen again turned the survival
+    delay into a second discovery test and removed otherwise intact setups.
+    """
+    c1 = _completed(candles_1m, 1)
+    if len(c1) < 21:
+        return {}, ["생존 확인용 완료봉 데이터 부족"]
+
+    current = float(ticker["trade_price"])
+    breakout = float(candidate["breakout_level"])
+    completed_close = float(c1[0]["trade_price"])
+    volume_ratio, volume_previous = _volume_metrics(c1)
+    book_ratio, spread, ratios = _book_metrics(orderbook_samples)
+    hard_book_persistent = sum(
+        ratio >= config.hard_min_orderbook_ratio for ratio in ratios
+    ) >= max(1, len(ratios) // 2 + 1)
+
+    rejected: list[str] = []
+    if current <= float(candidate["stop_price"]):
+        rejected.append("계획 손절선 이하")
+    if current >= float(candidate["chase_limit"]):
+        rejected.append("추격금지선 도달")
+    if completed_close < breakout or current < breakout * 0.998:
+        rejected.append("돌파선 유지 실패")
+    if volume_ratio < config.availability_min_volume_ratio:
+        rejected.append(f"완료 1분봉 거래량 붕괴({volume_ratio:.2f}배)")
+    if volume_previous < config.availability_min_volume_vs_previous:
+        rejected.append(f"직전 봉 대비 거래량 급감({volume_previous:.2f}배)")
+    if not hard_book_persistent:
+        rejected.append(f"호가 지지 소멸({book_ratio:.2f}배)")
+    if spread > config.hard_max_spread_pct:
+        rejected.append(f"호가 스프레드 극단적 과다({spread:.2f}%)")
+
+    return {
+        "survival_price": current,
+        "survival_completed_close": completed_close,
+        "survival_volume_ratio": round(volume_ratio, 2),
+        "survival_volume_vs_previous": round(volume_previous, 2),
+        "survival_orderbook_ratio": round(book_ratio, 2),
+        "survival_spread_pct": round(spread, 3),
+    }, rejected
+
+
 def evaluate_candidate(
     alert: dict[str, Any],
     ticker: dict[str, Any],
@@ -563,6 +638,16 @@ def evaluate_candidate(
             and completed_close >= breakout
         )
     )
+    early_leader_core = bool(
+        config.early_leader_lane_enabled
+        and relative_ready
+        and relative_eligible
+        and relative_percentile <= config.early_leader_max_percentile
+        and early_trend
+        and momentum_5m >= config.relative_strength_min_5m_pct
+        and (momentum_15m is None or momentum_15m > 0)
+        and retest_confirmed
+    )
 
     rejected: list[str] = []
     soft_warnings: list[str] = []
@@ -594,6 +679,20 @@ def evaluate_candidate(
         rejected.append("돌파선 재지지 실패")
     day_overheated = day_change > config.max_day_change_pct
     elevated_risk = day_change >= 10.0 or rsi1 >= 70.0 or rsi5 >= 68.0
+    early_leader_lane = bool(
+        early_leader_core
+        and completed_close >= breakout
+        and current >= breakout * 0.998
+        and current >= float(five["ma20"])
+        and extension <= config.max_price_extension_pct
+        and volume_ratio >= config.min_completed_volume_ratio
+        and volume_previous >= config.min_volume_vs_previous
+        and close_position >= config.min_close_position
+        and upper_wick <= config.max_upper_wick_ratio
+        and hard_book_persistent
+        and spread <= config.hard_max_spread_pct
+        and not day_overheated
+    )
     # Availability balancing is allowed to collect mild misses first. Elevated
     # setups are narrowed again below to candle-shape warnings only, so volume,
     # trend and resistance safety floors remain strict.
@@ -643,18 +742,26 @@ def evaluate_candidate(
     # Accuracy-first gates. These combinations produced high condition scores
     # despite poor follow-through in production. They are direct contradictions
     # to an actionable long entry and cannot be offset by setup/volume points.
+    breadth_softened = False
     if (
         market_regime == "risk_off"
         and market_breadth_5m_pct < config.hard_min_market_breadth_pct
     ):
-        rejected.append(
-            "시장 확산도 하드차단"
-            f"(5분 상승 종목 {market_breadth_5m_pct:.1f}% < "
-            f"{config.hard_min_market_breadth_pct:.1f}%)"
-        )
+        if early_leader_lane:
+            breadth_softened = True
+        else:
+            rejected.append(
+                "시장 확산도 하드차단"
+                f"(5분 상승 종목 {market_breadth_5m_pct:.1f}% < "
+                f"{config.hard_min_market_breadth_pct:.1f}%)"
+            )
+    book_softened = False
     if not book_persistent:
         label = "매우 약함" if not hard_book_persistent else "약함"
-        rejected.append(f"호가 지지 하드차단({label}, {book_ratio:.2f}배)")
+        if early_leader_lane and hard_book_persistent:
+            book_softened = True
+        else:
+            rejected.append(f"호가 지지 하드차단({label}, {book_ratio:.2f}배)")
     if btc_weak and book_ratio < config.btc_weak_min_orderbook_ratio:
         rejected.append(
             "BTC 약세·호가 약세 동시 발생"
@@ -664,7 +771,11 @@ def evaluate_candidate(
         rejected.append(
             f"단기 과열·호가 약세 동시 발생(RSI {rsi1:.1f}, {book_ratio:.2f}배)"
         )
-    if spread > config.max_spread_pct:
+    spread_softened = bool(
+        early_leader_lane
+        and config.max_spread_pct < spread <= config.hard_max_spread_pct
+    )
+    if spread > config.max_spread_pct and not spread_softened:
         rejected.append(f"호가 스프레드 허용치 초과({spread:.2f}%)")
 
     resistance_levels = _resistances(current, ticker, c5, c15)
@@ -676,7 +787,19 @@ def evaluate_candidate(
     )
     room = (resistance / current - 1) * 100
     resistance_rescued = False
+    leader_resistance_override = False
     if resistance_confirmed and room < config.hard_min_resistance_room_pct:
+        leader_resistance_override = bool(
+            early_leader_lane
+            and room >= config.early_leader_resistance_floor_pct
+            and (
+                alert.get("signal") == "consolidation_rebreakout"
+                or alert.get("leader_pullback_recheck")
+                or alert.get("is_reentry")
+            )
+            and not btc_weak
+            and not elevated_risk
+        )
         resistance_rescued = bool(
             config.availability_balance_enabled
             and room >= config.availability_resistance_floor_pct
@@ -688,9 +811,9 @@ def evaluate_candidate(
             and close_position >= 0.65
             and upper_wick <= 0.35
         )
-        if not resistance_rescued:
+        if not resistance_rescued and not leader_resistance_override:
             rejected.append(f"가까운 저항까지 여유 부족({room:.1f}%)")
-        else:
+        elif resistance_rescued:
             soft_warnings.append(f"가까운 저항 제한적 여유({room:.1f}%)")
     if len(soft_warnings) > config.availability_max_soft_warnings:
         rejected.append(
@@ -730,6 +853,9 @@ def evaluate_candidate(
             f"({current:g}원, {entry_low:g}~{entry_high:g}원)"
         ]
     entry_reference = current
+    target_resistance = resistance
+    if leader_resistance_override:
+        target_resistance = max(resistance, entry_reference * 1.03)
     support = min(
         min(float(c["low_price"]) for c in c1[:6]), breakout, float(one["ma20"])
     )
@@ -744,7 +870,7 @@ def evaluate_candidate(
         "down",
     )
     risk = max(entry_reference - stop, tick * 2)
-    risk_reward = (resistance - entry_reference) / risk
+    risk_reward = (target_resistance - entry_reference) / risk
     if risk_reward < config.min_risk_reward:
         return None, [f"가까운 저항 기준 손익비 부족({risk_reward:.2f})"]
 
@@ -779,6 +905,14 @@ def evaluate_candidate(
     if btc_weak:
         market_score = max(0, market_score - config.btc_weak_score_penalty)
     risk_notes: list[str] = list(soft_warnings)
+    if breadth_softened:
+        risk_notes.append(
+            "시장 약세 중 상대강도 선도 유지: 시장 확산도는 감점 반영"
+        )
+    if leader_resistance_override:
+        risk_notes.append(
+            "근접 저항은 상위 선도주의 재돌파 대상으로 조건부 허용"
+        )
     if elevated_candle_balance:
         risk_notes.append("중간 과열 구간의 경미한 완료봉 품질 감점 허용")
     if not resistance_confirmed:
@@ -825,6 +959,9 @@ def evaluate_candidate(
         relative_strength_bonus = config.relative_strength_score_bonus
         if relative_percentile > 5.0:
             relative_strength_bonus = max(1, relative_strength_bonus - 2)
+    early_leader_bonus = (
+        config.early_leader_score_bonus if early_leader_lane else 0
+    )
     score = min(
         100,
         max(
@@ -837,6 +974,7 @@ def evaluate_candidate(
             + (12 if book_ratio >= 1.2 and spread <= 0.2 and liquid_market else 10)
             + impulse_bonus
             + relative_strength_bonus
+            + early_leader_bonus
             + regime_bonus
             - score_penalty,
         ),
@@ -904,7 +1042,7 @@ def evaluate_candidate(
     target4 = None
     if relative_trend_extension:
         target1 = _round_tick(
-            min(resistance, entry_reference * 1.03), tick, "down"
+            min(target_resistance, entry_reference * 1.03), tick, "down"
         )
         target2 = _round_tick(
             entry_reference * (1 + config.trend_target_2_pct / 100), tick, "up"
@@ -912,13 +1050,13 @@ def evaluate_candidate(
         target_mode = "상대강도 추세추적형"
     elif strong_extension:
         target1 = _round_tick(
-            min(resistance, entry_reference * 1.07), tick, "down"
+            min(target_resistance, entry_reference * 1.07), tick, "down"
         )
         target2 = _round_tick(entry_reference * 1.10, tick, "up")
         target_mode = "강한 추세 확장형"
     else:
         target1 = _round_tick(
-            min(resistance, entry_reference * 1.03), tick, "down"
+            min(target_resistance, entry_reference * 1.03), tick, "down"
         )
         target2 = _round_tick(entry_reference * 1.05, tick, "up")
         target_mode = "균형 위험비형"
@@ -964,6 +1102,8 @@ def evaluate_candidate(
         reasons.insert(0, "첫 눌림·돌파선 재지지 확인")
     if early_trend and relative_ready:
         reasons.insert(0, "상승 초기 가속 구간")
+    if early_leader_lane:
+        reasons.insert(0, "상대강도 선도주 정밀 통과")
     if alert.get("is_reentry"):
         reasons.insert(0, "돌파선 재지지 후 재진입")
     if alert.get("leader_pullback_recheck"):
@@ -991,6 +1131,9 @@ def evaluate_candidate(
         "watchlist_recheck": bool(alert.get("watchlist_recheck")),
         "leader_pullback_recheck": bool(
             alert.get("leader_pullback_recheck")
+        ),
+        "selection_lane": (
+            "early_leader" if early_leader_lane else "standard"
         ),
         "score": score,
         "condition_score": score,
@@ -1023,8 +1166,10 @@ def evaluate_candidate(
             else "고정 목표 관리"
         ),
         "resistance_price": resistance,
+        "risk_reward_reference_price": target_resistance,
         "resistance_confirmed": resistance_confirmed,
         "resistance_room_pct": round(room, 2),
+        "leader_resistance_override": leader_resistance_override,
         "risk_reward": round(risk_reward, 2),
         "breakout_level": breakout,
         "valid_seconds": config.valid_seconds,
@@ -1033,6 +1178,7 @@ def evaluate_candidate(
         "relative_strength_ready": relative_ready,
         "relative_strength_eligible": relative_eligible,
         "early_trend": early_trend,
+        "early_leader_lane": early_leader_lane,
         "relative_strength_rank": alert.get("relative_strength_rank"),
         "relative_strength_universe": alert.get("relative_strength_universe"),
         "relative_strength_percentile": (

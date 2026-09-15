@@ -7,6 +7,7 @@ from candidate_analysis import (
     _completed_after_signal,
     _resistances,
     evaluate_candidate,
+    validate_candidate_survival,
 )
 
 
@@ -69,6 +70,10 @@ def _config(**overrides):
         "relative_strength_min_5m_pct": 0.8,
         "relative_strength_score_bonus": 8,
         "early_trend_required": True,
+        "early_leader_lane_enabled": True,
+        "early_leader_max_percentile": 5.0,
+        "early_leader_score_bonus": 8,
+        "early_leader_resistance_floor_pct": 1.0,
         "require_first_retest": True,
         "retest_tolerance_pct": 0.8,
         "leader_watch_enabled": True,
@@ -1099,6 +1104,127 @@ def test_risk_off_market_breadth_is_a_hard_rejection():
 
     assert candidate is None
     assert any("시장 확산도 하드차단" in reason for reason in rejected)
+
+
+def test_early_leader_lane_softens_breadth_and_moderate_orderbook():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.06,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+    alert = {
+        "market": "KRW-TEST",
+        "signal": "consolidation_rebreakout",
+        "price": current,
+        "relative_strength_ready": True,
+        "relative_strength_eligible": True,
+        "relative_strength_rank": 2,
+        "relative_strength_universe": 100,
+        "relative_strength_percentile": 2.0,
+        "momentum_5m_pct": 1.8,
+        "momentum_15m_pct": 2.4,
+        "early_trend": True,
+        "market_regime": "risk_off",
+        "market_breadth_5m_pct": 25.0,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(current, bid_ratio=0.6),
+        one,
+        five,
+        _config(min_score=80, availability_balance_enabled=False),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["selection_lane"] == "early_leader"
+    assert candidate["early_leader_lane"] is True
+    assert any("시장 약세 중 상대강도 선도" in note for note in candidate["risk_notes"])
+    assert any("호가 지지 약함" in note for note in candidate["risk_notes"])
+
+
+def test_early_leader_lane_can_treat_nearby_resistance_as_breakout_level(monkeypatch):
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    monkeypatch.setattr(
+        candidate_analysis, "_resistances", lambda *args: [current * 1.015]
+    )
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.06,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        {
+            "market": "KRW-TEST",
+            "signal": "consolidation_rebreakout",
+            "price": current,
+            "relative_strength_ready": True,
+            "relative_strength_eligible": True,
+            "relative_strength_rank": 1,
+            "relative_strength_universe": 100,
+            "relative_strength_percentile": 1.0,
+            "momentum_5m_pct": 2.0,
+            "momentum_15m_pct": 2.5,
+            "early_trend": True,
+        },
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80, availability_balance_enabled=False),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["leader_resistance_override"] is True
+    assert candidate["target_1"] > candidate["resistance_price"]
+    assert any("근접 저항" in note for note in candidate["risk_notes"])
+
+
+def test_survival_recheck_allows_cooling_volume_but_rejects_structure_loss():
+    candles = _candles()
+    current = float(candles[0]["trade_price"])
+    candles[1]["candle_acc_trade_volume"] = 48.0
+    candles[2]["candle_acc_trade_volume"] = 100.0
+    for candle in candles[3:23]:
+        candle["candle_acc_trade_volume"] = 5.0
+    candidate = {
+        "breakout_level": float(candles[1]["trade_price"]) - 0.1,
+        "stop_price": current * 0.97,
+        "chase_limit": current * 1.02,
+    }
+
+    metrics, rejected = validate_candidate_survival(
+        candidate,
+        {"trade_price": current},
+        [_orderbook(current, bid_ratio=0.6)] * 3,
+        candles,
+        _config(),
+    )
+
+    assert rejected == []
+    assert metrics["survival_volume_vs_previous"] == 0.48
+
+    candles[1]["trade_price"] = candidate["breakout_level"] * 0.99
+    _, rejected = validate_candidate_survival(
+        candidate,
+        {"trade_price": current},
+        [_orderbook(current, bid_ratio=0.6)] * 3,
+        candles,
+        _config(),
+    )
+
+    assert any("돌파선 유지 실패" in reason for reason in rejected)
 
 
 def test_high_day_change_is_a_score_penalty_not_an_automatic_rejection():

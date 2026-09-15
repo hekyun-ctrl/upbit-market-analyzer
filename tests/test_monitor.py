@@ -1047,6 +1047,15 @@ def test_candidate_message_labels_leader_pullback_recheck():
     assert "[조건부 진입 후보 | 선도주 눌림 |" in text
 
 
+def test_candidate_message_labels_early_leader_lane():
+    candidate = _telegram_candidate()
+    candidate["selection_lane"] = "early_leader"
+
+    text = _candidate_text(candidate)
+
+    assert "[조건부 진입 후보 | 선도주 정밀형 |" in text
+
+
 def test_early_watch_is_explicitly_not_an_entry_candidate():
     text = _early_watch_text(
         {
