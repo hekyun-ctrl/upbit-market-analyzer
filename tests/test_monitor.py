@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime, timedelta, timezone
 
 from candidate_analysis import CandidateConfig
 from monitor import (
@@ -32,6 +33,17 @@ def _config(**overrides):
         "relative_strength_top_percent": 15.0,
         "relative_strength_min_5m_pct": 0.8,
         "relative_strength_stale_seconds": 120,
+        "preleader_enabled": False,
+        "preleader_start_minute_kst": 525,
+        "preleader_end_minute_kst": 555,
+        "preleader_check_interval_seconds": 15,
+        "preleader_min_value_ratio_10m": 2.0,
+        "preleader_min_value_ratio_30m": 1.5,
+        "preleader_min_3m_pct": 0.4,
+        "preleader_min_5m_pct": 0.6,
+        "preleader_max_percentile": 20.0,
+        "preleader_rank_improvement_pct": 5.0,
+        "preleader_cooldown_seconds": 1800,
     }
     values.update(overrides)
     return MonitorConfig(**values)
@@ -159,11 +171,82 @@ def test_relative_strength_ranks_the_leading_market():
 def test_default_monitor_config_uses_accuracy_first_relative_strength(monkeypatch):
     monkeypatch.delenv("MONITOR_RELATIVE_STRENGTH_TOP_PERCENT", raising=False)
     monkeypatch.delenv("MONITOR_RELATIVE_STRENGTH_MIN_5M_PCT", raising=False)
+    monkeypatch.delenv("MONITOR_PRELEADER_ENABLED", raising=False)
+    monkeypatch.delenv("MONITOR_PRELEADER_START_KST", raising=False)
+    monkeypatch.delenv("MONITOR_PRELEADER_END_KST", raising=False)
 
     config = MonitorConfig.from_env()
 
     assert config.relative_strength_top_percent == 10.0
     assert config.relative_strength_min_5m_pct == 1.0
+    assert config.preleader_enabled is True
+    assert config.preleader_start_minute_kst == 8 * 60 + 45
+    assert config.preleader_end_minute_kst == 9 * 60 + 15
+
+
+def test_preleader_detects_volume_acceleration_before_large_one_minute_move():
+    engine = SignalEngine(
+        _config(
+            price_surge_1m_pct=100.0,
+            breakout_pct=100.0,
+            rebreakout_enabled=False,
+            relative_strength_min_universe=1,
+            relative_strength_top_percent=100.0,
+            preleader_enabled=True,
+            preleader_max_percentile=100.0,
+            min_trade_value_krw=100.0,
+        )
+    )
+    kst = timezone(timedelta(hours=9))
+    base = int(datetime(2026, 9, 15, 8, 14, tzinfo=kst).timestamp())
+    alerts = []
+
+    for second in range(2161):
+        accelerating = second >= 1860
+        price = 100.0 + max(0, second - 1860) * 0.003
+        volume = 0.5 if accelerating else 0.1
+        alerts.extend(
+            engine.update("KRW-IQ", price, volume, (base + second) * 1000)
+        )
+
+    preleaders = [
+        alert
+        for alert in alerts
+        if alert["signal"] == "leader_volume_acceleration"
+    ]
+    assert len(preleaders) == 1
+    assert preleaders[0]["internal_only"] is True
+    assert preleaders[0]["change_1m_pct"] < 1.5
+    assert preleaders[0]["preleader_volume_ratio_10m"] >= 2.0
+    assert preleaders[0]["preleader_volume_ratio_30m"] >= 1.5
+    assert preleaders[0]["momentum_3m_pct"] >= 0.4
+
+
+def test_preleader_signal_is_kept_internal_for_first_pullback(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    alert = {
+        "time_utc": "2026-09-14T23:50:00+00:00",
+        "market": "KRW-IQ",
+        "signal": "leader_volume_acceleration",
+        "price": 100.0,
+        "relative_strength_rank": 3,
+        "relative_strength_universe": 100,
+        "relative_strength_percentile": 3.0,
+        "momentum_3m_pct": 0.6,
+        "momentum_5m_pct": 0.8,
+        "preleader_volume_ratio_10m": 2.5,
+        "preleader_volume_ratio_30m": 2.0,
+        "internal_only": True,
+    }
+
+    assert analyzer.watch_preleader(alert) is True
+
+    state = analyzer._watchlist["KRW-IQ"]
+    assert state["source_signal"] == "leader_volume_acceleration"
+    assert state["leader_peak_price"] == 100.0
+    assert state["leader_pullback_seen"] is False
+    assert "첫 눌림 대기" in state["last_rejected"][0]
 
 
 def test_observation_telegram_delivery_can_be_disabled(monkeypatch):

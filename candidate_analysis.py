@@ -690,6 +690,7 @@ def evaluate_candidate(
         "consolidation_rebreakout": 25,
         "breakout": 22,
         "price_volume_surge": 20,
+        "leader_volume_acceleration": 20,
     }[str(alert["signal"])]
     volume_score = (
         20
@@ -881,6 +882,8 @@ def evaluate_candidate(
                 else "횡보 상단 재돌파"
             ),
         )
+    if alert.get("signal") == "leader_volume_acceleration":
+        reasons.insert(0, "09시 전후 거래대금 선행 가속에서 조기 포착")
     if relative_ready and relative_eligible:
         reasons.insert(
             0,

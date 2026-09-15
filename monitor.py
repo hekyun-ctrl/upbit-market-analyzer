@@ -12,6 +12,7 @@ import uuid
 from collections import Counter, defaultdict, deque
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
+from statistics import median
 from typing import Any, Callable
 
 import httpx
@@ -50,6 +51,19 @@ def _enabled(name: str, default: bool = False) -> bool:
     return raw.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _env_minute_of_day(name: str, default: str) -> int:
+    raw = os.getenv(name, default).strip()
+    try:
+        hour_text, minute_text = raw.split(":", 1)
+        hour = int(hour_text)
+        minute = int(minute_text)
+    except (AttributeError, TypeError, ValueError):
+        hour_text, minute_text = default.split(":", 1)
+        hour = int(hour_text)
+        minute = int(minute_text)
+    return max(0, min(1439, hour * 60 + minute))
+
+
 @dataclass(frozen=True)
 class MonitorConfig:
     markets: tuple[str, ...]
@@ -70,6 +84,17 @@ class MonitorConfig:
     relative_strength_top_percent: float
     relative_strength_min_5m_pct: float
     relative_strength_stale_seconds: int
+    preleader_enabled: bool
+    preleader_start_minute_kst: int
+    preleader_end_minute_kst: int
+    preleader_check_interval_seconds: int
+    preleader_min_value_ratio_10m: float
+    preleader_min_value_ratio_30m: float
+    preleader_min_3m_pct: float
+    preleader_min_5m_pct: float
+    preleader_max_percentile: float
+    preleader_rank_improvement_pct: float
+    preleader_cooldown_seconds: int
 
     @classmethod
     def from_env(cls) -> "MonitorConfig":
@@ -125,6 +150,39 @@ class MonitorConfig:
             ),
             relative_strength_stale_seconds=max(
                 30, _env_int("MONITOR_RELATIVE_STRENGTH_STALE_SECONDS", 120)
+            ),
+            preleader_enabled=_enabled("MONITOR_PRELEADER_ENABLED", True),
+            preleader_start_minute_kst=_env_minute_of_day(
+                "MONITOR_PRELEADER_START_KST", "08:45"
+            ),
+            preleader_end_minute_kst=_env_minute_of_day(
+                "MONITOR_PRELEADER_END_KST", "09:15"
+            ),
+            preleader_check_interval_seconds=max(
+                5, _env_int("MONITOR_PRELEADER_CHECK_INTERVAL_SECONDS", 15)
+            ),
+            preleader_min_value_ratio_10m=max(
+                1.2, _env_float("MONITOR_PRELEADER_MIN_VALUE_RATIO_10M", 2.0)
+            ),
+            preleader_min_value_ratio_30m=max(
+                1.1, _env_float("MONITOR_PRELEADER_MIN_VALUE_RATIO_30M", 1.5)
+            ),
+            preleader_min_3m_pct=max(
+                0.1, _env_float("MONITOR_PRELEADER_MIN_3M_PCT", 0.4)
+            ),
+            preleader_min_5m_pct=max(
+                0.2, _env_float("MONITOR_PRELEADER_MIN_5M_PCT", 0.6)
+            ),
+            preleader_max_percentile=max(
+                5.0,
+                min(40.0, _env_float("MONITOR_PRELEADER_MAX_PERCENTILE", 20.0)),
+            ),
+            preleader_rank_improvement_pct=max(
+                0.0,
+                _env_float("MONITOR_PRELEADER_RANK_IMPROVEMENT_PCT", 5.0),
+            ),
+            preleader_cooldown_seconds=max(
+                300, _env_int("MONITOR_PRELEADER_COOLDOWN_SECONDS", 1800)
             ),
         )
 
@@ -380,6 +438,11 @@ class SignalEngine:
         self._momentum_prices: dict[str, deque[tuple[int, float]]] = defaultdict(
             deque
         )
+        self._last_preleader_checked_at: dict[str, int] = {}
+        self._last_preleader_at: dict[str, int] = {}
+        self._relative_rank_history: dict[
+            str, deque[tuple[int, float]]
+        ] = defaultdict(deque)
 
     @staticmethod
     def _rolling_return(
@@ -407,6 +470,48 @@ class SignalEngine:
             samples[-1] = (sample_second, price)
         while samples and samples[0][0] < second - 3720:
             samples.popleft()
+
+    def _in_preleader_window(self, now: int) -> bool:
+        if not self.config.preleader_enabled:
+            return False
+        local = datetime.fromtimestamp(now, tz=_KST)
+        minute_of_day = local.hour * 60 + local.minute
+        start = self.config.preleader_start_minute_kst
+        end = self.config.preleader_end_minute_kst
+        if start <= end:
+            return start <= minute_of_day <= end
+        return minute_of_day >= start or minute_of_day <= end
+
+    @staticmethod
+    def _completed_minute_values(
+        window: deque[_SecondBucket], now: int, minutes: int
+    ) -> list[float]:
+        boundary = now - now % 60
+        totals: dict[int, float] = defaultdict(float)
+        earliest = boundary - minutes * 60
+        for bucket in window:
+            if earliest <= bucket.second < boundary:
+                index = (boundary - 1 - bucket.second) // 60
+                totals[index] += bucket.trade_value
+        return [totals[index] for index in range(minutes) if index in totals]
+
+    def _rank_improvement(
+        self, market: str, now: int, percentile: float
+    ) -> float:
+        history = self._relative_rank_history[market]
+        if not history or now - history[-1][0] >= 30:
+            history.append((now, percentile))
+        while history and history[0][0] < now - 600:
+            history.popleft()
+        reference = next(
+            (
+                prior_percentile
+                for observed_at, prior_percentile in reversed(history)
+                if observed_at <= now - 180
+            ),
+            None,
+        )
+        return max(0.0, float(reference) - percentile) if reference else 0.0
 
     def relative_strength_snapshot(self, market: str, now: int) -> dict[str, Any]:
         """Rank the current market against fresh KRW-market rolling momentum."""
@@ -495,7 +600,11 @@ class SignalEngine:
                 _SecondBucket(second, price, price, price, price, trade_value)
             )
 
-        history_seconds = max(360, self.config.rebreakout_consolidation_seconds + 120)
+        history_seconds = max(
+            360,
+            self.config.rebreakout_consolidation_seconds + 120,
+            1920 if self.config.preleader_enabled else 0,
+        )
         while window and window[0].second < second - history_seconds:
             window.popleft()
 
@@ -525,6 +634,71 @@ class SignalEngine:
         volume_ratio = value_1m / previous_value if previous_value > 0 else 0.0
 
         signals: list[tuple[str, str, dict[str, Any]]] = []
+        relative_strength: dict[str, Any] = {}
+
+        if (
+            self._in_preleader_window(now)
+            and now - self._last_preleader_checked_at.get(market, 0)
+            >= self.config.preleader_check_interval_seconds
+        ):
+            self._last_preleader_checked_at[market] = now
+            values_10m = self._completed_minute_values(window, now, 10)
+            values_30m = self._completed_minute_values(window, now, 30)
+            samples = self._momentum_prices[market]
+            change_3m = self._rolling_return(samples, now, 180)
+            change_5m = self._rolling_return(samples, now, 300)
+            if (
+                len(values_10m) >= 7
+                and len(values_30m) >= 20
+                and change_3m is not None
+                and change_5m is not None
+            ):
+                baseline_10m = float(median(values_10m))
+                baseline_30m = float(median(values_30m))
+                ratio_10m = value_1m / baseline_10m if baseline_10m > 0 else 0.0
+                ratio_30m = value_1m / baseline_30m if baseline_30m > 0 else 0.0
+                relative_strength = self.relative_strength_snapshot(market, now)
+                percentile = float(
+                    relative_strength.get("relative_strength_percentile") or 100.0
+                )
+                rank_improvement = self._rank_improvement(
+                    market, now, percentile
+                )
+                leadership_accelerating = bool(
+                    relative_strength.get("relative_strength_ready")
+                    and percentile <= self.config.preleader_max_percentile
+                    and (
+                        percentile <= self.config.relative_strength_top_percent
+                        or rank_improvement
+                        >= self.config.preleader_rank_improvement_pct
+                    )
+                )
+                if (
+                    value_1m >= self.config.min_trade_value_krw
+                    and ratio_10m >= self.config.preleader_min_value_ratio_10m
+                    and ratio_30m >= self.config.preleader_min_value_ratio_30m
+                    and change_3m >= self.config.preleader_min_3m_pct
+                    and change_5m >= self.config.preleader_min_5m_pct
+                    and leadership_accelerating
+                    and now - self._last_preleader_at.get(market, 0)
+                    >= self.config.preleader_cooldown_seconds
+                ):
+                    self._last_preleader_at[market] = now
+                    signals.append(
+                        (
+                            "leader_volume_acceleration",
+                            "09시 전후 거래대금 선행 가속",
+                            {
+                                "internal_only": True,
+                                "momentum_3m_pct": round(change_3m, 2),
+                                "preleader_volume_ratio_10m": round(ratio_10m, 2),
+                                "preleader_volume_ratio_30m": round(ratio_30m, 2),
+                                "preleader_rank_improvement_pct": round(
+                                    rank_improvement, 2
+                                ),
+                            },
+                        )
+                    )
 
         # Prefer a renewed breakout after a long, narrow consolidation over the
         # shorter generic surge signals. The most recent minute is excluded from
@@ -615,12 +789,14 @@ class SignalEngine:
                     )
                 )
 
-        relative_strength = (
-            self.relative_strength_snapshot(market, now) if signals else {}
-        )
+        if signals and not relative_strength:
+            relative_strength = self.relative_strength_snapshot(market, now)
         alerts = []
         for signal_type, label, details in signals:
-            if not self._can_alert(market, signal_type, now):
+            if (
+                signal_type != "leader_volume_acceleration"
+                and not self._can_alert(market, signal_type, now)
+            ):
                 continue
             alerts.append(
                 {
@@ -1099,6 +1275,81 @@ class CandidateAnalyzer:
             return None
         return state
 
+    def watch_preleader(self, alert: dict[str, Any]) -> bool:
+        """Keep an early volume leader internal until a clean retest occurs."""
+        if not self.config.enabled or not self.config.leader_watch_enabled:
+            return False
+        if alert.get("signal") != "leader_volume_acceleration":
+            return False
+        market = str(alert["market"])
+        now = time.time()
+        state = self._active_watch(market, now)
+        created = state is None
+        if state is None:
+            state = {
+                "market": market,
+                "created_at": now,
+                "first_signal_time_utc": alert.get("time_utc"),
+                "first_signal_price": float(alert["price"]),
+                "recheck_count": 0,
+                "leader_recheck_count": 0,
+            }
+        price = float(alert["price"])
+        state.update(
+            {
+                "source_signal": alert["signal"],
+                "breakout_level": price,
+                "last_price": price,
+                "last_rejected": ["09시 전후 선도주 조기탐지 후 첫 눌림 대기"],
+                "last_checked_at": now,
+                "expires_at": float(state["created_at"])
+                + self.config.watchlist_window_seconds,
+                "leader_peak_price": max(
+                    float(state.get("leader_peak_price") or 0), price
+                ),
+                "leader_pullback_low": float(
+                    state.get("leader_pullback_low") or price
+                ),
+                "leader_pullback_seen": bool(
+                    state.get("leader_pullback_seen", False)
+                ),
+                "leader_pullback_invalidated": bool(
+                    state.get("leader_pullback_invalidated", False)
+                ),
+                "relative_strength_rank": alert.get("relative_strength_rank"),
+                "relative_strength_universe": alert.get(
+                    "relative_strength_universe"
+                ),
+                "relative_strength_percentile": alert.get(
+                    "relative_strength_percentile"
+                ),
+                "momentum_3m_pct": alert.get("momentum_3m_pct"),
+                "momentum_5m_pct": alert.get("momentum_5m_pct"),
+                "preleader_volume_ratio_10m": alert.get(
+                    "preleader_volume_ratio_10m"
+                ),
+                "preleader_volume_ratio_30m": alert.get(
+                    "preleader_volume_ratio_30m"
+                ),
+            }
+        )
+        self._watchlist[market] = state
+        self._start_signal_track(alert, now)
+        MONITOR_STATE.add_alert(alert)
+        MONITOR_STATE.add_screening_record(
+            self._screening_record(alert, "preleader_watch", [])
+        )
+        LOGGER.info(
+            "Preleader retained for first pullback: %s rank=%s/%s "
+            "volume10m=%sx volume30m=%sx",
+            market,
+            alert.get("relative_strength_rank"),
+            alert.get("relative_strength_universe"),
+            alert.get("preleader_volume_ratio_10m"),
+            alert.get("preleader_volume_ratio_30m"),
+        )
+        return created
+
     def _start_signal_track(self, alert: dict[str, Any], now: float) -> None:
         """Track +5% versus -3% first-touch outcomes for every screened signal."""
         market = str(alert["market"])
@@ -1412,6 +1663,7 @@ class CandidateAnalyzer:
             "price_volume_surge",
             "breakout",
             "consolidation_rebreakout",
+            "leader_volume_acceleration",
         }:
             return False
         market = str(alert["market"])
@@ -1498,6 +1750,10 @@ class CandidateAnalyzer:
         if price < reclaim_level:
             return False
         if market in self._inflight_markets:
+            return False
+        if MONITOR_STATE.has_recent_signal(market, "rapid_drop", 600):
+            state["leader_pullback_seen"] = False
+            LOGGER.info("Leader recheck skipped after recent rapid drop: %s", market)
             return False
         if (
             int(state.get("leader_recheck_count", 0))
@@ -1941,6 +2197,9 @@ async def run_monitor_forever() -> None:
                             ),
                         )
                         for alert in alerts:
+                            if alert.get("internal_only"):
+                                candidate_analyzer.watch_preleader(alert)
+                                continue
                             candidate_analyzer.schedule(alert)
                             try:
                                 await dispatcher.send(alert)
