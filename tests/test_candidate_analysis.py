@@ -14,8 +14,10 @@ def _config(**overrides):
     values = {
         "enabled": True,
         "confirm_seconds": 30,
+        "survival_confirm_seconds": 60,
         "min_score": 80,
         "cooldown_seconds": 900,
+        "repeat_cooldown_seconds": 14400,
         "valid_seconds": 300,
         "max_day_change_pct": 20.0,
         "max_rsi_1m": 78.0,
@@ -37,6 +39,9 @@ def _config(**overrides):
         "min_risk_reward": 2.0,
         "max_stop_loss_pct": 3.0,
         "max_btc_decline_pct": -1.5,
+        "hard_min_market_breadth_pct": 35.0,
+        "btc_weak_min_orderbook_ratio": 1.0,
+        "hot_rsi_1m": 75.0,
         "orderbook_sample_count": 3,
         "orderbook_sample_interval_seconds": 2.0,
         "reentry_window_seconds": 1800,
@@ -76,6 +81,7 @@ def _config(**overrides):
         "trend_target_3_pct": 15.0,
         "trend_target_4_pct": 20.0,
         "trend_tracking_seconds": 21600,
+        "outcome_tracking_seconds": 7200,
     }
     values.update(overrides)
     return CandidateConfig(**values)
@@ -331,6 +337,10 @@ def test_default_candidate_config_is_accuracy_first(monkeypatch):
         "CANDIDATE_LEADER_PULLBACK_MAX_PCT",
         "CANDIDATE_LEADER_RECLAIM_PCT",
         "CANDIDATE_TREND_TARGET_2_PCT",
+        "CANDIDATE_SURVIVAL_CONFIRM_SECONDS",
+        "CANDIDATE_REPEAT_COOLDOWN_SECONDS",
+        "CANDIDATE_HARD_MIN_MARKET_BREADTH_PCT",
+        "CANDIDATE_OUTCOME_TRACKING_SECONDS",
     ):
         monkeypatch.delenv(name, raising=False)
 
@@ -346,6 +356,10 @@ def test_default_candidate_config_is_accuracy_first(monkeypatch):
     assert config.leader_pullback_max_pct == 5.0
     assert config.leader_reclaim_pct == 0.5
     assert config.trend_target_2_pct == 10.0
+    assert config.survival_confirm_seconds == 60
+    assert config.repeat_cooldown_seconds == 14400
+    assert config.hard_min_market_breadth_pct == 35.0
+    assert config.outcome_tracking_seconds == 7200
 
 
 def test_rebreakout_reason_never_displays_zero_minutes():
@@ -400,7 +414,7 @@ def test_overheated_signal_is_rejected():
     assert any("RSI 과열" in reason for reason in rejected)
 
 
-def test_extremely_weak_orderbook_is_only_a_score_penalty():
+def test_extremely_weak_orderbook_is_rejected():
     one = _candles()
     five = _candles()
     current = float(one[0]["trade_price"])
@@ -426,13 +440,11 @@ def test_extremely_weak_orderbook_is_only_a_score_penalty():
         _config(min_score=80),
     )
 
-    assert rejected == []
-    assert candidate is not None
-    assert candidate["suggested_position_pct"] == 5
-    assert any("호가 지지 매우 약함" in note for note in candidate["risk_notes"])
+    assert candidate is None
+    assert any("호가 지지 하드차단" in reason for reason in rejected)
 
 
-def test_moderately_weak_orderbook_is_a_score_penalty():
+def test_moderately_weak_orderbook_is_rejected():
     one = _candles()
     five = _candles()
     current = float(one[0]["trade_price"])
@@ -452,13 +464,11 @@ def test_moderately_weak_orderbook_is_a_score_penalty():
         _config(min_score=80),
     )
 
-    assert rejected == []
-    assert candidate is not None
-    assert candidate["suggested_position_pct"] == 5
-    assert any("호가 지지 약함" in note for note in candidate["risk_notes"])
+    assert candidate is None
+    assert any("호가 지지 하드차단" in reason for reason in rejected)
 
 
-def test_moderate_spread_is_a_score_penalty_but_extreme_spread_is_rejected():
+def test_spread_above_preferred_limit_is_rejected():
     one = _candles()
     five = _candles()
     current = float(one[0]["trade_price"])
@@ -481,9 +491,8 @@ def test_moderate_spread_is_a_score_penalty_but_extreme_spread_is_rejected():
         five,
         _config(min_score=80),
     )
-    assert rejected == []
-    assert candidate is not None
-    assert any("호가 스프레드 주의" in note for note in candidate["risk_notes"])
+    assert candidate is None
+    assert any("호가 스프레드 허용치 초과" in reason for reason in rejected)
 
     extreme = _orderbook(current)
     for index, unit in enumerate(extreme["orderbook_units"]):
@@ -646,7 +655,7 @@ def test_confirmed_resistance_room_below_hard_floor_is_rejected(monkeypatch):
     assert any("저항까지 여유 부족" in reason for reason in rejected)
 
 
-def test_orderbook_support_must_persist_to_avoid_penalty():
+def test_orderbook_support_must_persist_to_pass():
     one = _candles()
     five = _candles()
     current = float(one[0]["trade_price"])
@@ -671,9 +680,8 @@ def test_orderbook_support_must_persist_to_avoid_penalty():
         orderbook_samples=samples,
     )
 
-    assert rejected == []
-    assert candidate is not None
-    assert any("호가 지지 매우 약함" in note for note in candidate["risk_notes"])
+    assert candidate is None
+    assert any("호가 지지 하드차단" in reason for reason in rejected)
 
 
 def test_moderate_rsi_overheat_is_penalized_and_extreme_is_rejected():
@@ -1010,7 +1018,7 @@ def test_quality_below_availability_floor_is_still_rejected():
     assert any("거래량 절대 부족" in reason for reason in rejected)
 
 
-def test_btc_weakness_is_a_score_penalty_not_an_automatic_rejection():
+def test_btc_weakness_with_strong_orderbook_can_still_pass():
     one = _candles()
     five = _candles()
     current = float(one[0]["trade_price"])
@@ -1036,6 +1044,61 @@ def test_btc_weakness_is_a_score_penalty_not_an_automatic_rejection():
     assert candidate["btc_weak"] is True
     assert candidate["suggested_position_pct"] == 5
     assert any("BTC 약세 감점" in note for note in candidate["risk_notes"])
+
+
+def test_btc_weakness_with_weak_orderbook_is_rejected():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        {"market": "KRW-TEST", "signal": "consolidation_rebreakout", "price": current},
+        ticker,
+        _orderbook(current, bid_ratio=0.79),
+        one,
+        five,
+        _config(min_score=80, min_orderbook_ratio=0.7),
+        btc_ticker={"signed_change_rate": -0.02},
+    )
+
+    assert candidate is None
+    assert any("BTC 약세·호가 약세" in reason for reason in rejected)
+
+
+def test_risk_off_market_breadth_is_a_hard_rejection():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.08,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        {
+            "market": "KRW-TEST",
+            "signal": "consolidation_rebreakout",
+            "price": current,
+            "market_regime": "risk_off",
+            "market_breadth_5m_pct": 27.8,
+        },
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80),
+    )
+
+    assert candidate is None
+    assert any("시장 확산도 하드차단" in reason for reason in rejected)
 
 
 def test_high_day_change_is_a_score_penalty_not_an_automatic_rejection():

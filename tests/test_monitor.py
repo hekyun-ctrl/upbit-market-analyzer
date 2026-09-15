@@ -9,6 +9,8 @@ from monitor import (
     MonitorConfig,
     SignalEngine,
     _candidate_text,
+    _daily_performance_text,
+    _early_watch_text,
     _management_text,
     _revalidate_candidate_for_dispatch,
 )
@@ -1043,3 +1045,110 @@ def test_candidate_message_labels_leader_pullback_recheck():
     text = _candidate_text(candidate)
 
     assert "[조건부 진입 후보 | 선도주 눌림 |" in text
+
+
+def test_early_watch_is_explicitly_not_an_entry_candidate():
+    text = _early_watch_text(
+        {
+            "market": "KRW-ARK",
+            "price": 100.0,
+            "momentum_3m_pct": 0.8,
+            "momentum_5m_pct": 1.2,
+            "preleader_volume_ratio_10m": 3.0,
+            "preleader_volume_ratio_30m": 2.0,
+            "relative_strength_rank": 3,
+            "relative_strength_universe": 180,
+        }
+    )
+
+    assert "[초기 포착 | 진입 검증 전]" in text
+    assert "아직 매수 후보가 아닙니다" in text
+    assert "3/180위" in text
+
+
+def test_daily_performance_text_separates_simulation_from_real_returns():
+    text = _daily_performance_text(
+        {
+            "day_kst": "2026-09-15",
+            "accepted_count": 3,
+            "unique_markets": 3,
+            "target_1_first": 1,
+            "stop_first": 1,
+            "expired": 1,
+            "target_rate_pct": 50.0,
+            "simulated_return_average_pct": 0.2,
+            "assumed_cost_pct_per_candidate": 0.2,
+            "raw_decided_count": 5,
+            "raw_target_first": 2,
+            "missed_raw_winners": 1,
+        }
+    )
+
+    assert "후보당 모의 평균: +0.20%" in text
+    assert "실제 계좌 수익이 아닌" in text
+
+
+def test_recently_delivered_market_is_not_scheduled_again(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    monkeypatch.setenv("CANDIDATE_REPEAT_COOLDOWN_SECONDS", "14400")
+    monkeypatch.setattr("monitor.time.time", lambda: 1_800_000_000.0)
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    analyzer._last_delivered_at["KRW-XLM"] = 1_799_999_000.0
+
+    scheduled = analyzer.schedule(
+        {
+            "time_utc": "2026-09-15T00:00:00+00:00",
+            "market": "KRW-XLM",
+            "signal": "breakout",
+            "price": 267.0,
+        }
+    )
+
+    assert scheduled is False
+    assert "KRW-XLM" not in analyzer._inflight_markets
+
+
+def test_daily_performance_counts_cost_adjusted_outcomes():
+    MONITOR_STATE.candidate_outcomes.clear()
+    MONITOR_STATE.signal_outcomes.clear()
+    MONITOR_STATE.screening_records.clear()
+    MONITOR_STATE.candidate_outcomes.extend(
+        [
+            {
+                "market": "KRW-A",
+                "result": "target_1_first",
+                "entry_price": 100.0,
+                "exit_price": 103.0,
+                "completed_at_utc": "2026-09-15T01:00:00+00:00",
+            },
+            {
+                "market": "KRW-B",
+                "result": "stop_first",
+                "entry_price": 100.0,
+                "exit_price": 98.0,
+                "completed_at_utc": "2026-09-15T02:00:00+00:00",
+            },
+        ]
+    )
+    MONITOR_STATE.screening_records.extend(
+        [
+            {
+                "market": "KRW-A",
+                "decision": "accepted",
+                "time_utc": "2026-09-15T00:30:00+00:00",
+            },
+            {
+                "market": "KRW-B",
+                "decision": "accepted",
+                "time_utc": "2026-09-15T01:30:00+00:00",
+            },
+        ]
+    )
+
+    report = MONITOR_STATE.daily_performance("2026-09-15", cost_pct=0.2)
+
+    assert report["accepted_count"] == 2
+    assert report["target_1_first"] == 1
+    assert report["stop_first"] == 1
+    assert report["target_rate_pct"] == 50.0
+    assert report["simulated_return_average_pct"] == 0.3

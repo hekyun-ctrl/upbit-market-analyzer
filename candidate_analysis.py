@@ -35,8 +35,10 @@ def _enabled(name: str, default: bool = False) -> bool:
 class CandidateConfig:
     enabled: bool
     confirm_seconds: int
+    survival_confirm_seconds: int
     min_score: int
     cooldown_seconds: int
+    repeat_cooldown_seconds: int
     valid_seconds: int
     max_day_change_pct: float
     max_rsi_1m: float
@@ -58,6 +60,9 @@ class CandidateConfig:
     min_risk_reward: float
     max_stop_loss_pct: float
     max_btc_decline_pct: float
+    hard_min_market_breadth_pct: float
+    btc_weak_min_orderbook_ratio: float
+    hot_rsi_1m: float
     orderbook_sample_count: int
     orderbook_sample_interval_seconds: float
     reentry_window_seconds: int
@@ -97,14 +102,21 @@ class CandidateConfig:
     trend_target_3_pct: float
     trend_target_4_pct: float
     trend_tracking_seconds: int
+    outcome_tracking_seconds: int
 
     @classmethod
     def from_env(cls) -> "CandidateConfig":
         return cls(
             enabled=_enabled("ENABLE_CANDIDATE_ANALYSIS"),
             confirm_seconds=max(5, min(120, _env_int("CANDIDATE_CONFIRM_SECONDS", 30))),
+            survival_confirm_seconds=max(
+                30, min(180, _env_int("CANDIDATE_SURVIVAL_CONFIRM_SECONDS", 60))
+            ),
             min_score=max(50, min(100, _env_int("CANDIDATE_MIN_SCORE", 90))),
             cooldown_seconds=max(300, _env_int("CANDIDATE_COOLDOWN_SECONDS", 900)),
+            repeat_cooldown_seconds=max(
+                3600, _env_int("CANDIDATE_REPEAT_COOLDOWN_SECONDS", 14400)
+            ),
             valid_seconds=max(60, min(900, _env_int("CANDIDATE_VALID_SECONDS", 300))),
             max_day_change_pct=_env_float("CANDIDATE_MAX_DAY_CHANGE_PCT", 20.0),
             max_rsi_1m=_env_float("CANDIDATE_MAX_RSI_1M", 78.0),
@@ -140,6 +152,20 @@ class CandidateConfig:
             min_risk_reward=_env_float("CANDIDATE_MIN_RISK_REWARD", 2.0),
             max_stop_loss_pct=_env_float("CANDIDATE_MAX_STOP_LOSS_PCT", 3.0),
             max_btc_decline_pct=_env_float("CANDIDATE_MAX_BTC_DECLINE_PCT", -1.5),
+            hard_min_market_breadth_pct=max(
+                0.0,
+                min(
+                    100.0,
+                    _env_float("CANDIDATE_HARD_MIN_MARKET_BREADTH_PCT", 35.0),
+                ),
+            ),
+            btc_weak_min_orderbook_ratio=max(
+                0.0,
+                _env_float("CANDIDATE_BTC_WEAK_MIN_ORDERBOOK_RATIO", 1.0),
+            ),
+            hot_rsi_1m=max(
+                50.0, min(100.0, _env_float("CANDIDATE_HOT_RSI_1M", 75.0))
+            ),
             orderbook_sample_count=max(
                 1, min(5, _env_int("CANDIDATE_ORDERBOOK_SAMPLE_COUNT", 3))
             ),
@@ -261,6 +287,9 @@ class CandidateConfig:
             ),
             trend_tracking_seconds=max(
                 3600, _env_int("CANDIDATE_TREND_TRACKING_SECONDS", 21600)
+            ),
+            outcome_tracking_seconds=max(
+                3600, _env_int("CANDIDATE_OUTCOME_TRACKING_SECONDS", 7200)
             ),
         )
 
@@ -608,6 +637,35 @@ def evaluate_candidate(
         (rejected if strict_quality else soft_warnings).append(message)
 
     btc_weak = btc_change <= config.max_btc_decline_pct or btc_bearish
+    market_regime = str(alert.get("market_regime") or "neutral")
+    market_breadth_5m_pct = float(alert.get("market_breadth_5m_pct") or 0.0)
+
+    # Accuracy-first gates. These combinations produced high condition scores
+    # despite poor follow-through in production. They are direct contradictions
+    # to an actionable long entry and cannot be offset by setup/volume points.
+    if (
+        market_regime == "risk_off"
+        and market_breadth_5m_pct < config.hard_min_market_breadth_pct
+    ):
+        rejected.append(
+            "시장 확산도 하드차단"
+            f"(5분 상승 종목 {market_breadth_5m_pct:.1f}% < "
+            f"{config.hard_min_market_breadth_pct:.1f}%)"
+        )
+    if not book_persistent:
+        label = "매우 약함" if not hard_book_persistent else "약함"
+        rejected.append(f"호가 지지 하드차단({label}, {book_ratio:.2f}배)")
+    if btc_weak and book_ratio < config.btc_weak_min_orderbook_ratio:
+        rejected.append(
+            "BTC 약세·호가 약세 동시 발생"
+            f"({btc_change:+.2f}%, {book_ratio:.2f}배)"
+        )
+    if rsi1 >= config.hot_rsi_1m and book_ratio < 1.0:
+        rejected.append(
+            f"단기 과열·호가 약세 동시 발생(RSI {rsi1:.1f}, {book_ratio:.2f}배)"
+        )
+    if spread > config.max_spread_pct:
+        rejected.append(f"호가 스프레드 허용치 초과({spread:.2f}%)")
 
     resistance_levels = _resistances(current, ticker, c5, c15)
     resistance_confirmed = bool(resistance_levels)
@@ -727,8 +785,6 @@ def evaluate_candidate(
         risk_notes.append("반복 확인된 상단 구조 저항 없음")
     score_penalty = config.day_overheat_score_penalty if day_overheated else 0
     score_penalty += len(soft_warnings) * config.availability_soft_penalty
-    market_regime = str(alert.get("market_regime") or "neutral")
-    market_breadth_5m_pct = float(alert.get("market_breadth_5m_pct") or 0.0)
     regime_bonus = 3 if market_regime == "risk_on" else 0
     if market_regime == "risk_off":
         score_penalty += 6

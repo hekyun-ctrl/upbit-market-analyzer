@@ -12,7 +12,7 @@ import uuid
 from collections import Counter, defaultdict, deque
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
-from statistics import median
+from statistics import mean, median
 from typing import Any, Callable
 
 import httpx
@@ -306,6 +306,82 @@ class MonitorState:
                 round(targets / decided * 100, 2) if decided else None
             ),
             "recent": outcomes[:100],
+        }
+
+    @staticmethod
+    def _on_kst_day(value: Any, day_kst: str) -> bool:
+        if not value:
+            return False
+        try:
+            observed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        except (TypeError, ValueError):
+            return False
+        if observed.tzinfo is None:
+            observed = observed.replace(tzinfo=timezone.utc)
+        return observed.astimezone(_KST).date().isoformat() == day_kst
+
+    def daily_performance(self, day_kst: str, cost_pct: float = 0.2) -> dict[str, Any]:
+        """Return a restart-scoped daily audit without assuming real fills."""
+        with self._lock:
+            candidate_outcomes = list(self.candidate_outcomes)
+            signal_outcomes = list(self.signal_outcomes)
+            screening_records = list(self.screening_records)
+        outcomes = [
+            item
+            for item in candidate_outcomes
+            if self._on_kst_day(item.get("completed_at_utc"), day_kst)
+        ]
+        raw = [
+            item
+            for item in signal_outcomes
+            if self._on_kst_day(item.get("completed_at_utc"), day_kst)
+        ]
+        accepted = [
+            item
+            for item in screening_records
+            if item.get("decision") == "accepted"
+            and self._on_kst_day(item.get("time_utc"), day_kst)
+        ]
+        target_count = sum(item.get("result") == "target_1_first" for item in outcomes)
+        stop_count = sum(item.get("result") == "stop_first" for item in outcomes)
+        expired_count = sum(item.get("result") == "expired" for item in outcomes)
+        simulated_returns = []
+        for item in outcomes:
+            entry = float(item.get("entry_price") or 0)
+            exit_price = float(item.get("exit_price") or 0)
+            if entry > 0 and exit_price > 0:
+                simulated_returns.append((exit_price / entry - 1) * 100 - cost_pct)
+        missed_raw_winners = sum(
+            item.get("result") == "target_first"
+            and not bool(item.get("approved_candidate"))
+            for item in raw
+        )
+        return {
+            "day_kst": day_kst,
+            "accepted_count": len(accepted),
+            "unique_markets": len({item.get("market") for item in accepted}),
+            "completed_count": len(outcomes),
+            "target_1_first": target_count,
+            "stop_first": stop_count,
+            "expired": expired_count,
+            "target_rate_pct": (
+                round(target_count / (target_count + stop_count) * 100, 1)
+                if target_count + stop_count
+                else None
+            ),
+            "simulated_return_sum_pct": round(sum(simulated_returns), 2),
+            "simulated_return_average_pct": (
+                round(mean(simulated_returns), 2) if simulated_returns else None
+            ),
+            "assumed_cost_pct_per_candidate": round(cost_pct, 3),
+            "raw_decided_count": sum(
+                item.get("result") in {"target_first", "stop_first"} for item in raw
+            ),
+            "raw_target_first": sum(
+                item.get("result") == "target_first" for item in raw
+            ),
+            "missed_raw_winners": missed_raw_winners,
+            "restart_scoped": True,
         }
 
     def candidate_performance(self) -> dict[str, Any]:
@@ -1017,6 +1093,12 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
             f"{_format_price(float(candidate['target_4']))} "
             f"(+{float(candidate['target_4_pct']):.0f}%)\n"
         )
+    survival_line = ""
+    if candidate.get("survival_confirmed"):
+        survival_line = (
+            "2단계 확인: "
+            f"{int(candidate.get('survival_seconds') or 0)}초 가격·거래량·호가 생존 통과\n"
+        )
     return (
         f"[조건부 진입 후보{suffix} | 조건점수 {candidate['score']}/100] "
         f"{candidate['market']}\n"
@@ -1034,6 +1116,7 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"추세 관리: {candidate.get('trend_management', '고정 목표 관리')}\n"
         f"{relative_line}"
         f"{regime_line}"
+        f"{survival_line}"
         f"가까운 저항 여유: {candidate.get('resistance_room_pct', 0):.1f}%\n"
         f"예상 손익비: {candidate.get('risk_reward', 0):.2f}\n"
         f"추천 비중: 투자 가능금액의 {candidate['suggested_position_pct']}% 이내\n"
@@ -1042,6 +1125,47 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"선정 근거: {reasons}\n"
         "조건점수는 적중 확률이 아닙니다. 자동 주문이나 수익 보장이 아닌 "
         "공개 시세 기반 조건부 관찰 정보입니다."
+    )
+
+
+def _early_watch_text(alert: dict[str, Any]) -> str:
+    """Clearly separate fast discovery from a verified entry candidate."""
+    rank = int(alert.get("relative_strength_rank") or 0)
+    universe = int(alert.get("relative_strength_universe") or 0)
+    rank_line = f"상대강도: {rank}/{universe}위\n" if rank and universe else ""
+    return (
+        f"[초기 포착 | 진입 검증 전] {alert['market']}\n"
+        f"현재가: {_format_price(float(alert['price']))}\n"
+        f"3분 변화: {float(alert.get('momentum_3m_pct') or 0):+.1f}%\n"
+        f"5분 변화: {float(alert.get('momentum_5m_pct') or 0):+.1f}%\n"
+        f"거래대금 가속: 최근 10분 기준 "
+        f"{float(alert.get('preleader_volume_ratio_10m') or 0):.1f}배 · "
+        f"30분 기준 {float(alert.get('preleader_volume_ratio_30m') or 0):.1f}배\n"
+        f"{rank_line}"
+        "아직 매수 후보가 아닙니다. 눌림·돌파선 유지·거래량과 호가 생존을 "
+        "추가 확인한 경우에만 별도의 조건부 진입 후보를 보냅니다."
+    )
+
+
+def _daily_performance_text(report: dict[str, Any]) -> str:
+    rate = report.get("target_rate_pct")
+    rate_text = f"{float(rate):.1f}%" if rate is not None else "결정 표본 없음"
+    average = report.get("simulated_return_average_pct")
+    average_text = f"{float(average):+.2f}%" if average is not None else "산출 불가"
+    return (
+        f"[일일 후보 성과 | {report['day_kst']}]\n"
+        f"확인된 후보: {int(report['accepted_count'])}건 · "
+        f"고유 종목 {int(report['unique_markets'])}개\n"
+        f"결과: 1차 목표 {int(report['target_1_first'])} · "
+        f"손절 {int(report['stop_first'])} · 만료 {int(report['expired'])}\n"
+        f"목표 선도달률: {rate_text}\n"
+        f"후보당 모의 평균: {average_text} "
+        f"(비용 {float(report['assumed_cost_pct_per_candidate']):.2f}% 가정)\n"
+        f"원시 결정 신호: {int(report['raw_decided_count'])}건 · "
+        f"+5% 선도달 {int(report['raw_target_first'])}건\n"
+        f"최종 후보에서 놓친 원시 +5% 신호: {int(report['missed_raw_winners'])}건\n"
+        "이 성과표는 실제 계좌 수익이 아닌 공개 시세 모의 추적이며, "
+        "서비스 재시작 이후 수집된 표본 기준입니다."
     )
 
 
@@ -1125,6 +1249,25 @@ class AlertDispatcher:
         self._send_management_alerts = _enabled(
             "TELEGRAM_SEND_MANAGEMENT_ALERTS", True
         )
+        self._send_early_watch_alerts = _enabled(
+            "TELEGRAM_SEND_EARLY_WATCH_ALERTS", True
+        )
+        self._early_watch_daily_max = max(
+            0, min(20, _env_int("TELEGRAM_EARLY_WATCH_DAILY_MAX", 8))
+        )
+        self._send_daily_performance = _enabled(
+            "TELEGRAM_SEND_DAILY_PERFORMANCE", True
+        )
+        self._daily_performance_minute_kst = _env_minute_of_day(
+            "TELEGRAM_DAILY_PERFORMANCE_TIME_KST", "23:50"
+        )
+        self._simulated_round_trip_cost_pct = max(
+            0.0,
+            min(
+                2.0,
+                _env_float("CANDIDATE_SIMULATED_ROUND_TRIP_COST_PCT", 0.2),
+            ),
+        )
         self._candidate_min_target_2_pct = max(
             0.0, _env_float("TELEGRAM_CANDIDATE_MIN_TARGET_2_PCT", 5.0)
         )
@@ -1153,6 +1296,8 @@ class AlertDispatcher:
         self._last_inactivity_status_at = now
         self._candidate_delivery_day = self._today_kst()
         self._candidate_delivery_count = 0
+        self._early_watch_delivery_count = 0
+        self._last_daily_performance_day: str | None = None
         self._last_availability_delivery_at = 0.0
         self._raw_signal_times: deque[float] = deque(maxlen=5000)
         self._candidate_rejections: deque[tuple[float, tuple[str, ...]]] = deque(
@@ -1170,6 +1315,7 @@ class AlertDispatcher:
             return
         self._candidate_delivery_day = day
         self._candidate_delivery_count = 0
+        self._early_watch_delivery_count = 0
         self._last_availability_delivery_at = 0.0
         self._publish_candidate_delivery_state()
 
@@ -1286,11 +1432,45 @@ class AlertDispatcher:
         LOGGER.info("Telegram inactivity status delivered")
         return True
 
+    async def send_daily_performance_if_due(self) -> bool:
+        if self.mode != "telegram" or not self._send_daily_performance:
+            return False
+        now_kst = datetime.now(_KST)
+        day = now_kst.date().isoformat()
+        minute = now_kst.hour * 60 + now_kst.minute
+        if (
+            minute < self._daily_performance_minute_kst
+            or self._last_daily_performance_day == day
+        ):
+            return False
+        report = MONITOR_STATE.daily_performance(
+            day, self._simulated_round_trip_cost_pct
+        )
+        self._last_daily_performance_day = day
+        url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
+        try:
+            async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
+                response = await client.post(
+                    url,
+                    json={
+                        "chat_id": self._telegram_chat_id,
+                        "text": _daily_performance_text(report),
+                        "disable_web_page_preview": True,
+                    },
+                )
+                response.raise_for_status()
+        except Exception:
+            self._last_daily_performance_day = None
+            raise
+        LOGGER.warning("DAILY_CANDIDATE_PERFORMANCE %s", json.dumps(report, ensure_ascii=False))
+        return True
+
     async def run_inactivity_status_loop(self) -> None:
         while True:
             await asyncio.sleep(60)
             try:
                 await self.send_inactivity_status_if_due()
+                await self.send_daily_performance_if_due()
             except asyncio.CancelledError:
                 raise
             except Exception as exc:
@@ -1318,6 +1498,42 @@ class AlertDispatcher:
                 },
             )
             response.raise_for_status()
+
+    async def send_early_watch(self, alert: dict[str, Any]) -> bool:
+        """Send a capped discovery notice that cannot be mistaken for an entry."""
+        if (
+            self.mode != "telegram"
+            or not self._send_early_watch_alerts
+            or self._early_watch_daily_max <= 0
+        ):
+            return False
+        self._refresh_candidate_delivery_day()
+        if self._early_watch_delivery_count >= self._early_watch_daily_max:
+            LOGGER.info(
+                "EARLY_WATCH_DAILY_MAX_SUPPRESSED market=%s count=%d max=%d",
+                alert.get("market"),
+                self._early_watch_delivery_count,
+                self._early_watch_daily_max,
+            )
+            return False
+        self._early_watch_delivery_count += 1
+        url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
+        try:
+            async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
+                response = await client.post(
+                    url,
+                    json={
+                        "chat_id": self._telegram_chat_id,
+                        "text": _early_watch_text(alert),
+                        "disable_web_page_preview": True,
+                    },
+                )
+                response.raise_for_status()
+        except Exception:
+            self._early_watch_delivery_count -= 1
+            raise
+        LOGGER.warning("EARLY_WATCH %s", json.dumps(alert, ensure_ascii=False))
+        return True
 
     async def send_candidate(self, candidate: dict[str, Any]) -> bool:
         LOGGER.warning("ENTRY_CANDIDATE %s", json.dumps(candidate, ensure_ascii=False))
@@ -1446,6 +1662,7 @@ class CandidateAnalyzer:
         self._relative_strength_provider = relative_strength_provider
         self._last_checked_at: dict[str, float] = {}
         self._last_reentry_at: dict[str, float] = {}
+        self._last_delivered_at: dict[str, float] = {}
         self._last_leader_recheck_at: dict[str, float] = {}
         self._lifecycles: dict[str, dict[str, Any]] = {}
         self._watchlist: dict[str, dict[str, Any]] = {}
@@ -1903,6 +2120,16 @@ class CandidateAnalyzer:
             return False
         market = str(alert["market"])
         now = time.time()
+        since_delivery = now - self._last_delivered_at.get(market, 0)
+        if since_delivery < self.config.repeat_cooldown_seconds:
+            remaining = int(self.config.repeat_cooldown_seconds - since_delivery)
+            reason = f"동일 종목 후보 재전송 제한({remaining}초 남음)"
+            LOGGER.info("Candidate repeat suppressed for %s: %s", market, reason)
+            self.dispatcher.record_candidate_rejection([reason])
+            MONITOR_STATE.add_screening_record(
+                self._screening_record(alert, "repeat_suppressed", [reason])
+            )
+            return False
         watch = self._active_watch(market, now)
         watchlist_recheck = bool(
             watch and alert.get("signal") == "consolidation_rebreakout"
@@ -1944,6 +2171,11 @@ class CandidateAnalyzer:
     ) -> bool:
         """Recheck a rejected market after a controlled leader pullback/reclaim."""
         if not self.config.leader_watch_enabled:
+            return False
+        if (
+            now - self._last_delivered_at.get(market, 0)
+            < self.config.repeat_cooldown_seconds
+        ):
             return False
         state = self._active_watch(market, now)
         if not state or price <= 0:
@@ -2107,6 +2339,11 @@ class CandidateAnalyzer:
             < self.config.reentry_cooldown_seconds
         ):
             return leader_recheck_scheduled
+        if (
+            now - self._last_delivered_at.get(market, 0)
+            < self.config.repeat_cooldown_seconds
+        ):
+            return leader_recheck_scheduled
         self._last_reentry_at[market] = now
         state["waiting_retest"] = False
         alert = {
@@ -2178,6 +2415,52 @@ class CandidateAnalyzer:
                 await asyncio.sleep(self.config.orderbook_sample_interval_seconds)
         return samples
 
+    async def _market_snapshot(self, market: str) -> dict[str, Any]:
+        """Fetch one internally consistent public-data bundle for screening."""
+        async with self._semaphore:
+            client = UpbitPublicClient()
+            try:
+                values = await asyncio.gather(
+                    client.ticker(market),
+                    self._orderbook_samples(client, market),
+                    client.candles(market, "minute1", 120),
+                    client.candles(market, "minute5", 120),
+                    client.candles(market, "minute15", 120),
+                    client.ticker("KRW-BTC"),
+                    client.candles("KRW-BTC", "minute5", 120),
+                    client.candles("KRW-BTC", "minute15", 120),
+                )
+            finally:
+                await client.close()
+        keys = (
+            "ticker",
+            "orderbooks",
+            "candles_1m",
+            "candles_5m",
+            "candles_15m",
+            "btc_ticker",
+            "btc_candles_5m",
+            "btc_candles_15m",
+        )
+        return dict(zip(keys, values))
+
+    def _evaluate_snapshot(
+        self, alert: dict[str, Any], snapshot: dict[str, Any]
+    ) -> tuple[dict[str, Any] | None, list[str]]:
+        return evaluate_candidate(
+            alert,
+            snapshot["ticker"],
+            snapshot["orderbooks"][-1],
+            snapshot["candles_1m"],
+            snapshot["candles_5m"],
+            self.config,
+            candles_15m=snapshot["candles_15m"],
+            btc_ticker=snapshot["btc_ticker"],
+            btc_candles_5m=snapshot["btc_candles_5m"],
+            btc_candles_15m=snapshot["btc_candles_15m"],
+            orderbook_samples=snapshot["orderbooks"],
+        )
+
     async def _analyze(self, alert: dict[str, Any]) -> None:
         market = str(alert["market"])
         try:
@@ -2201,30 +2484,7 @@ class CandidateAnalyzer:
             if seconds_to_next_close < 22 and exposure_at_close < 20:
                 seconds_to_next_close += 60
             await asyncio.sleep(max(self.config.confirm_seconds, seconds_to_next_close))
-            async with self._semaphore:
-                client = UpbitPublicClient()
-                try:
-                    (
-                        ticker,
-                        orderbooks,
-                        candles_1m,
-                        candles_5m,
-                        candles_15m,
-                        btc_ticker,
-                        btc_candles_5m,
-                        btc_candles_15m,
-                    ) = await asyncio.gather(
-                        client.ticker(market),
-                        self._orderbook_samples(client, market),
-                        client.candles(market, "minute1", 120),
-                        client.candles(market, "minute5", 120),
-                        client.candles(market, "minute15", 120),
-                        client.ticker("KRW-BTC"),
-                        client.candles("KRW-BTC", "minute5", 120),
-                        client.candles("KRW-BTC", "minute15", 120),
-                    )
-                finally:
-                    await client.close()
+            snapshot = await self._market_snapshot(market)
             if self._relative_strength_provider is not None:
                 # Reconfirm leadership after the completed-candle wait. A coin
                 # that lost its rank during the pullback must not pass on stale
@@ -2232,31 +2492,70 @@ class CandidateAnalyzer:
                 alert.update(
                     self._relative_strength_provider(market, int(time.time()))
                 )
-            candidate, rejected = evaluate_candidate(
-                alert,
-                ticker,
-                orderbooks[-1],
-                candles_1m,
-                candles_5m,
-                self.config,
-                candles_15m=candles_15m,
-                btc_ticker=btc_ticker,
-                btc_candles_5m=btc_candles_5m,
-                btc_candles_15m=btc_candles_15m,
-                orderbook_samples=orderbooks,
-            )
+            candidate, rejected = self._evaluate_snapshot(alert, snapshot)
             if candidate is None:
                 LOGGER.info(
                     "Candidate rejected for %s: %s", market, "; ".join(rejected)
                 )
                 self._remember_rejected(
-                    alert, rejected, float(ticker["trade_price"])
+                    alert, rejected, float(snapshot["ticker"]["trade_price"])
                 )
                 self.dispatcher.record_candidate_rejection(rejected)
                 MONITOR_STATE.add_screening_record(
                     self._screening_record(alert, "rejected", rejected)
                 )
                 return
+            first_candidate = candidate
+            LOGGER.info(
+                "CANDIDATE_SURVIVAL_PENDING market=%s seconds=%d score=%d",
+                market,
+                self.config.survival_confirm_seconds,
+                int(candidate["score"]),
+            )
+            await asyncio.sleep(self.config.survival_confirm_seconds)
+            survival_snapshot = await self._market_snapshot(market)
+            if self._relative_strength_provider is not None:
+                alert.update(
+                    self._relative_strength_provider(market, int(time.time()))
+                )
+            candidate, survival_rejected = self._evaluate_snapshot(
+                alert, survival_snapshot
+            )
+            if candidate is None:
+                reasons = [f"생존 재검증: {reason}" for reason in survival_rejected]
+                LOGGER.info(
+                    "Candidate survival rejected for %s: %s",
+                    market,
+                    "; ".join(reasons),
+                )
+                self._remember_rejected(
+                    alert,
+                    reasons,
+                    float(survival_snapshot["ticker"]["trade_price"]),
+                )
+                self.dispatcher.record_candidate_rejection(reasons)
+                MONITOR_STATE.add_screening_record(
+                    self._screening_record(alert, "survival_rejected", reasons)
+                )
+                return
+            _, original_range_rejection = _revalidate_candidate_for_dispatch(
+                first_candidate, float(survival_snapshot["ticker"]["trade_price"])
+            )
+            if original_range_rejection:
+                reason = f"생존 재검증: {original_range_rejection}"
+                LOGGER.info("Candidate survival cancelled for %s: %s", market, reason)
+                self._remember_rejected(
+                    alert,
+                    [reason],
+                    float(survival_snapshot["ticker"]["trade_price"]),
+                )
+                self.dispatcher.record_candidate_rejection([reason])
+                MONITOR_STATE.add_screening_record(
+                    self._screening_record(alert, "survival_rejected", [reason])
+                )
+                return
+            candidate["survival_confirmed"] = True
+            candidate["survival_seconds"] = self.config.survival_confirm_seconds
             verification_client = UpbitPublicClient()
             try:
                 latest_ticker = await verification_client.ticker(market)
@@ -2318,6 +2617,7 @@ class CandidateAnalyzer:
             ):
                 accepted_record[key] = candidate.get(key)
             MONITOR_STATE.add_screening_record(accepted_record)
+            self._last_delivered_at[market] = time.time()
             self._watchlist.pop(market, None)
             if market in self._signal_tracks:
                 self._signal_tracks[market]["approved_candidate"] = True
@@ -2357,7 +2657,7 @@ class CandidateAnalyzer:
                 "momentum_15m_pct": candidate.get("momentum_15m_pct"),
                 "momentum_60m_pct": candidate.get("momentum_60m_pct"),
                 "waiting_retest": False,
-                "expires_at": lifecycle_now + self.config.reentry_window_seconds,
+                "expires_at": lifecycle_now + self.config.outcome_tracking_seconds,
             }
         except asyncio.CancelledError:
             raise
@@ -2479,7 +2779,12 @@ async def run_monitor_forever() -> None:
                         )
                         for alert in alerts:
                             if alert.get("internal_only"):
-                                candidate_analyzer.watch_preleader(alert)
+                                created = candidate_analyzer.watch_preleader(alert)
+                                if created:
+                                    try:
+                                        await dispatcher.send_early_watch(alert)
+                                    except Exception as exc:
+                                        LOGGER.error("Early-watch delivery failed: %s", exc)
                                 continue
                             candidate_analyzer.schedule(alert)
                             try:
