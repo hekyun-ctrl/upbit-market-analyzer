@@ -9,6 +9,7 @@ from monitor import (
     MonitorConfig,
     SignalEngine,
     _candidate_text,
+    _management_text,
     _revalidate_candidate_for_dispatch,
 )
 
@@ -59,7 +60,42 @@ def test_price_and_volume_surge_is_detected_after_warmup():
         volume = 0.1 if second < 61 else 1.0
         alerts.extend(engine.update("KRW-IQ", price, volume, base_ms + second * 1000))
 
-    assert any(alert["signal"] == "price_volume_surge" for alert in alerts)
+    surge = next(alert for alert in alerts if alert["signal"] == "price_volume_surge")
+    assert surge["confirmation_started_at_utc"] < surge["time_utc"]
+
+
+def test_rest_warm_start_restores_relative_strength_immediately():
+    engine = SignalEngine(_config(relative_strength_min_universe=20))
+    now = 1_800_000_000
+    boundary = now - now % 60
+
+    for market_index in range(20):
+        candles = []
+        for age in range(1, 66):
+            opened = boundary - age * 60
+            oldest_index = 65 - age
+            gain = 0.08 if market_index == 0 else 0.001 * market_index
+            close = 100 + oldest_index * gain
+            candles.append(
+                {
+                    "candle_date_time_utc": datetime.fromtimestamp(
+                        opened, tz=timezone.utc
+                    ).isoformat(),
+                    "opening_price": close - gain,
+                    "high_price": close + 0.01,
+                    "low_price": close - 0.01,
+                    "trade_price": close,
+                    "candle_acc_trade_price": 10_000.0,
+                }
+            )
+        assert engine.warm_market(f"KRW-T{market_index}", candles, now=now)
+
+    snapshot = engine.relative_strength_snapshot("KRW-T0", now - 1)
+
+    assert snapshot["relative_strength_ready"] is True
+    assert snapshot["relative_strength_rank"] == 1
+    assert snapshot["relative_strength_universe"] == 20
+    assert snapshot["market_regime"] in {"risk_on", "neutral", "risk_off"}
 
 
 def test_alert_cooldown_blocks_duplicate_signal():
@@ -282,6 +318,21 @@ def test_telegram_delivery_filters_default_to_enabled(monkeypatch):
     assert dispatcher.daily_candidate_max == 10
     assert dispatcher.inactivity_status_enabled is True
     assert dispatcher.inactivity_status_seconds == 3600
+
+
+def test_management_message_does_not_assume_user_entered():
+    text = _management_text(
+        {
+            "market": "KRW-IQ",
+            "event": "target_1",
+            "entry_price": 100.0,
+            "current_price": 103.0,
+        }
+    )
+
+    assert "1차 목표 도달" in text
+    assert "진입했다면" in text
+    assert "실제 체결 여부를 알 수 없는" in text
 
 
 def test_inactivity_status_reports_screening_without_creating_candidate(monkeypatch):

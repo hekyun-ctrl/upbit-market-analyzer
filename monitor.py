@@ -471,6 +471,59 @@ class SignalEngine:
         while samples and samples[0][0] < second - 3720:
             samples.popleft()
 
+    def warm_market(
+        self,
+        market: str,
+        candles: list[dict[str, Any]],
+        *,
+        now: int | None = None,
+    ) -> bool:
+        """Seed rolling momentum and minute values after a process restart."""
+        current_second = int(now or time.time())
+        boundary = current_second - current_second % 60
+        historical_prices: dict[int, float] = {}
+        historical_buckets: dict[int, _SecondBucket] = {}
+        for candle in candles:
+            raw_time = candle.get("candle_date_time_utc") or candle.get("time_utc")
+            if not raw_time:
+                continue
+            try:
+                opened = datetime.fromisoformat(
+                    str(raw_time).replace("Z", "+00:00")
+                )
+            except ValueError:
+                continue
+            if opened.tzinfo is None:
+                opened = opened.replace(tzinfo=timezone.utc)
+            opened_second = int(opened.timestamp())
+            if opened_second + 60 > boundary or opened_second < current_second - 3720:
+                continue
+            sample_second = opened_second + 59
+            close = float(candle.get("trade_price") or 0)
+            if close <= 0:
+                continue
+            historical_prices[sample_second] = close
+            historical_buckets[sample_second] = _SecondBucket(
+                second=sample_second,
+                opening_price=float(candle.get("opening_price") or close),
+                high_price=float(candle.get("high_price") or close),
+                low_price=float(candle.get("low_price") or close),
+                closing_price=close,
+                trade_value=float(candle.get("candle_acc_trade_price") or 0),
+            )
+
+        if len(historical_prices) < 20:
+            return False
+        for second, price in self._momentum_prices.get(market, ()):
+            historical_prices[second] = price
+        for bucket in self._windows.get(market, ()):
+            historical_buckets[bucket.second] = bucket
+        self._momentum_prices[market] = deque(sorted(historical_prices.items()))
+        self._windows[market] = deque(
+            historical_buckets[key] for key in sorted(historical_buckets)
+        )
+        return True
+
     def _in_preleader_window(self, now: int) -> bool:
         if not self.config.preleader_enabled:
             return False
@@ -543,11 +596,29 @@ class SignalEngine:
         snapshots.sort(key=lambda item: item[1], reverse=True)
         universe = len(snapshots)
         ready = universe >= self.config.relative_strength_min_universe
+        positive_count = sum(1 for _, _, change, _, _ in snapshots if change > 0)
+        breadth_5m_pct = positive_count / universe * 100 if universe else 0.0
+        median_5m_pct = (
+            float(median(item[2] for item in snapshots)) if snapshots else 0.0
+        )
+        market_regime = (
+            "risk_on"
+            if breadth_5m_pct >= 60 and median_5m_pct >= 0.15
+            else "risk_off"
+            if breadth_5m_pct <= 35 or median_5m_pct <= -0.35
+            else "neutral"
+        )
+        market_context = {
+            "market_breadth_5m_pct": round(breadth_5m_pct, 1),
+            "market_median_5m_pct": round(median_5m_pct, 2),
+            "market_regime": market_regime,
+        }
         selected = next((item for item in snapshots if item[0] == market), None)
         if selected is None:
             return {
                 "relative_strength_ready": ready,
                 "relative_strength_universe": universe,
+                **market_context,
             }
         rank = snapshots.index(selected) + 1
         percentile = rank / universe * 100 if universe else 100.0
@@ -577,6 +648,7 @@ class SignalEngine:
                 and change_5m >= self.config.relative_strength_min_5m_pct
                 and (change_15m is None or change_15m < change_5m * 4)
             ),
+            **market_context,
         }
 
     def update(
@@ -636,6 +708,19 @@ class SignalEngine:
         signals: list[tuple[str, str, dict[str, Any]]] = []
         relative_strength: dict[str, Any] = {}
 
+        def confirmation_started_at(price_level: float) -> str:
+            first = next(
+                (
+                    bucket
+                    for bucket in recent
+                    if bucket.high_price >= price_level
+                ),
+                recent[-1],
+            )
+            return datetime.fromtimestamp(
+                first.second, tz=timezone.utc
+            ).isoformat()
+
         if (
             self._in_preleader_window(now)
             and now - self._last_preleader_checked_at.get(market, 0)
@@ -690,6 +775,13 @@ class SignalEngine:
                             "09시 전후 거래대금 선행 가속",
                             {
                                 "internal_only": True,
+                                "confirmation_started_at_utc": confirmation_started_at(
+                                    start_price
+                                    * (
+                                        1
+                                        + self.config.preleader_min_3m_pct / 200
+                                    )
+                                ),
                                 "momentum_3m_pct": round(change_3m, 2),
                                 "preleader_volume_ratio_10m": round(ratio_10m, 2),
                                 "preleader_volume_ratio_30m": round(ratio_30m, 2),
@@ -746,6 +838,14 @@ class SignalEngine:
                             "consolidation_rebreakout",
                             f"{minutes}분 횡보 후 거래량 재돌파",
                             {
+                                "confirmation_started_at_utc": confirmation_started_at(
+                                    range_high
+                                    * (
+                                        1
+                                        + self.config.rebreakout_price_buffer_pct
+                                        / 200
+                                    )
+                                ),
                                 "consolidation_minutes": minutes,
                                 "consolidation_range_pct": round(range_pct, 2),
                                 "consolidation_high": range_high,
@@ -762,7 +862,18 @@ class SignalEngine:
             and value_1m >= self.config.min_trade_value_krw
             and volume_ratio >= self.config.volume_ratio
         ):
-            signals.append(("price_volume_surge", "가격·거래대금 급증", {}))
+            precursor_pct = max(0.35, self.config.price_surge_1m_pct * 0.4)
+            signals.append(
+                (
+                    "price_volume_surge",
+                    "가격·거래대금 급증",
+                    {
+                        "confirmation_started_at_utc": confirmation_started_at(
+                            start_price * (1 + precursor_pct / 100)
+                        )
+                    },
+                )
+            )
 
         if (
             change_1m_pct <= -self.config.price_surge_1m_pct
@@ -785,7 +896,14 @@ class SignalEngine:
                     (
                         "breakout",
                         "5분 고점 돌파",
-                        {"prior_high": prior_high, "breakout_level": breakout_level},
+                        {
+                            "prior_high": prior_high,
+                            "breakout_level": breakout_level,
+                            "confirmation_started_at_utc": confirmation_started_at(
+                                prior_high
+                                * (1 + self.config.breakout_pct / 200)
+                            ),
+                        },
                     )
                 )
 
@@ -880,6 +998,17 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
                 f" · 15분 {float(candidate['momentum_15m_pct']):+.1f}%"
             )
         relative_line += "\n"
+    regime_line = ""
+    if candidate.get("relative_strength_ready"):
+        regime_label = {
+            "risk_on": "확산 상승",
+            "risk_off": "확산 약세",
+            "neutral": "중립",
+        }.get(str(candidate.get("market_regime")), "중립")
+        regime_line = (
+            f"시장 환경: {regime_label} · 5분 상승 종목 "
+            f"{float(candidate.get('market_breadth_5m_pct') or 0):.0f}%\n"
+        )
     extension_line = ""
     if candidate.get("target_3") and candidate.get("target_4"):
         extension_line = (
@@ -904,6 +1033,7 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"목표 방식: {candidate['target_mode']}\n"
         f"추세 관리: {candidate.get('trend_management', '고정 목표 관리')}\n"
         f"{relative_line}"
+        f"{regime_line}"
         f"가까운 저항 여유: {candidate.get('resistance_room_pct', 0):.1f}%\n"
         f"예상 손익비: {candidate.get('risk_reward', 0):.2f}\n"
         f"추천 비중: 투자 가능금액의 {candidate['suggested_position_pct']}% 이내\n"
@@ -912,6 +1042,36 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"선정 근거: {reasons}\n"
         "조건점수는 적중 확률이 아닙니다. 자동 주문이나 수익 보장이 아닌 "
         "공개 시세 기반 조건부 관찰 정보입니다."
+    )
+
+
+def _management_text(update: dict[str, Any]) -> str:
+    event = str(update["event"])
+    labels = {
+        "target_1": "1차 목표 도달",
+        "target_2": "2차 목표 도달",
+        "target_3": "추세 확장 3차 도달",
+        "target_4": "추세 확장 4차 도달",
+        "stop": "계획 손절선 도달",
+        "protected": "1차 목표 후 진입가 보호 도달",
+    }
+    guidance = {
+        "target_1": "진입했다면 일부 수익 확정과 잔여분 손절가의 진입가 상향을 검토하세요.",
+        "target_2": "진입했다면 추가 수익 확정과 잔여분 추세 추적을 검토하세요.",
+        "target_3": "진입했다면 수익 보호를 우선하고 잔여분만 추세 추적을 검토하세요.",
+        "target_4": "추세 확장 관찰 목표에 도달했습니다. 진입했다면 수익 보호를 우선하세요.",
+        "stop": "진입했다면 사전에 정한 손실 제한 원칙을 확인하세요.",
+        "protected": "1차 목표 뒤 가격이 진입가로 돌아왔습니다. 잔여분 보호 기준을 확인하세요.",
+    }
+    entry = float(update["entry_price"])
+    current = float(update["current_price"])
+    return (
+        f"[후보 관리 | {labels[event]}] {update['market']}\n"
+        f"후보 기준가: {_format_price(entry)}\n"
+        f"현재가: {_format_price(current)} "
+        f"({(current / entry - 1) * 100:+.1f}%)\n"
+        f"{guidance[event]}\n"
+        "실제 체결 여부를 알 수 없는 공개 시세 기반 조건부 관리 정보입니다."
     )
 
 
@@ -962,6 +1122,9 @@ class AlertDispatcher:
             "TELEGRAM_SEND_OBSERVATION_ALERTS", True
         )
         self._send_candidate_alerts = _enabled("TELEGRAM_SEND_CANDIDATE_ALERTS", True)
+        self._send_management_alerts = _enabled(
+            "TELEGRAM_SEND_MANAGEMENT_ALERTS", True
+        )
         self._candidate_min_target_2_pct = max(
             0.0, _env_float("TELEGRAM_CANDIDATE_MIN_TARGET_2_PCT", 5.0)
         )
@@ -1242,6 +1405,30 @@ class AlertDispatcher:
         self._last_candidate_delivery_at = time.monotonic()
         self._last_inactivity_status_at = self._last_candidate_delivery_at
         self._publish_candidate_delivery_state(delivered=True)
+        return True
+
+    async def send_management_update(self, update: dict[str, Any]) -> bool:
+        LOGGER.warning(
+            "CANDIDATE_MANAGEMENT %s", json.dumps(update, ensure_ascii=False)
+        )
+        MONITOR_STATE.add_alert(update)
+        if (
+            self.mode != "telegram"
+            or not self._send_candidate_alerts
+            or not self._send_management_alerts
+        ):
+            return False
+        url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
+        async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
+            response = await client.post(
+                url,
+                json={
+                    "chat_id": self._telegram_chat_id,
+                    "text": _management_text(update),
+                    "disable_web_page_preview": True,
+                },
+            )
+            response.raise_for_status()
         return True
 
 
@@ -1529,6 +1716,40 @@ class CandidateAnalyzer:
         )
         self._trend_tracks.pop(market, None)
 
+    def _queue_management_update(
+        self,
+        market: str,
+        state: dict[str, Any],
+        event: str,
+        price: float,
+    ) -> None:
+        update = {
+            "time_utc": datetime.now(timezone.utc).isoformat(),
+            "market": market,
+            "signal": "candidate_management",
+            "event": event,
+            "entry_price": float(state["entry_price"]),
+            "current_price": price,
+            "score": int(state["score"]),
+            "target_mode": state["target_mode"],
+        }
+
+        async def deliver() -> None:
+            try:
+                await self.dispatcher.send_management_update(update)
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:
+                LOGGER.error("Candidate management delivery failed: %s", exc)
+
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            return
+        task = loop.create_task(deliver())
+        self._tasks.add(task)
+        task.add_done_callback(self._tasks.discard)
+
     def _observe_trend_track(self, market: str, price: float, now: float) -> None:
         state = self._trend_tracks.get(market)
         if not state:
@@ -1542,22 +1763,30 @@ class CandidateAnalyzer:
             state["target_2_reached"] = True
             state["target_3_reached"] = True
             state["target_4_reached"] = True
+            self._queue_management_update(market, state, "target_4", price)
             self._finish_trend_track(market, state, "target_4_reached", price, now)
             return
-        if target_3 is not None and price >= float(target_3):
+        if (
+            target_3 is not None
+            and price >= float(target_3)
+            and not state["target_3_reached"]
+        ):
             state["target_1_reached"] = True
             state["target_2_reached"] = True
             state["target_3_reached"] = True
-        if price >= float(state["target_2"]):
+            self._queue_management_update(market, state, "target_3", price)
+        if price >= float(state["target_2"]) and not state["target_2_reached"]:
             state["target_1_reached"] = True
             state["target_2_reached"] = True
+            self._queue_management_update(market, state, "target_2", price)
             if target_4 is None:
                 self._finish_trend_track(
                     market, state, "target_2_reached", price, now
                 )
                 return
-        if price >= float(state["target_1"]):
+        if price >= float(state["target_1"]) and not state["target_1_reached"]:
             state["target_1_reached"] = True
+            self._queue_management_update(market, state, "target_1", price)
         protected_stop = (
             float(state["entry_price"])
             if state["target_1_reached"]
@@ -1568,6 +1797,12 @@ class CandidateAnalyzer:
                 "protected_after_target_1"
                 if state["target_1_reached"]
                 else "stop_before_target_1"
+            )
+            self._queue_management_update(
+                market,
+                state,
+                "protected" if state["target_1_reached"] else "stop",
+                price,
             )
             self._finish_trend_track(market, state, result, price, now)
         elif now >= float(state["expires_at"]):
@@ -1946,12 +2181,24 @@ class CandidateAnalyzer:
     async def _analyze(self, alert: dict[str, Any]) -> None:
         market = str(alert["market"])
         try:
-            seconds_to_next_close = 62 - (time.time() % 60)
+            now_epoch = time.time()
+            seconds_to_next_close = 62 - (now_epoch % 60)
             # If the signal arrived in the final 20 seconds of a candle, wait
-            # for the following close. This avoids counting a candle that had
-            # almost no post-signal trading while retaining faster confirmation
-            # for signals detected earlier in the minute.
-            if seconds_to_next_close < 22:
+            # for the following close unless the move itself had already been
+            # developing for at least 20 seconds. This preserves completed-
+            # candle confirmation without turning a gradual leader into a late
+            # chase merely because the final threshold crossed near the close.
+            confirmation_started = alert.get("confirmation_started_at_utc")
+            try:
+                confirmation_started_epoch = datetime.fromisoformat(
+                    str(confirmation_started).replace("Z", "+00:00")
+                ).timestamp()
+            except (TypeError, ValueError):
+                confirmation_started_epoch = now_epoch
+            exposure_at_close = (
+                now_epoch + seconds_to_next_close - confirmation_started_epoch
+            )
+            if seconds_to_next_close < 22 and exposure_at_close < 20:
                 seconds_to_next_close += 60
             await asyncio.sleep(max(self.config.confirm_seconds, seconds_to_next_close))
             async with self._semaphore:
@@ -2133,6 +2380,35 @@ async def _resolve_markets(config: MonitorConfig) -> list[str]:
     )
 
 
+async def _warm_signal_engine(
+    engine: SignalEngine, markets: list[str]
+) -> tuple[int, int]:
+    """Backfill one hour without delaying the live WebSocket connection."""
+    semaphore = asyncio.Semaphore(4)
+    client = UpbitPublicClient()
+
+    async def warm_one(market: str) -> bool:
+        try:
+            async with semaphore:
+                candles = await client.candles(market, "minute1", 65)
+            return engine.warm_market(market, candles)
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            LOGGER.warning("Warm start failed for %s: %s", market, exc)
+            return False
+
+    try:
+        results = await asyncio.gather(*(warm_one(market) for market in markets))
+    finally:
+        await client.close()
+    warmed = sum(results)
+    LOGGER.info(
+        "Signal engine warm start completed: %d/%d markets", warmed, len(markets)
+    )
+    return warmed, len(markets)
+
+
 async def run_monitor_forever() -> None:
     config = MonitorConfig.from_env()
     dispatcher = AlertDispatcher()
@@ -2141,6 +2417,7 @@ async def run_monitor_forever() -> None:
         CandidateConfig.from_env(), dispatcher, engine.relative_strength_snapshot
     )
     backoff = 1
+    warmup_task: asyncio.Task[tuple[int, int]] | None = None
     inactivity_status_task = asyncio.create_task(
         dispatcher.run_inactivity_status_loop()
     )
@@ -2152,6 +2429,10 @@ async def run_monitor_forever() -> None:
                 if not markets:
                     raise RuntimeError("No KRW markets were resolved")
                 MONITOR_STATE.mark_started(len(markets), dispatcher.mode)
+                if warmup_task is None:
+                    warmup_task = asyncio.create_task(
+                        _warm_signal_engine(engine, markets)
+                    )
                 request = [
                     {"ticket": f"upbit-monitor-{uuid.uuid4()}"},
                     {
@@ -2214,7 +2495,11 @@ async def run_monitor_forever() -> None:
                 backoff = min(backoff * 2, 60)
     finally:
         inactivity_status_task.cancel()
-        await asyncio.gather(inactivity_status_task, return_exceptions=True)
+        tasks: list[asyncio.Task[Any]] = [inactivity_status_task]
+        if warmup_task is not None:
+            warmup_task.cancel()
+            tasks.append(warmup_task)
+        await asyncio.gather(*tasks, return_exceptions=True)
 
 
 _MONITOR_THREAD: threading.Thread | None = None

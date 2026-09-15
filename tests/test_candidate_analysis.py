@@ -223,6 +223,35 @@ def test_consolidation_rebreakout_is_accepted_and_explained():
     assert 9.8 <= candidate["target_2_pct"] <= 10.1
 
 
+def test_internal_preleader_can_pass_later_pullback_recheck():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    candidate, rejected = evaluate_candidate(
+        {
+            "market": "KRW-TEST",
+            "signal": "leader_volume_acceleration",
+            "price": current,
+            "is_reentry": True,
+            "pullback_retest": True,
+        },
+        {
+            "trade_price": current,
+            "signed_change_rate": 0.08,
+            "high_price": current * 1.08,
+        },
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["source_signal"] == "leader_volume_acceleration"
+    assert "09시 전후 거래대금 선행 가속에서 조기 포착" in candidate["reasons"]
+
+
 def test_ready_relative_strength_rejects_non_leader():
     one = _candles()
     five = _candles()

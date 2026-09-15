@@ -462,6 +462,7 @@ def evaluate_candidate(
         "price_volume_surge",
         "breakout",
         "consolidation_rebreakout",
+        "leader_volume_acceleration",
     }:
         return None, ["상승 후보 신호가 아님"]
     if len(candles_1m) < 62 or len(candles_5m) < 62:
@@ -553,7 +554,10 @@ def evaluate_candidate(
             rejected.append("상승 초기 가속 구간 아님")
         if config.require_first_retest and not retest_confirmed:
             rejected.append("첫 눌림·돌파선 재지지 미확인")
-    if not _completed_after_signal(c1[0], alert.get("time_utc")):
+    confirmation_started_at = alert.get("confirmation_started_at_utc") or alert.get(
+        "time_utc"
+    )
+    if not _completed_after_signal(c1[0], confirmation_started_at):
         rejected.append("신호 이후 확인시간 20초를 채운 완료 1분봉 없음")
     if completed_close < breakout:
         rejected.append("완료 1분봉이 돌파선 아래 마감")
@@ -723,6 +727,14 @@ def evaluate_candidate(
         risk_notes.append("반복 확인된 상단 구조 저항 없음")
     score_penalty = config.day_overheat_score_penalty if day_overheated else 0
     score_penalty += len(soft_warnings) * config.availability_soft_penalty
+    market_regime = str(alert.get("market_regime") or "neutral")
+    market_breadth_5m_pct = float(alert.get("market_breadth_5m_pct") or 0.0)
+    regime_bonus = 3 if market_regime == "risk_on" else 0
+    if market_regime == "risk_off":
+        score_penalty += 6
+        risk_notes.append(
+            f"시장 확산도 약세 -6점(5분 상승 종목 {market_breadth_5m_pct:.1f}%)"
+        )
     if not book_persistent:
         score_penalty += config.orderbook_score_penalty
         book_label = "매우 약함" if not hard_book_persistent else "약함"
@@ -769,6 +781,7 @@ def evaluate_candidate(
             + (12 if book_ratio >= 1.2 and spread <= 0.2 and liquid_market else 10)
             + impulse_bonus
             + relative_strength_bonus
+            + regime_bonus
             - score_penalty,
         ),
     )
@@ -969,6 +982,9 @@ def evaluate_candidate(
         "relative_strength_percentile": (
             round(relative_percentile, 2) if relative_ready else None
         ),
+        "market_regime": market_regime,
+        "market_breadth_5m_pct": round(market_breadth_5m_pct, 1),
+        "market_median_5m_pct": alert.get("market_median_5m_pct"),
         "momentum_5m_pct": (
             round(momentum_5m, 2) if relative_ready else None
         ),
