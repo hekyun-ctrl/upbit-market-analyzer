@@ -16,6 +16,12 @@ def _config(**overrides):
         "enabled": True,
         "confirm_seconds": 30,
         "survival_confirm_seconds": 60,
+        "fast_leader_enabled": True,
+        "fast_leader_confirm_seconds": 6,
+        "fast_leader_max_percentile": 2.0,
+        "fast_leader_min_value_ratio_10m": 5.0,
+        "fast_leader_min_value_ratio_30m": 5.0,
+        "fast_leader_max_extension_pct": 1.5,
         "min_score": 80,
         "cooldown_seconds": 900,
         "repeat_cooldown_seconds": 14400,
@@ -344,6 +350,12 @@ def test_default_candidate_config_is_accuracy_first(monkeypatch):
         "CANDIDATE_LEADER_RECLAIM_PCT",
         "CANDIDATE_TREND_TARGET_2_PCT",
         "CANDIDATE_SURVIVAL_CONFIRM_SECONDS",
+        "CANDIDATE_FAST_LEADER_ENABLED",
+        "CANDIDATE_FAST_LEADER_CONFIRM_SECONDS",
+        "CANDIDATE_FAST_LEADER_MAX_PERCENTILE",
+        "CANDIDATE_FAST_LEADER_MIN_VALUE_RATIO_10M",
+        "CANDIDATE_FAST_LEADER_MIN_VALUE_RATIO_30M",
+        "CANDIDATE_FAST_LEADER_MAX_EXTENSION_PCT",
         "CANDIDATE_REPEAT_COOLDOWN_SECONDS",
         "CANDIDATE_HARD_MIN_MARKET_BREADTH_PCT",
         "CANDIDATE_OUTCOME_TRACKING_SECONDS",
@@ -363,6 +375,12 @@ def test_default_candidate_config_is_accuracy_first(monkeypatch):
     assert config.leader_reclaim_pct == 0.5
     assert config.trend_target_2_pct == 10.0
     assert config.survival_confirm_seconds == 60
+    assert config.fast_leader_enabled is True
+    assert config.fast_leader_confirm_seconds == 6
+    assert config.fast_leader_max_percentile == 2.0
+    assert config.fast_leader_min_value_ratio_10m == 5.0
+    assert config.fast_leader_min_value_ratio_30m == 5.0
+    assert config.fast_leader_max_extension_pct == 1.5
     assert config.repeat_cooldown_seconds == 14400
     assert config.hard_min_market_breadth_pct == 35.0
     assert config.outcome_tracking_seconds == 7200
@@ -1236,6 +1254,104 @@ def test_persisted_leader_rebreakout_merges_breakout_resistance_cluster(monkeypa
     assert candidate["breakout_cluster_ignored"] is True
     assert candidate["resistance_confirmed"] is False
     assert any("동일 돌파 구간" in note for note in candidate["risk_notes"])
+
+
+def test_fast_leader_can_pass_before_completed_minute_without_chasing(monkeypatch):
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    one[0]["candle_date_time_utc"] = "2026-09-16T00:00:00+00:00"
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.06,
+        "high_price": current * 1.003,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+    monkeypatch.setattr(
+        candidate_analysis, "_resistances", lambda *args: [current * 1.003]
+    )
+    alert = {
+        "time_utc": "2026-09-16T00:00:50+00:00",
+        "confirmation_started_at_utc": "2026-09-16T00:00:50+00:00",
+        "market": "KRW-FOLD",
+        "signal": "leader_volume_acceleration",
+        "price": current,
+        "breakout_level": current,
+        "fast_leader": True,
+        "relative_strength_ready": True,
+        "relative_strength_eligible": True,
+        "relative_strength_rank": 3,
+        "relative_strength_universe": 200,
+        "relative_strength_percentile": 1.5,
+        "momentum_5m_pct": 6.55,
+        "momentum_15m_pct": 5.49,
+        "early_trend": True,
+        "market_regime": "neutral",
+        "preleader_volume_ratio_10m": 97.19,
+        "preleader_volume_ratio_30m": 144.65,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(current, bid_ratio=0.8),
+        one,
+        five,
+        _config(min_score=80, availability_balance_enabled=False),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["selection_lane"] == "fast_leader"
+    assert candidate["fast_leader"] is True
+    assert candidate["valid_seconds"] == 120
+    assert candidate["suggested_position_pct"] == 5
+    assert candidate["breakout_cluster_ignored"] is True
+    assert candidate["entry_high"] <= current * 1.015
+    assert not any("완료 1분봉 돌파 확정" in item for item in candidate["reasons"])
+
+
+def test_fast_leader_rejects_price_beyond_initial_chase_cap():
+    one = _candles()
+    five = _candles()
+    signal_price = float(one[0]["trade_price"])
+    current = signal_price * 1.02
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.05,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+    alert = {
+        "market": "KRW-FOLD",
+        "signal": "leader_volume_acceleration",
+        "price": signal_price,
+        "breakout_level": signal_price,
+        "fast_leader": True,
+        "relative_strength_ready": True,
+        "relative_strength_eligible": True,
+        "relative_strength_rank": 1,
+        "relative_strength_universe": 200,
+        "relative_strength_percentile": 0.5,
+        "momentum_5m_pct": 6.0,
+        "momentum_15m_pct": 5.0,
+        "early_trend": True,
+        "market_regime": "neutral",
+        "preleader_volume_ratio_10m": 20.0,
+        "preleader_volume_ratio_30m": 30.0,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80, availability_balance_enabled=False),
+    )
+
+    assert candidate is None
+    assert any("신호가 대비 추격 구간" in reason for reason in rejected)
 
 
 def test_survival_recheck_allows_cooling_volume_but_rejects_structure_loss():

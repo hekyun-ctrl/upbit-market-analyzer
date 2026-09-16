@@ -887,6 +887,60 @@ def test_rejected_leader_is_rechecked_after_pullback_and_reclaim(monkeypatch):
     assert seen[0]["breakout_level"] > 108.5
 
 
+def test_strong_leader_pullback_is_not_blocked_by_recent_rapid_drop(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+
+    def relative_strength(_market, _now):
+        return {
+            "relative_strength_ready": True,
+            "relative_strength_eligible": True,
+            "relative_strength_rank": 2,
+            "relative_strength_universe": 200,
+            "relative_strength_percentile": 1.0,
+            "momentum_5m_pct": 4.0,
+            "momentum_15m_pct": 5.0,
+            "early_trend": True,
+        }
+
+    analyzer = CandidateAnalyzer(
+        CandidateConfig.from_env(), AlertDispatcher(), relative_strength
+    )
+    analyzer._watchlist["KRW-FOLD"] = {
+        "market": "KRW-FOLD",
+        "created_at": 1_800_000_000.0,
+        "first_signal_time_utc": "2026-09-16T00:00:31+00:00",
+        "first_signal_price": 63.4,
+        "source_signal": "leader_volume_acceleration",
+        "breakout_level": 63.4,
+        "leader_peak_price": 65.0,
+        "leader_pullback_seen": False,
+        "leader_recheck_count": 0,
+        "recheck_count": 0,
+        "expires_at": 9_999_999_999.0,
+    }
+    monkeypatch.setattr(MONITOR_STATE, "has_recent_signal", lambda *args: True)
+    seen = []
+
+    async def fake_analyze(alert):
+        seen.append(alert)
+
+    monkeypatch.setattr(analyzer, "_analyze", fake_analyze)
+
+    async def run():
+        assert not analyzer._observe_leader_watchlist(
+            "KRW-FOLD", 63.8, 1_800_000_100.0
+        )
+        assert analyzer._observe_leader_watchlist(
+            "KRW-FOLD", 64.2, 1_800_000_110.0
+        )
+        await asyncio.sleep(0)
+
+    asyncio.run(run())
+
+    assert len(seen) == 1
+    assert seen[0]["leader_pullback_recheck"] is True
+
+
 def test_pullback_reclaim_is_not_rechecked_after_leadership_is_lost(monkeypatch):
     monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
     analyzer = CandidateAnalyzer(
@@ -1130,6 +1184,53 @@ def test_candidate_message_labels_early_leader_lane():
     text = _candidate_text(candidate)
 
     assert "[조건부 진입 후보 | 선도주 정밀형 |" in text
+
+
+def test_candidate_message_labels_fast_leader_lane():
+    candidate = _telegram_candidate()
+    candidate["selection_lane"] = "fast_leader"
+    candidate["survival_confirmed"] = True
+    candidate["survival_seconds"] = 10
+
+    text = _candidate_text(candidate)
+
+    assert "[조건부 진입 후보 | 초고속 선도주 |" in text
+    assert "10초 가격·거래대금·호가 유지 통과" in text
+
+
+def test_preleader_schedules_fast_lane_only_for_exceptional_leader(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    scheduled = []
+    monkeypatch.setattr(
+        analyzer, "schedule", lambda alert: scheduled.append(dict(alert)) or True
+    )
+    alert = {
+        "time_utc": "2026-09-16T00:00:31+00:00",
+        "market": "KRW-FOLD",
+        "signal": "leader_volume_acceleration",
+        "price": 63.4,
+        "internal_only": True,
+        "relative_strength_ready": True,
+        "relative_strength_eligible": True,
+        "relative_strength_rank": 3,
+        "relative_strength_universe": 200,
+        "relative_strength_percentile": 1.5,
+        "momentum_3m_pct": 5.84,
+        "momentum_5m_pct": 6.55,
+        "momentum_15m_pct": 5.49,
+        "early_trend": True,
+        "market_regime": "neutral",
+        "preleader_volume_ratio_10m": 97.19,
+        "preleader_volume_ratio_30m": 144.65,
+    }
+
+    assert analyzer.watch_preleader(alert) is True
+
+    assert len(scheduled) == 1
+    assert scheduled[0]["fast_leader"] is True
+    assert scheduled[0]["breakout_level"] == 63.4
+    assert "internal_only" not in scheduled[0]
 
 
 def test_early_watch_is_explicitly_not_an_entry_candidate():

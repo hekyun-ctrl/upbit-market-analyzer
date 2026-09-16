@@ -36,6 +36,12 @@ class CandidateConfig:
     enabled: bool
     confirm_seconds: int
     survival_confirm_seconds: int
+    fast_leader_enabled: bool
+    fast_leader_confirm_seconds: int
+    fast_leader_max_percentile: float
+    fast_leader_min_value_ratio_10m: float
+    fast_leader_min_value_ratio_30m: float
+    fast_leader_max_extension_pct: float
     min_score: int
     cooldown_seconds: int
     repeat_cooldown_seconds: int
@@ -116,6 +122,32 @@ class CandidateConfig:
             confirm_seconds=max(5, min(120, _env_int("CANDIDATE_CONFIRM_SECONDS", 30))),
             survival_confirm_seconds=max(
                 30, min(180, _env_int("CANDIDATE_SURVIVAL_CONFIRM_SECONDS", 60))
+            ),
+            fast_leader_enabled=_enabled("CANDIDATE_FAST_LEADER_ENABLED", True),
+            fast_leader_confirm_seconds=max(
+                5, min(20, _env_int("CANDIDATE_FAST_LEADER_CONFIRM_SECONDS", 6))
+            ),
+            fast_leader_max_percentile=max(
+                1.0,
+                min(
+                    3.0,
+                    _env_float("CANDIDATE_FAST_LEADER_MAX_PERCENTILE", 2.0),
+                ),
+            ),
+            fast_leader_min_value_ratio_10m=max(
+                2.0,
+                _env_float("CANDIDATE_FAST_LEADER_MIN_VALUE_RATIO_10M", 5.0),
+            ),
+            fast_leader_min_value_ratio_30m=max(
+                2.0,
+                _env_float("CANDIDATE_FAST_LEADER_MIN_VALUE_RATIO_30M", 5.0),
+            ),
+            fast_leader_max_extension_pct=max(
+                0.5,
+                min(
+                    3.0,
+                    _env_float("CANDIDATE_FAST_LEADER_MAX_EXTENSION_PCT", 1.5),
+                ),
             ),
             min_score=max(50, min(100, _env_int("CANDIDATE_MIN_SCORE", 90))),
             cooldown_seconds=max(300, _env_int("CANDIDATE_COOLDOWN_SECONDS", 900)),
@@ -571,7 +603,7 @@ def evaluate_candidate(
     btc_candles_15m: list[dict[str, Any]] | None = None,
     orderbook_samples: list[dict[str, Any]] | None = None,
 ) -> tuple[dict[str, Any] | None, list[str]]:
-    """Evaluate a setup using only completed candles and persistent snapshots."""
+    """Evaluate a setup with persistent snapshots and lane-specific candles."""
     if alert.get("signal") not in {
         "price_volume_surge",
         "breakout",
@@ -647,6 +679,8 @@ def evaluate_candidate(
     momentum_15m = (
         float(momentum_15m_value) if momentum_15m_value is not None else None
     )
+    preleader_ratio_10m = float(alert.get("preleader_volume_ratio_10m") or 0.0)
+    preleader_ratio_30m = float(alert.get("preleader_volume_ratio_30m") or 0.0)
     # The confirming candle must itself test the breakout area. Older lows may
     # predate the signal and would incorrectly classify a late chase as a retest.
     recent_retest_low = float(c1[0]["low_price"])
@@ -658,6 +692,19 @@ def evaluate_candidate(
             <= breakout * (1 + config.retest_tolerance_pct / 100)
             and completed_close >= breakout
         )
+    )
+    fast_leader_core = bool(
+        config.fast_leader_enabled
+        and alert.get("fast_leader")
+        and alert.get("signal") == "leader_volume_acceleration"
+        and relative_ready
+        and relative_eligible
+        and relative_percentile <= config.fast_leader_max_percentile
+        and early_trend
+        and momentum_5m >= config.relative_strength_min_5m_pct
+        and (momentum_15m is None or momentum_15m > 0)
+        and preleader_ratio_10m >= config.fast_leader_min_value_ratio_10m
+        and preleader_ratio_30m >= config.fast_leader_min_value_ratio_30m
     )
     early_leader_core = bool(
         config.early_leader_lane_enabled
@@ -691,29 +738,41 @@ def evaluate_candidate(
             rejected.append(f"15분 추세 미확인({momentum_15m:+.2f}%)")
         if config.early_trend_required and not early_trend:
             rejected.append("상승 초기 가속 구간 아님")
-        if config.require_first_retest and not retest_confirmed:
+        if config.require_first_retest and not retest_confirmed and not fast_leader_core:
             rejected.append("첫 눌림·돌파선 재지지 미확인")
     confirmation_started_at = alert.get("confirmation_started_at_utc") or alert.get(
         "time_utc"
     )
-    if not _completed_after_signal(c1[0], confirmation_started_at):
+    if not fast_leader_core and not _completed_after_signal(
+        c1[0], confirmation_started_at
+    ):
         rejected.append("신호 이후 확인시간 20초를 채운 완료 1분봉 없음")
-    if completed_close < breakout:
+    if not fast_leader_core and completed_close < breakout:
         rejected.append("완료 1분봉이 돌파선 아래 마감")
     if current < breakout * 0.998:
         rejected.append("돌파선 재지지 실패")
     day_overheated = day_change > config.max_day_change_pct
     elevated_risk = day_change >= 10.0 or rsi1 >= 70.0 or rsi5 >= 68.0
     early_leader_lane = bool(
-        early_leader_core
-        and completed_close >= breakout
+        (early_leader_core or fast_leader_core)
+        and (fast_leader_core or completed_close >= breakout)
         and current >= breakout * 0.998
         and current >= float(five["ma20"])
-        and extension <= config.max_price_extension_pct
-        and volume_ratio >= config.min_completed_volume_ratio
-        and volume_previous >= config.min_volume_vs_previous
-        and close_position >= config.min_close_position
-        and upper_wick <= config.max_upper_wick_ratio
+        and extension
+        <= (
+            config.fast_leader_max_extension_pct
+            if fast_leader_core
+            else config.max_price_extension_pct
+        )
+        and (
+            fast_leader_core
+            or (
+                volume_ratio >= config.min_completed_volume_ratio
+                and volume_previous >= config.min_volume_vs_previous
+                and close_position >= config.min_close_position
+                and upper_wick <= config.max_upper_wick_ratio
+            )
+        )
         and hard_book_persistent
         and spread <= config.hard_max_spread_pct
         and not day_overheated
@@ -728,7 +787,12 @@ def evaluate_candidate(
         rejected.append(f"호가 스프레드 극단적 과다({spread:.2f}%)")
     if trade_value_24h < config.min_trade_value_24h_krw:
         rejected.append(f"24시간 거래대금 부족({trade_value_24h:,.0f}원)")
-    if extension > config.max_price_extension_pct:
+    max_extension = (
+        config.fast_leader_max_extension_pct
+        if fast_leader_core
+        else config.max_price_extension_pct
+    )
+    if extension > max_extension:
         rejected.append(f"신호가 대비 추격 구간(+{extension:.1f}%)")
     if current < float(five["ma20"]):
         rejected.append("완료봉 기준 5분 20이평 아래")
@@ -736,27 +800,30 @@ def evaluate_candidate(
         message = "완료봉 기준 1분 20이평 아래"
         (rejected if strict_quality else soft_warnings).append(message)
 
-    if volume_ratio < config.availability_min_volume_ratio:
+    if not fast_leader_core and volume_ratio < config.availability_min_volume_ratio:
         rejected.append(f"완료 1분봉 거래량 절대 부족({volume_ratio:.2f}배)")
-    elif volume_ratio < config.min_completed_volume_ratio:
+    elif not fast_leader_core and volume_ratio < config.min_completed_volume_ratio:
         message = f"완료 1분봉 거래량 다소 부족({volume_ratio:.2f}배)"
         (rejected if strict_quality else soft_warnings).append(message)
 
-    if volume_previous < config.availability_min_volume_vs_previous:
+    if (
+        not fast_leader_core
+        and volume_previous < config.availability_min_volume_vs_previous
+    ):
         rejected.append(f"직전 봉 대비 거래량 급감({volume_previous:.2f}배)")
-    elif volume_previous < config.min_volume_vs_previous:
+    elif not fast_leader_core and volume_previous < config.min_volume_vs_previous:
         message = f"직전 봉 대비 거래량 감소({volume_previous:.2f}배)"
         (rejected if strict_quality else soft_warnings).append(message)
 
-    if close_position < config.availability_min_close_position:
+    if not fast_leader_core and close_position < config.availability_min_close_position:
         rejected.append(f"완료봉 종가 위치 매우 약함({close_position:.2f})")
-    elif close_position < config.min_close_position:
+    elif not fast_leader_core and close_position < config.min_close_position:
         message = f"완료봉 종가 위치 다소 약함({close_position:.2f})"
         (rejected if strict_quality else soft_warnings).append(message)
 
-    if upper_wick > config.availability_max_upper_wick_ratio:
+    if not fast_leader_core and upper_wick > config.availability_max_upper_wick_ratio:
         rejected.append(f"긴 윗꼬리({upper_wick:.2f})")
-    elif upper_wick > config.max_upper_wick_ratio:
+    elif not fast_leader_core and upper_wick > config.max_upper_wick_ratio:
         message = f"윗꼬리 주의({upper_wick:.2f})"
         (rejected if strict_quality else soft_warnings).append(message)
 
@@ -792,7 +859,8 @@ def evaluate_candidate(
             "BTC 약세·호가 약세 동시 발생"
             f"({btc_change:+.2f}%, {book_ratio:.2f}배)"
         )
-    if rsi1 >= config.hot_rsi_1m and book_ratio < 1.0:
+    hot_book_floor = config.min_orderbook_ratio if fast_leader_core else 1.0
+    if rsi1 >= config.hot_rsi_1m and book_ratio < hot_book_floor:
         rejected.append(
             f"단기 과열·호가 약세 동시 발생(RSI {rsi1:.1f}, {book_ratio:.2f}배)"
         )
@@ -807,8 +875,12 @@ def evaluate_candidate(
     breakout_cluster_ignored = False
     if (
         early_leader_lane
-        and alert.get("signal") == "consolidation_rebreakout"
-        and retest_confirmed
+        and (
+            fast_leader_core
+            or alert.get("signal") == "consolidation_rebreakout"
+            or alert.get("leader_pullback_recheck")
+        )
+        and (fast_leader_core or retest_confirmed)
         and not btc_weak
     ):
         # Repeated swing highs immediately around the consolidation ceiling
@@ -887,7 +959,14 @@ def evaluate_candidate(
         return None, rejected
 
     tick = _tick_size(orderbook, current)
-    entry_high = _round_tick(min(current, signal_price * 1.006), tick)
+    if fast_leader_core:
+        entry_high = _round_tick(
+            signal_price * (1 + config.fast_leader_max_extension_pct / 100),
+            tick,
+            "down",
+        )
+    else:
+        entry_high = _round_tick(min(current, signal_price * 1.006), tick)
     entry_low = _round_tick(
         min(entry_high, max(float(one["ma20"]), breakout * 0.998)), tick
     )
@@ -925,11 +1004,14 @@ def evaluate_candidate(
         "price_volume_surge": 20,
         "leader_volume_acceleration": 20,
     }[str(alert["signal"])]
-    volume_score = (
-        20
-        if volume_ratio >= 2 and volume_previous >= 0.8
-        else 17 if volume_ratio >= 1.5 and volume_previous >= 0.7 else 14
-    )
+    if fast_leader_core:
+        volume_score = 20
+    else:
+        volume_score = (
+            20
+            if volume_ratio >= 2 and volume_previous >= 0.8
+            else 17 if volume_ratio >= 1.5 and volume_previous >= 0.7 else 14
+        )
     trend_score = 0
     for summary, points in ((one, 5), (five, 5), (fifteen, 4)):
         trend_score += points if current >= float(summary["ma20"]) else 0
@@ -964,6 +1046,10 @@ def evaluate_candidate(
         )
     if elevated_candle_balance:
         risk_notes.append("중간 과열 구간의 경미한 완료봉 품질 감점 허용")
+    if fast_leader_core:
+        risk_notes.append(
+            "완료 1분봉 전 신속 검증형: 진입구간 이탈 시 추격하지 않고 첫 눌림 대기"
+        )
     if not resistance_confirmed:
         risk_notes.append("반복 확인된 상단 구조 저항 없음")
     score_penalty = config.day_overheat_score_penalty if day_overheated else 0
@@ -1068,7 +1154,7 @@ def evaluate_candidate(
         and relative_percentile <= 10.0
         and momentum_5m >= config.relative_strength_min_5m_pct
         and (momentum_15m is None or momentum_15m > 0)
-        and retest_confirmed
+        and (retest_confirmed or fast_leader_core)
         and score >= 90
         and trend_score >= 16
         and not btc_weak
@@ -1117,8 +1203,16 @@ def evaluate_candidate(
             entry_reference * (1 + config.trend_target_4_pct / 100), tick, "up"
         )
     reasons = [
-        "완료 1분봉 돌파 확정",
-        "거래량 유지",
+        (
+            "실시간 가격·호가 신속 생존 확인"
+            if fast_leader_core
+            else "완료 1분봉 돌파 확정"
+        ),
+        (
+            "거래대금 선행 급가속 유지"
+            if fast_leader_core
+            else "거래량 유지"
+        ),
         "호가 지지 지속" if book_persistent else "호가는 감점 보조지표",
         (
             f"저항 여유 {room:.1f}%"
@@ -1153,6 +1247,8 @@ def evaluate_candidate(
         reasons.insert(0, "상승 초기 가속 구간")
     if early_leader_lane:
         reasons.insert(0, "상대강도 선도주 정밀 통과")
+    if fast_leader_core:
+        reasons.insert(0, "상대강도 상위 2% 초고속 검증 통과")
     if alert.get("is_reentry"):
         reasons.insert(0, "돌파선 재지지 후 재진입")
     if alert.get("leader_pullback_recheck"):
@@ -1167,7 +1263,9 @@ def evaluate_candidate(
             f"당일 과열 감점 -{config.day_overheat_score_penalty}점({day_change:.1f}%)"
         )
     suggested_position_pct = (
-        5 if availability_tier or risk_notes else 15 if score >= 95 else 10
+        5
+        if fast_leader_core or availability_tier or risk_notes
+        else 15 if score >= 95 else 10
     )
 
     return {
@@ -1182,8 +1280,11 @@ def evaluate_candidate(
             alert.get("leader_pullback_recheck")
         ),
         "selection_lane": (
-            "early_leader" if early_leader_lane else "standard"
+            "fast_leader"
+            if fast_leader_core
+            else "early_leader" if early_leader_lane else "standard"
         ),
+        "fast_leader": fast_leader_core,
         "score": score,
         "condition_score": score,
         "current_price": current,
@@ -1222,7 +1323,11 @@ def evaluate_candidate(
         "breakout_cluster_ignored": breakout_cluster_ignored,
         "risk_reward": round(risk_reward, 2),
         "breakout_level": breakout,
-        "valid_seconds": config.valid_seconds,
+        "valid_seconds": (
+            min(config.valid_seconds, 120)
+            if fast_leader_core
+            else config.valid_seconds
+        ),
         "suggested_position_pct": suggested_position_pct,
         "day_change_pct": round(day_change, 2),
         "relative_strength_ready": relative_ready,

@@ -1166,7 +1166,9 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     risk_notes = "·".join(candidate.get("risk_notes", []))
     risk_line = f"위험 감점: {risk_notes}\n" if risk_notes else ""
     labels = []
-    if candidate.get("selection_lane") == "early_leader":
+    if candidate.get("selection_lane") == "fast_leader":
+        labels.append("초고속 선도주")
+    elif candidate.get("selection_lane") == "early_leader":
         labels.append("선도주 정밀형")
     if candidate.get("leader_pullback_recheck"):
         labels.append("선도주 눌림")
@@ -1209,10 +1211,18 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         )
     survival_line = ""
     if candidate.get("survival_confirmed"):
-        survival_line = (
-            "2단계 확인: "
-            f"{int(candidate.get('survival_seconds') or 0)}초 가격·거래량·호가 생존 통과\n"
-        )
+        if candidate.get("selection_lane") == "fast_leader":
+            survival_line = (
+                "신속 확인: "
+                f"{int(candidate.get('survival_seconds') or 0)}초 "
+                "가격·거래대금·호가 유지 통과\n"
+            )
+        else:
+            survival_line = (
+                "2단계 확인: "
+                f"{int(candidate.get('survival_seconds') or 0)}초 "
+                "가격·거래량·호가 생존 통과\n"
+            )
     return (
         f"[조건부 진입 후보{suffix} | 조건점수 {candidate['score']}/100] "
         f"{candidate['market']}\n"
@@ -1837,6 +1847,50 @@ class CandidateAnalyzer:
             return None
         return state
 
+    def _qualifies_fast_leader(self, alert: dict[str, Any]) -> bool:
+        """Limit the incomplete-candle path to exceptional live leaders."""
+        percentile = float(alert.get("relative_strength_percentile") or 100.0)
+        momentum_5m = float(alert.get("momentum_5m_pct") or 0.0)
+        momentum_15m_value = alert.get("momentum_15m_pct")
+        momentum_15m = (
+            float(momentum_15m_value) if momentum_15m_value is not None else None
+        )
+        return bool(
+            self.config.fast_leader_enabled
+            and alert.get("signal") == "leader_volume_acceleration"
+            and alert.get("relative_strength_ready")
+            and alert.get("relative_strength_eligible")
+            and percentile <= self.config.fast_leader_max_percentile
+            and alert.get("early_trend")
+            and momentum_5m >= self.config.relative_strength_min_5m_pct
+            and (momentum_15m is None or momentum_15m > 0)
+            and float(alert.get("preleader_volume_ratio_10m") or 0.0)
+            >= self.config.fast_leader_min_value_ratio_10m
+            and float(alert.get("preleader_volume_ratio_30m") or 0.0)
+            >= self.config.fast_leader_min_value_ratio_30m
+            and str(alert.get("market_regime") or "neutral") != "risk_off"
+        )
+
+    def _rapid_drop_allows_leader_recovery(
+        self, alert: dict[str, Any], watch: dict[str, Any] | None
+    ) -> bool:
+        """Treat a shallow dip as a reset when leadership is still intact."""
+        if watch is None:
+            return False
+        percentile = float(alert.get("relative_strength_percentile") or 100.0)
+        first_price = float(watch.get("first_signal_price") or alert.get("price") or 0)
+        current = float(alert.get("price") or 0)
+        return bool(
+            alert.get("relative_strength_ready")
+            and alert.get("relative_strength_eligible")
+            and percentile <= self.config.early_leader_max_percentile
+            and alert.get("early_trend")
+            and current > 0
+            and first_price > 0
+            and current
+            >= first_price * (1 - self.config.leader_pullback_max_pct / 100)
+        )
+
     def watch_preleader(self, alert: dict[str, Any]) -> bool:
         """Keep an early volume leader internal until a clean retest occurs."""
         if not self.config.enabled or not self.config.leader_watch_enabled:
@@ -1912,6 +1966,21 @@ class CandidateAnalyzer:
             alert.get("preleader_volume_ratio_10m"),
             alert.get("preleader_volume_ratio_30m"),
         )
+        if created and self._qualifies_fast_leader(alert):
+            fast_alert = dict(alert)
+            fast_alert.pop("internal_only", None)
+            fast_alert["fast_leader"] = True
+            fast_alert["breakout_level"] = price
+            scheduled = self.schedule(fast_alert)
+            LOGGER.info(
+                "FAST_LEADER_SCHEDULED market=%s scheduled=%s rank=%s/%s "
+                "confirm=%ss",
+                market,
+                scheduled,
+                alert.get("relative_strength_rank"),
+                alert.get("relative_strength_universe"),
+                self.config.fast_leader_confirm_seconds,
+            )
         return created
 
     @staticmethod
@@ -2540,9 +2609,17 @@ class CandidateAnalyzer:
         ):
             return False
         if MONITOR_STATE.has_recent_signal(market, "rapid_drop", 600):
-            LOGGER.info("Candidate skipped after recent rapid drop: %s", market)
-            self.dispatcher.record_candidate_rejection(["최근 급락 발생"])
-            return False
+            if self._rapid_drop_allows_leader_recovery(scheduled, watch):
+                LOGGER.info(
+                    "RAPID_DROP_RESET_AS_LEADER_PULLBACK market=%s rank=%s/%s",
+                    market,
+                    scheduled.get("relative_strength_rank"),
+                    scheduled.get("relative_strength_universe"),
+                )
+            else:
+                LOGGER.info("Candidate skipped after recent rapid drop: %s", market)
+                self.dispatcher.record_candidate_rejection(["최근 급락 발생"])
+                return False
 
         self._start_signal_track(scheduled, now)
         self._last_checked_at[market] = now
@@ -2612,10 +2689,6 @@ class CandidateAnalyzer:
             return False
         if market in self._inflight_markets:
             return False
-        if MONITOR_STATE.has_recent_signal(market, "rapid_drop", 600):
-            state["leader_pullback_seen"] = False
-            LOGGER.info("Leader recheck skipped after recent rapid drop: %s", market)
-            return False
         if (
             int(state.get("leader_recheck_count", 0))
             >= self.config.leader_watch_max_rechecks
@@ -2652,6 +2725,29 @@ class CandidateAnalyzer:
                 state["leader_pullback_seen"] = False
                 state["leader_pullback_low"] = price
             return False
+
+        recent_rapid_drop = MONITOR_STATE.has_recent_signal(
+            market, "rapid_drop", 600
+        )
+        recovery_alert = {
+            "price": price,
+            **relative,
+        }
+        if recent_rapid_drop and not self._rapid_drop_allows_leader_recovery(
+            recovery_alert, state
+        ):
+            state["leader_pullback_seen"] = False
+            LOGGER.info("Leader recheck skipped after recent rapid drop: %s", market)
+            return False
+        if recent_rapid_drop:
+            LOGGER.info(
+                "RAPID_DROP_RESET_AS_LEADER_PULLBACK market=%s drawdown=%.2f%% "
+                "rank=%s/%s",
+                market,
+                drawdown_pct,
+                relative.get("relative_strength_rank"),
+                relative.get("relative_strength_universe"),
+            )
 
         self._last_leader_recheck_at[market] = now
         state["leader_recheck_count"] = int(
@@ -2861,25 +2957,32 @@ class CandidateAnalyzer:
         market = str(alert["market"])
         try:
             now_epoch = time.time()
-            seconds_to_next_close = 62 - (now_epoch % 60)
-            # If the signal arrived in the final 20 seconds of a candle, wait
-            # for the following close unless the move itself had already been
-            # developing for at least 20 seconds. This preserves completed-
-            # candle confirmation without turning a gradual leader into a late
-            # chase merely because the final threshold crossed near the close.
-            confirmation_started = alert.get("confirmation_started_at_utc")
-            try:
-                confirmation_started_epoch = datetime.fromisoformat(
-                    str(confirmation_started).replace("Z", "+00:00")
-                ).timestamp()
-            except (TypeError, ValueError):
-                confirmation_started_epoch = now_epoch
-            exposure_at_close = (
-                now_epoch + seconds_to_next_close - confirmation_started_epoch
-            )
-            if seconds_to_next_close < 22 and exposure_at_close < 20:
-                seconds_to_next_close += 60
-            await asyncio.sleep(max(self.config.confirm_seconds, seconds_to_next_close))
+            fast_leader = bool(alert.get("fast_leader"))
+            if fast_leader:
+                # Three orderbook samples add roughly four seconds, so a six-
+                # second live hold produces a decision about ten seconds after
+                # discovery without waiting for the minute boundary.
+                await asyncio.sleep(self.config.fast_leader_confirm_seconds)
+            else:
+                seconds_to_next_close = 62 - (now_epoch % 60)
+                # If the signal arrived in the final 20 seconds of a candle,
+                # wait for the following close unless the move itself had
+                # already been developing for at least 20 seconds.
+                confirmation_started = alert.get("confirmation_started_at_utc")
+                try:
+                    confirmation_started_epoch = datetime.fromisoformat(
+                        str(confirmation_started).replace("Z", "+00:00")
+                    ).timestamp()
+                except (TypeError, ValueError):
+                    confirmation_started_epoch = now_epoch
+                exposure_at_close = (
+                    now_epoch + seconds_to_next_close - confirmation_started_epoch
+                )
+                if seconds_to_next_close < 22 and exposure_at_close < 20:
+                    seconds_to_next_close += 60
+                await asyncio.sleep(
+                    max(self.config.confirm_seconds, seconds_to_next_close)
+                )
             snapshot = await self._market_snapshot(market)
             if self._relative_strength_provider is not None:
                 # Reconfirm leadership after the completed-candle wait. A coin
@@ -2907,51 +3010,66 @@ class CandidateAnalyzer:
                     alert, "rejected", rejected
                 )
                 return
-            first_candidate = candidate
-            LOGGER.info(
-                "CANDIDATE_SURVIVAL_PENDING market=%s seconds=%d score=%d",
-                market,
-                self.config.survival_confirm_seconds,
-                int(candidate["score"]),
-            )
-            await asyncio.sleep(self.config.survival_confirm_seconds)
-            survival_snapshot = await self._market_snapshot(market)
-            live_price = float(survival_snapshot["ticker"]["trade_price"])
-            candidate, original_range_rejection = _revalidate_candidate_for_dispatch(
-                first_candidate, live_price
-            )
-            survival_metrics, survival_rejected = validate_candidate_survival(
-                first_candidate,
-                survival_snapshot["ticker"],
-                survival_snapshot["orderbooks"],
-                survival_snapshot["candles_1m"],
-                self.config,
-            )
-            if original_range_rejection:
-                survival_rejected.insert(0, original_range_rejection)
-            if candidate is None or survival_rejected:
-                reasons = [f"생존 재검증: {reason}" for reason in survival_rejected]
+            if fast_leader:
+                candidate["survival_confirmed"] = True
+                candidate["survival_seconds"] = max(
+                    self.config.fast_leader_confirm_seconds,
+                    int(round(time.time() - now_epoch)),
+                )
                 LOGGER.info(
-                    "Candidate survival rejected for %s: %s",
+                    "FAST_LEADER_VERIFIED market=%s seconds=%d score=%d",
                     market,
-                    "; ".join(reasons),
+                    int(candidate["survival_seconds"]),
+                    int(candidate["score"]),
                 )
-                self._remember_rejected(
-                    alert,
-                    reasons,
-                    float(survival_snapshot["ticker"]["trade_price"]),
+            else:
+                first_candidate = candidate
+                LOGGER.info(
+                    "CANDIDATE_SURVIVAL_PENDING market=%s seconds=%d score=%d",
+                    market,
+                    self.config.survival_confirm_seconds,
+                    int(candidate["score"]),
                 )
-                self.dispatcher.record_candidate_rejection(reasons)
-                MONITOR_STATE.add_screening_record(
-                    self._screening_record(alert, "survival_rejected", reasons)
+                await asyncio.sleep(self.config.survival_confirm_seconds)
+                survival_snapshot = await self._market_snapshot(market)
+                live_price = float(survival_snapshot["ticker"]["trade_price"])
+                candidate, original_range_rejection = (
+                    _revalidate_candidate_for_dispatch(first_candidate, live_price)
                 )
-                self._record_early_watch_screening(
-                    alert, "survival_rejected", reasons
+                survival_metrics, survival_rejected = validate_candidate_survival(
+                    first_candidate,
+                    survival_snapshot["ticker"],
+                    survival_snapshot["orderbooks"],
+                    survival_snapshot["candles_1m"],
+                    self.config,
                 )
-                return
-            candidate.update(survival_metrics)
-            candidate["survival_confirmed"] = True
-            candidate["survival_seconds"] = self.config.survival_confirm_seconds
+                if original_range_rejection:
+                    survival_rejected.insert(0, original_range_rejection)
+                if candidate is None or survival_rejected:
+                    reasons = [
+                        f"생존 재검증: {reason}" for reason in survival_rejected
+                    ]
+                    LOGGER.info(
+                        "Candidate survival rejected for %s: %s",
+                        market,
+                        "; ".join(reasons),
+                    )
+                    self._remember_rejected(
+                        alert,
+                        reasons,
+                        float(survival_snapshot["ticker"]["trade_price"]),
+                    )
+                    self.dispatcher.record_candidate_rejection(reasons)
+                    MONITOR_STATE.add_screening_record(
+                        self._screening_record(alert, "survival_rejected", reasons)
+                    )
+                    self._record_early_watch_screening(
+                        alert, "survival_rejected", reasons
+                    )
+                    return
+                candidate.update(survival_metrics)
+                candidate["survival_confirmed"] = True
+                candidate["survival_seconds"] = self.config.survival_confirm_seconds
             verification_client = UpbitPublicClient()
             try:
                 latest_ticker = await verification_client.ticker(market)
