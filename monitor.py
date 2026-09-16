@@ -218,6 +218,7 @@ class MonitorState:
         self.recent_alerts: deque[dict[str, Any]] = deque(maxlen=100)
         self.candidate_outcomes: deque[dict[str, Any]] = deque(maxlen=500)
         self.signal_outcomes: deque[dict[str, Any]] = deque(maxlen=1000)
+        self.early_watch_events: deque[dict[str, Any]] = deque(maxlen=2000)
         self.trend_outcomes: deque[dict[str, Any]] = deque(maxlen=500)
         self.screening_records: deque[dict[str, Any]] = deque(maxlen=2000)
         self.candidate_delivery_day_kst: str | None = None
@@ -268,6 +269,12 @@ class MonitorState:
             self.signal_outcomes.appendleft(dict(outcome))
         LOGGER.warning("RAW_SIGNAL_OUTCOME %s", json.dumps(outcome, ensure_ascii=False))
 
+    def add_early_watch_event(self, event: dict[str, Any]) -> None:
+        """Audit an early leader from detection through two-hour follow-through."""
+        with self._lock:
+            self.early_watch_events.appendleft(dict(event))
+        LOGGER.info("EARLY_WATCH_AUDIT %s", json.dumps(event, ensure_ascii=False))
+
     def add_trend_outcome(self, outcome: dict[str, Any]) -> None:
         with self._lock:
             self.trend_outcomes.appendleft(dict(outcome))
@@ -313,6 +320,83 @@ class MonitorState:
         }
 
     @staticmethod
+    def _early_watch_summary(events: list[dict[str, Any]]) -> dict[str, Any]:
+        starts = [item for item in events if item.get("event") == "started"]
+        outcomes = [item for item in events if item.get("event") == "outcome"]
+        approved_ids = {
+            item.get("lifecycle_id")
+            for item in events
+            if item.get("event") == "screening"
+            and item.get("decision") == "accepted"
+        }
+        target_first = sum(
+            item.get("first_touch_result") == "target_first" for item in outcomes
+        )
+        stop_first = sum(
+            item.get("first_touch_result") == "stop_first" for item in outcomes
+        )
+        decided = target_first + stop_first
+        horizon_performance: dict[str, dict[str, Any]] = {}
+        for minutes in (15, 30, 60, 120):
+            samples = [
+                item
+                for item in events
+                if item.get("event") == "horizon"
+                and int(item.get("horizon_minutes") or 0) == minutes
+            ]
+            horizon_performance[f"{minutes}m"] = {
+                "sample_count": len(samples),
+                "positive_count": sum(
+                    float(item.get("current_return_pct") or 0) > 0
+                    for item in samples
+                ),
+                "reached_3pct": sum(
+                    float(item.get("mfe_pct") or 0) >= 3.0 for item in samples
+                ),
+                "reached_5pct": sum(
+                    float(item.get("mfe_pct") or 0) >= 5.0 for item in samples
+                ),
+                "average_mfe_pct": (
+                    round(
+                        mean(float(item.get("mfe_pct") or 0) for item in samples),
+                        2,
+                    )
+                    if samples
+                    else None
+                ),
+                "average_mae_pct": (
+                    round(
+                        mean(float(item.get("mae_pct") or 0) for item in samples),
+                        2,
+                    )
+                    if samples
+                    else None
+                ),
+            }
+        return {
+            "started_count": len(starts),
+            "completed_count": len(outcomes),
+            "candidate_approved_count": len(approved_ids),
+            "candidate_conversion_rate_pct": (
+                round(len(approved_ids) / len(starts) * 100, 2) if starts else None
+            ),
+            "decided_count": decided,
+            "target_first": target_first,
+            "stop_first": stop_first,
+            "target_first_rate_pct": (
+                round(target_first / decided * 100, 2) if decided else None
+            ),
+            "missed_target_first": sum(
+                item.get("first_touch_result") == "target_first"
+                and not bool(item.get("candidate_approved"))
+                for item in outcomes
+            ),
+            "horizons": horizon_performance,
+            "recent_outcomes": outcomes[:100],
+            "recent_events": events[:200],
+        }
+
+    @staticmethod
     def _on_kst_day(value: Any, day_kst: str) -> bool:
         if not value:
             return False
@@ -329,6 +413,7 @@ class MonitorState:
         with self._lock:
             candidate_outcomes = list(self.candidate_outcomes)
             signal_outcomes = list(self.signal_outcomes)
+            early_watch_events = list(self.early_watch_events)
             screening_records = list(self.screening_records)
         outcomes = [
             item
@@ -346,6 +431,13 @@ class MonitorState:
             if item.get("decision") == "accepted"
             and self._on_kst_day(item.get("time_utc"), day_kst)
         ]
+        early_watch = self._early_watch_summary(
+            [
+                item
+                for item in early_watch_events
+                if self._on_kst_day(item.get("time_utc"), day_kst)
+            ]
+        )
         target_count = sum(item.get("result") == "target_1_first" for item in outcomes)
         stop_count = sum(item.get("result") == "stop_first" for item in outcomes)
         expired_count = sum(item.get("result") == "expired" for item in outcomes)
@@ -385,6 +477,17 @@ class MonitorState:
                 item.get("result") == "target_first" for item in raw
             ),
             "missed_raw_winners": missed_raw_winners,
+            "early_watch_started": early_watch["started_count"],
+            "early_watch_completed": early_watch["completed_count"],
+            "early_watch_target_first": early_watch["target_first"],
+            "early_watch_stop_first": early_watch["stop_first"],
+            "early_watch_candidate_approved": early_watch[
+                "candidate_approved_count"
+            ],
+            "early_watch_missed_target_first": early_watch[
+                "missed_target_first"
+            ],
+            "early_watch_horizons": early_watch["horizons"],
             "restart_scoped": True,
         }
 
@@ -392,6 +495,7 @@ class MonitorState:
         with self._lock:
             outcomes = list(self.candidate_outcomes)
             signal_outcomes = list(self.signal_outcomes)
+            early_watch_events = list(self.early_watch_events)
             trend_outcomes = list(self.trend_outcomes)
             screening_records = list(self.screening_records)
         targets = sum(item.get("result") == "target_1_first" for item in outcomes)
@@ -408,6 +512,9 @@ class MonitorState:
             ),
             "recent": outcomes[:100],
             "raw_signal_performance": self._performance_summary(signal_outcomes),
+            "early_watch_performance": self._early_watch_summary(
+                early_watch_events
+            ),
             "six_hour_trend_performance": {
                 "sample_count": len(trend_outcomes),
                 "target_1_reached": sum(
@@ -468,6 +575,7 @@ class MonitorState:
                 "recent_alert_count": len(self.recent_alerts),
                 "candidate_outcome_count": len(self.candidate_outcomes),
                 "raw_signal_outcome_count": len(self.signal_outcomes),
+                "early_watch_event_count": len(self.early_watch_events),
                 "six_hour_trend_outcome_count": len(self.trend_outcomes),
                 "candidate_screening_count": len(self.screening_records),
                 "candidate_delivery_day_kst": self.candidate_delivery_day_kst,
@@ -1170,6 +1278,14 @@ def _daily_performance_text(report: dict[str, Any]) -> str:
         f"원시 결정 신호: {int(report['raw_decided_count'])}건 · "
         f"+5% 선도달 {int(report['raw_target_first'])}건\n"
         f"최종 후보에서 놓친 원시 +5% 신호: {int(report['missed_raw_winners'])}건\n"
+        f"초기 포착: {int(report.get('early_watch_started', 0))}건 · "
+        f"2시간 관찰 완료 {int(report.get('early_watch_completed', 0))}건 · "
+        f"+5% 선도달 {int(report.get('early_watch_target_first', 0))}건 · "
+        f"손절 선도달 {int(report.get('early_watch_stop_first', 0))}건\n"
+        f"초기 포착→조건부 후보 전환: "
+        f"{int(report.get('early_watch_candidate_approved', 0))}건 · "
+        f"놓친 +5% 초기 포착 "
+        f"{int(report.get('early_watch_missed_target_first', 0))}건\n"
         "이 성과표는 실제 계좌 수익이 아닌 공개 시세 모의 추적이며, "
         "서비스 재시작 이후 수집된 표본 기준입니다."
     )
@@ -1677,6 +1793,7 @@ class CandidateAnalyzer:
         self._lifecycles: dict[str, dict[str, Any]] = {}
         self._watchlist: dict[str, dict[str, Any]] = {}
         self._signal_tracks: dict[str, dict[str, Any]] = {}
+        self._early_watch_tracks: dict[str, dict[str, Any]] = {}
         self._trend_tracks: dict[str, dict[str, Any]] = {}
         self._inflight_markets: set[str] = set()
         self._inflight_alerts: dict[str, dict[str, Any]] = {}
@@ -1779,6 +1896,8 @@ class CandidateAnalyzer:
             }
         )
         self._watchlist[market] = state
+        if created:
+            self._start_early_watch_track(alert, now)
         self._start_signal_track(alert, now)
         MONITOR_STATE.add_alert(alert)
         MONITOR_STATE.add_screening_record(
@@ -1794,6 +1913,181 @@ class CandidateAnalyzer:
             alert.get("preleader_volume_ratio_30m"),
         )
         return created
+
+    @staticmethod
+    def _early_watch_event(
+        state: dict[str, Any], event: str, now: float, **values: Any
+    ) -> dict[str, Any]:
+        return {
+            "time_utc": datetime.fromtimestamp(now, tz=timezone.utc).isoformat(),
+            "event": event,
+            "lifecycle_id": state["lifecycle_id"],
+            "market": state["market"],
+            "signal_time_utc": state.get("signal_time_utc"),
+            "signal_price": state["signal_price"],
+            **values,
+        }
+
+    def _start_early_watch_track(
+        self, alert: dict[str, Any], now: float
+    ) -> None:
+        market = str(alert["market"])
+        price = float(alert["price"])
+        lifecycle_id = f"{market}:{alert.get('time_utc') or now}"
+        state = {
+            "lifecycle_id": lifecycle_id,
+            "market": market,
+            "signal_time_utc": alert.get("time_utc"),
+            "signal_price": price,
+            "target_price": price * (1 + self.config.raw_signal_target_pct / 100),
+            "stop_price": price * (1 - self.config.raw_signal_stop_pct / 100),
+            "created_at": now,
+            "max_price": price,
+            "min_price": price,
+            "first_touch_result": None,
+            "first_touch_at": None,
+            "horizons_recorded": set(),
+            "candidate_approved": False,
+            "screening_count": 0,
+            "last_decision": "preleader_watch",
+            "last_reasons": [],
+        }
+        self._early_watch_tracks[market] = state
+        MONITOR_STATE.add_early_watch_event(
+            self._early_watch_event(
+                state,
+                "started",
+                now,
+                relative_strength_rank=alert.get("relative_strength_rank"),
+                relative_strength_universe=alert.get(
+                    "relative_strength_universe"
+                ),
+                relative_strength_percentile=alert.get(
+                    "relative_strength_percentile"
+                ),
+                momentum_3m_pct=alert.get("momentum_3m_pct"),
+                momentum_5m_pct=alert.get("momentum_5m_pct"),
+                volume_ratio_10m=alert.get("preleader_volume_ratio_10m"),
+                volume_ratio_30m=alert.get("preleader_volume_ratio_30m"),
+            )
+        )
+
+    def _record_early_watch_screening(
+        self,
+        alert: dict[str, Any],
+        decision: str,
+        reasons: list[str],
+        candidate: dict[str, Any] | None = None,
+    ) -> None:
+        market = str(alert["market"])
+        state = self._early_watch_tracks.get(market)
+        if state is None:
+            return
+        state["screening_count"] = int(state["screening_count"]) + 1
+        state["last_decision"] = decision
+        state["last_reasons"] = list(reasons)
+        if decision == "accepted":
+            state["candidate_approved"] = True
+            state["candidate_approved_at"] = time.time()
+        MONITOR_STATE.add_early_watch_event(
+            self._early_watch_event(
+                state,
+                "screening",
+                time.time(),
+                decision=decision,
+                reasons=list(reasons),
+                source_signal=alert.get("signal"),
+                score=candidate.get("score") if candidate else None,
+                candidate_price=(
+                    candidate.get("current_price") if candidate else None
+                ),
+                screening_count=state["screening_count"],
+            )
+        )
+
+    def _record_early_watch_signal_upgrade(
+        self, market: str, previous_signal: str, signal: str, now: float
+    ) -> None:
+        state = self._early_watch_tracks.get(market)
+        if state is None:
+            return
+        MONITOR_STATE.add_early_watch_event(
+            self._early_watch_event(
+                state,
+                "signal_upgraded",
+                now,
+                previous_signal=previous_signal,
+                source_signal=signal,
+            )
+        )
+
+    def _observe_early_watch_track(
+        self, market: str, price: float, now: float
+    ) -> None:
+        state = self._early_watch_tracks.get(market)
+        if state is None:
+            return
+        state["max_price"] = max(float(state["max_price"]), price)
+        state["min_price"] = min(float(state["min_price"]), price)
+        if state["first_touch_result"] is None:
+            if price >= float(state["target_price"]):
+                state["first_touch_result"] = "target_first"
+                state["first_touch_at"] = now
+            elif price <= float(state["stop_price"]):
+                state["first_touch_result"] = "stop_first"
+                state["first_touch_at"] = now
+        elapsed = now - float(state["created_at"])
+        entry = float(state["signal_price"])
+        for minutes in (15, 30, 60, 120):
+            if elapsed < minutes * 60 or minutes in state["horizons_recorded"]:
+                continue
+            state["horizons_recorded"].add(minutes)
+            MONITOR_STATE.add_early_watch_event(
+                self._early_watch_event(
+                    state,
+                    "horizon",
+                    now,
+                    horizon_minutes=minutes,
+                    current_price=price,
+                    current_return_pct=round((price / entry - 1) * 100, 2),
+                    mfe_pct=round(
+                        (float(state["max_price"]) / entry - 1) * 100, 2
+                    ),
+                    mae_pct=round(
+                        (float(state["min_price"]) / entry - 1) * 100, 2
+                    ),
+                    first_touch_result=state["first_touch_result"],
+                    candidate_approved=bool(state["candidate_approved"]),
+                )
+            )
+        if elapsed < 120 * 60:
+            return
+        MONITOR_STATE.add_early_watch_event(
+            self._early_watch_event(
+                state,
+                "outcome",
+                now,
+                exit_price=price,
+                current_return_pct=round((price / entry - 1) * 100, 2),
+                mfe_pct=round((float(state["max_price"]) / entry - 1) * 100, 2),
+                mae_pct=round((float(state["min_price"]) / entry - 1) * 100, 2),
+                first_touch_result=state["first_touch_result"] or "undecided",
+                first_touch_elapsed_seconds=(
+                    round(
+                        float(state["first_touch_at"])
+                        - float(state["created_at"]),
+                        1,
+                    )
+                    if state["first_touch_at"] is not None
+                    else None
+                ),
+                candidate_approved=bool(state["candidate_approved"]),
+                screening_count=int(state["screening_count"]),
+                last_decision=state["last_decision"],
+                last_reasons=list(state["last_reasons"]),
+            )
+        )
+        self._early_watch_tracks.pop(market, None)
 
     def _start_signal_track(self, alert: dict[str, Any], now: float) -> None:
         """Track +5% versus -3% first-touch outcomes for every screened signal."""
@@ -2232,6 +2526,12 @@ class CandidateAnalyzer:
                         [f"{previous_signal}→{inflight.get('signal')}"],
                     )
                 )
+                self._record_early_watch_signal_upgrade(
+                    market,
+                    previous_signal,
+                    str(inflight.get("signal")),
+                    now,
+                )
                 return True
             return False
         if (
@@ -2400,6 +2700,7 @@ class CandidateAnalyzer:
     def observe_price(self, market: str, price: float) -> bool:
         """Schedule one fresh recheck after price leaves and retakes the entry zone."""
         now = time.time()
+        self._observe_early_watch_track(market, price, now)
         self._observe_signal_track(market, price, now)
         self._observe_trend_track(market, price, now)
         leader_recheck_scheduled = self._observe_leader_watchlist(
@@ -2602,6 +2903,9 @@ class CandidateAnalyzer:
                 MONITOR_STATE.add_screening_record(
                     self._screening_record(alert, "rejected", rejected)
                 )
+                self._record_early_watch_screening(
+                    alert, "rejected", rejected
+                )
                 return
             first_candidate = candidate
             LOGGER.info(
@@ -2641,6 +2945,9 @@ class CandidateAnalyzer:
                 MONITOR_STATE.add_screening_record(
                     self._screening_record(alert, "survival_rejected", reasons)
                 )
+                self._record_early_watch_screening(
+                    alert, "survival_rejected", reasons
+                )
                 return
             candidate.update(survival_metrics)
             candidate["survival_confirmed"] = True
@@ -2669,6 +2976,11 @@ class CandidateAnalyzer:
                         [str(dispatch_rejection or "전송 직전 재검증 실패")],
                     )
                 )
+                self._record_early_watch_screening(
+                    alert,
+                    "dispatch_rejected",
+                    [str(dispatch_rejection or "전송 직전 재검증 실패")],
+                )
                 return
             candidate["analysis_time_utc"] = datetime.now(timezone.utc).isoformat()
             delivered = await self.dispatcher.send_candidate(candidate)
@@ -2684,6 +2996,11 @@ class CandidateAnalyzer:
                         "delivery_suppressed",
                         ["Telegram 일일 가용성·상한 정책으로 전송 보류"],
                     )
+                )
+                self._record_early_watch_screening(
+                    alert,
+                    "delivery_suppressed",
+                    ["Telegram 일일 가용성·상한 정책으로 전송 보류"],
                 )
                 return
             accepted_record = self._screening_record(alert, "accepted", [])
@@ -2709,6 +3026,9 @@ class CandidateAnalyzer:
             ):
                 accepted_record[key] = candidate.get(key)
             MONITOR_STATE.add_screening_record(accepted_record)
+            self._record_early_watch_screening(
+                alert, "accepted", [], candidate
+            )
             self._last_delivered_at[market] = time.time()
             self._watchlist.pop(market, None)
             if market in self._signal_tracks:
@@ -2756,6 +3076,9 @@ class CandidateAnalyzer:
             raise
         except Exception as exc:
             LOGGER.error("Candidate analysis failed for %s: %s", market, exc)
+            self._record_early_watch_screening(
+                alert, "analysis_failed", [f"{type(exc).__name__}: {exc}"]
+            )
 
 
 async def _resolve_markets(config: MonitorConfig) -> list[str]:

@@ -983,6 +983,82 @@ def test_every_screened_signal_tracks_five_percent_before_three_percent(monkeypa
     assert performance["target_first_rate_pct"] == 100.0
 
 
+def test_early_watch_tracks_horizons_and_missed_winners(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    MONITOR_STATE.early_watch_events.clear()
+    started = 1_800_000_000.0
+    alert = {
+        "time_utc": "2027-01-15T08:00:00+00:00",
+        "market": "KRW-LSK",
+        "signal": "leader_volume_acceleration",
+        "price": 342.0,
+        "relative_strength_rank": 14,
+        "relative_strength_universe": 231,
+        "relative_strength_percentile": 6.06,
+        "momentum_3m_pct": 1.2,
+        "momentum_5m_pct": 1.2,
+        "preleader_volume_ratio_10m": 12.5,
+        "preleader_volume_ratio_30m": 20.0,
+    }
+
+    analyzer._start_early_watch_track(alert, started)
+    analyzer._observe_early_watch_track("KRW-LSK", 350.0, started + 900)
+    monkeypatch.setattr("monitor.time.time", lambda: started + 1_000)
+    analyzer._record_early_watch_screening(
+        {**alert, "signal": "consolidation_rebreakout"},
+        "rejected",
+        ["호가 지지 하드차단"],
+    )
+    analyzer._observe_early_watch_track("KRW-LSK", 360.0, started + 1_800)
+    analyzer._observe_early_watch_track("KRW-LSK", 370.0, started + 3_600)
+    analyzer._observe_early_watch_track("KRW-LSK", 365.0, started + 7_200)
+
+    performance = MONITOR_STATE.candidate_performance()[
+        "early_watch_performance"
+    ]
+    assert performance["started_count"] == 1
+    assert performance["completed_count"] == 1
+    assert performance["target_first"] == 1
+    assert performance["stop_first"] == 0
+    assert performance["candidate_approved_count"] == 0
+    assert performance["missed_target_first"] == 1
+    assert performance["horizons"]["15m"]["sample_count"] == 1
+    assert performance["horizons"]["30m"]["reached_5pct"] == 1
+    assert performance["recent_outcomes"][0]["last_decision"] == "rejected"
+    assert "호가 지지 하드차단" in performance["recent_outcomes"][0][
+        "last_reasons"
+    ]
+
+
+def test_early_watch_records_candidate_conversion(monkeypatch):
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    MONITOR_STATE.early_watch_events.clear()
+    started = 1_800_000_000.0
+    alert = {
+        "time_utc": "2027-01-15T08:00:00+00:00",
+        "market": "KRW-CVC",
+        "signal": "leader_volume_acceleration",
+        "price": 100.0,
+    }
+    analyzer._start_early_watch_track(alert, started)
+    monkeypatch.setattr("monitor.time.time", lambda: started + 600)
+    analyzer._record_early_watch_screening(
+        {**alert, "signal": "consolidation_rebreakout"},
+        "accepted",
+        [],
+        {"score": 94, "current_price": 102.0},
+    )
+    analyzer._observe_early_watch_track("KRW-CVC", 106.0, started + 7_200)
+
+    performance = MONITOR_STATE.candidate_performance()[
+        "early_watch_performance"
+    ]
+    assert performance["candidate_approved_count"] == 1
+    assert performance["candidate_conversion_rate_pct"] == 100.0
+    assert performance["recent_outcomes"][0]["candidate_approved"] is True
+
+
 def test_candidate_message_labels_score_as_condition_score():
     text = _candidate_text(
         {
