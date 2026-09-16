@@ -74,6 +74,7 @@ def _config(**overrides):
         "early_leader_max_percentile": 5.0,
         "early_leader_score_bonus": 8,
         "early_leader_resistance_floor_pct": 1.0,
+        "breakout_resistance_cluster_pct": 1.5,
         "require_first_retest": True,
         "retest_tolerance_pct": 0.8,
         "leader_watch_enabled": True,
@@ -1189,6 +1190,52 @@ def test_early_leader_lane_can_treat_nearby_resistance_as_breakout_level(monkeyp
     assert candidate["leader_resistance_override"] is True
     assert candidate["target_1"] > candidate["resistance_price"]
     assert any("근접 저항" in note for note in candidate["risk_notes"])
+
+
+def test_persisted_leader_rebreakout_merges_breakout_resistance_cluster(monkeypatch):
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    monkeypatch.setattr(
+        candidate_analysis, "_resistances", lambda *args: [current * 1.006]
+    )
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.06,
+        "high_price": current * 1.006,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        {
+            "market": "KRW-TEST",
+            "signal": "consolidation_rebreakout",
+            "price": current,
+            "relative_strength_ready": True,
+            "relative_strength_eligible": True,
+            "relative_strength_rank": 13,
+            "relative_strength_universe": 210,
+            "relative_strength_percentile": 6.19,
+            "best_relative_strength_percentile": 4.59,
+            "momentum_5m_pct": 2.07,
+            "momentum_15m_pct": 1.47,
+            "early_trend": True,
+        },
+        ticker,
+        _orderbook(current, bid_ratio=0.69),
+        one,
+        five,
+        _config(min_score=80, availability_balance_enabled=False),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["early_leader_lane"] is True
+    assert candidate["leadership_persisted"] is True
+    assert candidate["best_relative_strength_percentile"] == 4.59
+    assert candidate["breakout_cluster_ignored"] is True
+    assert candidate["resistance_confirmed"] is False
+    assert any("동일 돌파 구간" in note for note in candidate["risk_notes"])
 
 
 def test_survival_recheck_allows_cooling_volume_but_rejects_structure_loss():

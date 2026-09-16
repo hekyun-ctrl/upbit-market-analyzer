@@ -94,6 +94,7 @@ class CandidateConfig:
     early_leader_max_percentile: float
     early_leader_score_bonus: int
     early_leader_resistance_floor_pct: float
+    breakout_resistance_cluster_pct: float
     require_first_retest: bool
     retest_tolerance_pct: float
     leader_watch_enabled: bool
@@ -276,6 +277,15 @@ class CandidateConfig:
                 0.5,
                 _env_float(
                     "CANDIDATE_EARLY_LEADER_RESISTANCE_FLOOR_PCT", 1.0
+                ),
+            ),
+            breakout_resistance_cluster_pct=max(
+                0.5,
+                min(
+                    3.0,
+                    _env_float(
+                        "CANDIDATE_BREAKOUT_RESISTANCE_CLUSTER_PCT", 1.5
+                    ),
                 ),
             ),
             require_first_retest=_enabled("CANDIDATE_REQUIRE_FIRST_RETEST", True),
@@ -621,6 +631,17 @@ def evaluate_candidate(
     relative_eligible = bool(alert.get("relative_strength_eligible"))
     early_trend = bool(alert.get("early_trend"))
     relative_percentile = float(alert.get("relative_strength_percentile") or 100.0)
+    best_relative_percentile = min(
+        relative_percentile,
+        float(
+            alert.get("best_relative_strength_percentile")
+            or relative_percentile
+        ),
+    )
+    leadership_persisted = bool(
+        best_relative_percentile <= config.early_leader_max_percentile
+        and relative_percentile <= config.relative_strength_top_percent
+    )
     momentum_5m = float(alert.get("momentum_5m_pct") or 0.0)
     momentum_15m_value = alert.get("momentum_15m_pct")
     momentum_15m = (
@@ -642,7 +663,11 @@ def evaluate_candidate(
         config.early_leader_lane_enabled
         and relative_ready
         and relative_eligible
-        and relative_percentile <= config.early_leader_max_percentile
+        # A leader can move a few ranks while the confirming minute closes.
+        # Preserve a top-tier observation from this same in-flight analysis,
+        # but require the fresh snapshot to remain inside the broader
+        # relative-strength eligibility band.
+        and leadership_persisted
         and early_trend
         and momentum_5m >= config.relative_strength_min_5m_pct
         and (momentum_15m is None or momentum_15m > 0)
@@ -779,6 +804,26 @@ def evaluate_candidate(
         rejected.append(f"호가 스프레드 허용치 초과({spread:.2f}%)")
 
     resistance_levels = _resistances(current, ticker, c5, c15)
+    breakout_cluster_ignored = False
+    if (
+        early_leader_lane
+        and alert.get("signal") == "consolidation_rebreakout"
+        and retest_confirmed
+        and not btc_weak
+    ):
+        # Repeated swing highs immediately around the consolidation ceiling
+        # describe the level being broken, not a separate overhead supply
+        # zone. Counting them again as resistance rejected genuine rebreakouts
+        # such as KRW-LSK. Only collapse the tight cluster; farther structural
+        # resistance remains a hard risk input.
+        cluster_ceiling = breakout * (
+            1 + config.breakout_resistance_cluster_pct / 100
+        )
+        filtered_levels = [
+            level for level in resistance_levels if level > cluster_ceiling
+        ]
+        breakout_cluster_ignored = len(filtered_levels) < len(resistance_levels)
+        resistance_levels = filtered_levels
     resistance_confirmed = bool(resistance_levels)
     resistance = (
         resistance_levels[0]
@@ -912,6 +957,10 @@ def evaluate_candidate(
     if leader_resistance_override:
         risk_notes.append(
             "근접 저항은 상위 선도주의 재돌파 대상으로 조건부 허용"
+        )
+    if breakout_cluster_ignored:
+        risk_notes.append(
+            "재돌파 기준선 인접 저항군은 동일 돌파 구간으로 병합"
         )
     if elevated_candle_balance:
         risk_notes.append("중간 과열 구간의 경미한 완료봉 품질 감점 허용")
@@ -1170,6 +1219,7 @@ def evaluate_candidate(
         "resistance_confirmed": resistance_confirmed,
         "resistance_room_pct": round(room, 2),
         "leader_resistance_override": leader_resistance_override,
+        "breakout_cluster_ignored": breakout_cluster_ignored,
         "risk_reward": round(risk_reward, 2),
         "breakout_level": breakout,
         "valid_seconds": config.valid_seconds,
@@ -1184,6 +1234,10 @@ def evaluate_candidate(
         "relative_strength_percentile": (
             round(relative_percentile, 2) if relative_ready else None
         ),
+        "best_relative_strength_percentile": (
+            round(best_relative_percentile, 2) if relative_ready else None
+        ),
+        "leadership_persisted": leadership_persisted,
         "market_regime": market_regime,
         "market_breadth_5m_pct": round(market_breadth_5m_pct, 1),
         "market_median_5m_pct": alert.get("market_median_5m_pct"),

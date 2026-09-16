@@ -1679,8 +1679,39 @@ class CandidateAnalyzer:
         self._signal_tracks: dict[str, dict[str, Any]] = {}
         self._trend_tracks: dict[str, dict[str, Any]] = {}
         self._inflight_markets: set[str] = set()
+        self._inflight_alerts: dict[str, dict[str, Any]] = {}
         self._tasks: set[asyncio.Task[None]] = set()
         self._semaphore = asyncio.Semaphore(2)
+
+    @staticmethod
+    def _signal_priority(alert: dict[str, Any]) -> int:
+        priority = {
+            "price_volume_surge": 10,
+            "leader_volume_acceleration": 20,
+            "breakout": 30,
+            "consolidation_rebreakout": 40,
+        }.get(str(alert.get("signal")), 0)
+        if alert.get("watchlist_recheck"):
+            priority += 5
+        if alert.get("leader_pullback_recheck"):
+            priority += 10
+        return priority
+
+    @staticmethod
+    def _remember_best_relative_strength(alert: dict[str, Any]) -> None:
+        value = alert.get("relative_strength_percentile")
+        if value is None:
+            return
+        percentile = float(value)
+        previous = alert.get("best_relative_strength_percentile")
+        if previous is None or percentile < float(previous):
+            alert["best_relative_strength_percentile"] = percentile
+            alert["best_relative_strength_rank"] = alert.get(
+                "relative_strength_rank"
+            )
+            alert["best_relative_strength_universe"] = alert.get(
+                "relative_strength_universe"
+            )
 
     def _active_watch(self, market: str, now: float) -> dict[str, Any] | None:
         state = self._watchlist.get(market)
@@ -2146,7 +2177,62 @@ class CandidateAnalyzer:
         watchlist_recheck = bool(
             watch and alert.get("signal") == "consolidation_rebreakout"
         )
+        scheduled = dict(alert)
+        if watchlist_recheck:
+            scheduled["is_reentry"] = True
+            scheduled["watchlist_recheck"] = True
+            scheduled["original_signal_time_utc"] = watch.get(
+                "first_signal_time_utc"
+            )
+        self._remember_best_relative_strength(scheduled)
         if market in self._inflight_markets:
+            inflight = self._inflight_alerts.get(market)
+            if (
+                inflight is not None
+                and self._signal_priority(scheduled)
+                > self._signal_priority(inflight)
+            ):
+                previous_signal = str(inflight.get("signal"))
+                best_percentile = min(
+                    float(
+                        inflight.get("best_relative_strength_percentile")
+                        or 100.0
+                    ),
+                    float(
+                        scheduled.get("best_relative_strength_percentile")
+                        or 100.0
+                    ),
+                )
+                best_rank = inflight.get("best_relative_strength_rank")
+                best_universe = inflight.get("best_relative_strength_universe")
+                if best_percentile == float(
+                    scheduled.get("best_relative_strength_percentile") or 100.0
+                ):
+                    best_rank = scheduled.get("best_relative_strength_rank")
+                    best_universe = scheduled.get(
+                        "best_relative_strength_universe"
+                    )
+                inflight.clear()
+                inflight.update(scheduled)
+                if best_percentile < 100.0:
+                    inflight["best_relative_strength_percentile"] = best_percentile
+                    inflight["best_relative_strength_rank"] = best_rank
+                    inflight["best_relative_strength_universe"] = best_universe
+                inflight["superseded_signal"] = previous_signal
+                LOGGER.info(
+                    "CANDIDATE_SIGNAL_UPGRADED market=%s from=%s to=%s",
+                    market,
+                    previous_signal,
+                    inflight.get("signal"),
+                )
+                MONITOR_STATE.add_screening_record(
+                    self._screening_record(
+                        inflight,
+                        "signal_upgraded",
+                        [f"{previous_signal}→{inflight.get('signal')}"],
+                    )
+                )
+                return True
             return False
         if (
             not watchlist_recheck
@@ -2158,22 +2244,18 @@ class CandidateAnalyzer:
             self.dispatcher.record_candidate_rejection(["최근 급락 발생"])
             return False
 
-        scheduled = dict(alert)
-        if watchlist_recheck:
-            scheduled["is_reentry"] = True
-            scheduled["watchlist_recheck"] = True
-            scheduled["original_signal_time_utc"] = watch.get(
-                "first_signal_time_utc"
-            )
         self._start_signal_track(scheduled, now)
         self._last_checked_at[market] = now
         self._inflight_markets.add(market)
+        self._inflight_alerts[market] = scheduled
         task = asyncio.create_task(self._analyze(scheduled))
         self._tasks.add(task)
 
         def completed(done: asyncio.Task[None]) -> None:
             self._tasks.discard(done)
             self._inflight_markets.discard(market)
+            if self._inflight_alerts.get(market) is scheduled:
+                self._inflight_alerts.pop(market, None)
 
         task.add_done_callback(completed)
         return True
@@ -2502,9 +2584,12 @@ class CandidateAnalyzer:
                 # Reconfirm leadership after the completed-candle wait. A coin
                 # that lost its rank during the pullback must not pass on stale
                 # raw-signal momentum.
-                alert.update(
-                    self._relative_strength_provider(market, int(time.time()))
+                relative_snapshot = self._relative_strength_provider(
+                    market, int(time.time())
                 )
+                self._remember_best_relative_strength(alert)
+                alert.update(relative_snapshot)
+                self._remember_best_relative_strength(alert)
             candidate, rejected = self._evaluate_snapshot(alert, snapshot)
             if candidate is None:
                 LOGGER.info(

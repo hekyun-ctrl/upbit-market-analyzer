@@ -68,7 +68,7 @@ Telegram을 사용하려면 `TELEGRAM_BOT_TOKEN`과 `TELEGRAM_CHAT_ID`를 Railwa
 `TELEGRAM_CANDIDATE_MIN_TARGET_2_PCT`를 사용합니다. 기본값 `5`는 1차 목표가
 2~3%이더라도 2차 확장 목표가 5% 이상이면 전송 대상으로 인정합니다. 이전의
 `TELEGRAM_CANDIDATE_MIN_TARGET_1_PCT`와
-`TELEGRAM_CANDIDATE_MIN_RESISTANCE_ROOM_PCT`는 더 이상 전송 차단에 사용하지 않습니다.
+`TELEGRAM_CANDIDATE_MIN_RESISTANCE_ROOM_PCT`는 더 이상 전송 차단에 사용하지 않습니다. 강한 횡보 재돌파에서는 `CANDIDATE_BREAKOUT_RESISTANCE_CLUSTER_PCT` 이내의 반복 고점을 동일 돌파 구간으로 병합하지만, 그 위의 구조적 저항은 계속 평가합니다.
 
 점수 기준도 함께 적용하려면 `TELEGRAM_CANDIDATE_MIN_SCORE`를 사용합니다. 예를 들어
 `90`으로 설정하면 조건점수 90점 이상이면서 위 2차 목표 기준까지 충족한 후보만

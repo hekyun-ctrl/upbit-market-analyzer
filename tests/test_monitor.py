@@ -1117,6 +1117,68 @@ def test_recently_delivered_market_is_not_scheduled_again(monkeypatch):
     assert "KRW-XLM" not in analyzer._inflight_markets
 
 
+def test_stronger_signal_upgrades_inflight_candidate(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    analyzer._watchlist["KRW-LSK"] = {
+        "market": "KRW-LSK",
+        "created_at": 1_800_000_000.0,
+        "first_signal_time_utc": "2026-09-16T00:01:20+00:00",
+        "first_signal_price": 342.0,
+        "expires_at": 9_999_999_999.0,
+    }
+    entered = asyncio.Event()
+    release = asyncio.Event()
+    seen = []
+
+    async def fake_analyze(alert):
+        entered.set()
+        await release.wait()
+        seen.append(dict(alert))
+
+    monkeypatch.setattr(analyzer, "_analyze", fake_analyze)
+
+    async def run():
+        assert analyzer.schedule(
+            {
+                "time_utc": "2026-09-16T00:07:34+00:00",
+                "market": "KRW-LSK",
+                "signal": "breakout",
+                "price": 343.0,
+                "breakout_level": 342.8,
+                "relative_strength_percentile": 4.8,
+            }
+        )
+        await entered.wait()
+        assert analyzer.schedule(
+            {
+                "time_utc": "2026-09-16T00:07:45+00:00",
+                "market": "KRW-LSK",
+                "signal": "consolidation_rebreakout",
+                "price": 345.0,
+                "breakout_level": 343.026,
+                "relative_strength_percentile": 4.59,
+                "relative_strength_rank": 10,
+                "relative_strength_universe": 218,
+            }
+        )
+        release.set()
+        await asyncio.sleep(0)
+        await asyncio.sleep(0)
+
+    asyncio.run(run())
+
+    assert len(seen) == 1
+    assert seen[0]["signal"] == "consolidation_rebreakout"
+    assert seen[0]["superseded_signal"] == "breakout"
+    assert seen[0]["watchlist_recheck"] is True
+    assert seen[0]["is_reentry"] is True
+    assert seen[0]["breakout_level"] == 343.026
+    assert seen[0]["best_relative_strength_percentile"] == 4.59
+    assert "KRW-LSK" not in analyzer._inflight_markets
+    assert "KRW-LSK" not in analyzer._inflight_alerts
+
+
 def test_daily_performance_counts_cost_adjusted_outcomes():
     MONITOR_STATE.candidate_outcomes.clear()
     MONITOR_STATE.signal_outcomes.clear()
