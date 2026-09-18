@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime, timedelta, timezone
 
+import monitor
 from candidate_analysis import CandidateConfig
 from monitor import (
     MONITOR_STATE,
@@ -1250,6 +1251,121 @@ def test_early_watch_is_explicitly_not_an_entry_candidate():
     assert "[초기 포착 | 진입 검증 전]" in text
     assert "아직 매수 후보가 아닙니다" in text
     assert "3/180위" in text
+
+
+def test_fast_leader_runs_while_breakout_waits_for_completed_candle(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    release = asyncio.Event()
+    seen = []
+
+    async def fake_analyze(alert):
+        seen.append(dict(alert))
+        await release.wait()
+
+    monkeypatch.setattr(analyzer, "_analyze", fake_analyze)
+
+    async def run():
+        assert analyzer.schedule(
+            {
+                "market": "KRW-B3",
+                "signal": "breakout",
+                "price": 0.785,
+                "time_utc": "2026-09-18T00:00:06+00:00",
+            }
+        )
+        await asyncio.sleep(0)
+        assert analyzer.watch_preleader(
+            {
+                "market": "KRW-B3",
+                "signal": "leader_volume_acceleration",
+                "price": 0.804,
+                "time_utc": "2026-09-18T00:00:08+00:00",
+                "relative_strength_ready": True,
+                "relative_strength_eligible": True,
+                "relative_strength_rank": 2,
+                "relative_strength_universe": 195,
+                "relative_strength_percentile": 1.03,
+                "momentum_5m_pct": 3.08,
+                "momentum_15m_pct": 2.94,
+                "early_trend": True,
+                "market_regime": "neutral",
+                "preleader_volume_ratio_10m": 134.0,
+                "preleader_volume_ratio_30m": 117.0,
+            }
+        )
+        await asyncio.sleep(0)
+        assert len(seen) == 2
+        assert seen[0]["signal"] == "breakout"
+        assert seen[1]["fast_leader"] is True
+        assert analyzer._inflight_alerts["KRW-B3"]["signal"] == "breakout"
+        release.set()
+        await asyncio.sleep(0)
+        await asyncio.sleep(0)
+
+    asyncio.run(run())
+    assert not analyzer._fast_inflight_markets
+
+
+def test_parallel_checks_only_dispatch_one_candidate_per_market(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    sent = []
+
+    async def fake_send(candidate):
+        sent.append(candidate)
+        await asyncio.sleep(0)
+        return True
+
+    monkeypatch.setattr(analyzer.dispatcher, "send_candidate", fake_send)
+
+    async def run():
+        results = await asyncio.gather(
+            analyzer._send_candidate_once({"market": "KRW-B3", "score": 91}),
+            analyzer._send_candidate_once({"market": "KRW-B3", "score": 90}),
+        )
+        assert results == [(True, False), (False, True)]
+
+    asyncio.run(run())
+    assert len(sent) == 1
+
+
+def test_upgraded_signal_waits_for_eligible_completed_candle(monkeypatch):
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    now = datetime(2026, 9, 18, 0, 11, 52, tzinfo=timezone.utc).timestamp()
+    waits = []
+    snapshots = []
+    alert = {
+        "market": "KRW-ICX",
+        "signal": "price_volume_surge",
+        "price": 18.4,
+        "confirmation_started_at_utc": "2026-09-18T00:11:26+00:00",
+    }
+
+    def fake_time():
+        return now
+
+    async def fake_sleep(seconds):
+        nonlocal now
+        waits.append(seconds)
+        now += seconds
+        if len(waits) == 1:
+            alert["signal"] = "breakout"
+            alert["confirmation_started_at_utc"] = "2026-09-18T00:11:42+00:00"
+
+    async def fake_snapshot(_market):
+        snapshots.append(now)
+        return {"ticker": {"trade_price": 19.0}}
+
+    monkeypatch.setattr(monitor.time, "time", fake_time)
+    monkeypatch.setattr(monitor.asyncio, "sleep", fake_sleep)
+    monkeypatch.setattr(analyzer, "_market_snapshot", fake_snapshot)
+    monkeypatch.setattr(analyzer, "_evaluate_snapshot", lambda _a, _s: (None, ["검증 실패"]))
+    monkeypatch.setattr(analyzer, "_remember_rejected", lambda *_args: None)
+    asyncio.run(analyzer._analyze(alert))
+
+    assert waits == [30, 40.0]
+    assert snapshots == [datetime(2026, 9, 18, 0, 13, 2, tzinfo=timezone.utc).timestamp()]
 
 
 def test_daily_performance_text_separates_simulation_from_real_returns():

@@ -1807,6 +1807,8 @@ class CandidateAnalyzer:
         self._trend_tracks: dict[str, dict[str, Any]] = {}
         self._inflight_markets: set[str] = set()
         self._inflight_alerts: dict[str, dict[str, Any]] = {}
+        self._fast_inflight_markets: set[str] = set()
+        self._dispatch_locks: dict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
         self._tasks: set[asyncio.Task[None]] = set()
         self._semaphore = asyncio.Semaphore(2)
 
@@ -2549,6 +2551,29 @@ class CandidateAnalyzer:
             )
         self._remember_best_relative_strength(scheduled)
         if market in self._inflight_markets:
+            if scheduled.get("fast_leader"):
+                if market in self._fast_inflight_markets:
+                    return False
+                if MONITOR_STATE.has_recent_signal(market, "rapid_drop", 600):
+                    if not self._rapid_drop_allows_leader_recovery(scheduled, watch):
+                        LOGGER.info("Candidate skipped after recent rapid drop: %s", market)
+                        self.dispatcher.record_candidate_rejection(["최근 급락 발생"])
+                        return False
+                # A pending completed-candle check must not consume the only
+                # opportunity to verify an exceptional live leader. Keep both
+                # checks; whichever passes first still faces the same dispatch
+                # guards and the per-market delivery lock.
+                self._fast_inflight_markets.add(market)
+                task = asyncio.create_task(self._analyze(scheduled))
+                self._tasks.add(task)
+
+                def completed_fast(done: asyncio.Task[None]) -> None:
+                    self._tasks.discard(done)
+                    self._fast_inflight_markets.discard(market)
+
+                task.add_done_callback(completed_fast)
+                LOGGER.info("FAST_LEADER_PARALLEL_CHECK market=%s", market)
+                return True
             inflight = self._inflight_alerts.get(market)
             if (
                 inflight is not None
@@ -2636,6 +2661,22 @@ class CandidateAnalyzer:
 
         task.add_done_callback(completed)
         return True
+
+    async def _send_candidate_once(
+        self, candidate: dict[str, Any]
+    ) -> tuple[bool, bool]:
+        """Serialize same-market sends when fast and completed checks overlap."""
+        market = str(candidate["market"])
+        async with self._dispatch_locks[market]:
+            if (
+                time.time() - self._last_delivered_at.get(market, 0)
+                < self.config.repeat_cooldown_seconds
+            ):
+                return False, True
+            delivered = await self.dispatcher.send_candidate(candidate)
+            if delivered:
+                self._last_delivered_at[market] = time.time()
+            return delivered, False
 
     def _observe_leader_watchlist(
         self, market: str, price: float, now: float
@@ -2975,14 +3016,26 @@ class CandidateAnalyzer:
                     ).timestamp()
                 except (TypeError, ValueError):
                     confirmation_started_epoch = now_epoch
-                exposure_at_close = (
-                    now_epoch + seconds_to_next_close - confirmation_started_epoch
-                )
-                if seconds_to_next_close < 22 and exposure_at_close < 20:
+                candle_close = now_epoch - (now_epoch % 60) + 60
+                if candle_close - confirmation_started_epoch < 20:
                     seconds_to_next_close += 60
                 await asyncio.sleep(
                     max(self.config.confirm_seconds, seconds_to_next_close)
                 )
+                # A stronger signal can upgrade this alert while it sleeps.
+                # Recalculate using the upgraded signal and the actual minute
+                # boundary; the two-second API buffer is not candle exposure.
+                confirmation_started = alert.get("confirmation_started_at_utc")
+                try:
+                    confirmation_started_epoch = datetime.fromisoformat(
+                        str(confirmation_started).replace("Z", "+00:00")
+                    ).timestamp()
+                except (TypeError, ValueError):
+                    confirmation_started_epoch = now_epoch
+                checked_at = time.time()
+                last_candle_close = checked_at - (checked_at % 60)
+                if last_candle_close - confirmation_started_epoch < 20:
+                    await asyncio.sleep(62 - (checked_at % 60))
             snapshot = await self._market_snapshot(market)
             if self._relative_strength_provider is not None:
                 # Reconfirm leadership after the completed-candle wait. A coin
@@ -3101,7 +3154,15 @@ class CandidateAnalyzer:
                 )
                 return
             candidate["analysis_time_utc"] = datetime.now(timezone.utc).isoformat()
-            delivered = await self.dispatcher.send_candidate(candidate)
+            delivered, repeated = await self._send_candidate_once(candidate)
+            if repeated:
+                LOGGER.info("Candidate repeat suppressed after validation for %s", market)
+                MONITOR_STATE.add_screening_record(
+                    self._screening_record(
+                        alert, "repeat_suppressed", ["동일 종목 후보 이미 전송됨"]
+                    )
+                )
+                return
             if not delivered:
                 self._remember_rejected(
                     alert,
@@ -3147,7 +3208,6 @@ class CandidateAnalyzer:
             self._record_early_watch_screening(
                 alert, "accepted", [], candidate
             )
-            self._last_delivered_at[market] = time.time()
             self._watchlist.pop(market, None)
             if market in self._signal_tracks:
                 self._signal_tracks[market]["approved_candidate"] = True
