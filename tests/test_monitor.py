@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from datetime import datetime, timedelta, timezone
 
 import monitor
@@ -38,6 +39,7 @@ def _config(**overrides):
         "relative_strength_min_5m_pct": 0.8,
         "relative_strength_stale_seconds": 120,
         "preleader_enabled": False,
+        "extended_leader_enabled": False,
         "preleader_start_minute_kst": 525,
         "preleader_end_minute_kst": 555,
         "preleader_check_interval_seconds": 15,
@@ -213,6 +215,7 @@ def test_default_monitor_config_uses_accuracy_first_relative_strength(monkeypatc
     monkeypatch.delenv("MONITOR_PRELEADER_ENABLED", raising=False)
     monkeypatch.delenv("MONITOR_PRELEADER_START_KST", raising=False)
     monkeypatch.delenv("MONITOR_PRELEADER_END_KST", raising=False)
+    monkeypatch.delenv("MONITOR_EXTENDED_LEADER_ENABLED", raising=False)
 
     config = MonitorConfig.from_env()
 
@@ -221,6 +224,71 @@ def test_default_monitor_config_uses_accuracy_first_relative_strength(monkeypatc
     assert config.preleader_enabled is True
     assert config.preleader_start_minute_kst == 8 * 60 + 45
     assert config.preleader_end_minute_kst == 9 * 60 + 15
+    assert config.extended_leader_enabled is True
+
+
+def test_exceptional_volume_leader_runs_after_morning_without_early_watch():
+    engine = SignalEngine(
+        _config(
+            price_surge_1m_pct=100.0,
+            breakout_pct=100.0,
+            rebreakout_enabled=False,
+            preleader_enabled=True,
+            extended_leader_enabled=True,
+        )
+    )
+    engine.relative_strength_snapshot = lambda market, now: {
+        "relative_strength_ready": True,
+        "relative_strength_eligible": True,
+        "relative_strength_rank": 2,
+        "relative_strength_universe": 200,
+        "relative_strength_percentile": 1.0,
+        "momentum_15m_pct": 2.0,
+        "early_trend": True,
+        "market_regime": "neutral",
+    }
+    kst = timezone(timedelta(hours=9))
+    base = int(datetime(2026, 9, 18, 12, 0, tzinfo=kst).timestamp())
+    alerts = []
+    for second in range(2050):
+        speeding = second >= 1920
+        price = 100 + max(0, second - 1920) * 0.035
+        volume = 50_000 if speeding else 100
+        alerts.extend(engine.update("KRW-IQ", price, volume, (base + second) * 1000))
+
+    leaders = [a for a in alerts if a["signal"] == "leader_volume_acceleration"]
+    assert len(leaders) == 1
+    assert leaders[0]["notify_early_watch"] is False
+    assert leaders[0]["internal_only"] is True
+    assert leaders[0]["preleader_volume_ratio_10m"] >= 8.0
+    assert leaders[0]["preleader_volume_ratio_30m"] >= 8.0
+
+
+def test_telegram_transport_logging_is_reprotected_and_urls_are_redacted(monkeypatch):
+    logger = logging.getLogger("httpx")
+    original = logger.level
+    try:
+        logger.setLevel(logging.INFO)
+        monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "fake-private-token")
+        dispatcher = AlertDispatcher()
+        assert dispatcher._telegram_url().endswith("/sendMessage")
+        assert logger.level >= logging.WARNING
+        for name in ("httpx", "upbit-monitor"):
+            record = logging.LogRecord(
+                name,
+                logging.ERROR,
+                "test.py",
+                1,
+                "request failed: %s",
+                ("https://api.telegram.org/botfake-private-token/sendMessage",),
+                None,
+            )
+            for log_filter in logging.getLogger(name).filters:
+                log_filter.filter(record)
+            assert "fake-private-token" not in record.getMessage()
+            assert "[REDACTED]" in record.getMessage()
+    finally:
+        logger.setLevel(original)
 
 
 def test_preleader_detects_volume_acceleration_before_large_one_minute_move():
@@ -1232,6 +1300,50 @@ def test_preleader_schedules_fast_lane_only_for_exceptional_leader(monkeypatch):
     assert scheduled[0]["fast_leader"] is True
     assert scheduled[0]["breakout_level"] == 63.4
     assert "internal_only" not in scheduled[0]
+
+
+def test_exceptional_narrow_market_leader_can_receive_fast_check_without_watch_notice(
+    monkeypatch,
+):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    scheduled = []
+    monkeypatch.setattr(
+        analyzer, "schedule", lambda alert: scheduled.append(dict(alert)) or True
+    )
+    alert = {
+        "time_utc": "2026-09-18T06:00:00+00:00",
+        "market": "KRW-FOLD",
+        "signal": "leader_volume_acceleration",
+        "price": 63.4,
+        "internal_only": True,
+        "notify_early_watch": False,
+        "relative_strength_ready": True,
+        "relative_strength_eligible": True,
+        "relative_strength_rank": 1,
+        "relative_strength_universe": 200,
+        "relative_strength_percentile": 0.5,
+        "momentum_3m_pct": 3.0,
+        "momentum_5m_pct": 4.0,
+        "momentum_15m_pct": 3.0,
+        "early_trend": True,
+        "market_regime": "risk_off",
+        "market_breadth_5m_pct": 27.0,
+        "preleader_volume_ratio_10m": 11.0,
+        "preleader_volume_ratio_30m": 12.0,
+    }
+
+    assert analyzer.watch_preleader(alert)
+    assert scheduled[0]["fast_leader"] is True
+    assert "KRW-FOLD" not in analyzer._early_watch_tracks
+
+    weaker = dict(alert, market="KRW-SECOND", relative_strength_percentile=1.5)
+    assert analyzer._qualifies_fast_leader(weaker) is False
+
+    # A fresh volume acceleration must still get its fast check when this
+    # market is already on the 12-hour watchlist from an earlier signal.
+    assert analyzer.watch_preleader(dict(alert)) is False
+    assert len(scheduled) == 2
 
 
 def test_early_watch_is_explicitly_not_an_entry_candidate():

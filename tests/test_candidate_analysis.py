@@ -300,6 +300,35 @@ def test_ready_relative_strength_rejects_non_leader():
     assert any("상대강도 상위권 아님" in reason for reason in rejected)
 
 
+def test_top_rank_with_fading_momentum_is_not_mislabeled_as_low_rank():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    candidate, rejected = evaluate_candidate(
+        {
+            "market": "KRW-TEST",
+            "signal": "breakout",
+            "price": current,
+            "relative_strength_ready": True,
+            "relative_strength_eligible": False,
+            "relative_strength_rank": 2,
+            "relative_strength_universe": 200,
+            "relative_strength_percentile": 1.0,
+            "momentum_5m_pct": 0.4,
+            "momentum_15m_pct": 1.2,
+        },
+        {"trade_price": current, "signed_change_rate": 0.08},
+        _orderbook(current),
+        one,
+        five,
+        _config(),
+    )
+
+    assert candidate is None
+    assert any("5분 상대 모멘텀 부족" in reason for reason in rejected)
+    assert not any("상대강도 상위권 아님" in reason for reason in rejected)
+
+
 def test_relative_strength_retest_uses_trend_tracking_targets():
     one = _candles()
     five = _candles()

@@ -6,6 +6,7 @@ import asyncio
 import json
 import logging
 import os
+import re
 import threading
 import time
 import uuid
@@ -26,10 +27,37 @@ from candidate_analysis import (
 from upbit_client import UpbitPublicClient
 
 LOGGER = logging.getLogger("upbit-monitor")
-# Telegram places the bot token in the request URL. Disable transport-level
-# logging so the token can never be copied into Railway's persistent logs.
-logging.getLogger("httpx").disabled = True
-logging.getLogger("httpcore").disabled = True
+
+
+class _TelegramTokenFilter(logging.Filter):
+    """Remove Telegram credentials from request and exception messages."""
+
+    _url = re.compile(r"(https://api\.telegram\.org/bot)[^/\s\"']+")
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        message = record.getMessage()
+        redacted = self._url.sub(r"\1[REDACTED]", message)
+        if redacted != message:
+            record.msg = redacted
+            record.args = ()
+        return True
+
+
+_TELEGRAM_TOKEN_FILTER = _TelegramTokenFilter()
+
+
+def _protect_telegram_logs() -> None:
+    # The server may reconfigure logging after this module is imported. Apply
+    # protection again immediately before every outbound Telegram request.
+    for name in ("upbit-monitor", "httpx", "httpcore"):
+        logger = logging.getLogger(name)
+        if _TELEGRAM_TOKEN_FILTER not in logger.filters:
+            logger.addFilter(_TELEGRAM_TOKEN_FILTER)
+        if name != "upbit-monitor":
+            logger.setLevel(logging.WARNING)
+
+
+_protect_telegram_logs()
 _WS_URL = "wss://api.upbit.com/websocket/v1"
 _KST = timezone(timedelta(hours=9))
 
@@ -89,6 +117,7 @@ class MonitorConfig:
     relative_strength_min_5m_pct: float
     relative_strength_stale_seconds: int
     preleader_enabled: bool
+    extended_leader_enabled: bool
     preleader_start_minute_kst: int
     preleader_end_minute_kst: int
     preleader_check_interval_seconds: int
@@ -156,6 +185,9 @@ class MonitorConfig:
                 30, _env_int("MONITOR_RELATIVE_STRENGTH_STALE_SECONDS", 120)
             ),
             preleader_enabled=_enabled("MONITOR_PRELEADER_ENABLED", True),
+            extended_leader_enabled=_enabled(
+                "MONITOR_EXTENDED_LEADER_ENABLED", True
+            ),
             preleader_start_minute_kst=_env_minute_of_day(
                 "MONITOR_PRELEADER_START_KST", "08:45"
             ),
@@ -863,7 +895,9 @@ class SignalEngine:
         history_seconds = max(
             360,
             self.config.rebreakout_consolidation_seconds + 120,
-            1920 if self.config.preleader_enabled else 0,
+            1920
+            if self.config.preleader_enabled or self.config.extended_leader_enabled
+            else 0,
         )
         while window and window[0].second < second - history_seconds:
             window.popleft()
@@ -909,8 +943,9 @@ class SignalEngine:
                 first.second, tz=timezone.utc
             ).isoformat()
 
+        morning_window = self._in_preleader_window(now)
         if (
-            self._in_preleader_window(now)
+            (morning_window or self.config.extended_leader_enabled)
             and now - self._last_preleader_checked_at.get(market, 0)
             >= self.config.preleader_check_interval_seconds
         ):
@@ -930,55 +965,81 @@ class SignalEngine:
                 baseline_30m = float(median(values_30m))
                 ratio_10m = value_1m / baseline_10m if baseline_10m > 0 else 0.0
                 ratio_30m = value_1m / baseline_30m if baseline_30m > 0 else 0.0
-                relative_strength = self.relative_strength_snapshot(market, now)
-                percentile = float(
-                    relative_strength.get("relative_strength_percentile") or 100.0
-                )
-                rank_improvement = self._rank_improvement(
-                    market, now, percentile
-                )
-                leadership_accelerating = bool(
-                    relative_strength.get("relative_strength_ready")
-                    and percentile <= self.config.preleader_max_percentile
-                    and (
-                        percentile <= self.config.relative_strength_top_percent
-                        or rank_improvement
-                        >= self.config.preleader_rank_improvement_pct
-                    )
-                )
-                if (
-                    value_1m >= self.config.min_trade_value_krw
+                has_morning_impulse = bool(
+                    morning_window
+                    and value_1m >= self.config.min_trade_value_krw
                     and ratio_10m >= self.config.preleader_min_value_ratio_10m
                     and ratio_30m >= self.config.preleader_min_value_ratio_30m
                     and change_3m >= self.config.preleader_min_3m_pct
                     and change_5m >= self.config.preleader_min_5m_pct
-                    and leadership_accelerating
+                )
+                strong_volume_impulse = bool(
+                    not morning_window
+                    and self.config.extended_leader_enabled
+                    and value_1m >= max(100_000_000, self.config.min_trade_value_krw)
+                    and change_3m >= 1.0
+                    and change_5m >= 1.5
+                    and ratio_10m >= max(8.0, self.config.preleader_min_value_ratio_10m)
+                    and ratio_30m >= max(8.0, self.config.preleader_min_value_ratio_30m)
+                )
+                if (
+                    (has_morning_impulse or strong_volume_impulse)
                     and now - self._last_preleader_at.get(market, 0)
                     >= self.config.preleader_cooldown_seconds
                 ):
-                    self._last_preleader_at[market] = now
-                    signals.append(
-                        (
-                            "leader_volume_acceleration",
-                            "09시 전후 거래대금 선행 가속",
-                            {
-                                "internal_only": True,
-                                "confirmation_started_at_utc": confirmation_started_at(
-                                    start_price
-                                    * (
-                                        1
-                                        + self.config.preleader_min_3m_pct / 200
-                                    )
-                                ),
-                                "momentum_3m_pct": round(change_3m, 2),
-                                "preleader_volume_ratio_10m": round(ratio_10m, 2),
-                                "preleader_volume_ratio_30m": round(ratio_30m, 2),
-                                "preleader_rank_improvement_pct": round(
-                                    rank_improvement, 2
-                                ),
-                            },
+                    # Rank the entire market only after a qualifying volume
+                    # impulse; scanning it for every coin every 15 seconds all
+                    # day would starve the live WebSocket consumer.
+                    relative_strength = self.relative_strength_snapshot(market, now)
+                    percentile = float(
+                        relative_strength.get("relative_strength_percentile") or 100.0
+                    )
+                    rank_improvement = self._rank_improvement(market, now, percentile)
+                    leadership_accelerating = bool(
+                        relative_strength.get("relative_strength_ready")
+                        and percentile <= self.config.preleader_max_percentile
+                        and (
+                            percentile <= self.config.relative_strength_top_percent
+                            or rank_improvement
+                            >= self.config.preleader_rank_improvement_pct
                         )
                     )
+                    extended_leader = bool(
+                        strong_volume_impulse
+                        and relative_strength.get("relative_strength_eligible")
+                        and relative_strength.get("early_trend")
+                        and percentile <= 2.0
+                        and (relative_strength.get("momentum_15m_pct") or 0) > 0
+                    )
+                    if leadership_accelerating and (morning_window or extended_leader):
+                        self._last_preleader_at[market] = now
+                        signals.append(
+                            (
+                                "leader_volume_acceleration",
+                                (
+                                    "09시 전후 거래대금 선행 가속"
+                                    if morning_window
+                                    else "장중 선도주 거래대금 급가속"
+                                ),
+                                {
+                                    "internal_only": True,
+                                    "notify_early_watch": morning_window,
+                                    "confirmation_started_at_utc": confirmation_started_at(
+                                        start_price
+                                        * (
+                                            1
+                                            + self.config.preleader_min_3m_pct / 200
+                                        )
+                                    ),
+                                    "momentum_3m_pct": round(change_3m, 2),
+                                    "preleader_volume_ratio_10m": round(ratio_10m, 2),
+                                    "preleader_volume_ratio_30m": round(ratio_30m, 2),
+                                    "preleader_rank_improvement_pct": round(
+                                        rank_improvement, 2
+                                    ),
+                                },
+                            )
+                        )
 
         # Prefer a renewed breakout after a long, narrow consolidation over the
         # shorter generic surge signals. The most recent minute is excluded from
@@ -1441,6 +1502,10 @@ class AlertDispatcher:
         )
         self._publish_candidate_delivery_state()
 
+    def _telegram_url(self) -> str:
+        _protect_telegram_logs()
+        return f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
+
     @staticmethod
     def _today_kst() -> str:
         return datetime.now(_KST).date().isoformat()
@@ -1554,7 +1619,7 @@ class AlertDispatcher:
             return False
         # Throttle retries even when Telegram is temporarily unavailable.
         self._last_inactivity_status_at = now
-        url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
+        url = self._telegram_url()
         async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
             response = await client.post(
                 url,
@@ -1583,7 +1648,7 @@ class AlertDispatcher:
             day, self._simulated_round_trip_cost_pct
         )
         self._last_daily_performance_day = day
-        url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
+        url = self._telegram_url()
         try:
             async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
                 response = await client.post(
@@ -1623,7 +1688,7 @@ class AlertDispatcher:
         LOGGER.warning("MARKET_ALERT %s", json.dumps(alert, ensure_ascii=False))
         if self.mode != "telegram" or not self._send_observation_alerts:
             return
-        url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
+        url = self._telegram_url()
         async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
             response = await client.post(
                 url,
@@ -1653,7 +1718,7 @@ class AlertDispatcher:
             )
             return False
         self._early_watch_delivery_count += 1
-        url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
+        url = self._telegram_url()
         try:
             async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
                 response = await client.post(
@@ -1735,7 +1800,7 @@ class AlertDispatcher:
         self._candidate_delivery_count += 1
         if availability_tier:
             self._last_availability_delivery_at = now
-        url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
+        url = self._telegram_url()
         try:
             async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
                 response = await client.post(
@@ -1770,7 +1835,7 @@ class AlertDispatcher:
             or not self._send_management_alerts
         ):
             return False
-        url = f"https://api.telegram.org/bot{self._telegram_token}/sendMessage"
+        url = self._telegram_url()
         async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
             response = await client.post(
                 url,
@@ -1853,9 +1918,18 @@ class CandidateAnalyzer:
         """Limit the incomplete-candle path to exceptional live leaders."""
         percentile = float(alert.get("relative_strength_percentile") or 100.0)
         momentum_5m = float(alert.get("momentum_5m_pct") or 0.0)
+        ratio_10m = float(alert.get("preleader_volume_ratio_10m") or 0.0)
+        ratio_30m = float(alert.get("preleader_volume_ratio_30m") or 0.0)
         momentum_15m_value = alert.get("momentum_15m_pct")
         momentum_15m = (
             float(momentum_15m_value) if momentum_15m_value is not None else None
+        )
+        narrow_market_leader = bool(
+            percentile <= 1.0
+            and momentum_5m >= 2.0
+            and ratio_10m >= 8.0
+            and ratio_30m >= 8.0
+            and float(alert.get("market_breadth_5m_pct") or 0.0) >= 20.0
         )
         return bool(
             self.config.fast_leader_enabled
@@ -1866,11 +1940,12 @@ class CandidateAnalyzer:
             and alert.get("early_trend")
             and momentum_5m >= self.config.relative_strength_min_5m_pct
             and (momentum_15m is None or momentum_15m > 0)
-            and float(alert.get("preleader_volume_ratio_10m") or 0.0)
-            >= self.config.fast_leader_min_value_ratio_10m
-            and float(alert.get("preleader_volume_ratio_30m") or 0.0)
-            >= self.config.fast_leader_min_value_ratio_30m
-            and str(alert.get("market_regime") or "neutral") != "risk_off"
+            and ratio_10m >= self.config.fast_leader_min_value_ratio_10m
+            and ratio_30m >= self.config.fast_leader_min_value_ratio_30m
+            and (
+                str(alert.get("market_regime") or "neutral") != "risk_off"
+                or narrow_market_leader
+            )
         )
 
     def _rapid_drop_allows_leader_recovery(
@@ -1918,7 +1993,7 @@ class CandidateAnalyzer:
                 "source_signal": alert["signal"],
                 "breakout_level": price,
                 "last_price": price,
-                "last_rejected": ["09시 전후 선도주 조기탐지 후 첫 눌림 대기"],
+                "last_rejected": ["상대강도 선도주 조기탐지 후 첫 눌림 대기"],
                 "last_checked_at": now,
                 "expires_at": float(state["created_at"])
                 + self.config.watchlist_window_seconds,
@@ -1952,7 +2027,7 @@ class CandidateAnalyzer:
             }
         )
         self._watchlist[market] = state
-        if created:
+        if created and alert.get("notify_early_watch", True):
             self._start_early_watch_track(alert, now)
         self._start_signal_track(alert, now)
         MONITOR_STATE.add_alert(alert)
@@ -1968,7 +2043,7 @@ class CandidateAnalyzer:
             alert.get("preleader_volume_ratio_10m"),
             alert.get("preleader_volume_ratio_30m"),
         )
-        if created and self._qualifies_fast_leader(alert):
+        if self._qualifies_fast_leader(alert):
             fast_alert = dict(alert)
             fast_alert.pop("internal_only", None)
             fast_alert["fast_leader"] = True
@@ -3374,7 +3449,7 @@ async def run_monitor_forever() -> None:
                         for alert in alerts:
                             if alert.get("internal_only"):
                                 created = candidate_analyzer.watch_preleader(alert)
-                                if created:
+                                if created and alert.get("notify_early_watch", True):
                                     try:
                                         await dispatcher.send_early_watch(alert)
                                     except Exception as exc:

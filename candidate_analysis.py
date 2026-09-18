@@ -724,14 +724,17 @@ def evaluate_candidate(
     rejected: list[str] = []
     soft_warnings: list[str] = []
     if relative_ready and config.relative_strength_required:
-        if (
-            not relative_eligible
-            or relative_percentile > config.relative_strength_top_percent
-        ):
+        if relative_percentile > config.relative_strength_top_percent:
             rejected.append(
                 "전체 시장 상대강도 상위권 아님"
                 f"({relative_percentile:.1f}백분위)"
             )
+        elif (
+            not relative_eligible
+            and momentum_5m >= config.relative_strength_min_5m_pct
+            and (momentum_15m is None or momentum_15m > 0)
+        ):
+            rejected.append("상대강도 자격 재확인 필요(순위 외 조건 불일치)")
         if momentum_5m < config.relative_strength_min_5m_pct:
             rejected.append(f"5분 상대 모멘텀 부족({momentum_5m:+.2f}%)")
         if momentum_15m is not None and momentum_15m <= 0:
@@ -1233,7 +1236,14 @@ def evaluate_candidate(
             ),
         )
     if alert.get("signal") == "leader_volume_acceleration":
-        reasons.insert(0, "09시 전후 거래대금 선행 가속에서 조기 포착")
+        reasons.insert(
+            0,
+            (
+                "09시 전후 거래대금 선행 가속에서 조기 포착"
+                if alert.get("notify_early_watch", True)
+                else "장중 상대강도 선도주 거래대금 급가속"
+            ),
+        )
     if relative_ready and relative_eligible:
         reasons.insert(
             0,
