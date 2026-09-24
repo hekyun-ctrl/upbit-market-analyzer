@@ -6,7 +6,7 @@ import os
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_UP
-from statistics import mean, median
+from statistics import mean, median, pstdev
 from typing import Any
 
 from analysis import analyze_candles
@@ -82,6 +82,12 @@ class CandidateConfig:
     spread_score_penalty: int
     resistance_score_penalty: int
     rsi_score_penalty: int
+    double_bb_enabled: bool
+    double_bb_require_confirmation: bool
+    double_bb_lookback: int
+    double_bb_score_bonus: int
+    double_bb_unconfirmed_penalty: int
+    double_bb_reversal_wick_ratio: float
     availability_balance_enabled: bool
     availability_max_soft_warnings: int
     availability_soft_penalty: int
@@ -245,6 +251,26 @@ class CandidateConfig:
             rsi_score_penalty=max(
                 0, _env_int("CANDIDATE_RSI_SCORE_PENALTY", 4)
             ),
+            double_bb_enabled=_enabled("CANDIDATE_DOUBLE_BB_ENABLED", True),
+            double_bb_require_confirmation=_enabled(
+                "CANDIDATE_DOUBLE_BB_REQUIRE_CONFIRMATION", True
+            ),
+            double_bb_lookback=max(
+                2, min(8, _env_int("CANDIDATE_DOUBLE_BB_LOOKBACK", 4))
+            ),
+            double_bb_score_bonus=max(
+                0, _env_int("CANDIDATE_DOUBLE_BB_SCORE_BONUS", 6)
+            ),
+            double_bb_unconfirmed_penalty=max(
+                0, _env_int("CANDIDATE_DOUBLE_BB_UNCONFIRMED_PENALTY", 6)
+            ),
+            double_bb_reversal_wick_ratio=max(
+                0.1,
+                min(
+                    0.9,
+                    _env_float("CANDIDATE_DOUBLE_BB_REVERSAL_WICK_RATIO", 0.35),
+                ),
+            ),
             availability_balance_enabled=_enabled(
                 "CANDIDATE_AVAILABILITY_BALANCE_ENABLED", False
             ),
@@ -400,6 +426,119 @@ def _candle_shape(candle: dict[str, Any]) -> tuple[float, float]:
     if span <= 0:
         return 1.0, 0.0
     return (close - low) / span, (high - max(opening, close)) / span
+
+
+def _bollinger_at(
+    candles: list[dict[str, Any]],
+    offset: int,
+    period: int,
+    deviation: float,
+    source_key: str,
+) -> tuple[float, float, float] | None:
+    """Return basis/upper/lower for newest-first completed candles."""
+    window = candles[offset : offset + period]
+    if len(window) < period:
+        return None
+    values = [float(candle[source_key]) for candle in window]
+    basis = mean(values)
+    width = pstdev(values) * deviation
+    return basis, basis + width, basis - width
+
+
+def _double_bollinger_context(
+    candles: list[dict[str, Any]],
+    breakout: float,
+    *,
+    lookback: int = 4,
+    retest_tolerance_pct: float = 0.8,
+    reversal_wick_ratio: float = 0.35,
+) -> dict[str, Any]:
+    """Classify the 4/4-open + 20/2-close double-BB setup."""
+    if len(candles) < 20 + lookback:
+        return {
+            "ready": False,
+            "status": "WB 데이터 부족",
+            "confirmed": False,
+            "true_breakout": False,
+            "first_retest": False,
+            "fake_breakout": False,
+        }
+
+    snapshots: list[dict[str, Any]] = []
+    for offset in range(lookback):
+        fast = _bollinger_at(candles, offset, 4, 4.0, "opening_price")
+        standard = _bollinger_at(candles, offset, 20, 2.0, "trade_price")
+        if fast is None or standard is None:
+            continue
+        candle = candles[offset]
+        opening = float(candle["opening_price"])
+        high = float(candle["high_price"])
+        low = float(candle["low_price"])
+        close = float(candle["trade_price"])
+        span = max(high - low, 0.0)
+        upper_wick = (high - max(opening, close)) / span if span else 0.0
+        fast_upper, standard_upper = fast[1], standard[1]
+        preceding = candles[offset + 1 : offset + 21]
+        prior_high = max(float(item["high_price"]) for item in preceding)
+        above_both = close > fast_upper and close > standard_upper
+        touched_both = high >= fast_upper and high >= standard_upper
+        structure_broken = close > prior_high
+        snapshots.append(
+            {
+                "offset": offset,
+                "close": close,
+                "low": low,
+                "fast_upper": fast_upper,
+                "standard_upper": standard_upper,
+                "prior_high": prior_high,
+                "upper_wick": upper_wick,
+                "true_breakout": above_both and structure_broken,
+                "fake_breakout": bool(
+                    touched_both
+                    and not above_both
+                    and not structure_broken
+                    and upper_wick >= reversal_wick_ratio
+                ),
+            }
+        )
+
+    latest = snapshots[0]
+    recent_breakout = next(
+        (item for item in snapshots if item["true_breakout"]), None
+    )
+    retest_level = breakout
+    if recent_breakout is not None:
+        retest_level = max(breakout, float(recent_breakout["prior_high"]))
+    first_retest = bool(
+        recent_breakout is not None
+        and int(recent_breakout["offset"]) > 0
+        and float(latest["low"])
+        <= retest_level * (1 + retest_tolerance_pct / 100)
+        and float(latest["close"]) >= retest_level
+    )
+    true_breakout = bool(latest["true_breakout"])
+    fake_breakout = bool(latest["fake_breakout"] and not first_retest)
+    confirmed = true_breakout or first_retest
+    if first_retest:
+        status = "WB 동시 돌파 후 첫 눌림 재지지"
+    elif true_breakout:
+        status = "WB 두 상단·직전 매물대 동시 돌파"
+    elif fake_breakout:
+        status = "WB 상단 접촉 후 밴드 복귀(가짜 돌파 의심)"
+    else:
+        status = "WB 동시 돌파 미확정"
+    return {
+        "ready": True,
+        "status": status,
+        "confirmed": confirmed,
+        "true_breakout": true_breakout,
+        "first_retest": first_retest,
+        "fake_breakout": fake_breakout,
+        "fast_upper": round(float(latest["fast_upper"]), 12),
+        "standard_upper": round(float(latest["standard_upper"]), 12),
+        "structure_high": round(float(latest["prior_high"]), 12),
+        "retest_level": round(retest_level, 12),
+    }
 
 
 def _parse_time(value: Any) -> datetime | None:
@@ -693,6 +832,16 @@ def evaluate_candidate(
             and completed_close >= breakout
         )
     )
+    double_bb = _double_bollinger_context(
+        c1,
+        breakout,
+        lookback=config.double_bb_lookback,
+        retest_tolerance_pct=config.retest_tolerance_pct,
+        reversal_wick_ratio=config.double_bb_reversal_wick_ratio,
+    )
+    wb_ready = bool(config.double_bb_enabled and double_bb.get("ready"))
+    wb_confirmed = bool(wb_ready and double_bb.get("confirmed"))
+    wb_fake_breakout = bool(wb_ready and double_bb.get("fake_breakout"))
     fast_leader_core = bool(
         config.fast_leader_enabled
         and alert.get("fast_leader")
@@ -754,6 +903,16 @@ def evaluate_candidate(
         rejected.append("완료 1분봉이 돌파선 아래 마감")
     if current < breakout * 0.998:
         rejected.append("돌파선 재지지 실패")
+    if wb_fake_breakout:
+        rejected.append("WB 상단 접촉 후 밴드 복귀·긴 윗꼬리(가짜 돌파)")
+    if (
+        config.double_bb_enabled
+        and config.double_bb_require_confirmation
+        and wb_ready
+        and not wb_confirmed
+        and not fast_leader_core
+    ):
+        rejected.append("WB 두 상단·직전 매물대 동시 돌파 또는 첫 재지지 미확인")
     day_overheated = day_change > config.max_day_change_pct
     elevated_risk = day_change >= 10.0 or rsi1 >= 70.0 or rsi5 >= 68.0
     early_leader_lane = bool(
@@ -1053,6 +1212,8 @@ def evaluate_candidate(
         risk_notes.append(
             "완료 1분봉 전 신속 검증형: 진입구간 이탈 시 추격하지 않고 첫 눌림 대기"
         )
+        if config.double_bb_enabled and not wb_confirmed:
+            risk_notes.append("WB 미확정 초고속 신호: 첫 눌림 전 추격 금지")
     if not resistance_confirmed:
         risk_notes.append("반복 확인된 상단 구조 저항 없음")
     score_penalty = config.day_overheat_score_penalty if day_overheated else 0
@@ -1085,6 +1246,13 @@ def evaluate_candidate(
         risk_notes.append(
             f"RSI 주의 -{config.rsi_score_penalty}점(1분 {rsi1:.1f}/5분 {rsi5:.1f})"
         )
+    wb_bonus = config.double_bb_score_bonus if wb_confirmed else 0
+    if config.double_bb_enabled and wb_ready and not wb_confirmed:
+        score_penalty += config.double_bb_unconfirmed_penalty
+        risk_notes.append(
+            "WB 동시 돌파 미확정 "
+            f"-{config.double_bb_unconfirmed_penalty}점"
+        )
     raw_change = float(alert.get("change_1m_pct") or 0.0)
     raw_volume_ratio = float(alert.get("volume_ratio_vs_previous_1m") or 0.0)
     impulse_bonus = (
@@ -1113,6 +1281,7 @@ def evaluate_candidate(
             + impulse_bonus
             + relative_strength_bonus
             + early_leader_bonus
+            + wb_bonus
             + regime_bonus
             - score_penalty,
         ),
@@ -1253,6 +1422,8 @@ def evaluate_candidate(
         )
     if retest_confirmed and relative_ready:
         reasons.insert(0, "첫 눌림·돌파선 재지지 확인")
+    if wb_confirmed:
+        reasons.insert(0, str(double_bb["status"]))
     if early_trend and relative_ready:
         reasons.insert(0, "상승 초기 가속 구간")
     if early_leader_lane:
@@ -1364,6 +1535,16 @@ def evaluate_candidate(
         ),
         "momentum_60m_pct": alert.get("momentum_60m_pct"),
         "first_retest_confirmed": retest_confirmed,
+        "double_bb_enabled": config.double_bb_enabled,
+        "double_bb_ready": bool(double_bb.get("ready")),
+        "double_bb_status": double_bb.get("status"),
+        "double_bb_confirmed": wb_confirmed,
+        "double_bb_true_breakout": bool(double_bb.get("true_breakout")),
+        "double_bb_first_retest": bool(double_bb.get("first_retest")),
+        "double_bb_fake_breakout": wb_fake_breakout,
+        "double_bb_fast_upper": double_bb.get("fast_upper"),
+        "double_bb_standard_upper": double_bb.get("standard_upper"),
+        "double_bb_structure_high": double_bb.get("structure_high"),
         "rsi_1m": round(rsi1, 1),
         "rsi_5m": round(rsi5, 1),
         "orderbook_bid_ask_ratio": round(book_ratio, 2),

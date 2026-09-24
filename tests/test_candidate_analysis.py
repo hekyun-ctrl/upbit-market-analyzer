@@ -5,6 +5,7 @@ from candidate_analysis import (
     CandidateConfig,
     _completed,
     _completed_after_signal,
+    _double_bollinger_context,
     _resistances,
     evaluate_candidate,
     validate_candidate_survival,
@@ -62,6 +63,12 @@ def _config(**overrides):
         "spread_score_penalty": 4,
         "resistance_score_penalty": 6,
         "rsi_score_penalty": 4,
+        "double_bb_enabled": False,
+        "double_bb_require_confirmation": True,
+        "double_bb_lookback": 4,
+        "double_bb_score_bonus": 6,
+        "double_bb_unconfirmed_penalty": 6,
+        "double_bb_reversal_wick_ratio": 0.35,
         "availability_balance_enabled": True,
         "availability_max_soft_warnings": 2,
         "availability_soft_penalty": 4,
@@ -138,6 +145,71 @@ def _orderbook(price, bid_ratio=1.5):
             for index in range(15)
         ],
     }
+
+
+def _wb_breakout_candles(retest=False, fakeout=False):
+    chronological = []
+    for index in range(30):
+        close = 100.0 + (index % 3) * 0.03
+        opening = close - 0.02
+        high = close + 0.08
+        low = close - 0.08
+        if index == 28 and (retest or fakeout):
+            opening = 100.0
+            close = 106.0
+            high = 106.2
+            low = 99.9
+        if index == 29 and retest:
+            opening = 106.0
+            close = 105.8
+            high = 106.1
+            low = 105.4
+        elif index == 29 and fakeout:
+            opening = 100.1
+            close = 100.0
+            high = 106.0
+            low = 99.9
+        elif index == 29:
+            opening = 100.0
+            close = 106.0
+            high = 106.2
+            low = 99.9
+        chronological.append(
+            {
+                "opening_price": opening,
+                "high_price": high,
+                "low_price": low,
+                "trade_price": close,
+                "candle_acc_trade_volume": 100.0,
+                "candle_acc_trade_price": close * 100.0,
+            }
+        )
+    return list(reversed(chronological))
+
+
+def test_double_bollinger_confirms_true_breakout_and_first_retest():
+    breakout = _double_bollinger_context(
+        _wb_breakout_candles(), 105.0, lookback=4
+    )
+    assert breakout["confirmed"] is True
+    assert breakout["true_breakout"] is True
+    assert "동시 돌파" in breakout["status"]
+
+    retest = _double_bollinger_context(
+        _wb_breakout_candles(retest=True), 105.5, lookback=4
+    )
+    assert retest["confirmed"] is True
+    assert retest["first_retest"] is True
+    assert "첫 눌림" in retest["status"]
+
+
+def test_double_bollinger_rejects_upper_wick_fakeout():
+    result = _double_bollinger_context(
+        _wb_breakout_candles(fakeout=True), 105.0, lookback=4
+    )
+    assert result["confirmed"] is False
+    assert result["fake_breakout"] is True
+    assert "가짜 돌파" in result["status"]
 
 
 def test_healthy_signal_builds_orderable_risk_plan():

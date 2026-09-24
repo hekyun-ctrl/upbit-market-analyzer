@@ -1284,6 +1284,9 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
                 f"{int(candidate.get('survival_seconds') or 0)}초 "
                 "가격·거래량·호가 생존 통과\n"
             )
+    wb_line = ""
+    if candidate.get("double_bb_enabled"):
+        wb_line = f"WB 판정: {candidate.get('double_bb_status') or '확인 중'}\n"
     return (
         f"[조건부 진입 후보{suffix} | 조건점수 {candidate['score']}/100] "
         f"{candidate['market']}\n"
@@ -1302,6 +1305,7 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"{relative_line}"
         f"{regime_line}"
         f"{survival_line}"
+        f"{wb_line}"
         f"가까운 저항 여유: {candidate.get('resistance_room_pct', 0):.1f}%\n"
         f"예상 손익비: {candidate.get('risk_reward', 0):.2f}\n"
         f"추천 비중: 투자 가능금액의 {candidate['suggested_position_pct']}% 이내\n"
@@ -3277,6 +3281,11 @@ class CandidateAnalyzer:
                 "early_leader_lane",
                 "selection_lane",
                 "leader_resistance_override",
+                "double_bb_status",
+                "double_bb_confirmed",
+                "double_bb_true_breakout",
+                "double_bb_first_retest",
+                "double_bb_fake_breakout",
             ):
                 accepted_record[key] = candidate.get(key)
             MONITOR_STATE.add_screening_record(accepted_record)
