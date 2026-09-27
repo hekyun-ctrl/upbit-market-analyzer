@@ -59,6 +59,10 @@ def _config(**overrides):
         "persistent_leader_min_value_ratio_30m": 1.15,
         "persistent_leader_max_percentile": 3.0,
         "persistent_leader_cooldown_seconds": 1800,
+        "pullback_watch_enabled": False,
+        "pullback_watch_min_1m_pct": 0.8,
+        "pullback_watch_min_volume_ratio": 1.3,
+        "pullback_watch_max_percentile": 15.0,
     }
     values.update(overrides)
     return MonitorConfig(**values)
@@ -76,6 +80,40 @@ def test_price_and_volume_surge_is_detected_after_warmup():
 
     surge = next(alert for alert in alerts if alert["signal"] == "price_volume_surge")
     assert surge["confirmation_started_at_utc"] < surge["time_utc"]
+
+
+def test_moderate_impulse_is_kept_as_internal_pullback_watch():
+    engine = SignalEngine(
+        _config(
+            price_surge_1m_pct=1.5,
+            breakout_pct=100.0,
+            rebreakout_enabled=False,
+            pullback_watch_enabled=True,
+            min_trade_value_krw=100.0,
+        )
+    )
+    engine.relative_strength_snapshot = lambda market, now: {
+        "relative_strength_ready": True,
+        "relative_strength_eligible": True,
+        "relative_strength_rank": 5,
+        "relative_strength_universe": 100,
+        "relative_strength_percentile": 5.0,
+        "momentum_5m_pct": 1.2,
+        "momentum_15m_pct": 2.0,
+        "early_trend": True,
+    }
+    alerts = []
+    base_ms = 1_800_000_000_000
+    for second in range(361):
+        rising = second >= 300
+        price = 100.0 + max(0, second - 300) * 0.015
+        volume = 2.0 if rising else 0.1
+        alerts.extend(engine.update("KRW-IQ", price, volume, base_ms + second * 1000))
+
+    watch = next(alert for alert in alerts if alert.get("pullback_watch"))
+    assert watch["internal_only"] is True
+    assert watch["notify_early_watch"] is False
+    assert watch["change_1m_pct"] < 1.5
 
 
 def test_rest_warm_start_restores_relative_strength_immediately():
@@ -411,6 +449,86 @@ def test_preleader_signal_is_kept_internal_for_first_pullback(monkeypatch):
     assert state["leader_peak_price"] == 100.0
     assert state["leader_pullback_seen"] is False
     assert "첫 눌림 대기" in state["last_rejected"][0]
+
+
+def test_initial_price_surge_is_watched_instead_of_sent_immediately(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+
+    assert analyzer.schedule(
+        {
+            "time_utc": "2026-09-27T14:00:00+00:00",
+            "market": "KRW-IQ",
+            "signal": "price_volume_surge",
+            "price": 100.0,
+        }
+    )
+    assert "KRW-IQ" in analyzer._watchlist
+    assert analyzer._watchlist["KRW-IQ"]["pullback_watch"] is True
+    assert "KRW-IQ" not in analyzer._inflight_markets
+
+
+def test_pullback_watch_rechecks_without_requiring_early_trend(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    monkeypatch.setattr("monitor.time.time", lambda: 1_800_000_000.0)
+
+    def relative_strength(_market, _now):
+        return {
+            "relative_strength_ready": True,
+            "relative_strength_eligible": True,
+            "relative_strength_rank": 8,
+            "relative_strength_universe": 100,
+            "relative_strength_percentile": 8.0,
+            "momentum_5m_pct": 1.3,
+            "momentum_15m_pct": 3.0,
+            "early_trend": False,
+        }
+
+    analyzer = CandidateAnalyzer(
+        CandidateConfig.from_env(), AlertDispatcher(), relative_strength
+    )
+    assert analyzer.watch_preleader(
+        {
+            "time_utc": "2026-09-27T14:00:00+00:00",
+            "market": "KRW-IQ",
+            "signal": "price_volume_surge",
+            "price": 100.0,
+            "pullback_watch": True,
+            "notify_early_watch": False,
+        }
+    )
+    seen = []
+
+    async def fake_analyze(alert):
+        seen.append(alert)
+
+    monkeypatch.setattr(analyzer, "_analyze", fake_analyze)
+
+    async def run():
+        assert analyzer._observe_leader_watchlist("KRW-IQ", 99.3, 1_800_000_100.0) is False
+        assert analyzer._observe_leader_watchlist("KRW-IQ", 99.7, 1_800_000_110.0) is True
+        await asyncio.sleep(0)
+
+    asyncio.run(run())
+    assert seen[0]["leader_pullback_recheck"] is True
+    assert seen[0]["breakout_level"] > 99.3
+
+
+def test_survival_rejects_candidate_that_loses_relative_strength(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    reasons = analyzer._relative_survival_rejections(
+        {"relative_strength_ready": True},
+        {
+            "relative_strength_ready": True,
+            "relative_strength_percentile": 22.0,
+            "momentum_5m_pct": -0.2,
+            "momentum_15m_pct": -0.1,
+        },
+    )
+    assert any("상대강도 이탈" in reason for reason in reasons)
+    assert any("5분 모멘텀 소멸" in reason for reason in reasons)
+    assert any("15분 추세 반전" in reason for reason in reasons)
 
 
 def test_observation_telegram_delivery_can_be_disabled(monkeypatch):

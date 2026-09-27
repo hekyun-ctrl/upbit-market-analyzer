@@ -44,6 +44,11 @@ class CandidateConfig:
     fast_leader_max_extension_pct: float
     persistent_leader_max_day_change_pct: float
     persistent_leader_min_15m_pct: float
+    pullback_entry_only_enabled: bool
+    pullback_survival_confirm_seconds: int
+    pullback_watch_min_pct: float
+    pullback_watch_max_pct: float
+    pullback_watch_reclaim_pct: float
     min_score: int
     cooldown_seconds: int
     repeat_cooldown_seconds: int
@@ -167,6 +172,25 @@ class CandidateConfig:
             persistent_leader_min_15m_pct=max(
                 1.0,
                 _env_float("CANDIDATE_PERSISTENT_LEADER_MIN_15M_PCT", 3.0),
+            ),
+            pullback_entry_only_enabled=_enabled(
+                "CANDIDATE_PULLBACK_ENTRY_ONLY_ENABLED", True
+            ),
+            pullback_survival_confirm_seconds=max(
+                10,
+                min(
+                    60,
+                    _env_int("CANDIDATE_PULLBACK_SURVIVAL_CONFIRM_SECONDS", 20),
+                ),
+            ),
+            pullback_watch_min_pct=max(
+                0.3, _env_float("CANDIDATE_PULLBACK_WATCH_MIN_PCT", 0.6)
+            ),
+            pullback_watch_max_pct=max(
+                2.0, _env_float("CANDIDATE_PULLBACK_WATCH_MAX_PCT", 4.0)
+            ),
+            pullback_watch_reclaim_pct=max(
+                0.2, _env_float("CANDIDATE_PULLBACK_WATCH_RECLAIM_PCT", 0.35)
             ),
             min_score=max(50, min(100, _env_int("CANDIDATE_MIN_SCORE", 90))),
             cooldown_seconds=max(300, _env_int("CANDIDATE_COOLDOWN_SECONDS", 900)),

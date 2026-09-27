@@ -137,6 +137,10 @@ class MonitorConfig:
     persistent_leader_min_value_ratio_30m: float
     persistent_leader_max_percentile: float
     persistent_leader_cooldown_seconds: int
+    pullback_watch_enabled: bool
+    pullback_watch_min_1m_pct: float
+    pullback_watch_min_volume_ratio: float
+    pullback_watch_max_percentile: float
 
     @classmethod
     def from_env(cls) -> "MonitorConfig":
@@ -263,6 +267,20 @@ class MonitorConfig:
             persistent_leader_cooldown_seconds=max(
                 600,
                 _env_int("MONITOR_PERSISTENT_LEADER_COOLDOWN_SECONDS", 1800),
+            ),
+            pullback_watch_enabled=_enabled("MONITOR_PULLBACK_WATCH_ENABLED", True),
+            pullback_watch_min_1m_pct=max(
+                0.3, _env_float("MONITOR_PULLBACK_WATCH_MIN_1M_PCT", 0.8)
+            ),
+            pullback_watch_min_volume_ratio=max(
+                1.0, _env_float("MONITOR_PULLBACK_WATCH_MIN_VOLUME_RATIO", 1.3)
+            ),
+            pullback_watch_max_percentile=max(
+                5.0,
+                min(
+                    30.0,
+                    _env_float("MONITOR_PULLBACK_WATCH_MAX_PERCENTILE", 15.0),
+                ),
             ),
         )
 
@@ -1244,6 +1262,56 @@ class SignalEngine:
                 )
             )
 
+        # Broaden discovery without broadening entries.  A moderate impulse is
+        # retained internally and can only become a candidate after an actual
+        # pullback/reclaim cycle in CandidateAnalyzer.
+        standard_surge = bool(
+            change_1m_pct >= self.config.price_surge_1m_pct
+            and value_1m >= self.config.min_trade_value_krw
+            and volume_ratio >= self.config.volume_ratio
+        )
+        if (
+            self.config.pullback_watch_enabled
+            and not standard_surge
+            and change_1m_pct >= self.config.pullback_watch_min_1m_pct
+            and value_1m >= self.config.min_trade_value_krw
+            and volume_ratio >= self.config.pullback_watch_min_volume_ratio
+        ):
+            if not relative_strength:
+                relative_strength = self.relative_strength_snapshot(market, now)
+            watch_percentile = float(
+                relative_strength.get("relative_strength_percentile") or 100.0
+            )
+            watch_momentum_5m = float(
+                relative_strength.get("momentum_5m_pct") or 0.0
+            )
+            watch_momentum_15m = relative_strength.get("momentum_15m_pct")
+            if (
+                relative_strength.get("relative_strength_ready")
+                and watch_percentile <= self.config.pullback_watch_max_percentile
+                and watch_momentum_5m
+                >= self.config.relative_strength_min_5m_pct * 0.8
+                and (
+                    watch_momentum_15m is None
+                    or float(watch_momentum_15m) > 0
+                )
+            ):
+                signals.append(
+                    (
+                        "price_volume_surge",
+                        "중간 가속·첫 눌림 관찰",
+                        {
+                            "internal_only": True,
+                            "notify_early_watch": False,
+                            "pullback_watch": True,
+                            "confirmation_started_at_utc": confirmation_started_at(
+                                start_price
+                                * (1 + self.config.pullback_watch_min_1m_pct / 200)
+                            ),
+                        },
+                    )
+                )
+
         if (
             change_1m_pct <= -self.config.price_surge_1m_pct
             and value_1m >= self.config.min_trade_value_krw
@@ -2098,7 +2166,8 @@ class CandidateAnalyzer:
         """Keep an early volume leader internal until a clean retest occurs."""
         if not self.config.enabled or not self.config.leader_watch_enabled:
             return False
-        if alert.get("signal") != "leader_volume_acceleration":
+        pullback_watch = bool(alert.get("pullback_watch"))
+        if alert.get("signal") != "leader_volume_acceleration" and not pullback_watch:
             return False
         market = str(alert["market"])
         now = time.time()
@@ -2135,6 +2204,9 @@ class CandidateAnalyzer:
                 "leader_pullback_invalidated": bool(
                     state.get("leader_pullback_invalidated", False)
                 ),
+                "pullback_watch": pullback_watch or bool(
+                    state.get("pullback_watch", False)
+                ),
                 "relative_strength_rank": alert.get("relative_strength_rank"),
                 "relative_strength_universe": alert.get(
                     "relative_strength_universe"
@@ -2153,7 +2225,7 @@ class CandidateAnalyzer:
             }
         )
         self._watchlist[market] = state
-        if created and alert.get("notify_early_watch", True):
+        if created and alert.get("notify_early_watch", True) and not pullback_watch:
             self._start_early_watch_track(alert, now)
         self._start_signal_track(alert, now)
         MONITOR_STATE.add_alert(alert)
@@ -2169,7 +2241,7 @@ class CandidateAnalyzer:
             alert.get("preleader_volume_ratio_10m"),
             alert.get("preleader_volume_ratio_30m"),
         )
-        if self._qualifies_fast_leader(alert):
+        if not pullback_watch and self._qualifies_fast_leader(alert):
             fast_alert = dict(alert)
             fast_alert.pop("internal_only", None)
             fast_alert["fast_leader"] = True
@@ -2740,6 +2812,17 @@ class CandidateAnalyzer:
                 self._screening_record(alert, "repeat_suppressed", [reason])
             )
             return False
+        if (
+            self.config.pullback_entry_only_enabled
+            and alert.get("signal") == "price_volume_surge"
+            and not alert.get("is_reentry")
+            and not alert.get("leader_pullback_recheck")
+        ):
+            watch_alert = dict(alert)
+            watch_alert["internal_only"] = True
+            watch_alert["notify_early_watch"] = False
+            watch_alert["pullback_watch"] = True
+            return self.watch_preleader(watch_alert)
         watch = self._active_watch(market, now)
         watchlist_recheck = bool(
             watch and alert.get("signal") == "consolidation_rebreakout"
@@ -2906,9 +2989,16 @@ class CandidateAnalyzer:
         peak = max(previous_peak, price)
         state["leader_peak_price"] = peak
         drawdown_pct = max(0.0, (peak / price - 1) * 100)
-        max_pullback = max(
-            self.config.leader_pullback_min_pct,
-            self.config.leader_pullback_max_pct,
+        pullback_watch = bool(state.get("pullback_watch"))
+        min_pullback = (
+            self.config.pullback_watch_min_pct
+            if pullback_watch
+            else self.config.leader_pullback_min_pct
+        )
+        max_pullback = (
+            self.config.pullback_watch_max_pct
+            if pullback_watch
+            else self.config.leader_pullback_max_pct
         )
 
         if drawdown_pct > max_pullback:
@@ -2919,7 +3009,7 @@ class CandidateAnalyzer:
             return False
 
         if not state.get("leader_pullback_seen"):
-            if drawdown_pct < self.config.leader_pullback_min_pct:
+            if drawdown_pct < min_pullback:
                 return False
             state["leader_pullback_seen"] = True
             state["leader_pullback_low"] = price
@@ -2927,7 +3017,12 @@ class CandidateAnalyzer:
 
         pullback_low = min(float(state.get("leader_pullback_low") or price), price)
         state["leader_pullback_low"] = pullback_low
-        reclaim_level = pullback_low * (1 + self.config.leader_reclaim_pct / 100)
+        reclaim_pct = (
+            self.config.pullback_watch_reclaim_pct
+            if pullback_watch
+            else self.config.leader_reclaim_pct
+        )
+        reclaim_level = pullback_low * (1 + reclaim_pct / 100)
         if price < reclaim_level:
             return False
         if market in self._inflight_markets:
@@ -2952,13 +3047,22 @@ class CandidateAnalyzer:
             }
         )
         percentile = float(relative.get("relative_strength_percentile") or 100.0)
+        momentum_15m = relative.get("momentum_15m_pct")
         still_a_leader = bool(
             relative.get("relative_strength_ready")
-            and relative.get("relative_strength_eligible")
             and percentile <= self.config.relative_strength_top_percent
+            and float(relative.get("momentum_5m_pct") or 0.0)
+            >= self.config.relative_strength_min_5m_pct
+            and (momentum_15m is None or float(momentum_15m) > 0)
             and (
-                not self.config.early_trend_required
-                or relative.get("early_trend")
+                pullback_watch
+                or (
+                    relative.get("relative_strength_eligible")
+                    and (
+                        not self.config.early_trend_required
+                        or relative.get("early_trend")
+                    )
+                )
             )
         )
         if not still_a_leader:
@@ -3196,6 +3300,29 @@ class CandidateAnalyzer:
             orderbook_samples=snapshot["orderbooks"],
         )
 
+    def _relative_survival_rejections(
+        self, candidate: dict[str, Any], relative: dict[str, Any]
+    ) -> list[str]:
+        """Reject a candidate that loses leadership during the survival wait."""
+        if not candidate.get("relative_strength_ready"):
+            return []
+        if not relative.get("relative_strength_ready"):
+            return ["생존 시점 상대강도 시장표본 미확인"]
+        rejected: list[str] = []
+        percentile = float(relative.get("relative_strength_percentile") or 100.0)
+        momentum_5m = float(relative.get("momentum_5m_pct") or 0.0)
+        momentum_15m_value = relative.get("momentum_15m_pct")
+        momentum_15m = (
+            float(momentum_15m_value) if momentum_15m_value is not None else None
+        )
+        if percentile > self.config.relative_strength_top_percent:
+            rejected.append(f"생존 중 상대강도 이탈({percentile:.1f}백분위)")
+        if momentum_5m <= 0:
+            rejected.append(f"생존 중 5분 모멘텀 소멸({momentum_5m:+.2f}%)")
+        if momentum_15m is not None and momentum_15m <= 0:
+            rejected.append(f"생존 중 15분 추세 반전({momentum_15m:+.2f}%)")
+        return rejected
+
     async def _analyze(self, alert: dict[str, Any]) -> None:
         market = str(alert["market"])
         try:
@@ -3279,13 +3406,18 @@ class CandidateAnalyzer:
                 )
             else:
                 first_candidate = candidate
+                survival_seconds = (
+                    self.config.pullback_survival_confirm_seconds
+                    if alert.get("leader_pullback_recheck")
+                    else self.config.survival_confirm_seconds
+                )
                 LOGGER.info(
                     "CANDIDATE_SURVIVAL_PENDING market=%s seconds=%d score=%d",
                     market,
-                    self.config.survival_confirm_seconds,
+                    survival_seconds,
                     int(candidate["score"]),
                 )
-                await asyncio.sleep(self.config.survival_confirm_seconds)
+                await asyncio.sleep(survival_seconds)
                 survival_snapshot = await self._market_snapshot(market)
                 live_price = float(survival_snapshot["ticker"]["trade_price"])
                 candidate, original_range_rejection = (
@@ -3298,6 +3430,15 @@ class CandidateAnalyzer:
                     survival_snapshot["candles_1m"],
                     self.config,
                 )
+                if self._relative_strength_provider is not None:
+                    survival_relative = self._relative_strength_provider(
+                        market, int(time.time())
+                    )
+                    survival_rejected.extend(
+                        self._relative_survival_rejections(
+                            first_candidate, survival_relative
+                        )
+                    )
                 if original_range_rejection:
                     survival_rejected.insert(0, original_range_rejection)
                 if candidate is None or survival_rejected:
@@ -3324,7 +3465,7 @@ class CandidateAnalyzer:
                     return
                 candidate.update(survival_metrics)
                 candidate["survival_confirmed"] = True
-                candidate["survival_seconds"] = self.config.survival_confirm_seconds
+                candidate["survival_seconds"] = survival_seconds
             verification_client = UpbitPublicClient()
             try:
                 latest_ticker = await verification_client.ticker(market)
