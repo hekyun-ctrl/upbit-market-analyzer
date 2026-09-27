@@ -128,6 +128,15 @@ class MonitorConfig:
     preleader_max_percentile: float
     preleader_rank_improvement_pct: float
     preleader_cooldown_seconds: int
+    persistent_leader_enabled: bool
+    persistent_leader_check_interval_seconds: int
+    persistent_leader_min_5m_pct: float
+    persistent_leader_min_15m_pct: float
+    persistent_leader_min_60m_pct: float
+    persistent_leader_min_value_ratio_10m: float
+    persistent_leader_min_value_ratio_30m: float
+    persistent_leader_max_percentile: float
+    persistent_leader_cooldown_seconds: int
 
     @classmethod
     def from_env(cls) -> "MonitorConfig":
@@ -219,6 +228,41 @@ class MonitorConfig:
             ),
             preleader_cooldown_seconds=max(
                 300, _env_int("MONITOR_PRELEADER_COOLDOWN_SECONDS", 1800)
+            ),
+            persistent_leader_enabled=_enabled(
+                "MONITOR_PERSISTENT_LEADER_ENABLED", True
+            ),
+            persistent_leader_check_interval_seconds=max(
+                15,
+                _env_int("MONITOR_PERSISTENT_LEADER_CHECK_INTERVAL_SECONDS", 30),
+            ),
+            persistent_leader_min_5m_pct=max(
+                0.2, _env_float("MONITOR_PERSISTENT_LEADER_MIN_5M_PCT", 0.8)
+            ),
+            persistent_leader_min_15m_pct=max(
+                1.0, _env_float("MONITOR_PERSISTENT_LEADER_MIN_15M_PCT", 3.0)
+            ),
+            persistent_leader_min_60m_pct=max(
+                2.0, _env_float("MONITOR_PERSISTENT_LEADER_MIN_60M_PCT", 5.0)
+            ),
+            persistent_leader_min_value_ratio_10m=max(
+                1.0,
+                _env_float("MONITOR_PERSISTENT_LEADER_MIN_VALUE_RATIO_10M", 1.25),
+            ),
+            persistent_leader_min_value_ratio_30m=max(
+                1.0,
+                _env_float("MONITOR_PERSISTENT_LEADER_MIN_VALUE_RATIO_30M", 1.15),
+            ),
+            persistent_leader_max_percentile=max(
+                1.0,
+                min(
+                    10.0,
+                    _env_float("MONITOR_PERSISTENT_LEADER_MAX_PERCENTILE", 3.0),
+                ),
+            ),
+            persistent_leader_cooldown_seconds=max(
+                600,
+                _env_int("MONITOR_PERSISTENT_LEADER_COOLDOWN_SECONDS", 1800),
             ),
         )
 
@@ -660,6 +704,8 @@ class SignalEngine:
         )
         self._last_preleader_checked_at: dict[str, int] = {}
         self._last_preleader_at: dict[str, int] = {}
+        self._last_persistent_leader_checked_at: dict[str, int] = {}
+        self._last_persistent_leader_at: dict[str, int] = {}
         self._relative_rank_history: dict[
             str, deque[tuple[int, float]]
         ] = defaultdict(deque)
@@ -895,8 +941,12 @@ class SignalEngine:
         history_seconds = max(
             360,
             self.config.rebreakout_consolidation_seconds + 120,
-            1920
-            if self.config.preleader_enabled or self.config.extended_leader_enabled
+            3720
+            if (
+                self.config.preleader_enabled
+                or self.config.extended_leader_enabled
+                or self.config.persistent_leader_enabled
+            )
             else 0,
         )
         while window and window[0].second < second - history_seconds:
@@ -1041,6 +1091,76 @@ class SignalEngine:
                             )
                         )
 
+        # Persistent leaders often rise in a staircase: no single one-minute
+        # candle is explosive enough for the surge path, while 5/15/60-minute
+        # relative strength and sustained turnover remain exceptional.
+        if (
+            self.config.persistent_leader_enabled
+            and now - self._last_persistent_leader_checked_at.get(market, 0)
+            >= self.config.persistent_leader_check_interval_seconds
+        ):
+            self._last_persistent_leader_checked_at[market] = now
+            values_10m = self._completed_minute_values(window, now, 10)
+            values_30m = self._completed_minute_values(window, now, 30)
+            samples = self._momentum_prices[market]
+            change_5m = self._rolling_return(samples, now, 300)
+            change_15m = self._rolling_return(samples, now, 900)
+            change_60m = self._rolling_return(samples, now, 3600)
+            if (
+                len(values_10m) >= 7
+                and len(values_30m) >= 20
+                and change_5m is not None
+                and change_15m is not None
+                and change_60m is not None
+            ):
+                baseline_10m = float(median(values_10m))
+                baseline_30m = float(median(values_30m))
+                ratio_10m = value_1m / baseline_10m if baseline_10m > 0 else 0.0
+                ratio_30m = value_1m / baseline_30m if baseline_30m > 0 else 0.0
+                sustained_impulse = bool(
+                    value_1m >= self.config.min_trade_value_krw
+                    and change_5m >= self.config.persistent_leader_min_5m_pct
+                    and change_15m >= self.config.persistent_leader_min_15m_pct
+                    and change_60m >= self.config.persistent_leader_min_60m_pct
+                    and ratio_10m
+                    >= self.config.persistent_leader_min_value_ratio_10m
+                    and ratio_30m
+                    >= self.config.persistent_leader_min_value_ratio_30m
+                )
+                if (
+                    sustained_impulse
+                    and now - self._last_persistent_leader_at.get(market, 0)
+                    >= self.config.persistent_leader_cooldown_seconds
+                ):
+                    persistent_strength = self.relative_strength_snapshot(market, now)
+                    percentile = float(
+                        persistent_strength.get("relative_strength_percentile")
+                        or 100.0
+                    )
+                    if (
+                        persistent_strength.get("relative_strength_ready")
+                        and percentile
+                        <= self.config.persistent_leader_max_percentile
+                    ):
+                        self._last_persistent_leader_at[market] = now
+                        relative_strength = persistent_strength
+                        signals.append(
+                            (
+                                "persistent_leader_acceleration",
+                                "지속형 선도주 재가속",
+                                {
+                                    "internal_only": True,
+                                    "persistent_leader": True,
+                                    "notify_early_watch": False,
+                                    "confirmation_started_at_utc": datetime.fromtimestamp(
+                                        now, tz=timezone.utc
+                                    ).isoformat(),
+                                    "persistent_volume_ratio_10m": round(ratio_10m, 2),
+                                    "persistent_volume_ratio_30m": round(ratio_30m, 2),
+                                },
+                            )
+                        )
+
         # Prefer a renewed breakout after a long, narrow consolidation over the
         # shorter generic surge signals. The most recent minute is excluded from
         # the baseline so its volume can be compared with the preceding range.
@@ -1161,7 +1281,8 @@ class SignalEngine:
         alerts = []
         for signal_type, label, details in signals:
             if (
-                signal_type != "leader_volume_acceleration"
+                signal_type
+                not in {"leader_volume_acceleration", "persistent_leader_acceleration"}
                 and not self._can_alert(market, signal_type, now)
             ):
                 continue
@@ -1886,6 +2007,7 @@ class CandidateAnalyzer:
         priority = {
             "price_volume_surge": 10,
             "leader_volume_acceleration": 20,
+            "persistent_leader_acceleration": 25,
             "breakout": 30,
             "consolidation_rebreakout": 40,
         }.get(str(alert.get("signal")), 0)
@@ -2603,6 +2725,7 @@ class CandidateAnalyzer:
             "breakout",
             "consolidation_rebreakout",
             "leader_volume_acceleration",
+            "persistent_leader_acceleration",
         }:
             return False
         market = str(alert["market"])
@@ -3457,6 +3580,9 @@ async def run_monitor_forever() -> None:
                         )
                         for alert in alerts:
                             if alert.get("internal_only"):
+                                if alert.get("signal") == "persistent_leader_acceleration":
+                                    candidate_analyzer.schedule(alert)
+                                    continue
                                 created = candidate_analyzer.watch_preleader(alert)
                                 if created and alert.get("notify_early_watch", True):
                                     try:

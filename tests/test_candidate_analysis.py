@@ -23,6 +23,8 @@ def _config(**overrides):
         "fast_leader_min_value_ratio_10m": 5.0,
         "fast_leader_min_value_ratio_30m": 5.0,
         "fast_leader_max_extension_pct": 1.5,
+        "persistent_leader_max_day_change_pct": 35.0,
+        "persistent_leader_min_15m_pct": 3.0,
         "min_score": 80,
         "cooldown_seconds": 900,
         "repeat_cooldown_seconds": 14400,
@@ -340,6 +342,44 @@ def test_internal_preleader_can_pass_later_pullback_recheck():
     assert candidate is not None
     assert candidate["source_signal"] == "leader_volume_acceleration"
     assert "09시 전후 거래대금 선행 가속에서 조기 포착" in candidate["reasons"]
+
+
+def test_persistent_leader_can_pass_after_early_trend_phase():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    candidate, rejected = evaluate_candidate(
+        {
+            "market": "KRW-TEST",
+            "signal": "persistent_leader_acceleration",
+            "persistent_leader": True,
+            "price": current,
+            "relative_strength_ready": True,
+            "relative_strength_eligible": True,
+            "relative_strength_rank": 2,
+            "relative_strength_universe": 100,
+            "relative_strength_percentile": 2.0,
+            "momentum_5m_pct": 1.2,
+            "momentum_15m_pct": 5.0,
+            "momentum_60m_pct": 14.0,
+            "early_trend": False,
+        },
+        {
+            "trade_price": current,
+            "signed_change_rate": 0.26,
+            "high_price": current * 1.08,
+        },
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["source_signal"] == "persistent_leader_acceleration"
+    assert candidate["day_overheated"] is False
+    assert "지속형 선도주 재가속 경로 통과" in candidate["reasons"]
 
 
 def test_ready_relative_strength_rejects_non_leader():

@@ -50,6 +50,15 @@ def _config(**overrides):
         "preleader_max_percentile": 20.0,
         "preleader_rank_improvement_pct": 5.0,
         "preleader_cooldown_seconds": 1800,
+        "persistent_leader_enabled": False,
+        "persistent_leader_check_interval_seconds": 30,
+        "persistent_leader_min_5m_pct": 0.8,
+        "persistent_leader_min_15m_pct": 3.0,
+        "persistent_leader_min_60m_pct": 5.0,
+        "persistent_leader_min_value_ratio_10m": 1.25,
+        "persistent_leader_min_value_ratio_30m": 1.15,
+        "persistent_leader_max_percentile": 3.0,
+        "persistent_leader_cooldown_seconds": 1800,
     }
     values.update(overrides)
     return MonitorConfig(**values)
@@ -101,6 +110,54 @@ def test_rest_warm_start_restores_relative_strength_immediately():
     assert snapshot["relative_strength_rank"] == 1
     assert snapshot["relative_strength_universe"] == 20
     assert snapshot["market_regime"] in {"risk_on", "neutral", "risk_off"}
+
+
+def test_persistent_leader_detects_stair_step_without_one_minute_spike():
+    engine = SignalEngine(
+        _config(
+            price_surge_1m_pct=100.0,
+            breakout_pct=100.0,
+            rebreakout_enabled=False,
+            relative_strength_min_universe=20,
+            persistent_leader_enabled=True,
+            persistent_leader_max_percentile=5.0,
+            min_trade_value_krw=1_000.0,
+        )
+    )
+    now = 1_800_000_030
+    boundary = now - now % 60
+
+    for market_index in range(20):
+        candles = []
+        for age in range(1, 66):
+            opened = boundary - age * 60
+            close = 107.0 - age * 0.25 if market_index == 0 else 100.0
+            candles.append(
+                {
+                    "candle_date_time_utc": datetime.fromtimestamp(
+                        opened, tz=timezone.utc
+                    ).isoformat(),
+                    "opening_price": close - 0.02,
+                    "high_price": close + 0.03,
+                    "low_price": close - 0.03,
+                    "trade_price": close,
+                    "candle_acc_trade_price": 10_000.0,
+                }
+            )
+        assert engine.warm_market(f"KRW-T{market_index}", candles, now=now)
+
+    alerts = engine.update("KRW-T0", 107.0, 200.0, now * 1000)
+    persistent = next(
+        alert
+        for alert in alerts
+        if alert["signal"] == "persistent_leader_acceleration"
+    )
+
+    assert persistent["persistent_leader"] is True
+    assert persistent["momentum_15m_pct"] >= 3.0
+    assert persistent["momentum_60m_pct"] >= 5.0
+    assert persistent["relative_strength_rank"] == 1
+    assert not any(alert["signal"] == "price_volume_surge" for alert in alerts)
 
 
 def test_alert_cooldown_blocks_duplicate_signal():

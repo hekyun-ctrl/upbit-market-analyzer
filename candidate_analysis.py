@@ -42,6 +42,8 @@ class CandidateConfig:
     fast_leader_min_value_ratio_10m: float
     fast_leader_min_value_ratio_30m: float
     fast_leader_max_extension_pct: float
+    persistent_leader_max_day_change_pct: float
+    persistent_leader_min_15m_pct: float
     min_score: int
     cooldown_seconds: int
     repeat_cooldown_seconds: int
@@ -154,6 +156,17 @@ class CandidateConfig:
                     3.0,
                     _env_float("CANDIDATE_FAST_LEADER_MAX_EXTENSION_PCT", 1.5),
                 ),
+            ),
+            persistent_leader_max_day_change_pct=max(
+                20.0,
+                min(
+                    50.0,
+                    _env_float("CANDIDATE_PERSISTENT_LEADER_MAX_DAY_CHANGE_PCT", 35.0),
+                ),
+            ),
+            persistent_leader_min_15m_pct=max(
+                1.0,
+                _env_float("CANDIDATE_PERSISTENT_LEADER_MIN_15M_PCT", 3.0),
             ),
             min_score=max(50, min(100, _env_int("CANDIDATE_MIN_SCORE", 90))),
             cooldown_seconds=max(300, _env_int("CANDIDATE_COOLDOWN_SECONDS", 900)),
@@ -748,6 +761,7 @@ def evaluate_candidate(
         "breakout",
         "consolidation_rebreakout",
         "leader_volume_acceleration",
+        "persistent_leader_acceleration",
     }:
         return None, ["상승 후보 신호가 아님"]
     if len(candles_1m) < 62 or len(candles_5m) < 62:
@@ -835,7 +849,11 @@ def evaluate_candidate(
     double_bb = _double_bollinger_context(
         c1,
         breakout,
-        lookback=config.double_bb_lookback,
+        lookback=(
+            max(config.double_bb_lookback, 12)
+            if alert.get("signal") == "persistent_leader_acceleration"
+            else config.double_bb_lookback
+        ),
         retest_tolerance_pct=config.retest_tolerance_pct,
         reversal_wick_ratio=config.double_bb_reversal_wick_ratio,
     )
@@ -854,6 +872,15 @@ def evaluate_candidate(
         and (momentum_15m is None or momentum_15m > 0)
         and preleader_ratio_10m >= config.fast_leader_min_value_ratio_10m
         and preleader_ratio_30m >= config.fast_leader_min_value_ratio_30m
+    )
+    persistent_leader_core = bool(
+        alert.get("signal") == "persistent_leader_acceleration"
+        and alert.get("persistent_leader")
+        and relative_ready
+        and relative_percentile <= config.early_leader_max_percentile
+        and momentum_5m >= config.relative_strength_min_5m_pct
+        and momentum_15m is not None
+        and momentum_15m >= config.persistent_leader_min_15m_pct
     )
     early_leader_core = bool(
         config.early_leader_lane_enabled
@@ -888,9 +915,14 @@ def evaluate_candidate(
             rejected.append(f"5분 상대 모멘텀 부족({momentum_5m:+.2f}%)")
         if momentum_15m is not None and momentum_15m <= 0:
             rejected.append(f"15분 추세 미확인({momentum_15m:+.2f}%)")
-        if config.early_trend_required and not early_trend:
+        if config.early_trend_required and not early_trend and not persistent_leader_core:
             rejected.append("상승 초기 가속 구간 아님")
-        if config.require_first_retest and not retest_confirmed and not fast_leader_core:
+        if (
+            config.require_first_retest
+            and not retest_confirmed
+            and not fast_leader_core
+            and not persistent_leader_core
+        ):
             rejected.append("첫 눌림·돌파선 재지지 미확인")
     confirmation_started_at = alert.get("confirmation_started_at_utc") or alert.get(
         "time_utc"
@@ -913,10 +945,15 @@ def evaluate_candidate(
         and not fast_leader_core
     ):
         rejected.append("WB 두 상단·직전 매물대 동시 돌파 또는 첫 재지지 미확인")
-    day_overheated = day_change > config.max_day_change_pct
+    allowed_day_change = (
+        config.persistent_leader_max_day_change_pct
+        if persistent_leader_core
+        else config.max_day_change_pct
+    )
+    day_overheated = day_change > allowed_day_change
     elevated_risk = day_change >= 10.0 or rsi1 >= 70.0 or rsi5 >= 68.0
     early_leader_lane = bool(
-        (early_leader_core or fast_leader_core)
+        (early_leader_core or fast_leader_core or persistent_leader_core)
         and (fast_leader_core or completed_close >= breakout)
         and current >= breakout * 0.998
         and current >= float(five["ma20"])
@@ -1165,6 +1202,7 @@ def evaluate_candidate(
         "breakout": 22,
         "price_volume_surge": 20,
         "leader_volume_acceleration": 20,
+        "persistent_leader_acceleration": 24,
     }[str(alert["signal"])]
     if fast_leader_core:
         volume_score = 20
@@ -1413,6 +1451,8 @@ def evaluate_candidate(
                 else "장중 상대강도 선도주 거래대금 급가속"
             ),
         )
+    if alert.get("signal") == "persistent_leader_acceleration":
+        reasons.insert(0, "5·15·60분 상대강도와 거래대금이 유지된 지속형 선도주")
     if relative_ready and relative_eligible:
         reasons.insert(
             0,
@@ -1428,6 +1468,8 @@ def evaluate_candidate(
         reasons.insert(0, "상승 초기 가속 구간")
     if early_leader_lane:
         reasons.insert(0, "상대강도 선도주 정밀 통과")
+    if persistent_leader_core:
+        reasons.insert(0, "지속형 선도주 재가속 경로 통과")
     if fast_leader_core:
         reasons.insert(0, "상대강도 상위 2% 초고속 검증 통과")
     if alert.get("is_reentry"):
