@@ -30,6 +30,10 @@ def _config(**overrides):
         "pullback_watch_min_pct": 0.6,
         "pullback_watch_max_pct": 4.0,
         "pullback_watch_reclaim_pct": 0.35,
+        "reentry_max_drawdown_from_day_high_pct": 7.0,
+        "risk_off_exception_max_percentile": 1.0,
+        "risk_off_exception_min_5m_pct": 2.0,
+        "risk_off_low_room_score_cap": 89,
         "min_score": 80,
         "cooldown_seconds": 900,
         "repeat_cooldown_seconds": 14400,
@@ -258,6 +262,11 @@ def test_healthy_signal_builds_orderable_risk_plan():
     }
     assert candidate["resistance_room_pct"] >= 5.0
     assert candidate["risk_reward"] >= 2.0
+    expected_rr = (candidate["target_1"] - candidate["current_price"]) / (
+        candidate["current_price"] - candidate["stop_price"]
+    )
+    assert candidate["risk_reward"] == round(expected_rr, 2)
+    assert candidate["risk_reward_reference_price"] == candidate["target_1"]
 
 
 def test_price_surge_uses_structural_resistance_targets():
@@ -335,7 +344,7 @@ def test_internal_preleader_can_pass_later_pullback_recheck():
         {
             "trade_price": current,
             "signed_change_rate": 0.08,
-            "high_price": current * 1.08,
+            "high_price": current * 1.06,
         },
         _orderbook(current),
         one,
@@ -504,6 +513,10 @@ def test_default_candidate_config_is_accuracy_first(monkeypatch):
         "CANDIDATE_FAST_LEADER_MAX_EXTENSION_PCT",
         "CANDIDATE_REPEAT_COOLDOWN_SECONDS",
         "CANDIDATE_HARD_MIN_MARKET_BREADTH_PCT",
+        "CANDIDATE_REENTRY_MAX_DRAWDOWN_FROM_DAY_HIGH_PCT",
+        "CANDIDATE_RISK_OFF_EXCEPTION_MAX_PERCENTILE",
+        "CANDIDATE_RISK_OFF_EXCEPTION_MIN_5M_PCT",
+        "CANDIDATE_RISK_OFF_LOW_ROOM_SCORE_CAP",
         "CANDIDATE_OUTCOME_TRACKING_SECONDS",
     ):
         monkeypatch.delenv(name, raising=False)
@@ -529,6 +542,10 @@ def test_default_candidate_config_is_accuracy_first(monkeypatch):
     assert config.fast_leader_max_extension_pct == 1.5
     assert config.repeat_cooldown_seconds == 14400
     assert config.hard_min_market_breadth_pct == 35.0
+    assert config.reentry_max_drawdown_from_day_high_pct == 7.0
+    assert config.risk_off_exception_max_percentile == 1.0
+    assert config.risk_off_exception_min_5m_pct == 2.0
+    assert config.risk_off_low_room_score_cap == 89
     assert config.outcome_tracking_seconds == 7200
 
 
@@ -546,7 +563,7 @@ def test_rebreakout_reason_never_displays_zero_minutes():
         {
             "trade_price": current,
             "signed_change_rate": 0.08,
-            "high_price": current * 1.08,
+            "high_price": current * 1.06,
         },
         _orderbook(current),
         one,
@@ -1271,7 +1288,70 @@ def test_risk_off_market_breadth_is_a_hard_rejection():
     assert any("시장 확산도 하드차단" in reason for reason in rejected)
 
 
-def test_early_leader_lane_softens_breadth_and_moderate_orderbook():
+def test_risk_off_breadth_rejects_nonexceptional_early_leader():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    candidate, rejected = evaluate_candidate(
+        {
+            "market": "KRW-TEST",
+            "signal": "consolidation_rebreakout",
+            "price": current,
+            "relative_strength_ready": True,
+            "relative_strength_eligible": True,
+            "relative_strength_percentile": 4.0,
+            "best_relative_strength_percentile": 2.0,
+            "momentum_5m_pct": 1.4,
+            "momentum_15m_pct": 1.4,
+            "early_trend": True,
+            "is_reentry": True,
+            "market_regime": "risk_off",
+            "market_breadth_5m_pct": 34.9,
+        },
+        {
+            "trade_price": current,
+            "signed_change_rate": 0.08,
+            "high_price": current * 1.06,
+            "acc_trade_price_24h": 10_000_000_000,
+        },
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80),
+    )
+
+    assert candidate is None
+    assert any("시장 확산도 하드차단" in reason for reason in rejected)
+
+
+def test_reentry_rejects_stale_leader_far_below_day_high():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    candidate, rejected = evaluate_candidate(
+        {
+            "market": "KRW-ARX",
+            "signal": "consolidation_rebreakout",
+            "price": current,
+            "is_reentry": True,
+        },
+        {
+            "trade_price": current,
+            "signed_change_rate": 0.18,
+            "high_price": current / 0.89,
+            "acc_trade_price_24h": 20_000_000_000,
+        },
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80),
+    )
+
+    assert candidate is None
+    assert any("당일 고점 대비 낙폭 과다" in reason for reason in rejected)
+
+
+def test_only_exceptional_early_leader_softens_breadth_and_moderate_orderbook():
     one = _candles()
     five = _candles()
     current = float(one[0]["trade_price"])
@@ -1289,8 +1369,8 @@ def test_early_leader_lane_softens_breadth_and_moderate_orderbook():
         "relative_strength_eligible": True,
         "relative_strength_rank": 2,
         "relative_strength_universe": 100,
-        "relative_strength_percentile": 2.0,
-        "momentum_5m_pct": 1.8,
+        "relative_strength_percentile": 0.8,
+        "momentum_5m_pct": 2.2,
         "momentum_15m_pct": 2.4,
         "early_trend": True,
         "market_regime": "risk_off",

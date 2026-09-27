@@ -531,6 +531,26 @@ def test_survival_rejects_candidate_that_loses_relative_strength(monkeypatch):
     assert any("15분 추세 반전" in reason for reason in reasons)
 
 
+def test_survival_revalidates_reentry_relative_eligibility_and_minimum_momentum(
+    monkeypatch,
+):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    reasons = analyzer._relative_survival_rejections(
+        {"relative_strength_ready": True, "is_reentry": True},
+        {
+            "relative_strength_ready": True,
+            "relative_strength_eligible": False,
+            "relative_strength_percentile": 5.0,
+            "momentum_5m_pct": 0.4,
+            "momentum_15m_pct": 0.6,
+        },
+    )
+
+    assert any("재진입 상대강도 자격 상실" in reason for reason in reasons)
+    assert any("5분 모멘텀 소멸" in reason for reason in reasons)
+
+
 def test_observation_telegram_delivery_can_be_disabled(monkeypatch):
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
     monkeypatch.setenv("TELEGRAM_CHAT_ID", "test-chat")
