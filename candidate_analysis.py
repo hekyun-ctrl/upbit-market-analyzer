@@ -49,6 +49,10 @@ class CandidateConfig:
     pullback_watch_min_pct: float
     pullback_watch_max_pct: float
     pullback_watch_reclaim_pct: float
+    reentry_max_drawdown_from_day_high_pct: float
+    risk_off_exception_max_percentile: float
+    risk_off_exception_min_5m_pct: float
+    risk_off_low_room_score_cap: int
     min_score: int
     cooldown_seconds: int
     repeat_cooldown_seconds: int
@@ -191,6 +195,27 @@ class CandidateConfig:
             ),
             pullback_watch_reclaim_pct=max(
                 0.2, _env_float("CANDIDATE_PULLBACK_WATCH_RECLAIM_PCT", 0.35)
+            ),
+            reentry_max_drawdown_from_day_high_pct=max(
+                1.0,
+                _env_float(
+                    "CANDIDATE_REENTRY_MAX_DRAWDOWN_FROM_DAY_HIGH_PCT", 7.0
+                ),
+            ),
+            risk_off_exception_max_percentile=max(
+                0.1,
+                _env_float("CANDIDATE_RISK_OFF_EXCEPTION_MAX_PERCENTILE", 1.0),
+            ),
+            risk_off_exception_min_5m_pct=max(
+                0.0,
+                _env_float("CANDIDATE_RISK_OFF_EXCEPTION_MIN_5M_PCT", 2.0),
+            ),
+            risk_off_low_room_score_cap=max(
+                0,
+                min(
+                    100,
+                    _env_int("CANDIDATE_RISK_OFF_LOW_ROOM_SCORE_CAP", 89),
+                ),
             ),
             min_score=max(50, min(100, _env_int("CANDIDATE_MIN_SCORE", 90))),
             cooldown_seconds=max(300, _env_int("CANDIDATE_COOLDOWN_SECONDS", 900)),
@@ -806,6 +831,13 @@ def evaluate_candidate(
 
     current, signal_price = float(ticker["trade_price"]), float(alert["price"])
     day_change = float(ticker.get("signed_change_rate", 0)) * 100
+    day_high = max(current, float(ticker.get("high_price") or current))
+    drawdown_from_day_high_pct = max(0.0, (1 - current / day_high) * 100)
+    is_reentry_path = bool(
+        alert.get("is_reentry")
+        or alert.get("watchlist_recheck")
+        or alert.get("leader_pullback_recheck")
+    )
     trade_value_24h = float(
         ticker.get("acc_trade_price_24h") or config.min_trade_value_24h_krw
     )
@@ -923,6 +955,16 @@ def evaluate_candidate(
 
     rejected: list[str] = []
     soft_warnings: list[str] = []
+    if (
+        is_reentry_path
+        and drawdown_from_day_high_pct
+        > config.reentry_max_drawdown_from_day_high_pct
+    ):
+        rejected.append(
+            "재진입 후보 당일 고점 대비 낙폭 과다"
+            f"(-{drawdown_from_day_high_pct:.1f}% > "
+            f"{config.reentry_max_drawdown_from_day_high_pct:.1f}%)"
+        )
     if relative_ready and config.relative_strength_required:
         if relative_percentile > config.relative_strength_top_percent:
             rejected.append(
@@ -1058,11 +1100,19 @@ def evaluate_candidate(
     # despite poor follow-through in production. They are direct contradictions
     # to an actionable long entry and cannot be offset by setup/volume points.
     breadth_softened = False
+    risk_off_exception = bool(
+        relative_ready
+        and relative_eligible
+        and relative_percentile <= config.risk_off_exception_max_percentile
+        and momentum_5m >= config.risk_off_exception_min_5m_pct
+        and momentum_15m is not None
+        and momentum_15m > 0
+    )
     if (
         market_regime == "risk_off"
         and market_breadth_5m_pct < config.hard_min_market_breadth_pct
     ):
-        if early_leader_lane:
+        if risk_off_exception:
             breadth_softened = True
         else:
             rejected.append(
@@ -1217,9 +1267,7 @@ def evaluate_candidate(
         "down",
     )
     risk = max(entry_reference - stop, tick * 2)
-    risk_reward = (target_resistance - entry_reference) / risk
-    if risk_reward < config.min_risk_reward:
-        return None, [f"가까운 저항 기준 손익비 부족({risk_reward:.2f})"]
+    structural_risk_reward = (target_resistance - entry_reference) / risk
 
     setup_score = {
         "consolidation_rebreakout": 25,
@@ -1338,7 +1386,7 @@ def evaluate_candidate(
             + volume_score
             + trend_score
             + market_score
-            + (12 if room >= 7 and risk_reward >= 2.5 else 10)
+            + (12 if room >= 7 and structural_risk_reward >= 2.5 else 10)
             + (12 if book_ratio >= 1.2 and spread <= 0.2 and liquid_market else 10)
             + impulse_bonus
             + relative_strength_bonus
@@ -1348,6 +1396,16 @@ def evaluate_candidate(
             - score_penalty,
         ),
     )
+    risk_off_low_room = bool(
+        market_regime == "risk_off"
+        and room < config.min_resistance_room_pct
+    )
+    if risk_off_low_room:
+        score = min(score, config.risk_off_low_room_score_cap)
+        risk_notes.append(
+            "약세장·저항 여유 부족 점수 상한 "
+            f"{config.risk_off_low_room_score_cap}점"
+        )
     effective_min_score = config.min_score
     if config.availability_balance_enabled:
         effective_min_score = min(
@@ -1364,6 +1422,7 @@ def evaluate_candidate(
         availability_safe = bool(
             not elevated_risk
             and not btc_weak
+            and not risk_off_low_room
             and not day_overheated
             and book_persistent
             and spread <= config.max_spread_pct
@@ -1398,7 +1457,7 @@ def evaluate_candidate(
         alert.get("signal") == "consolidation_rebreakout"
         and score >= 95
         and room >= 7
-        and risk_reward >= 2.5
+        and structural_risk_reward >= 2.5
         and volume_ratio >= 2
         and volume_previous >= 0.8
         and trend_score >= 18
@@ -1429,6 +1488,12 @@ def evaluate_candidate(
         )
         target2 = _round_tick(entry_reference * 1.05, tick, "up")
         target_mode = "균형 위험비형"
+    risk_reward = (target1 - entry_reference) / risk
+    if risk_reward < config.min_risk_reward:
+        return None, [
+            "실제 1차 목표 기준 손익비 부족"
+            f"({risk_reward:.2f} < {config.min_risk_reward:.2f})"
+        ]
     if relative_trend_extension or strong_extension:
         target3 = _round_tick(
             entry_reference * (1 + config.trend_target_3_pct / 100), tick, "up"
@@ -1563,12 +1628,13 @@ def evaluate_candidate(
             else "고정 목표 관리"
         ),
         "resistance_price": resistance,
-        "risk_reward_reference_price": target_resistance,
+        "risk_reward_reference_price": target1,
         "resistance_confirmed": resistance_confirmed,
         "resistance_room_pct": round(room, 2),
         "leader_resistance_override": leader_resistance_override,
         "breakout_cluster_ignored": breakout_cluster_ignored,
         "risk_reward": round(risk_reward, 2),
+        "structural_risk_reward": round(structural_risk_reward, 2),
         "breakout_level": breakout,
         "valid_seconds": (
             min(config.valid_seconds, 120)

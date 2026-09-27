@@ -3315,9 +3315,21 @@ class CandidateAnalyzer:
         momentum_15m = (
             float(momentum_15m_value) if momentum_15m_value is not None else None
         )
+        is_reentry = bool(
+            candidate.get("is_reentry")
+            or candidate.get("watchlist_recheck")
+            or candidate.get("leader_pullback_recheck")
+        )
         if percentile > self.config.relative_strength_top_percent:
             rejected.append(f"생존 중 상대강도 이탈({percentile:.1f}백분위)")
-        if momentum_5m <= 0:
+        if is_reentry and not relative.get("relative_strength_eligible"):
+            rejected.append("생존 중 재진입 상대강도 자격 상실")
+        min_momentum_5m = (
+            self.config.relative_strength_min_5m_pct if is_reentry else 0.0
+        )
+        if momentum_5m < min_momentum_5m or (
+            not is_reentry and momentum_5m <= 0
+        ):
             rejected.append(f"생존 중 5분 모멘텀 소멸({momentum_5m:+.2f}%)")
         if momentum_15m is not None and momentum_15m <= 0:
             rejected.append(f"생존 중 15분 추세 반전({momentum_15m:+.2f}%)")
