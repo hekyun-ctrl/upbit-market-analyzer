@@ -976,7 +976,7 @@ def evaluate_candidate(
     # first pullback. Let that exact setup proceed to the normal 60s survival
     # check when rank, multi-timeframe momentum, completed volume, book depth,
     # and breakout hold all remain strong. This does not waive the 1m RSI cap,
-    # resistance/R:R checks, or any survival/dispatch validation.
+    # resistance/R:R checks, or the configured survival/dispatch validation.
     elite_leader_retest = bool(
         alert.get("leader_pullback_recheck")
         and retest_confirmed
@@ -1403,7 +1403,7 @@ def evaluate_candidate(
     if elite_leader_retest:
         risk_notes.append(
             "최상위 선도주 첫 재지지 예외: 5분 RSI/WB 미확정은 감점 유지, "
-            "60초 생존·저항·손익비 검증 필수"
+            "생존·저항·손익비 검증 필수"
         )
     if not resistance_confirmed:
         risk_notes.append("반복 확인된 상단 구조 저항 없음")
