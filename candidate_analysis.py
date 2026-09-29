@@ -64,6 +64,7 @@ class CandidateConfig:
     max_rsi_5m: float
     hard_max_rsi_1m: float
     hard_max_rsi_5m: float
+    elite_retest_max_rsi_5m: float
     min_orderbook_ratio: float
     hard_min_orderbook_ratio: float
     max_price_extension_pct: float
@@ -243,6 +244,10 @@ class CandidateConfig:
             max_rsi_5m=_env_float("CANDIDATE_MAX_RSI_5M", 75.0),
             hard_max_rsi_1m=_env_float("CANDIDATE_HARD_MAX_RSI_1M", 88.0),
             hard_max_rsi_5m=_env_float("CANDIDATE_HARD_MAX_RSI_5M", 85.0),
+            elite_retest_max_rsi_5m=max(
+                85.0,
+                min(95.0, _env_float("CANDIDATE_ELITE_RETEST_MAX_RSI_5M", 92.0)),
+            ),
             min_orderbook_ratio=_env_float("CANDIDATE_MIN_ORDERBOOK_RATIO", 0.8),
             hard_min_orderbook_ratio=_env_float(
                 "CANDIDATE_HARD_MIN_ORDERBOOK_RATIO", 0.4
@@ -967,6 +972,37 @@ def evaluate_candidate(
         and (momentum_15m is None or momentum_15m > 0)
         and retest_confirmed
     )
+    # A small number of genuine leaders stay overbought throughout a clean
+    # first pullback. Let that exact setup proceed to the normal 60s survival
+    # check when rank, multi-timeframe momentum, completed volume, book depth,
+    # and breakout hold all remain strong. This does not waive the 1m RSI cap,
+    # resistance/R:R checks, or any survival/dispatch validation.
+    elite_leader_retest = bool(
+        alert.get("leader_pullback_recheck")
+        and retest_confirmed
+        and relative_ready
+        and relative_eligible
+        and leadership_persisted
+        and relative_percentile <= config.risk_off_exception_max_percentile
+        and early_trend
+        and momentum_5m >= max(
+            config.relative_strength_min_5m_pct,
+            config.risk_off_exception_min_5m_pct,
+        )
+        and momentum_15m is not None
+        and momentum_15m >= config.persistent_leader_min_15m_pct
+        and current >= breakout * 0.998
+        and current >= float(five["ma20"])
+        and extension <= config.max_price_extension_pct
+        and volume_ratio >= config.availability_min_volume_ratio
+        and volume_previous >= config.availability_min_volume_vs_previous
+        and hard_book_persistent
+        and spread <= config.hard_max_spread_pct
+        and day_change <= config.max_day_change_pct
+        and rsi1 <= config.hard_max_rsi_1m
+        and rsi5 <= config.elite_retest_max_rsi_5m
+        and not wb_fake_breakout
+    )
 
     rejected: list[str] = []
     soft_warnings: list[str] = []
@@ -1024,6 +1060,7 @@ def evaluate_candidate(
         and wb_ready
         and not wb_confirmed
         and not fast_leader_core
+        and not elite_leader_retest
     ):
         rejected.append("WB 두 상단·직전 매물대 동시 돌파 또는 첫 재지지 미확인")
     allowed_day_change = (
@@ -1061,7 +1098,9 @@ def evaluate_candidate(
     # setups are narrowed again below to candle-shape warnings only, so volume,
     # trend and resistance safety floors remain strict.
     strict_quality = not config.availability_balance_enabled
-    if rsi1 > config.hard_max_rsi_1m or rsi5 > config.hard_max_rsi_5m:
+    if rsi1 > config.hard_max_rsi_1m or (
+        rsi5 > config.hard_max_rsi_5m and not elite_leader_retest
+    ):
         rejected.append(f"RSI 과열(1분 {rsi1:.1f}/5분 {rsi5:.1f})")
     if spread > config.hard_max_spread_pct:
         rejected.append(f"호가 스프레드 극단적 과다({spread:.2f}%)")
@@ -1361,6 +1400,11 @@ def evaluate_candidate(
         )
         if config.double_bb_enabled and not wb_confirmed:
             risk_notes.append("WB 미확정 초고속 신호: 첫 눌림 전 추격 금지")
+    if elite_leader_retest:
+        risk_notes.append(
+            "최상위 선도주 첫 재지지 예외: 5분 RSI/WB 미확정은 감점 유지, "
+            "60초 생존·저항·손익비 검증 필수"
+        )
     if not resistance_confirmed:
         risk_notes.append("반복 확인된 상단 구조 저항 없음")
     score_penalty = config.day_overheat_score_penalty if day_overheated else 0

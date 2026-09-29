@@ -45,6 +45,7 @@ def _config(**overrides):
         "max_rsi_5m": 75.0,
         "hard_max_rsi_1m": 88.0,
         "hard_max_rsi_5m": 85.0,
+        "elite_retest_max_rsi_5m": 92.0,
         "min_orderbook_ratio": 0.8,
         "hard_min_orderbook_ratio": 0.4,
         "max_price_extension_pct": 2.5,
@@ -521,6 +522,7 @@ def test_default_candidate_config_is_accuracy_first(monkeypatch):
         "CANDIDATE_RISK_OFF_FRESH_LEADER_MAX_PERCENTILE",
         "CANDIDATE_RISK_OFF_FRESH_LEADER_MIN_5M_PCT",
         "CANDIDATE_RISK_OFF_LOW_ROOM_SCORE_CAP",
+        "CANDIDATE_ELITE_RETEST_MAX_RSI_5M",
         "CANDIDATE_OUTCOME_TRACKING_SECONDS",
     ):
         monkeypatch.delenv(name, raising=False)
@@ -552,6 +554,7 @@ def test_default_candidate_config_is_accuracy_first(monkeypatch):
     assert config.risk_off_fresh_leader_max_percentile == 5.0
     assert config.risk_off_fresh_leader_min_5m_pct == 1.5
     assert config.risk_off_low_room_score_cap == 89
+    assert config.elite_retest_max_rsi_5m == 92.0
     assert config.outcome_tracking_seconds == 7200
 
 
@@ -911,6 +914,94 @@ def test_moderate_rsi_overheat_is_penalized_and_extreme_is_rejected():
     )
     assert candidate is None
     assert any("RSI 과열" in reason for reason in rejected)
+
+
+def test_elite_leader_retest_can_advance_despite_hot_5m_rsi_and_unconfirmed_wb(
+    monkeypatch,
+):
+    one = _candles()
+    five = _candles()
+    five[1]["_force_high_rsi"] = True
+    current = float(one[0]["trade_price"])
+    original_analysis = candidate_analysis.analyze_candles
+
+    def analysis_with_hot_five_minute_rsi(candles):
+        result = original_analysis(candles)
+        if candles and candles[0].get("_force_high_rsi"):
+            result["rsi14"] = 90.0
+        return result
+
+    monkeypatch.setattr(
+        candidate_analysis, "analyze_candles", analysis_with_hot_five_minute_rsi
+    )
+    monkeypatch.setattr(
+        candidate_analysis,
+        "_double_bollinger_context",
+        lambda *args, **kwargs: {
+            "ready": True,
+            "confirmed": False,
+            "fake_breakout": False,
+            "status": "상단 미확정",
+        },
+    )
+    monkeypatch.setattr(candidate_analysis, "_resistances", lambda *args: [])
+
+    alert = {
+        "time_utc": "2026-09-12T10:00:00+00:00",
+        "market": "KRW-TEST",
+        "signal": "breakout",
+        "price": current,
+        "breakout_level": current * 0.995,
+        "is_reentry": True,
+        "pullback_retest": True,
+        "leader_pullback_recheck": True,
+        "relative_strength_ready": True,
+        "relative_strength_eligible": True,
+        "relative_strength_rank": 1,
+        "relative_strength_universe": 200,
+        "relative_strength_percentile": 0.5,
+        "best_relative_strength_percentile": 0.5,
+        "momentum_5m_pct": 2.5,
+        "momentum_15m_pct": 3.5,
+        "early_trend": True,
+        "market_regime": "neutral",
+        "market_breadth_5m_pct": 50.0,
+    }
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.08,
+        "high_price": current * 1.01,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+
+    candidate, rejected = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80, double_bb_enabled=True),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert any("최상위 선도주 첫 재지지 예외" in note for note in candidate["risk_notes"])
+    assert any("RSI 주의" in note for note in candidate["risk_notes"])
+
+    ordinary = dict(alert)
+    ordinary.pop("leader_pullback_recheck")
+    ordinary.pop("pullback_retest")
+    candidate, rejected = evaluate_candidate(
+        ordinary,
+        ticker,
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80, double_bb_enabled=True),
+    )
+    assert candidate is None
+    assert any("RSI 과열" in reason for reason in rejected)
+    assert any("WB 두 상단" in reason for reason in rejected)
 
 
 def test_strong_price_volume_impulse_adds_six_points():
