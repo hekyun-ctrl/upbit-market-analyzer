@@ -33,6 +33,8 @@ def _config(**overrides):
         "reentry_max_drawdown_from_day_high_pct": 7.0,
         "risk_off_exception_max_percentile": 1.0,
         "risk_off_exception_min_5m_pct": 2.0,
+        "risk_off_fresh_leader_max_percentile": 5.0,
+        "risk_off_fresh_leader_min_5m_pct": 1.5,
         "risk_off_low_room_score_cap": 89,
         "min_score": 80,
         "cooldown_seconds": 900,
@@ -516,6 +518,8 @@ def test_default_candidate_config_is_accuracy_first(monkeypatch):
         "CANDIDATE_REENTRY_MAX_DRAWDOWN_FROM_DAY_HIGH_PCT",
         "CANDIDATE_RISK_OFF_EXCEPTION_MAX_PERCENTILE",
         "CANDIDATE_RISK_OFF_EXCEPTION_MIN_5M_PCT",
+        "CANDIDATE_RISK_OFF_FRESH_LEADER_MAX_PERCENTILE",
+        "CANDIDATE_RISK_OFF_FRESH_LEADER_MIN_5M_PCT",
         "CANDIDATE_RISK_OFF_LOW_ROOM_SCORE_CAP",
         "CANDIDATE_OUTCOME_TRACKING_SECONDS",
     ):
@@ -523,8 +527,8 @@ def test_default_candidate_config_is_accuracy_first(monkeypatch):
 
     config = CandidateConfig.from_env()
 
-    assert config.availability_balance_enabled is False
-    assert config.availability_min_score == 90
+    assert config.availability_balance_enabled is True
+    assert config.availability_min_score == 86
     assert config.relative_strength_top_percent == 10.0
     assert config.relative_strength_min_5m_pct == 1.0
     assert config.early_trend_required is True
@@ -545,6 +549,8 @@ def test_default_candidate_config_is_accuracy_first(monkeypatch):
     assert config.reentry_max_drawdown_from_day_high_pct == 7.0
     assert config.risk_off_exception_max_percentile == 1.0
     assert config.risk_off_exception_min_5m_pct == 2.0
+    assert config.risk_off_fresh_leader_max_percentile == 5.0
+    assert config.risk_off_fresh_leader_min_5m_pct == 1.5
     assert config.risk_off_low_room_score_cap == 89
     assert config.outcome_tracking_seconds == 7200
 
@@ -1322,6 +1328,43 @@ def test_risk_off_breadth_rejects_nonexceptional_early_leader():
 
     assert candidate is None
     assert any("시장 확산도 하드차단" in reason for reason in rejected)
+
+
+def test_risk_off_breadth_allows_fresh_top_five_percent_leader():
+    one = _candles()
+    five = _candles()
+    current = float(one[0]["trade_price"])
+    candidate, rejected = evaluate_candidate(
+        {
+            "market": "KRW-FRESH",
+            "signal": "consolidation_rebreakout",
+            "price": current,
+            "relative_strength_ready": True,
+            "relative_strength_eligible": True,
+            "relative_strength_percentile": 4.0,
+            "best_relative_strength_percentile": 2.0,
+            "momentum_5m_pct": 1.6,
+            "momentum_15m_pct": 1.7,
+            "early_trend": True,
+            "market_regime": "risk_off",
+            "market_breadth_5m_pct": 30.0,
+        },
+        {
+            "trade_price": current,
+            "signed_change_rate": 0.06,
+            "high_price": current * 1.08,
+            "acc_trade_price_24h": 10_000_000_000,
+        },
+        _orderbook(current),
+        one,
+        five,
+        _config(min_score=80),
+    )
+
+    assert rejected == []
+    assert candidate is not None
+    assert candidate["selection_lane"] == "early_leader"
+    assert any("시장 약세 중 상대강도 선도 유지" in note for note in candidate["risk_notes"])
 
 
 def test_reentry_rejects_stale_leader_far_below_day_high():

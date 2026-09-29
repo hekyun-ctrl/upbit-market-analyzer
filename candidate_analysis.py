@@ -52,6 +52,8 @@ class CandidateConfig:
     reentry_max_drawdown_from_day_high_pct: float
     risk_off_exception_max_percentile: float
     risk_off_exception_min_5m_pct: float
+    risk_off_fresh_leader_max_percentile: float
+    risk_off_fresh_leader_min_5m_pct: float
     risk_off_low_room_score_cap: int
     min_score: int
     cooldown_seconds: int
@@ -210,6 +212,19 @@ class CandidateConfig:
                 0.0,
                 _env_float("CANDIDATE_RISK_OFF_EXCEPTION_MIN_5M_PCT", 2.0),
             ),
+            risk_off_fresh_leader_max_percentile=max(
+                1.0,
+                min(
+                    10.0,
+                    _env_float(
+                        "CANDIDATE_RISK_OFF_FRESH_LEADER_MAX_PERCENTILE", 5.0
+                    ),
+                ),
+            ),
+            risk_off_fresh_leader_min_5m_pct=max(
+                0.5,
+                _env_float("CANDIDATE_RISK_OFF_FRESH_LEADER_MIN_5M_PCT", 1.5),
+            ),
             risk_off_low_room_score_cap=max(
                 0,
                 min(
@@ -334,7 +349,7 @@ class CandidateConfig:
                 ),
             ),
             availability_balance_enabled=_enabled(
-                "CANDIDATE_AVAILABILITY_BALANCE_ENABLED", False
+                "CANDIDATE_AVAILABILITY_BALANCE_ENABLED", True
             ),
             availability_max_soft_warnings=max(
                 0, min(3, _env_int("CANDIDATE_AVAILABILITY_MAX_SOFT_WARNINGS", 2))
@@ -359,7 +374,7 @@ class CandidateConfig:
             ),
             availability_min_score=max(
                 50,
-                min(100, _env_int("CANDIDATE_AVAILABILITY_MIN_SCORE", 90)),
+                min(100, _env_int("CANDIDATE_AVAILABILITY_MIN_SCORE", 86)),
             ),
             relative_strength_required=_enabled(
                 "CANDIDATE_RELATIVE_STRENGTH_REQUIRED", True
@@ -1100,13 +1115,35 @@ def evaluate_candidate(
     # despite poor follow-through in production. They are direct contradictions
     # to an actionable long entry and cannot be offset by setup/volume points.
     breadth_softened = False
-    risk_off_exception = bool(
-        relative_ready
+    # Old reentries keep the strict exception because a former leader can
+    # still rank well while distribution continues. A genuinely fresh leader
+    # gets a separate lane, then must still pass every normal safety and
+    # survival check before Telegram dispatch.
+    risk_off_reentry_exception = bool(
+        is_reentry_path
+        and relative_ready
         and relative_eligible
         and relative_percentile <= config.risk_off_exception_max_percentile
         and momentum_5m >= config.risk_off_exception_min_5m_pct
         and momentum_15m is not None
         and momentum_15m > 0
+    )
+    risk_off_fresh_leader_exception = bool(
+        not is_reentry_path
+        and relative_ready
+        and relative_eligible
+        and relative_percentile
+        <= config.risk_off_fresh_leader_max_percentile
+        and momentum_5m >= config.risk_off_fresh_leader_min_5m_pct
+        and momentum_15m is not None
+        and momentum_15m > 0
+        and early_trend
+        and (early_leader_core or persistent_leader_core)
+        and volume_ratio >= config.min_completed_volume_ratio
+        and volume_previous >= config.min_volume_vs_previous
+    )
+    risk_off_exception = bool(
+        risk_off_reentry_exception or risk_off_fresh_leader_exception
     )
     if (
         market_regime == "risk_off"
