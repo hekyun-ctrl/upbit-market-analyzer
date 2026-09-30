@@ -3,6 +3,7 @@ import logging
 from datetime import datetime, timedelta, timezone
 
 import monitor
+import pytest
 from candidate_analysis import CandidateConfig
 from monitor import (
     MONITOR_STATE,
@@ -919,6 +920,127 @@ def test_dispatch_revalidation_rejects_stale_entry_and_refreshes_metrics():
     assert refreshed["target_2_pct"] == round((106.0 / 100.5 - 1) * 100, 2)
 
 
+def test_dispatch_checks_actual_first_target_rr_without_rounding_into_pass():
+    candidate = {
+        "entry_low": 99,
+        "entry_high": 102,
+        "chase_limit": 103,
+        "stop_price": 98,
+        "target_1": 104,
+        "target_2": 110,
+        "resistance_price": 112,
+    }
+    assert (
+        _revalidate_candidate_for_dispatch(candidate, 100, min_risk_reward=2)[1] is None
+    )
+    # Still inside entry range, but price drift makes the actual first target inferior.
+    assert (
+        "손익비 부족"
+        in _revalidate_candidate_for_dispatch(candidate, 100.001, min_risk_reward=2)[1]
+    )
+
+
+def test_dispatch_rechecks_stop_width_and_hourly_capital_risk_budget():
+    candidate = {
+        "entry_low": 100,
+        "entry_high": 102,
+        "chase_limit": 103,
+        "stop_price": 98,
+        "target_1": 110,
+        "target_2": 120,
+        "holding_mode": "hourly_structure",
+        "suggested_position_pct": 5,
+    }
+    assert (
+        "손절폭 초과"
+        in _revalidate_candidate_for_dispatch(candidate, 102, max_stop_loss_pct=3)[1]
+    )
+    refreshed, reason = _revalidate_candidate_for_dispatch(
+        candidate, 101, min_risk_reward=2, max_stop_loss_pct=3
+    )
+    assert reason is None
+    assert refreshed["suggested_position_pct"] < 5
+    assert refreshed["suggested_position_pct"] / 100 * (101 - 98) / 101 * 100 <= 0.1
+
+
+def test_gradual_leader_discovery_is_internal_and_deduplicated_without_minute_impulse():
+    engine = SignalEngine(_config(rebreakout_enabled=False, breakout_pct=100))
+    engine.relative_strength_snapshot = lambda market, now: {
+        "relative_strength_ready": True,
+        "relative_strength_eligible": False,
+        "relative_strength_percentile": 3,
+        "momentum_5m_pct": 0.4,
+        "momentum_15m_pct": 1.2,
+        "momentum_60m_pct": 2,
+        "early_trend": False,
+    }
+    alerts = []
+    for second in range(361):
+        alerts.extend(
+            engine.update(
+                "KRW-IQ", 100 + second * 0.001, 1, 1_800_000_000_000 + second * 1000
+            )
+        )
+    assert len(alerts) == 1
+    assert alerts[0]["sustained_watch"] and alerts[0]["pullback_watch"]
+    assert alerts[0]["internal_only"] and not alerts[0]["notify_early_watch"]
+    assert alerts[0]["change_1m_pct"] < 0.1
+
+
+def test_sustained_survival_can_cool_but_cannot_lose_leadership(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    candidate = {
+        "relative_strength_ready": True,
+        "is_reentry": True,
+        "sustained_retest": True,
+        "holding_mode": "hourly_structure",
+    }
+    relative = {
+        "relative_strength_ready": True,
+        "relative_strength_eligible": False,
+        "relative_strength_percentile": 3,
+        "momentum_5m_pct": 0.4,
+        "momentum_15m_pct": 1,
+    }
+    assert analyzer._relative_survival_rejections(candidate, relative) == []
+    assert analyzer._relative_survival_rejections(
+        candidate, {**relative, "momentum_5m_pct": -0.1}
+    )
+    assert analyzer._relative_survival_rejections(
+        candidate, {**relative, "relative_strength_percentile": 99}
+    )
+
+
+def test_internal_watch_and_recheck_are_not_reported_as_rejections():
+    state = monitor.MonitorState()
+    for decision in [
+        "preleader_watch",
+        "leader_recheck_scheduled",
+        "repeat_suppressed",
+        "accepted",
+        "rejected",
+        "survival_rejected",
+        "dispatch_rejected",
+    ]:
+        state.add_screening_record({"decision": decision, "reasons": []})
+    screening = state.candidate_performance()["screening"]
+    assert screening["rejected"] == 3
+    assert screening["accepted"] == 1
+
+
+def test_telegram_explains_sustained_path_and_completed_volume():
+    candidate = _telegram_candidate()
+    candidate.update(
+        sustained_retest=True,
+        completed_5m_volume_ratio=1.8,
+        completed_15m_volume_ratio=1.2,
+    )
+    text = _candidate_text(candidate)
+    assert "1시간 추세 재지지" in text
+    assert "완료 거래량: 5분 1.80배 · 15분 1.20배" in text
+
+
 def test_price_retake_schedules_one_reentry_check(monkeypatch):
     monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
     analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
@@ -1094,20 +1216,21 @@ def test_rejected_candidate_is_rechecked_on_consolidation_breakout(monkeypatch):
     assert seen[0]["watchlist_recheck"] is True
 
 
-def test_rejected_leader_is_rechecked_after_pullback_and_reclaim(monkeypatch):
+@pytest.mark.parametrize("cooled", [False, True])
+def test_rejected_leader_is_rechecked_after_pullback_and_reclaim(monkeypatch, cooled):
     monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
 
     def relative_strength(_market, _now):
         return {
             "relative_strength_ready": True,
-            "relative_strength_eligible": True,
+            "relative_strength_eligible": not cooled,
             "relative_strength_rank": 2,
             "relative_strength_universe": 100,
             "relative_strength_percentile": 2.0,
-            "momentum_5m_pct": 2.4,
+            "momentum_5m_pct": 0.4 if cooled else 2.4,
             "momentum_15m_pct": 5.0,
             "momentum_60m_pct": 8.0,
-            "early_trend": True,
+            "early_trend": not cooled,
         }
 
     analyzer = CandidateAnalyzer(
@@ -1149,6 +1272,8 @@ def test_rejected_leader_is_rechecked_after_pullback_and_reclaim(monkeypatch):
     assert seen[0]["pullback_retest"] is True
     assert seen[0]["relative_strength_rank"] == 2
     assert seen[0]["breakout_level"] > 108.5
+    assert seen[0]["signal_id"]
+    assert seen[0]["hourly_recheck"]
 
 
 def test_strong_leader_pullback_is_not_blocked_by_recent_rapid_drop(monkeypatch):

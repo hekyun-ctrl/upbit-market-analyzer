@@ -25,8 +25,10 @@ from candidate_analysis import (
     _round_tick,
     evaluate_candidate,
     validate_candidate_survival,
+    validate_btc_survival,
 )
 from trend_context import higher_timeframe_context
+from filter_audit import filter_audit, REJECTIONS
 from upbit_client import UpbitPublicClient
 
 LOGGER = logging.getLogger("upbit-monitor")
@@ -144,6 +146,9 @@ class MonitorConfig:
     pullback_watch_min_1m_pct: float
     pullback_watch_min_volume_ratio: float
     pullback_watch_max_percentile: float
+    sustained_watch_enabled: bool = True
+    sustained_watch_interval_seconds: int = 60
+    sustained_watch_cooldown_seconds: int = 1800
 
     @classmethod
     def from_env(cls) -> "MonitorConfig":
@@ -154,6 +159,13 @@ class MonitorConfig:
         all_markets = not values or "ALL_KRW" in values
         selected = tuple(value for value in values if value != "ALL_KRW")
         return cls(
+            sustained_watch_enabled=_enabled("MONITOR_SUSTAINED_WATCH_ENABLED", True),
+            sustained_watch_interval_seconds=max(
+                30, _env_int("MONITOR_SUSTAINED_WATCH_INTERVAL_SECONDS", 60)
+            ),
+            sustained_watch_cooldown_seconds=max(
+                600, _env_int("MONITOR_SUSTAINED_WATCH_COOLDOWN_SECONDS", 1800)
+            ),
             markets=selected,
             all_krw_markets=all_markets,
             price_surge_1m_pct=_env_float("MONITOR_PRICE_SURGE_1M_PCT", 1.5),
@@ -201,9 +213,7 @@ class MonitorConfig:
                 30, _env_int("MONITOR_RELATIVE_STRENGTH_STALE_SECONDS", 120)
             ),
             preleader_enabled=_enabled("MONITOR_PRELEADER_ENABLED", True),
-            extended_leader_enabled=_enabled(
-                "MONITOR_EXTENDED_LEADER_ENABLED", True
-            ),
+            extended_leader_enabled=_enabled("MONITOR_EXTENDED_LEADER_ENABLED", True),
             preleader_start_minute_kst=_env_minute_of_day(
                 "MONITOR_PRELEADER_START_KST", "08:45"
             ),
@@ -609,6 +619,7 @@ class MonitorState:
             ),
             "recent": outcomes[:100],
             "raw_signal_performance": self._performance_summary(signal_outcomes),
+            "filter_audit": filter_audit(signal_outcomes, screening_records),
             "early_watch_performance": self._early_watch_summary(early_watch_events),
             "six_hour_trend_performance": {
                 "sample_count": len(trend_outcomes),
@@ -654,7 +665,7 @@ class MonitorState:
                     item.get("decision") == "accepted" for item in screening_records
                 ),
                 "rejected": sum(
-                    item.get("decision") != "accepted" for item in screening_records
+                    item.get("decision") in REJECTIONS for item in screening_records
                 ),
                 "recent": screening_records[:100],
             },
@@ -734,6 +745,8 @@ class SignalEngine:
         self._last_preleader_at: dict[str, int] = {}
         self._last_persistent_leader_checked_at: dict[str, int] = {}
         self._last_persistent_leader_at: dict[str, int] = {}
+        self._last_sustained_checked_at: dict[str, int] = {}
+        self._last_sustained_watch_at: dict[str, int] = {}
         self._relative_rank_history: dict[
             str, deque[tuple[int, float]]
         ] = defaultdict(deque)
@@ -1007,6 +1020,40 @@ class SignalEngine:
 
         signals: list[tuple[str, str, dict[str, Any]]] = []
         relative_strength: dict[str, Any] = {}
+
+        # Discovery only: gradual leaders need not print another one-minute
+        # impulse. A later real pullback/reclaim must still pass REST screening.
+        if (
+            self.config.sustained_watch_enabled
+            and now - self._last_sustained_checked_at.get(market, 0)
+            >= self.config.sustained_watch_interval_seconds
+        ):
+            self._last_sustained_checked_at[market] = now
+            sustained = self.relative_strength_snapshot(market, now)
+            if (
+                sustained.get("relative_strength_ready")
+                and float(sustained.get("relative_strength_percentile") or 100) <= 5
+                and float(sustained.get("momentum_5m_pct") or 0) >= 0.2
+                and float(sustained.get("momentum_15m_pct") or 0) >= 0.8
+                and float(sustained.get("momentum_60m_pct") or 0) >= 1.5
+                and value_1m >= self.config.min_trade_value_krw
+                and now - self._last_sustained_watch_at.get(market, 0)
+                >= self.config.sustained_watch_cooldown_seconds
+            ):
+                self._last_sustained_watch_at[market] = now
+                relative_strength = sustained
+                signals.append(
+                    (
+                        "leader_volume_acceleration",
+                        "지속 추세 내부 관찰",
+                        {
+                            "internal_only": True,
+                            "notify_early_watch": False,
+                            "pullback_watch": True,
+                            "sustained_watch": True,
+                        },
+                    )
+                )
 
         def confirmation_started_at(price_level: float) -> str:
             first = next(
@@ -1436,6 +1483,8 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         labels.append("재지지")
     if candidate.get("availability_tier"):
         labels.append("보완형")
+    if candidate.get("sustained_retest"):
+        labels.append("1시간 추세 재지지")
     suffix = f" | {'·'.join(labels)}" if labels else ""
     relative_line = ""
     if candidate.get("relative_strength_ready"):
@@ -1494,6 +1543,12 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
             f"4시간 {higher['four_hour']['status']}\n"
             f"최초 손절 기준: {candidate.get('stop_timeframe', '초기 신호 구조')}\n"
         )
+    volume_line = ""
+    if candidate.get("completed_5m_volume_ratio") is not None:
+        volume_line = (
+            f"완료 거래량: 5분 {float(candidate['completed_5m_volume_ratio']):.2f}배 · "
+            f"15분 {float(candidate['completed_15m_volume_ratio']):.2f}배\n"
+        )
     return (
         f"[조건부 진입 후보{suffix} | 조건점수 {candidate['score']}/100] "
         f"{candidate['market']}\n"
@@ -1514,6 +1569,7 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"{survival_line}"
         f"{wb_line}"
         f"{higher_line}"
+        f"{volume_line}"
         f"가까운 저항 여유: {candidate.get('resistance_room_pct', 0):.1f}%\n"
         f"예상 손익비: {candidate.get('risk_reward', 0):.2f}\n"
         f"추천 비중: 투자 가능금액의 {candidate['suggested_position_pct']}% 이내\n"
@@ -1624,7 +1680,11 @@ def _management_text(update: dict[str, Any]) -> str:
 
 
 def _revalidate_candidate_for_dispatch(
-    candidate: dict[str, Any], live_price: float
+    candidate: dict[str, Any],
+    live_price: float,
+    *,
+    min_risk_reward: float = 0.0,
+    max_stop_loss_pct: float = float("inf"),
 ) -> tuple[dict[str, Any] | None, str | None]:
     """Keep Telegram counts meaningful by sending only actionable entries."""
     entry_low = float(candidate["entry_low"])
@@ -1650,6 +1710,14 @@ def _revalidate_candidate_for_dispatch(
     risk_reward_reference = float(
         candidate.get("risk_reward_reference_price") or resistance
     )
+    actual_rr = (
+        (min(target_1, risk_reward_reference) - live_price) / risk if risk > 0 else 0.0
+    )
+    stop_pct = risk / live_price * 100 if live_price > 0 else float("inf")
+    if actual_rr < min_risk_reward:
+        return None, f"전송 직전 실제 1차 목표 손익비 부족({actual_rr:.2f})"
+    if stop_pct > max_stop_loss_pct:
+        return None, f"전송 직전 계획 손절폭 초과({stop_pct:.2f}%)"
     refreshed.update(
         {
             "current_price": live_price,
@@ -1658,11 +1726,16 @@ def _revalidate_candidate_for_dispatch(
             "target_2_pct": round((target_2 / live_price - 1) * 100, 2),
             "resistance_room_pct": round((resistance / live_price - 1) * 100, 2),
             "risk_reward": round(
-                (risk_reward_reference - live_price) / risk if risk > 0 else 0.0,
+                actual_rr,
                 2,
             ),
         }
     )
+    if candidate.get("holding_mode") == "hourly_structure" and stop_pct > 0:
+        refreshed["suggested_position_pct"] = min(
+            float(candidate.get("suggested_position_pct") or 5),
+            _round_tick(min(5.0, 10.0 / stop_pct), 0.01, "down"),
+        )
     return refreshed, None
 
 
@@ -2477,9 +2550,13 @@ class CandidateAnalyzer:
         market = str(alert["market"])
         existing = self._signal_tracks.get(market)
         if existing and now < float(existing["expires_at"]):
+            alert["signal_id"] = existing["signal_id"]
             return
+        signal_id = uuid.uuid4().hex
+        alert["signal_id"] = signal_id
         price = float(alert["price"])
         self._signal_tracks[market] = {
+            "signal_id": signal_id,
             "market": market,
             "source_signal": alert["signal"],
             "signal_price": price,
@@ -2495,9 +2572,7 @@ class CandidateAnalyzer:
             "approved_candidate": False,
             "relative_strength_rank": alert.get("relative_strength_rank"),
             "relative_strength_universe": alert.get("relative_strength_universe"),
-            "relative_strength_percentile": alert.get(
-                "relative_strength_percentile"
-            ),
+            "relative_strength_percentile": alert.get("relative_strength_percentile"),
             "momentum_5m_pct": alert.get("momentum_5m_pct"),
             "momentum_15m_pct": alert.get("momentum_15m_pct"),
             "momentum_60m_pct": alert.get("momentum_60m_pct"),
@@ -2515,6 +2590,8 @@ class CandidateAnalyzer:
         entry = float(state["signal_price"])
         MONITOR_STATE.add_signal_outcome(
             {
+                "signal_id": state.get("signal_id"),
+                "last_rejections": list(state.get("last_rejections", [])),
                 "market": market,
                 "source_signal": state["source_signal"],
                 "result": result,
@@ -2529,9 +2606,7 @@ class CandidateAnalyzer:
                 "signal_time_utc": state.get("signal_time_utc"),
                 "completed_at_utc": datetime.now(timezone.utc).isoformat(),
                 "relative_strength_rank": state.get("relative_strength_rank"),
-                "relative_strength_universe": state.get(
-                    "relative_strength_universe"
-                ),
+                "relative_strength_universe": state.get("relative_strength_universe"),
                 "relative_strength_percentile": state.get(
                     "relative_strength_percentile"
                 ),
@@ -2548,6 +2623,8 @@ class CandidateAnalyzer:
         alert: dict[str, Any], decision: str, reasons: list[str]
     ) -> dict[str, Any]:
         return {
+            "signal_id": alert.get("signal_id"),
+            "strategy_version": "leader-recheck-v2",
             "time_utc": datetime.now(timezone.utc).isoformat(),
             "market": alert.get("market"),
             "source_signal": alert.get("signal"),
@@ -2555,17 +2632,13 @@ class CandidateAnalyzer:
             "reasons": list(reasons),
             "relative_strength_rank": alert.get("relative_strength_rank"),
             "relative_strength_universe": alert.get("relative_strength_universe"),
-            "relative_strength_percentile": alert.get(
-                "relative_strength_percentile"
-            ),
+            "relative_strength_percentile": alert.get("relative_strength_percentile"),
             "momentum_5m_pct": alert.get("momentum_5m_pct"),
             "momentum_15m_pct": alert.get("momentum_15m_pct"),
             "momentum_60m_pct": alert.get("momentum_60m_pct"),
             "early_trend": alert.get("early_trend"),
             "change_1m_pct": alert.get("change_1m_pct"),
-            "volume_ratio_vs_previous_1m": alert.get(
-                "volume_ratio_vs_previous_1m"
-            ),
+            "volume_ratio_vs_previous_1m": alert.get("volume_ratio_vs_previous_1m"),
         }
 
     def _start_trend_track(self, candidate: dict[str, Any], now: float) -> None:
@@ -2926,6 +2999,10 @@ class CandidateAnalyzer:
         current_price: float,
     ) -> None:
         market = str(alert["market"])
+        tracked = self._signal_tracks.get(market)
+        if tracked:
+            tracked["last_rejections"] = list(rejected)
+            alert["signal_id"] = tracked["signal_id"]
         now = time.time()
         state = self._active_watch(market, now)
         if state is None:
@@ -3248,14 +3325,24 @@ class CandidateAnalyzer:
         )
         percentile = float(relative.get("relative_strength_percentile") or 100.0)
         momentum_15m = relative.get("momentum_15m_pct")
+        # Admission to completed-hourly screening only; never an entry waiver.
+        hourly_recheck = bool(
+            self.config.higher_timeframe_enabled
+            and relative.get("relative_strength_ready")
+            and percentile <= self.config.early_leader_max_percentile
+            and float(relative.get("momentum_5m_pct") or 0) >= 0.2
+            and float(momentum_15m or 0) >= 0.8
+            and float(relative.get("momentum_60m_pct") or 0) >= 1.5
+        )
         still_a_leader = bool(
             relative.get("relative_strength_ready")
             and percentile <= self.config.relative_strength_top_percent
             and float(relative.get("momentum_5m_pct") or 0.0)
-            >= self.config.relative_strength_min_5m_pct
+            >= (0.2 if hourly_recheck else self.config.relative_strength_min_5m_pct)
             and (momentum_15m is None or float(momentum_15m) > 0)
             and (
-                pullback_watch
+                hourly_recheck
+                or pullback_watch
                 or (
                     relative.get("relative_strength_eligible")
                     and (
@@ -3314,9 +3401,11 @@ class CandidateAnalyzer:
             "pullback_retest": True,
             "watchlist_recheck": True,
             "leader_pullback_recheck": True,
+            "hourly_recheck": hourly_recheck,
             "original_signal_time_utc": state.get("first_signal_time_utc"),
             **relative,
         }
+        self._start_signal_track(alert, now)
         MONITOR_STATE.add_screening_record(
             self._screening_record(alert, "leader_recheck_scheduled", [])
         )
@@ -3544,13 +3633,23 @@ class CandidateAnalyzer:
         )
         if percentile > self.config.relative_strength_top_percent:
             rejected.append(f"생존 중 상대강도 이탈({percentile:.1f}백분위)")
-        if is_reentry and not relative.get("relative_strength_eligible"):
+        sustained = bool(
+            candidate.get("sustained_retest")
+            and candidate.get("holding_mode") == "hourly_structure"
+        )
+        if (
+            is_reentry
+            and not relative.get("relative_strength_eligible")
+            and not sustained
+        ):
             rejected.append("생존 중 재진입 상대강도 자격 상실")
         min_momentum_5m = (
-            self.config.relative_strength_min_5m_pct if is_reentry else 0.0
+            self.config.relative_strength_min_5m_pct
+            if is_reentry and not sustained
+            else 0.0
         )
         if momentum_5m < min_momentum_5m or (
-            not is_reentry and momentum_5m <= 0
+            (not is_reentry or sustained) and momentum_5m <= 0
         ):
             rejected.append(f"생존 중 5분 모멘텀 소멸({momentum_5m:+.2f}%)")
         if momentum_15m is not None and momentum_15m <= 0:
@@ -3655,7 +3754,12 @@ class CandidateAnalyzer:
                 survival_snapshot = await self._market_snapshot(market)
                 live_price = float(survival_snapshot["ticker"]["trade_price"])
                 candidate, original_range_rejection = (
-                    _revalidate_candidate_for_dispatch(first_candidate, live_price)
+                    _revalidate_candidate_for_dispatch(
+                        first_candidate,
+                        live_price,
+                        min_risk_reward=self.config.min_risk_reward,
+                        max_stop_loss_pct=self.config.max_stop_loss_pct,
+                    )
                 )
                 survival_metrics, survival_rejected = validate_candidate_survival(
                     first_candidate,
@@ -3664,6 +3768,26 @@ class CandidateAnalyzer:
                     survival_snapshot["candles_1m"],
                     self.config,
                 )
+                btc_metrics, btc_rejected = validate_btc_survival(
+                    survival_snapshot.get("btc_ticker"),
+                    survival_snapshot.get("btc_candles_5m") or [],
+                    self.config,
+                )
+                survival_metrics.update(btc_metrics)
+                survival_rejected.extend(btc_rejected)
+                if (
+                    float(
+                        (survival_snapshot.get("btc_ticker") or {}).get(
+                            "signed_change_rate"
+                        )
+                        or 0
+                    )
+                    * 100
+                    <= self.config.max_btc_decline_pct
+                    and float(survival_metrics.get("survival_orderbook_ratio") or 0)
+                    < self.config.btc_weak_min_orderbook_ratio
+                ):
+                    survival_rejected.append("생존 중 BTC 약세·호가 약세 동시 발생")
                 if self._relative_strength_provider is not None:
                     survival_relative = self._relative_strength_provider(
                         market, int(time.time())
@@ -3706,7 +3830,10 @@ class CandidateAnalyzer:
             finally:
                 await verification_client.close()
             candidate, dispatch_rejection = _revalidate_candidate_for_dispatch(
-                candidate, float(latest_ticker["trade_price"])
+                candidate,
+                float(latest_ticker["trade_price"]),
+                min_risk_reward=self.config.min_risk_reward,
+                max_stop_loss_pct=self.config.max_stop_loss_pct,
             )
             if candidate is None:
                 LOGGER.info(
@@ -3787,6 +3914,9 @@ class CandidateAnalyzer:
                 "holding_mode",
                 "stop_timeframe",
                 "higher_timeframe_context",
+                "completed_5m_volume_ratio",
+                "completed_15m_volume_ratio",
+                "sustained_retest",
             ):
                 accepted_record[key] = candidate.get(key)
             MONITOR_STATE.add_screening_record(accepted_record)
