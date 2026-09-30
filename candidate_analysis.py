@@ -10,7 +10,7 @@ from statistics import mean, median, pstdev
 from typing import Any
 
 from analysis import analyze_candles
-
+from trend_context import higher_timeframe_context
 
 def _env_float(name: str, default: float) -> float:
     try:
@@ -134,6 +134,11 @@ class CandidateConfig:
     trend_target_4_pct: float
     trend_tracking_seconds: int
     outcome_tracking_seconds: int
+    higher_timeframe_enabled: bool = True
+    higher_timeframe_refresh_seconds: int = 300
+    higher_timeframe_tracking_seconds: int = 86400
+    btc_crash_5m_pct: float = -0.8
+    btc_crash_15m_pct: float = -1.5
 
     @classmethod
     def from_env(cls) -> "CandidateConfig":
@@ -201,9 +206,7 @@ class CandidateConfig:
             ),
             reentry_max_drawdown_from_day_high_pct=max(
                 1.0,
-                _env_float(
-                    "CANDIDATE_REENTRY_MAX_DRAWDOWN_FROM_DAY_HIGH_PCT", 7.0
-                ),
+                _env_float("CANDIDATE_REENTRY_MAX_DRAWDOWN_FROM_DAY_HIGH_PCT", 7.0),
             ),
             risk_off_exception_max_percentile=max(
                 0.1,
@@ -217,9 +220,7 @@ class CandidateConfig:
                 1.0,
                 min(
                     10.0,
-                    _env_float(
-                        "CANDIDATE_RISK_OFF_FRESH_LEADER_MAX_PERCENTILE", 5.0
-                    ),
+                    _env_float("CANDIDATE_RISK_OFF_FRESH_LEADER_MAX_PERCENTILE", 5.0),
                 ),
             ),
             risk_off_fresh_leader_min_5m_pct=max(
@@ -262,9 +263,7 @@ class CandidateConfig:
             min_close_position=_env_float("CANDIDATE_MIN_CLOSE_POSITION", 0.6),
             max_upper_wick_ratio=_env_float("CANDIDATE_MAX_UPPER_WICK_RATIO", 0.4),
             max_spread_pct=_env_float("CANDIDATE_MAX_SPREAD_PCT", 0.5),
-            hard_max_spread_pct=_env_float(
-                "CANDIDATE_HARD_MAX_SPREAD_PCT", 1.2
-            ),
+            hard_max_spread_pct=_env_float("CANDIDATE_HARD_MAX_SPREAD_PCT", 1.2),
             min_trade_value_24h_krw=_env_float(
                 "CANDIDATE_MIN_TRADE_VALUE_24H_KRW", 1_000_000_000
             ),
@@ -288,9 +287,7 @@ class CandidateConfig:
                 0.0,
                 _env_float("CANDIDATE_BTC_WEAK_MIN_ORDERBOOK_RATIO", 1.0),
             ),
-            hot_rsi_1m=max(
-                50.0, min(100.0, _env_float("CANDIDATE_HOT_RSI_1M", 75.0))
-            ),
+            hot_rsi_1m=max(50.0, min(100.0, _env_float("CANDIDATE_HOT_RSI_1M", 75.0))),
             orderbook_sample_count=max(
                 1, min(5, _env_int("CANDIDATE_ORDERBOOK_SAMPLE_COUNT", 3))
             ),
@@ -324,15 +321,11 @@ class CandidateConfig:
             orderbook_score_penalty=max(
                 0, _env_int("CANDIDATE_ORDERBOOK_SCORE_PENALTY", 4)
             ),
-            spread_score_penalty=max(
-                0, _env_int("CANDIDATE_SPREAD_SCORE_PENALTY", 4)
-            ),
+            spread_score_penalty=max(0, _env_int("CANDIDATE_SPREAD_SCORE_PENALTY", 4)),
             resistance_score_penalty=max(
                 0, _env_int("CANDIDATE_RESISTANCE_SCORE_PENALTY", 6)
             ),
-            rsi_score_penalty=max(
-                0, _env_int("CANDIDATE_RSI_SCORE_PENALTY", 4)
-            ),
+            rsi_score_penalty=max(0, _env_int("CANDIDATE_RSI_SCORE_PENALTY", 4)),
             double_bb_enabled=_enabled("CANDIDATE_DOUBLE_BB_ENABLED", True),
             double_bb_require_confirmation=_enabled(
                 "CANDIDATE_DOUBLE_BB_REQUIRE_CONFIRMATION", True
@@ -397,9 +390,7 @@ class CandidateConfig:
             relative_strength_score_bonus=max(
                 0, _env_int("CANDIDATE_RELATIVE_STRENGTH_SCORE_BONUS", 8)
             ),
-            early_trend_required=_enabled(
-                "CANDIDATE_EARLY_TREND_REQUIRED", True
-            ),
+            early_trend_required=_enabled("CANDIDATE_EARLY_TREND_REQUIRED", True),
             early_leader_lane_enabled=_enabled(
                 "CANDIDATE_EARLY_LEADER_LANE_ENABLED", True
             ),
@@ -415,17 +406,13 @@ class CandidateConfig:
             ),
             early_leader_resistance_floor_pct=max(
                 0.5,
-                _env_float(
-                    "CANDIDATE_EARLY_LEADER_RESISTANCE_FLOOR_PCT", 1.0
-                ),
+                _env_float("CANDIDATE_EARLY_LEADER_RESISTANCE_FLOOR_PCT", 1.0),
             ),
             breakout_resistance_cluster_pct=max(
                 0.5,
                 min(
                     3.0,
-                    _env_float(
-                        "CANDIDATE_BREAKOUT_RESISTANCE_CLUSTER_PCT", 1.5
-                    ),
+                    _env_float("CANDIDATE_BREAKOUT_RESISTANCE_CLUSTER_PCT", 1.5),
                 ),
             ),
             require_first_retest=_enabled("CANDIDATE_REQUIRE_FIRST_RETEST", True),
@@ -463,6 +450,19 @@ class CandidateConfig:
             ),
             outcome_tracking_seconds=max(
                 3600, _env_int("CANDIDATE_OUTCOME_TRACKING_SECONDS", 7200)
+            ),
+            higher_timeframe_enabled=_enabled(
+                "CANDIDATE_HIGHER_TIMEFRAME_ENABLED", True
+            ),
+            higher_timeframe_refresh_seconds=max(
+                60, _env_int("CANDIDATE_HIGHER_TIMEFRAME_REFRESH_SECONDS", 300)
+            ),
+            higher_timeframe_tracking_seconds=max(
+                21600, _env_int("CANDIDATE_HIGHER_TIMEFRAME_TRACKING_SECONDS", 86400)
+            ),
+            btc_crash_5m_pct=min(-0.1, _env_float("CANDIDATE_BTC_CRASH_5M_PCT", -0.8)),
+            btc_crash_15m_pct=min(
+                -0.2, _env_float("CANDIDATE_BTC_CRASH_15M_PCT", -1.5)
             ),
         )
 
@@ -819,6 +819,8 @@ def evaluate_candidate(
     config: CandidateConfig,
     *,
     candles_15m: list[dict[str, Any]] | None = None,
+    candles_60m: list[dict[str, Any]] | None = None,
+    candles_240m: list[dict[str, Any]] | None = None,
     btc_ticker: dict[str, Any] | None = None,
     btc_candles_5m: list[dict[str, Any]] | None = None,
     btc_candles_15m: list[dict[str, Any]] | None = None,
@@ -888,6 +890,21 @@ def evaluate_candidate(
         and _ma20_slope(b5) < 0
         and _ma20_slope(b15) < 0
     )
+    btc_bar_change = (
+        float(b5[0]["trade_price"]) / float(b5[0]["opening_price"]) - 1
+    ) * 100
+    btc_window_change = (
+        float(b5[0]["trade_price"]) / float(b5[3]["trade_price"]) - 1
+    ) * 100
+    btc_crash = (
+        btc_bar_change <= config.btc_crash_5m_pct
+        or btc_window_change <= config.btc_crash_15m_pct
+    )
+    higher = (
+        higher_timeframe_context(candles_15m, candles_60m or [], candles_240m or [])
+        if config.higher_timeframe_enabled
+        else {"ready": False, "status": "비활성"}
+    )
     relative_ready = bool(alert.get("relative_strength_ready"))
     relative_eligible = bool(alert.get("relative_strength_eligible"))
     early_trend = bool(alert.get("early_trend"))
@@ -936,6 +953,16 @@ def evaluate_candidate(
     wb_ready = bool(config.double_bb_enabled and double_bb.get("ready"))
     wb_confirmed = bool(wb_ready and double_bb.get("confirmed"))
     wb_fake_breakout = bool(wb_ready and double_bb.get("fake_breakout"))
+    hourly_trend_core = bool(
+        relative_ready
+        and relative_eligible
+        and relative_percentile <= config.early_leader_max_percentile
+        and higher.get("ready")
+        and higher.get("hourly_established")
+        and higher.get("fifteen_intact")
+        and higher["fifteen"]["above_ma20"]
+        and (retest_confirmed or wb_confirmed)
+    )
     fast_leader_core = bool(
         config.fast_leader_enabled
         and alert.get("fast_leader")
@@ -1032,7 +1059,12 @@ def evaluate_candidate(
             rejected.append(f"5분 상대 모멘텀 부족({momentum_5m:+.2f}%)")
         if momentum_15m is not None and momentum_15m <= 0:
             rejected.append(f"15분 추세 미확인({momentum_15m:+.2f}%)")
-        if config.early_trend_required and not early_trend and not persistent_leader_core:
+        if (
+            config.early_trend_required
+            and not early_trend
+            and not persistent_leader_core
+            and not hourly_trend_core
+        ):
             rejected.append("상승 초기 가속 구간 아님")
         if (
             config.require_first_retest
@@ -1071,7 +1103,12 @@ def evaluate_candidate(
     day_overheated = day_change > allowed_day_change
     elevated_risk = day_change >= 10.0 or rsi1 >= 70.0 or rsi5 >= 68.0
     early_leader_lane = bool(
-        (early_leader_core or fast_leader_core or persistent_leader_core)
+        (
+            early_leader_core
+            or fast_leader_core
+            or persistent_leader_core
+            or hourly_trend_core
+        )
         and (fast_leader_core or completed_close >= breakout)
         and current >= breakout * 0.998
         and current >= float(five["ma20"])
@@ -1146,7 +1183,14 @@ def evaluate_candidate(
         message = f"윗꼬리 주의({upper_wick:.2f})"
         (rejected if strict_quality else soft_warnings).append(message)
 
-    btc_weak = btc_change <= config.max_btc_decline_pct or btc_bearish
+    # Below an MA is a caution, not proof of a crash. A real completed-bar
+    # crash cannot be rescued by a strong orderbook or a high condition score.
+    btc_weak = btc_change <= config.max_btc_decline_pct or btc_crash
+    btc_caution = btc_bearish and not btc_weak
+    if btc_crash:
+        rejected.append(
+            f"BTC 완료봉 급락(5분 {btc_bar_change:+.2f}%, 15분 {btc_window_change:+.2f}%)"
+        )
     market_regime = str(alert.get("market_regime") or "neutral")
     market_breadth_5m_pct = float(alert.get("market_breadth_5m_pct") or 0.0)
 
@@ -1333,7 +1377,16 @@ def evaluate_candidate(
         min(float(c["low_price"]) for c in c1[:6]), breakout, float(one["ma20"])
     )
     atr_risk = max(_atr(c1) * 1.2, _atr(c5) * 0.35)
+    if hourly_trend_core:
+        # Plan a 5m initial invalidation before entry, never widen it later.
+        support = min(min(float(c["low_price"]) for c in c5[:3]), breakout)
+        atr_risk = max(_atr(c5) * 0.8, tick * 2)
     stop_raw = min(support * 0.998, entry_reference - atr_risk)
+    if (
+        hourly_trend_core
+        and (1 - stop_raw / entry_reference) * 100 > config.max_stop_loss_pct
+    ):
+        return None, ["5분 구조 손절폭이 허용 손실폭 초과"]
     stop = _round_tick(
         max(
             stop_raw,
@@ -1342,6 +1395,11 @@ def evaluate_candidate(
         tick,
         "down",
     )
+    if (
+        hourly_trend_core
+        and (1 - stop / entry_reference) * 100 > config.max_stop_loss_pct
+    ):
+        return None, ["호가 단위 반영 후 5분 구조 손절폭 초과"]
     risk = max(entry_reference - stop, tick * 2)
     structural_risk_reward = (target_resistance - entry_reference) / risk
 
@@ -1370,6 +1428,13 @@ def evaluate_candidate(
             else 0
         )
     trend_score = min(trend_score, 20)
+    if hourly_trend_core:
+        trend_score = (
+            8
+            + (6 if higher["fifteen"]["above_ma20"] else 0)
+            + (4 if current >= float(five["ma20"]) else 0)
+            + (2 if higher["four_hour"].get("above_ma20") else 0)
+        )
     btc_strong = (
         float(btc_five["latest_price"]) >= float(btc_five["ma20"])
         and float(btc_fifteen["latest_price"]) >= float(btc_fifteen["ma20"])
@@ -1379,6 +1444,8 @@ def evaluate_candidate(
     market_score = 15 if btc_strong else 12
     if btc_weak:
         market_score = max(0, market_score - config.btc_weak_score_penalty)
+    elif btc_caution:
+        market_score = max(0, market_score - config.btc_weak_score_penalty // 2)
     risk_notes: list[str] = list(soft_warnings)
     if breadth_softened:
         risk_notes.append(
@@ -1549,14 +1616,19 @@ def evaluate_candidate(
     )
     target3 = None
     target4 = None
-    if relative_trend_extension:
+    hourly_trend_extension = bool(
+        hourly_trend_core and score >= 90 and not btc_weak and not day_overheated
+    )
+    if hourly_trend_extension or relative_trend_extension:
         target1 = _round_tick(
             min(target_resistance, entry_reference * 1.03), tick, "down"
         )
         target2 = _round_tick(
             entry_reference * (1 + config.trend_target_2_pct / 100), tick, "up"
         )
-        target_mode = "상대강도 추세추적형"
+        target_mode = (
+            "1시간 추세보유형" if hourly_trend_extension else "상대강도 추세추적형"
+        )
     elif strong_extension:
         target1 = _round_tick(
             min(target_resistance, entry_reference * 1.07), tick, "down"
@@ -1575,7 +1647,7 @@ def evaluate_candidate(
             "실제 1차 목표 기준 손익비 부족"
             f"({risk_reward:.2f} < {config.min_risk_reward:.2f})"
         ]
-    if relative_trend_extension or strong_extension:
+    if hourly_trend_extension or relative_trend_extension or strong_extension:
         target3 = _round_tick(
             entry_reference * (1 + config.trend_target_3_pct / 100), tick, "up"
         )
@@ -1651,15 +1723,26 @@ def evaluate_candidate(
         risk_notes.append(
             f"BTC 약세 감점 -{config.btc_weak_score_penalty}점({btc_change:.2f}%)"
         )
+    elif btc_caution:
+        risk_notes.append(
+            f"BTC 단기 이평 약세 주의 -{config.btc_weak_score_penalty // 2}점(완료봉 급락 아님)"
+        )
+    if higher.get("ready"):
+        reasons.insert(
+            0,
+            f"1시간 {higher['hourly']['status']} · 4시간 {higher['four_hour']['status']}",
+        )
     if day_overheated:
         risk_notes.append(
             f"당일 과열 감점 -{config.day_overheat_score_penalty}점({day_change:.1f}%)"
         )
-    suggested_position_pct = (
-        5
-        if fast_leader_core or availability_tier or risk_notes
-        else 15 if score >= 95 else 10
-    )
+    suggested_position_pct = 5
+    if hourly_trend_extension:
+        stop_loss_pct = (1 - stop / entry_reference) * 100
+        # At most 0.1% of investment capital at the planned initial stop.
+        suggested_position_pct = _round_tick(
+            min(5.0, 10.0 / max(stop_loss_pct, 0.01)), 0.01, "down"
+        )
 
     return {
         "time_utc": alert.get("time_utc"),
@@ -1669,9 +1752,7 @@ def evaluate_candidate(
         "source_signal": alert["signal"],
         "is_reentry": bool(alert.get("is_reentry")),
         "watchlist_recheck": bool(alert.get("watchlist_recheck")),
-        "leader_pullback_recheck": bool(
-            alert.get("leader_pullback_recheck")
-        ),
+        "leader_pullback_recheck": bool(alert.get("leader_pullback_recheck")),
         "selection_lane": (
             "fast_leader"
             if fast_leader_core
@@ -1703,10 +1784,20 @@ def evaluate_candidate(
             else None
         ),
         "target_mode": target_mode,
+        "holding_mode": (
+            "hourly_structure" if hourly_trend_extension else "initial_signal"
+        ),
+        "higher_timeframe_context": higher,
+        "stop_timeframe": "5분 구조" if hourly_trend_core else "초기 신호 구조",
+        "price_tick": tick,
         "trend_management": (
-            "1차 목표 후 진입가 보호, 10%·15%·20% 추세 관찰"
-            if relative_trend_extension or strong_extension
-            else "고정 목표 관리"
+            "1차 일부 익절·진입가 보호, 잔여분 15분 확정 저점·1시간 추세 관리"
+            if hourly_trend_extension
+            else (
+                "1차 목표 후 진입가 보호, 10%·15%·20% 추세 관찰"
+                if relative_trend_extension or strong_extension
+                else "고정 목표 관리"
+            )
         ),
         "resistance_price": resistance,
         "risk_reward_reference_price": target1,
@@ -1718,9 +1809,7 @@ def evaluate_candidate(
         "structural_risk_reward": round(structural_risk_reward, 2),
         "breakout_level": breakout,
         "valid_seconds": (
-            min(config.valid_seconds, 120)
-            if fast_leader_core
-            else config.valid_seconds
+            min(config.valid_seconds, 120) if fast_leader_core else config.valid_seconds
         ),
         "suggested_position_pct": suggested_position_pct,
         "day_change_pct": round(day_change, 2),
@@ -1740,9 +1829,7 @@ def evaluate_candidate(
         "market_regime": market_regime,
         "market_breadth_5m_pct": round(market_breadth_5m_pct, 1),
         "market_median_5m_pct": alert.get("market_median_5m_pct"),
-        "momentum_5m_pct": (
-            round(momentum_5m, 2) if relative_ready else None
-        ),
+        "momentum_5m_pct": (round(momentum_5m, 2) if relative_ready else None),
         "momentum_15m_pct": (
             round(momentum_15m, 2) if momentum_15m is not None else None
         ),
@@ -1768,6 +1855,8 @@ def evaluate_candidate(
         "upper_wick_ratio": round(upper_wick, 2),
         "btc_day_change_pct": round(btc_change, 2),
         "btc_weak": btc_weak,
+        "btc_caution": btc_caution,
+        "btc_crash": btc_crash,
         "day_overheated": day_overheated,
         "elevated_risk": elevated_risk,
         "elevated_candle_balance": elevated_candle_balance,

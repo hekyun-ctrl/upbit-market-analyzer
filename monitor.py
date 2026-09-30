@@ -13,6 +13,7 @@ import uuid
 from collections import Counter, defaultdict, deque
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 from statistics import mean, median
 from typing import Any, Callable
 
@@ -21,9 +22,11 @@ import websockets
 
 from candidate_analysis import (
     CandidateConfig,
+    _round_tick,
     evaluate_candidate,
     validate_candidate_survival,
 )
+from trend_context import higher_timeframe_context
 from upbit_client import UpbitPublicClient
 
 LOGGER = logging.getLogger("upbit-monitor")
@@ -595,7 +598,7 @@ class MonitorState:
         targets = sum(item.get("result") == "target_1_first" for item in outcomes)
         stops = sum(item.get("result") == "stop_first" for item in outcomes)
         decided = targets + stops
-        return {
+        report = {
             "sample_count": len(outcomes),
             "decided_count": decided,
             "target_1_first": targets,
@@ -606,9 +609,7 @@ class MonitorState:
             ),
             "recent": outcomes[:100],
             "raw_signal_performance": self._performance_summary(signal_outcomes),
-            "early_watch_performance": self._early_watch_summary(
-                early_watch_events
-            ),
+            "early_watch_performance": self._early_watch_summary(early_watch_events),
             "six_hour_trend_performance": {
                 "sample_count": len(trend_outcomes),
                 "target_1_reached": sum(
@@ -620,8 +621,7 @@ class MonitorState:
                     for item in trend_outcomes
                 ),
                 "target_3_reached": sum(
-                    bool(item.get("target_3_reached"))
-                    for item in trend_outcomes
+                    bool(item.get("target_3_reached")) for item in trend_outcomes
                 ),
                 "target_4_reached": sum(
                     bool(item.get("target_4_reached"))
@@ -634,6 +634,13 @@ class MonitorState:
                 ),
                 "protected_after_target_1": sum(
                     item.get("result") == "protected_after_target_1"
+                    for item in trend_outcomes
+                ),
+                "structure_exit": sum(
+                    item.get("result") == "structure_exit" for item in trend_outcomes
+                ),
+                "hourly_structure_count": sum(
+                    item.get("holding_mode") == "hourly_structure"
                     for item in trend_outcomes
                 ),
                 "expired": sum(
@@ -652,6 +659,9 @@ class MonitorState:
                 "recent": screening_records[:100],
             },
         }
+        # Retain the old API key for existing clients; new tracks can last 24h.
+        report["trend_tracking_performance"] = report["six_hour_trend_performance"]
+        return report
 
     def snapshot(self) -> dict[str, Any]:
         with self._lock:
@@ -1476,6 +1486,14 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     wb_line = ""
     if candidate.get("double_bb_enabled"):
         wb_line = f"WB 판정: {candidate.get('double_bb_status') or '확인 중'}\n"
+    higher_line = ""
+    higher = candidate.get("higher_timeframe_context") or {}
+    if higher.get("ready"):
+        higher_line = (
+            f"상위 추세: 1시간 {higher['hourly']['status']} · "
+            f"4시간 {higher['four_hour']['status']}\n"
+            f"최초 손절 기준: {candidate.get('stop_timeframe', '초기 신호 구조')}\n"
+        )
     return (
         f"[조건부 진입 후보{suffix} | 조건점수 {candidate['score']}/100] "
         f"{candidate['market']}\n"
@@ -1495,6 +1513,7 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"{regime_line}"
         f"{survival_line}"
         f"{wb_line}"
+        f"{higher_line}"
         f"가까운 저항 여유: {candidate.get('resistance_room_pct', 0):.1f}%\n"
         f"예상 손익비: {candidate.get('risk_reward', 0):.2f}\n"
         f"추천 비중: 투자 가능금액의 {candidate['suggested_position_pct']}% 이내\n"
@@ -1564,6 +1583,10 @@ def _management_text(update: dict[str, Any]) -> str:
         "target_4": "추세 확장 4차 도달",
         "stop": "계획 손절선 도달",
         "protected": "1차 목표 후 진입가 보호 도달",
+        "hourly_promoted": "1시간 추세보유 전환",
+        "structure_raised": "잔여분 구조 보호선 상향",
+        "structure_exit": "완료 15분봉 구조 보호선 이탈",
+        "hourly_caution": "1시간 추세 약화 주의",
     }
     guidance = {
         "target_1": "진입했다면 일부 수익 확정과 잔여분 손절가의 진입가 상향을 검토하세요.",
@@ -1572,14 +1595,29 @@ def _management_text(update: dict[str, Any]) -> str:
         "target_4": "추세 확장 관찰 목표에 도달했습니다. 진입했다면 수익 보호를 우선하세요.",
         "stop": "진입했다면 사전에 정한 손실 제한 원칙을 확인하세요.",
         "protected": "1차 목표 뒤 가격이 진입가로 돌아왔습니다. 잔여분 보호 기준을 확인하세요.",
+        "hourly_promoted": "진입했다면 일부 익절 후 잔여분을 15분 확정 저점·1시간 추세로 관리하세요. 최초 손절선은 낮추지 않습니다.",
+        "structure_raised": "진입했다면 잔여분의 보호 기준 상향을 확인하세요. 5분 지표 약화만으로 전량 청산을 판정하지 않습니다.",
+        "structure_exit": "완료 15분봉이 미리 정한 구조 보호선 아래 마감했습니다. 진입했다면 잔여분 정리 기준을 확인하세요.",
+        "hourly_caution": "완료 1시간봉의 상승 구조가 약해졌습니다. 기존 보호선과 최초 손절 기준을 유지하며 잔여분 축소를 검토하세요.",
     }
     entry = float(update["entry_price"])
     current = float(update["current_price"])
+    protection_line = ""
+    if update.get("structure_protection_price"):
+        protection_line = f"15분 종가 보호선: {_format_price(float(update['structure_protection_price']))}\n"
+    target_line = ""
+    if event == "hourly_promoted":
+        target_line = (
+            f"확장 관찰: {_format_price(float(update['target_2']))} · "
+            f"{_format_price(float(update['target_3']))} · "
+            f"{_format_price(float(update['target_4']))}\n"
+        )
     return (
         f"[후보 관리 | {labels[event]}] {update['market']}\n"
         f"후보 기준가: {_format_price(entry)}\n"
         f"현재가: {_format_price(current)} "
         f"({(current / entry - 1) * 100:+.1f}%)\n"
+        f"{protection_line}{target_line}"
         f"{guidance[event]}\n"
         "실제 체결 여부를 알 수 없는 공개 시세 기반 조건부 관리 정보입니다."
     )
@@ -2063,6 +2101,7 @@ class CandidateAnalyzer:
         self._signal_tracks: dict[str, dict[str, Any]] = {}
         self._early_watch_tracks: dict[str, dict[str, Any]] = {}
         self._trend_tracks: dict[str, dict[str, Any]] = {}
+        self._trend_refresh_inflight: set[str] = set()
         self._inflight_markets: set[str] = set()
         self._inflight_alerts: dict[str, dict[str, Any]] = {}
         self._fast_inflight_markets: set[str] = set()
@@ -2532,6 +2571,10 @@ class CandidateAnalyzer:
     def _start_trend_track(self, candidate: dict[str, Any], now: float) -> None:
         market = str(candidate["market"])
         entry = float(candidate["entry_reference_price"])
+        higher = candidate.get("higher_timeframe_context") or {}
+        multiframe_tracking = bool(
+            self.config.higher_timeframe_enabled and higher.get("ready")
+        )
         self._trend_tracks[market] = {
             "market": market,
             "source_signal": candidate["source_signal"],
@@ -2552,20 +2595,30 @@ class CandidateAnalyzer:
             "max_price": entry,
             "min_price": entry,
             "created_at": now,
-            "expires_at": now + self.config.trend_tracking_seconds,
+            "expires_at": now
+            + (
+                self.config.higher_timeframe_tracking_seconds
+                if multiframe_tracking
+                else self.config.trend_tracking_seconds
+            ),
             "score": candidate["score"],
             "target_mode": candidate["target_mode"],
             "selection_lane": candidate.get("selection_lane", "standard"),
             "relative_strength_rank": candidate.get("relative_strength_rank"),
-            "relative_strength_universe": candidate.get(
-                "relative_strength_universe"
-            ),
+            "relative_strength_universe": candidate.get("relative_strength_universe"),
             "relative_strength_percentile": candidate.get(
                 "relative_strength_percentile"
             ),
             "momentum_5m_pct": candidate.get("momentum_5m_pct"),
             "momentum_15m_pct": candidate.get("momentum_15m_pct"),
             "momentum_60m_pct": candidate.get("momentum_60m_pct"),
+            "multiframe_tracking": multiframe_tracking,
+            "holding_mode": candidate.get("holding_mode", "initial_signal"),
+            "higher_timeframe_context": higher,
+            "price_tick": float(candidate.get("price_tick") or entry * 0.0001),
+            "structure_protection_price": None,
+            "last_trend_refresh_at": 0.0,
+            "hourly_warning": False,
         }
 
     def _finish_trend_track(
@@ -2601,15 +2654,17 @@ class CandidateAnalyzer:
                 "elapsed_seconds": round(now - float(state["created_at"]), 1),
                 "completed_at_utc": datetime.now(timezone.utc).isoformat(),
                 "relative_strength_rank": state.get("relative_strength_rank"),
-                "relative_strength_universe": state.get(
-                    "relative_strength_universe"
-                ),
+                "relative_strength_universe": state.get("relative_strength_universe"),
                 "relative_strength_percentile": state.get(
                     "relative_strength_percentile"
                 ),
                 "momentum_5m_pct": state.get("momentum_5m_pct"),
                 "momentum_15m_pct": state.get("momentum_15m_pct"),
                 "momentum_60m_pct": state.get("momentum_60m_pct"),
+                "holding_mode": state.get("holding_mode", "initial_signal"),
+                "structure_protection_price": state.get("structure_protection_price"),
+                "higher_timeframe_context": state.get("higher_timeframe_context"),
+                "tracking_seconds": round(now - float(state["created_at"]), 1),
             }
         )
         self._trend_tracks.pop(market, None)
@@ -2630,6 +2685,11 @@ class CandidateAnalyzer:
             "current_price": price,
             "score": int(state["score"]),
             "target_mode": state["target_mode"],
+            "holding_mode": state.get("holding_mode"),
+            "structure_protection_price": state.get("structure_protection_price"),
+            "target_2": state["target_2"],
+            "target_3": state.get("target_3"),
+            "target_4": state.get("target_4"),
         }
 
         async def deliver() -> None:
@@ -2645,6 +2705,144 @@ class CandidateAnalyzer:
         except RuntimeError:
             return
         task = loop.create_task(deliver())
+        self._tasks.add(task)
+        task.add_done_callback(self._tasks.discard)
+
+    async def _holding_snapshot(self, market: str) -> dict[str, Any]:
+        async with self._semaphore:
+            client = UpbitPublicClient()
+            try:
+                values = await asyncio.gather(
+                    client.ticker(market),
+                    client.candles(market, "minute15", 80),
+                    client.candles(market, "minute60", 80),
+                    client.candles(market, "minute240", 80),
+                )
+            finally:
+                await client.close()
+        return dict(
+            zip(("ticker", "candles_15m", "candles_60m", "candles_240m"), values)
+        )
+
+    def _apply_holding_context(
+        self, market: str, context: dict[str, Any], price: float, now: float
+    ) -> None:
+        state = self._trend_tracks.get(market)
+        if not state or not context.get("ready"):
+            return
+        # Price-based original/breakeven protection also applies during REST
+        # refresh; a rebound cannot turn a stopped trade into a longer hold.
+        hard_stop = max(
+            float(state["stop_price"]),
+            float(state["entry_price"]) if state["target_1_reached"] else 0,
+        )
+        if price <= hard_stop or now >= float(state["expires_at"]):
+            self._observe_trend_track(market, price, now)
+            return
+        old_level = state.get("structure_protection_price")
+        state["higher_timeframe_context"] = context
+        if state.get("holding_mode") == "hourly_structure" and old_level is not None:
+            if float(context["fifteen"]["close"]) < float(old_level):
+                self._queue_management_update(market, state, "structure_exit", price)
+                self._finish_trend_track(market, state, "structure_exit", price, now)
+                return
+        if (
+            context.get("hourly_established")
+            and context.get("fifteen_intact")
+            and price > float(state["entry_price"])
+        ):
+            if state.get("holding_mode") != "hourly_structure":
+                state["holding_mode"] = "hourly_structure"
+                state["target_mode"] = "1시간 추세보유형"
+                entry, tick = float(state["entry_price"]), float(state["price_tick"])
+                for key, pct in (
+                    ("target_2", self.config.trend_target_2_pct),
+                    ("target_3", self.config.trend_target_3_pct),
+                    ("target_4", self.config.trend_target_4_pct),
+                ):
+                    target = float(
+                        Decimal(str(entry)) * (Decimal("1") + Decimal(str(pct)) / 100)
+                    )
+                    state[key] = max(
+                        float(state.get(key) or 0), _round_tick(target, tick, "up")
+                    )
+                    state[key + "_reached"] = float(state["max_price"]) >= float(
+                        state[key]
+                    )
+                self._queue_management_update(market, state, "hourly_promoted", price)
+            state["hourly_warning"] = False
+        elif (
+            state.get("holding_mode") == "hourly_structure"
+            and not state["hourly_warning"]
+        ):
+            state["hourly_warning"] = True
+            self._queue_management_update(market, state, "hourly_caution", price)
+        if (
+            state.get("holding_mode") != "hourly_structure"
+            or not state["target_1_reached"]
+        ):
+            return
+        # Only confirmed 15m pivots raise the structural exit level. The 1h
+        # trend determines holding status, not an intrabar oscillating MA stop.
+        support = context["fifteen"].get("support")
+        if support is not None:
+            proposed = _round_tick(
+                float(support) * 0.998, float(state["price_tick"]), "down"
+            )
+            floor = max(hard_stop, float(old_level or 0))
+            if floor < proposed < min(price, float(context["fifteen"]["close"])):
+                state["structure_protection_price"] = proposed
+                self._queue_management_update(market, state, "structure_raised", price)
+
+    def _schedule_holding_refresh(self, market: str, now: float) -> None:
+        state = self._trend_tracks.get(market)
+        if (
+            not state
+            or not state.get("multiframe_tracking")
+            or market in self._trend_refresh_inflight
+        ):
+            return
+        if (
+            now - float(state["last_trend_refresh_at"])
+            < self.config.higher_timeframe_refresh_seconds
+        ):
+            return
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            return
+        state["last_trend_refresh_at"] = now
+        self._trend_refresh_inflight.add(market)
+
+        async def refresh() -> None:
+            try:
+                snapshot = await self._holding_snapshot(market)
+                # A newer candidate for the same market may replace this track.
+                if self._trend_tracks.get(market) is not state:
+                    return
+                context = higher_timeframe_context(
+                    snapshot["candles_15m"],
+                    snapshot["candles_60m"],
+                    snapshot["candles_240m"],
+                )
+                self._apply_holding_context(
+                    market,
+                    context,
+                    float(snapshot["ticker"]["trade_price"]),
+                    time.time(),
+                )
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:
+                LOGGER.warning(
+                    "Holding context unavailable for %s; protection unchanged: %s",
+                    market,
+                    exc,
+                )
+            finally:
+                self._trend_refresh_inflight.discard(market)
+
+        task = loop.create_task(refresh())
         self._tasks.add(task)
         task.add_done_callback(self._tasks.discard)
 
@@ -2677,13 +2875,14 @@ class CandidateAnalyzer:
             state["target_1_reached"] = True
             state["target_2_reached"] = True
             self._queue_management_update(market, state, "target_2", price)
-            if target_4 is None:
+            if target_4 is None and not state.get("multiframe_tracking"):
                 self._finish_trend_track(
                     market, state, "target_2_reached", price, now
                 )
                 return
         if price >= float(state["target_1"]) and not state["target_1_reached"]:
             state["target_1_reached"] = True
+            state["last_trend_refresh_at"] = 0.0
             self._queue_management_update(market, state, "target_1", price)
         protected_stop = (
             float(state["entry_price"])
@@ -2705,6 +2904,7 @@ class CandidateAnalyzer:
             self._finish_trend_track(market, state, result, price, now)
         elif now >= float(state["expires_at"]):
             self._finish_trend_track(market, state, "expired", price, now)
+        self._schedule_holding_refresh(market, now)
 
     def _observe_signal_track(self, market: str, price: float, now: float) -> None:
         state = self._signal_tracks.get(market)
@@ -3258,6 +3458,22 @@ class CandidateAnalyzer:
         """Fetch one internally consistent public-data bundle for screening."""
         async with self._semaphore:
             client = UpbitPublicClient()
+            async def optional_higher(interval: str) -> list[dict[str, Any]]:
+                if not self.config.higher_timeframe_enabled:
+                    return []
+                try:
+                    return await asyncio.wait_for(
+                        client.candles(market, interval, 80), timeout=5
+                    )
+                except Exception as exc:
+                    LOGGER.warning(
+                        "Higher timeframe unavailable for %s %s: %s",
+                        market,
+                        interval,
+                        exc,
+                    )
+                    return []
+
             try:
                 values = await asyncio.gather(
                     client.ticker(market),
@@ -3268,6 +3484,8 @@ class CandidateAnalyzer:
                     client.ticker("KRW-BTC"),
                     client.candles("KRW-BTC", "minute5", 120),
                     client.candles("KRW-BTC", "minute15", 120),
+                    optional_higher("minute60"),
+                    optional_higher("minute240"),
                 )
             finally:
                 await client.close()
@@ -3280,6 +3498,8 @@ class CandidateAnalyzer:
             "btc_ticker",
             "btc_candles_5m",
             "btc_candles_15m",
+            "candles_60m",
+            "candles_240m",
         )
         return dict(zip(keys, values))
 
@@ -3294,6 +3514,8 @@ class CandidateAnalyzer:
             snapshot["candles_5m"],
             self.config,
             candles_15m=snapshot["candles_15m"],
+            candles_60m=snapshot.get("candles_60m"),
+            candles_240m=snapshot.get("candles_240m"),
             btc_ticker=snapshot["btc_ticker"],
             btc_candles_5m=snapshot["btc_candles_5m"],
             btc_candles_15m=snapshot["btc_candles_15m"],
@@ -3562,6 +3784,9 @@ class CandidateAnalyzer:
                 "double_bb_true_breakout",
                 "double_bb_first_retest",
                 "double_bb_fake_breakout",
+                "holding_mode",
+                "stop_timeframe",
+                "higher_timeframe_context",
             ):
                 accepted_record[key] = candidate.get(key)
             MONITOR_STATE.add_screening_record(accepted_record)

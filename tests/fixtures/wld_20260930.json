@@ -1,0 +1,959 @@
+{
+  "market": "KRW-WLD",
+  "source": "Upbit public candles",
+  "captured_at_utc": "2026-09-30T21:55:16.367Z",
+  "as_of_kst": [
+    "2026-09-30T10:05:00+09:00",
+    "2026-09-30T18:00:00+09:00"
+  ],
+  "hourly": [
+    {
+      "candle_date_time_utc": "2026-09-30T08:00:00.000Z",
+      "opening_price": 680,
+      "high_price": 705,
+      "low_price": 673,
+      "trade_price": 698,
+      "candle_acc_trade_volume": 3842173.00390655
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T07:00:00.000Z",
+      "opening_price": 673,
+      "high_price": 682,
+      "low_price": 669,
+      "trade_price": 680,
+      "candle_acc_trade_volume": 2078612.74356556
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T06:00:00.000Z",
+      "opening_price": 678,
+      "high_price": 684,
+      "low_price": 671,
+      "trade_price": 673,
+      "candle_acc_trade_volume": 2191022.45858729
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T05:00:00.000Z",
+      "opening_price": 673,
+      "high_price": 688,
+      "low_price": 670,
+      "trade_price": 678,
+      "candle_acc_trade_volume": 2602456.72212293
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T04:00:00.000Z",
+      "opening_price": 664,
+      "high_price": 677,
+      "low_price": 664,
+      "trade_price": 673,
+      "candle_acc_trade_volume": 1146594.09532754
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T03:00:00.000Z",
+      "opening_price": 666,
+      "high_price": 668,
+      "low_price": 659,
+      "trade_price": 664,
+      "candle_acc_trade_volume": 853414.42042955
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T02:00:00.000Z",
+      "opening_price": 670,
+      "high_price": 679,
+      "low_price": 663,
+      "trade_price": 666,
+      "candle_acc_trade_volume": 1693071.37468262
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T01:00:00.000Z",
+      "opening_price": 666,
+      "high_price": 681,
+      "low_price": 666,
+      "trade_price": 670,
+      "candle_acc_trade_volume": 3173859.62569953
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T00:00:00.000Z",
+      "opening_price": 657,
+      "high_price": 667,
+      "low_price": 651,
+      "trade_price": 665,
+      "candle_acc_trade_volume": 2648428.72994342
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T23:00:00.000Z",
+      "opening_price": 662,
+      "high_price": 669,
+      "low_price": 649,
+      "trade_price": 657,
+      "candle_acc_trade_volume": 2894106.83813809
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T22:00:00.000Z",
+      "opening_price": 664,
+      "high_price": 670,
+      "low_price": 662,
+      "trade_price": 662,
+      "candle_acc_trade_volume": 1097664.91566841
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T21:00:00.000Z",
+      "opening_price": 673,
+      "high_price": 674,
+      "low_price": 662,
+      "trade_price": 664,
+      "candle_acc_trade_volume": 1746967.97265322
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T20:00:00.000Z",
+      "opening_price": 669,
+      "high_price": 677,
+      "low_price": 663,
+      "trade_price": 673,
+      "candle_acc_trade_volume": 987352.0684255
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T19:00:00.000Z",
+      "opening_price": 671,
+      "high_price": 683,
+      "low_price": 668,
+      "trade_price": 669,
+      "candle_acc_trade_volume": 680000.07780891
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T18:00:00.000Z",
+      "opening_price": 661,
+      "high_price": 675,
+      "low_price": 660,
+      "trade_price": 671,
+      "candle_acc_trade_volume": 988522.50401145
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T17:00:00.000Z",
+      "opening_price": 667,
+      "high_price": 671,
+      "low_price": 656,
+      "trade_price": 660,
+      "candle_acc_trade_volume": 2554027.05442961
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T16:00:00.000Z",
+      "opening_price": 673,
+      "high_price": 681,
+      "low_price": 662,
+      "trade_price": 667,
+      "candle_acc_trade_volume": 1604398.74963773
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T15:00:00.000Z",
+      "opening_price": 691,
+      "high_price": 697,
+      "low_price": 670,
+      "trade_price": 672,
+      "candle_acc_trade_volume": 6411400.321167
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T14:00:00.000Z",
+      "opening_price": 675,
+      "high_price": 705,
+      "low_price": 671,
+      "trade_price": 692,
+      "candle_acc_trade_volume": 6191663.37928475
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T13:00:00.000Z",
+      "opening_price": 676,
+      "high_price": 679,
+      "low_price": 670,
+      "trade_price": 675,
+      "candle_acc_trade_volume": 1940645.52330078
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T12:00:00.000Z",
+      "opening_price": 685,
+      "high_price": 689,
+      "low_price": 675,
+      "trade_price": 676,
+      "candle_acc_trade_volume": 3362172.80643439
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T11:00:00.000Z",
+      "opening_price": 677,
+      "high_price": 687,
+      "low_price": 675,
+      "trade_price": 685,
+      "candle_acc_trade_volume": 2078099.614788
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T10:00:00.000Z",
+      "opening_price": 676,
+      "high_price": 678,
+      "low_price": 671,
+      "trade_price": 677,
+      "candle_acc_trade_volume": 1365388.33943317
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T09:00:00.000Z",
+      "opening_price": 677,
+      "high_price": 681,
+      "low_price": 675,
+      "trade_price": 676,
+      "candle_acc_trade_volume": 2057429.7633098
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T08:00:00.000Z",
+      "opening_price": 683,
+      "high_price": 687,
+      "low_price": 673,
+      "trade_price": 678,
+      "candle_acc_trade_volume": 3152210.75409553
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T07:00:00.000Z",
+      "opening_price": 668,
+      "high_price": 687,
+      "low_price": 668,
+      "trade_price": 682,
+      "candle_acc_trade_volume": 5275625.08416305
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T06:00:00.000Z",
+      "opening_price": 655,
+      "high_price": 670,
+      "low_price": 653,
+      "trade_price": 669,
+      "candle_acc_trade_volume": 2065946.46126787
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T05:00:00.000Z",
+      "opening_price": 645,
+      "high_price": 657,
+      "low_price": 642,
+      "trade_price": 655,
+      "candle_acc_trade_volume": 1281921.16461103
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T04:00:00.000Z",
+      "opening_price": 643,
+      "high_price": 652,
+      "low_price": 639,
+      "trade_price": 645,
+      "candle_acc_trade_volume": 1539794.91744957
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T03:00:00.000Z",
+      "opening_price": 637,
+      "high_price": 648,
+      "low_price": 634,
+      "trade_price": 643,
+      "candle_acc_trade_volume": 2666538.06248966
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T02:00:00.000Z",
+      "opening_price": 656,
+      "high_price": 657,
+      "low_price": 634,
+      "trade_price": 636,
+      "candle_acc_trade_volume": 4016772.51692257
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T01:00:00.000Z",
+      "opening_price": 663,
+      "high_price": 670,
+      "low_price": 647,
+      "trade_price": 655,
+      "candle_acc_trade_volume": 3221511.79757624
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T00:00:00.000Z",
+      "opening_price": 669,
+      "high_price": 676,
+      "low_price": 662,
+      "trade_price": 664,
+      "candle_acc_trade_volume": 2854823.16135595
+    },
+    {
+      "candle_date_time_utc": "2026-09-28T23:00:00.000Z",
+      "opening_price": 660,
+      "high_price": 668,
+      "low_price": 659,
+      "trade_price": 668,
+      "candle_acc_trade_volume": 1631044.36863882
+    }
+  ],
+  "four_hour": [
+    {
+      "candle_date_time_utc": "2026-09-30T04:00:00.000Z",
+      "opening_price": 664,
+      "high_price": 688,
+      "low_price": 664,
+      "trade_price": 680,
+      "candle_acc_trade_volume": 8018686.01960332
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T00:00:00.000Z",
+      "opening_price": 657,
+      "high_price": 681,
+      "low_price": 651,
+      "trade_price": 664,
+      "candle_acc_trade_volume": 8368774.15075512
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T20:00:00.000Z",
+      "opening_price": 669,
+      "high_price": 677,
+      "low_price": 649,
+      "trade_price": 657,
+      "candle_acc_trade_volume": 6726091.79488522
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T16:00:00.000Z",
+      "opening_price": 673,
+      "high_price": 683,
+      "low_price": 656,
+      "trade_price": 669,
+      "candle_acc_trade_volume": 5826948.3858877
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T12:00:00.000Z",
+      "opening_price": 685,
+      "high_price": 705,
+      "low_price": 670,
+      "trade_price": 672,
+      "candle_acc_trade_volume": 17905882.03018692
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T08:00:00.000Z",
+      "opening_price": 683,
+      "high_price": 687,
+      "low_price": 671,
+      "trade_price": 685,
+      "candle_acc_trade_volume": 8653128.4716265
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T04:00:00.000Z",
+      "opening_price": 643,
+      "high_price": 687,
+      "low_price": 639,
+      "trade_price": 682,
+      "candle_acc_trade_volume": 10163287.62749152
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T00:00:00.000Z",
+      "opening_price": 669,
+      "high_price": 676,
+      "low_price": 634,
+      "trade_price": 643,
+      "candle_acc_trade_volume": 12759645.53834442
+    },
+    {
+      "candle_date_time_utc": "2026-09-28T20:00:00.000Z",
+      "opening_price": 657,
+      "high_price": 668,
+      "low_price": 652,
+      "trade_price": 668,
+      "candle_acc_trade_volume": 6532190.44582222
+    },
+    {
+      "candle_date_time_utc": "2026-09-28T16:00:00.000Z",
+      "opening_price": 664,
+      "high_price": 687,
+      "low_price": 655,
+      "trade_price": 657,
+      "candle_acc_trade_volume": 4380860.24144799
+    },
+    {
+      "candle_date_time_utc": "2026-09-28T12:00:00.000Z",
+      "opening_price": 695,
+      "high_price": 707,
+      "low_price": 649,
+      "trade_price": 663,
+      "candle_acc_trade_volume": 20822847.64918385
+    },
+    {
+      "candle_date_time_utc": "2026-09-28T08:00:00.000Z",
+      "opening_price": 693,
+      "high_price": 704,
+      "low_price": 682,
+      "trade_price": 695,
+      "candle_acc_trade_volume": 11842131.10436882
+    },
+    {
+      "candle_date_time_utc": "2026-09-28T04:00:00.000Z",
+      "opening_price": 714,
+      "high_price": 723,
+      "low_price": 692,
+      "trade_price": 693,
+      "candle_acc_trade_volume": 14812450.48775953
+    },
+    {
+      "candle_date_time_utc": "2026-09-28T00:00:00.000Z",
+      "opening_price": 738,
+      "high_price": 747,
+      "low_price": 707,
+      "trade_price": 714,
+      "candle_acc_trade_volume": 17356992.64868833
+    },
+    {
+      "candle_date_time_utc": "2026-09-27T20:00:00.000Z",
+      "opening_price": 759,
+      "high_price": 765,
+      "low_price": 731,
+      "trade_price": 738,
+      "candle_acc_trade_volume": 11076701.00679426
+    },
+    {
+      "candle_date_time_utc": "2026-09-27T16:00:00.000Z",
+      "opening_price": 749,
+      "high_price": 773,
+      "low_price": 749,
+      "trade_price": 758,
+      "candle_acc_trade_volume": 6374323.60760188
+    },
+    {
+      "candle_date_time_utc": "2026-09-27T12:00:00.000Z",
+      "opening_price": 785,
+      "high_price": 798,
+      "low_price": 748,
+      "trade_price": 749,
+      "candle_acc_trade_volume": 39603717.77564457
+    },
+    {
+      "candle_date_time_utc": "2026-09-27T08:00:00.000Z",
+      "opening_price": 728,
+      "high_price": 796,
+      "low_price": 728,
+      "trade_price": 784,
+      "candle_acc_trade_volume": 46658454.03135793
+    },
+    {
+      "candle_date_time_utc": "2026-09-27T04:00:00.000Z",
+      "opening_price": 716,
+      "high_price": 741,
+      "low_price": 696,
+      "trade_price": 728,
+      "candle_acc_trade_volume": 20392098.68058547
+    },
+    {
+      "candle_date_time_utc": "2026-09-27T00:00:00.000Z",
+      "opening_price": 711,
+      "high_price": 723,
+      "low_price": 703,
+      "trade_price": 717,
+      "candle_acc_trade_volume": 15853553.4751989
+    },
+    {
+      "candle_date_time_utc": "2026-09-26T20:00:00.000Z",
+      "opening_price": 721,
+      "high_price": 725,
+      "low_price": 700,
+      "trade_price": 712,
+      "candle_acc_trade_volume": 7886401.18798638
+    },
+    {
+      "candle_date_time_utc": "2026-09-26T16:00:00.000Z",
+      "opening_price": 733,
+      "high_price": 746,
+      "low_price": 714,
+      "trade_price": 721,
+      "candle_acc_trade_volume": 24168045.38762102
+    },
+    {
+      "candle_date_time_utc": "2026-09-26T12:00:00.000Z",
+      "opening_price": 665,
+      "high_price": 735,
+      "low_price": 660,
+      "trade_price": 733,
+      "candle_acc_trade_volume": 36757765.99138858
+    },
+    {
+      "candle_date_time_utc": "2026-09-26T08:00:00.000Z",
+      "opening_price": 657,
+      "high_price": 667,
+      "low_price": 646,
+      "trade_price": 665,
+      "candle_acc_trade_volume": 7720363.50353447
+    },
+    {
+      "candle_date_time_utc": "2026-09-26T04:00:00.000Z",
+      "opening_price": 655,
+      "high_price": 662,
+      "low_price": 647,
+      "trade_price": 658,
+      "candle_acc_trade_volume": 7219485.86788357
+    },
+    {
+      "candle_date_time_utc": "2026-09-26T00:00:00.000Z",
+      "opening_price": 669,
+      "high_price": 694,
+      "low_price": 651,
+      "trade_price": 655,
+      "candle_acc_trade_volume": 28018070.39519012
+    },
+    {
+      "candle_date_time_utc": "2026-09-25T20:00:00.000Z",
+      "opening_price": 634,
+      "high_price": 679,
+      "low_price": 630,
+      "trade_price": 669,
+      "candle_acc_trade_volume": 20331234.20409279
+    },
+    {
+      "candle_date_time_utc": "2026-09-25T16:00:00.000Z",
+      "opening_price": 618,
+      "high_price": 636,
+      "low_price": 617,
+      "trade_price": 634,
+      "candle_acc_trade_volume": 9486565.11600903
+    }
+  ],
+  "fifteen": [
+    {
+      "candle_date_time_utc": "2026-09-30T08:45:00.000Z",
+      "opening_price": 679,
+      "high_price": 705,
+      "low_price": 679,
+      "trade_price": 698,
+      "candle_acc_trade_volume": 2283170.29967831
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T08:30:00.000Z",
+      "opening_price": 681,
+      "high_price": 681,
+      "low_price": 673,
+      "trade_price": 680,
+      "candle_acc_trade_volume": 602337.15207635
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T08:15:00.000Z",
+      "opening_price": 682,
+      "high_price": 688,
+      "low_price": 679,
+      "trade_price": 681,
+      "candle_acc_trade_volume": 573684.17828148
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T08:00:00.000Z",
+      "opening_price": 680,
+      "high_price": 682,
+      "low_price": 678,
+      "trade_price": 682,
+      "candle_acc_trade_volume": 382981.37387041
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T07:45:00.000Z",
+      "opening_price": 680,
+      "high_price": 682,
+      "low_price": 678,
+      "trade_price": 680,
+      "candle_acc_trade_volume": 468824.6297682
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T07:30:00.000Z",
+      "opening_price": 676,
+      "high_price": 681,
+      "low_price": 674,
+      "trade_price": 680,
+      "candle_acc_trade_volume": 395404.14688031
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T07:15:00.000Z",
+      "opening_price": 669,
+      "high_price": 680,
+      "low_price": 669,
+      "trade_price": 676,
+      "candle_acc_trade_volume": 590634.12502509
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T07:00:00.000Z",
+      "opening_price": 673,
+      "high_price": 678,
+      "low_price": 669,
+      "trade_price": 670,
+      "candle_acc_trade_volume": 623749.84189196
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T06:45:00.000Z",
+      "opening_price": 678,
+      "high_price": 679,
+      "low_price": 673,
+      "trade_price": 673,
+      "candle_acc_trade_volume": 563439.87669394
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T06:30:00.000Z",
+      "opening_price": 674,
+      "high_price": 679,
+      "low_price": 673,
+      "trade_price": 677,
+      "candle_acc_trade_volume": 219861.04621025
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T06:15:00.000Z",
+      "opening_price": 676,
+      "high_price": 677,
+      "low_price": 671,
+      "trade_price": 674,
+      "candle_acc_trade_volume": 868661.23629798
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T06:00:00.000Z",
+      "opening_price": 678,
+      "high_price": 684,
+      "low_price": 675,
+      "trade_price": 676,
+      "candle_acc_trade_volume": 539060.29938512
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T05:45:00.000Z",
+      "opening_price": 686,
+      "high_price": 688,
+      "low_price": 678,
+      "trade_price": 678,
+      "candle_acc_trade_volume": 527686.88350429
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T05:30:00.000Z",
+      "opening_price": 679,
+      "high_price": 687,
+      "low_price": 678,
+      "trade_price": 687,
+      "candle_acc_trade_volume": 1144065.57241651
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T05:15:00.000Z",
+      "opening_price": 672,
+      "high_price": 679,
+      "low_price": 670,
+      "trade_price": 679,
+      "candle_acc_trade_volume": 504771.66467583
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T05:00:00.000Z",
+      "opening_price": 673,
+      "high_price": 677,
+      "low_price": 670,
+      "trade_price": 673,
+      "candle_acc_trade_volume": 425932.6015263
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T04:45:00.000Z",
+      "opening_price": 676,
+      "high_price": 677,
+      "low_price": 672,
+      "trade_price": 673,
+      "candle_acc_trade_volume": 261743.98070063
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T04:30:00.000Z",
+      "opening_price": 671,
+      "high_price": 677,
+      "low_price": 668,
+      "trade_price": 676,
+      "candle_acc_trade_volume": 290333.99550509
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T04:15:00.000Z",
+      "opening_price": 669,
+      "high_price": 673,
+      "low_price": 668,
+      "trade_price": 671,
+      "candle_acc_trade_volume": 227819.45042849
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T04:00:00.000Z",
+      "opening_price": 664,
+      "high_price": 672,
+      "low_price": 664,
+      "trade_price": 669,
+      "candle_acc_trade_volume": 366696.66869333
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T03:45:00.000Z",
+      "opening_price": 665,
+      "high_price": 665,
+      "low_price": 661,
+      "trade_price": 664,
+      "candle_acc_trade_volume": 139939.7641708
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T03:30:00.000Z",
+      "opening_price": 663,
+      "high_price": 667,
+      "low_price": 660,
+      "trade_price": 665,
+      "candle_acc_trade_volume": 180967.23325629
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T03:15:00.000Z",
+      "opening_price": 664,
+      "high_price": 665,
+      "low_price": 659,
+      "trade_price": 663,
+      "candle_acc_trade_volume": 381978.27268818
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T03:00:00.000Z",
+      "opening_price": 666,
+      "high_price": 668,
+      "low_price": 662,
+      "trade_price": 664,
+      "candle_acc_trade_volume": 150529.15031428
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T02:45:00.000Z",
+      "opening_price": 668,
+      "high_price": 670,
+      "low_price": 664,
+      "trade_price": 666,
+      "candle_acc_trade_volume": 360886.81982843
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T02:30:00.000Z",
+      "opening_price": 665,
+      "high_price": 669,
+      "low_price": 663,
+      "trade_price": 668,
+      "candle_acc_trade_volume": 425682.09428664
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T02:15:00.000Z",
+      "opening_price": 673,
+      "high_price": 673,
+      "low_price": 664,
+      "trade_price": 666,
+      "candle_acc_trade_volume": 462977.2736515
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T02:00:00.000Z",
+      "opening_price": 670,
+      "high_price": 679,
+      "low_price": 669,
+      "trade_price": 674,
+      "candle_acc_trade_volume": 443525.18691605
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T01:45:00.000Z",
+      "opening_price": 674,
+      "high_price": 678,
+      "low_price": 670,
+      "trade_price": 670,
+      "candle_acc_trade_volume": 530163.71924374
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T01:30:00.000Z",
+      "opening_price": 675,
+      "high_price": 676,
+      "low_price": 669,
+      "trade_price": 673,
+      "candle_acc_trade_volume": 504664.77710111
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T01:15:00.000Z",
+      "opening_price": 680,
+      "high_price": 680,
+      "low_price": 674,
+      "trade_price": 675,
+      "candle_acc_trade_volume": 534776.98129267
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T01:00:00.000Z",
+      "opening_price": 666,
+      "high_price": 681,
+      "low_price": 666,
+      "trade_price": 680,
+      "candle_acc_trade_volume": 1604254.14806201
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T00:45:00.000Z",
+      "opening_price": 661,
+      "high_price": 667,
+      "low_price": 657,
+      "trade_price": 665,
+      "candle_acc_trade_volume": 759050.96254565
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T00:30:00.000Z",
+      "opening_price": 657,
+      "high_price": 663,
+      "low_price": 657,
+      "trade_price": 661,
+      "candle_acc_trade_volume": 542182.40944595
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T00:15:00.000Z",
+      "opening_price": 653,
+      "high_price": 658,
+      "low_price": 651,
+      "trade_price": 657,
+      "candle_acc_trade_volume": 847972.5656902
+    },
+    {
+      "candle_date_time_utc": "2026-09-30T00:00:00.000Z",
+      "opening_price": 657,
+      "high_price": 659,
+      "low_price": 652,
+      "trade_price": 653,
+      "candle_acc_trade_volume": 499222.79226162
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T23:45:00.000Z",
+      "opening_price": 651,
+      "high_price": 657,
+      "low_price": 649,
+      "trade_price": 657,
+      "candle_acc_trade_volume": 698735.6304663
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T23:30:00.000Z",
+      "opening_price": 661,
+      "high_price": 661,
+      "low_price": 650,
+      "trade_price": 650,
+      "candle_acc_trade_volume": 1125213.15214641
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T23:15:00.000Z",
+      "opening_price": 667,
+      "high_price": 667,
+      "low_price": 660,
+      "trade_price": 661,
+      "candle_acc_trade_volume": 501248.18443976
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T23:00:00.000Z",
+      "opening_price": 662,
+      "high_price": 669,
+      "low_price": 661,
+      "trade_price": 667,
+      "candle_acc_trade_volume": 568909.87108562
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T22:45:00.000Z",
+      "opening_price": 665,
+      "high_price": 665,
+      "low_price": 662,
+      "trade_price": 662,
+      "candle_acc_trade_volume": 170616.24589913
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T22:30:00.000Z",
+      "opening_price": 663,
+      "high_price": 666,
+      "low_price": 662,
+      "trade_price": 665,
+      "candle_acc_trade_volume": 141664.69176751
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T22:15:00.000Z",
+      "opening_price": 667,
+      "high_price": 667,
+      "low_price": 663,
+      "trade_price": 663,
+      "candle_acc_trade_volume": 352947.80853825
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T22:00:00.000Z",
+      "opening_price": 664,
+      "high_price": 670,
+      "low_price": 664,
+      "trade_price": 668,
+      "candle_acc_trade_volume": 432436.16946352
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T21:45:00.000Z",
+      "opening_price": 663,
+      "high_price": 667,
+      "low_price": 662,
+      "trade_price": 664,
+      "candle_acc_trade_volume": 689313.72401234
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T21:30:00.000Z",
+      "opening_price": 665,
+      "high_price": 666,
+      "low_price": 662,
+      "trade_price": 663,
+      "candle_acc_trade_volume": 162692.67828926
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T21:15:00.000Z",
+      "opening_price": 673,
+      "high_price": 673,
+      "low_price": 662,
+      "trade_price": 665,
+      "candle_acc_trade_volume": 779050.82151851
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T21:00:00.000Z",
+      "opening_price": 673,
+      "high_price": 674,
+      "low_price": 670,
+      "trade_price": 673,
+      "candle_acc_trade_volume": 115910.74883311
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T20:45:00.000Z",
+      "opening_price": 671,
+      "high_price": 673,
+      "low_price": 670,
+      "trade_price": 673,
+      "candle_acc_trade_volume": 91534.19374506
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T20:30:00.000Z",
+      "opening_price": 674,
+      "high_price": 674,
+      "low_price": 670,
+      "trade_price": 672,
+      "candle_acc_trade_volume": 261617.15824894
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T20:15:00.000Z",
+      "opening_price": 666,
+      "high_price": 677,
+      "low_price": 666,
+      "trade_price": 675,
+      "candle_acc_trade_volume": 424204.48321721
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T20:00:00.000Z",
+      "opening_price": 669,
+      "high_price": 673,
+      "low_price": 663,
+      "trade_price": 666,
+      "candle_acc_trade_volume": 209996.23321429
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T19:45:00.000Z",
+      "opening_price": 673,
+      "high_price": 674,
+      "low_price": 668,
+      "trade_price": 669,
+      "candle_acc_trade_volume": 214891.36259475
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T19:30:00.000Z",
+      "opening_price": 676,
+      "high_price": 679,
+      "low_price": 672,
+      "trade_price": 672,
+      "candle_acc_trade_volume": 118256.01945751
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T19:15:00.000Z",
+      "opening_price": 678,
+      "high_price": 681,
+      "low_price": 676,
+      "trade_price": 677,
+      "candle_acc_trade_volume": 85203.98188628
+    },
+    {
+      "candle_date_time_utc": "2026-09-29T19:00:00.000Z",
+      "opening_price": 671,
+      "high_price": 683,
+      "low_price": 671,
+      "trade_price": 679,
+      "candle_acc_trade_volume": 261648.71387037
+    }
+  ]
+}

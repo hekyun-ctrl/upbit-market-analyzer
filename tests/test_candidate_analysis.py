@@ -161,6 +161,161 @@ def _orderbook(price, bid_ratio=1.5):
     }
 
 
+def _with_dates(candles, minutes):
+    now = datetime.now(timezone.utc)
+    start = now.replace(second=0, microsecond=0)
+    start -= timedelta(minutes=int(start.timestamp() // 60) % minutes)
+    return [
+        {
+            **c,
+            "candle_date_time_utc": (
+                start - timedelta(minutes=minutes * i)
+            ).isoformat(),
+        }
+        for i, c in enumerate(candles)
+    ]
+
+
+def _hourly_setup():
+    one, five = _candles(), _candles()
+    current = float(one[0]["trade_price"])
+    alert = {
+        "market": "KRW-TEST",
+        "signal": "breakout",
+        "price": current,
+        "breakout_level": current * 0.995,
+        "relative_strength_ready": True,
+        "relative_strength_eligible": True,
+        "relative_strength_percentile": 3.0,
+        "momentum_5m_pct": 1.5,
+        "momentum_15m_pct": 2.0,
+        "early_trend": False,
+        "market_regime": "neutral",
+        "market_breadth_5m_pct": 50.0,
+        "pullback_retest": True,
+    }
+    ticker = {
+        "trade_price": current,
+        "signed_change_rate": 0.05,
+        "high_price": current * 1.01,
+        "acc_trade_price_24h": 10_000_000_000,
+    }
+    return alert, ticker, one, five
+
+
+def test_hourly_retest_can_hold_trend_after_early_acceleration_has_cooled():
+    alert, ticker, one, five = _hourly_setup()
+    candidate, rejected = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(ticker["trade_price"]),
+        one,
+        five,
+        _config(),
+        candles_15m=_with_dates(_candles(), 15),
+        candles_60m=_with_dates(_candles(monotonic=True), 60),
+        candles_240m=_with_dates(list(reversed(_candles())), 240),
+    )
+    assert rejected == []
+    assert candidate["holding_mode"] == "hourly_structure"
+    assert candidate["stop_timeframe"] == "5분 구조"
+    assert candidate["target_4"] is not None
+    assert 0 < candidate["suggested_position_pct"] <= 5
+    assert candidate["higher_timeframe_context"]["four_hour"]["status"] == "하락 우위"
+
+
+def test_missing_hourly_data_does_not_invent_a_longer_holding_exception():
+    alert, ticker, one, five = _hourly_setup()
+    candidate, rejected = evaluate_candidate(
+        alert, ticker, _orderbook(ticker["trade_price"]), one, five, _config()
+    )
+    assert candidate is None
+    assert "상승 초기 가속 구간 아님" in rejected
+    alert["early_trend"] = True
+    candidate, rejected = evaluate_candidate(
+        alert, ticker, _orderbook(ticker["trade_price"]), one, five, _config()
+    )
+    assert rejected == []
+    assert candidate["holding_mode"] == "initial_signal"
+
+
+def test_hourly_trend_does_not_relax_entry_for_an_ineligible_relative_leader():
+    alert, ticker, one, five = _hourly_setup()
+    alert["relative_strength_eligible"] = False
+    candidate, rejected = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(ticker["trade_price"]),
+        one,
+        five,
+        _config(),
+        candles_15m=_with_dates(_candles(), 15),
+        candles_60m=_with_dates(_candles(monotonic=True), 60),
+    )
+    assert candidate is None
+    assert "상승 초기 가속 구간 아님" in rejected
+
+
+def test_hourly_stop_too_wide_is_rejected_instead_of_clipped_inside_support():
+    alert, ticker, one, five = _hourly_setup()
+    five[1]["low_price"] = ticker["trade_price"] * 0.9
+    candidate, rejected = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(ticker["trade_price"]),
+        one,
+        five,
+        _config(),
+        candles_15m=_with_dates(_candles(), 15),
+        candles_60m=_with_dates(_candles(monotonic=True), 60),
+    )
+    assert candidate is None
+    assert any("5분 구조 손절폭" in reason for reason in rejected)
+
+
+def test_btc_completed_bar_crash_cannot_be_rescued_by_strong_book():
+    alert, ticker, one, five = _hourly_setup()
+    alert["early_trend"] = True
+    btc = _candles()
+    btc[1]["opening_price"] = btc[1]["trade_price"] / 0.98
+    candidate, rejected = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(ticker["trade_price"], bid_ratio=3),
+        one,
+        five,
+        _config(),
+        btc_candles_5m=btc,
+    )
+    assert candidate is None
+    assert any("BTC 완료봉 급락" in reason for reason in rejected)
+
+
+def test_btc_slow_ma_decline_is_caution_not_a_crash():
+    alert, ticker, one, five = _hourly_setup()
+    alert["early_trend"] = True
+    btc = _candles(monotonic=True)
+    for c in btc:
+        c["trade_price"] = 200 - c["trade_price"]
+        c["opening_price"] = c["trade_price"] + 0.01
+        c["high_price"] = c["opening_price"] + 0.01
+        c["low_price"] = c["trade_price"] - 0.01
+    candidate, rejected = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(ticker["trade_price"]),
+        one,
+        five,
+        _config(min_score=75),
+        btc_candles_5m=btc,
+        btc_candles_15m=btc,
+    )
+    assert rejected == []
+    assert candidate["btc_caution"]
+    assert not candidate["btc_crash"] and not candidate["btc_weak"]
+    assert any("급락 아님" in note for note in candidate["risk_notes"])
+
+
 def _wb_breakout_candles(retest=False, fakeout=False):
     chronological = []
     for index in range(30):
