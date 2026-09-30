@@ -10,7 +10,33 @@ from statistics import mean, median, pstdev
 from typing import Any
 
 from analysis import analyze_candles
-from trend_context import higher_timeframe_context
+from trend_context import higher_timeframe_context, completed_context_candles
+
+
+def validate_btc_survival(
+    ticker: dict[str, Any] | None,
+    candles_5m: list[dict[str, Any]],
+    config: CandidateConfig,
+) -> tuple[dict[str, float], list[str]]:
+    """Refresh market risk during the wait; live price is a protective guard."""
+    bars = completed_context_candles(candles_5m, 5, datetime.now(timezone.utc))
+    if not bars or not ticker or not ticker.get("trade_price"):
+        return {}, ["생존 시점 BTC 최신 완료봉 미확인"]
+    close = float(bars[0]["trade_price"])
+    body = (close / float(bars[0]["opening_price"]) - 1) * 100
+    window = (close / float(bars[3]["trade_price"]) - 1) * 100
+    live = (float(ticker["trade_price"]) / close - 1) * 100
+    rejected = []
+    if body <= config.btc_crash_5m_pct or window <= config.btc_crash_15m_pct:
+        rejected.append("생존 중 BTC 완료봉 급락")
+    if live <= config.btc_crash_5m_pct:
+        rejected.append("생존 중 BTC 실시간 급락 보호")
+    return {
+        "survival_btc_5m_pct": round(body, 3),
+        "survival_btc_15m_pct": round(window, 3),
+        "survival_btc_live_pct": round(live, 3),
+    }, rejected
+
 
 def _env_float(name: str, default: float) -> float:
     try:
@@ -953,9 +979,30 @@ def evaluate_candidate(
     wb_ready = bool(config.double_bb_enabled and double_bb.get("ready"))
     wb_confirmed = bool(wb_ready and double_bb.get("confirmed"))
     wb_fake_breakout = bool(wb_ready and double_bb.get("fake_breakout"))
+    context_now = datetime.now(timezone.utc)
+    fresh_five = completed_context_candles(candles_5m, 5, context_now)
+    fresh_fifteen = completed_context_candles(candles_15m, 15, context_now)
+    sustained_retest = bool(
+        alert.get("hourly_recheck")
+        and relative_ready
+        and relative_percentile <= config.early_leader_max_percentile
+        and momentum_5m >= 0.2
+        and momentum_15m is not None
+        and momentum_15m >= 0.8
+        and float(alert.get("momentum_60m_pct") or 0) >= 1.5
+        and higher.get("ready")
+        and higher.get("hourly_established")
+        and higher.get("fifteen_intact")
+        and higher["fifteen"]["above_ma20"]
+        and _volume_metrics(fresh_five)[0] >= 1.5
+        and _volume_metrics(fresh_fifteen)[0] >= 1.0
+        and bool(completed_context_candles(candles_1m, 1, context_now))
+        and retest_confirmed
+        and wb_confirmed
+    )
     hourly_trend_core = bool(
         relative_ready
-        and relative_eligible
+        and (relative_eligible or sustained_retest)
         and relative_percentile <= config.early_leader_max_percentile
         and higher.get("ready")
         and higher.get("hourly_established")
@@ -1055,7 +1102,7 @@ def evaluate_candidate(
             and (momentum_15m is None or momentum_15m > 0)
         ):
             rejected.append("상대강도 자격 재확인 필요(순위 외 조건 불일치)")
-        if momentum_5m < config.relative_strength_min_5m_pct:
+        if momentum_5m < config.relative_strength_min_5m_pct and not sustained_retest:
             rejected.append(f"5분 상대 모멘텀 부족({momentum_5m:+.2f}%)")
         if momentum_15m is not None and momentum_15m <= 0:
             rejected.append(f"15분 추세 미확인({momentum_15m:+.2f}%)")
@@ -1442,10 +1489,6 @@ def evaluate_candidate(
     )
     liquid_market = trade_value_24h >= config.min_trade_value_24h_krw * 5
     market_score = 15 if btc_strong else 12
-    if btc_weak:
-        market_score = max(0, market_score - config.btc_weak_score_penalty)
-    elif btc_caution:
-        market_score = max(0, market_score - config.btc_weak_score_penalty // 2)
     risk_notes: list[str] = list(soft_warnings)
     if breadth_softened:
         risk_notes.append(
@@ -1475,6 +1518,10 @@ def evaluate_candidate(
     if not resistance_confirmed:
         risk_notes.append("반복 확인된 상단 구조 저항 없음")
     score_penalty = config.day_overheat_score_penalty if day_overheated else 0
+    if btc_weak:
+        score_penalty += min(market_score, config.btc_weak_score_penalty)
+    elif btc_caution:
+        score_penalty += min(market_score, config.btc_weak_score_penalty // 2)
     score_penalty += len(soft_warnings) * config.availability_soft_penalty
     regime_bonus = 3 if market_regime == "risk_on" else 0
     if market_regime == "risk_off":
@@ -1526,24 +1573,23 @@ def evaluate_candidate(
     early_leader_bonus = (
         config.early_leader_score_bonus if early_leader_lane else 0
     )
-    score = min(
+    # Bonuses may fill an area, but must not erase explicit risk deductions
+    # through saturation above 100. A score of 100 has no deducted warnings.
+    score_before_penalties = min(
         100,
-        max(
-            0,
-            setup_score
-            + volume_score
-            + trend_score
-            + market_score
-            + (12 if room >= 7 and structural_risk_reward >= 2.5 else 10)
-            + (12 if book_ratio >= 1.2 and spread <= 0.2 and liquid_market else 10)
-            + impulse_bonus
-            + relative_strength_bonus
-            + early_leader_bonus
-            + wb_bonus
-            + regime_bonus
-            - score_penalty,
-        ),
+        setup_score
+        + volume_score
+        + trend_score
+        + market_score
+        + (12 if room >= 7 and structural_risk_reward >= 2.5 else 10)
+        + (12 if book_ratio >= 1.2 and spread <= 0.2 and liquid_market else 10)
+        + impulse_bonus
+        + relative_strength_bonus
+        + early_leader_bonus
+        + wb_bonus
+        + regime_bonus,
     )
+    score = max(0, score_before_penalties - score_penalty)
     risk_off_low_room = bool(
         market_regime == "risk_off"
         and room < config.min_resistance_room_pct
@@ -1619,6 +1665,8 @@ def evaluate_candidate(
     hourly_trend_extension = bool(
         hourly_trend_core and score >= 90 and not btc_weak and not day_overheated
     )
+    if sustained_retest and not hourly_trend_extension:
+        return None, ["지속 재지지 추세보유 자격 미확인"]
     if hourly_trend_extension or relative_trend_extension:
         target1 = _round_tick(
             min(target_resistance, entry_reference * 1.03), tick, "down"
@@ -1788,6 +1836,11 @@ def evaluate_candidate(
             "hourly_structure" if hourly_trend_extension else "initial_signal"
         ),
         "higher_timeframe_context": higher,
+        "sustained_retest": sustained_retest,
+        "score_before_penalties": score_before_penalties,
+        "score_penalty": score_penalty,
+        "completed_5m_volume_ratio": round(_volume_metrics(c5)[0], 2),
+        "completed_15m_volume_ratio": round(_volume_metrics(c15)[0], 2),
         "stop_timeframe": "5분 구조" if hourly_trend_core else "초기 신호 구조",
         "price_tick": tick,
         "trend_management": (

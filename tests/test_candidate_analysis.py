@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 
 import candidate_analysis
+import pytest
 from candidate_analysis import (
     CandidateConfig,
     _completed,
@@ -9,8 +10,8 @@ from candidate_analysis import (
     _resistances,
     evaluate_candidate,
     validate_candidate_survival,
+    validate_btc_survival,
 )
-
 
 def _config(**overrides):
     values = {
@@ -203,6 +204,156 @@ def _hourly_setup():
     return alert, ticker, one, five
 
 
+def _sustained_setup(monkeypatch):
+    alert, ticker, one, five = _hourly_setup()
+    alert.update(
+        hourly_recheck=True,
+        relative_strength_eligible=False,
+        momentum_5m_pct=0.4,
+        momentum_60m_pct=3.0,
+    )
+    monkeypatch.setattr(
+        candidate_analysis,
+        "_double_bollinger_context",
+        lambda *args, **kwargs: {
+            "ready": True,
+            "confirmed": True,
+            "fake_breakout": False,
+            "status": "재지지",
+        },
+    )
+    return (
+        alert,
+        ticker,
+        _with_dates(one, 1),
+        _with_dates(five, 5),
+        _with_dates(_candles(), 15),
+        _with_dates(_candles(monotonic=True), 60),
+    )
+
+
+def test_sustained_retest_uses_hourly_trend_when_short_impulse_is_below_old_gate(
+    monkeypatch,
+):
+    alert, ticker, one, five, fifteen, hourly = _sustained_setup(monkeypatch)
+    candidate, reasons = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(ticker["trade_price"]),
+        one,
+        five,
+        _config(min_score=90, double_bb_enabled=True),
+        candles_15m=fifteen,
+        candles_60m=hourly,
+    )
+    assert reasons == []
+    assert candidate["sustained_retest"]
+    assert candidate["holding_mode"] == "hourly_structure"
+    assert candidate["completed_5m_volume_ratio"] >= 1.5
+    assert candidate["completed_15m_volume_ratio"] >= 1.0
+    assert candidate["score"] >= 90
+
+
+def test_extra_bonuses_do_not_erase_explicit_risk_deductions(monkeypatch):
+    alert, ticker, one, five, fifteen, hourly = _sustained_setup(monkeypatch)
+    alert.update(
+        relative_strength_eligible=True,
+        early_trend=True,
+        change_1m_pct=2.5,
+        volume_ratio_vs_previous_1m=6,
+    )
+    candidate, reasons = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(ticker["trade_price"], bid_ratio=0.5),
+        one,
+        five,
+        _config(min_score=90, double_bb_enabled=True),
+        candles_15m=fifteen,
+        candles_60m=hourly,
+    )
+    assert reasons == []
+    assert candidate["score_before_penalties"] == 100
+    assert candidate["score_penalty"] >= 4
+    assert candidate["score"] == 100 - candidate["score_penalty"]
+    assert candidate["score"] < 100
+
+
+@pytest.mark.parametrize(
+    "failure",
+    [
+        "hourly_missing",
+        "five_volume",
+        "fifteen_volume",
+        "minute_gap",
+        "five_gap",
+        "wb_missing",
+        "rank_lost",
+    ],
+)
+def test_sustained_retest_cannot_bypass_completed_data_volume_or_wb(
+    monkeypatch, failure
+):
+    alert, ticker, one, five, fifteen, hourly = _sustained_setup(monkeypatch)
+    if failure == "hourly_missing":
+        hourly = []
+    elif failure == "five_volume":
+        five[1]["candle_acc_trade_volume"] = 100
+        five[0]["candle_acc_trade_volume"] = 1_000_000  # unfinished surge is irrelevant
+    elif failure == "fifteen_volume":
+        fifteen[1]["candle_acc_trade_volume"] = 50
+    elif failure == "minute_gap":
+        one.pop(5)
+    elif failure == "five_gap":
+        five.pop(5)
+    elif failure == "wb_missing":
+        monkeypatch.setattr(
+            candidate_analysis,
+            "_double_bollinger_context",
+            lambda *args, **kwargs: {"ready": True, "confirmed": False},
+        )
+    else:
+        alert["relative_strength_percentile"] = 8.0
+    candidate, reasons = evaluate_candidate(
+        alert,
+        ticker,
+        _orderbook(ticker["trade_price"]),
+        one,
+        five,
+        _config(min_score=90, double_bb_enabled=True),
+        candles_15m=fifteen,
+        candles_60m=hourly,
+    )
+    assert candidate is None
+    assert reasons
+
+
+def test_btc_survival_ignores_unfinished_extreme_bar_but_checks_new_completed_crash():
+    bars = _with_dates(_candles(), 5)
+    bars[0]["trade_price"] = 1  # in-progress bar must not enter indicator judgement
+    ticker = {"trade_price": bars[1]["trade_price"]}
+    metrics, reasons = validate_btc_survival(ticker, bars, _config())
+    assert reasons == []
+    assert metrics["survival_btc_5m_pct"] > -0.8
+    bars[1]["opening_price"] = bars[1]["trade_price"] / 0.98
+    assert (
+        "생존 중 BTC 완료봉 급락" in validate_btc_survival(ticker, bars, _config())[1]
+    )
+
+
+def test_btc_survival_blocks_live_crash_and_stale_or_sparse_confirmation():
+    bars = _with_dates(_candles(), 5)
+    ticker = {"trade_price": bars[1]["trade_price"] * 0.98}
+    assert (
+        "생존 중 BTC 실시간 급락 보호"
+        in validate_btc_survival(ticker, bars, _config())[1]
+    )
+    ticker["trade_price"] = bars[1]["trade_price"]
+    assert validate_btc_survival(ticker, bars[5:], _config())[1]
+    bars.pop(5)
+    assert validate_btc_survival(ticker, bars, _config())[1]
+
+
 def test_hourly_retest_can_hold_trend_after_early_acceleration_has_cooled():
     alert, ticker, one, five = _hourly_setup()
     candidate, rejected = evaluate_candidate(
@@ -313,6 +464,7 @@ def test_btc_slow_ma_decline_is_caution_not_a_crash():
     assert rejected == []
     assert candidate["btc_caution"]
     assert not candidate["btc_crash"] and not candidate["btc_weak"]
+    assert candidate["score"] <= 100 - _config().btc_weak_score_penalty // 2
     assert any("급락 아님" in note for note in candidate["risk_notes"])
 
 
