@@ -2260,3 +2260,80 @@ def test_explosive_first_retest_requires_actual_completed_contact():
     five[1]["high_price"] = 102
     five[1]["trade_price"] = 101.9
     assert not _explosive_bar_context(one, five, fifteen, now)["confirmed"]
+
+
+def _ordinary_hot_breakout(monkeypatch):
+    import candidate_analysis
+    setup = _explosive_setup()
+    now, one, five, fifteen, btc, alert, ticker = setup
+    five[1]["candle_acc_trade_volume"] = 200  # 2x, below the explosive 3x floor
+    one[1].update(opening_price=100.8, high_price=101.02, low_price=100.8,
+                  trade_price=101, candle_acc_trade_volume=1000)
+    alert.update(early_trend=True, market_regime="risk_on", market_breadth_5m_pct=60)
+    monkeypatch.setattr(candidate_analysis, "_double_bollinger_context",
+                        lambda *a, **k: {"ready": True, "confirmed": True,
+                                         "fake_breakout": False, "status": "confirmed"})
+    return setup
+
+
+def _evaluate_hot(setup, book=2):
+    now, one, five, fifteen, btc, alert, ticker = setup
+    return evaluate_candidate(alert, ticker, _orderbook(ticker["trade_price"], book),
+                              one, five, _config(double_bb_enabled=True, min_score=80),
+                              candles_15m=fifteen, btc_candles_5m=btc,
+                              btc_candles_15m=btc, as_of=now)
+
+
+def test_rsi_only_exception_retains_ordinary_lane_and_survival(monkeypatch):
+    setup = _ordinary_hot_breakout(monkeypatch)
+    candidate, reasons = _evaluate_hot(setup)
+    assert candidate is not None, reasons
+    assert candidate["rsi_breakout_exception"]
+    assert candidate["selection_lane"] != "explosive_leader"
+    assert any("RSI" in note for note in candidate["risk_notes"])
+    now, one, five, fifteen, _, _, ticker = setup
+    _, rejected = validate_candidate_survival(candidate, ticker, [_orderbook(101, 2)],
+                                              one, _config(), as_of=now,
+                                              candles_5m=five, candles_15m=fifteen)
+    assert rejected == []
+    _, rejected = validate_candidate_survival(candidate, ticker, [_orderbook(101, .7)],
+                                              one, _config(), as_of=now,
+                                              candles_5m=five, candles_15m=fifteen)
+    assert any("RSI 예외" in reason for reason in rejected)
+
+
+@pytest.mark.parametrize("cause", ["volume5", "volume15", "gap", "rank", "book", "btc", "wick"])
+def test_rsi_exception_cannot_waive_missing_evidence(monkeypatch, cause):
+    setup = _ordinary_hot_breakout(monkeypatch)
+    _, one, five, fifteen, btc, alert, _ = setup
+    if cause == "volume5": five[1]["candle_acc_trade_volume"] = 100
+    elif cause == "volume15": fifteen[1]["candle_acc_trade_volume"] = 50
+    elif cause == "gap": one.pop(3)
+    elif cause == "rank": alert["relative_strength_percentile"] = 5
+    elif cause == "btc": btc[1]["trade_price"] = 98
+    elif cause == "wick": five[1]["high_price"] = 103
+    candidate, reasons = _evaluate_hot(setup, book=.7 if cause == "book" else 2)
+    assert candidate is None
+    assert any("RSI" in reason for reason in reasons)
+
+
+@pytest.mark.parametrize("cause", ["held", "lost_support", "unbroken", "incomplete"])
+def test_resistance_reclassification_needs_completed_clearance_and_live_hold(cause):
+    setup = _explosive_setup()
+    now, one, five, fifteen, btc, alert, ticker = setup
+    for index in (20, 25, 30): five[index]["high_price"] = 101.15
+    five[1].update(high_price=101.42, trade_price=101.4)
+    ticker["high_price"] = 101.42
+    if cause == "lost_support": ticker["trade_price"] = 100.9
+    elif cause == "unbroken":
+        for index in (20, 25, 30): five[index]["high_price"] = 101.5
+    elif cause == "incomplete":
+        five[0].update(high_price=101.42, trade_price=101.4)
+        five[1].update(high_price=101.05, trade_price=101)
+    candidate, reasons = _evaluate_explosive(setup)
+    if cause == "held":
+        assert candidate is not None, reasons
+        assert 101.15 in candidate["cleared_resistance_levels"]
+    else:
+        assert candidate is None
+        assert any("저항" in reason for reason in reasons)

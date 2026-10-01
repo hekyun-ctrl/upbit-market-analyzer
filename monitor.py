@@ -23,6 +23,7 @@ import websockets
 from candidate_analysis import (
     CandidateConfig,
     _round_tick,
+    _completed,
     evaluate_candidate,
     validate_candidate_survival,
     validate_btc_survival,
@@ -33,7 +34,7 @@ from exit_plan import exit_plan_metrics, modeled_exit_return, partial_plan_summa
 from upbit_client import UpbitPublicClient
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "explosive-leader-v3.2.1"
+STRATEGY_VERSION = "audited-breakout-v3.3"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -1760,6 +1761,8 @@ def _revalidate_candidate_for_dispatch(
         return None, f"전송 직전 추격금지선 도달({live_price:g}원)"
     if live_price <= stop or live_price >= target_1:
         return None, f"전송 전 손절·1차 목표 구간 도달({live_price:g}원)"
+    if any(live_price < float(level) * 0.998 for level in candidate.get("cleared_resistance_levels", [])):
+        return None, "전송 직전 돌파한 과거 저항의 지지 전환 실패"
 
     refreshed = dict(candidate)
     risk = live_price - stop
@@ -2792,6 +2795,10 @@ class CandidateAnalyzer:
             "volume_ratio_vs_previous_1m": alert.get("volume_ratio_vs_previous_1m"),
             "risk_plan_diagnostics": alert.get("risk_plan_diagnostics"),
             "completed_bar_recheck": bool(alert.get("completed_bar_recheck")),
+            "signal_price": alert.get("price"),
+            "original_signal_time_utc": alert.get("original_signal_time_utc") or alert.get("time_utc"),
+            "screening_snapshot": alert.get("screening_snapshot"),
+            "screening_metrics": alert.get("screening_metrics"),
         }
 
     def _start_trend_track(self, candidate: dict[str, Any], now: float) -> None:
@@ -3841,9 +3848,25 @@ class CandidateAnalyzer:
         )
         return {**dict(zip(keys, values)), "as_of": as_of}
 
+    @staticmethod
+    def _record_screening_snapshot(alert: dict[str, Any], snapshot: dict[str, Any], stage: str) -> None:
+        as_of = snapshot.get("as_of") or datetime.now(timezone.utc)
+        completed_times = {}
+        for minutes in (1, 5, 15):
+            bars = _completed(snapshot.get(f"candles_{minutes}m") or [], minutes, as_of)
+            completed_times[str(minutes)] = bars[0].get("candle_date_time_utc") if bars else None
+        alert["screening_snapshot"] = {
+            "stage": stage,
+            "as_of_utc": as_of.isoformat(),
+            "current_price": float(snapshot["ticker"]["trade_price"]),
+            "ticker_timestamp": snapshot["ticker"].get("timestamp"),
+            "completed_candle_start_times_utc": completed_times,
+        }
+
     def _evaluate_snapshot(
         self, alert: dict[str, Any], snapshot: dict[str, Any]
     ) -> tuple[dict[str, Any] | None, list[str]]:
+        self._record_screening_snapshot(alert, snapshot, "entry_screen")
         return evaluate_candidate(
             alert,
             snapshot["ticker"],
@@ -3871,7 +3894,7 @@ class CandidateAnalyzer:
             return ["생존 시점 상대강도 시장표본 미확인"]
         rejected: list[str] = []
         percentile = float(relative.get("relative_strength_percentile") or 100.0)
-        if candidate.get("selection_lane") == "explosive_leader" and percentile > 2.0:
+        if (candidate.get("selection_lane") == "explosive_leader" or candidate.get("rsi_breakout_exception")) and percentile > 2.0:
             rejected.append("생존 중 폭발적 선도주 상위 2% 이탈")
         momentum_5m = float(relative.get("momentum_5m_pct") or 0.0)
         momentum_15m_value = relative.get("momentum_15m_pct")
@@ -3981,7 +4004,7 @@ class CandidateAnalyzer:
                     alert, "rejected", rejected
                 )
                 return
-            if fast_leader and candidate.get("selection_lane") != "explosive_leader":
+            if fast_leader and candidate.get("selection_lane") != "explosive_leader" and not candidate.get("rsi_breakout_exception"):
                 candidate["survival_confirmed"] = True
                 candidate["survival_seconds"] = max(
                     self.config.fast_leader_confirm_seconds,
@@ -3999,6 +4022,7 @@ class CandidateAnalyzer:
                     self.config.pullback_survival_confirm_seconds
                     if alert.get("leader_pullback_recheck")
                     and first_candidate.get("selection_lane") != "explosive_leader"
+                    and not first_candidate.get("rsi_breakout_exception")
                     else self.config.survival_confirm_seconds
                 )
                 LOGGER.info(
@@ -4009,6 +4033,7 @@ class CandidateAnalyzer:
                 )
                 await asyncio.sleep(survival_seconds)
                 survival_snapshot = await self._market_snapshot(market)
+                self._record_screening_snapshot(alert, survival_snapshot, "survival_screen")
                 live_price = float(survival_snapshot["ticker"]["trade_price"])
                 candidate, original_range_rejection = (
                     _revalidate_candidate_for_dispatch(
@@ -4090,6 +4115,13 @@ class CandidateAnalyzer:
                 latest_ticker = await verification_client.ticker(market)
             finally:
                 await verification_client.close()
+            alert["screening_snapshot"] = {
+                **(alert.get("screening_snapshot") or {}),
+                "stage": "dispatch_quote",
+                "quote_checked_at_utc": datetime.now(timezone.utc).isoformat(),
+                "current_price": float(latest_ticker["trade_price"]),
+                "ticker_timestamp": latest_ticker.get("timestamp"),
+            }
             candidate, dispatch_rejection = _revalidate_candidate_for_dispatch(
                 candidate,
                 float(latest_ticker["trade_price"]),
@@ -4187,6 +4219,8 @@ class CandidateAnalyzer:
                 "completed_15m_volume_ratio",
                 "volume_timeframe",
                 "explosive_context",
+                "rsi_breakout_exception",
+                "cleared_resistance_levels",
                 "sustained_retest",
             ):
                 accepted_record[key] = candidate.get(key)

@@ -4,6 +4,26 @@ from datetime import datetime, timedelta, timezone
 
 import monitor
 import pytest
+
+
+def test_screening_audit_updates_live_price_and_excludes_unfinished_candle():
+    now = datetime(2026, 10, 1, 10, 0, 5, tzinfo=timezone.utc)
+    alert = {"signal_id": "same", "market": "KRW-QKC", "price": 4.1}
+    snapshot = {"as_of": now, "ticker": {"trade_price": 4.2, "timestamp": 123}}
+    for minutes in (1, 5, 15):
+        snapshot[f"candles_{minutes}m"] = [
+            {"candle_date_time_utc": now.replace(second=0).isoformat()},
+            {"candle_date_time_utc": (now.replace(second=0) - timedelta(minutes=minutes)).isoformat()},
+        ]
+    monitor.CandidateAnalyzer._record_screening_snapshot(alert, snapshot, "entry_screen")
+    before = monitor.CandidateAnalyzer._screening_record(alert, "rejected", ["test"])
+    snapshot["ticker"] = {"trade_price": 4.3, "timestamp": 456}
+    monitor.CandidateAnalyzer._record_screening_snapshot(alert, snapshot, "survival_screen")
+    after = monitor.CandidateAnalyzer._screening_record(alert, "survival_rejected", ["test"])
+    assert before["screening_snapshot"]["current_price"] == 4.2
+    assert after["screening_snapshot"]["current_price"] == 4.3
+    assert after["signal_price"] == 4.1
+    assert after["screening_snapshot"]["completed_candle_start_times_utc"]["5"] == "2026-10-01T09:55:00+00:00"
 from candidate_analysis import CandidateConfig
 from monitor import (
     MONITOR_STATE,
@@ -2234,7 +2254,8 @@ def test_telegram_explosive_score_exception_requires_actual_qualified_plan(monke
 
 
 @pytest.mark.parametrize("path", ["fast", "completed", "pullback"])
-def test_explosive_runtime_never_skips_full_survival_for_other_signal_paths(monkeypatch, path):
+@pytest.mark.parametrize("lane", ["explosive", "rsi_exception"])
+def test_explosive_runtime_never_skips_full_survival_for_other_signal_paths(monkeypatch, path, lane):
     monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
     monkeypatch.setattr("monitor.time.time", lambda: 1_800_000_010)
     analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
@@ -2250,8 +2271,20 @@ def test_explosive_runtime_never_skips_full_survival_for_other_signal_paths(monk
         return {"ticker": {"trade_price": 100}}
     monkeypatch.setattr("monitor.asyncio.sleep", sleep)
     monkeypatch.setattr(analyzer, "_market_snapshot", snapshot)
-    monkeypatch.setattr(analyzer, "_evaluate_snapshot", lambda *args: (_explosive_telegram_candidate(), []))
+    candidate = _explosive_telegram_candidate()
+    if lane == "rsi_exception":
+        candidate.update(selection_lane="standard", rsi_breakout_exception=True)
+    monkeypatch.setattr(analyzer, "_evaluate_snapshot", lambda *args: (candidate, []))
     asyncio.run(analyzer._analyze(alert))
     assert len(snapshots) == 2
     assert waits[-1] == 60
     if path == "completed": assert waits == [60]
+
+
+def test_dispatch_does_not_send_when_reclassified_resistance_support_is_lost():
+    candidate = _telegram_candidate()
+    price = float(candidate["entry_high"])
+    candidate["cleared_resistance_levels"] = [price * 1.003]
+    refreshed, rejection = _revalidate_candidate_for_dispatch(candidate, price)
+    assert refreshed is None
+    assert "지지 전환 실패" in rejection
