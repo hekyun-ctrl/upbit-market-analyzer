@@ -33,7 +33,7 @@ from exit_plan import exit_plan_metrics, modeled_exit_return, partial_plan_summa
 from upbit_client import UpbitPublicClient
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "explosive-leader-v3.2"
+STRATEGY_VERSION = "explosive-leader-v3.2.1"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -2116,8 +2116,42 @@ class AlertDispatcher:
         structural stop and completed-candle qualifications.
         """
         reasons = []
-        if int(candidate.get("score", 0)) < self._candidate_min_score:
-            reasons.append(f"Telegram 점수 미달({candidate.get('score', 0)} < {self._candidate_min_score})")
+        score_floor = self._candidate_min_score
+        if candidate.get("selection_lane") == "explosive_leader":
+            context = candidate.get("explosive_context") or {}
+            risk_config = self._candidate_risk_config
+            qualified = bool(
+                risk_config.explosive_leader_enabled and context.get("confirmed")
+                and candidate.get("survival_confirmed")
+                and float(candidate.get("survival_seconds") or 0) >= risk_config.survival_confirm_seconds
+                and 0 < float(candidate.get("relative_strength_percentile") or 100) <= 2
+                and float(context.get("volume_5m") or 0) >= (1.5 if context.get("retest") else 3)
+                and float(context.get("volume_15m") or 0) >= 1
+                and float(context.get("close_position") or 0) >= 0.65
+                and float(context.get("upper_wick", 1)) <= 0.35
+                and all(candidate.get(key) is not None for key in (
+                    "survival_btc_5m_pct", "survival_btc_15m_pct", "survival_btc_live_pct"))
+                and float(candidate.get("survival_btc_5m_pct") or 0) > risk_config.btc_crash_5m_pct
+                and float(candidate.get("survival_btc_15m_pct") or 0) > risk_config.btc_crash_15m_pct
+                and float(candidate.get("survival_btc_live_pct") or 0) > risk_config.btc_crash_5m_pct
+            )
+            try:
+                _, rejection = _revalidate_candidate_for_dispatch(
+                    candidate, float(candidate["current_price"]),
+                    min_risk_reward=risk_config.min_risk_reward,
+                    max_stop_loss_pct=risk_config.max_stop_loss_pct,
+                )
+                if rejection:
+                    qualified = False
+                    reasons.append(f"Telegram 폭발적 선도주 {rejection}")
+            except (KeyError, TypeError, ValueError):
+                qualified = False
+            if qualified:
+                score_floor = risk_config.explosive_leader_min_score
+            else:
+                reasons.append("Telegram 완료봉 폭발적 선도주 생존·구조·위험 자격 미확인")
+        if int(candidate.get("score", 0)) < score_floor:
+            reasons.append(f"Telegram 점수 미달({candidate.get('score', 0)} < {score_floor})")
         plan = candidate.get("exit_plan")
         if plan:
             higher = candidate.get("higher_timeframe_context") or {}
@@ -3964,6 +3998,7 @@ class CandidateAnalyzer:
                 survival_seconds = (
                     self.config.pullback_survival_confirm_seconds
                     if alert.get("leader_pullback_recheck")
+                    and first_candidate.get("selection_lane") != "explosive_leader"
                     else self.config.survival_confirm_seconds
                 )
                 LOGGER.info(

@@ -2183,3 +2183,75 @@ def test_new_completed_bar_is_rechecked_even_after_late_previous_bar_rejection(m
         assert not analyzer._observe_completed_bar_watchlist("KRW-TEST", 101, 1_800_000_310)
     asyncio.run(run())
     assert len(seen) == 1 and seen[0]["breakout_level"] == 100
+
+
+def _explosive_telegram_candidate():
+    candidate = _telegram_candidate()
+    candidate.update(score=80, selection_lane="explosive_leader", stop_price=99,
+                     suggested_position_pct=5, relative_strength_percentile=0.5,
+                     survival_confirmed=True, survival_seconds=60,
+                     survival_btc_5m_pct=0, survival_btc_15m_pct=0, survival_btc_live_pct=0,
+                     explosive_context={"confirmed": True, "retest": False, "volume_5m": 10,
+                                        "volume_15m": 4, "close_position": 0.9, "upper_wick": 0.1})
+    return candidate
+
+
+def test_verified_explosive_candidate_reaches_mock_telegram_with_separate_score_floor(monkeypatch):
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "test-chat")
+    monkeypatch.setenv("TELEGRAM_CANDIDATE_MIN_SCORE", "90")
+    dispatcher = AlertDispatcher()
+    sent = []
+    class Response:
+        def raise_for_status(self): pass
+    class Client:
+        def __init__(self, *args, **kwargs): pass
+        async def __aenter__(self): return self
+        async def __aexit__(self, *args): pass
+        async def post(self, url, json):
+            sent.append(json["text"])
+            return Response()
+    monkeypatch.setattr("monitor.httpx.AsyncClient", Client)
+    candidate = _explosive_telegram_candidate()
+    assert dispatcher.candidate_delivery_reasons(candidate) == []
+    assert asyncio.run(dispatcher.send_candidate(candidate))
+    assert len(sent) == 1 and "완료 5분 폭발적 선도주" in sent[0]
+    ordinary = dict(candidate, selection_lane="standard")
+    assert any("점수 미달" in reason for reason in dispatcher.candidate_delivery_reasons(ordinary))
+
+
+@pytest.mark.parametrize("cause", ["survival", "btc", "risk", "volume", "shape", "score", "disabled"])
+def test_telegram_explosive_score_exception_requires_actual_qualified_plan(monkeypatch, cause):
+    candidate = _explosive_telegram_candidate()
+    if cause == "survival": candidate["survival_confirmed"] = False
+    elif cause == "btc": candidate["survival_btc_5m_pct"] = -1
+    elif cause == "risk": candidate["stop_price"] = 97
+    elif cause == "volume": candidate["explosive_context"]["volume_15m"] = 0.5
+    elif cause == "shape": candidate["explosive_context"]["upper_wick"] = 0.8
+    elif cause == "score": candidate["score"] = 79
+    elif cause == "disabled": monkeypatch.setenv("CANDIDATE_EXPLOSIVE_LEADER_ENABLED", "false")
+    assert AlertDispatcher().candidate_delivery_reasons(candidate)
+
+
+@pytest.mark.parametrize("path", ["fast", "completed", "pullback"])
+def test_explosive_runtime_never_skips_full_survival_for_other_signal_paths(monkeypatch, path):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    monkeypatch.setattr("monitor.time.time", lambda: 1_800_000_010)
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    alert = {"market": "KRW-TEST", "signal": "breakout", "price": 100}
+    if path == "fast": alert["fast_leader"] = True
+    elif path == "completed": alert.update(completed_bar_recheck=True, original_signal_time_utc="2026-10-01T00:00:00+00:00")
+    else: alert["leader_pullback_recheck"] = True
+    waits, snapshots = [], []
+    async def sleep(seconds): waits.append(seconds)
+    async def snapshot(market):
+        snapshots.append(market)
+        if len(snapshots) > 1: raise RuntimeError("end mock at survival snapshot")
+        return {"ticker": {"trade_price": 100}}
+    monkeypatch.setattr("monitor.asyncio.sleep", sleep)
+    monkeypatch.setattr(analyzer, "_market_snapshot", snapshot)
+    monkeypatch.setattr(analyzer, "_evaluate_snapshot", lambda *args: (_explosive_telegram_candidate(), []))
+    asyncio.run(analyzer._analyze(alert))
+    assert len(snapshots) == 2
+    assert waits[-1] == 60
+    if path == "completed": assert waits == [60]
