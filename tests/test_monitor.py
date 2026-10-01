@@ -940,6 +940,81 @@ def test_dispatch_checks_actual_first_target_rr_without_rounding_into_pass():
     )
 
 
+def test_dispatch_uses_partial_plan_and_rejects_price_drift_or_fake_runner():
+    candidate = {
+        "entry_low": 99, "entry_high": 102, "chase_limit": 103,
+        "stop_price": 98, "target_1": 103, "target_2": 105,
+        "resistance_price": 105,
+        "exit_plan": {"mode": "partial_50_50", "target_1_fraction": 0.5,
+                      "runner_fraction": 0.5, "runner_ceiling": 105},
+    }
+    refreshed, reason = _revalidate_candidate_for_dispatch(candidate, 100, min_risk_reward=2)
+    assert reason is None
+    assert refreshed["risk_reward"] == 2
+    assert refreshed["first_target_risk_reward"] == 1.5
+    assert "손익비 부족" in _revalidate_candidate_for_dispatch(candidate, 100.001, min_risk_reward=2)[1]
+    candidate["target_2"] = 110
+    assert "계획 무효" in _revalidate_candidate_for_dispatch(candidate, 100, min_risk_reward=2)[1]
+
+
+def test_partial_plan_outcome_ends_at_runner_not_twenty_percent_observation(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    MONITOR_STATE.trend_outcomes.clear()
+    analyzer._start_trend_track({
+        "market": "KRW-TEST", "source_signal": "breakout",
+        "entry_reference_price": 100, "stop_price": 98, "target_1": 103,
+        "target_2": 105, "target_3": 115, "target_4": 120,
+        "score": 95, "target_mode": "1시간 추세보유형",
+        "exit_plan": {"mode": "partial_50_50", "target_1_fraction": 0.5,
+                      "runner_fraction": 0.5, "runner_ceiling": 105},
+    }, 1_800_000_000)
+    analyzer._observe_trend_track("KRW-TEST", 120, 1_800_000_010)
+    outcome = MONITOR_STATE.trend_outcomes[0]
+    assert outcome["result"] == "planned_target_2_exit"
+    assert outcome["modeled_plan_return_pct"] == 4
+    assert outcome["modeled_plan_r"] == 2
+    assert not outcome["target_4_reached"]
+    assert "KRW-TEST" not in analyzer._trend_tracks
+
+
+def test_completed_recheck_survives_three_old_retries_without_fake_retest(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    monkeypatch.setattr(MONITOR_STATE, "has_recent_signal", lambda *args: False)
+    relative = {"relative_strength_ready": True, "relative_strength_eligible": False,
+                "relative_strength_percentile": 2, "momentum_5m_pct": 0.4,
+                "momentum_15m_pct": 2, "momentum_60m_pct": 3}
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher(), lambda *args: relative)
+    analyzer._watchlist["KRW-TEST"] = {
+        "created_at": 1_800_000_000, "expires_at": 1_800_010_000,
+        "first_signal_price": 100, "source_signal": "breakout",
+        "breakout_level": 100, "leader_recheck_count": 3,
+        "last_checked_at": 1_800_000_000,
+    }
+    seen = []
+    async def fake_analyze(alert):
+        seen.append(alert)
+    monkeypatch.setattr(analyzer, "_analyze", fake_analyze)
+    async def run():
+        assert analyzer._observe_completed_bar_watchlist("KRW-TEST", 101, 1_800_000_305)
+        assert not analyzer._observe_completed_bar_watchlist("KRW-TEST", 101, 1_800_000_306)
+        await asyncio.sleep(0)
+        await asyncio.sleep(0)
+        assert not analyzer._observe_completed_bar_watchlist("KRW-TEST", 101, 1_800_000_310)
+        assert analyzer._observe_completed_bar_watchlist("KRW-TEST", 101, 1_800_000_605)
+        await asyncio.sleep(0)
+        await asyncio.sleep(0)
+    asyncio.run(run())
+    assert len(seen) == 2
+    assert all(a["completed_bar_recheck"] for a in seen)
+    assert all(not a.get("pullback_retest") and not a.get("is_reentry") for a in seen)
+    relative["relative_strength_percentile"] = 40
+    assert not analyzer._observe_completed_bar_watchlist("KRW-TEST", 101, 1_800_000_905)
+    relative["relative_strength_percentile"] = 2
+    analyzer._watchlist["KRW-TEST"]["leader_pullback_invalidated"] = True
+    assert not analyzer._observe_completed_bar_watchlist("KRW-TEST", 101, 1_800_000_905)
+
+
 def test_dispatch_rechecks_stop_width_and_hourly_capital_risk_budget():
     candidate = {
         "entry_low": 100,

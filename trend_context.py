@@ -43,6 +43,19 @@ def completed_context_candles(
     return [candle for _, candle in dated]
 
 
+def recent_minute_candles_contiguous(
+    candles: list[dict[str, Any]], now: datetime, count: int = 10
+) -> bool:
+    """At least one execution in each of the last ten completed minutes.
+
+    Do not impose a twenty-one minute no-gap rule for a ten-minute boundary.
+    This does not prove uninterrupted tick-by-tick execution.
+    """
+    last_open = now.astimezone(timezone.utc).replace(second=0, microsecond=0) - timedelta(minutes=1)
+    starts = {_opened(c) for c in candles}
+    return all(last_open - timedelta(minutes=i) in starts for i in range(count))
+
+
 def _confirmed_lows(candles: list[dict[str, Any]]) -> list[float]:
     """A low needs two completed bars on each side; no future confirmation."""
     lows = [float(c["low_price"]) for c in reversed(candles[:48])]
