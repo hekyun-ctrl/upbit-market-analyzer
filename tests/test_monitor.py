@@ -354,7 +354,7 @@ def test_exceptional_volume_leader_runs_after_morning_without_early_watch():
 
     leaders = [a for a in alerts if a["signal"] == "leader_volume_acceleration"]
     assert len(leaders) == 1
-    assert leaders[0]["notify_early_watch"] is False
+    assert leaders[0]["notify_early_watch"] is True
     assert leaders[0]["internal_only"] is True
     assert leaders[0]["preleader_volume_ratio_10m"] >= 8.0
     assert leaders[0]["preleader_volume_ratio_30m"] >= 8.0
@@ -2122,3 +2122,64 @@ def test_daily_first_target_baseline_caps_upward_gap_at_published_target():
         "completed_at_utc": "2026-10-01T01:00:00+00:00",
     })
     assert state.daily_performance("2026-10-01", 0.2)["simulated_return_average_pct"] == 2.8
+
+
+def test_existing_quiet_watch_does_not_suppress_first_intraday_notice(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    monkeypatch.setattr(analyzer, "schedule", lambda alert: False)
+    quiet = {"market": "KRW-ICX", "signal": "breakout", "price": 20.8,
+             "breakout_level": 20.5, "pullback_watch": True, "notify_early_watch": False}
+    assert analyzer.watch_preleader(quiet)
+    notice = dict(quiet, signal="leader_volume_acceleration", price=21.5,
+                  breakout_level=21.4, pullback_watch=False, notify_early_watch=True)
+    assert not analyzer.watch_preleader(notice)
+    assert analyzer.early_watch_due(notice)
+    assert analyzer._watchlist["KRW-ICX"]["breakout_level"] == 20.5
+    # Failed/suppressed transport remains eligible; only success deduplicates.
+    assert analyzer.early_watch_due(notice)
+    analyzer.mark_early_watch_delivered(notice)
+    assert not analyzer.early_watch_due(notice)
+    analyzer._remember_rejected(dict(notice, watchlist_recheck=True), ["RSI"], 22)
+    assert analyzer._watchlist["KRW-ICX"]["breakout_level"] == 20.5
+    assert not analyzer.early_watch_due(notice)
+
+
+def test_explosive_lane_is_visible_in_telegram():
+    candidate = dict(_telegram_candidate(), selection_lane="explosive_leader")
+    assert "완료 5분 폭발적 선도주" in _candidate_text(candidate)
+
+
+def test_explosive_survival_requires_leadership_to_remain_top_two_percent(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    candidate = {"selection_lane": "explosive_leader", "relative_strength_ready": True}
+    relative = {"relative_strength_ready": True, "relative_strength_eligible": True,
+                "relative_strength_percentile": 3, "momentum_5m_pct": 2, "momentum_15m_pct": 3}
+    assert any("상위 2%" in reason for reason in analyzer._relative_survival_rejections(candidate, relative))
+    relative["relative_strength_percentile"] = 1
+    assert analyzer._relative_survival_rejections(candidate, relative) == []
+
+
+def test_new_completed_bar_is_rechecked_even_after_late_previous_bar_rejection(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    monkeypatch.setattr(MONITOR_STATE, "has_recent_signal", lambda *args: False)
+    relative = {"relative_strength_ready": True, "relative_strength_eligible": True,
+                "relative_strength_percentile": 1, "momentum_5m_pct": 2,
+                "momentum_15m_pct": 3, "momentum_60m_pct": 4}
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher(), lambda *args: relative)
+    analyzer._watchlist["KRW-TEST"] = {"created_at": 1_800_000_000,
+        "expires_at": 1_800_010_000, "source_signal": "breakout", "breakout_level": 100,
+        "first_signal_price": 100, "last_checked_at": 1_800_000_295}
+    analyzer._last_leader_recheck_at["KRW-TEST"] = 1_800_000_295
+    seen = []
+    async def fake_analyze(alert): seen.append(alert)
+    monkeypatch.setattr(analyzer, "_analyze", fake_analyze)
+    async def run():
+        assert not analyzer._observe_completed_bar_watchlist("KRW-TEST", 101, 1_800_000_304)
+        assert analyzer._observe_completed_bar_watchlist("KRW-TEST", 101, 1_800_000_305)
+        await asyncio.sleep(0)
+        await asyncio.sleep(0)
+        assert not analyzer._observe_completed_bar_watchlist("KRW-TEST", 101, 1_800_000_310)
+    asyncio.run(run())
+    assert len(seen) == 1 and seen[0]["breakout_level"] == 100

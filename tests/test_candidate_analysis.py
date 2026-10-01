@@ -2149,3 +2149,114 @@ def test_high_day_change_is_a_score_penalty_not_an_automatic_rejection():
     assert candidate["condition_score"] == candidate["score"]
     assert candidate["suggested_position_pct"] == 5
     assert any("당일 과열 감점" in note for note in candidate["risk_notes"])
+
+
+def _explosive_setup():
+    now = datetime(2026, 10, 1, 7, 30, 5, tzinfo=timezone.utc)
+    def bars(minutes, latest_price=100.1):
+        boundary = now.replace(second=0) - timedelta(minutes=int(now.timestamp() // 60) % minutes)
+        result = []
+        for index in range(120):
+            result.append({"opening_price": 100.0, "high_price": 100.2, "low_price": 99.95,
+                           "trade_price": 100.1, "candle_acc_trade_volume": 100,
+                           "candle_acc_trade_price": 10010,
+                           "candle_date_time_utc": (boundary - timedelta(minutes=index * minutes)).isoformat()})
+        return result
+    one, five, fifteen, btc = bars(1), bars(5), bars(15), bars(5)
+    # Latest 1m has a long wick, weak volume and RSI heat; completed 5m is clean.
+    one[1].update(opening_price=100.9, high_price=102, low_price=100.9,
+                  trade_price=101, candle_acc_trade_volume=10)
+    five[1].update(opening_price=100.3, high_price=101.05, low_price=100.3,
+                   trade_price=101, candle_acc_trade_volume=1000)
+    fifteen[1]["candle_acc_trade_volume"] = 500
+    alert = {"market": "KRW-TEST", "signal": "breakout", "price": 101,
+             "breakout_level": 100.2, "relative_strength_ready": True,
+             "relative_strength_eligible": True, "relative_strength_percentile": 0.5,
+             "relative_strength_rank": 1, "relative_strength_universe": 200,
+             "momentum_5m_pct": 2, "momentum_15m_pct": 3,
+             "early_trend": False, "market_regime": "risk_off", "market_breadth_5m_pct": 12}
+    ticker = {"trade_price": 101, "signed_change_rate": 0.10,
+              "high_price": 101.05, "acc_trade_price_24h": 10_000_000_000}
+    return now, one, five, fifteen, btc, alert, ticker
+
+
+def _evaluate_explosive(setup, **config):
+    now, one, five, fifteen, btc, alert, ticker = setup
+    return evaluate_candidate(alert, ticker, _orderbook(ticker["trade_price"], 0.7), one, five,
+                              _config(**{"double_bb_enabled": True, "min_score": 80, **config}),
+                              candles_15m=fifteen, btc_candles_5m=btc,
+                              btc_candles_15m=btc, as_of=now)
+
+
+def test_completed_explosive_leader_can_use_five_minute_evidence():
+    setup = _explosive_setup()
+    candidate, reasons = _evaluate_explosive(setup)
+    assert candidate is not None, reasons
+    assert candidate["selection_lane"] == "explosive_leader"
+    assert candidate["volume_timeframe"] == "5분"
+    assert candidate["risk_reward"] >= 2
+    assert candidate["explosive_context"]["volume_5m"] == 10
+    assert any("RSI" in note for note in candidate["risk_notes"])
+    now, one, five, fifteen, _, _, ticker = setup
+    _, reasons = validate_candidate_survival(candidate, ticker, [_orderbook(101, 0.7)],
+                                             one, _config(), as_of=now,
+                                             candles_5m=five, candles_15m=fifteen)
+    assert reasons == []
+    _, reasons = validate_candidate_survival(candidate, ticker, [_orderbook(101, 0.7)],
+                                             one, _config(), as_of=now)
+    assert any("5·15분" in reason for reason in reasons)
+
+
+@pytest.mark.parametrize("cause", ["incomplete", "weak_five", "weak_fifteen", "gap", "wick", "rank", "btc", "wide_stop", "near_resistance", "chase"])
+def test_explosive_lane_keeps_completed_structure_and_risk_guards(cause):
+    setup = _explosive_setup()
+    now, one, five, fifteen, btc, alert, ticker = setup
+    if cause == "incomplete":
+        five[0].update(five[1]); five[0]["candle_date_time_utc"] = now.replace(second=0).isoformat()
+        five[1]["candle_acc_trade_volume"] = 100
+    elif cause == "weak_five": five[1]["candle_acc_trade_volume"] = 100
+    elif cause == "weak_fifteen": fifteen[1]["candle_acc_trade_volume"] = 20
+    elif cause == "gap": one.pop(3)
+    elif cause == "wick": five[1]["high_price"] = 103
+    elif cause == "rank": alert["relative_strength_percentile"] = 9
+    elif cause == "btc": btc[1]["trade_price"] = 98
+    elif cause == "wide_stop": alert["breakout_level"] = 95
+    elif cause == "near_resistance":
+        # Repeated prior peaks remain hard overhead supply, not today's unconfirmed high.
+        for bars in (five, fifteen):
+            for index in (5, 10, 15): bars[index]["high_price"] = 101.5
+    elif cause == "chase": ticker["trade_price"] = 103
+    candidate, reasons = _evaluate_explosive(setup)
+    assert candidate is None, (cause, candidate)
+    assert reasons
+
+
+def test_explosive_path_can_be_disabled_without_relaxing_ordinary_screen():
+    candidate, reasons = _evaluate_explosive(_explosive_setup(), explosive_leader_enabled=False)
+    assert candidate is None
+    assert any("1분봉 거래량" in reason for reason in reasons)
+
+
+def test_explosive_lane_preserves_deductions_with_separate_explicit_score_floor():
+    candidate, reasons = _evaluate_explosive(_explosive_setup(), min_score=95, availability_min_score=86)
+    assert candidate is not None, reasons
+    assert 80 <= candidate["score"] < 95
+    assert not candidate["availability_tier"]
+    assert candidate["completed_1m_volume_ratio"] < 1
+    candidate, reasons = _evaluate_explosive(_explosive_setup(), explosive_leader_min_score=95)
+    assert candidate is None and any("점수 부족" in reason for reason in reasons)
+
+
+def test_explosive_first_retest_requires_actual_completed_contact():
+    from candidate_analysis import _explosive_bar_context
+    now, one, five, fifteen, _, _, _ = _explosive_setup()
+    # Move the impulse back one completed 5m bar; its original ceiling is 100.2.
+    five[2].update({k: v for k, v in five[1].items() if k != "candle_date_time_utc"})
+    five[1].update(opening_price=100.2, high_price=100.9, low_price=100.15,
+                   trade_price=100.85, candle_acc_trade_volume=400)
+    context = _explosive_bar_context(one, five, fifteen, now)
+    assert context["confirmed"] and context["retest"]
+    five[1]["low_price"] = 101.1
+    five[1]["high_price"] = 102
+    five[1]["trade_price"] = 101.9
+    assert not _explosive_bar_context(one, five, fifteen, now)["confirmed"]
