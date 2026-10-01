@@ -33,7 +33,7 @@ from exit_plan import exit_plan_metrics, modeled_exit_return, partial_plan_summa
 from upbit_client import UpbitPublicClient
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "trend-exit-plan-v3.1"
+STRATEGY_VERSION = "explosive-leader-v3.2"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -1177,7 +1177,9 @@ class SignalEngine:
                                 ),
                                 {
                                     "internal_only": True,
-                                    "notify_early_watch": morning_window,
+                                    "notify_early_watch": morning_window or extended_leader,
+                                    "discovery_window": "morning" if morning_window else "intraday",
+                                    "breakout_level": max(bucket.high_price for bucket in previous),
                                     "confirmation_started_at_utc": confirmation_started_at(
                                         start_price
                                         * (
@@ -1502,7 +1504,9 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     risk_notes = "·".join(candidate.get("risk_notes", []))
     risk_line = f"위험 감점: {risk_notes}\n" if risk_notes else ""
     labels = []
-    if candidate.get("selection_lane") == "fast_leader":
+    if candidate.get("selection_lane") == "explosive_leader":
+        labels.append("완료 5분 폭발적 선도주")
+    elif candidate.get("selection_lane") == "fast_leader":
         labels.append("초고속 선도주")
     elif candidate.get("selection_lane") == "early_leader":
         labels.append("선도주 정밀형")
@@ -1564,6 +1568,8 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     wb_line = ""
     if candidate.get("double_bb_enabled"):
         wb_line = f"WB 판정: {candidate.get('double_bb_status') or '확인 중'}\n"
+        if candidate.get("selection_lane") == "explosive_leader":
+            wb_line = f"1분 {wb_line.rstrip()} · 별도 완료 5분 구조로 검증\n"
     higher_line = ""
     higher = candidate.get("higher_timeframe_context") or {}
     if higher.get("ready"):
@@ -2372,6 +2378,17 @@ class CandidateAnalyzer:
             >= first_price * (1 - self.config.leader_pullback_max_pct / 100)
         )
 
+    def early_watch_due(self, alert: dict[str, Any]) -> bool:
+        state = self._watchlist.get(str(alert["market"])) or {}
+        return bool(state and alert.get("notify_early_watch", True)
+                    and not alert.get("pullback_watch")
+                    and not state.get("early_watch_delivered"))
+
+    def mark_early_watch_delivered(self, alert: dict[str, Any]) -> None:
+        state = self._watchlist.get(str(alert["market"]))
+        if state is not None:
+            state["early_watch_delivered"] = True
+
     def watch_preleader(self, alert: dict[str, Any]) -> bool:
         """Keep an early volume leader internal until a clean retest occurs."""
         if not self.config.enabled or not self.config.leader_watch_enabled:
@@ -2393,10 +2410,12 @@ class CandidateAnalyzer:
                 "leader_recheck_count": 0,
             }
         price = float(alert["price"])
+        anchor = float(state.get("breakout_level") or alert.get("breakout_level")
+                       or alert.get("consolidation_high") or price)
         state.update(
             {
                 "source_signal": alert["signal"],
-                "breakout_level": price,
+                "breakout_level": anchor,
                 "last_price": price,
                 "last_rejected": ["상대강도 선도주 조기탐지 후 첫 눌림 대기"],
                 "last_checked_at": now,
@@ -2435,7 +2454,7 @@ class CandidateAnalyzer:
             }
         )
         self._watchlist[market] = state
-        if created and alert.get("notify_early_watch", True) and not pullback_watch:
+        if self.early_watch_due(alert) and not pullback_watch and market not in self._early_watch_tracks:
             self._start_early_watch_track(alert, now)
         self._start_signal_track(alert, now)
         MONITOR_STATE.add_alert(alert)
@@ -2455,7 +2474,7 @@ class CandidateAnalyzer:
             fast_alert = dict(alert)
             fast_alert.pop("internal_only", None)
             fast_alert["fast_leader"] = True
-            fast_alert["breakout_level"] = price
+            fast_alert["breakout_level"] = anchor
             scheduled = self.schedule(fast_alert)
             LOGGER.info(
                 "FAST_LEADER_SCHEDULED market=%s scheduled=%s rank=%s/%s "
@@ -3144,7 +3163,8 @@ class CandidateAnalyzer:
             {
                 "source_signal": alert["signal"],
                 "breakout_level": float(
-                    alert.get("breakout_level")
+                    state.get("breakout_level")
+                    or alert.get("breakout_level")
                     or alert.get("consolidation_high")
                     or alert["price"]
                 ),
@@ -3565,7 +3585,7 @@ class CandidateAnalyzer:
         completed volume, hourly structure, spread, risk and a real retest.
         """
         if not (self.config.enabled and self.config.leader_watch_enabled
-                and self.config.higher_timeframe_enabled):
+                and (self.config.higher_timeframe_enabled or self.config.explosive_leader_enabled)):
             return False
         state = self._active_watch(market, now)
         if (not state or state.get("leader_pullback_invalidated") or price <= 0
@@ -3578,8 +3598,8 @@ class CandidateAnalyzer:
         # within the same bar, nor alongside a just-started fast retry.
         if (now - bucket * 300 < 5
                 or state.get("completed_recheck_bucket") == bucket
-                or now - float(state.get("last_checked_at") or 0) < 300
-                or now - self._last_leader_recheck_at.get(market, 0) < 300):
+                or int(float(state.get("last_checked_at") or 0)) // 300 == bucket
+                or int(self._last_leader_recheck_at.get(market, 0)) // 300 == bucket):
             return False
         breakout = float(state.get("breakout_level") or state.get("first_signal_price") or 0)
         if price < breakout or MONITOR_STATE.has_recent_signal(market, "rapid_drop", 600):
@@ -3817,6 +3837,8 @@ class CandidateAnalyzer:
             return ["생존 시점 상대강도 시장표본 미확인"]
         rejected: list[str] = []
         percentile = float(relative.get("relative_strength_percentile") or 100.0)
+        if candidate.get("selection_lane") == "explosive_leader" and percentile > 2.0:
+            rejected.append("생존 중 폭발적 선도주 상위 2% 이탈")
         momentum_5m = float(relative.get("momentum_5m_pct") or 0.0)
         momentum_15m_value = relative.get("momentum_15m_pct")
         momentum_15m = (
@@ -3857,7 +3879,11 @@ class CandidateAnalyzer:
         try:
             now_epoch = time.time()
             fast_leader = bool(alert.get("fast_leader"))
-            if fast_leader:
+            if alert.get("completed_bar_recheck"):
+                # Scheduled only after the 5m close/API buffer; do not wait
+                # for another 1m discovery candle or overwrite its anchor.
+                alert["confirmation_started_at_utc"] = alert.get("original_signal_time_utc")
+            elif fast_leader:
                 # Three orderbook samples add roughly four seconds, so a six-
                 # second live hold produces a decision about ten seconds after
                 # discovery without waiting for the minute boundary.
@@ -3921,7 +3947,7 @@ class CandidateAnalyzer:
                     alert, "rejected", rejected
                 )
                 return
-            if fast_leader:
+            if fast_leader and candidate.get("selection_lane") != "explosive_leader":
                 candidate["survival_confirmed"] = True
                 candidate["survival_seconds"] = max(
                     self.config.fast_leader_confirm_seconds,
@@ -3964,6 +3990,8 @@ class CandidateAnalyzer:
                     survival_snapshot["candles_1m"],
                     self.config,
                     as_of=survival_snapshot.get("as_of"),
+                    candles_5m=survival_snapshot.get("candles_5m"),
+                    candles_15m=survival_snapshot.get("candles_15m"),
                 )
                 btc_metrics, btc_rejected = validate_btc_survival(
                     survival_snapshot.get("btc_ticker"),
@@ -4122,6 +4150,8 @@ class CandidateAnalyzer:
                 "higher_timeframe_context",
                 "completed_5m_volume_ratio",
                 "completed_15m_volume_ratio",
+                "volume_timeframe",
+                "explosive_context",
                 "sustained_retest",
             ):
                 accepted_record[key] = candidate.get(key)
@@ -4300,10 +4330,11 @@ async def run_monitor_forever() -> None:
                                 if alert.get("signal") == "persistent_leader_acceleration":
                                     candidate_analyzer.schedule(alert)
                                     continue
-                                created = candidate_analyzer.watch_preleader(alert)
-                                if created and alert.get("notify_early_watch", True):
+                                candidate_analyzer.watch_preleader(alert)
+                                if candidate_analyzer.early_watch_due(alert):
                                     try:
-                                        await dispatcher.send_early_watch(alert)
+                                        if await dispatcher.send_early_watch(alert):
+                                            candidate_analyzer.mark_early_watch_delivered(alert)
                                     except Exception as exc:
                                         LOGGER.error("Early-watch delivery failed: %s", exc)
                                 continue
