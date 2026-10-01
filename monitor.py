@@ -29,6 +29,7 @@ from candidate_analysis import (
 )
 from trend_context import higher_timeframe_context
 from filter_audit import filter_audit, REJECTIONS
+from exit_plan import exit_plan_metrics, modeled_exit_return
 from upbit_client import UpbitPublicClient
 
 LOGGER = logging.getLogger("upbit-monitor")
@@ -672,6 +673,16 @@ class MonitorState:
         }
         # Retain the old API key for existing clients; new tracks can last 24h.
         report["trend_tracking_performance"] = report["six_hour_trend_performance"]
+        partial = [item for item in trend_outcomes if item.get("exit_plan")]
+        report["partial_exit_plan_performance"] = {
+            "sample_count": len(partial),
+            "planned_target_2_exit": sum(item.get("result") == "planned_target_2_exit" for item in partial),
+            "gross_modeled_positive": sum(float(item.get("modeled_plan_return_pct", 0)) > 0 for item in partial),
+            "gross_modeled_negative": sum(float(item.get("modeled_plan_return_pct", 0)) < 0 for item in partial),
+            "mean_gross_modeled_r": round(mean(float(item["modeled_plan_r"]) for item in partial), 4) if partial else None,
+            "definition": "50/50 계획 가정·수수료 전·실제 체결 또는 계좌 수익률 아님",
+            "recent": partial[:100],
+        }
         return report
 
     def snapshot(self) -> dict[str, Any]:
@@ -1549,6 +1560,13 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
             f"완료 거래량: 5분 {float(candidate['completed_5m_volume_ratio']):.2f}배 · "
             f"15분 {float(candidate['completed_15m_volume_ratio']):.2f}배\n"
         )
+    plan_line = ""
+    if candidate.get("exit_plan"):
+        plan_line = (
+            "청산 계획: 1차 50%·2차 잔여 50%, 1차 후 진입가 보호\n"
+            f"1차 손익비: {candidate['first_target_risk_reward']:.2f} · "
+            "전체 계획 손익비는 두 목표 도달 가정·수수료 전\n"
+        )
     return (
         f"[조건부 진입 후보{suffix} | 조건점수 {candidate['score']}/100] "
         f"{candidate['market']}\n"
@@ -1571,7 +1589,8 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"{higher_line}"
         f"{volume_line}"
         f"가까운 저항 여유: {candidate.get('resistance_room_pct', 0):.1f}%\n"
-        f"예상 손익비: {candidate.get('risk_reward', 0):.2f}\n"
+        f"{plan_line}"
+        f"계획 손익비: {candidate.get('risk_reward', 0):.2f}\n"
         f"추천 비중: 투자 가능금액의 {candidate['suggested_position_pct']}% 이내\n"
         f"신호 유효시간: {int(candidate['valid_seconds'] / 60)}분\n"
         f"{risk_line}"
@@ -1656,6 +1675,11 @@ def _management_text(update: dict[str, Any]) -> str:
         "structure_exit": "완료 15분봉이 미리 정한 구조 보호선 아래 마감했습니다. 진입했다면 잔여분 정리 기준을 확인하세요.",
         "hourly_caution": "완료 1시간봉의 상승 구조가 약해졌습니다. 기존 보호선과 최초 손절 기준을 유지하며 잔여분 축소를 검토하세요.",
     }
+    if update.get("exit_plan"):
+        guidance.update({
+            "target_1": "계획상 50% 익절·잔여 50% 진입가 보호 구간입니다. 실제 체결 여부를 확인하세요.",
+            "target_2": "계획상 잔여 50% 청산 구간입니다. 이후 확장 가격은 별도 관찰이며 보유 지시가 아닙니다.",
+        })
     entry = float(update["entry_price"])
     current = float(update["current_price"])
     protection_line = ""
@@ -1710,12 +1734,20 @@ def _revalidate_candidate_for_dispatch(
     risk_reward_reference = float(
         candidate.get("risk_reward_reference_price") or resistance
     )
-    actual_rr = (
-        (min(target_1, risk_reward_reference) - live_price) / risk if risk > 0 else 0.0
-    )
+    plan = candidate.get("exit_plan")
+    try:
+        metrics = exit_plan_metrics(
+            live_price, stop, min(target_1, risk_reward_reference), target_2, plan
+        )
+    except (ValueError, KeyError, TypeError):
+        return None, "전송 직전 청산 계획 무효"
+    actual_rr = float(metrics["risk_reward"])
     stop_pct = risk / live_price * 100 if live_price > 0 else float("inf")
+    if plan and float(metrics["first_target_risk_reward"]) < 1.0:
+        return None, "전송 직전 부분 청산 1차 손익비 부족"
     if actual_rr < min_risk_reward:
-        return None, f"전송 직전 실제 1차 목표 손익비 부족({actual_rr:.2f})"
+        label = "부분 청산 계획" if plan else "실제 1차 목표"
+        return None, f"전송 직전 {label} 손익비 부족({actual_rr:.2f})"
     if stop_pct > max_stop_loss_pct:
         return None, f"전송 직전 계획 손절폭 초과({stop_pct:.2f}%)"
     refreshed.update(
@@ -1729,6 +1761,8 @@ def _revalidate_candidate_for_dispatch(
                 actual_rr,
                 2,
             ),
+            "risk_reward_basis": metrics["risk_reward_basis"],
+            "first_target_risk_reward": round(float(metrics["first_target_risk_reward"]), 4),
         }
     )
     if candidate.get("holding_mode") == "hourly_structure" and stop_pct > 0:
@@ -2624,7 +2658,7 @@ class CandidateAnalyzer:
     ) -> dict[str, Any]:
         return {
             "signal_id": alert.get("signal_id"),
-            "strategy_version": "leader-recheck-v2",
+            "strategy_version": "trend-exit-plan-v3",
             "time_utc": datetime.now(timezone.utc).isoformat(),
             "market": alert.get("market"),
             "source_signal": alert.get("signal"),
@@ -2639,6 +2673,8 @@ class CandidateAnalyzer:
             "early_trend": alert.get("early_trend"),
             "change_1m_pct": alert.get("change_1m_pct"),
             "volume_ratio_vs_previous_1m": alert.get("volume_ratio_vs_previous_1m"),
+            "risk_plan_diagnostics": alert.get("risk_plan_diagnostics"),
+            "completed_bar_recheck": bool(alert.get("completed_bar_recheck")),
         }
 
     def _start_trend_track(self, candidate: dict[str, Any], now: float) -> None:
@@ -2688,6 +2724,7 @@ class CandidateAnalyzer:
             "multiframe_tracking": multiframe_tracking,
             "holding_mode": candidate.get("holding_mode", "initial_signal"),
             "higher_timeframe_context": higher,
+            "exit_plan": candidate.get("exit_plan"),
             "price_tick": float(candidate.get("price_tick") or entry * 0.0001),
             "structure_protection_price": None,
             "last_trend_refresh_at": 0.0,
@@ -2703,6 +2740,12 @@ class CandidateAnalyzer:
         now: float,
     ) -> None:
         entry = float(state["entry_price"])
+        modeled = (
+            modeled_exit_return(entry, float(state["stop_price"]),
+                                float(state["target_1"]), float(state["target_2"]),
+                                bool(state["target_1_reached"]), exit_price)
+            if state.get("exit_plan") else {}
+        )
         MONITOR_STATE.add_trend_outcome(
             {
                 "market": market,
@@ -2712,6 +2755,8 @@ class CandidateAnalyzer:
                 "target_mode": state["target_mode"],
                 "selection_lane": state.get("selection_lane", "standard"),
                 "entry_price": entry,
+                "exit_plan": state.get("exit_plan"),
+                **modeled,
                 "exit_price": exit_price,
                 "target_1": state["target_1"],
                 "target_2": state["target_2"],
@@ -2760,6 +2805,7 @@ class CandidateAnalyzer:
             "target_mode": state["target_mode"],
             "holding_mode": state.get("holding_mode"),
             "structure_protection_price": state.get("structure_protection_price"),
+            "exit_plan": state.get("exit_plan"),
             "target_2": state["target_2"],
             "target_3": state.get("target_3"),
             "target_4": state.get("target_4"),
@@ -2803,6 +2849,9 @@ class CandidateAnalyzer:
         state = self._trend_tracks.get(market)
         if not state or not context.get("ready"):
             return
+        if state.get("exit_plan") and price >= float(state["target_2"]):
+            self._observe_trend_track(market, price, now)
+            return
         # Price-based original/breakeven protection also applies during REST
         # refresh; a rebound cannot turn a stopped trade into a longer hold.
         hard_stop = max(
@@ -2833,6 +2882,8 @@ class CandidateAnalyzer:
                     ("target_3", self.config.trend_target_3_pct),
                     ("target_4", self.config.trend_target_4_pct),
                 ):
+                    if key == "target_2" and state.get("exit_plan"):
+                        continue  # Never extend an admitted full exit afterward.
                     target = float(
                         Decimal(str(entry)) * (Decimal("1") + Decimal(str(pct)) / 100)
                     )
@@ -2925,6 +2976,12 @@ class CandidateAnalyzer:
             return
         state["max_price"] = max(float(state["max_price"]), price)
         state["min_price"] = min(float(state["min_price"]), price)
+        if state.get("exit_plan") and price >= float(state["target_2"]):
+            state["target_1_reached"] = True
+            state["target_2_reached"] = True
+            self._queue_management_update(market, state, "target_2", price)
+            self._finish_trend_track(market, state, "planned_target_2_exit", price, now)
+            return
         target_3 = state.get("target_3")
         target_4 = state.get("target_4")
         if target_4 is not None and price >= float(target_4):
@@ -3429,6 +3486,70 @@ class CandidateAnalyzer:
         )
         return True
 
+    def _observe_completed_bar_watchlist(
+        self, market: str, price: float, now: float
+    ) -> bool:
+        """A new completed 5m bar permits a fresh screen, not a retest waiver.
+
+        The three fast pullback retries do not exhaust a 12h watch forever.
+        At most one REST screen per market/5m, sharing the inflight guard and
+        semaphore. Admission requires current leadership; REST confirms WB,
+        completed volume, hourly structure, spread, risk and a real retest.
+        """
+        if not (self.config.enabled and self.config.leader_watch_enabled
+                and self.config.higher_timeframe_enabled):
+            return False
+        state = self._active_watch(market, now)
+        if (not state or state.get("leader_pullback_invalidated") or price <= 0
+                or market in self._inflight_markets):
+            return False
+        if now - self._last_delivered_at.get(market, 0) < self.config.repeat_cooldown_seconds:
+            return False
+        bucket = int(now) // 300
+        # Allow the freshly ended bar to be published. No repeated screens
+        # within the same bar, nor alongside a just-started fast retry.
+        if (now - bucket * 300 < 5
+                or state.get("completed_recheck_bucket") == bucket
+                or now - float(state.get("last_checked_at") or 0) < 300
+                or now - self._last_leader_recheck_at.get(market, 0) < 300):
+            return False
+        breakout = float(state.get("breakout_level") or state.get("first_signal_price") or 0)
+        if price < breakout or MONITOR_STATE.has_recent_signal(market, "rapid_drop", 600):
+            return False
+        relative = (self._relative_strength_provider(market, int(now))
+                    if self._relative_strength_provider else {})
+        if not (
+            relative.get("relative_strength_ready")
+            and float(relative.get("relative_strength_percentile") or 100) <= self.config.early_leader_max_percentile
+            and float(relative.get("momentum_5m_pct") or 0) >= 0.2
+            and float(relative.get("momentum_15m_pct") or 0) >= 0.8
+            and float(relative.get("momentum_60m_pct") or 0) >= 1.5
+        ):
+            return False
+        state["completed_recheck_bucket"] = bucket
+        state["completed_recheck_count"] = int(state.get("completed_recheck_count", 0)) + 1
+        self._last_leader_recheck_at[market] = now
+        alert = {
+            "time_utc": datetime.now(timezone.utc).isoformat(),
+            "market": market, "signal": state["source_signal"], "price": price,
+            "breakout_level": breakout, "watchlist_recheck": True,
+            "hourly_recheck": True, "completed_bar_recheck": True,
+            "original_signal_time_utc": state.get("first_signal_time_utc"),
+            **relative,
+        }
+        # Deliberately omit is_reentry/pullback_retest: those flags would fake
+        # a reclaimed line; the completed chart must establish it itself.
+        self._start_signal_track(alert, now)
+        MONITOR_STATE.add_screening_record(self._screening_record(alert, "leader_recheck_scheduled", []))
+        self._inflight_markets.add(market)
+        task = asyncio.create_task(self._analyze(alert))
+        self._tasks.add(task)
+        def completed(finished: asyncio.Task[None]) -> None:
+            self._tasks.discard(finished)
+            self._inflight_markets.discard(market)
+        task.add_done_callback(completed)
+        return True
+
     def observe_price(self, market: str, price: float) -> bool:
         """Schedule one fresh recheck after price leaves and retakes the entry zone."""
         now = time.time()
@@ -3438,6 +3559,8 @@ class CandidateAnalyzer:
         leader_recheck_scheduled = self._observe_leader_watchlist(
             market, price, now
         )
+        if not leader_recheck_scheduled:
+            leader_recheck_scheduled = self._observe_completed_bar_watchlist(market, price, now)
         state = self._lifecycles.get(market)
         if not state:
             return leader_recheck_scheduled
@@ -3547,6 +3670,7 @@ class CandidateAnalyzer:
         """Fetch one internally consistent public-data bundle for screening."""
         async with self._semaphore:
             client = UpbitPublicClient()
+            as_of = datetime.now(timezone.utc)
             async def optional_higher(interval: str) -> list[dict[str, Any]]:
                 if not self.config.higher_timeframe_enabled:
                     return []
@@ -3590,7 +3714,7 @@ class CandidateAnalyzer:
             "candles_60m",
             "candles_240m",
         )
-        return dict(zip(keys, values))
+        return {**dict(zip(keys, values)), "as_of": as_of}
 
     def _evaluate_snapshot(
         self, alert: dict[str, Any], snapshot: dict[str, Any]
@@ -3609,6 +3733,7 @@ class CandidateAnalyzer:
             btc_candles_5m=snapshot["btc_candles_5m"],
             btc_candles_15m=snapshot["btc_candles_15m"],
             orderbook_samples=snapshot["orderbooks"],
+            as_of=snapshot.get("as_of"),
         )
 
     def _relative_survival_rejections(
@@ -3767,11 +3892,13 @@ class CandidateAnalyzer:
                     survival_snapshot["orderbooks"],
                     survival_snapshot["candles_1m"],
                     self.config,
+                    as_of=survival_snapshot.get("as_of"),
                 )
                 btc_metrics, btc_rejected = validate_btc_survival(
                     survival_snapshot.get("btc_ticker"),
                     survival_snapshot.get("btc_candles_5m") or [],
                     self.config,
+                    as_of=survival_snapshot.get("as_of"),
                 )
                 survival_metrics.update(btc_metrics)
                 survival_rejected.extend(btc_rejected)
@@ -3901,6 +4028,9 @@ class CandidateAnalyzer:
                 "spread_pct",
                 "resistance_room_pct",
                 "risk_reward",
+                "risk_reward_basis",
+                "first_target_risk_reward",
+                "exit_plan",
                 "first_retest_confirmed",
                 "early_trend",
                 "early_leader_lane",
@@ -4145,4 +4275,7 @@ def public_config() -> dict[str, Any]:
     return {
         **asdict(MonitorConfig.from_env()),
         "candidate_analysis": CandidateConfig.from_env().public(),
+        "trend_exit_plan": {"mode": "partial_50_50", "minimum_first_target_r": 1.0,
+                            "runner_ceiling": "nearest_resistance_or_conservative_projection",
+                            "completed_recheck_seconds": 300},
     }

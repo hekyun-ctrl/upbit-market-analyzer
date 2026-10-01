@@ -254,6 +254,69 @@ def test_sustained_retest_uses_hourly_trend_when_short_impulse_is_below_old_gate
     assert candidate["score"] >= 90
 
 
+def test_hourly_partial_exit_admits_plan_without_inventing_ten_percent_room(monkeypatch):
+    alert, ticker, one, five, fifteen, hourly = _sustained_setup(monkeypatch)
+    monkeypatch.setattr(candidate_analysis, "_atr", lambda bars: 2.3)
+    candidate, reasons = evaluate_candidate(
+        alert, ticker, _orderbook(ticker["trade_price"]), one, five,
+        _config(min_score=90, double_bb_enabled=True),
+        candles_15m=fifteen, candles_60m=hourly,
+    )
+    assert reasons == []
+    assert 1 <= candidate["first_target_risk_reward"] < 2
+    assert candidate["risk_reward"] >= 2
+    assert candidate["exit_plan"]["mode"] == "partial_50_50"
+    assert candidate["target_2_pct"] <= 5
+    assert candidate["target_2"] <= candidate["resistance_price"]
+    assert candidate["exit_plan"]["ceiling_basis"] == "conservative_projection"
+
+
+def test_snapshot_crossing_a_minute_boundary_cannot_reclassify_partial_bars():
+    before = datetime(2026, 10, 1, 0, 34, 59, tzinfo=timezone.utc)
+    candles = [
+        {"candle_date_time_utc": f"2026-10-01T00:{minute}:00", "trade_price": minute}
+        for minute in (35, 34, 33, 32)
+    ]
+    # Data fetched after 00:35 may include both 00:35 and the still-open-at-
+    # capture-time 00:34. Neither can become a completed decision candle.
+    assert [c["trade_price"] for c in _completed(candles, 1, before)] == [33, 32]
+
+
+def test_ten_minute_no_gap_rule_does_not_silently_require_twenty_one():
+    from trend_context import recent_minute_candles_contiguous
+    before = datetime(2026, 10, 1, 0, 35, 5, tzinfo=timezone.utc)
+    candles = [{"candle_date_time_utc": (before.replace(second=0) - timedelta(minutes=i)).isoformat()}
+               for i in range(1, 25) if i != 15]
+    assert recent_minute_candles_contiguous(candles, before)
+    candles.pop(4)
+    assert not recent_minute_candles_contiguous(candles, before)
+
+
+@pytest.mark.parametrize("cause", ["wide_risk", "near_resistance", "weak_book"])
+def test_partial_exit_does_not_rescue_unavailable_reward_or_weak_liquidity(monkeypatch, cause):
+    alert, ticker, one, five, fifteen, hourly = _sustained_setup(monkeypatch)
+    monkeypatch.setattr(candidate_analysis, "_atr", lambda bars: 3.5 if cause == "wide_risk" else 2.3)
+    book = _orderbook(ticker["trade_price"])
+    if cause == "near_resistance":
+        monkeypatch.setattr(candidate_analysis, "_resistances", lambda *args: [ticker["trade_price"] * 1.032])
+    if cause == "weak_book":
+        book["total_bid_size"] = 10
+        for level in book["orderbook_units"]:
+            level["bid_size"] = 0.01
+    candidate, reasons = evaluate_candidate(
+        alert, ticker, book, one, five, _config(min_score=90, double_bb_enabled=True),
+        candles_15m=fifteen, candles_60m=hourly,
+    )
+    assert candidate is None
+    assert reasons
+    if cause != "weak_book":
+        assert "손익비 부족" in reasons[0]
+        assert alert["risk_plan_diagnostics"]["risk_reward"] < 2
+    else:
+        assert any("호가" in reason or "손익비 부족" in reason for reason in reasons)
+        assert alert.get("risk_plan_diagnostics", {}).get("exit_plan") is None
+
+
 def test_extra_bonuses_do_not_erase_explicit_risk_deductions(monkeypatch):
     alert, ticker, one, five, fifteen, hourly = _sustained_setup(monkeypatch)
     alert.update(
@@ -1927,7 +1990,9 @@ def test_fast_leader_can_pass_before_completed_minute_without_chasing(monkeypatc
     one = _candles()
     five = _candles()
     current = float(one[0]["trade_price"])
-    one[0]["candle_date_time_utc"] = "2026-09-16T00:00:00+00:00"
+    opened = datetime(2026, 9, 16, tzinfo=timezone.utc)
+    for index, candle in enumerate(one):
+        candle["candle_date_time_utc"] = (opened - timedelta(minutes=index)).isoformat()
     ticker = {
         "trade_price": current,
         "signed_change_rate": 0.06,
@@ -1965,6 +2030,7 @@ def test_fast_leader_can_pass_before_completed_minute_without_chasing(monkeypatc
         one,
         five,
         _config(min_score=80, availability_balance_enabled=False),
+        as_of=opened + timedelta(seconds=55),
     )
 
     assert rejected == []

@@ -10,16 +10,18 @@ from statistics import mean, median, pstdev
 from typing import Any
 
 from analysis import analyze_candles
-from trend_context import higher_timeframe_context, completed_context_candles
+from trend_context import higher_timeframe_context, completed_context_candles, recent_minute_candles_contiguous
+from exit_plan import exit_plan_metrics
 
 
 def validate_btc_survival(
     ticker: dict[str, Any] | None,
     candles_5m: list[dict[str, Any]],
     config: CandidateConfig,
+    *, as_of: datetime | None = None,
 ) -> tuple[dict[str, float], list[str]]:
     """Refresh market risk during the wait; live price is a protective guard."""
-    bars = completed_context_candles(candles_5m, 5, datetime.now(timezone.utc))
+    bars = completed_context_candles(candles_5m, 5, as_of or datetime.now(timezone.utc))
     if not bars or not ticker or not ticker.get("trade_price"):
         return {}, ["생존 시점 BTC 최신 완료봉 미확인"]
     close = float(bars[0]["trade_price"])
@@ -508,7 +510,12 @@ def _completed(
     if opened is None:
         return candles[1:]
     current_time = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
-    return candles if opened + timedelta(minutes=minutes) <= current_time else candles[1:]
+    # A REST bundle can cross a minute boundary after its as-of timestamp.
+    # More than its first candle may then be unfinished at that timestamp.
+    return [c for c in candles if (
+        (start := _parse_time(c.get("candle_date_time_utc") or c.get("time_utc")))
+        is not None and start + timedelta(minutes=minutes) <= current_time
+    )]
 
 
 def _volume_metrics(candles: list[dict[str, Any]]) -> tuple[float, float]:
@@ -790,6 +797,7 @@ def validate_candidate_survival(
     orderbook_samples: list[dict[str, Any]],
     candles_1m: list[dict[str, Any]],
     config: CandidateConfig,
+    *, as_of: datetime | None = None,
 ) -> tuple[dict[str, Any], list[str]]:
     """Recheck only the conditions that can invalidate an already-built setup.
 
@@ -797,7 +805,7 @@ def validate_candidate_survival(
     impulse. Requiring the complete entry screen again turned the survival
     delay into a second discovery test and removed otherwise intact setups.
     """
-    c1 = _completed(candles_1m, 1)
+    c1 = _completed(candles_1m, 1, as_of)
     if len(c1) < 21:
         return {}, ["생존 확인용 완료봉 데이터 부족"]
 
@@ -851,8 +859,11 @@ def evaluate_candidate(
     btc_candles_5m: list[dict[str, Any]] | None = None,
     btc_candles_15m: list[dict[str, Any]] | None = None,
     orderbook_samples: list[dict[str, Any]] | None = None,
+    as_of: datetime | None = None,
 ) -> tuple[dict[str, Any] | None, list[str]]:
     """Evaluate a setup with persistent snapshots and lane-specific candles."""
+    alert.pop("risk_plan_diagnostics", None)
+    context_now = (as_of or datetime.now(timezone.utc)).astimezone(timezone.utc)
     if alert.get("signal") not in {
         "price_volume_surge",
         "breakout",
@@ -869,11 +880,11 @@ def evaluate_candidate(
     btc_candles_15m = btc_candles_15m or btc_candles_5m
     btc_ticker = btc_ticker or {"signed_change_rate": 0.0}
     c1, c5, c15 = (
-        _completed(candles_1m, 1),
-        _completed(candles_5m, 5),
-        _completed(candles_15m, 15),
+        _completed(candles_1m, 1, context_now),
+        _completed(candles_5m, 5, context_now),
+        _completed(candles_15m, 15, context_now),
     )
-    b5, b15 = _completed(btc_candles_5m, 5), _completed(btc_candles_15m, 15)
+    b5, b15 = _completed(btc_candles_5m, 5, context_now), _completed(btc_candles_15m, 15, context_now)
     if min(map(len, (c1, c5, c15, b5, b15))) < 60:
         return None, ["완료봉 데이터 부족"]
 
@@ -927,7 +938,7 @@ def evaluate_candidate(
         or btc_window_change <= config.btc_crash_15m_pct
     )
     higher = (
-        higher_timeframe_context(candles_15m, candles_60m or [], candles_240m or [])
+        higher_timeframe_context(candles_15m, candles_60m or [], candles_240m or [], now=context_now)
         if config.higher_timeframe_enabled
         else {"ready": False, "status": "비활성"}
     )
@@ -979,7 +990,6 @@ def evaluate_candidate(
     wb_ready = bool(config.double_bb_enabled and double_bb.get("ready"))
     wb_confirmed = bool(wb_ready and double_bb.get("confirmed"))
     wb_fake_breakout = bool(wb_ready and double_bb.get("fake_breakout"))
-    context_now = datetime.now(timezone.utc)
     fresh_five = completed_context_candles(candles_5m, 5, context_now)
     fresh_fifteen = completed_context_candles(candles_15m, 15, context_now)
     sustained_retest = bool(
@@ -996,7 +1006,7 @@ def evaluate_candidate(
         and higher["fifteen"]["above_ma20"]
         and _volume_metrics(fresh_five)[0] >= 1.5
         and _volume_metrics(fresh_fifteen)[0] >= 1.0
-        and bool(completed_context_candles(candles_1m, 1, context_now))
+        and recent_minute_candles_contiguous(candles_1m, context_now)
         and retest_confirmed
         and wb_confirmed
     )
@@ -1689,11 +1699,48 @@ def evaluate_candidate(
         )
         target2 = _round_tick(entry_reference * 1.05, tick, "up")
         target_mode = "균형 위험비형"
-    risk_reward = (target1 - entry_reference) / risk
+    # Only an established, freshly confirmed hourly retest may use partial
+    # exits. Keep normal/fast entries on the existing first-target rule.
+    exit_plan = None
+    if (
+        (hourly_trend_extension or relative_trend_extension)
+        and higher.get("ready") and higher.get("hourly_established")
+        and higher.get("fifteen_intact") and higher["fifteen"]["above_ma20"]
+        and wb_confirmed and retest_confirmed and score >= 90
+        and book_persistent and spread <= config.max_spread_pct
+        and _volume_metrics(fresh_five)[0] >= 1.5
+        and _volume_metrics(fresh_fifteen)[0] >= 1.0
+        and recent_minute_candles_contiguous(candles_1m, context_now)
+    ):
+        # Do not enlarge a close confirmed resistance using a leader override.
+        # Without historical resistance, use the existing conservative room
+        # projection, never the nominal 10% expansion target.
+        runner_ceiling = _round_tick(
+            min(resistance, entry_reference * (1 + config.trend_target_2_pct / 100)),
+            tick, "down",
+        )
+        if runner_ceiling > target1:
+            target2 = runner_ceiling
+            exit_plan = {
+                "mode": "partial_50_50", "target_1_fraction": 0.5,
+                "runner_fraction": 0.5, "runner_ceiling": runner_ceiling,
+                "ceiling_basis": "confirmed_resistance" if resistance_confirmed
+                else "conservative_projection",
+                "protect_after_target_1": "entry_price",
+            }
+    metrics = exit_plan_metrics(entry_reference, stop, target1, target2, exit_plan)
+    risk_reward = float(metrics["risk_reward"])
+    alert["risk_plan_diagnostics"] = {
+        "entry_reference_price": entry_reference, "stop_price": stop,
+        "target_1": target1, "target_2": target2, "exit_plan": exit_plan,
+        **metrics, "min_risk_reward": config.min_risk_reward,
+    }
+    if exit_plan and float(metrics["first_target_risk_reward"]) < 1.0:
+        return None, ["부분 청산 1차 목표 손익비 부족(1.00 미만)"]
     if risk_reward < config.min_risk_reward:
         return None, [
-            "실제 1차 목표 기준 손익비 부족"
-            f"({risk_reward:.2f} < {config.min_risk_reward:.2f})"
+            ("부분 청산 계획 손익비 부족" if exit_plan else "실제 1차 목표 기준 손익비 부족")
+            + f"({risk_reward:.2f} < {config.min_risk_reward:.2f})"
         ]
     if hourly_trend_extension or relative_trend_extension or strong_extension:
         target3 = _round_tick(
@@ -1844,6 +1891,8 @@ def evaluate_candidate(
         "stop_timeframe": "5분 구조" if hourly_trend_core else "초기 신호 구조",
         "price_tick": tick,
         "trend_management": (
+            "1차 50% 익절·진입가 보호, 2차 잔여 50% 청산·확장선은 별도 관찰"
+            if exit_plan else
             "1차 일부 익절·진입가 보호, 잔여분 15분 확정 저점·1시간 추세 관리"
             if hourly_trend_extension
             else (
@@ -1854,6 +1903,9 @@ def evaluate_candidate(
         ),
         "resistance_price": resistance,
         "risk_reward_reference_price": target1,
+        "exit_plan": exit_plan,
+        "risk_reward_basis": metrics["risk_reward_basis"],
+        "first_target_risk_reward": round(float(metrics["first_target_risk_reward"]), 4),
         "resistance_confirmed": resistance_confirmed,
         "resistance_room_pct": round(room, 2),
         "leader_resistance_override": leader_resistance_override,
