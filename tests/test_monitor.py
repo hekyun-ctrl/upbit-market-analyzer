@@ -1893,7 +1893,7 @@ def test_daily_performance_text_separates_simulation_from_real_returns():
         }
     )
 
-    assert "후보당 모의 평균: +0.20%" in text
+    assert "1차 전량 청산 가정 모의 평균: +0.20%" in text
     assert "실제 계좌 수익이 아닌" in text
 
 
@@ -2023,3 +2023,102 @@ def test_daily_performance_counts_cost_adjusted_outcomes():
     assert report["stop_first"] == 1
     assert report["target_rate_pct"] == 50.0
     assert report["simulated_return_average_pct"] == 0.3
+
+
+def _qualified_partial_telegram_candidate():
+    candidate = _telegram_candidate()
+    candidate.update({
+        "stop_price": 98.05, "entry_high": 100.1, "target_1": 103, "target_2": 104.9,
+        "target_2_pct": 4.9, "risk_reward": 2.03, "first_target_risk_reward": 1.5385,
+        "exit_plan": {"mode": "partial_50_50", "target_1_fraction": 0.5,
+                      "runner_fraction": 0.5, "runner_ceiling": 104.9},
+        "higher_timeframe_context": {"ready": True, "hourly_established": True,
+            "fifteen_intact": True, "fifteen": {"above_ma20": True},
+            "hourly": {"status": "상승"}, "four_hour": {"status": "상승"}},
+        "double_bb_confirmed": True, "first_retest_confirmed": True,
+        "completed_5m_volume_ratio": 2, "completed_15m_volume_ratio": 2,
+    })
+    return candidate
+
+
+def test_qualified_partial_plan_reaches_mock_telegram_below_generic_target_floor(monkeypatch):
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "test-chat")
+    monkeypatch.setenv("TELEGRAM_CANDIDATE_MIN_TARGET_2_PCT", "5")
+    monkeypatch.setenv("CANDIDATE_MIN_RISK_REWARD", "2")
+    dispatcher = AlertDispatcher()
+    sent = []
+    class Response:
+        def raise_for_status(self):
+            pass
+    class Client:
+        def __init__(self, *args, **kwargs):
+            pass
+        async def __aenter__(self):
+            return self
+        async def __aexit__(self, *args):
+            pass
+        async def post(self, url, json):
+            sent.append(json)
+            return Response()
+    monkeypatch.setattr("monitor.httpx.AsyncClient", Client)
+    candidate = _qualified_partial_telegram_candidate()
+    assert asyncio.run(dispatcher.send_candidate(candidate))
+    assert "청산 계획: 1차 50%" in sent[0]["text"]
+    assert "delivery_suppression_reasons" not in candidate
+    ordinary = dict(candidate)
+    ordinary.pop("exit_plan")
+    assert not asyncio.run(dispatcher.send_candidate(ordinary))
+    assert "일반형 2차 목표 미달" in ordinary["delivery_suppression_reasons"][0]
+    assert len(sent) == 1
+
+
+@pytest.mark.parametrize("cause", ["risk", "fake_runner", "stop_width", "unconfirmed", "score", "volume"])
+def test_partial_delivery_does_not_bypass_final_qualification(monkeypatch, cause):
+    monkeypatch.setenv("CANDIDATE_MIN_RISK_REWARD", "2")
+    dispatcher = AlertDispatcher()
+    candidate = _qualified_partial_telegram_candidate()
+    if cause == "risk":
+        candidate["current_price"] = 100.017  # 1.9995R must not round into a 2R pass
+    elif cause == "fake_runner":
+        candidate["target_2"] = 110
+    elif cause == "stop_width":
+        candidate["stop_price"] = 96
+    elif cause == "unconfirmed":
+        candidate["first_retest_confirmed"] = False
+    elif cause == "score":
+        candidate["score"] = 89
+    elif cause == "volume":
+        candidate["completed_5m_volume_ratio"] = 1.49
+    assert dispatcher.candidate_delivery_reasons(candidate)
+
+
+def test_daily_report_separates_partial_first_touch_from_completed_plan():
+    state = monitor.MonitorState()
+    state.candidate_outcomes.append({
+        "market": "KRW-W", "result": "target_1_first", "entry_price": 100,
+        "target_1": 103, "exit_price": 104, "exit_plan": {"mode": "partial_50_50"},
+        "completed_at_utc": "2026-10-01T01:00:00+00:00",
+    })
+    before = state.daily_performance("2026-10-01")
+    assert before["target_1_first"] == 1
+    assert before["simulated_return_average_pct"] is None
+    assert before["partial_exit_plan_performance"]["sample_count"] == 0
+    state.trend_outcomes.append({
+        "exit_plan": {"mode": "partial_50_50"}, "entry_price": 100,
+        "stop_price": 98, "modeled_plan_return_pct": 1.5,
+        "completed_at_utc": "2026-10-01T02:00:00+00:00",
+    })
+    after = state.daily_performance("2026-10-01", 0.2)
+    assert after["partial_exit_plan_performance"]["mean_net_modeled_return_pct"] == 1.3
+    assert "비용 차감 모의 평균 +1.30%" in _daily_performance_text(after)
+
+
+def test_daily_first_target_baseline_caps_upward_gap_at_published_target():
+    state = monitor.MonitorState()
+    state.candidate_outcomes.append({
+        "result": "target_1_first", "entry_price": 100,
+        "target_1": 103, "exit_price": 110,
+        "completed_at_utc": "2026-10-01T01:00:00+00:00",
+    })
+    assert state.daily_performance("2026-10-01", 0.2)["simulated_return_average_pct"] == 2.8

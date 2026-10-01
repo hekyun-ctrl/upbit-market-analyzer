@@ -29,10 +29,11 @@ from candidate_analysis import (
 )
 from trend_context import higher_timeframe_context
 from filter_audit import filter_audit, REJECTIONS
-from exit_plan import exit_plan_metrics, modeled_exit_return
+from exit_plan import exit_plan_metrics, modeled_exit_return, partial_plan_summary
 from upbit_client import UpbitPublicClient
 
 LOGGER = logging.getLogger("upbit-monitor")
+STRATEGY_VERSION = "trend-exit-plan-v3.1"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -520,6 +521,7 @@ class MonitorState:
         """Return a restart-scoped daily audit without assuming real fills."""
         with self._lock:
             candidate_outcomes = list(self.candidate_outcomes)
+            trend_outcomes = list(self.trend_outcomes)
             signal_outcomes = list(self.signal_outcomes)
             early_watch_events = list(self.early_watch_events)
             screening_records = list(self.screening_records)
@@ -551,8 +553,14 @@ class MonitorState:
         expired_count = sum(item.get("result") == "expired" for item in outcomes)
         simulated_returns = []
         for item in outcomes:
+            # A 50% first exit cannot count as a full position profit. Its
+            # complete 50/50 path is reported separately when the runner ends.
+            if item.get("exit_plan"):
+                continue
             entry = float(item.get("entry_price") or 0)
             exit_price = float(item.get("exit_price") or 0)
+            if item.get("result") == "target_1_first" and item.get("target_1"):
+                exit_price = min(exit_price, float(item["target_1"]))
             if entry > 0 and exit_price > 0:
                 simulated_returns.append((exit_price / entry - 1) * 100 - cost_pct)
         missed_raw_winners = sum(
@@ -562,6 +570,12 @@ class MonitorState:
         )
         return {
             "day_kst": day_kst,
+            "partial_exit_plan_performance": partial_plan_summary(
+                [row for row in trend_outcomes
+                 if self._on_kst_day(row.get("completed_at_utc"), day_kst)], cost_pct
+            ),
+            "first_target_baseline_sample_count": len(simulated_returns),
+            "partial_first_touch_count": sum(bool(row.get("exit_plan")) for row in outcomes),
             "accepted_count": len(accepted),
             "unique_markets": len({item.get("market") for item in accepted}),
             "completed_count": len(outcomes),
@@ -675,14 +689,18 @@ class MonitorState:
         report["trend_tracking_performance"] = report["six_hour_trend_performance"]
         partial = [item for item in trend_outcomes if item.get("exit_plan")]
         report["partial_exit_plan_performance"] = {
+            **partial_plan_summary(partial, max(0.0, min(2.0, _env_float("CANDIDATE_SIMULATED_ROUND_TRIP_COST_PCT", 0.2)))),
             "sample_count": len(partial),
             "planned_target_2_exit": sum(item.get("result") == "planned_target_2_exit" for item in partial),
             "gross_modeled_positive": sum(float(item.get("modeled_plan_return_pct", 0)) > 0 for item in partial),
             "gross_modeled_negative": sum(float(item.get("modeled_plan_return_pct", 0)) < 0 for item in partial),
             "mean_gross_modeled_r": round(mean(float(item["modeled_plan_r"]) for item in partial), 4) if partial else None,
-            "definition": "50/50 계획 가정·수수료 전·실제 체결 또는 계좌 수익률 아님",
+            "definition": "50/50 계획 가정·수수료 전 gross와 비용 가정 net을 구분·실제 체결 또는 계좌 수익률 아님",
             "recent": partial[:100],
         }
+        report["strategy_version"] = STRATEGY_VERSION
+        report["restart_scoped"] = True
+        report["collection_started_at_utc"] = self.started_at
         return report
 
     def snapshot(self) -> dict[str, Any]:
@@ -1624,6 +1642,14 @@ def _daily_performance_text(report: dict[str, Any]) -> str:
     rate_text = f"{float(rate):.1f}%" if rate is not None else "결정 표본 없음"
     average = report.get("simulated_return_average_pct")
     average_text = f"{float(average):+.2f}%" if average is not None else "산출 불가"
+    partial = report.get("partial_exit_plan_performance") or {}
+    partial_average = partial.get("mean_net_modeled_return_pct")
+    partial_average_text = f"{partial_average:+.2f}%" if partial_average is not None else "완료 표본 없음"
+    partial_line = (
+        f"50/50 계획 종료: {int(partial.get('sample_count', 0))}건 · "
+        f"비용 차감 모의 평균 {partial_average_text}\n"
+        "1차 도달률은 전체 청산 수익률이 아닙니다.\n"
+    ) if report.get("partial_exit_plan_performance") is not None else ""
     return (
         f"[일일 후보 성과 | {report['day_kst']}]\n"
         f"확인된 후보: {int(report['accepted_count'])}건 · "
@@ -1631,8 +1657,9 @@ def _daily_performance_text(report: dict[str, Any]) -> str:
         f"결과: 1차 목표 {int(report['target_1_first'])} · "
         f"손절 {int(report['stop_first'])} · 만료 {int(report['expired'])}\n"
         f"목표 선도달률: {rate_text}\n"
-        f"후보당 모의 평균: {average_text} "
+        f"1차 전량 청산 가정 모의 평균: {average_text} "
         f"(비용 {float(report['assumed_cost_pct_per_candidate']):.2f}% 가정)\n"
+        f"{partial_line}"
         f"원시 결정 신호: {int(report['raw_decided_count'])}건 · "
         f"+5% 선도달 {int(report['raw_target_first'])}건\n"
         f"최종 후보에서 놓친 원시 +5% 신호: {int(report['missed_raw_winners'])}건\n"
@@ -1809,6 +1836,7 @@ class AlertDispatcher:
         self._candidate_min_score = max(
             0, min(100, _env_int("TELEGRAM_CANDIDATE_MIN_SCORE", 90))
         )
+        self._candidate_risk_config = CandidateConfig.from_env()
         self._daily_candidate_min = max(
             0, min(10, _env_int("TELEGRAM_DAILY_CANDIDATE_MIN", 5))
         )
@@ -2074,31 +2102,65 @@ class AlertDispatcher:
         LOGGER.warning("EARLY_WATCH %s", json.dumps(alert, ensure_ascii=False))
         return True
 
+    def candidate_delivery_reasons(self, candidate: dict[str, Any]) -> list[str]:
+        """Match the final Telegram policy to the published exit plan.
+
+        Normal candidates retain the configured second-target floor. A
+        qualified partial plan instead retains its unrounded R, first R,
+        structural stop and completed-candle qualifications.
+        """
+        reasons = []
+        if int(candidate.get("score", 0)) < self._candidate_min_score:
+            reasons.append(f"Telegram 점수 미달({candidate.get('score', 0)} < {self._candidate_min_score})")
+        plan = candidate.get("exit_plan")
+        if plan:
+            higher = candidate.get("higher_timeframe_context") or {}
+            if not (
+                int(candidate.get("score", 0)) >= 90
+                and higher.get("ready") and higher.get("hourly_established")
+                and higher.get("fifteen_intact")
+                and (higher.get("fifteen") or {}).get("above_ma20")
+                and candidate.get("double_bb_confirmed")
+                and candidate.get("first_retest_confirmed")
+                and float(candidate.get("completed_5m_volume_ratio") or 0) >= 1.5
+                and float(candidate.get("completed_15m_volume_ratio") or 0) >= 1.0
+            ):
+                reasons.append("Telegram 부분 청산 추세형 자격 미확인")
+            try:
+                _, rejection = _revalidate_candidate_for_dispatch(
+                    candidate, float(candidate["current_price"]),
+                    min_risk_reward=self._candidate_risk_config.min_risk_reward,
+                    max_stop_loss_pct=self._candidate_risk_config.max_stop_loss_pct,
+                )
+                if rejection:
+                    reasons.append(f"Telegram {rejection}")
+            except (KeyError, TypeError, ValueError):
+                reasons.append("Telegram 부분 청산 가격·계획 데이터 무효")
+        elif float(candidate.get("target_2_pct", 0.0)) < self._candidate_min_target_2_pct:
+            reasons.append(
+                f"Telegram 일반형 2차 목표 미달({candidate.get('target_2_pct', 0)}% < {self._candidate_min_target_2_pct}%)"
+            )
+        return reasons
+
     async def send_candidate(self, candidate: dict[str, Any]) -> bool:
+        candidate.pop("delivery_suppression_reasons", None)
         LOGGER.warning("ENTRY_CANDIDATE %s", json.dumps(candidate, ensure_ascii=False))
         if self.mode != "telegram" or not self._send_candidate_alerts:
+            candidate["delivery_suppression_reasons"] = ["Telegram 후보 알림 비활성 또는 연결 설정 없음"]
             return False
-        score = int(candidate.get("score", 0))
-        target_2_pct = float(candidate.get("target_2_pct", 0.0))
-        if (
-            score < self._candidate_min_score
-            or target_2_pct < self._candidate_min_target_2_pct
-        ):
+        reasons = self.candidate_delivery_reasons(candidate)
+        if reasons:
+            candidate["delivery_suppression_reasons"] = reasons
             LOGGER.info(
-                "ENTRY_CANDIDATE_TELEGRAM_SUPPRESSED market=%s "
-                "score=%d minimum_score=%d target_2_pct=%.2f "
-                "minimum_target_2_pct=%.2f",
-                candidate.get("market"),
-                score,
-                self._candidate_min_score,
-                target_2_pct,
-                self._candidate_min_target_2_pct,
+                "ENTRY_CANDIDATE_TELEGRAM_SUPPRESSED market=%s reasons=%s",
+                candidate.get("market"), reasons,
             )
             return False
         self._refresh_candidate_delivery_day()
         availability_tier = bool(candidate.get("availability_tier"))
         now = time.monotonic()
         if self._candidate_delivery_count >= self._daily_candidate_max:
+            candidate["delivery_suppression_reasons"] = ["Telegram 후보 일일 전송 상한 도달"]
             LOGGER.info(
                 "ENTRY_CANDIDATE_DAILY_MAX_SUPPRESSED market=%s count=%d max=%d",
                 candidate.get("market"),
@@ -2110,6 +2172,7 @@ class AlertDispatcher:
             availability_tier
             and self._candidate_delivery_count >= self._daily_candidate_min
         ):
+            candidate["delivery_suppression_reasons"] = ["Telegram 가용성형 일일 목표 도달"]
             LOGGER.info(
                 "ENTRY_CANDIDATE_AVAILABILITY_TARGET_REACHED market=%s count=%d target=%d",
                 candidate.get("market"),
@@ -2123,6 +2186,7 @@ class AlertDispatcher:
             and now - self._last_availability_delivery_at
             < self._availability_min_interval_seconds
         ):
+            candidate["delivery_suppression_reasons"] = ["Telegram 가용성형 전송 간격 대기"]
             LOGGER.info(
                 "ENTRY_CANDIDATE_AVAILABILITY_PACED market=%s remaining_seconds=%d",
                 candidate.get("market"),
@@ -2658,7 +2722,7 @@ class CandidateAnalyzer:
     ) -> dict[str, Any]:
         return {
             "signal_id": alert.get("signal_id"),
-            "strategy_version": "trend-exit-plan-v3",
+            "strategy_version": STRATEGY_VERSION,
             "time_utc": datetime.now(timezone.utc).isoformat(),
             "market": alert.get("market"),
             "source_signal": alert.get("signal"),
@@ -2687,6 +2751,8 @@ class CandidateAnalyzer:
         self._trend_tracks[market] = {
             "market": market,
             "source_signal": candidate["source_signal"],
+            "strategy_version": candidate.get("strategy_version", STRATEGY_VERSION),
+            "candidate_id": candidate.get("candidate_id"),
             "entry_price": entry,
             "stop_price": float(candidate["stop_price"]),
             "target_1": float(candidate["target_1"]),
@@ -2751,6 +2817,8 @@ class CandidateAnalyzer:
                 "market": market,
                 "source_signal": state["source_signal"],
                 "result": result,
+                "strategy_version": state.get("strategy_version"),
+                "candidate_id": state.get("candidate_id"),
                 "score": state["score"],
                 "target_mode": state["target_mode"],
                 "selection_lane": state.get("selection_lane", "standard"),
@@ -3641,6 +3709,9 @@ class CandidateAnalyzer:
             {
                 "market": market,
                 "result": result,
+                "strategy_version": state.get("strategy_version"),
+                "candidate_id": state.get("candidate_id"),
+                "exit_plan": state.get("exit_plan"),
                 "score": state["score"],
                 "is_reentry": state["is_reentry"],
                 "selection_lane": state.get("selection_lane", "standard"),
@@ -3985,6 +4056,8 @@ class CandidateAnalyzer:
                 )
                 return
             candidate["analysis_time_utc"] = datetime.now(timezone.utc).isoformat()
+            candidate["strategy_version"] = STRATEGY_VERSION
+            candidate["candidate_id"] = uuid.uuid4().hex
             delivered, repeated = await self._send_candidate_once(candidate)
             if repeated:
                 LOGGER.info("Candidate repeat suppressed after validation for %s", market)
@@ -3995,26 +4068,29 @@ class CandidateAnalyzer:
                 )
                 return
             if not delivered:
+                delivery_reasons = candidate.get("delivery_suppression_reasons") or ["Telegram 전송 보류·사유 미확인"]
                 self._remember_rejected(
                     alert,
-                    ["Telegram 일일 가용성·상한 정책으로 전송 보류"],
+                    delivery_reasons,
                     float(latest_ticker["trade_price"]),
                 )
                 MONITOR_STATE.add_screening_record(
                     self._screening_record(
                         alert,
                         "delivery_suppressed",
-                        ["Telegram 일일 가용성·상한 정책으로 전송 보류"],
+                        delivery_reasons,
                     )
                 )
                 self._record_early_watch_screening(
                     alert,
                     "delivery_suppressed",
-                    ["Telegram 일일 가용성·상한 정책으로 전송 보류"],
+                    delivery_reasons,
                 )
                 return
             accepted_record = self._screening_record(alert, "accepted", [])
             for key in (
+                "candidate_id",
+                "strategy_version",
                 "score",
                 "target_mode",
                 "day_change_pct",
@@ -4059,6 +4135,9 @@ class CandidateAnalyzer:
             lifecycle_now = time.time()
             self._start_trend_track(candidate, lifecycle_now)
             self._lifecycles[market] = {
+                "strategy_version": candidate["strategy_version"],
+                "candidate_id": candidate["candidate_id"],
+                "exit_plan": candidate.get("exit_plan"),
                 "source_signal": candidate["source_signal"],
                 "entry_low": candidate["entry_low"],
                 "entry_high": candidate["entry_high"],
@@ -4273,9 +4352,11 @@ def start_monitor_thread() -> bool:
 def public_config() -> dict[str, Any]:
     """Return non-secret threshold configuration for inspection."""
     return {
+        "strategy_version": STRATEGY_VERSION,
         **asdict(MonitorConfig.from_env()),
         "candidate_analysis": CandidateConfig.from_env().public(),
         "trend_exit_plan": {"mode": "partial_50_50", "minimum_first_target_r": 1.0,
                             "runner_ceiling": "nearest_resistance_or_conservative_projection",
-                            "completed_recheck_seconds": 300},
+                            "completed_recheck_seconds": 300,
+                            "telegram_policy": "qualified_plan_r_instead_of_generic_target_2_floor"},
     }
