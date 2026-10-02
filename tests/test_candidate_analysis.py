@@ -2511,3 +2511,111 @@ def test_completed_five_minute_wb_is_not_vetoed_by_unconfirmed_one_minute_bands(
     assert candidate['double_bb_timeframe'] == '5분'
     assert candidate['double_bb_true_breakout']
     assert setup[5]['screening_metrics']['wb_five_breakout']
+
+
+def _flow_setup(monkeypatch):
+    from test_trade_flow import strong_flow
+    setup = _ordinary_hot_breakout(monkeypatch)
+    now, one, five, fifteen, btc, alert, ticker = setup
+    alert.update(early_trend=False, momentum_5m_pct=.6, momentum_15m_pct=1.9,
+                 momentum_60m_pct=3, relative_strength_percentile=1.52,
+                 market_regime='risk_off', market_breadth_5m_pct=30.8,
+                 trade_flow_context=strong_flow(now.timestamp()), breakout_level=100)
+    one[1]['low_price'] = 100.9
+    fifteen[1]['trade_price'] = 100.5
+    hourly = [dict(bar) for bar in fifteen]
+    boundary = now.replace(minute=0, second=0)
+    for i, bar in enumerate(hourly):
+        bar['candle_date_time_utc'] = (boundary - timedelta(hours=i)).isoformat()
+    hourly[1]['trade_price'] = 100.5
+    # Hot but below the unchanged hard caps.
+    analyze = candidate_analysis.analyze_candles
+    monkeypatch.setattr(candidate_analysis, 'analyze_candles',
+                        lambda c: {**analyze(c), 'rsi14': 80.0})
+    book = _orderbook(101, .29)
+    book.update(total_ask_size=750000, total_bid_size=217500)
+    for unit in book['orderbook_units']:
+        unit.update(bid_size=14500, ask_size=50000)
+    return setup, hourly, [book] * 3
+
+
+def _evaluate_flow(fixture, **overrides):
+    setup, hourly, books = fixture
+    now, one, five, fifteen, btc, alert, ticker = setup
+    return evaluate_candidate(alert, ticker, books[-1], one, five,
+        _config(double_bb_enabled=True, min_score=90, **overrides),
+        candles_15m=fifteen, candles_60m=hourly,
+        btc_candles_5m=btc, btc_candles_15m=btc, btc_ticker=alert.get('_test_btc_ticker'),
+        orderbook_samples=books, as_of=now)
+
+
+def test_actual_buy_flow_can_replace_only_weak_book_and_moderate_breadth(monkeypatch):
+    fixture = _flow_setup(monkeypatch)
+    candidate, reasons = _evaluate_flow(fixture)
+    assert candidate is not None, reasons
+    assert candidate['trade_flow_leader'] and candidate['selection_lane'] == 'trade_flow_leader'
+    assert 86 <= candidate['score'] <= 90  # Risk deductions stay visible.
+    assert not candidate['first_retest_confirmed']
+    assert not candidate['completed_breakout_entry']
+    assert candidate['volume_timeframe'] == '5분'
+    assert candidate['first_target_risk_reward'] >= 2
+    assert candidate['stop_timeframe'] == '5분 구조'
+    candidate, reasons = _evaluate_flow(fixture, trade_flow_leader_enabled=False)
+    assert candidate is None and any('호가' in r for r in reasons)
+
+
+@pytest.mark.parametrize('cause', ['missing_flow', 'stale_flow', 'selling', 'thin_book', 'wide_spread',
+    'extreme_book', 'single_book', 'breadth', 'rank', 'five_volume', 'fifteen_volume', 'minute_gap',
+    'hour_down', 'btc', 'btc_daily', 'unfinished', 'chase', 'wide_stop', 'fake_wb', 'rsi_hard', 'liquidity'])
+def test_flow_lane_preserves_direct_risk_and_verification_floors(monkeypatch, cause):
+    fixture = _flow_setup(monkeypatch)
+    setup, hourly, books = fixture
+    now, one, five, fifteen, btc, alert, ticker = setup
+    if cause == 'missing_flow': alert.pop('trade_flow_context')
+    elif cause == 'stale_flow': alert['trade_flow_context']['as_of'] -= 11
+    elif cause == 'selling':
+        for w in alert['trade_flow_context']['windows']: w['buy_krw'] = 0
+    elif cause == 'thin_book':
+        for u in books[0]['orderbook_units']: u['bid_size'] = 1
+    elif cause == 'wide_spread': books[0]['orderbook_units'][0]['ask_price'] = 103
+    elif cause == 'extreme_book': books[0]['total_bid_size'] = 75000
+    elif cause == 'single_book': books[:] = books[:1]
+    elif cause == 'breadth': alert['market_breadth_5m_pct'] = 19
+    elif cause == 'rank': alert['relative_strength_percentile'] = 3
+    elif cause == 'five_volume': five[1]['candle_acc_trade_volume'] = 100
+    elif cause == 'fifteen_volume': fifteen[1]['candle_acc_trade_volume'] = 50
+    elif cause == 'minute_gap': one.pop(5)
+    elif cause == 'hour_down': hourly[1]['trade_price'] = 99
+    elif cause == 'btc': btc[1]['trade_price'] = 98
+    elif cause == 'btc_daily': alert['_test_btc_ticker'] = {'signed_change_rate': -.02}
+    elif cause == 'unfinished': five[1]['candle_date_time_utc'] = five[0]['candle_date_time_utc']
+    elif cause == 'chase': ticker['trade_price'] = 104
+    elif cause == 'wide_stop': alert['breakout_level'] = 96
+    elif cause == 'fake_wb': monkeypatch.setattr(candidate_analysis, '_double_bollinger_context',
+        lambda *a, **k: {'ready': True, 'confirmed': False, 'fake_breakout': True})
+    elif cause == 'rsi_hard': monkeypatch.setattr(candidate_analysis, 'analyze_candles',
+        lambda c: {**__import__('analysis').analyze_candles(c), 'rsi14': 95})
+    elif cause == 'liquidity': ticker['acc_trade_price_24h'] = 1
+    candidate, reasons = _evaluate_flow(fixture)
+    assert candidate is None, (cause, candidate)
+    assert reasons
+
+
+def test_flow_survival_uses_new_executions_and_current_higher_structure(monkeypatch):
+    fixture = _flow_setup(monkeypatch)
+    candidate, reasons = _evaluate_flow(fixture)
+    assert candidate is not None, reasons
+    setup, hourly, books = fixture
+    now, one, five, fifteen, _, alert, ticker = setup
+    kwargs = dict(as_of=now, candles_5m=five, candles_15m=fifteen, candles_60m=hourly)
+    _, reasons = validate_candidate_survival(candidate, ticker, books, one, _config(),
+        trade_flow_context=alert['trade_flow_context'], **kwargs)
+    assert reasons == []
+    for flow in (None, {**alert['trade_flow_context'], 'as_of': now.timestamp() - 11}):
+        _, reasons = validate_candidate_survival(candidate, ticker, books, one, _config(),
+            trade_flow_context=flow, **kwargs)
+        assert any('체결 매수' in r for r in reasons)
+    hourly[1]['trade_price'] = 99
+    _, reasons = validate_candidate_survival(candidate, ticker, books, one, _config(),
+        trade_flow_context=alert['trade_flow_context'], **kwargs)
+    assert any('체결 매수' in r for r in reasons)

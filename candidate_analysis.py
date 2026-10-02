@@ -12,6 +12,7 @@ from typing import Any
 from analysis import analyze_candles
 from trend_context import higher_timeframe_context, completed_context_candles, recent_minute_candles_contiguous
 from exit_plan import exit_plan_metrics
+from trade_flow import buying_persistent
 
 
 def validate_btc_survival(
@@ -169,6 +170,8 @@ class CandidateConfig:
     btc_crash_15m_pct: float = -1.5
     explosive_leader_enabled: bool = True
     explosive_leader_min_score: int = 80
+    trade_flow_leader_enabled: bool = True
+    trade_flow_leader_min_score: int = 86
 
     @classmethod
     def from_env(cls) -> "CandidateConfig":
@@ -494,6 +497,8 @@ class CandidateConfig:
             btc_crash_15m_pct=min(
                 -0.2, _env_float("CANDIDATE_BTC_CRASH_15M_PCT", -1.5)
             ),
+            trade_flow_leader_min_score=max(86, min(100, _env_int("CANDIDATE_TRADE_FLOW_LEADER_MIN_SCORE", 86))),
+            trade_flow_leader_enabled=_enabled("CANDIDATE_TRADE_FLOW_LEADER_ENABLED", True),
             explosive_leader_enabled=_enabled("CANDIDATE_EXPLOSIVE_LEADER_ENABLED", True),
             explosive_leader_min_score=max(80, min(100, _env_int("CANDIDATE_EXPLOSIVE_LEADER_MIN_SCORE", 80))),
         )
@@ -832,6 +837,21 @@ def _explosive_bar_context(candles_1m, candles_5m, candles_15m, now, *, impulse_
     return {"confirmed": False}
 
 
+def _flow_book_supported(samples, current, config):
+    """Execution flow can replace imbalance, never a thin/wide/invalid book."""
+    supported = 0
+    for sample in samples:
+        ratio, spread, _ = _book_metrics([sample])
+        units = sample.get("orderbook_units") or []
+        bid_value = sum(float(u.get("bid_price") or 0) * float(u.get("bid_size") or 0)
+                        for u in units if current * .995 <= float(u.get("bid_price") or 0) <= current * 1.005)
+        ask_value = sum(float(u.get("ask_price") or 0) * float(u.get("ask_size") or 0)
+                        for u in units if current * .995 <= float(u.get("ask_price") or 0) <= current * 1.005)
+        if ratio >= .2 and spread <= config.max_spread_pct and min(bid_value, ask_value) >= 5_000_000:
+            supported += 1
+    return len(samples) >= 3 and supported >= len(samples) // 2 + 1
+
+
 def validate_candidate_survival(
     candidate: dict[str, Any],
     ticker: dict[str, Any],
@@ -841,6 +861,8 @@ def validate_candidate_survival(
     *, as_of: datetime | None = None,
     candles_5m: list[dict[str, Any]] | None = None,
     candles_15m: list[dict[str, Any]] | None = None,
+    trade_flow_context: dict[str, Any] | None = None,
+    candles_60m: list[dict[str, Any]] | None = None,
 ) -> tuple[dict[str, Any], list[str]]:
     """Recheck only the conditions that can invalidate an already-built setup.
 
@@ -861,7 +883,21 @@ def validate_candidate_survival(
         ratio >= config.hard_min_orderbook_ratio for ratio in ratios
     ) >= max(1, len(ratios) // 2 + 1)
 
+    flow_lane = bool(candidate.get("trade_flow_leader"))
+    flow_now = as_of or datetime.now(timezone.utc)
+    flow_evidence = _explosive_bar_context(candles_1m, candles_5m or [], candles_15m or [], flow_now, impulse_min=1.5) if flow_lane else {}
+    flow_higher = higher_timeframe_context(candles_15m or [], candles_60m or [], [], now=flow_now) if flow_lane else {}
+    flow_valid = bool(flow_lane and config.trade_flow_leader_enabled
+        and buying_persistent(trade_flow_context, current, flow_now.timestamp())
+        and _flow_book_supported(orderbook_samples, current, config)
+        and flow_evidence.get("confirmed")
+        and flow_higher.get("ready") and flow_higher.get("hourly_established")
+        and flow_higher.get("fifteen_intact") and flow_higher["fifteen"]["above_ma20"]
+        and current >= max(breakout, float(flow_evidence.get("level") or breakout))
+        and current <= float(flow_evidence.get("close") or current) * 1.005)
     rejected: list[str] = []
+    if flow_lane and not flow_valid:
+        rejected.append("체결 매수 지속·완료봉 돌파·호가 깊이 생존 실패")
     if current <= float(candidate["stop_price"]):
         rejected.append("계획 손절선 이하")
     if current >= float(candidate["chase_limit"]):
@@ -879,11 +915,11 @@ def validate_candidate_survival(
             rejected.append("완료 5·15분 돌파 거래량·구조 생존 실패")
         elif current < float(context["level"]) or current > float(context["close"]) * 1.01:
             rejected.append("완료 5분 돌파선 이탈 또는 이격 과다")
-    if not explosive and volume_ratio < config.availability_min_volume_ratio:
+    if not explosive and not flow_lane and volume_ratio < config.availability_min_volume_ratio:
         rejected.append(f"완료 1분봉 거래량 붕괴({volume_ratio:.2f}배)")
-    if not explosive and volume_previous < config.availability_min_volume_vs_previous:
+    if not explosive and not flow_lane and volume_previous < config.availability_min_volume_vs_previous:
         rejected.append(f"직전 봉 대비 거래량 급감({volume_previous:.2f}배)")
-    if not hard_book_persistent:
+    if not hard_book_persistent and not flow_valid:
         rejected.append(f"호가 지지 소멸({book_ratio:.2f}배)")
     if candidate.get("rsi_breakout_exception"):
         evidence = _explosive_bar_context(candles_1m, candles_5m or [], candles_15m or [],
@@ -915,6 +951,7 @@ def validate_candidate_survival(
         rejected.append(f"호가 스프레드 극단적 과다({spread:.2f}%)")
 
     return {
+        "survival_trade_flow": trade_flow_context if flow_lane else None,
         "survival_price": current,
         "survival_completed_close": completed_close,
         "survival_volume_ratio": round(volume_ratio, 2),
@@ -1216,15 +1253,35 @@ def evaluate_candidate(
         and book_persistent and spread <= config.max_spread_pct
         and not btc_crash and btc_change > config.max_btc_decline_pct
     )
+    flow_context = alert.get("trade_flow_context") or {}
+    flow_leader = bool(config.trade_flow_leader_enabled
+        and buying_persistent(flow_context, current, context_now.timestamp())
+        and rsi_context.get("confirmed")
+        and (wb_confirmed or wb_five_breakout) and not wb_fake_breakout
+        and relative_ready and relative_percentile <= 2.0
+        and momentum_5m >= .2 and momentum_15m is not None and momentum_15m >= .8
+        and float(alert.get("momentum_60m_pct") or 0) >= 1.5
+        and higher.get("ready") and higher.get("hourly_established")
+        and higher.get("fifteen_intact") and higher["fifteen"]["above_ma20"]
+        and float(alert.get("market_breadth_5m_pct") or 0) >= 20.0
+        and _flow_book_supported(samples, current, config)
+        and current >= max(breakout, float(rsi_context["level"]))
+        and current <= float(rsi_context["close"]) * 1.005
+        and not btc_crash and btc_change > config.max_btc_decline_pct)
+    # Keep the flow route distinct: it requires full 60s survival and does not
+    # inherit fast/RSI/breadth exceptions with different revalidation rules.
+    if flow_leader:
+        fast_leader_core = explosive_core = completed_breakout_entry = False
+        hourly_trend_core = True
     wb_confirmation_timeframe = "1분"
-    if completed_breakout_entry and not wb_confirmed and wb_five_breakout:
+    if (completed_breakout_entry or flow_leader) and not wb_confirmed and wb_five_breakout:
         # A completed 5m WB breakout can confirm the structural route even
         # when the short 1m bands no longer signal. Keep 1m hold/quality gates.
         double_bb = double_bb_five
         wb_ready = wb_confirmed = True
         wb_confirmation_timeframe = "5분"
     rsi_breakout_exception = bool(
-        config.explosive_leader_enabled and not explosive_core
+        config.explosive_leader_enabled and not explosive_core and not flow_leader
         and (rsi1 > config.hard_max_rsi_1m or rsi5 > config.hard_max_rsi_5m)
         and rsi_context.get("confirmed") and wb_confirmed and not wb_fake_breakout
         and relative_ready and relative_eligible and relative_percentile <= 2.0
@@ -1236,11 +1293,12 @@ def evaluate_candidate(
     )
     # Retain real 1m RSI for risk deductions, but use the completed 5m candle
     # for volume/shape gates in this narrowly qualified lane.
-    if explosive_core:
-        volume_ratio = float(explosive_context["volume_5m"])
-        volume_previous = float(explosive_context["volume_previous_5m"])
-        close_position = float(explosive_context["close_position"])
-        upper_wick = float(explosive_context["upper_wick"])
+    if explosive_core or flow_leader:
+        quality_context = rsi_context if flow_leader else explosive_context
+        volume_ratio = float(quality_context["volume_5m"])
+        volume_previous = float(quality_context["volume_previous_5m"])
+        close_position = float(quality_context["close_position"])
+        upper_wick = float(quality_context["upper_wick"])
 
     rejected: list[str] = []
     soft_warnings: list[str] = []
@@ -1261,12 +1319,12 @@ def evaluate_candidate(
                 f"({relative_percentile:.1f}백분위)"
             )
         elif (
-            not relative_eligible
+            not relative_eligible and not flow_leader
             and momentum_5m >= config.relative_strength_min_5m_pct
             and (momentum_15m is None or momentum_15m > 0)
         ):
             rejected.append("상대강도 자격 재확인 필요(순위 외 조건 불일치)")
-        if momentum_5m < config.relative_strength_min_5m_pct and not sustained_retest:
+        if momentum_5m < config.relative_strength_min_5m_pct and not sustained_retest and not flow_leader:
             rejected.append(f"5분 상대 모멘텀 부족({momentum_5m:+.2f}%)")
         if momentum_15m is not None and momentum_15m <= 0:
             rejected.append(f"15분 추세 미확인({momentum_15m:+.2f}%)")
@@ -1285,6 +1343,7 @@ def evaluate_candidate(
             and not persistent_leader_core
             and not explosive_core
             and not completed_breakout_entry
+            and not flow_leader
         ):
             rejected.append("첫 눌림·돌파선 재지지 미확인")
     confirmation_started_at = alert.get("confirmation_started_at_utc") or alert.get(
@@ -1347,7 +1406,7 @@ def evaluate_candidate(
         and spread <= config.hard_max_spread_pct
         and not day_overheated
     )
-    early_leader_lane = early_leader_lane or explosive_core
+    early_leader_lane = early_leader_lane or explosive_core or flow_leader
     # Availability balancing is allowed to collect mild misses first. Elevated
     # setups are narrowed again below to candle-shape warnings only, so volume,
     # trend and resistance safety floors remain strict.
@@ -1380,11 +1439,11 @@ def evaluate_candidate(
         (rejected if strict_quality else soft_warnings).append(message)
 
     if (
-        not fast_leader_core and not explosive_core
+        not fast_leader_core and not explosive_core and not flow_leader
         and volume_previous < config.availability_min_volume_vs_previous
     ):
         rejected.append(f"직전 봉 대비 거래량 급감({volume_previous:.2f}배)")
-    elif not fast_leader_core and not explosive_core and volume_previous < config.min_volume_vs_previous:
+    elif not fast_leader_core and not explosive_core and not flow_leader and volume_previous < config.min_volume_vs_previous:
         message = f"직전 봉 대비 거래량 감소({volume_previous:.2f}배)"
         (rejected if strict_quality else soft_warnings).append(message)
 
@@ -1447,7 +1506,7 @@ def evaluate_candidate(
     # This exempts ONLY breadth. It cannot waive WB, RSI, book, chase, stop,
     # score or any other ordinary-lane rule (including failed retests).
     breadth_breakout_exception = bool(
-        config.explosive_leader_enabled
+        config.explosive_leader_enabled and not flow_leader
         and market_regime == "risk_off"
         and 20.0 <= market_breadth_5m_pct < config.hard_min_market_breadth_pct
         and explosive_context.get("confirmed")
@@ -1463,7 +1522,7 @@ def evaluate_candidate(
     )
     risk_off_exception = bool(
         risk_off_reentry_exception or risk_off_fresh_leader_exception or explosive_core
-        or breadth_breakout_exception
+        or breadth_breakout_exception or flow_leader
     )
     if (
         market_regime == "risk_off"
@@ -1480,7 +1539,7 @@ def evaluate_candidate(
     book_softened = False
     if not book_persistent:
         label = "매우 약함" if not hard_book_persistent else "약함"
-        if early_leader_lane and hard_book_persistent:
+        if (early_leader_lane and hard_book_persistent) or flow_leader:
             book_softened = True
         else:
             rejected.append(f"호가 지지 하드차단({label}, {book_ratio:.2f}배)")
@@ -1490,7 +1549,7 @@ def evaluate_candidate(
             f"({btc_change:+.2f}%, {book_ratio:.2f}배)"
         )
     hot_book_floor = config.min_orderbook_ratio if fast_leader_core else 1.0
-    if not explosive_core and rsi1 >= config.hot_rsi_1m and book_ratio < hot_book_floor:
+    if not explosive_core and not flow_leader and rsi1 >= config.hot_rsi_1m and book_ratio < hot_book_floor:
         rejected.append(
             f"단기 과열·호가 약세 동시 발생(RSI {rsi1:.1f}, {book_ratio:.2f}배)"
         )
@@ -1503,11 +1562,11 @@ def evaluate_candidate(
 
     resistance_levels = (
         _resistances(current, ticker, c5, c15, completed_impulse_high=float(c5[0]["high_price"]))
-        if explosive_core or rsi_breakout_exception
+        if explosive_core or rsi_breakout_exception or flow_leader
         else _resistances(current, ticker, c5, c15)
     )
     cleared_resistance_levels = []
-    if explosive_core or rsi_breakout_exception:
+    if explosive_core or rsi_breakout_exception or flow_leader:
         proof = explosive_context if explosive_core else rsi_context
         # A completed close must clear the old zone; the live and completed
         # one-minute prices must still hold its 0.2% support tolerance.
@@ -1602,6 +1661,7 @@ def evaluate_candidate(
     alert["screening_metrics"] = {
         **alert["screening_metrics"],
         "retest_confirmed": retest_confirmed,
+        "trade_flow_leader": flow_leader, "trade_flow_context": flow_context,
         "completed_breakout_entry": completed_breakout_entry,
         "ordinary_breakout_context": rsi_context,
         "wb_confirmation_timeframe": wb_confirmation_timeframe,
@@ -1651,8 +1711,8 @@ def evaluate_candidate(
     if hourly_trend_core or explosive_core:
         # Plan a 5m initial invalidation before entry, never widen it later.
         support = min(min(float(c["low_price"]) for c in c5[:3]), breakout)
-        if explosive_core:
-            support = min(float(explosive_context["low"]), breakout)
+        if explosive_core or flow_leader:
+            support = min(float((rsi_context if flow_leader else explosive_context)["low"]), breakout)
         atr_risk = max(_atr(c5) * 0.8, tick * 2)
     stop_raw = min(support * 0.998, entry_reference - atr_risk)
     alert["risk_plan_diagnostics"] = {
@@ -1731,6 +1791,8 @@ def evaluate_candidate(
         risk_notes.append(
             "시장 약세 중 상대강도 선도 유지: 시장 확산도는 감점 반영"
         )
+    if flow_leader:
+        risk_notes.append("실제 매수 체결 지속으로 호가 비율·확산도 차단 대체: 깊이·완료봉·60초 생존 검증, 감점 유지")
     if breadth_breakout_exception:
         risk_notes.append("완료 5·15분 돌파·상위 2% 선도주 확인: 확산도 차단만 감점 전환, 60초 재검증")
     if leader_resistance_override:
@@ -1852,10 +1914,12 @@ def evaluate_candidate(
         )
     if explosive_core:
         effective_min_score = config.explosive_leader_min_score
+    if flow_leader:
+        effective_min_score = config.trade_flow_leader_min_score
     if score < effective_min_score:
         return None, [f"후보 점수 부족({score}/{effective_min_score})"]
 
-    availability_tier = score < config.min_score and not explosive_core
+    availability_tier = score < config.min_score and not explosive_core and not flow_leader
     if availability_tier:
         # The lower score tier exists only to restore a small number of usable
         # messages. It must still pass every direct entry-safety boundary and
@@ -1975,6 +2039,8 @@ def evaluate_candidate(
     }
     if exit_plan and float(metrics["first_target_risk_reward"]) < 1.0:
         return None, ["부분 청산 1차 목표 손익비 부족(1.00 미만)"]
+    if flow_leader and float(metrics["first_target_risk_reward"]) < 2.0:
+        return None, ["체결 지속형 1차 목표 손익비 부족(2.00 미만)"]
     if risk_reward < config.min_risk_reward:
         return None, [
             ("부분 청산 계획 손익비 부족" if exit_plan else "실제 1차 목표 기준 손익비 부족")
@@ -2041,6 +2107,8 @@ def evaluate_candidate(
         )
     if retest_confirmed and relative_ready:
         reasons.insert(0, "첫 눌림·돌파선 재지지 확인")
+    if flow_leader:
+        reasons.insert(0, "60초 실제 매수 체결 지속·15분/1시간 추세·완료 5분 구조 확인")
     if completed_breakout_entry:
         reasons.insert(0, "완료 5분봉 거래량 동반 돌파 확인(첫 눌림 대안)")
     if wb_confirmed:
@@ -2093,16 +2161,18 @@ def evaluate_candidate(
         "watchlist_recheck": bool(alert.get("watchlist_recheck")),
         "leader_pullback_recheck": bool(alert.get("leader_pullback_recheck")),
         "selection_lane": (
-            "explosive_leader" if explosive_core
+            "trade_flow_leader" if flow_leader
+            else "explosive_leader" if explosive_core
             else "fast_leader" if fast_leader_core
             else "early_leader" if early_leader_lane else "standard"
         ),
         "explosive_context": explosive_context if explosive_core else None,
         "rsi_breakout_exception": rsi_breakout_exception,
         "completed_breakout_entry": completed_breakout_entry,
+        "trade_flow_leader": flow_leader, "trade_flow_context": flow_context if flow_leader else None,
         "breadth_breakout_exception": breadth_breakout_exception,
         "cleared_resistance_levels": cleared_resistance_levels,
-        "volume_timeframe": "5분" if explosive_core else "1분",
+        "volume_timeframe": "5분" if explosive_core or flow_leader else "1분",
         "fast_leader": fast_leader_core and not explosive_core,
         "score": score,
         "condition_score": score,

@@ -2378,7 +2378,7 @@ def test_telegram_explosive_score_exception_requires_actual_qualified_plan(monke
 
 
 @pytest.mark.parametrize("path", ["fast", "completed", "pullback"])
-@pytest.mark.parametrize("lane", ["explosive", "rsi_exception", "completed_breakout"])
+@pytest.mark.parametrize("lane", ["explosive", "rsi_exception", "completed_breakout", "trade_flow"])
 def test_explosive_runtime_never_skips_full_survival_for_other_signal_paths(monkeypatch, path, lane):
     monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
     monkeypatch.setattr("monitor.time.time", lambda: 1_800_000_010)
@@ -2400,6 +2400,8 @@ def test_explosive_runtime_never_skips_full_survival_for_other_signal_paths(monk
         candidate.update(selection_lane="standard", rsi_breakout_exception=True)
     elif lane == "completed_breakout":
         candidate.update(selection_lane="standard", completed_breakout_entry=True)
+    elif lane == "trade_flow":
+        candidate.update(selection_lane="trade_flow_leader", trade_flow_leader=True)
     monkeypatch.setattr(analyzer, "_evaluate_snapshot", lambda *args: (candidate, []))
     asyncio.run(analyzer._analyze(alert))
     assert len(snapshots) == 2
@@ -2479,3 +2481,69 @@ def test_no_pullback_route_revalidates_leader_rank_and_eligibility():
     relative.update(relative_strength_percentile=6, relative_strength_eligible=False)
     reasons = analyzer._relative_survival_rejections(candidate, relative)
     assert len(reasons) == 2
+
+
+def _flow_telegram_candidate(now):
+    from test_trade_flow import strong_flow
+    candidate = _explosive_telegram_candidate()
+    candidate.update(score=86, selection_lane='trade_flow_leader', trade_flow_leader=True,
+                     survival_trade_flow=strong_flow(now, float(candidate['current_price'])),
+                     first_target_risk_reward=3, double_bb_enabled=True, double_bb_confirmed=True,
+                     double_bb_timeframe='5분', double_bb_status='완료 돌파',
+                     completed_5m_volume_ratio=2, completed_15m_volume_ratio=1.5)
+    return candidate
+
+
+def test_new_trade_flow_is_exposed_by_live_engine_not_ohlc_warmup():
+    engine = SignalEngine(_config())
+    now = 1800000100
+    for index in range(61):
+        engine.update('KRW-TEST', 100 + index * .004, 2000, (now - 60 + index) * 1000,
+                      ask_bid='ASK' if index % 3 == 0 else 'BID', sequential_id=index)
+    context = engine.relative_strength_snapshot('KRW-TEST', now)['trade_flow_context']
+    assert context['ready'] and context['trade_count'] == 60
+    assert context['buy_share_pct'] > 60
+    engine.trade_flow.clear()
+    assert not engine.relative_strength_snapshot('KRW-TEST', now)['trade_flow_context']['ready']
+
+
+def test_telegram_flow_route_preserves_deductions_and_uses_current_execution_evidence(monkeypatch):
+    now = 1800000100
+    monkeypatch.setattr('monitor.time.time', lambda: now)
+    monkeypatch.setenv('TELEGRAM_CANDIDATE_MIN_SCORE', '90')
+    candidate = _flow_telegram_candidate(now)
+    dispatcher = AlertDispatcher()
+    assert dispatcher.candidate_delivery_reasons(candidate) == []
+    text = monitor._candidate_text(candidate)
+    assert '체결 매수 지속형' in text and '실제 체결:' in text and '60초' in text
+    candidate['trade_flow_leader'] = False
+    assert dispatcher.candidate_delivery_reasons(candidate)
+
+
+@pytest.mark.parametrize('cause', ['stale', 'selling', 'survival', 'btc', 'risk', 'score', 'rr', 'disabled'])
+def test_telegram_flow_route_requires_all_fresh_risk_qualifications(monkeypatch, cause):
+    now = 1800000100
+    monkeypatch.setattr('monitor.time.time', lambda: now)
+    candidate = _flow_telegram_candidate(now)
+    if cause == 'stale': candidate['survival_trade_flow']['as_of'] -= 11
+    elif cause == 'selling':
+        for w in candidate['survival_trade_flow']['windows']: w['buy_krw'] = 0
+    elif cause == 'survival': candidate['survival_confirmed'] = False
+    elif cause == 'btc': candidate['survival_btc_5m_pct'] = -1
+    elif cause == 'risk': candidate['stop_price'] = 95
+    elif cause == 'score': candidate['score'] = 85
+    elif cause == 'rr': candidate['first_target_risk_reward'] = 1.99
+    elif cause == 'disabled': monkeypatch.setenv('CANDIDATE_TRADE_FLOW_LEADER_ENABLED', 'false')
+    assert AlertDispatcher().candidate_delivery_reasons(candidate)
+
+
+def test_flow_survival_does_not_cool_out_an_intact_leader_but_still_requires_rank_and_breadth():
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    candidate = {'trade_flow_leader': True, 'relative_strength_ready': True, 'watchlist_recheck': True}
+    relative = {'relative_strength_ready': True, 'relative_strength_eligible': False,
+        'relative_strength_percentile': 1, 'momentum_5m_pct': .6, 'momentum_15m_pct': 2,
+        'momentum_60m_pct': 3, 'market_breadth_5m_pct': 30}
+    assert analyzer._relative_survival_rejections(candidate, relative) == []
+    for key, value in [('relative_strength_percentile', 3), ('market_breadth_5m_pct', 19),
+                       ('momentum_5m_pct', -.1), ('momentum_60m_pct', 0)]:
+        assert analyzer._relative_survival_rejections(candidate, {**relative, key: value})

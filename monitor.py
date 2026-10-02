@@ -32,9 +32,10 @@ from trend_context import higher_timeframe_context
 from filter_audit import filter_audit, REJECTIONS
 from exit_plan import exit_plan_metrics, modeled_exit_return, partial_plan_summary
 from upbit_client import UpbitPublicClient
+from trade_flow import TradeFlow, buying_persistent
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "verification-audit-v3.5"
+STRATEGY_VERSION = "verification-audit-v3.6"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -803,6 +804,7 @@ class SignalEngine:
         self._last_persistent_leader_checked_at: dict[str, int] = {}
         self._last_persistent_leader_at: dict[str, int] = {}
         self._last_sustained_checked_at: dict[str, int] = {}
+        self.trade_flow = TradeFlow()
         self._last_sustained_watch_at: dict[str, int] = {}
         self._relative_rank_history: dict[
             str, deque[tuple[int, float]]
@@ -932,8 +934,9 @@ class SignalEngine:
 
     def relative_strength_snapshot(self, market: str, now: int) -> dict[str, Any]:
         """Rank the current market against fresh KRW-market rolling momentum."""
+        flow = {"trade_flow_context": self.trade_flow.snapshot(market, now)}
         if not self.config.relative_strength_enabled:
-            return {"relative_strength_ready": False}
+            return {"relative_strength_ready": False, **flow}
 
         snapshots: list[tuple[str, float, float, float | None, float | None]] = []
         for code, samples in self._momentum_prices.items():
@@ -984,7 +987,7 @@ class SignalEngine:
             return {
                 "relative_strength_ready": ready,
                 "relative_strength_universe": universe,
-                **market_context,
+                **market_context, **flow,
             }
         rank = snapshots.index(selected) + 1
         percentile = rank / universe * 100 if universe else 100.0
@@ -1014,15 +1017,17 @@ class SignalEngine:
                 and change_5m >= self.config.relative_strength_min_5m_pct
                 and (change_15m is None or change_15m < change_5m * 4)
             ),
-            **market_context,
+            **market_context, **flow,
         }
 
     def update(
-        self, market: str, price: float, volume: float, timestamp_ms: int
+        self, market: str, price: float, volume: float, timestamp_ms: int,
+        *, ask_bid: str | None = None, sequential_id: int | None = None,
     ) -> list[dict[str, Any]]:
         if price <= 0 or volume < 0:
             return []
         second = int(timestamp_ms / 1000)
+        self.trade_flow.observe(market, price, volume, timestamp_ms, ask_bid, sequential_id)
         self._update_momentum_price(market, second, price)
         window = self._windows[market]
         trade_value = price * volume
@@ -1534,7 +1539,9 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     risk_notes = "·".join(candidate.get("risk_notes", []))
     risk_line = f"위험 감점: {risk_notes}\n" if risk_notes else ""
     labels = []
-    if candidate.get("selection_lane") == "explosive_leader":
+    if candidate.get("trade_flow_leader"):
+        labels.append("체결 매수 지속형")
+    elif candidate.get("selection_lane") == "explosive_leader":
         labels.append("완료 5분 폭발적 선도주")
     elif candidate.get("selection_lane") == "fast_leader":
         labels.append("초고속 선도주")
@@ -1603,6 +1610,11 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
                        f"{candidate.get('double_bb_timeframe') or '1분'} {wb_line}")
         if candidate.get("selection_lane") == "explosive_leader":
             wb_line = f"1분 {wb_line.rstrip()} · 별도 완료 5분 구조로 검증\n"
+    if candidate.get("trade_flow_leader"):
+        flow = candidate.get("survival_trade_flow") or candidate.get("trade_flow_context") or {}
+        wb_line = (f"진입형: 체결 매수 지속형 · {candidate.get('double_bb_timeframe') or '1분'} {wb_line}"
+                   f"실제 체결: 최근 완료 60초 매수 거래대금 {float(flow.get('buy_share_pct') or 0):.1f}% · "
+                   f"{int(flow.get('trade_count') or 0)}건(호가 대기량과 구분)\n")
     higher_line = ""
     higher = candidate.get("higher_timeframe_context") or {}
     if higher.get("ready"):
@@ -2185,18 +2197,50 @@ class AlertDispatcher:
                 score_floor = risk_config.explosive_leader_min_score
             else:
                 reasons.append("Telegram 완료봉 폭발적 선도주 생존·구조·위험 자격 미확인")
+        if candidate.get("trade_flow_leader"):
+            risk_config = self._candidate_risk_config
+            flow = candidate.get("survival_trade_flow") or {}
+            qualified = bool(risk_config.trade_flow_leader_enabled
+                and candidate.get("selection_lane") == "trade_flow_leader"
+                and candidate.get("survival_confirmed")
+                and float(candidate.get("survival_seconds") or 0) >= risk_config.survival_confirm_seconds
+                and buying_persistent(flow, float(candidate.get("current_price") or 0), time.time())
+                and float(candidate.get("first_target_risk_reward") or 0) >= 2.0
+                and 0 < float(candidate.get("relative_strength_percentile") or 100) <= 2.0
+                and float(candidate.get("completed_5m_volume_ratio") or 0) >= 1.5
+                and float(candidate.get("completed_15m_volume_ratio") or 0) >= 1.0
+                and candidate.get("double_bb_confirmed")
+                and all(candidate.get(key) is not None for key in (
+                    "survival_btc_5m_pct", "survival_btc_15m_pct", "survival_btc_live_pct"))
+                and float(candidate.get("survival_btc_5m_pct") or 0) > risk_config.btc_crash_5m_pct
+                and float(candidate.get("survival_btc_15m_pct") or 0) > risk_config.btc_crash_15m_pct
+                and float(candidate.get("survival_btc_live_pct") or 0) > risk_config.btc_crash_5m_pct)
+            try:
+                _, rejection = _revalidate_candidate_for_dispatch(
+                    candidate, float(candidate["current_price"]),
+                    min_risk_reward=risk_config.min_risk_reward,
+                    max_stop_loss_pct=risk_config.max_stop_loss_pct)
+                if rejection:
+                    qualified = False
+                    reasons.append(f"Telegram 체결 지속형 {rejection}")
+            except (KeyError, TypeError, ValueError):
+                qualified = False
+            if qualified:
+                score_floor = risk_config.trade_flow_leader_min_score
+            else:
+                reasons.append("Telegram 체결 지속형 최신 매수·60초 생존·위험 자격 미확인")
         if int(candidate.get("score", 0)) < score_floor:
             reasons.append(f"Telegram 점수 미달({candidate.get('score', 0)} < {score_floor})")
         plan = candidate.get("exit_plan")
         if plan:
             higher = candidate.get("higher_timeframe_context") or {}
             if not (
-                int(candidate.get("score", 0)) >= 90
+                int(candidate.get("score", 0)) >= (score_floor if candidate.get("trade_flow_leader") else 90)
                 and higher.get("ready") and higher.get("hourly_established")
                 and higher.get("fifteen_intact")
                 and (higher.get("fifteen") or {}).get("above_ma20")
                 and candidate.get("double_bb_confirmed")
-                and candidate.get("first_retest_confirmed")
+                and (candidate.get("first_retest_confirmed") or candidate.get("trade_flow_leader"))
                 and float(candidate.get("completed_5m_volume_ratio") or 0) >= 1.5
                 and float(candidate.get("completed_15m_volume_ratio") or 0) >= 1.0
             ):
@@ -3959,6 +4003,12 @@ class CandidateAnalyzer:
             return ["생존 시점 상대강도 시장표본 미확인"]
         rejected: list[str] = []
         percentile = float(relative.get("relative_strength_percentile") or 100.0)
+        if candidate.get("trade_flow_leader"):
+            if (percentile > 2.0 or float(relative.get("momentum_5m_pct") or 0) < .2
+                    or float(relative.get("momentum_15m_pct") or 0) < .8
+                    or float(relative.get("momentum_60m_pct") or 0) < 1.5
+                    or float(relative.get("market_breadth_5m_pct") or 0) < 20):
+                rejected.append("생존 중 체결 지속형 선도 순위·추세·확산도 상실")
         if candidate.get("completed_breakout_entry"):
             if percentile > self.config.early_leader_max_percentile:
                 rejected.append("생존 중 눌림 없는 돌파 선도 순위 이탈")
@@ -3991,11 +4041,12 @@ class CandidateAnalyzer:
             is_reentry
             and not relative.get("relative_strength_eligible")
             and not sustained
+            and not candidate.get("trade_flow_leader")
         ):
             rejected.append("생존 중 재진입 상대강도 자격 상실")
         min_momentum_5m = (
             self.config.relative_strength_min_5m_pct
-            if is_reentry and not sustained
+            if is_reentry and not sustained and not candidate.get("trade_flow_leader")
             else 0.0
         )
         if momentum_5m < min_momentum_5m or (
@@ -4079,7 +4130,7 @@ class CandidateAnalyzer:
                     alert, "rejected", rejected
                 )
                 return
-            if fast_leader and candidate.get("selection_lane") != "explosive_leader" and not candidate.get("rsi_breakout_exception") and not candidate.get("breadth_breakout_exception") and not candidate.get("completed_breakout_entry"):
+            if fast_leader and candidate.get("selection_lane") != "explosive_leader" and not candidate.get("rsi_breakout_exception") and not candidate.get("breadth_breakout_exception") and not candidate.get("completed_breakout_entry") and not candidate.get("trade_flow_leader"):
                 candidate["survival_confirmed"] = True
                 candidate["survival_seconds"] = max(
                     self.config.fast_leader_confirm_seconds,
@@ -4100,6 +4151,7 @@ class CandidateAnalyzer:
                     and not first_candidate.get("rsi_breakout_exception")
                     and not first_candidate.get("breadth_breakout_exception")
                     and not first_candidate.get("completed_breakout_entry")
+                    and not first_candidate.get("trade_flow_leader")
                     else self.config.survival_confirm_seconds
                 )
                 LOGGER.info(
@@ -4120,6 +4172,8 @@ class CandidateAnalyzer:
                         max_stop_loss_pct=self.config.max_stop_loss_pct,
                     )
                 )
+                survival_relative = (self._relative_strength_provider(market, int(time.time()))
+                    if self._relative_strength_provider is not None else {})
                 survival_metrics, survival_rejected = validate_candidate_survival(
                     first_candidate,
                     survival_snapshot["ticker"],
@@ -4129,6 +4183,8 @@ class CandidateAnalyzer:
                     as_of=survival_snapshot.get("as_of"),
                     candles_5m=survival_snapshot.get("candles_5m"),
                     candles_15m=survival_snapshot.get("candles_15m"),
+                    trade_flow_context=survival_relative.get("trade_flow_context"),
+                    candles_60m=survival_snapshot.get("candles_60m"),
                 )
                 btc_metrics, btc_rejected = validate_btc_survival(
                     survival_snapshot.get("btc_ticker"),
@@ -4152,9 +4208,6 @@ class CandidateAnalyzer:
                 ):
                     survival_rejected.append("생존 중 BTC 약세·호가 약세 동시 발생")
                 if self._relative_strength_provider is not None:
-                    survival_relative = self._relative_strength_provider(
-                        market, int(time.time())
-                    )
                     survival_rejected.extend(
                         self._relative_survival_rejections(
                             first_candidate, survival_relative
@@ -4300,6 +4353,7 @@ class CandidateAnalyzer:
                 "rsi_breakout_exception",
                 "breadth_breakout_exception",
                 "completed_breakout_entry",
+                "trade_flow_leader", "trade_flow_context", "survival_trade_flow",
                 "cleared_resistance_levels",
                 "sustained_retest",
             ):
@@ -4435,6 +4489,10 @@ async def _refresh_subscription_once(websocket, config, engine, markets):
     coverage = MONITOR_STATE.snapshot()
     LOGGER.info("MARKET_COVERAGE subscribed=%d received=%d without_trade=%s",
                 len(refreshed), coverage["received_market_count"], coverage["markets_without_trade"])
+    flow_contexts = [engine.trade_flow.snapshot(code, int(time.time())) for code in refreshed]
+    LOGGER.info("TRADE_FLOW_COVERAGE markets=%d ready=%d buy_persistent=%d",
+                len(refreshed), sum(bool(c.get("ready")) for c in flow_contexts),
+                sum(buying_persistent(c, float(c["windows"][-1]["close"]), int(time.time())) for c in flow_contexts))
     return refreshed, sorted(new - old)
 
 
@@ -4497,6 +4555,7 @@ async def run_monitor_forever() -> None:
                     max_size=2**20,
                 ) as websocket:
                     await websocket.send(_trade_subscription(markets))
+                    engine.trade_flow.clear()  # Require fresh executions after reconnect.
                     MONITOR_STATE.mark_connected()
                     LOGGER.info(
                         "Connected to Upbit WebSocket for %d markets", len(markets)
@@ -4528,6 +4587,8 @@ async def run_monitor_forever() -> None:
                                 message.get("trade_timestamp")
                                 or message["timestamp"]
                             ),
+                            ask_bid=message.get("ask_bid"),
+                            sequential_id=message.get("sequential_id"),
                         )
                         for alert in alerts:
                             if alert.get("internal_only"):
