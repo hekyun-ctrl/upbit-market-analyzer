@@ -2284,6 +2284,61 @@ def _evaluate_hot(setup, book=2):
                               btc_candles_15m=btc, as_of=now)
 
 
+def _moderate_breadth_breakout(monkeypatch):
+    setup = _ordinary_hot_breakout(monkeypatch)
+    _, one, five, _, _, alert, _ = setup
+    five[1]["candle_acc_trade_volume"] = 400
+    one[1]["low_price"] = 100.2  # Real contact with the breakout line.
+    alert.update(momentum_5m_pct=1.1, momentum_15m_pct=1.98,
+                 momentum_60m_pct=3, relative_strength_percentile=1.52,
+                 market_regime="risk_off", market_breadth_5m_pct=32.5)
+    analyze = candidate_analysis.analyze_candles
+    def cool_rsi(candles): return {**analyze(candles), "rsi14": 65.0}
+    monkeypatch.setattr(candidate_analysis, "analyze_candles", cool_rsi)
+    return setup
+
+
+@pytest.mark.parametrize("recheck", [False, True])
+def test_completed_breakout_softens_only_moderate_breadth_for_fresh_and_recheck(monkeypatch, recheck):
+    setup = _moderate_breadth_breakout(monkeypatch)
+    setup[5]["watchlist_recheck"] = recheck
+    candidate, reasons = _evaluate_hot(setup, book=.7)
+    assert candidate is not None, reasons
+    assert candidate["breadth_breakout_exception"]
+    assert candidate["selection_lane"] != "explosive_leader"
+    assert candidate["completed_5m_volume_ratio"] == 4
+    assert any("확산도" in note for note in candidate["risk_notes"])
+    now, one, five, fifteen, _, _, ticker = setup
+    _, reasons = validate_candidate_survival(candidate, ticker, [_orderbook(101, .7)] * 3,
+        one, _config(), as_of=now, candles_5m=five, candles_15m=fifteen)
+    assert reasons == []
+    five[1]["trade_price"] = 99.9
+    _, reasons = validate_candidate_survival(candidate, ticker, [_orderbook(101, .7)] * 3,
+        one, _config(), as_of=now, candles_5m=five, candles_15m=fifteen)
+    assert any("확산도 예외" in reason for reason in reasons)
+
+
+@pytest.mark.parametrize("cause", ["low_breadth", "volume5", "volume15", "gap", "rank", "book", "btc", "chase", "liquidity", "wb", "broken", "hour_down"])
+def test_breadth_breakout_cannot_rescue_unsafe_or_unverified_setup(monkeypatch, cause):
+    setup = _moderate_breadth_breakout(monkeypatch)
+    _, one, five, fifteen, btc, alert, ticker = setup
+    if cause == "low_breadth": alert["market_breadth_5m_pct"] = 19
+    elif cause == "volume5": five[1]["candle_acc_trade_volume"] = 100
+    elif cause == "volume15": fifteen[1]["candle_acc_trade_volume"] = 50
+    elif cause == "gap": one.pop(3)
+    elif cause == "rank": alert["relative_strength_percentile"] = 3
+    elif cause == "btc": btc[1]["trade_price"] = 98
+    elif cause == "chase": ticker["trade_price"] = 104
+    elif cause == "liquidity": ticker["acc_trade_price_24h"] = 1
+    elif cause == "wb":
+        monkeypatch.setattr(candidate_analysis, "_double_bollinger_context",
+            lambda *a, **k: {"ready": True, "confirmed": False, "fake_breakout": True})
+    elif cause == "broken": one[1]["trade_price"] = 99.9
+    elif cause == "hour_down": alert["momentum_60m_pct"] = -1
+    candidate, reasons = _evaluate_hot(setup, book=.1 if cause == "book" else .7)
+    assert candidate is None and reasons, (cause, candidate)
+
+
 def test_rsi_only_exception_retains_ordinary_lane_and_survival(monkeypatch):
     setup = _ordinary_hot_breakout(monkeypatch)
     candidate, reasons = _evaluate_hot(setup)

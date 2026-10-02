@@ -894,6 +894,14 @@ def validate_candidate_survival(
                 or current < max(breakout, float(evidence.get("level") or breakout))
                 or current > float(evidence.get("close") or current) * 1.005):
             rejected.append("RSI 예외 완료봉 돌파·호가 생존 실패")
+    if candidate.get("breadth_breakout_exception"):
+        evidence = _explosive_bar_context(candles_1m, candles_5m or [], candles_15m or [],
+                                         as_of or datetime.now(timezone.utc))
+        if (not evidence.get("confirmed") or not hard_book_persistent
+                or spread > config.max_spread_pct
+                or current < max(breakout, float(evidence.get("level") or breakout))
+                or current > float(evidence.get("close") or current) * 1.005):
+            rejected.append("확산도 예외 완료봉 돌파·호가 생존 실패")
     if spread > config.hard_max_spread_pct:
         rejected.append(f"호가 스프레드 극단적 과다({spread:.2f}%)")
 
@@ -1385,8 +1393,28 @@ def evaluate_candidate(
         and volume_ratio >= config.min_completed_volume_ratio
         and volume_previous >= config.min_volume_vs_previous
     )
+    # A top leader with fresh, completed structural evidence can rotate in a
+    # moderately weak market even after rolling 5m momentum cools below 1.5%.
+    # This exempts ONLY breadth. It cannot waive WB, RSI, book, chase, stop,
+    # score or any other ordinary-lane rule (including failed retests).
+    breadth_breakout_exception = bool(
+        config.explosive_leader_enabled
+        and market_regime == "risk_off"
+        and 20.0 <= market_breadth_5m_pct < config.hard_min_market_breadth_pct
+        and explosive_context.get("confirmed")
+        and wb_confirmed and not wb_fake_breakout
+        and relative_ready and relative_eligible and relative_percentile <= 2.0
+        and momentum_5m >= config.relative_strength_min_5m_pct
+        and momentum_15m is not None and momentum_15m > 0
+        and (alert.get("momentum_60m_pct") is None or float(alert["momentum_60m_pct"]) > 0)
+        and current >= max(breakout, float(explosive_context["level"]))
+        and current <= float(explosive_context["close"]) * 1.005
+        and hard_book_persistent and spread <= config.max_spread_pct
+        and not btc_weak
+    )
     risk_off_exception = bool(
         risk_off_reentry_exception or risk_off_fresh_leader_exception or explosive_core
+        or breadth_breakout_exception
     )
     if (
         market_regime == "risk_off"
@@ -1530,6 +1558,7 @@ def evaluate_candidate(
         "trade_value_24h_krw": trade_value_24h,
         "btc_crash": btc_crash, "resistance_room_pct": room,
         "rsi_breakout_exception": rsi_breakout_exception,
+        "breadth_breakout_exception": breadth_breakout_exception,
         "cleared_resistance_levels": cleared_resistance_levels,
         "explosive_context": explosive_context,
     }
@@ -1634,6 +1663,8 @@ def evaluate_candidate(
         risk_notes.append(
             "시장 약세 중 상대강도 선도 유지: 시장 확산도는 감점 반영"
         )
+    if breadth_breakout_exception:
+        risk_notes.append("완료 5·15분 돌파·상위 2% 선도주 확인: 확산도 차단만 감점 전환, 60초 재검증")
     if leader_resistance_override:
         risk_notes.append(
             "근접 저항은 상위 선도주의 재돌파 대상으로 조건부 허용"
@@ -1997,6 +2028,7 @@ def evaluate_candidate(
         ),
         "explosive_context": explosive_context if explosive_core else None,
         "rsi_breakout_exception": rsi_breakout_exception,
+        "breadth_breakout_exception": breadth_breakout_exception,
         "cleared_resistance_levels": cleared_resistance_levels,
         "volume_timeframe": "5분" if explosive_core else "1분",
         "fast_leader": fast_leader_core and not explosive_core,

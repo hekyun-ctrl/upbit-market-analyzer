@@ -34,7 +34,7 @@ from exit_plan import exit_plan_metrics, modeled_exit_return, partial_plan_summa
 from upbit_client import UpbitPublicClient
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "audited-breakout-v3.3"
+STRATEGY_VERSION = "live-universe-leader-v3.4"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -152,6 +152,7 @@ class MonitorConfig:
     sustained_watch_enabled: bool = True
     sustained_watch_interval_seconds: int = 60
     sustained_watch_cooldown_seconds: int = 1800
+    market_refresh_seconds: int = 60
 
     @classmethod
     def from_env(cls) -> "MonitorConfig":
@@ -162,6 +163,7 @@ class MonitorConfig:
         all_markets = not values or "ALL_KRW" in values
         selected = tuple(value for value in values if value != "ALL_KRW")
         return cls(
+            market_refresh_seconds=max(30, _env_int("MONITOR_MARKET_REFRESH_SECONDS", 60)),
             sustained_watch_enabled=_enabled("MONITOR_SUSTAINED_WATCH_ENABLED", True),
             sustained_watch_interval_seconds=max(
                 30, _env_int("MONITOR_SUSTAINED_WATCH_INTERVAL_SECONDS", 60)
@@ -324,6 +326,10 @@ class MonitorState:
         self.reconnect_count = 0
         self.message_count = 0
         self.market_count = 0
+        self.last_market_refresh_at: str | None = None
+        self.market_refresh_count = 0
+        self.subscribed_markets: set[str] = set()
+        self.received_markets: set[str] = set()
         self.notification_mode = "log_only"
         self.recent_alerts: deque[dict[str, Any]] = deque(maxlen=100)
         self.candidate_outcomes: deque[dict[str, Any]] = deque(maxlen=500)
@@ -341,17 +347,33 @@ class MonitorState:
     def _now() -> str:
         return datetime.now(timezone.utc).isoformat()
 
-    def mark_started(self, market_count: int, notification_mode: str) -> None:
+    def mark_started(self, market_count: int, notification_mode: str, markets: list[str] | None = None) -> None:
         with self._lock:
             self.started_at = self.started_at or self._now()
             self.market_count = market_count
             self.notification_mode = notification_mode
+            if markets is not None:
+                self.subscribed_markets = set(markets)
+                self.received_markets.clear()
 
     def mark_connected(self) -> None:
         with self._lock:
             self.connected = True
             self.connected_at = self._now()
             self.last_error = None
+
+    def mark_market_refresh(self, market_count: int, changed: bool, markets: list[str] | None = None) -> None:
+        with self._lock:
+            self.market_count = market_count
+            self.last_market_refresh_at = self._now()
+            self.market_refresh_count += int(changed)
+            if markets is not None:
+                self.subscribed_markets = set(markets)
+                self.received_markets.intersection_update(self.subscribed_markets)
+
+    def mark_trade_received(self, market: str) -> None:
+        with self._lock:
+            self.received_markets.add(market)
 
     def mark_message(self) -> None:
         with self._lock:
@@ -716,6 +738,10 @@ class MonitorState:
                 "reconnect_count": self.reconnect_count,
                 "message_count": self.message_count,
                 "market_count": self.market_count,
+                "last_market_refresh_at_utc": self.last_market_refresh_at,
+                "market_refresh_count": self.market_refresh_count,
+                "received_market_count": len(self.received_markets & self.subscribed_markets),
+                "markets_without_trade": sorted(self.subscribed_markets - self.received_markets),
                 "notification_mode": self.notification_mode,
                 "recent_alert_count": len(self.recent_alerts),
                 "candidate_outcome_count": len(self.candidate_outcomes),
@@ -764,6 +790,7 @@ class SignalEngine:
 
     def __init__(self, config: MonitorConfig) -> None:
         self.config = config
+        self.active_markets: set[str] | None = None
         self._windows: dict[str, deque[_SecondBucket]] = defaultdict(deque)
         self._last_evaluated_second: dict[str, int] = {}
         self._last_alert_at: dict[tuple[str, str], int] = {}
@@ -910,6 +937,8 @@ class SignalEngine:
 
         snapshots: list[tuple[str, float, float, float | None, float | None]] = []
         for code, samples in self._momentum_prices.items():
+            if self.active_markets is not None and code not in self.active_markets:
+                continue
             if (
                 not samples
                 or now - samples[-1][0]
@@ -3647,13 +3676,25 @@ class CandidateAnalyzer:
             return False
         relative = (self._relative_strength_provider(market, int(now))
                     if self._relative_strength_provider else {})
-        if not (
+        hourly_admission = bool(
             relative.get("relative_strength_ready")
             and float(relative.get("relative_strength_percentile") or 100) <= self.config.early_leader_max_percentile
             and float(relative.get("momentum_5m_pct") or 0) >= 0.2
             and float(relative.get("momentum_15m_pct") or 0) >= 0.8
             and float(relative.get("momentum_60m_pct") or 0) >= 1.5
-        ):
+        )
+        # Young leaders need not wait an hour for discovery. This only admits
+        # a REST screen; the completed 5/15m breakout and all risk gates still
+        # decide entry. No synthetic retest flag is created.
+        breakout_admission = bool(
+            self.config.explosive_leader_enabled
+            and relative.get("relative_strength_ready")
+            and relative.get("relative_strength_eligible")
+            and float(relative.get("relative_strength_percentile") or 100) <= 2.0
+            and float(relative.get("momentum_5m_pct") or 0) >= self.config.relative_strength_min_5m_pct
+            and float(relative.get("momentum_15m_pct") or 0) > 0
+        )
+        if not (hourly_admission or breakout_admission):
             return False
         state["completed_recheck_bucket"] = bucket
         state["completed_recheck_count"] = int(state.get("completed_recheck_count", 0)) + 1
@@ -3662,7 +3703,8 @@ class CandidateAnalyzer:
             "time_utc": datetime.now(timezone.utc).isoformat(),
             "market": market, "signal": state["source_signal"], "price": price,
             "breakout_level": breakout, "watchlist_recheck": True,
-            "hourly_recheck": True, "completed_bar_recheck": True,
+            "hourly_recheck": hourly_admission, "completed_bar_recheck": True,
+            "completed_breakout_recheck": breakout_admission,
             "original_signal_time_utc": state.get("first_signal_time_utc"),
             **relative,
         }
@@ -3894,8 +3936,13 @@ class CandidateAnalyzer:
             return ["생존 시점 상대강도 시장표본 미확인"]
         rejected: list[str] = []
         percentile = float(relative.get("relative_strength_percentile") or 100.0)
-        if (candidate.get("selection_lane") == "explosive_leader" or candidate.get("rsi_breakout_exception")) and percentile > 2.0:
+        if (candidate.get("selection_lane") == "explosive_leader" or candidate.get("rsi_breakout_exception") or candidate.get("breadth_breakout_exception")) and percentile > 2.0:
             rejected.append("생존 중 폭발적 선도주 상위 2% 이탈")
+        if candidate.get("breadth_breakout_exception"):
+            if not relative.get("relative_strength_eligible"):
+                rejected.append("생존 중 완료봉 선도주 자격 상실")
+            if float(relative.get("market_breadth_5m_pct") or 0) < 20.0:
+                rejected.append("생존 중 시장 확산도 극단적 약세")
         momentum_5m = float(relative.get("momentum_5m_pct") or 0.0)
         momentum_15m_value = relative.get("momentum_15m_pct")
         momentum_15m = (
@@ -4004,7 +4051,7 @@ class CandidateAnalyzer:
                     alert, "rejected", rejected
                 )
                 return
-            if fast_leader and candidate.get("selection_lane") != "explosive_leader" and not candidate.get("rsi_breakout_exception"):
+            if fast_leader and candidate.get("selection_lane") != "explosive_leader" and not candidate.get("rsi_breakout_exception") and not candidate.get("breadth_breakout_exception"):
                 candidate["survival_confirmed"] = True
                 candidate["survival_seconds"] = max(
                     self.config.fast_leader_confirm_seconds,
@@ -4023,6 +4070,7 @@ class CandidateAnalyzer:
                     if alert.get("leader_pullback_recheck")
                     and first_candidate.get("selection_lane") != "explosive_leader"
                     and not first_candidate.get("rsi_breakout_exception")
+                    and not first_candidate.get("breadth_breakout_exception")
                     else self.config.survival_confirm_seconds
                 )
                 LOGGER.info(
@@ -4220,6 +4268,7 @@ class CandidateAnalyzer:
                 "volume_timeframe",
                 "explosive_context",
                 "rsi_breakout_exception",
+                "breadth_breakout_exception",
                 "cleared_resistance_levels",
                 "sustained_retest",
             ):
@@ -4326,6 +4375,58 @@ async def _warm_signal_engine(
     return warmed, len(markets)
 
 
+def _trade_subscription(markets: list[str]) -> str:
+    return json.dumps([
+        {"ticket": f"upbit-monitor-{uuid.uuid4()}"},
+        {"type": "trade", "codes": sorted(set(markets)), "is_only_realtime": True},
+        {"format": "DEFAULT"},
+    ])
+
+
+async def _refresh_subscription_once(websocket, config, engine, markets):
+    """Replace the entire subscription only after a successful, nonempty fetch.
+
+    Preserve engine/watch state and do not advance local membership on send
+    failure. Newly listed markets get live trades immediately, even if their
+    short history is insufficient for candidate qualification.
+    """
+    refreshed = sorted(set(await _resolve_markets(config)))
+    if not refreshed:
+        raise RuntimeError("Empty market refresh; retaining current subscription")
+    old, new = set(markets), set(refreshed)
+    if old != new:
+        await websocket.send(_trade_subscription(refreshed))
+        engine.active_markets = new
+        LOGGER.info("MARKET_UNIVERSE_REFRESH count=%d added=%s removed=%s",
+                    len(new), sorted(new - old), sorted(old - new))
+    MONITOR_STATE.mark_market_refresh(len(refreshed), old != new, refreshed)
+    coverage = MONITOR_STATE.snapshot()
+    LOGGER.info("MARKET_COVERAGE subscribed=%d received=%d without_trade=%s",
+                len(refreshed), coverage["received_market_count"], coverage["markets_without_trade"])
+    return refreshed, sorted(new - old)
+
+
+async def _refresh_market_subscriptions(websocket, config, engine, markets, warm_tasks):
+    if not config.all_krw_markets:
+        return
+    while True:
+        await asyncio.sleep(config.market_refresh_seconds)
+        try:
+            refreshed, added = await _refresh_subscription_once(websocket, config, engine, markets)
+        except asyncio.CancelledError:
+            raise
+        except websockets.exceptions.ConnectionClosed:
+            return  # The receive loop handles reconnect and a fresh universe.
+        except Exception as exc:
+            LOGGER.warning("Market refresh failed; retaining %d subscriptions: %s", len(markets), exc)
+            continue
+        markets[:] = refreshed
+        if added:
+            task = asyncio.create_task(_warm_signal_engine(engine, added))
+            warm_tasks.add(task)
+            task.add_done_callback(warm_tasks.discard)
+
+
 async def run_monitor_forever() -> None:
     config = MonitorConfig.from_env()
     dispatcher = AlertDispatcher()
@@ -4334,7 +4435,9 @@ async def run_monitor_forever() -> None:
         CandidateConfig.from_env(), dispatcher, engine.relative_strength_snapshot
     )
     backoff = 1
-    warmup_task: asyncio.Task[tuple[int, int]] | None = None
+    warmed_markets: set[str] = set()
+    warm_tasks: set[asyncio.Task[Any]] = set()
+    refresh_task: asyncio.Task[Any] | None = None
     inactivity_status_task = asyncio.create_task(
         dispatcher.run_inactivity_status_loop()
     )
@@ -4345,20 +4448,14 @@ async def run_monitor_forever() -> None:
                 markets = await _resolve_markets(config)
                 if not markets:
                     raise RuntimeError("No KRW markets were resolved")
-                MONITOR_STATE.mark_started(len(markets), dispatcher.mode)
-                if warmup_task is None:
-                    warmup_task = asyncio.create_task(
-                        _warm_signal_engine(engine, markets)
-                    )
-                request = [
-                    {"ticket": f"upbit-monitor-{uuid.uuid4()}"},
-                    {
-                        "type": "trade",
-                        "codes": markets,
-                        "is_only_realtime": True,
-                    },
-                    {"format": "DEFAULT"},
-                ]
+                MONITOR_STATE.mark_started(len(markets), dispatcher.mode, markets)
+                engine.active_markets = set(markets)
+                added = sorted(set(markets) - warmed_markets)
+                if added:
+                    task = asyncio.create_task(_warm_signal_engine(engine, added))
+                    warm_tasks.add(task)
+                    task.add_done_callback(warm_tasks.discard)
+                    warmed_markets.update(added)
                 async with websockets.connect(
                     _WS_URL,
                     ping_interval=30,
@@ -4367,12 +4464,15 @@ async def run_monitor_forever() -> None:
                     open_timeout=15,
                     max_size=2**20,
                 ) as websocket:
-                    await websocket.send(json.dumps(request))
+                    await websocket.send(_trade_subscription(markets))
                     MONITOR_STATE.mark_connected()
                     LOGGER.info(
                         "Connected to Upbit WebSocket for %d markets", len(markets)
                     )
                     backoff = 1
+                    refresh_task = asyncio.create_task(
+                        _refresh_market_subscriptions(websocket, config, engine, markets, warm_tasks)
+                    )
                     async for raw in websocket:
                         MONITOR_STATE.mark_message()
                         if isinstance(raw, bytes):
@@ -4383,6 +4483,9 @@ async def run_monitor_forever() -> None:
                         if message.get("type") != "trade":
                             continue
                         market = str(message["code"])
+                        if market not in (engine.active_markets or set()):
+                            continue  # Ignore a buffered trade from a removed market.
+                        MONITOR_STATE.mark_trade_received(market)
                         price = float(message["trade_price"])
                         candidate_analyzer.observe_price(market, price)
                         alerts = engine.update(
@@ -4419,12 +4522,18 @@ async def run_monitor_forever() -> None:
                 LOGGER.exception("Upbit monitor disconnected; retrying in %ss", backoff)
                 await asyncio.sleep(backoff)
                 backoff = min(backoff * 2, 60)
+            finally:
+                if refresh_task is not None:
+                    refresh_task.cancel()
+                    await asyncio.gather(refresh_task, return_exceptions=True)
+                    refresh_task = None
+                warmed_markets.update(engine.active_markets or ())
     finally:
         inactivity_status_task.cancel()
         tasks: list[asyncio.Task[Any]] = [inactivity_status_task]
-        if warmup_task is not None:
-            warmup_task.cancel()
-            tasks.append(warmup_task)
+        for task in warm_tasks:
+            task.cancel()
+            tasks.append(task)
         await asyncio.gather(*tasks, return_exceptions=True)
 
 

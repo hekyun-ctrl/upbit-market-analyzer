@@ -6,6 +6,130 @@ import monitor
 import pytest
 
 
+def test_refresh_adds_new_market_removes_old_and_preserves_engine_state(monkeypatch):
+    import json
+    engine = SignalEngine(_config(all_krw_markets=True))
+    engine.active_markets = {"KRW-BTC", "KRW-OLD"}
+    sentinel = engine._windows["KRW-BTC"]
+    async def resolve(config): return ["KRW-POD", "KRW-BTC"]
+    monkeypatch.setattr(monitor, "_resolve_markets", resolve)
+    class Socket:
+        def __init__(self): self.sent = []
+        async def send(self, data): self.sent.append(json.loads(data))
+    socket = Socket()
+    refreshed, added = asyncio.run(monitor._refresh_subscription_once(
+        socket, engine.config, engine, ["KRW-BTC", "KRW-OLD"]))
+    assert refreshed == ["KRW-BTC", "KRW-POD"] and added == ["KRW-POD"]
+    assert socket.sent[0][1]["codes"] == refreshed
+    assert socket.sent[0][1]["is_only_realtime"]
+    assert engine.active_markets == set(refreshed)
+    assert engine._windows["KRW-BTC"] is sentinel
+    assert MONITOR_STATE.snapshot()["market_count"] == 2
+    asyncio.run(monitor._refresh_subscription_once(socket, engine.config, engine, refreshed))
+    assert len(socket.sent) == 1  # No unnecessary resubscription.
+
+
+@pytest.mark.parametrize("cause", ["empty", "rest_failure", "send_failure"])
+def test_market_refresh_failure_does_not_replace_live_membership(monkeypatch, cause):
+    engine = SignalEngine(_config(all_krw_markets=True))
+    engine.active_markets = {"KRW-BTC"}
+    async def resolve(config):
+        if cause == "rest_failure": raise RuntimeError("public API unavailable")
+        return [] if cause == "empty" else ["KRW-BTC", "KRW-POD"]
+    monkeypatch.setattr(monitor, "_resolve_markets", resolve)
+    class Socket:
+        async def send(self, data): raise RuntimeError("send failed")
+    with pytest.raises(RuntimeError):
+        asyncio.run(monitor._refresh_subscription_once(Socket(), engine.config, engine, ["KRW-BTC"]))
+    assert engine.active_markets == {"KRW-BTC"}
+
+
+def test_periodic_refresh_warms_only_additions_and_cancels_cleanly(monkeypatch):
+    engine = SignalEngine(_config(all_krw_markets=True))
+    resolutions = iter([["KRW-BTC", "KRW-POD"], ["KRW-BTC", "KRW-POD"]])
+    async def resolve(config): return next(resolutions)
+    monkeypatch.setattr(monitor, "_resolve_markets", resolve)
+    warmed, sends = [], []
+    async def warm(engine, codes): warmed.extend(codes)
+    monkeypatch.setattr(monitor, "_warm_signal_engine", warm)
+    original_sleep = asyncio.sleep
+    async def sleep(seconds): await original_sleep(0)
+    monkeypatch.setattr(monitor.asyncio, "sleep", sleep)
+    class Socket:
+        async def send(self, data): sends.append(data)
+    async def run():
+        tasks, markets = set(), ["KRW-BTC"]
+        task = asyncio.create_task(monitor._refresh_market_subscriptions(Socket(), engine.config, engine, markets, tasks))
+        for _ in range(4): await original_sleep(0)
+        task.cancel()
+        await asyncio.gather(task, *tasks, return_exceptions=True)
+        assert markets == ["KRW-BTC", "KRW-POD"]
+    asyncio.run(run())
+    assert warmed == ["KRW-POD"] and len(sends) == 1
+
+
+def test_young_completed_breakout_is_admitted_to_recheck_without_hourly_history(monkeypatch):
+    monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
+    monkeypatch.setattr(MONITOR_STATE, "has_recent_signal", lambda *args: False)
+    relative = {"relative_strength_ready": True, "relative_strength_eligible": True,
+                "relative_strength_percentile": 1.5, "momentum_5m_pct": 1.1,
+                "momentum_15m_pct": 2.0, "momentum_60m_pct": None}
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher(), lambda *args: relative)
+    analyzer._watchlist["KRW-TEST"] = {"created_at": 1_800_000_000,
+        "expires_at": 1_800_010_000, "source_signal": "breakout", "breakout_level": 100,
+        "first_signal_price": 100, "last_checked_at": 1_800_000_295}
+    seen = []
+    async def analyze(alert): seen.append(alert)
+    monkeypatch.setattr(analyzer, "_analyze", analyze)
+    async def run():
+        assert analyzer._observe_completed_bar_watchlist("KRW-TEST", 101, 1_800_000_305)
+        await asyncio.sleep(0)
+        await asyncio.sleep(0)
+        relative["relative_strength_eligible"] = False
+        assert not analyzer._observe_completed_bar_watchlist("KRW-TEST", 101, 1_800_000_605)
+    asyncio.run(run())
+    assert len(seen) == 1 and seen[0]["completed_breakout_recheck"]
+    assert not seen[0]["hourly_recheck"]
+    assert not seen[0].get("is_reentry") and not seen[0].get("pullback_retest")
+
+
+def test_breadth_exception_requires_renewed_rank_eligibility_and_market_floor():
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    candidate = {"relative_strength_ready": True, "breadth_breakout_exception": True}
+    relative = {"relative_strength_ready": True, "relative_strength_eligible": True,
+                "relative_strength_percentile": 1.5, "momentum_5m_pct": 1.1,
+                "momentum_15m_pct": 2, "market_breadth_5m_pct": 32.5}
+    assert analyzer._relative_survival_rejections(candidate, relative) == []
+    relative.update(relative_strength_eligible=False, market_breadth_5m_pct=10,
+                    relative_strength_percentile=3)
+    reasons = analyzer._relative_survival_rejections(candidate, relative)
+    assert len(reasons) == 3
+
+
+def test_coverage_distinguishes_subscription_from_received_trades():
+    state = monitor.MonitorState()
+    state.mark_started(2, "telegram", ["KRW-BTC", "KRW-POD"])
+    state.mark_trade_received("KRW-BTC")
+    assert state.snapshot()["markets_without_trade"] == ["KRW-POD"]
+    state.mark_market_refresh(2, True, ["KRW-BTC", "KRW-NEW"])
+    assert state.snapshot()["received_market_count"] == 1
+    assert state.snapshot()["markets_without_trade"] == ["KRW-NEW"]
+    state.mark_trade_received("KRW-NEW")
+    assert state.snapshot()["received_market_count"] == 2
+
+
+def test_removed_market_is_excluded_from_relative_universe():
+    from collections import deque
+    engine = SignalEngine(_config(relative_strength_min_universe=1))
+    now = 1_800_000_300
+    engine._momentum_prices["KRW-BTC"] = deque([(now - 300, 100), (now, 101)])
+    engine._momentum_prices["KRW-OLD"] = deque([(now - 300, 100), (now, 150)])
+    engine.active_markets = {"KRW-BTC"}
+    result = engine.relative_strength_snapshot("KRW-BTC", now)
+    assert result["relative_strength_universe"] == 1
+    assert result["relative_strength_rank"] == 1
+
+
 def test_screening_audit_updates_live_price_and_excludes_unfinished_candle():
     now = datetime(2026, 10, 1, 10, 0, 5, tzinfo=timezone.utc)
     alert = {"signal_id": "same", "market": "KRW-QKC", "price": 4.1}
