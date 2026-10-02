@@ -35,7 +35,7 @@ from upbit_client import UpbitPublicClient
 from trade_flow import TradeFlow, buying_persistent
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "verification-audit-v3.6"
+STRATEGY_VERSION = "verification-audit-v3.7"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -1553,6 +1553,8 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         labels.append("재지지")
     if candidate.get("availability_tier"):
         labels.append("보완형")
+    if candidate.get("completed_wb_retest_entry"):
+        labels.append("5분WB 첫 재지지")
     if candidate.get("sustained_retest"):
         labels.append("1시간 추세 재지지")
     suffix = f" | {'·'.join(labels)}" if labels else ""
@@ -1605,6 +1607,8 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     wb_line = ""
     if candidate.get("double_bb_enabled"):
         wb_line = f"WB 판정: {candidate.get('double_bb_status') or '확인 중'}\n"
+        if candidate.get("completed_wb_retest_entry"):
+            wb_line = f"5분 {wb_line}"
         if candidate.get("completed_breakout_entry"):
             wb_line = (f"진입형: 눌림 없는 완료봉 돌파\n"
                        f"{candidate.get('double_bb_timeframe') or '1분'} {wb_line}")
@@ -2008,7 +2012,7 @@ class AlertDispatcher:
             for reason in reasons
         )
         top_reasons = " · ".join(
-            f"{reason} {count}건" for reason, count in reason_counts.most_common(3)
+            f"{reason} {count}회" for reason, count in reason_counts.most_common(3)
         ) or "심층검증 대상 없음"
         status = MONITOR_STATE.snapshot()
         connection = "정상" if status["connected"] else "재연결 중"
@@ -2017,8 +2021,8 @@ class AlertDispatcher:
             f"[운영상태 | 최근 {minutes}분]\n"
             f"공개 시세 감시: {connection}\n"
             f"원시 상승신호: {len(self._raw_signal_times)}건\n"
-            f"심층검증 탈락: {len(self._candidate_rejections)}건\n"
-            f"주요 탈락 사유: {top_reasons}\n"
+            f"심층검증 탈락: {len(self._candidate_rejections)}회(동일 후보 재검증 포함)\n"
+            f"주요 탈락 사유(중복 집계): {top_reasons}\n"
             "조건부 진입 후보: 0건\n"
             "서비스는 계속 감시 중이며, 이 메시지는 매수 신호가 아닙니다."
         )
@@ -4009,11 +4013,12 @@ class CandidateAnalyzer:
                     or float(relative.get("momentum_60m_pct") or 0) < 1.5
                     or float(relative.get("market_breadth_5m_pct") or 0) < 20):
                 rejected.append("생존 중 체결 지속형 선도 순위·추세·확산도 상실")
-        if candidate.get("completed_breakout_entry"):
+        if candidate.get("completed_breakout_entry") or candidate.get("completed_wb_retest_entry"):
+            route = "5분 WB 첫 재지지" if candidate.get("completed_wb_retest_entry") else "눌림 없는 돌파"
             if percentile > self.config.early_leader_max_percentile:
-                rejected.append("생존 중 눌림 없는 돌파 선도 순위 이탈")
+                rejected.append(f"생존 중 {route} 선도 순위 이탈")
             if not relative.get("relative_strength_eligible"):
-                rejected.append("생존 중 눌림 없는 돌파 상대강도 자격 상실")
+                rejected.append(f"생존 중 {route} 상대강도 자격 상실")
         if (candidate.get("selection_lane") == "explosive_leader" or candidate.get("rsi_breakout_exception") or candidate.get("breadth_breakout_exception")) and percentile > 2.0:
             rejected.append("생존 중 폭발적 선도주 상위 2% 이탈")
         if candidate.get("breadth_breakout_exception"):
@@ -4130,7 +4135,7 @@ class CandidateAnalyzer:
                     alert, "rejected", rejected
                 )
                 return
-            if fast_leader and candidate.get("selection_lane") != "explosive_leader" and not candidate.get("rsi_breakout_exception") and not candidate.get("breadth_breakout_exception") and not candidate.get("completed_breakout_entry") and not candidate.get("trade_flow_leader"):
+            if fast_leader and candidate.get("selection_lane") != "explosive_leader" and not candidate.get("rsi_breakout_exception") and not candidate.get("breadth_breakout_exception") and not candidate.get("completed_breakout_entry") and not candidate.get("trade_flow_leader") and not candidate.get("completed_wb_retest_entry"):
                 candidate["survival_confirmed"] = True
                 candidate["survival_seconds"] = max(
                     self.config.fast_leader_confirm_seconds,
@@ -4152,6 +4157,7 @@ class CandidateAnalyzer:
                     and not first_candidate.get("breadth_breakout_exception")
                     and not first_candidate.get("completed_breakout_entry")
                     and not first_candidate.get("trade_flow_leader")
+                    and not first_candidate.get("completed_wb_retest_entry")
                     else self.config.survival_confirm_seconds
                 )
                 LOGGER.info(
@@ -4353,7 +4359,7 @@ class CandidateAnalyzer:
                 "rsi_breakout_exception",
                 "breadth_breakout_exception",
                 "completed_breakout_entry",
-                "trade_flow_leader", "trade_flow_context", "survival_trade_flow",
+                "trade_flow_leader", "trade_flow_context", "survival_trade_flow", "completed_wb_retest_entry",
                 "cleared_resistance_levels",
                 "sustained_retest",
             ):

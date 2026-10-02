@@ -13,6 +13,180 @@ from candidate_analysis import (
     validate_btc_survival,
 )
 
+
+def _controlled_wb_pullback(monkeypatch, post):
+    # Fix band values to isolate event ordering; real-band integration tests
+    # below independently check the 4/4-open and 20/2-close calculation.
+    monkeypatch.setattr(candidate_analysis, '_bollinger_at', lambda *a: (100, 105, 95))
+    base = {'opening_price': 100, 'high_price': 100.1, 'low_price': 99.9,
+            'trade_price': 100, 'candle_acc_trade_volume': 100}
+    chronological = [dict(base) for _ in range(26)]
+    chronological.append(dict(base, opening_price=100, high_price=110,
+                              low_price=100, trade_price=106))
+    chronological.extend(dict(base, opening_price=105.8, **bar) for bar in post)
+    return _double_bollinger_context(list(reversed(chronological)), 105.5)
+
+
+@pytest.mark.parametrize('post', [
+    [{'high_price': 106.2, 'low_price': 105.4, 'trade_price': 106}],
+    [{'high_price': 106.2, 'low_price': 105.4, 'trade_price': 106},
+     {'high_price': 106.3, 'low_price': 105.6, 'trade_price': 106.1}],
+    [{'high_price': 106.2, 'low_price': 105.4, 'trade_price': 106},
+     {'high_price': 107.2, 'low_price': 106.5, 'trade_price': 107}],
+])
+def test_wb_first_pullback_accepts_single_episode_and_immediate_recovery(monkeypatch, post):
+    wb = _controlled_wb_pullback(monkeypatch, post)
+    assert wb['confirmed'] and wb['first_retest'] and not wb['true_breakout']
+    assert wb['retest_diagnostic'] == 'first_pullback_confirmed'
+    assert wb['retest_level'] == 105.5
+
+
+@pytest.mark.parametrize('post,diagnostic', [
+    ([{'high_price': 106, 'low_price': 105, 'trade_price': 105.2},
+      {'high_price': 106.2, 'low_price': 105.4, 'trade_price': 106}], 'intervening_support_break'),
+    ([{'high_price': 106.2, 'low_price': 104.5, 'trade_price': 106}], 'intervening_support_break'),
+    ([{'high_price': 106.2, 'low_price': 105.4, 'trade_price': 106},
+      {'high_price': 107.2, 'low_price': 106.5, 'trade_price': 107},
+      {'high_price': 106.4, 'low_price': 105.4, 'trade_price': 106.2}], 'repeated_or_expired_pullback'),
+    ([{'high_price': 107.2, 'low_price': 106.5, 'trade_price': 107}], 'no_actual_zone_contact'),
+    ([{'high_price': 106.2, 'low_price': 105.4, 'trade_price': 106}] * 3, 'repeated_or_expired_pullback'),
+])
+def test_wb_first_pullback_rejects_broken_repeated_or_absent_support(monkeypatch, post, diagnostic):
+    wb = _controlled_wb_pullback(monkeypatch, post)
+    assert not wb['first_retest'] and not wb['confirmed']
+    assert wb['retest_diagnostic'] == diagnostic
+
+
+def _five_wb_retest_setup(monkeypatch):
+    setup = _ordinary_hot_breakout(monkeypatch)
+    _, one, five, _, _, alert, _ = setup
+    five[2].update(opening_price=100.3, high_price=101.05, low_price=100.3,
+                   trade_price=101, candle_acc_trade_volume=200)
+    five[1].update(opening_price=100.7, high_price=101.05, low_price=100.25,
+                   trade_price=101, candle_acc_trade_volume=200)
+    alert.update(early_trend=False, momentum_5m_pct=1.2, relative_strength_percentile=2.5)
+    analyze = candidate_analysis.analyze_candles
+    monkeypatch.setattr(candidate_analysis, 'analyze_candles',
+                        lambda bars: {**analyze(bars), 'rsi14': 65.0})
+    def context(bars, *args, **kwargs):
+        is_five = len(bars) >= 2 and (
+            datetime.fromisoformat(bars[0]['candle_date_time_utc']) -
+            datetime.fromisoformat(bars[1]['candle_date_time_utc'])).total_seconds() == 300
+        return {'ready': True, 'confirmed': is_five, 'fake_breakout': False,
+                'true_breakout': False, 'first_retest': is_five,
+                'retest_level': 100.2, 'status': 'WB 첫 재지지' if is_five else 'WB 미확정'}
+    monkeypatch.setattr(candidate_analysis, '_double_bollinger_context', context)
+    return setup
+
+
+def test_completed_five_wb_first_retest_can_confirm_ordinary_entry(monkeypatch):
+    setup = _five_wb_retest_setup(monkeypatch)
+    candidate, reasons = _evaluate_hot(setup)
+    assert candidate is not None, reasons
+    assert candidate['completed_wb_retest_entry']
+    assert candidate['first_retest_confirmed']
+    assert candidate['double_bb_timeframe'] == '5분'
+    assert candidate['stop_timeframe'] == '5분 구조'
+    assert not candidate['completed_breakout_entry'] and not candidate['rsi_breakout_exception']
+    assert not candidate['trade_flow_leader']
+    assert setup[5]['screening_metrics']['wb_five_retest']
+    assert not setup[5]['screening_metrics']['wb_one_context']['confirmed']
+
+
+@pytest.mark.parametrize('cause', ['five_volume', 'fifteen_volume', 'gap', 'unfinished',
+    'book', 'rank', 'eligible', 'btc', 'chase', 'one_close', 'momentum', 'fake_wb', 'rsi_hard'])
+def test_five_wb_retest_cannot_waive_execution_or_risk_guards(monkeypatch, cause):
+    setup = _five_wb_retest_setup(monkeypatch)
+    _, one, five, fifteen, btc, alert, ticker = setup
+    book = 2
+    if cause == 'five_volume': five[1]['candle_acc_trade_volume'] = 100
+    elif cause == 'fifteen_volume': fifteen[1]['candle_acc_trade_volume'] = 99
+    elif cause == 'gap': one.pop(5)
+    elif cause == 'unfinished': five[1]['candle_date_time_utc'] = five[0]['candle_date_time_utc']
+    elif cause == 'book': book = .7
+    elif cause == 'rank': alert['relative_strength_percentile'] = 8
+    elif cause == 'eligible': alert['relative_strength_eligible'] = False
+    elif cause == 'btc': btc[1]['trade_price'] = 98
+    elif cause == 'chase': ticker['trade_price'] = 103
+    elif cause == 'one_close': one[1]['trade_price'] = 100.1
+    elif cause == 'momentum': alert['momentum_5m_pct'] = .5
+    elif cause == 'fake_wb': monkeypatch.setattr(candidate_analysis, '_double_bollinger_context',
+        lambda *a, **k: {'ready': True, 'confirmed': False, 'fake_breakout': True, 'first_retest': False})
+    elif cause == 'rsi_hard':
+        analyze = candidate_analysis.analyze_candles
+        monkeypatch.setattr(candidate_analysis, 'analyze_candles', lambda bars: {**analyze(bars), 'rsi14': 100})
+    candidate, reasons = _evaluate_hot(setup, book=book)
+    assert candidate is None, (cause, candidate)
+    assert reasons
+
+
+@pytest.mark.parametrize('cause', ['held', 'lost_wb', 'volume', 'book', 'one_close'])
+def test_five_wb_retest_survival_refreshes_structure_and_execution(monkeypatch, cause):
+    setup = _five_wb_retest_setup(monkeypatch)
+    candidate, reasons = _evaluate_hot(setup)
+    assert candidate is not None, reasons
+    now, one, five, fifteen, _, _, ticker = setup
+    book = 2
+    if cause == 'lost_wb': monkeypatch.setattr(candidate_analysis, '_double_bollinger_context',
+        lambda *a, **k: {'first_retest': False, 'fake_breakout': False})
+    elif cause == 'volume': five[1]['candle_acc_trade_volume'] = 100
+    elif cause == 'book': book = .7
+    elif cause == 'one_close':
+        # Original alert support still holds but the fresher WB anchor is lost.
+        candidate['breakout_level'] = 100
+        one[1]['trade_price'] = 100.1
+    _, reasons = validate_candidate_survival(candidate, ticker, [_orderbook(101, book)] * 3,
+        one, _config(), as_of=now, candles_5m=five, candles_15m=fifteen)
+    if cause == 'held': assert reasons == []
+    else: assert any('완료 5분 WB 첫 재지지' in r for r in reasons)
+
+
+def test_historical_tree_first_retest_uses_completed_five_minute_bands():
+    import json
+    from pathlib import Path
+    data = json.loads((Path(__file__).parent / 'fixtures/wb-tree-20261002.json').read_text())
+    now = datetime.fromisoformat(data['as_of'])
+    one = _double_bollinger_context(_completed(data['1'], 1, now), 63)
+    five = _double_bollinger_context(_completed(data['5'], 5, now), 63)
+    assert not one['confirmed']
+    assert five['first_retest'] and five['confirmed']
+    assert five['retest_level'] == 63.1
+    assert five['breakout_offset'] == 1 and five['first_touch_offset'] == 0
+    # A future high/close in the open 13:00 UTC bar cannot change the verdict.
+    data['5'][0].update(trade_price=1000, high_price=1000)
+    assert _double_bollinger_context(_completed(data['5'], 5, now), 63) == five
+
+
+@pytest.mark.parametrize('cause', ['held', 'lost_wb', 'lost_anchor'])
+def test_flow_lane_five_wb_first_retest_is_revalidated_fresh(monkeypatch, cause):
+    from test_trade_flow import strong_flow
+    fixture = _flow_setup(monkeypatch)
+    setup, hourly, books = fixture
+    now, one, five, fifteen, _, _, ticker = setup
+    five[2].update(opening_price=100.3, high_price=101.05, low_price=100.3,
+                   trade_price=101, candle_acc_trade_volume=200)
+    five[1].update(opening_price=100.7, high_price=101.05, low_price=100.25,
+                   trade_price=101, candle_acc_trade_volume=200)
+    def context(bars, *args, **kwargs):
+        is_five = (datetime.fromisoformat(bars[0]['candle_date_time_utc']) -
+                   datetime.fromisoformat(bars[1]['candle_date_time_utc'])).total_seconds() == 300
+        return {'ready': True, 'confirmed': is_five, 'fake_breakout': False,
+                'first_retest': is_five, 'true_breakout': False,
+                'retest_level': 100.2, 'status': 'WB 첫 재지지' if is_five else 'WB 미확정'}
+    monkeypatch.setattr(candidate_analysis, '_double_bollinger_context', context)
+    candidate, reasons = _evaluate_flow(fixture)
+    assert candidate is not None, reasons
+    assert candidate['trade_flow_leader'] and candidate['double_bb_timeframe'] == '5분'
+    assert candidate['double_bb_first_retest']
+    if cause == 'lost_wb': monkeypatch.setattr(candidate_analysis, '_double_bollinger_context',
+        lambda *a, **k: {'confirmed': False})
+    elif cause == 'lost_anchor': one[1]['trade_price'] = 100.1
+    _, reasons = validate_candidate_survival(candidate, ticker, books, one, _config(),
+        as_of=now, candles_5m=five, candles_15m=fifteen, candles_60m=hourly,
+        trade_flow_context=strong_flow(now.timestamp()))
+    if cause == 'held': assert reasons == []
+    else: assert any('체결 매수 지속' in r for r in reasons)
+
 def _config(**overrides):
     values = {
         "enabled": True,

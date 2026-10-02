@@ -798,7 +798,8 @@ def test_inactivity_status_reports_screening_without_creating_candidate(monkeypa
     text = sent[0]["text"]
     assert "[운영상태 | 최근 60분]" in text
     assert "원시 상승신호: 1건" in text
-    assert "심층검증 탈락: 1건" in text
+    assert "심층검증 탈락: 1회(동일 후보 재검증 포함)" in text
+    assert "주요 탈락 사유(중복 집계)" in text
     assert "조건부 진입 후보: 0건" in text
     assert "매수 신호가 아닙니다" in text
 
@@ -2378,7 +2379,7 @@ def test_telegram_explosive_score_exception_requires_actual_qualified_plan(monke
 
 
 @pytest.mark.parametrize("path", ["fast", "completed", "pullback"])
-@pytest.mark.parametrize("lane", ["explosive", "rsi_exception", "completed_breakout", "trade_flow"])
+@pytest.mark.parametrize("lane", ["explosive", "rsi_exception", "completed_breakout", "trade_flow", "wb_retest"])
 def test_explosive_runtime_never_skips_full_survival_for_other_signal_paths(monkeypatch, path, lane):
     monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
     monkeypatch.setattr("monitor.time.time", lambda: 1_800_000_010)
@@ -2402,6 +2403,8 @@ def test_explosive_runtime_never_skips_full_survival_for_other_signal_paths(monk
         candidate.update(selection_lane="standard", completed_breakout_entry=True)
     elif lane == "trade_flow":
         candidate.update(selection_lane="trade_flow_leader", trade_flow_leader=True)
+    elif lane == "wb_retest":
+        candidate.update(selection_lane="standard", completed_wb_retest_entry=True)
     monkeypatch.setattr(analyzer, "_evaluate_snapshot", lambda *args: (candidate, []))
     asyncio.run(analyzer._analyze(alert))
     assert len(snapshots) == 2
@@ -2416,6 +2419,24 @@ def test_dispatch_does_not_send_when_reclassified_resistance_support_is_lost():
     refreshed, rejection = _revalidate_candidate_for_dispatch(candidate, price)
     assert refreshed is None
     assert "지지 전환 실패" in rejection
+
+
+def test_wb_retest_notification_identifies_completed_five_minute_evidence():
+    candidate = _telegram_candidate()
+    candidate.update(completed_wb_retest_entry=True, double_bb_enabled=True,
+                     double_bb_status='WB 동시 돌파 후 첫 눌림 재지지', double_bb_timeframe='5분')
+    text = monitor._candidate_text(candidate)
+    assert '5분WB 첫 재지지' in text
+    assert '5분 WB 판정: WB 동시 돌파 후 첫 눌림 재지지' in text
+
+
+def test_wb_retest_survival_rejects_lost_relative_eligibility():
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    candidate = {'relative_strength_ready': True, 'completed_wb_retest_entry': True}
+    relative = {'relative_strength_ready': True, 'relative_strength_percentile': 1,
+                'relative_strength_eligible': False, 'momentum_5m_pct': 2, 'momentum_15m_pct': 2}
+    reasons = analyzer._relative_survival_rejections(candidate, relative)
+    assert '생존 중 5분 WB 첫 재지지 상대강도 자격 상실' in reasons
 
 
 def test_resolve_all_krw_markets_requests_uncached_listing(monkeypatch):
