@@ -34,7 +34,7 @@ from exit_plan import exit_plan_metrics, modeled_exit_return, partial_plan_summa
 from upbit_client import UpbitPublicClient
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "live-universe-leader-v3.4"
+STRATEGY_VERSION = "verification-audit-v3.5"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -1598,6 +1598,9 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     wb_line = ""
     if candidate.get("double_bb_enabled"):
         wb_line = f"WB 판정: {candidate.get('double_bb_status') or '확인 중'}\n"
+        if candidate.get("completed_breakout_entry"):
+            wb_line = (f"진입형: 눌림 없는 완료봉 돌파\n"
+                       f"{candidate.get('double_bb_timeframe') or '1분'} {wb_line}")
         if candidate.get("selection_lane") == "explosive_leader":
             wb_line = f"1분 {wb_line.rstrip()} · 별도 완료 5분 구조로 검증\n"
     higher_line = ""
@@ -3309,6 +3312,15 @@ class CandidateAnalyzer:
             and alert.get("signal") == "price_volume_surge"
             and not alert.get("is_reentry")
             and not alert.get("leader_pullback_recheck")
+            and not (
+                alert.get("relative_strength_ready")
+                and alert.get("relative_strength_eligible")
+                and float(alert.get("relative_strength_percentile") or 100)
+                    <= self.config.early_leader_max_percentile
+                and float(alert.get("momentum_5m_pct") or 0)
+                    >= self.config.relative_strength_min_5m_pct
+                and float(alert.get("momentum_15m_pct") or 0) > 0
+            )
         ):
             watch_alert = dict(alert)
             watch_alert["internal_only"] = True
@@ -3842,6 +3854,7 @@ class CandidateAnalyzer:
 
     async def _market_snapshot(self, market: str) -> dict[str, Any]:
         """Fetch one internally consistent public-data bundle for screening."""
+        requested_at = datetime.now(timezone.utc)
         async with self._semaphore:
             client = UpbitPublicClient()
             as_of = datetime.now(timezone.utc)
@@ -3888,7 +3901,9 @@ class CandidateAnalyzer:
             "candles_60m",
             "candles_240m",
         )
-        return {**dict(zip(keys, values)), "as_of": as_of}
+        return {**dict(zip(keys, values)), "as_of": as_of,
+                "requested_at": requested_at,
+                "fetched_at": datetime.now(timezone.utc)}
 
     @staticmethod
     def _record_screening_snapshot(alert: dict[str, Any], snapshot: dict[str, Any], stage: str) -> None:
@@ -3903,6 +3918,14 @@ class CandidateAnalyzer:
             "current_price": float(snapshot["ticker"]["trade_price"]),
             "ticker_timestamp": snapshot["ticker"].get("timestamp"),
             "completed_candle_start_times_utc": completed_times,
+            "queue_wait_seconds": (
+                (as_of - snapshot["requested_at"]).total_seconds()
+                if snapshot.get("requested_at") else None
+            ),
+            "fetch_duration_seconds": (
+                (snapshot["fetched_at"] - as_of).total_seconds()
+                if snapshot.get("fetched_at") else None
+            ),
         }
 
     def _evaluate_snapshot(
@@ -3936,6 +3959,11 @@ class CandidateAnalyzer:
             return ["생존 시점 상대강도 시장표본 미확인"]
         rejected: list[str] = []
         percentile = float(relative.get("relative_strength_percentile") or 100.0)
+        if candidate.get("completed_breakout_entry"):
+            if percentile > self.config.early_leader_max_percentile:
+                rejected.append("생존 중 눌림 없는 돌파 선도 순위 이탈")
+            if not relative.get("relative_strength_eligible"):
+                rejected.append("생존 중 눌림 없는 돌파 상대강도 자격 상실")
         if (candidate.get("selection_lane") == "explosive_leader" or candidate.get("rsi_breakout_exception") or candidate.get("breadth_breakout_exception")) and percentile > 2.0:
             rejected.append("생존 중 폭발적 선도주 상위 2% 이탈")
         if candidate.get("breadth_breakout_exception"):
@@ -4051,7 +4079,7 @@ class CandidateAnalyzer:
                     alert, "rejected", rejected
                 )
                 return
-            if fast_leader and candidate.get("selection_lane") != "explosive_leader" and not candidate.get("rsi_breakout_exception") and not candidate.get("breadth_breakout_exception"):
+            if fast_leader and candidate.get("selection_lane") != "explosive_leader" and not candidate.get("rsi_breakout_exception") and not candidate.get("breadth_breakout_exception") and not candidate.get("completed_breakout_entry"):
                 candidate["survival_confirmed"] = True
                 candidate["survival_seconds"] = max(
                     self.config.fast_leader_confirm_seconds,
@@ -4071,6 +4099,7 @@ class CandidateAnalyzer:
                     and first_candidate.get("selection_lane") != "explosive_leader"
                     and not first_candidate.get("rsi_breakout_exception")
                     and not first_candidate.get("breadth_breakout_exception")
+                    and not first_candidate.get("completed_breakout_entry")
                     else self.config.survival_confirm_seconds
                 )
                 LOGGER.info(
@@ -4256,6 +4285,7 @@ class CandidateAnalyzer:
                 "selection_lane",
                 "leader_resistance_override",
                 "double_bb_status",
+                "double_bb_timeframe",
                 "double_bb_confirmed",
                 "double_bb_true_breakout",
                 "double_bb_first_retest",
@@ -4269,6 +4299,7 @@ class CandidateAnalyzer:
                 "explosive_context",
                 "rsi_breakout_exception",
                 "breadth_breakout_exception",
+                "completed_breakout_entry",
                 "cleared_resistance_levels",
                 "sustained_retest",
             ):
@@ -4336,7 +4367,8 @@ async def _resolve_markets(config: MonitorConfig) -> list[str]:
         return [UpbitPublicClient.normalize_market(value) for value in config.markets]
     client = UpbitPublicClient()
     try:
-        rows = await client.markets()
+        # A 60s refresh must not silently reuse the default five-minute cache.
+        rows = await client.markets(cache_seconds=0)
     finally:
         await client.close()
     return sorted(

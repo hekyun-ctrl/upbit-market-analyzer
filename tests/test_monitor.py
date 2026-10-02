@@ -2378,7 +2378,7 @@ def test_telegram_explosive_score_exception_requires_actual_qualified_plan(monke
 
 
 @pytest.mark.parametrize("path", ["fast", "completed", "pullback"])
-@pytest.mark.parametrize("lane", ["explosive", "rsi_exception"])
+@pytest.mark.parametrize("lane", ["explosive", "rsi_exception", "completed_breakout"])
 def test_explosive_runtime_never_skips_full_survival_for_other_signal_paths(monkeypatch, path, lane):
     monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
     monkeypatch.setattr("monitor.time.time", lambda: 1_800_000_010)
@@ -2398,6 +2398,8 @@ def test_explosive_runtime_never_skips_full_survival_for_other_signal_paths(monk
     candidate = _explosive_telegram_candidate()
     if lane == "rsi_exception":
         candidate.update(selection_lane="standard", rsi_breakout_exception=True)
+    elif lane == "completed_breakout":
+        candidate.update(selection_lane="standard", completed_breakout_entry=True)
     monkeypatch.setattr(analyzer, "_evaluate_snapshot", lambda *args: (candidate, []))
     asyncio.run(analyzer._analyze(alert))
     assert len(snapshots) == 2
@@ -2412,3 +2414,68 @@ def test_dispatch_does_not_send_when_reclassified_resistance_support_is_lost():
     refreshed, rejection = _revalidate_candidate_for_dispatch(candidate, price)
     assert refreshed is None
     assert "지지 전환 실패" in rejection
+
+
+def test_resolve_all_krw_markets_requests_uncached_listing(monkeypatch):
+    calls = []
+    class Client:
+        async def markets(self, **kwargs):
+            calls.append(kwargs)
+            return [{'market': 'KRW-POD'}, {'market': 'BTC-ETH'}, {'market': 'KRW-BTC'}]
+        async def close(self): pass
+    monkeypatch.setattr(monitor, 'UpbitPublicClient', Client)
+    from types import SimpleNamespace
+    result = asyncio.run(monitor._resolve_markets(SimpleNamespace(all_krw_markets=True)))
+    assert result == ['KRW-BTC', 'KRW-POD']
+    assert calls == [{'cache_seconds': 0}]
+
+
+def test_screening_snapshot_exposes_queue_and_fetch_delay():
+    now = datetime(2026, 10, 2, 8, 50, 5, tzinfo=timezone.utc)
+    alert = {}
+    snapshot = {'as_of': now, 'requested_at': now - timedelta(seconds=12),
+                'fetched_at': now + timedelta(seconds=4), 'ticker': {'trade_price': 101}}
+    monitor.CandidateAnalyzer._record_screening_snapshot(alert, snapshot, 'entry_screen')
+    assert alert['screening_snapshot']['queue_wait_seconds'] == 12
+    assert alert['screening_snapshot']['fetch_duration_seconds'] == 4
+
+
+def test_qualified_surge_reaches_validation_without_waiting_for_a_pullback(monkeypatch):
+    monkeypatch.setenv('ENABLE_CANDIDATE_ANALYSIS', 'true')
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    seen = []
+    async def analyze(alert): seen.append(alert)
+    monkeypatch.setattr(analyzer, '_analyze', analyze)
+    alert = {'market': 'KRW-TEST', 'signal': 'price_volume_surge', 'price': 100,
+             'relative_strength_ready': True, 'relative_strength_eligible': True,
+             'relative_strength_percentile': 1, 'momentum_5m_pct': 2,
+             'momentum_15m_pct': 3}
+    async def run():
+        assert analyzer.schedule(alert)
+        await asyncio.sleep(0)
+    asyncio.run(run())
+    assert len(seen) == 1
+    assert not seen[0].get('is_reentry')
+    assert not seen[0].get('pullback_retest')
+    assert not seen[0].get('leader_pullback_recheck')
+
+
+def test_completed_breakout_message_reports_actual_wb_timeframe():
+    candidate = _telegram_candidate()
+    candidate.update(completed_breakout_entry=True, double_bb_enabled=True,
+                     double_bb_timeframe='5분', double_bb_status='WB 두 상단·직전 매물대 동시 돌파')
+    message = monitor._candidate_text(candidate)
+    assert '진입형: 눌림 없는 완료봉 돌파' in message
+    assert '5분 WB 판정:' in message
+
+
+def test_no_pullback_route_revalidates_leader_rank_and_eligibility():
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    candidate = {'relative_strength_ready': True, 'completed_breakout_entry': True}
+    relative = {'relative_strength_ready': True, 'relative_strength_eligible': True,
+                'relative_strength_percentile': 1, 'momentum_5m_pct': 1.2,
+                'momentum_15m_pct': 2}
+    assert analyzer._relative_survival_rejections(candidate, relative) == []
+    relative.update(relative_strength_percentile=6, relative_strength_eligible=False)
+    reasons = analyzer._relative_survival_rejections(candidate, relative)
+    assert len(reasons) == 2

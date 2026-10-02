@@ -122,9 +122,9 @@ class UpbitPublicClient:
             return data
         raise RuntimeError("Upbit public request retry loop exhausted")
 
-    async def markets(self) -> list[dict[str, Any]]:
+    async def markets(self, *, cache_seconds: float = 300) -> list[dict[str, Any]]:
         return await self._get(
-            "/v1/market/all", {"isDetails": "false"}, cache_seconds=300
+            "/v1/market/all", {"isDetails": "false"}, cache_seconds=cache_seconds
         )
 
     async def ticker(self, market: str) -> dict[str, Any]:

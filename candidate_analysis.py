@@ -753,7 +753,7 @@ def _resistances(
 def _tick_size(orderbook: dict[str, Any], price: float) -> float:
     points = sorted(
         {
-            float(u.get(k, 0))
+            Decimal(str(u.get(k, 0)))
             for u in orderbook.get("orderbook_units", [])
             for k in ("bid_price", "ask_price")
             if float(u.get(k, 0)) > 0
@@ -761,7 +761,7 @@ def _tick_size(orderbook: dict[str, Any], price: float) -> float:
     )
     differences = [b - a for a, b in zip(points, points[1:]) if b > a]
     if differences:
-        return min(differences)
+        return float(min(differences))
     return (
         1.0
         if price >= 100
@@ -894,6 +894,15 @@ def validate_candidate_survival(
                 or current < max(breakout, float(evidence.get("level") or breakout))
                 or current > float(evidence.get("close") or current) * 1.005):
             rejected.append("RSI 예외 완료봉 돌파·호가 생존 실패")
+    if candidate.get("completed_breakout_entry"):
+        evidence = _explosive_bar_context(candles_1m, candles_5m or [], candles_15m or [],
+                                          as_of or datetime.now(timezone.utc), impulse_min=1.5)
+        normal_book = sum(x >= config.min_orderbook_ratio for x in ratios) >= max(1, len(ratios) // 2 + 1)
+        if (not evidence.get("confirmed") or not normal_book
+                or spread > config.max_spread_pct
+                or current < max(breakout, float(evidence.get("level") or breakout))
+                or current > float(evidence.get("close") or current) * 1.005):
+            rejected.append("눌림 대안 완료봉 돌파·거래량·호가 생존 실패")
     if candidate.get("breadth_breakout_exception"):
         evidence = _explosive_bar_context(candles_1m, candles_5m or [], candles_15m or [],
                                          as_of or datetime.now(timezone.utc))
@@ -944,9 +953,6 @@ def evaluate_candidate(
         "persistent_leader_acceleration",
     }:
         return None, ["상승 후보 신호가 아님"]
-    if len(candles_1m) < 62 or len(candles_5m) < 62:
-        return None, ["분봉 데이터 부족"]
-
     candles_15m = candles_15m or candles_5m
     btc_candles_5m = btc_candles_5m or candles_5m
     btc_candles_15m = btc_candles_15m or btc_candles_5m
@@ -957,8 +963,20 @@ def evaluate_candidate(
         _completed(candles_15m, 15, context_now),
     )
     b5, b15 = _completed(btc_candles_5m, 5, context_now), _completed(btc_candles_15m, 15, context_now)
-    if min(map(len, (c1, c5, c15, b5, b15))) < 60:
-        return None, ["완료봉 데이터 부족"]
+    # MA60 is retained for the entry timeframes; 15m/BTC need 21 bars for
+    # MA20, its slope and a latest-volume / previous-20 comparison. Missing
+    # optional MA60 must not impose an unrelated 15-hour listing embargo.
+    counts = dict(zip(("1m", "5m", "15m", "btc5m", "btc15m"),
+                      map(len, (c1, c5, c15, b5, b15))))
+    minimums = {"1m": 60, "5m": 60, "15m": 21, "btc5m": 21, "btc15m": 21}
+    alert["screening_metrics"] = {
+        "completed_candle_counts": counts, "required_candle_counts": minimums,
+        "history_ready": all(counts[k] >= v for k, v in minimums.items()),
+    }
+    if not alert["screening_metrics"]["history_ready"]:
+        missing = ", ".join(f"{k} {counts[k]}/{v}" for k, v in minimums.items()
+                            if counts[k] < v)
+        return None, [f"완료봉 데이터 부족({missing})"]
 
     current, signal_price = float(ticker["trade_price"]), float(alert["price"])
     day_change = float(ticker.get("signed_change_rate", 0)) * 100
@@ -1175,6 +1193,36 @@ def evaluate_candidate(
     # WB, one-minute quality, score, liquidity, breadth, or risk-plan gates.
     rsi_context = _explosive_bar_context(candles_1m, candles_5m, candles_15m,
                                         context_now, impulse_min=1.5)
+    double_bb_five = _double_bollinger_context(
+        c5, breakout, lookback=config.double_bb_lookback,
+        retest_tolerance_pct=config.retest_tolerance_pct,
+        reversal_wick_ratio=config.double_bb_reversal_wick_ratio,
+    )
+    wb_five_breakout = bool(config.double_bb_enabled
+                            and double_bb_five.get("true_breakout")
+                            and not double_bb_five.get("fake_breakout"))
+    # A clean, completed volume breakout is an alternative to a first retest,
+    # not evidence that a retest happened. Keep every ordinary quality, score,
+    # risk and 60s survival check on this route.
+    completed_breakout_entry = bool(
+        rsi_context.get("confirmed") and not rsi_context.get("retest")
+        and (wb_confirmed or wb_five_breakout) and not wb_fake_breakout
+        and relative_ready and relative_eligible and early_trend
+        and relative_percentile <= config.early_leader_max_percentile
+        and momentum_5m >= config.relative_strength_min_5m_pct
+        and momentum_15m is not None and momentum_15m > 0
+        and current >= max(breakout, float(rsi_context["level"]))
+        and current <= float(rsi_context["close"]) * 1.005
+        and book_persistent and spread <= config.max_spread_pct
+        and not btc_crash and btc_change > config.max_btc_decline_pct
+    )
+    wb_confirmation_timeframe = "1분"
+    if completed_breakout_entry and not wb_confirmed and wb_five_breakout:
+        # A completed 5m WB breakout can confirm the structural route even
+        # when the short 1m bands no longer signal. Keep 1m hold/quality gates.
+        double_bb = double_bb_five
+        wb_ready = wb_confirmed = True
+        wb_confirmation_timeframe = "5분"
     rsi_breakout_exception = bool(
         config.explosive_leader_enabled and not explosive_core
         and (rsi1 > config.hard_max_rsi_1m or rsi5 > config.hard_max_rsi_5m)
@@ -1236,6 +1284,7 @@ def evaluate_candidate(
             and not fast_leader_core
             and not persistent_leader_core
             and not explosive_core
+            and not completed_breakout_entry
         ):
             rejected.append("첫 눌림·돌파선 재지지 미확인")
     confirmation_started_at = alert.get("confirmation_started_at_utc") or alert.get(
@@ -1551,6 +1600,14 @@ def evaluate_candidate(
             # resistance deficiencies. Preserve the concrete reasons in logs.
             rejected.extend(soft_warnings)
     alert["screening_metrics"] = {
+        **alert["screening_metrics"],
+        "retest_confirmed": retest_confirmed,
+        "completed_breakout_entry": completed_breakout_entry,
+        "ordinary_breakout_context": rsi_context,
+        "wb_confirmation_timeframe": wb_confirmation_timeframe,
+        "wb_five_breakout": wb_five_breakout,
+        "recent_ten_completed_minutes_contiguous": recent_minute_candles_contiguous(candles_1m, context_now),
+        "hourly_context": higher,
         "rsi_1m": rsi1, "rsi_5m": rsi5, "wb_confirmed": wb_confirmed,
         "volume_ratio_5m": _volume_metrics(c5)[0],
         "volume_ratio_15m": _volume_metrics(c15)[0],
@@ -1598,6 +1655,13 @@ def evaluate_candidate(
             support = min(float(explosive_context["low"]), breakout)
         atr_risk = max(_atr(c5) * 0.8, tick * 2)
     stop_raw = min(support * 0.998, entry_reference - atr_risk)
+    alert["risk_plan_diagnostics"] = {
+        "stage": "structural_stop", "entry_reference_price": entry_reference,
+        "support": support, "atr_risk": atr_risk, "tick_size": tick,
+        "stop_raw": stop_raw,
+        "raw_stop_loss_pct": (1 - stop_raw / entry_reference) * 100,
+        "max_stop_loss_pct": config.max_stop_loss_pct,
+    }
     if (
         (hourly_trend_core or explosive_core)
         and (1 - stop_raw / entry_reference) * 100 > config.max_stop_loss_pct
@@ -1611,9 +1675,13 @@ def evaluate_candidate(
         tick,
         "down",
     )
+    alert["risk_plan_diagnostics"].update(
+        stage="rounded_stop", stop_price=stop,
+        rounded_stop_loss_pct=(1 - stop / entry_reference) * 100,
+    )
     if (
         (hourly_trend_core or explosive_core)
-        and (1 - stop / entry_reference) * 100 > config.max_stop_loss_pct
+        and (1 - stop / entry_reference) * 100 > config.max_stop_loss_pct + 1e-9
     ):
         return None, ["호가 단위 반영 후 5분 구조 손절폭 초과"]
     risk = max(entry_reference - stop, tick * 2)
@@ -1900,6 +1968,7 @@ def evaluate_candidate(
     metrics = exit_plan_metrics(entry_reference, stop, target1, target2, exit_plan)
     risk_reward = float(metrics["risk_reward"])
     alert["risk_plan_diagnostics"] = {
+        **alert["risk_plan_diagnostics"], "stage": "target_plan",
         "entry_reference_price": entry_reference, "stop_price": stop,
         "target_1": target1, "target_2": target2, "exit_plan": exit_plan,
         **metrics, "min_risk_reward": config.min_risk_reward,
@@ -1972,6 +2041,8 @@ def evaluate_candidate(
         )
     if retest_confirmed and relative_ready:
         reasons.insert(0, "첫 눌림·돌파선 재지지 확인")
+    if completed_breakout_entry:
+        reasons.insert(0, "완료 5분봉 거래량 동반 돌파 확인(첫 눌림 대안)")
     if wb_confirmed:
         reasons.insert(0, str(double_bb["status"]))
     if early_trend and relative_ready:
@@ -2028,6 +2099,7 @@ def evaluate_candidate(
         ),
         "explosive_context": explosive_context if explosive_core else None,
         "rsi_breakout_exception": rsi_breakout_exception,
+        "completed_breakout_entry": completed_breakout_entry,
         "breadth_breakout_exception": breadth_breakout_exception,
         "cleared_resistance_levels": cleared_resistance_levels,
         "volume_timeframe": "5분" if explosive_core else "1분",
@@ -2119,6 +2191,7 @@ def evaluate_candidate(
         "momentum_60m_pct": alert.get("momentum_60m_pct"),
         "first_retest_confirmed": retest_confirmed,
         "double_bb_enabled": config.double_bb_enabled,
+        "double_bb_timeframe": wb_confirmation_timeframe,
         "double_bb_ready": bool(double_bb.get("ready")),
         "double_bb_status": double_bb.get("status"),
         "double_bb_confirmed": wb_confirmed,

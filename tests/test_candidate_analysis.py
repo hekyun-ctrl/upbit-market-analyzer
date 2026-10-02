@@ -2392,3 +2392,122 @@ def test_resistance_reclassification_needs_completed_clearance_and_live_hold(cau
     else:
         assert candidate is None
         assert any("저항" in reason for reason in reasons)
+
+
+def _no_pullback_completed_breakout():
+    setup = _explosive_setup()
+    now, one, five, fifteen, btc, alert, ticker = setup
+    for i in (5, 6):
+        one[i].update(opening_price=100.65, high_price=100.72, low_price=100.6,
+                      trade_price=100.7)
+    for i in range(1, 5):
+        one[i].update(opening_price=101.1, high_price=101.15, low_price=101.08,
+                      trade_price=101.1, candle_acc_trade_volume=100)
+    one[1].update(high_price=101.42, low_price=101.1, trade_price=101.4,
+                  candle_acc_trade_volume=300)
+    five[1].update(high_price=101.42, trade_price=101.4, candle_acc_trade_volume=200)
+    alert.update(price=101.4, early_trend=True, momentum_5m_pct=1.2,
+                 relative_strength_percentile=2.42, market_regime='risk_on',
+                 market_breadth_5m_pct=60)
+    ticker.update(trade_price=101.4, high_price=101.42, signed_change_rate=.02)
+    return setup
+
+
+def _evaluate_no_pullback(setup, book=2, **overrides):
+    now, one, five, fifteen, btc, alert, ticker = setup
+    config = _config(**{'double_bb_enabled': True, 'hard_max_rsi_1m': 100,
+                        'hard_max_rsi_5m': 100, 'hot_rsi_1m': 101,
+                        'min_score': 80, **overrides})
+    return evaluate_candidate(alert, ticker, _orderbook(ticker['trade_price'], book),
+        one, five, config, candles_15m=fifteen, btc_candles_5m=btc,
+        btc_candles_15m=btc, as_of=now)
+
+
+def test_completed_volume_breakout_can_enter_without_fabricating_a_pullback():
+    setup = _no_pullback_completed_breakout()
+    candidate, reasons = _evaluate_no_pullback(setup)
+    assert candidate is not None, reasons
+    metrics = setup[5]['screening_metrics']
+    assert metrics['wb_confirmed']
+    assert not metrics['retest_confirmed']
+    assert candidate['completed_breakout_entry']
+    assert candidate['completed_5m_volume_ratio'] == 2
+    assert any('첫 눌림 대안' in r for r in candidate['reasons'])
+    assert not any('첫 눌림·돌파선 재지지 확인' in r for r in candidate['reasons'])
+
+
+@pytest.mark.parametrize('cause', ['volume5', 'volume15', 'gap', 'unfinished', 'book', 'chase'])
+def test_no_pullback_alternative_keeps_completed_evidence_guards(cause):
+    setup = _no_pullback_completed_breakout()
+    _, one, five, fifteen, _, alert, ticker = setup
+    book = 2
+    if cause == 'volume5': five[1]['candle_acc_trade_volume'] = 149
+    elif cause == 'volume15': fifteen[1]['candle_acc_trade_volume'] = 99
+    elif cause == 'gap': one.pop(5)
+    elif cause == 'unfinished':
+        five[0].update(**{k: v for k, v in five[1].items() if k != 'candle_date_time_utc'})
+        five[1].update(trade_price=100.1, high_price=100.2, candle_acc_trade_volume=100)
+    elif cause == 'book': book = .7
+    elif cause == 'chase': ticker['trade_price'] = 102
+    candidate, reasons = _evaluate_no_pullback(setup, book=book)
+    assert candidate is None, (cause, candidate)
+    assert not alert['screening_metrics']['completed_breakout_entry']
+    assert any('첫 눌림' in r for r in reasons)
+
+
+def test_no_pullback_survival_rechecks_the_completed_breakout():
+    setup = _no_pullback_completed_breakout()
+    candidate, reasons = _evaluate_no_pullback(setup)
+    assert candidate is not None, reasons
+    now, one, five, fifteen, _, _, ticker = setup
+    _, reasons = validate_candidate_survival(candidate, ticker, [_orderbook(101.4, 2)] * 3,
+        one, _config(), as_of=now, candles_5m=five, candles_15m=fifteen)
+    assert reasons == []
+    fifteen[1]['candle_acc_trade_volume'] = 99
+    _, reasons = validate_candidate_survival(candidate, ticker, [_orderbook(101.4, 2)] * 3,
+        one, _config(), as_of=now, candles_5m=five, candles_15m=fifteen)
+    assert any('눌림 대안' in r for r in reasons)
+
+
+def test_fifteen_minute_history_needs_twenty_previous_bars_not_ma60():
+    setup = list(_no_pullback_completed_breakout())
+    setup[3] = setup[3][:22]  # One unfinished + latest completed + prior 20.
+    candidate, reasons = _evaluate_no_pullback(setup)
+    assert candidate is not None, reasons
+    assert setup[5]['screening_metrics']['completed_candle_counts']['15m'] == 21
+    setup[3] = setup[3][:21]
+    candidate, reasons = _evaluate_no_pullback(setup)
+    assert candidate is None
+    assert reasons == ['완료봉 데이터 부족(15m 20/21)']
+    assert not setup[5]['screening_metrics']['history_ready']
+
+
+def test_decimal_orderbook_ticks_do_not_create_fractional_grid_dust():
+    book = {'orderbook_units': [{'bid_price': 8.22, 'ask_price': 8.23},
+                                {'bid_price': 8.21, 'ask_price': 8.24}]}
+    tick = candidate_analysis._tick_size(book, 8.23)
+    assert tick == .01
+    assert candidate_analysis._round_tick(8.001, tick, 'down') == 8.0
+
+
+def test_rejected_structural_stop_still_emits_risk_diagnostics():
+    setup = _explosive_setup()
+    setup[2][1]['low_price'] = 95
+    candidate, reasons = _evaluate_explosive(setup)
+    assert candidate is None
+    assert any('구조 손절폭' in r for r in reasons)
+    diag = setup[5]['risk_plan_diagnostics']
+    assert diag['stage'] == 'structural_stop'
+    assert diag['raw_stop_loss_pct'] > diag['max_stop_loss_pct']
+    assert diag['tick_size'] == .1
+
+
+def test_completed_five_minute_wb_is_not_vetoed_by_unconfirmed_one_minute_bands():
+    setup = _no_pullback_completed_breakout()
+    setup[1][1]['opening_price'] = 101.38
+    candidate, reasons = _evaluate_no_pullback(setup)
+    assert candidate is not None, reasons
+    assert candidate['completed_breakout_entry']
+    assert candidate['double_bb_timeframe'] == '5분'
+    assert candidate['double_bb_true_breakout']
+    assert setup[5]['screening_metrics']['wb_five_breakout']
