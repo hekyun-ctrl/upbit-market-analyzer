@@ -864,6 +864,73 @@ def _explosive_bar_context(candles_1m, candles_5m, candles_15m, now, *, impulse_
     return {"confirmed": False}
 
 
+def _completed_retest_volume_context(candles_1m, candles_5m, candles_15m, now, anchor):
+    """Volume/shape evidence for an already-proven WB first pullback.
+
+    Do not demand a second, different 12-bar breakout pattern on top of WB.
+    """
+    five = completed_context_candles(candles_5m, 5, now)
+    fifteen = completed_context_candles(candles_15m, 15, now)
+    if len(five) < 21 or len(fifteen) < 21 or not recent_minute_candles_contiguous(candles_1m, now):
+        return {"confirmed": False}
+    volume5, previous5 = _volume_metrics(five)
+    volume15 = _volume_metrics(fifteen)[0]
+    position, wick = _candle_shape(five[0])
+    return {"confirmed": bool(volume5 >= 1.5 and volume15 >= 1.0
+                              and position >= .65 and wick <= .35
+                              and float(five[0]["trade_price"]) >= anchor),
+            "retest": True, "level": anchor, "close": float(five[0]["trade_price"]),
+            "low": float(five[0]["low_price"]), "volume_5m": volume5,
+            "volume_previous_5m": previous5, "volume_15m": volume15,
+            "close_position": position, "upper_wick": wick}
+
+
+def _completed_leader_context(candles_1m, candles_5m, candles_15m, now):
+    """Bounded WB continuation, not a fabricated first pullback or hourly trend.
+
+    Require a real dual-band breakout in the last hour, uninterrupted anchor
+    support, three rising completed lows/closes, fresh volume and an intact
+    rising 15m average. Live buy flow and execution/risk guards remain separate.
+    """
+    five = completed_context_candles(candles_5m, 5, now)
+    fifteen = completed_context_candles(candles_15m, 15, now)
+    missing = {"confirmed": False, "status": "완료봉 지속 구조 미확인"}
+    if len(five) < 32 or len(fifteen) < 21 or not recent_minute_candles_contiguous(candles_1m, now):
+        return missing
+    volume5, previous5 = _volume_metrics(five)
+    volume15 = _volume_metrics(fifteen)[0]
+    position, wick = _candle_shape(five[0])
+    recent = list(reversed(five[:3]))
+    lows = [float(b["low_price"]) for b in recent]
+    closes = [float(b["trade_price"]) for b in recent]
+    rising = (all(b >= a for a, b in zip(lows, lows[1:])) and lows[-1] > lows[0]
+              and all(b >= a for a, b in zip(closes, closes[1:])) and closes[-1] > closes[0])
+    ma15 = mean(float(b["trade_price"]) for b in fifteen[:20])
+    previous_ma15 = mean(float(b["trade_price"]) for b in fifteen[1:21])
+    if not (volume5 >= 1.5 and volume15 >= 1.0 and rising and position >= .65 and wick <= .35
+            and float(fifteen[0]["trade_price"]) > ma15 > previous_ma15
+            and float(fifteen[0]["low_price"]) >= float(fifteen[1]["low_price"])):
+        return missing
+    anchor, offset = None, None
+    # Inspect each historical breakout against its own preceding prices only.
+    for i in range(12):
+        proof = _double_bollinger_context(five[i:], 0, lookback=1)
+        if not proof.get("true_breakout"):
+            continue
+        level = float(proof["structure_high"])
+        if all(float(b["trade_price"]) >= level and float(b["low_price"]) >= level * .992
+               for b in five[:i]):
+            anchor, offset = level, i
+            break
+    if anchor is None:
+        return missing
+    return {"confirmed": True, "status": "WB 돌파 후 완료봉 저점 상승·체결 검증 대상",
+            "retest": False, "level": anchor, "breakout_offset": offset,
+            "close": closes[-1], "low": min(lows[-2:]),
+            "volume_5m": volume5, "volume_previous_5m": previous5,
+            "volume_15m": volume15, "close_position": position, "upper_wick": wick}
+
+
 def _flow_book_supported(samples, current, config):
     """Execution flow can replace imbalance, never a thin/wide/invalid book."""
     supported = 0
@@ -912,17 +979,27 @@ def validate_candidate_survival(
 
     flow_lane = bool(candidate.get("trade_flow_leader"))
     flow_now = as_of or datetime.now(timezone.utc)
-    flow_evidence = _explosive_bar_context(candles_1m, candles_5m or [], candles_15m or [], flow_now, impulse_min=1.5) if flow_lane else {}
+    continuation_lane = bool(flow_lane and candidate.get("flow_continuation_entry"))
+    flow_evidence = (_completed_leader_context(candles_1m, candles_5m or [], candles_15m or [], flow_now)
+                     if continuation_lane else _explosive_bar_context(candles_1m, candles_5m or [], candles_15m or [], flow_now, impulse_min=1.5)) if flow_lane else {}
     flow_higher = higher_timeframe_context(candles_15m or [], candles_60m or [], [], now=flow_now) if flow_lane else {}
     flow_valid = bool(flow_lane and config.trade_flow_leader_enabled
-        and buying_persistent(trade_flow_context, current, flow_now.timestamp())
+        and buying_persistent(trade_flow_context, current, flow_now.timestamp(),
+                              min_close_gain_pct=0.0 if continuation_lane else 0.1)
         and _flow_book_supported(orderbook_samples, current, config)
         and flow_evidence.get("confirmed")
-        and flow_higher.get("ready") and flow_higher.get("hourly_established")
+        and flow_higher.get("ready")
+        and (flow_higher.get("hourly_established") or (continuation_lane and flow_higher["hourly"]["support_intact"]))
         and flow_higher.get("fifteen_intact") and flow_higher["fifteen"]["above_ma20"]
         and current >= max(breakout, float(flow_evidence.get("level") or breakout))
         and current <= float(flow_evidence.get("close") or current) * 1.005)
-    if flow_lane and candidate.get("double_bb_timeframe") == "5분":
+    if continuation_lane:
+        flow_valid = bool(flow_valid and current >= float(flow_evidence.get("low") or breakout)
+                          and completed_close >= max(breakout, float(flow_evidence.get("level") or breakout),
+                                                     float(flow_evidence.get("low") or breakout))
+                          and analyze_candles(c1)["rsi14"] < 95
+                          and analyze_candles(completed_context_candles(candles_5m or [], 5, flow_now))["rsi14"] < 95)
+    if flow_lane and not continuation_lane and candidate.get("double_bb_timeframe") == "5분":
         bars = completed_context_candles(candles_5m or [], 5, flow_now)
         wb = _double_bollinger_context(bars, breakout, lookback=config.double_bb_lookback,
             retest_tolerance_pct=config.retest_tolerance_pct, reversal_wick_ratio=config.double_bb_reversal_wick_ratio)
@@ -978,7 +1055,8 @@ def validate_candidate_survival(
         bars = completed_context_candles(candles_5m or [], 5, now)
         wb = _double_bollinger_context(bars, breakout, lookback=config.double_bb_lookback,
             retest_tolerance_pct=config.retest_tolerance_pct, reversal_wick_ratio=config.double_bb_reversal_wick_ratio)
-        evidence = _explosive_bar_context(candles_1m, candles_5m or [], candles_15m or [], now, impulse_min=1.5)
+        evidence = _completed_retest_volume_context(candles_1m, candles_5m or [], candles_15m or [], now,
+                                                    float(wb.get("retest_level") or breakout))
         normal_book = sum(x >= config.min_orderbook_ratio for x in ratios) >= max(1, len(ratios) // 2 + 1)
         if (not evidence.get("confirmed") or not wb.get("first_retest") or wb.get("fake_breakout")
                 or not normal_book or spread > config.max_spread_pct
@@ -999,6 +1077,7 @@ def validate_candidate_survival(
 
     return {
         "survival_trade_flow": trade_flow_context if flow_lane else None,
+        "survival_continuation_context": flow_evidence if continuation_lane else None,
         "survival_price": current,
         "survival_completed_close": completed_close,
         "survival_volume_ratio": round(volume_ratio, 2),
@@ -1288,15 +1367,17 @@ def evaluate_candidate(
                             and not double_bb_five.get("fake_breakout"))
     wb_five_retest = bool(config.double_bb_enabled and double_bb_five.get("first_retest")
                          and not double_bb_five.get("fake_breakout"))
+    wb_retest_volume = _completed_retest_volume_context(candles_1m, candles_5m, candles_15m, context_now,
+                                                       float(double_bb_five.get("retest_level") or breakout))
     completed_wb_retest_entry = bool(
-        wb_five_retest and not wb_confirmed and not explosive_core and rsi_context.get("confirmed") and rsi_context.get("retest")
+        wb_five_retest and not wb_confirmed and not explosive_core and wb_retest_volume.get("confirmed")
         and not wb_fake_breakout and relative_ready and relative_eligible
         and relative_percentile <= config.early_leader_max_percentile
         and momentum_5m >= config.relative_strength_min_5m_pct
         and momentum_15m is not None and momentum_15m > 0
-        and current >= max(breakout, float(rsi_context["level"]), float(double_bb_five["retest_level"]))
+        and current >= max(breakout, float(double_bb_five["retest_level"]))
         and completed_close >= float(double_bb_five["retest_level"])
-        and current <= float(rsi_context["close"]) * 1.005
+        and current <= float(wb_retest_volume["close"]) * 1.005
         and book_persistent and spread <= config.max_spread_pct
         and not btc_crash and btc_change > config.max_btc_decline_pct)
     # A clean, completed volume breakout is an alternative to a first retest,
@@ -1315,6 +1396,22 @@ def evaluate_candidate(
         and not btc_crash and btc_change > config.max_btc_decline_pct
     )
     flow_context = alert.get("trade_flow_context") or {}
+    continuation_context = _completed_leader_context(candles_1m, candles_5m, candles_15m, context_now)
+    flow_continuation_entry = bool(config.trade_flow_leader_enabled and config.double_bb_enabled
+        and continuation_context.get("confirmed")
+        and buying_persistent(flow_context, current, context_now.timestamp(), min_close_gain_pct=0.0)
+        and relative_ready and relative_percentile <= 2.0
+        and momentum_5m >= .2 and momentum_15m is not None and momentum_15m >= .8
+        and float(alert.get("momentum_60m_pct") or 0) >= 1.5
+        and higher.get("ready") and higher.get("fifteen_intact")
+        and higher["fifteen"]["above_ma20"] and higher["hourly"]["support_intact"]
+        and float(alert.get("market_breadth_5m_pct") or 0) >= 20.0
+        and _flow_book_supported(samples, current, config)
+        and current >= max(breakout, float(continuation_context["level"]), float(continuation_context["low"]))
+        and completed_close >= max(breakout, float(continuation_context["level"]), float(continuation_context["low"]))
+        and current <= float(continuation_context["close"]) * 1.005
+        and not wb_fake_breakout and rsi1 < 95 and rsi5 < 95
+        and not btc_crash and btc_change > config.max_btc_decline_pct)
     flow_leader = bool(config.trade_flow_leader_enabled
         and buying_persistent(flow_context, current, context_now.timestamp())
         and rsi_context.get("confirmed")
@@ -1330,21 +1427,32 @@ def evaluate_candidate(
         and _flow_book_supported(samples, current, config)
         and current >= max(breakout, float(rsi_context["level"]))
         and current <= float(rsi_context["close"]) * 1.005
-        and not btc_crash and btc_change > config.max_btc_decline_pct)
+        and not btc_crash and btc_change > config.max_btc_decline_pct) or flow_continuation_entry
     # Keep the flow route distinct: it requires full 60s survival and does not
     # inherit fast/RSI/breadth exceptions with different revalidation rules.
     if flow_leader:
         fast_leader_core = explosive_core = completed_breakout_entry = completed_wb_retest_entry = False
         hourly_trend_core = True
+    if flow_continuation_entry:
+        rsi_context = continuation_context
     if completed_wb_retest_entry:
         # Keep 1m execution quality, but use a 5m structural initial stop.
         fast_leader_core = False
+        rsi_context = wb_retest_volume
     wb_confirmation_timeframe = "1분"
     if completed_wb_retest_entry or ((completed_breakout_entry or flow_leader)
             and not wb_confirmed and (wb_five_breakout or wb_five_retest)):
         # A completed 5m WB breakout can confirm the structural route even
         # when the short 1m bands no longer signal. Keep 1m hold/quality gates.
         double_bb = double_bb_five
+        wb_ready = wb_confirmed = True
+        wb_confirmation_timeframe = "5분"
+    if flow_continuation_entry:
+        # Historical WB clearance is evidence of continuation, never a claim
+        # that the current candle broke both bands or tested the old anchor.
+        double_bb = {**double_bb_five, "confirmed": True, "fake_breakout": False,
+                     "true_breakout": False, "first_retest": False,
+                     "status": "WB 완료 돌파 후 저점 상승·매수 체결 지속"}
         wb_ready = wb_confirmed = True
         wb_confirmation_timeframe = "5분"
     rsi_breakout_exception = bool(
@@ -1437,8 +1545,11 @@ def evaluate_candidate(
         and not elite_leader_retest
         and not explosive_core
     ):
+        wb_rejection_label = ("완료 5분 WB 구조 확인·진입 실행조건 미충족"
+                              if wb_five_breakout or wb_five_retest or continuation_context.get("confirmed")
+                              else "WB 두 상단·직전 매물대 동시 돌파 또는 첫 재지지 미확인")
         rejected.append(
-            "WB 두 상단·직전 매물대 동시 돌파 또는 첫 재지지 미확인"
+            wb_rejection_label +
             f"(1분 {double_bb.get('status', '데이터 부족')} · "
             f"5분 {double_bb_five.get('status', '데이터 부족')} · "
             "완료봉 대체 경로 실행조건 미충족)"
@@ -1485,7 +1596,7 @@ def evaluate_candidate(
     # setups are narrowed again below to candle-shape warnings only, so volume,
     # trend and resistance safety floors remain strict.
     strict_quality = not config.availability_balance_enabled
-    if not explosive_core and not rsi_breakout_exception and (rsi1 > config.hard_max_rsi_1m or (
+    if not explosive_core and not rsi_breakout_exception and not flow_continuation_entry and (rsi1 > config.hard_max_rsi_1m or (
         rsi5 > config.hard_max_rsi_5m and not elite_leader_retest
     )):
         rejected.append(f"RSI 과열(1분 {rsi1:.1f}/5분 {rsi5:.1f})")
@@ -1736,6 +1847,8 @@ def evaluate_candidate(
         **alert["screening_metrics"],
         "retest_confirmed": retest_confirmed,
         "trade_flow_leader": flow_leader, "trade_flow_context": flow_context,
+        "flow_continuation_entry": flow_continuation_entry,
+        "continuation_context": continuation_context,
         "completed_breakout_entry": completed_breakout_entry,
         "ordinary_breakout_context": rsi_context,
         "wb_confirmation_timeframe": wb_confirmation_timeframe,
@@ -1791,6 +1904,8 @@ def evaluate_candidate(
         support = min(min(float(c["low_price"]) for c in c5[:3]), breakout)
         if explosive_core or flow_leader or completed_wb_retest_entry:
             support = min(float((rsi_context if flow_leader or completed_wb_retest_entry else explosive_context)["low"]), breakout)
+        if flow_continuation_entry:
+            support = max(breakout, float(continuation_context["low"]))
         atr_risk = max(_atr(c5) * 0.8, tick * 2)
     stop_raw = min(support * 0.998, entry_reference - atr_risk)
     alert["risk_plan_diagnostics"] = {
@@ -1871,6 +1986,8 @@ def evaluate_candidate(
         )
     if flow_leader:
         risk_notes.append("실제 매수 체결 지속으로 호가 비율·확산도 차단 대체: 깊이·완료봉·60초 생존 검증, 감점 유지")
+    if flow_continuation_entry:
+        risk_notes.append("완료 15분 추세·5분 저점 상승·60초 매수 지속으로 회복 초반 검증: RSI 감점 유지, 95 이상 제외")
     if breadth_breakout_exception:
         risk_notes.append("완료 5·15분 돌파·상위 2% 선도주 확인: 확산도 차단만 감점 전환, 60초 재검증")
     if leader_resistance_override:
@@ -2053,6 +2170,7 @@ def evaluate_candidate(
     target4 = None
     hourly_trend_extension = bool(
         hourly_trend_core and score >= 90 and not btc_weak and not day_overheated
+        and (not flow_continuation_entry or higher.get("hourly_established"))
     )
     if sustained_retest and not hourly_trend_extension:
         return None, ["지속 재지지 추세보유 자격 미확인"]
@@ -2188,7 +2306,8 @@ def evaluate_candidate(
     if completed_wb_retest_entry:
         reasons.insert(0, "완료 5분 WB 첫 눌림 구조·거래량 확인(1분 실행 품질 유지)")
     if flow_leader:
-        reasons.insert(0, "60초 실제 매수 체결 지속·15분/1시간 추세·완료 5분 구조 확인")
+        reasons.insert(0, "60초 실제 매수 체결 지속·15분 추세·완료 5분 저점 상승 확인"
+                       if flow_continuation_entry else "60초 실제 매수 체결 지속·15분/1시간 추세·완료 5분 구조 확인")
     if completed_breakout_entry:
         reasons.insert(0, "완료 5분봉 거래량 동반 돌파 확인(첫 눌림 대안)")
     if wb_confirmed:
@@ -2251,6 +2370,8 @@ def evaluate_candidate(
         "completed_breakout_entry": completed_breakout_entry,
         "completed_wb_retest_entry": completed_wb_retest_entry,
         "trade_flow_leader": flow_leader, "trade_flow_context": flow_context if flow_leader else None,
+        "flow_continuation_entry": flow_continuation_entry,
+        "continuation_context": continuation_context if flow_continuation_entry else None,
         "breadth_breakout_exception": breadth_breakout_exception,
         "cleared_resistance_levels": cleared_resistance_levels,
         "volume_timeframe": "5분" if explosive_core or flow_leader else "1분",

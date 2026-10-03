@@ -35,7 +35,7 @@ from upbit_client import UpbitPublicClient
 from trade_flow import TradeFlow, buying_persistent
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "verification-audit-v3.7"
+STRATEGY_VERSION = "verification-audit-v3.8"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -1540,7 +1540,7 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     risk_line = f"위험 감점: {risk_notes}\n" if risk_notes else ""
     labels = []
     if candidate.get("trade_flow_leader"):
-        labels.append("체결 매수 지속형")
+        labels.append("완료봉 상승 지속형" if candidate.get("flow_continuation_entry") else "체결 매수 지속형")
     elif candidate.get("selection_lane") == "explosive_leader":
         labels.append("완료 5분 폭발적 선도주")
     elif candidate.get("selection_lane") == "fast_leader":
@@ -1616,7 +1616,8 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
             wb_line = f"1분 {wb_line.rstrip()} · 별도 완료 5분 구조로 검증\n"
     if candidate.get("trade_flow_leader"):
         flow = candidate.get("survival_trade_flow") or candidate.get("trade_flow_context") or {}
-        wb_line = (f"진입형: 체결 매수 지속형 · {candidate.get('double_bb_timeframe') or '1분'} {wb_line}"
+        flow_label = "완료봉 상승 지속형" if candidate.get("flow_continuation_entry") else "체결 매수 지속형"
+        wb_line = (f"진입형: {flow_label} · {candidate.get('double_bb_timeframe') or '1분'} {wb_line}"
                    f"실제 체결: 최근 완료 60초 매수 거래대금 {float(flow.get('buy_share_pct') or 0):.1f}% · "
                    f"{int(flow.get('trade_count') or 0)}건(호가 대기량과 구분)\n")
     higher_line = ""
@@ -2208,7 +2209,14 @@ class AlertDispatcher:
                 and candidate.get("selection_lane") == "trade_flow_leader"
                 and candidate.get("survival_confirmed")
                 and float(candidate.get("survival_seconds") or 0) >= risk_config.survival_confirm_seconds
-                and buying_persistent(flow, float(candidate.get("current_price") or 0), time.time())
+                and buying_persistent(flow, float(candidate.get("current_price") or 0), time.time(),
+                                      min_close_gain_pct=0.0 if candidate.get("flow_continuation_entry") else 0.1)
+                and (not candidate.get("flow_continuation_entry")
+                     or ((candidate.get("survival_continuation_context") or {}).get("confirmed")
+                         and float(candidate["survival_continuation_context"].get("volume_5m") or 0) >= 1.5
+                         and float(candidate["survival_continuation_context"].get("volume_15m") or 0) >= 1.0
+                         and float(candidate.get("current_price") or 0) >= float(candidate["survival_continuation_context"].get("low") or 0)
+                         and float(candidate.get("current_price") or 0) <= float(candidate["survival_continuation_context"].get("close") or 0) * 1.005))
                 and float(candidate.get("first_target_risk_reward") or 0) >= 2.0
                 and 0 < float(candidate.get("relative_strength_percentile") or 100) <= 2.0
                 and float(candidate.get("completed_5m_volume_ratio") or 0) >= 1.5
@@ -4360,6 +4368,7 @@ class CandidateAnalyzer:
                 "breadth_breakout_exception",
                 "completed_breakout_entry",
                 "trade_flow_leader", "trade_flow_context", "survival_trade_flow", "completed_wb_retest_entry",
+                "flow_continuation_entry", "continuation_context", "survival_continuation_context",
                 "cleared_resistance_levels",
                 "sustained_retest",
             ):

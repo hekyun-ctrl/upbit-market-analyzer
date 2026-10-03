@@ -80,7 +80,7 @@ class TradeFlow:
         return context
 
 
-def buying_persistent(context, current, now):
+def buying_persistent(context, current, now, *, min_close_gain_pct=0.1):
     """Check 60 completed seconds, including the most recent 20s window."""
     if (not context or not context.get("ready")
             or context.get("source") != "upbit_websocket_trade"
@@ -102,5 +102,5 @@ def buying_persistent(context, current, now):
                 and sum(w["count"] for w in windows) >= 20
                 and min(lows + closes) > 0
                 and all(b >= a * .9985 for a, b in zip(lows, lows[1:]))
-                and closes[-1] >= closes[0] * 1.001
+                and closes[-1] >= closes[0] * (1 + min_close_gain_pct / 100)
                 and lows[-1] * .998 <= current <= closes[-1] * 1.005)
