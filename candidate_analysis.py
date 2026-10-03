@@ -949,6 +949,85 @@ def _completed_leader_context(candles_1m, candles_5m, candles_15m, now):
             "volume_15m": volume15, "close_position": position, "upper_wick": wick}
 
 
+def _flow_entry_context(candles_1m, candles_5m, candles_15m, now, config):
+    """Alternative evidence exclusively for the fresh executed-buying lane.
+
+    A rolling 15 minutes is three *completed* five-minute bars, compared with
+    20 preceding non-overlapping three-bar blocks. Never project a forming bar.
+    A contracting first pullback needs an independently confirmed WB event.
+    """
+    strict = _explosive_bar_context(candles_1m, candles_5m, candles_15m, now, impulse_min=1.5)
+    if strict.get("confirmed"):
+        return {**strict, "volume_mode": "standard", "as_of": now.timestamp()}
+    five = completed_context_candles(candles_5m, 5, now)
+    fifteen = completed_context_candles(candles_15m, 15, now)
+    missing = {"confirmed": False}
+    if len(five) < 63 or len(fifteen) < 21 or not recent_minute_candles_contiguous(candles_1m, now):
+        return missing
+    dates = [datetime.fromisoformat(b["candle_date_time_utc"]).replace(tzinfo=timezone.utc) for b in five[:63]]
+    last_open = now.astimezone(timezone.utc).replace(minute=now.minute // 5 * 5, second=0, microsecond=0) - timedelta(minutes=5)
+    if dates[0] != last_open or any(a - b != timedelta(minutes=5) for a, b in zip(dates, dates[1:])):
+        return missing
+    volumes = [float(b["candle_acc_trade_volume"]) for b in five[:63]]
+    baseline = mean(sum(volumes[i:i + 3]) for i in range(3, 63, 3))
+    rolling = sum(volumes[:3]) / baseline if baseline > 0 else 0.0
+    volume5, previous5 = _volume_metrics(five)
+    volume15 = _volume_metrics(fifteen)[0]
+    position, wick = _candle_shape(five[0])
+    close = float(five[0]["trade_price"])
+    prior_high = max(float(b["high_price"]) for b in five[1:13])
+    mode, level, impulse, contraction = None, prior_high, volume5, None
+    if volume5 >= 1.5 and rolling >= 1.0 and close > prior_high and position >= .75 and wick <= .25:
+        mode = "completed_rolling_breakout"
+    else:
+        wb = _double_bollinger_context(five, 0, lookback=config.double_bb_lookback,
+            retest_tolerance_pct=config.retest_tolerance_pct,
+            reversal_wick_ratio=config.double_bb_reversal_wick_ratio)
+        offset = wb.get("breakout_offset")
+        if not wb.get("first_retest") or wb.get("fake_breakout") or offset not in (1, 2):
+            return missing
+        level = float(wb.get("retest_level") or 0)
+        impulse = _volume_metrics(five[offset:])[0]
+        contraction = volumes[0] / volumes[offset] if volumes[offset] > 0 else float("inf")
+        if (.5 <= volume5 < 1.5 and impulse >= 1.5 and contraction <= .75
+                and (volume15 >= 1.0 or rolling >= 1.0)
+                and position >= .5 and wick <= .35 and close >= level > 0):
+            mode = "contracting_first_retest"
+    if mode is None:
+        return missing
+    return {"confirmed": True, "volume_mode": mode, "as_of": now.timestamp(),
+            "retest": mode == "contracting_first_retest", "level": level,
+            "close": close, "low": float(five[0]["low_price"]),
+            "volume_5m": volume5, "volume_previous_5m": previous5,
+            "volume_15m": volume15, "rolling_15m_volume_ratio": rolling,
+            "impulse_volume_ratio": impulse, "pullback_to_impulse_volume_ratio": contraction,
+            "close_position": position, "upper_wick": wick}
+
+
+def flow_volume_verified(candidate, now):
+    """Final delivery must use fresh survival evidence for alternative volume."""
+    evidence = candidate.get("survival_flow_entry_context") or {}
+    mode = candidate.get("flow_volume_mode", "standard")
+    if mode == "standard":
+        return (float(candidate.get("completed_5m_volume_ratio") or 0) >= 1.5
+                and float(candidate.get("completed_15m_volume_ratio") or 0) >= 1.0)
+    if (mode not in ("completed_rolling_breakout", "contracting_first_retest")
+            or not evidence.get("confirmed") or evidence.get("volume_mode") != mode
+            or not 0 <= now - float(evidence.get("as_of") or 0) <= 10
+            or not float(evidence.get("level") or 0) <= float(candidate.get("current_price") or 0)
+               <= float(evidence.get("close") or 0) * 1.005):
+        return False
+    v5, v15 = float(evidence.get("volume_5m") or 0), float(evidence.get("volume_15m") or 0)
+    rolling = float(evidence.get("rolling_15m_volume_ratio") or 0)
+    if mode == "completed_rolling_breakout":
+        return v5 >= 1.5 and rolling >= 1 and not evidence.get("retest")
+    return bool(evidence.get("retest") and .5 <= v5 < 1.5
+                and float(evidence.get("impulse_volume_ratio") or 0) >= 1.5
+                and evidence.get("pullback_to_impulse_volume_ratio") is not None
+                and 0 <= float(evidence["pullback_to_impulse_volume_ratio"]) <= .75
+                and (v15 >= 1 or rolling >= 1))
+
+
 def _quote_execution_context(sample, current, config):
     units = sample.get("orderbook_units") or []
     missing = {"one_tick": False, "depth_supported": False, "spread_pct": float("inf")}
@@ -978,6 +1057,8 @@ def _quote_execution_context(sample, current, config):
     return {"one_tick": one_tick, "coarse_tick": coarse, "spread_pct": spread,
             "tick_size": float(tick), "best_bid": bid, "best_ask": ask,
             "depth_supported": ratio >= .2 and min(bid_value, ask_value) >= 5_000_000,
+            "nearby_depth_supported": bool(min(bid_value, ask_value) >= 5_000_000
+                                            and ask_value > 0 and bid_value / ask_value >= .2),
             "bid_value_krw": bid_value, "ask_value_krw": ask_value}
 
 
@@ -998,7 +1079,8 @@ def _flow_book_supported(samples, current, config):
     supported = 0
     for sample in samples:
         q = _quote_execution_context(sample, current, config)
-        if q["depth_supported"] and (q["spread_pct"] <= config.max_spread_pct or q.get("coarse_tick")):
+        if ((q.get("nearby_depth_supported") and q["spread_pct"] <= config.max_spread_pct)
+                or (q["depth_supported"] and q.get("coarse_tick"))):
             supported += 1
     return len(samples) >= 3 and supported >= len(samples) // 2 + 1
 
@@ -1042,7 +1124,7 @@ def validate_candidate_survival(
         (candidate.get("tick_spread_exception") and execution_spread_context["confirmed"]))
     continuation_lane = bool(flow_lane and candidate.get("flow_continuation_entry"))
     flow_evidence = (_completed_leader_context(candles_1m, candles_5m or [], candles_15m or [], flow_now)
-                     if continuation_lane else _explosive_bar_context(candles_1m, candles_5m or [], candles_15m or [], flow_now, impulse_min=1.5)) if flow_lane else {}
+                     if continuation_lane else _flow_entry_context(candles_1m, candles_5m or [], candles_15m or [], flow_now, config)) if flow_lane else {}
     flow_higher = higher_timeframe_context(candles_15m or [], candles_60m or [], [], now=flow_now) if flow_lane else {}
     flow_valid = bool(flow_lane and config.trade_flow_leader_enabled
         and buying_persistent(trade_flow_context, current, flow_now.timestamp(),
@@ -1155,6 +1237,12 @@ def validate_candidate_survival(
             rejected.append("최소 호가 단위 예외의 비용 계획 무효")
 
     return {
+        **({"completed_5m_volume_ratio": round(float(flow_evidence.get("volume_5m") or 0), 2),
+            "completed_15m_volume_ratio": round(float(flow_evidence.get("volume_15m") or 0), 2),
+            "flow_volume_mode": flow_evidence.get("volume_mode", "standard"),
+            "flow_execution_override": bool(candidate.get("flow_execution_override") or book_ratio < .2
+                 or flow_evidence.get("volume_mode", "standard") != "standard")} if flow_lane else {}),
+        "survival_flow_entry_context": flow_evidence if flow_lane and not continuation_lane else None,
         **({"completed_5m_volume_ratio": round(volume5, 2),
             "completed_15m_volume_ratio": round(volume15, 2)} if candidate.get("tick_spread_exception") else {}),
         "survival_execution_spread_context": execution_spread_context if candidate.get("tick_spread_exception") else None,
@@ -1485,6 +1573,7 @@ def evaluate_candidate(
         and not btc_crash and btc_change > config.max_btc_decline_pct
     )
     flow_context = alert.get("trade_flow_context") or {}
+    flow_entry_context = _flow_entry_context(candles_1m, candles_5m, candles_15m, context_now, config)
     continuation_context = _completed_leader_context(candles_1m, candles_5m, candles_15m, context_now)
     flow_continuation_entry = bool(config.trade_flow_leader_enabled and config.double_bb_enabled
         and continuation_context.get("confirmed")
@@ -1496,6 +1585,7 @@ def evaluate_candidate(
         and higher["fifteen"]["above_ma20"] and higher["hourly"]["support_intact"]
         and float(alert.get("market_breadth_5m_pct") or 0) >= 20.0
         and _flow_book_supported(samples, current, config)
+        and execution_spread_ok
         and current >= max(breakout, float(continuation_context["level"]), float(continuation_context["low"]))
         and completed_close >= max(breakout, float(continuation_context["level"]), float(continuation_context["low"]))
         and current <= float(continuation_context["close"]) * 1.005
@@ -1503,7 +1593,7 @@ def evaluate_candidate(
         and not btc_crash and btc_change > config.max_btc_decline_pct)
     flow_leader = bool(config.trade_flow_leader_enabled
         and buying_persistent(flow_context, current, context_now.timestamp())
-        and rsi_context.get("confirmed")
+        and flow_entry_context.get("confirmed")
         and (wb_confirmed or wb_five_breakout or wb_five_retest) and not wb_fake_breakout
         and (wb_confirmed or current >= float(double_bb_five.get("retest_level") or breakout))
         and (wb_confirmed or completed_close >= float(double_bb_five.get("retest_level") or breakout))
@@ -1514,14 +1604,16 @@ def evaluate_candidate(
         and higher.get("fifteen_intact") and higher["fifteen"]["above_ma20"]
         and float(alert.get("market_breadth_5m_pct") or 0) >= 20.0
         and _flow_book_supported(samples, current, config)
-        and current >= max(breakout, float(rsi_context["level"]))
-        and current <= float(rsi_context["close"]) * 1.005
+        and execution_spread_ok
+        and current >= max(breakout, float(flow_entry_context["level"]))
+        and current <= float(flow_entry_context["close"]) * 1.005
         and not btc_crash and btc_change > config.max_btc_decline_pct) or flow_continuation_entry
     # Keep the flow route distinct: it requires full 60s survival and does not
     # inherit fast/RSI/breadth exceptions with different revalidation rules.
     if flow_leader:
         fast_leader_core = explosive_core = completed_breakout_entry = completed_wb_retest_entry = False
         hourly_trend_core = True
+        rsi_context = flow_entry_context
     if flow_continuation_entry:
         rsi_context = continuation_context
     if completed_wb_retest_entry:
@@ -1706,9 +1798,10 @@ def evaluate_candidate(
         message = "완료봉 기준 1분 20이평 아래"
         (rejected if strict_quality else soft_warnings).append(message)
 
-    if not fast_leader_core and volume_ratio < config.availability_min_volume_ratio:
+    contracting_flow_retest = bool(flow_leader and rsi_context.get("volume_mode") == "contracting_first_retest")
+    if not fast_leader_core and not contracting_flow_retest and volume_ratio < config.availability_min_volume_ratio:
         rejected.append(f"완료 1분봉 거래량 절대 부족({volume_ratio:.2f}배)")
-    elif not fast_leader_core and volume_ratio < config.min_completed_volume_ratio:
+    elif not fast_leader_core and not contracting_flow_retest and volume_ratio < config.min_completed_volume_ratio:
         message = f"완료 1분봉 거래량 다소 부족({volume_ratio:.2f}배)"
         (rejected if strict_quality else soft_warnings).append(message)
 
@@ -1829,6 +1922,8 @@ def evaluate_candidate(
         )
     tick_spread_exception = bool(tick_spread_ready and
         (completed_wb_retest_entry or completed_breakout_entry or flow_leader))
+    flow_execution_override = bool(flow_leader and (book_ratio < .2
+        or rsi_context.get("volume_mode", "standard") != "standard"))
     spread_softened = bool(tick_spread_exception or (
         early_leader_lane
         and config.max_spread_pct < spread <= config.hard_max_spread_pct
@@ -1938,6 +2033,9 @@ def evaluate_candidate(
         **alert["screening_metrics"],
         "retest_confirmed": retest_confirmed,
         "trade_flow_leader": flow_leader, "trade_flow_context": flow_context,
+        "flow_entry_context": flow_entry_context,
+        "flow_volume_mode": rsi_context.get("volume_mode", "standard") if flow_leader else None,
+        "flow_execution_override": flow_execution_override,
         "flow_continuation_entry": flow_continuation_entry,
         "continuation_context": continuation_context,
         "completed_breakout_entry": completed_breakout_entry,
@@ -2321,7 +2419,7 @@ def evaluate_candidate(
     metrics = exit_plan_metrics(entry_reference, stop, target1, target2, exit_plan)
     risk_reward = float(metrics["risk_reward"])
     execution_cost = {}
-    if tick_spread_exception:
+    if tick_spread_exception or flow_execution_override:
         execution_cost = execution_cost_metrics(entry_reference, stop, target1, target2,
             exit_plan, spread, config.tick_spread_cost_buffer_pct)
         alert["screening_metrics"]["execution_cost"] = execution_cost
@@ -2470,6 +2568,9 @@ def evaluate_candidate(
         "completed_breakout_entry": completed_breakout_entry,
         "completed_wb_retest_entry": completed_wb_retest_entry,
         "trade_flow_leader": flow_leader, "trade_flow_context": flow_context if flow_leader else None,
+        "flow_volume_mode": rsi_context.get("volume_mode", "standard") if flow_leader else None,
+        "flow_entry_context": rsi_context if flow_leader else None,
+        "flow_execution_override": flow_execution_override,
         "flow_continuation_entry": flow_continuation_entry,
         "continuation_context": continuation_context if flow_continuation_entry else None,
         "breadth_breakout_exception": breadth_breakout_exception,
@@ -2514,7 +2615,7 @@ def evaluate_candidate(
         "price_tick": tick,
         "tick_spread_exception": tick_spread_exception,
         "execution_spread_context": execution_spread_context if tick_spread_exception else None,
-        "execution_cost": execution_cost if tick_spread_exception else None,
+        "execution_cost": execution_cost if tick_spread_exception or flow_execution_override else None,
         "execution_cost_buffer_pct": config.tick_spread_cost_buffer_pct,
         "minimum_net_risk_reward": config.tick_spread_min_net_risk_reward,
         "trend_management": (

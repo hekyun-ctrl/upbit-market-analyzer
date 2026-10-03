@@ -25,6 +25,7 @@ from candidate_analysis import (
     _round_tick,
     _completed,
     _quote_execution_context,
+    flow_volume_verified,
     evaluate_candidate,
     validate_candidate_survival,
     validate_btc_survival,
@@ -36,7 +37,7 @@ from upbit_client import UpbitPublicClient
 from trade_flow import TradeFlow, buying_persistent
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "verification-audit-v3.9"
+STRATEGY_VERSION = "verification-audit-v3.10"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -1635,10 +1636,19 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
             f"완료 거래량: 5분 {float(candidate['completed_5m_volume_ratio']):.2f}배 · "
             f"15분 {float(candidate['completed_15m_volume_ratio']):.2f}배\n"
         )
+    if candidate.get("trade_flow_leader") and candidate.get("flow_volume_mode") not in (None, "standard"):
+        proof = candidate.get("survival_flow_entry_context") or candidate.get("flow_entry_context") or {}
+        mode_label = ("돌파 후 거래량 감소·첫 지지 확인" if candidate.get("flow_volume_mode") == "contracting_first_retest"
+                      else "최근 완료 5분봉 3개 합산으로 15분 거래량 확인")
+        volume_line += (f"거래량 검증 방식: {mode_label}\n"
+                        f"최근 완료 15분 합산: {float(proof.get('rolling_15m_volume_ratio') or 0):.2f}배"
+                        "(직전 20개 완료 구간 대비·진행봉 제외)\n")
     cost_line = ""
-    if candidate.get("tick_spread_exception"):
+    if candidate.get("tick_spread_exception") or candidate.get("flow_execution_override"):
         cost = candidate.get("execution_cost") or {}
-        cost_line = (f"호가 검증: 공식 최소 1호가 단위·반복 호가·매수 체결 통과\n"
+        quote_label = ("공식 최소 1호가 단위·반복 호가·매수 체결 통과" if candidate.get("tick_spread_exception")
+                       else "가까운 호가 깊이·실제 매수 체결·전송 직전 호가 확인")
+        cost_line = (f"호가 검증: {quote_label}\n"
                      f"추정 왕복 비용: {float(cost.get('estimated_round_trip_cost_pct') or 0):.2f}% "
                      f"(스프레드+수수료·슬리피지 가정) · 비용 차감 계획 손익비 {float(cost.get('net_risk_reward') or 0):.2f}\n")
     plan_line = ""
@@ -1843,13 +1853,13 @@ def _revalidate_candidate_for_dispatch(
         return None, f"전송 직전 {label} 손익비 부족({actual_rr:.2f})"
     if stop_pct > max_stop_loss_pct:
         return None, f"전송 직전 계획 손절폭 초과({stop_pct:.2f}%)"
-    if candidate.get("tick_spread_exception"):
+    if candidate.get("tick_spread_exception") or candidate.get("flow_execution_override"):
         proof = candidate.get("survival_execution_spread_context") or candidate.get("execution_spread_context") or {}
         quote = candidate.get("dispatch_execution_quote") or {}
-        if not proof.get("confirmed"):
+        if candidate.get("tick_spread_exception") and not proof.get("confirmed"):
             return None, "최소 호가 단위 실행 증거 누락"
         try:
-            observed_spread = max(float(proof["spread_pct"]), float(quote.get("spread_pct") or 0))
+            observed_spread = max(float(proof.get("spread_pct") or candidate.get("spread_pct") or 0), float(quote.get("spread_pct") or 0))
             costs = execution_cost_metrics(live_price, stop, min(target_1, risk_reward_reference),
                 target_2, plan, observed_spread, max(.2, float(candidate.get("execution_cost_buffer_pct") or .2)))
             floor = max(1.0, float(candidate.get("minimum_net_risk_reward") or 1.0))
@@ -2265,14 +2275,18 @@ class AlertDispatcher:
                          and float(candidate.get("current_price") or 0) <= float(candidate["survival_continuation_context"].get("close") or 0) * 1.005))
                 and float(candidate.get("first_target_risk_reward") or 0) >= 2.0
                 and 0 < float(candidate.get("relative_strength_percentile") or 100) <= 2.0
-                and float(candidate.get("completed_5m_volume_ratio") or 0) >= 1.5
-                and float(candidate.get("completed_15m_volume_ratio") or 0) >= 1.0
+                and flow_volume_verified(candidate, time.time())
                 and candidate.get("double_bb_confirmed")
                 and all(candidate.get(key) is not None for key in (
                     "survival_btc_5m_pct", "survival_btc_15m_pct", "survival_btc_live_pct"))
                 and float(candidate.get("survival_btc_5m_pct") or 0) > risk_config.btc_crash_5m_pct
                 and float(candidate.get("survival_btc_15m_pct") or 0) > risk_config.btc_crash_15m_pct
                 and float(candidate.get("survival_btc_live_pct") or 0) > risk_config.btc_crash_5m_pct)
+            if candidate.get("flow_execution_override") or candidate.get("flow_volume_mode") not in (None, "standard"):
+                quote = candidate.get("dispatch_execution_quote") or {}
+                qualified = bool(qualified and quote.get("nearby_depth_supported")
+                    and 0 <= time.time() - float(quote.get("as_of") or 0) <= 10
+                    and float(quote.get("spread_pct", float("inf"))) <= risk_config.max_spread_pct)
             try:
                 _, rejection = _revalidate_candidate_for_dispatch(
                     candidate, float(candidate["current_price"]),
@@ -2299,8 +2313,10 @@ class AlertDispatcher:
                 and (higher.get("fifteen") or {}).get("above_ma20")
                 and candidate.get("double_bb_confirmed")
                 and (candidate.get("first_retest_confirmed") or candidate.get("trade_flow_leader"))
-                and float(candidate.get("completed_5m_volume_ratio") or 0) >= 1.5
-                and float(candidate.get("completed_15m_volume_ratio") or 0) >= 1.0
+                and ((candidate.get("trade_flow_leader") and flow_volume_verified(candidate, time.time()))
+                     or (not candidate.get("trade_flow_leader")
+                         and float(candidate.get("completed_5m_volume_ratio") or 0) >= 1.5
+                         and float(candidate.get("completed_15m_volume_ratio") or 0) >= 1.0))
             ):
                 reasons.append("Telegram 부분 청산 추세형 자격 미확인")
             try:
@@ -4302,7 +4318,7 @@ class CandidateAnalyzer:
                 candidate["survival_seconds"] = survival_seconds
             verification_client = UpbitPublicClient()
             try:
-                if candidate.get("tick_spread_exception"):
+                if candidate.get("tick_spread_exception") or candidate.get("flow_execution_override"):
                     latest_ticker, latest_book = await asyncio.gather(
                         verification_client.ticker(market), verification_client.orderbook(market))
                     candidate["dispatch_execution_quote"] = {
@@ -4423,6 +4439,7 @@ class CandidateAnalyzer:
                 "completed_breakout_entry",
                 "trade_flow_leader", "trade_flow_context", "survival_trade_flow", "completed_wb_retest_entry",
                 "flow_continuation_entry", "continuation_context", "survival_continuation_context",
+                "flow_volume_mode", "flow_entry_context", "survival_flow_entry_context", "flow_execution_override",
                 "tick_spread_exception", "execution_spread_context", "execution_cost",
                 "survival_execution_spread_context", "survival_execution_cost", "dispatch_execution_quote",
                 "cleared_resistance_levels",

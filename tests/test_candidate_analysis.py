@@ -2752,12 +2752,17 @@ def test_flow_lane_preserves_direct_risk_and_verification_floors(monkeypatch, ca
     elif cause == 'thin_book':
         for u in books[0]['orderbook_units']: u['bid_size'] = 1
     elif cause == 'wide_spread': books[0]['orderbook_units'][0]['ask_price'] = 103
-    elif cause == 'extreme_book': books[0]['total_bid_size'] = 75000
+    elif cause == 'extreme_book':
+        books[0]['total_bid_size'] = 75000
+        for u in books[0]['orderbook_units']: u['bid_size'] = u['ask_size'] * .1
     elif cause == 'single_book': books[:] = books[:1]
     elif cause == 'breadth': alert['market_breadth_5m_pct'] = 19
     elif cause == 'rank': alert['relative_strength_percentile'] = 3
     elif cause == 'five_volume': five[1]['candle_acc_trade_volume'] = 100
-    elif cause == 'fifteen_volume': fifteen[1]['candle_acc_trade_volume'] = 50
+    elif cause == 'fifteen_volume':
+        fifteen[1]['candle_acc_trade_volume'] = 50
+        # Neither aligned nor completed rolling 15m confirms demand.
+        for b in five[2:]: b['candle_acc_trade_volume'] = 1000
     elif cause == 'minute_gap': one.pop(5)
     elif cause == 'hour_down': hourly[1]['trade_price'] = 99
     elif cause == 'btc': btc[1]['trade_price'] = 98
