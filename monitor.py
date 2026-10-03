@@ -24,18 +24,19 @@ from candidate_analysis import (
     CandidateConfig,
     _round_tick,
     _completed,
+    _quote_execution_context,
     evaluate_candidate,
     validate_candidate_survival,
     validate_btc_survival,
 )
 from trend_context import higher_timeframe_context
 from filter_audit import filter_audit, REJECTIONS
-from exit_plan import exit_plan_metrics, modeled_exit_return, partial_plan_summary
+from exit_plan import exit_plan_metrics, execution_cost_metrics, modeled_exit_return, partial_plan_summary
 from upbit_client import UpbitPublicClient
 from trade_flow import TradeFlow, buying_persistent
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "verification-audit-v3.8"
+STRATEGY_VERSION = "verification-audit-v3.9"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -1634,6 +1635,12 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
             f"완료 거래량: 5분 {float(candidate['completed_5m_volume_ratio']):.2f}배 · "
             f"15분 {float(candidate['completed_15m_volume_ratio']):.2f}배\n"
         )
+    cost_line = ""
+    if candidate.get("tick_spread_exception"):
+        cost = candidate.get("execution_cost") or {}
+        cost_line = (f"호가 검증: 공식 최소 1호가 단위·반복 호가·매수 체결 통과\n"
+                     f"추정 왕복 비용: {float(cost.get('estimated_round_trip_cost_pct') or 0):.2f}% "
+                     f"(스프레드+수수료·슬리피지 가정) · 비용 차감 계획 손익비 {float(cost.get('net_risk_reward') or 0):.2f}\n")
     plan_line = ""
     if candidate.get("exit_plan"):
         plan_line = (
@@ -1662,6 +1669,7 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"{wb_line}"
         f"{higher_line}"
         f"{volume_line}"
+        f"{cost_line}"
         f"가까운 저항 여유: {candidate.get('resistance_room_pct', 0):.1f}%\n"
         f"{plan_line}"
         f"계획 손익비: {candidate.get('risk_reward', 0):.2f}\n"
@@ -1835,6 +1843,21 @@ def _revalidate_candidate_for_dispatch(
         return None, f"전송 직전 {label} 손익비 부족({actual_rr:.2f})"
     if stop_pct > max_stop_loss_pct:
         return None, f"전송 직전 계획 손절폭 초과({stop_pct:.2f}%)"
+    if candidate.get("tick_spread_exception"):
+        proof = candidate.get("survival_execution_spread_context") or candidate.get("execution_spread_context") or {}
+        quote = candidate.get("dispatch_execution_quote") or {}
+        if not proof.get("confirmed"):
+            return None, "최소 호가 단위 실행 증거 누락"
+        try:
+            observed_spread = max(float(proof["spread_pct"]), float(quote.get("spread_pct") or 0))
+            costs = execution_cost_metrics(live_price, stop, min(target_1, risk_reward_reference),
+                target_2, plan, observed_spread, max(.2, float(candidate.get("execution_cost_buffer_pct") or .2)))
+            floor = max(1.0, float(candidate.get("minimum_net_risk_reward") or 1.0))
+            if costs["net_risk_reward"] < floor:
+                return None, f"전송 직전 비용 차감 손익비 부족({costs['net_risk_reward']:.2f} < {floor:.2f})"
+            refreshed["execution_cost"] = costs
+        except (KeyError, TypeError, ValueError):
+            return None, "전송 직전 최소 호가 단위 비용 계획 무효"
     refreshed.update(
         {
             "current_price": live_price,
@@ -2169,6 +2192,29 @@ class AlertDispatcher:
         """
         reasons = []
         score_floor = self._candidate_min_score
+        if candidate.get("tick_spread_exception"):
+            risk_config = self._candidate_risk_config
+            proof = candidate.get("survival_execution_spread_context") or {}
+            quote = candidate.get("dispatch_execution_quote") or {}
+            flow = candidate.get("survival_trade_flow") or {}
+            if not (risk_config.tick_spread_enabled and proof.get("confirmed")
+                    and 0 <= time.time() - float(proof.get("as_of") or 0) <= 10
+                    and candidate.get("survival_confirmed")
+                    and float(candidate.get("survival_seconds") or 0) >= risk_config.survival_confirm_seconds
+                    and quote.get("one_tick") and quote.get("depth_supported")
+                    and 0 <= time.time() - float(quote.get("as_of") or 0) <= 10
+                    and float(quote.get("spread_pct", float("inf"))) <= risk_config.hard_max_spread_pct
+                    and buying_persistent(flow, float(candidate.get("current_price") or 0), time.time(), min_close_gain_pct=0.0)
+                    and float(candidate.get("completed_5m_volume_ratio") or 0) >= 1.5
+                    and float(candidate.get("completed_15m_volume_ratio") or 0) >= 1.0):
+                reasons.append("Telegram 최소 호가 단위 예외의 최신 호가·매수 체결·60초 생존 미확인")
+            try:
+                _, reason = _revalidate_candidate_for_dispatch(candidate, float(candidate["current_price"]),
+                    min_risk_reward=risk_config.min_risk_reward, max_stop_loss_pct=risk_config.max_stop_loss_pct)
+                if reason:
+                    reasons.append(f"Telegram {reason}")
+            except (KeyError, TypeError, ValueError):
+                reasons.append("Telegram 최소 호가 단위 비용 재검증 실패")
         if candidate.get("selection_lane") == "explosive_leader":
             context = candidate.get("explosive_context") or {}
             risk_config = self._candidate_risk_config
@@ -4256,7 +4302,15 @@ class CandidateAnalyzer:
                 candidate["survival_seconds"] = survival_seconds
             verification_client = UpbitPublicClient()
             try:
-                latest_ticker = await verification_client.ticker(market)
+                if candidate.get("tick_spread_exception"):
+                    latest_ticker, latest_book = await asyncio.gather(
+                        verification_client.ticker(market), verification_client.orderbook(market))
+                    candidate["dispatch_execution_quote"] = {
+                        **_quote_execution_context(latest_book, float(latest_ticker["trade_price"]), self.config),
+                        "as_of": time.time(),
+                    }
+                else:
+                    latest_ticker = await verification_client.ticker(market)
             finally:
                 await verification_client.close()
             alert["screening_snapshot"] = {
@@ -4369,6 +4423,8 @@ class CandidateAnalyzer:
                 "completed_breakout_entry",
                 "trade_flow_leader", "trade_flow_context", "survival_trade_flow", "completed_wb_retest_entry",
                 "flow_continuation_entry", "continuation_context", "survival_continuation_context",
+                "tick_spread_exception", "execution_spread_context", "execution_cost",
+                "survival_execution_spread_context", "survival_execution_cost", "dispatch_execution_quote",
                 "cleared_resistance_levels",
                 "sustained_retest",
             ):

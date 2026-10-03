@@ -6,12 +6,13 @@ import os
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal, ROUND_CEILING, ROUND_FLOOR, ROUND_HALF_UP
+from math import isfinite
 from statistics import mean, median, pstdev
 from typing import Any
 
 from analysis import analyze_candles
 from trend_context import higher_timeframe_context, completed_context_candles, recent_minute_candles_contiguous
-from exit_plan import exit_plan_metrics
+from exit_plan import exit_plan_metrics, execution_cost_metrics
 from trade_flow import buying_persistent
 
 
@@ -172,6 +173,9 @@ class CandidateConfig:
     explosive_leader_min_score: int = 80
     trade_flow_leader_enabled: bool = True
     trade_flow_leader_min_score: int = 86
+    tick_spread_enabled: bool = True
+    tick_spread_cost_buffer_pct: float = 0.2
+    tick_spread_min_net_risk_reward: float = 1.0
 
     @classmethod
     def from_env(cls) -> "CandidateConfig":
@@ -499,6 +503,9 @@ class CandidateConfig:
             ),
             trade_flow_leader_min_score=max(86, min(100, _env_int("CANDIDATE_TRADE_FLOW_LEADER_MIN_SCORE", 86))),
             trade_flow_leader_enabled=_enabled("CANDIDATE_TRADE_FLOW_LEADER_ENABLED", True),
+            tick_spread_enabled=_enabled("CANDIDATE_TICK_SPREAD_ENABLED", True),
+            tick_spread_cost_buffer_pct=max(0.2, _env_float("CANDIDATE_TICK_SPREAD_COST_BUFFER_PCT", 0.2)),
+            tick_spread_min_net_risk_reward=max(1.0, _env_float("CANDIDATE_TICK_SPREAD_MIN_NET_RISK_REWARD", 1.0)),
             explosive_leader_enabled=_enabled("CANDIDATE_EXPLOSIVE_LEADER_ENABLED", True),
             explosive_leader_min_score=max(80, min(100, _env_int("CANDIDATE_EXPLOSIVE_LEADER_MIN_SCORE", 80))),
         )
@@ -782,6 +789,17 @@ def _resistances(
     return sorted({round(x, 12) for x in levels if x > current * 1.001})
 
 
+def _krw_tick_size(price: float) -> float:
+    """Official KRW grid (2025-07-31 policy); never infer a gap as one tick."""
+    for floor, tick in ((1_000_000, 1000), (500_000, 500), (100_000, 100),
+                        (50_000, 50), (10_000, 10), (5_000, 5), (100, 1),
+                        (10, .1), (1, .01), (.1, .001), (.01, .0001),
+                        (.001, .00001), (.0001, .000001), (.00001, .0000001)):
+        if price >= floor:
+            return float(tick)
+    return .00000001
+
+
 def _tick_size(orderbook: dict[str, Any], price: float) -> float:
     points = sorted(
         {
@@ -931,17 +949,56 @@ def _completed_leader_context(candles_1m, candles_5m, candles_15m, now):
             "volume_15m": volume15, "close_position": position, "upper_wick": wick}
 
 
+def _quote_execution_context(sample, current, config):
+    units = sample.get("orderbook_units") or []
+    missing = {"one_tick": False, "depth_supported": False, "spread_pct": float("inf")}
+    if not units or current <= 0:
+        return missing
+    bid = float(units[0].get("bid_price") or 0)
+    ask = float(units[0].get("ask_price") or 0)
+    if (not all(isfinite(x) for x in (bid, ask, current))
+            or not 0 < bid < ask or not bid * .98 <= current <= ask * 1.02):
+        return missing
+    tick = Decimal(str(_krw_tick_size(bid)))
+    bid_d, ask_d = Decimal(str(bid)), Decimal(str(ask))
+    one_tick = bool(bid_d % tick == 0 and ask_d - bid_d == tick
+                    and ask_d % Decimal(str(_krw_tick_size(ask))) == 0)
+    ratio, spread, _ = _book_metrics([sample])
+    coarse = bool(config.tick_spread_enabled and one_tick
+                  and config.max_spread_pct < spread <= config.hard_max_spread_pct)
+    # For a legal coarse tick the closest quote can sit outside +/-0.5%.
+    # Include that executable quote, not distant resting book liquidity.
+    bid_floor = min(current * .995, bid) if coarse else current * .995
+    ask_ceiling = max(current * 1.005, ask) if coarse else current * 1.005
+    tolerance = max(current * 1e-10, 1e-12)
+    bid_value = sum(float(u.get("bid_price") or 0) * float(u.get("bid_size") or 0)
+                    for u in units if bid_floor - tolerance <= float(u.get("bid_price") or 0) <= min(current * 1.005, bid) + tolerance)
+    ask_value = sum(float(u.get("ask_price") or 0) * float(u.get("ask_size") or 0)
+                    for u in units if max(current * .995, ask) - tolerance <= float(u.get("ask_price") or 0) <= ask_ceiling + tolerance)
+    return {"one_tick": one_tick, "coarse_tick": coarse, "spread_pct": spread,
+            "tick_size": float(tick), "best_bid": bid, "best_ask": ask,
+            "depth_supported": ratio >= .2 and min(bid_value, ask_value) >= 5_000_000,
+            "bid_value_krw": bid_value, "ask_value_krw": ask_value}
+
+
+def _tick_spread_context(samples, current, config, *, require_coarse=True):
+    quotes = [_quote_execution_context(s, current, config) for s in samples]
+    confirmed = bool(config.tick_spread_enabled and len(quotes) >= 3
+        and all(q.get("one_tick") and q["spread_pct"] <= config.hard_max_spread_pct for q in quotes)
+        and (not require_coarse or any(q.get("coarse_tick") for q in quotes))
+        and sum(q["depth_supported"] for q in quotes) >= len(quotes) // 2 + 1)
+    return {"confirmed": confirmed, "sample_count": len(quotes),
+            "spread_pct": max((q["spread_pct"] for q in quotes), default=float("inf")),
+            "tick_size": quotes[-1].get("tick_size") if quotes else None,
+            "quotes": quotes}
+
+
 def _flow_book_supported(samples, current, config):
     """Execution flow can replace imbalance, never a thin/wide/invalid book."""
     supported = 0
     for sample in samples:
-        ratio, spread, _ = _book_metrics([sample])
-        units = sample.get("orderbook_units") or []
-        bid_value = sum(float(u.get("bid_price") or 0) * float(u.get("bid_size") or 0)
-                        for u in units if current * .995 <= float(u.get("bid_price") or 0) <= current * 1.005)
-        ask_value = sum(float(u.get("ask_price") or 0) * float(u.get("ask_size") or 0)
-                        for u in units if current * .995 <= float(u.get("ask_price") or 0) <= current * 1.005)
-        if ratio >= .2 and spread <= config.max_spread_pct and min(bid_value, ask_value) >= 5_000_000:
+        q = _quote_execution_context(sample, current, config)
+        if q["depth_supported"] and (q["spread_pct"] <= config.max_spread_pct or q.get("coarse_tick")):
             supported += 1
     return len(samples) >= 3 and supported >= len(samples) // 2 + 1
 
@@ -973,12 +1030,16 @@ def validate_candidate_survival(
     completed_close = float(c1[0]["trade_price"])
     volume_ratio, volume_previous = _volume_metrics(c1)
     book_ratio, spread, ratios = _book_metrics(orderbook_samples)
+    execution_spread_context = _tick_spread_context(orderbook_samples, current, config, require_coarse=False)
     hard_book_persistent = sum(
         ratio >= config.hard_min_orderbook_ratio for ratio in ratios
     ) >= max(1, len(ratios) // 2 + 1)
 
     flow_lane = bool(candidate.get("trade_flow_leader"))
     flow_now = as_of or datetime.now(timezone.utc)
+    execution_spread_context["as_of"] = flow_now.timestamp()
+    survival_spread_ok = bool(spread <= config.max_spread_pct or
+        (candidate.get("tick_spread_exception") and execution_spread_context["confirmed"]))
     continuation_lane = bool(flow_lane and candidate.get("flow_continuation_entry"))
     flow_evidence = (_completed_leader_context(candles_1m, candles_5m or [], candles_15m or [], flow_now)
                      if continuation_lane else _explosive_bar_context(candles_1m, candles_5m or [], candles_15m or [], flow_now, impulse_min=1.5)) if flow_lane else {}
@@ -987,6 +1048,7 @@ def validate_candidate_survival(
         and buying_persistent(trade_flow_context, current, flow_now.timestamp(),
                               min_close_gain_pct=0.0 if continuation_lane else 0.1)
         and _flow_book_supported(orderbook_samples, current, config)
+        and survival_spread_ok
         and flow_evidence.get("confirmed")
         and flow_higher.get("ready")
         and (flow_higher.get("hourly_established") or (continuation_lane and flow_higher["hourly"]["support_intact"]))
@@ -1037,7 +1099,7 @@ def validate_candidate_survival(
                                           as_of or datetime.now(timezone.utc), impulse_min=1.5)
         normal_book = sum(x >= config.min_orderbook_ratio for x in ratios) >= max(1, len(ratios) // 2 + 1)
         if (not evidence.get("confirmed") or not normal_book
-                or spread > config.max_spread_pct
+                or not survival_spread_ok
                 or current < max(breakout, float(evidence.get("level") or breakout))
                 or current > float(evidence.get("close") or current) * 1.005):
             rejected.append("RSI 예외 완료봉 돌파·호가 생존 실패")
@@ -1046,7 +1108,7 @@ def validate_candidate_survival(
                                           as_of or datetime.now(timezone.utc), impulse_min=1.5)
         normal_book = sum(x >= config.min_orderbook_ratio for x in ratios) >= max(1, len(ratios) // 2 + 1)
         if (not evidence.get("confirmed") or not normal_book
-                or spread > config.max_spread_pct
+                or not survival_spread_ok
                 or current < max(breakout, float(evidence.get("level") or breakout))
                 or current > float(evidence.get("close") or current) * 1.005):
             rejected.append("눌림 대안 완료봉 돌파·거래량·호가 생존 실패")
@@ -1059,7 +1121,7 @@ def validate_candidate_survival(
                                                     float(wb.get("retest_level") or breakout))
         normal_book = sum(x >= config.min_orderbook_ratio for x in ratios) >= max(1, len(ratios) // 2 + 1)
         if (not evidence.get("confirmed") or not wb.get("first_retest") or wb.get("fake_breakout")
-                or not normal_book or spread > config.max_spread_pct
+                or not normal_book or not survival_spread_ok
                 or completed_close < float(wb.get("retest_level") or breakout)
                 or current < max(breakout, float(evidence.get("level") or breakout), float(wb.get("retest_level") or breakout))
                 or current > float(evidence.get("close") or current) * 1.005):
@@ -1075,8 +1137,29 @@ def validate_candidate_survival(
     if spread > config.hard_max_spread_pct:
         rejected.append(f"호가 스프레드 극단적 과다({spread:.2f}%)")
 
+    survival_cost = {}
+    if candidate.get("tick_spread_exception"):
+        volume5 = _volume_metrics(completed_context_candles(candles_5m or [], 5, flow_now))[0]
+        volume15 = _volume_metrics(completed_context_candles(candles_15m or [], 15, flow_now))[0]
+        if (not execution_spread_context["confirmed"]
+                or not buying_persistent(trade_flow_context, current, flow_now.timestamp(), min_close_gain_pct=0.0)
+                or volume5 < 1.5 or volume15 < 1.0):
+            rejected.append("최소 호가 단위 예외의 반복 호가·매수 체결·완료 거래량 생존 실패")
+        try:
+            survival_cost = execution_cost_metrics(current, float(candidate["stop_price"]),
+                float(candidate["target_1"]), float(candidate["target_2"]), candidate.get("exit_plan"),
+                spread, config.tick_spread_cost_buffer_pct)
+            if survival_cost["net_risk_reward"] < config.tick_spread_min_net_risk_reward:
+                rejected.append("최소 호가 단위 예외의 비용 차감 손익비 생존 실패")
+        except (ValueError, KeyError, TypeError):
+            rejected.append("최소 호가 단위 예외의 비용 계획 무효")
+
     return {
-        "survival_trade_flow": trade_flow_context if flow_lane else None,
+        **({"completed_5m_volume_ratio": round(volume5, 2),
+            "completed_15m_volume_ratio": round(volume15, 2)} if candidate.get("tick_spread_exception") else {}),
+        "survival_execution_spread_context": execution_spread_context if candidate.get("tick_spread_exception") else None,
+        "survival_execution_cost": survival_cost if candidate.get("tick_spread_exception") else None,
+        "survival_trade_flow": trade_flow_context if flow_lane or candidate.get("tick_spread_exception") else None,
         "survival_continuation_context": flow_evidence if continuation_lane else None,
         "survival_price": current,
         "survival_completed_close": completed_close,
@@ -1162,6 +1245,12 @@ def evaluate_candidate(
     one_volume_ratio = volume_ratio
     samples = orderbook_samples or [orderbook]
     book_ratio, spread, ratios = _book_metrics(samples)
+    execution_spread_context = _tick_spread_context(samples, current, config)
+    execution_spread_context["as_of"] = context_now.timestamp()
+    tick_spread_ready = bool(execution_spread_context["confirmed"]
+        and buying_persistent(alert.get("trade_flow_context"), current, context_now.timestamp(), min_close_gain_pct=0.0)
+        and _volume_metrics(c5)[0] >= 1.5 and _volume_metrics(c15)[0] >= 1.0)
+    execution_spread_ok = spread <= config.max_spread_pct or tick_spread_ready
     book_persistent = sum(x >= config.min_orderbook_ratio for x in ratios) >= max(
         1, len(ratios) // 2 + 1
     )
@@ -1378,7 +1467,7 @@ def evaluate_candidate(
         and current >= max(breakout, float(double_bb_five["retest_level"]))
         and completed_close >= float(double_bb_five["retest_level"])
         and current <= float(wb_retest_volume["close"]) * 1.005
-        and book_persistent and spread <= config.max_spread_pct
+        and book_persistent and execution_spread_ok
         and not btc_crash and btc_change > config.max_btc_decline_pct)
     # A clean, completed volume breakout is an alternative to a first retest,
     # not evidence that a retest happened. Keep every ordinary quality, score,
@@ -1392,7 +1481,7 @@ def evaluate_candidate(
         and momentum_15m is not None and momentum_15m > 0
         and current >= max(breakout, float(rsi_context["level"]))
         and current <= float(rsi_context["close"]) * 1.005
-        and book_persistent and spread <= config.max_spread_pct
+        and book_persistent and execution_spread_ok
         and not btc_crash and btc_change > config.max_btc_decline_pct
     )
     flow_context = alert.get("trade_flow_context") or {}
@@ -1738,10 +1827,12 @@ def evaluate_candidate(
         rejected.append(
             f"단기 과열·호가 약세 동시 발생(RSI {rsi1:.1f}, {book_ratio:.2f}배)"
         )
-    spread_softened = bool(
+    tick_spread_exception = bool(tick_spread_ready and
+        (completed_wb_retest_entry or completed_breakout_entry or flow_leader))
+    spread_softened = bool(tick_spread_exception or (
         early_leader_lane
         and config.max_spread_pct < spread <= config.hard_max_spread_pct
-    )
+    ))
     if spread > config.max_spread_pct and not spread_softened:
         rejected.append(f"호가 스프레드 허용치 초과({spread:.2f}%)")
 
@@ -1863,6 +1954,8 @@ def evaluate_candidate(
         "volume_ratio_5m": _volume_metrics(c5)[0],
         "volume_ratio_15m": _volume_metrics(c15)[0],
         "orderbook_ratio": book_ratio, "spread_pct": spread,
+        "tick_spread_exception": tick_spread_exception,
+        "execution_spread_context": execution_spread_context,
         "trade_value_24h_krw": trade_value_24h,
         "btc_crash": btc_crash, "resistance_room_pct": room,
         "rsi_breakout_exception": rsi_breakout_exception,
@@ -2204,7 +2297,7 @@ def evaluate_candidate(
         and higher.get("ready") and higher.get("hourly_established")
         and higher.get("fifteen_intact") and higher["fifteen"]["above_ma20"]
         and wb_confirmed and retest_confirmed and score >= 90
-        and book_persistent and spread <= config.max_spread_pct
+        and book_persistent and execution_spread_ok
         and _volume_metrics(fresh_five)[0] >= 1.5
         and _volume_metrics(fresh_fifteen)[0] >= 1.0
         and recent_minute_candles_contiguous(candles_1m, context_now)
@@ -2227,6 +2320,13 @@ def evaluate_candidate(
             }
     metrics = exit_plan_metrics(entry_reference, stop, target1, target2, exit_plan)
     risk_reward = float(metrics["risk_reward"])
+    execution_cost = {}
+    if tick_spread_exception:
+        execution_cost = execution_cost_metrics(entry_reference, stop, target1, target2,
+            exit_plan, spread, config.tick_spread_cost_buffer_pct)
+        alert["screening_metrics"]["execution_cost"] = execution_cost
+        if execution_cost["net_risk_reward"] < config.tick_spread_min_net_risk_reward:
+            return None, [f"최소 호가 단위 예외의 비용 차감 손익비 부족({execution_cost['net_risk_reward']:.2f} < {config.tick_spread_min_net_risk_reward:.2f})"]
     alert["risk_plan_diagnostics"] = {
         **alert["risk_plan_diagnostics"], "stage": "target_plan",
         "entry_reference_price": entry_reference, "stop_price": stop,
@@ -2412,6 +2512,11 @@ def evaluate_candidate(
         "completed_15m_volume_ratio": round(_volume_metrics(c15)[0], 2),
         "stop_timeframe": "5분 구조" if hourly_trend_core or explosive_core or completed_wb_retest_entry else "초기 신호 구조",
         "price_tick": tick,
+        "tick_spread_exception": tick_spread_exception,
+        "execution_spread_context": execution_spread_context if tick_spread_exception else None,
+        "execution_cost": execution_cost if tick_spread_exception else None,
+        "execution_cost_buffer_pct": config.tick_spread_cost_buffer_pct,
+        "minimum_net_risk_reward": config.tick_spread_min_net_risk_reward,
         "trend_management": (
             "1차 50% 익절·진입가 보호, 2차 잔여 50% 청산·확장선은 별도 관찰"
             if exit_plan else

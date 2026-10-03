@@ -37,6 +37,25 @@ def exit_plan_metrics(
             "first_target_risk_reward": first_rr}
 
 
+def execution_cost_metrics(entry, stop, target_1, target_2, plan, spread_pct, buffer_pct=0.2):
+    """Conservative model: one full spread plus an explicit fee/slippage buffer.
+
+    Costs reduce reward and increase loss; hypothetical fills remain unknown.
+    Partial plans use their existing conservative ceiling, never expansion lines.
+    """
+    if not all(isfinite(x) and x >= 0 for x in (spread_pct, buffer_pct)):
+        raise ValueError("invalid execution cost assumption")
+    gross = exit_plan_metrics(entry, stop, target_1, target_2, plan)
+    cost = entry * (spread_pct + buffer_pct) / 100
+    risk = entry - stop
+    return {
+        "estimated_round_trip_cost_pct": spread_pct + buffer_pct,
+        "net_risk_reward": (float(gross["risk_reward"]) * risk - cost) / (risk + cost),
+        "net_first_target_risk_reward": (target_1 - entry - cost) / (risk + cost),
+        "execution_cost_basis": "full_observed_spread_plus_fee_slippage_buffer",
+    }
+
+
 def modeled_exit_return(
     entry: float, stop: float, target_1: float, target_2: float,
     target_1_reached: bool, exit_price: float,
