@@ -548,6 +548,22 @@ def _volume_metrics(candles: list[dict[str, Any]]) -> tuple[float, float]:
     )
 
 
+def _trade_value_metrics(candles: list[dict[str, Any]]) -> tuple[float, float]:
+    """Compare completed-candle KRW turnover with the preceding 20-bar baseline."""
+    if len(candles) < 21:
+        return 0.0, 0.0
+    values = [
+        float(c.get("candle_acc_trade_price") or c.get("trade_value") or 0.0)
+        for c in candles[:21]
+    ]
+    latest, previous = values[0], values[1]
+    baseline = mean(values[1:21])
+    return (
+        latest / baseline if baseline else 0.0,
+        latest / previous if previous else 0.0,
+    )
+
+
 def _candle_shape(candle: dict[str, Any]) -> tuple[float, float]:
     opening, high, low, close = (
         float(candle["opening_price"]),
@@ -1535,8 +1551,8 @@ def evaluate_candidate(
         and higher.get("hourly_established")
         and higher.get("fifteen_intact")
         and higher["fifteen"]["above_ma20"]
-        and _volume_metrics(fresh_five)[0] >= 1.5
-        and _volume_metrics(fresh_fifteen)[0] >= 1.0
+        and _trade_value_metrics(fresh_five)[0] >= 1.5
+        and _trade_value_metrics(fresh_fifteen)[0] >= 1.0
         and recent_minute_candles_contiguous(candles_1m, context_now)
         and retest_confirmed
         and wb_confirmed
