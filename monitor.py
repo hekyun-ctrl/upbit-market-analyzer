@@ -38,7 +38,7 @@ from upbit_client import UpbitPublicClient
 from trade_flow import TradeFlow, buying_persistent
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "verification-audit-v3.12"
+STRATEGY_VERSION = "verification-audit-v3.13"
 
 
 class _TelegramTokenFilter(logging.Filter):
