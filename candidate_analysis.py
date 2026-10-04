@@ -1567,12 +1567,38 @@ def evaluate_candidate(
         and higher["fifteen"]["above_ma20"]
         and (retest_confirmed or wb_confirmed)
     )
+    # Broaden the fast lane for exceptionally strong preleaders. A rank in the
+    # top 3%, fresh 5m/15m strength and large 10m/30m turnover expansion can
+    # qualify even when the market regime or the ordinary 5m threshold lags.
+    # Hard execution, BTC-crash, structure and stop-risk checks still apply.
+    narrow_market_fast_core = bool(
+        config.fast_leader_enabled
+        and alert.get("fast_leader")
+        and alert.get("signal") == "leader_volume_acceleration"
+        and relative_ready and relative_eligible
+        and relative_percentile <= 3.0
+        and early_trend
+        and momentum_5m >= 1.0
+        and momentum_15m is not None and momentum_15m > 0
+        and preleader_ratio_10m >= 5.0
+        and preleader_ratio_30m >= 3.0
+        and float(alert.get("market_breadth_5m_pct") or 0.0) >= 20.0
+        and _volume_metrics(fresh_five)[0] >= 1.5
+        and _volume_metrics(fresh_fifteen)[0] >= 1.0
+        and current >= breakout * 0.998
+        and current >= float(five["ma20"])
+        and extension <= config.fast_leader_max_extension_pct
+        and hard_book_persistent
+        and spread <= config.hard_max_spread_pct
+        and not wb_fake_breakout
+        and not btc_crash
+        and btc_change > config.max_btc_decline_pct
+    )
     fast_leader_core = bool(
         config.fast_leader_enabled
         and alert.get("fast_leader")
         and alert.get("signal") == "leader_volume_acceleration"
-        and relative_ready
-        and relative_eligible
+        and relative_ready and relative_eligible
         and relative_percentile <= config.fast_leader_max_percentile
         and early_trend
         and momentum_5m >= config.relative_strength_min_5m_pct
@@ -1581,7 +1607,7 @@ def evaluate_candidate(
         and preleader_ratio_30m >= config.fast_leader_min_value_ratio_30m
         and _volume_metrics(fresh_five)[0] >= 1.5
         and _volume_metrics(fresh_fifteen)[0] >= 1.0
-    )
+    ) or narrow_market_fast_core
     persistent_leader_core = bool(
         alert.get("signal") == "persistent_leader_acceleration"
         and alert.get("persistent_leader")
@@ -1886,7 +1912,7 @@ def evaluate_candidate(
         )
     allowed_day_change = (
         config.persistent_leader_max_day_change_pct
-        if persistent_leader_core
+        if persistent_leader_core or narrow_market_fast_core
         else config.max_day_change_pct
     )
     day_overheated = day_change > allowed_day_change
@@ -2005,17 +2031,20 @@ def evaluate_candidate(
     )
     risk_off_fresh_leader_exception = bool(
         not is_reentry_path
-        and relative_ready
-        and relative_eligible
-        and relative_percentile
-        <= config.risk_off_fresh_leader_max_percentile
-        and momentum_5m >= config.risk_off_fresh_leader_min_5m_pct
-        and momentum_15m is not None
-        and momentum_15m > 0
-        and early_trend
-        and (early_leader_core or persistent_leader_core)
-        and volume_ratio >= config.min_completed_volume_ratio
-        and volume_previous >= config.min_volume_vs_previous
+        and (
+            narrow_market_fast_core
+            or (
+                relative_ready
+                and relative_eligible
+                and relative_percentile <= config.risk_off_fresh_leader_max_percentile
+                and momentum_5m >= config.risk_off_fresh_leader_min_5m_pct
+                and momentum_15m is not None and momentum_15m > 0
+                and early_trend
+                and (early_leader_core or persistent_leader_core)
+                and volume_ratio >= config.min_completed_volume_ratio
+                and volume_previous >= config.min_volume_vs_previous
+            )
+        )
     )
     # A top leader with fresh, completed structural evidence can rotate in a
     # moderately weak market even after rolling 5m momentum cools below 1.5%.
@@ -2242,7 +2271,7 @@ def evaluate_candidate(
         min(float(c["low_price"]) for c in c1[:6]), breakout, float(one["ma20"])
     )
     atr_risk = max(_atr(c1) * 1.2, _atr(c5) * 0.35)
-    if hourly_trend_core or explosive_core or completed_wb_retest_entry:
+    if hourly_trend_core or explosive_core or completed_wb_retest_entry or narrow_market_fast_core:
         # Plan a 5m initial invalidation before entry, never widen it later.
         support = min(min(float(c["low_price"]) for c in c5[:3]), breakout)
         if explosive_core or flow_leader or completed_wb_retest_entry:
@@ -2261,7 +2290,7 @@ def evaluate_candidate(
         "max_stop_loss_pct": config.max_stop_loss_pct,
     }
     if (
-        (hourly_trend_core or explosive_core or completed_wb_retest_entry)
+        (hourly_trend_core or explosive_core or completed_wb_retest_entry or narrow_market_fast_core)
         and (1 - stop_raw / entry_reference) * 100 > config.max_stop_loss_pct
     ):
         return None, ["5분 구조 손절폭이 허용 손실폭 초과"]
@@ -2278,7 +2307,7 @@ def evaluate_candidate(
         rounded_stop_loss_pct=(1 - stop / entry_reference) * 100,
     )
     if (
-        (hourly_trend_core or explosive_core or completed_wb_retest_entry)
+        (hourly_trend_core or explosive_core or completed_wb_retest_entry or narrow_market_fast_core)
         and (1 - stop / entry_reference) * 100 > config.max_stop_loss_pct + 1e-9
     ):
         return None, ["호가 단위 반영 후 5분 구조 손절폭 초과"]
@@ -2591,10 +2620,11 @@ def evaluate_candidate(
         return None, ["부분 청산 1차 목표 손익비 부족(1.00 미만)"]
     if flow_leader and float(metrics["first_target_risk_reward"]) < 2.0:
         return None, ["체결 지속형 1차 목표 손익비 부족(2.00 미만)"]
-    if risk_reward < config.min_risk_reward:
+    required_risk_reward = 1.4 if narrow_market_fast_core else config.min_risk_reward
+    if risk_reward < required_risk_reward:
         return None, [
             ("부분 청산 계획 손익비 부족" if exit_plan else "실제 1차 목표 기준 손익비 부족")
-            + f"({risk_reward:.2f} < {config.min_risk_reward:.2f})"
+            + f"({risk_reward:.2f} < {required_risk_reward:.2f})"
         ]
     if hourly_trend_extension or relative_trend_extension or strong_extension:
         target3 = _round_tick(
@@ -2741,6 +2771,7 @@ def evaluate_candidate(
         "cleared_resistance_levels": cleared_resistance_levels,
         "volume_timeframe": "5분" if explosive_core or flow_leader or completed_structure_entry else "1분",
         "fast_leader": fast_leader_core and not explosive_core,
+        "narrow_market_fast_leader": narrow_market_fast_core,
         "score": score,
         "condition_score": score,
         "current_price": current,
