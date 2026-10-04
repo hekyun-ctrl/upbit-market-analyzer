@@ -38,7 +38,7 @@ from upbit_client import UpbitPublicClient
 from trade_flow import TradeFlow, buying_persistent
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "verification-audit-v3.11"
+STRATEGY_VERSION = "verification-audit-v3.12"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -233,10 +233,10 @@ class MonitorConfig:
                 5, _env_int("MONITOR_PRELEADER_CHECK_INTERVAL_SECONDS", 15)
             ),
             preleader_min_value_ratio_10m=max(
-                1.2, _env_float("MONITOR_PRELEADER_MIN_VALUE_RATIO_10M", 2.0)
+                1.0, _env_float("MONITOR_PRELEADER_MIN_VALUE_RATIO_10M", 1.5)
             ),
             preleader_min_value_ratio_30m=max(
-                1.1, _env_float("MONITOR_PRELEADER_MIN_VALUE_RATIO_30M", 1.5)
+                1.0, _env_float("MONITOR_PRELEADER_MIN_VALUE_RATIO_30M", 1.2)
             ),
             preleader_min_3m_pct=max(
                 0.1, _env_float("MONITOR_PRELEADER_MIN_3M_PCT", 0.4)
@@ -1168,11 +1168,11 @@ class SignalEngine:
                 strong_volume_impulse = bool(
                     not morning_window
                     and self.config.extended_leader_enabled
-                    and value_1m >= max(100_000_000, self.config.min_trade_value_krw)
-                    and change_3m >= 1.0
-                    and change_5m >= 1.5
-                    and ratio_10m >= max(8.0, self.config.preleader_min_value_ratio_10m)
-                    and ratio_30m >= max(8.0, self.config.preleader_min_value_ratio_30m)
+                    and value_1m >= self.config.min_trade_value_krw
+                    and change_3m >= self.config.preleader_min_3m_pct
+                    and change_5m >= self.config.preleader_min_5m_pct
+                    and ratio_10m >= self.config.preleader_min_value_ratio_10m
+                    and ratio_30m >= self.config.preleader_min_value_ratio_30m
                 )
                 if (
                     (has_morning_impulse or strong_volume_impulse)
@@ -1200,22 +1200,26 @@ class SignalEngine:
                         strong_volume_impulse
                         and relative_strength.get("relative_strength_eligible")
                         and relative_strength.get("early_trend")
-                        and percentile <= 2.0
+                        and percentile <= self.config.relative_strength_top_percent
                         and (relative_strength.get("momentum_15m_pct") or 0) > 0
                     )
-                    if leadership_accelerating and (morning_window or extended_leader):
+                    if leadership_accelerating:
                         self._last_preleader_at[market] = now
                         signals.append(
                             (
                                 "leader_volume_acceleration",
                                 (
-                                    "09시 전후 거래대금 선행 가속"
-                                    if morning_window
-                                    else "장중 선도주 거래대금 급가속"
+                                    (
+                                        "기존 급등 후 재가속 관찰"
+                                        if float(relative_strength.get("momentum_60m_pct") or 0) >= 8.0
+                                        else "09시 전후 거래대금 선행 가속"
+                                        if morning_window
+                                        else "장중 선도주 거래대금 급가속"
+                                    )
                                 ),
                                 {
                                     "internal_only": True,
-                                    "notify_early_watch": morning_window or extended_leader,
+                                    "notify_early_watch": True,
                                     "discovery_window": "morning" if morning_window else "intraday",
                                     "breakout_level": max(bucket.high_price for bucket in previous),
                                     "confirmation_started_at_utc": confirmation_started_at(
@@ -1228,6 +1232,11 @@ class SignalEngine:
                                     "momentum_3m_pct": round(change_3m, 2),
                                     "preleader_volume_ratio_10m": round(ratio_10m, 2),
                                     "preleader_volume_ratio_30m": round(ratio_30m, 2),
+                                    "momentum_phase": (
+                                        "late_reacceleration"
+                                        if float(relative_strength.get("momentum_60m_pct") or 0) >= 8.0
+                                        else "fresh_or_building"
+                                    ),
                                     "preleader_rank_improvement_pct": round(
                                         rank_improvement, 2
                                     ),
