@@ -111,7 +111,7 @@ def test_new_route_preserves_five_minute_structure_without_claiming_retest_or_bu
     assert not monitor.AlertDispatcher().candidate_delivery_reasons(c)
     text = monitor._candidate_text(c)
     assert '완료 5분 구조 돌파형' in text
-    assert '연속 63봉' in text and '매수 체결 우위와 구분' in text
+    assert '연속 63봉' in text and '실제 매수 체결 우위 미확인' in text
     assert '실제 체결:' not in text and '첫 눌림·돌파선 재지지 확인' not in text
 
 

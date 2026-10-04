@@ -27,6 +27,8 @@ from candidate_analysis import (
     _quote_execution_context,
     flow_volume_verified,
     structure_volume_verified,
+    structure_quote_supported,
+    _structure_buy_flow,
     evaluate_candidate,
     validate_candidate_survival,
     validate_btc_survival,
@@ -38,7 +40,7 @@ from upbit_client import UpbitPublicClient
 from trade_flow import TradeFlow, buying_persistent
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "verification-audit-v3.14"
+STRATEGY_VERSION = "verification-audit-v3.15"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -1667,7 +1669,14 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         quote_label = ("공식 최소 1호가 단위·반복 호가·매수 체결 통과" if candidate.get("tick_spread_exception")
                        else "가까운 호가 깊이·실제 매수 체결·전송 직전 호가 확인")
         if candidate.get("completed_structure_entry"):
-            quote_label = "가까운 호가 깊이 3회·전송 직전 호가 확인(매수 체결 우위와 구분)"
+            book = candidate.get("survival_structure_book_context") or {}
+            quote_label = "가까운 호가 깊이 3회·전송 직전 호가 확인"
+            if book.get("coarse_tick"):
+                quote_label += "·공식 1호가 단위 비용 검증"
+            if book.get("flow_supported"):
+                quote_label += "·실제 체결 매수 비중 확인(지속 매수 판정과 구분)"
+            else:
+                quote_label += "(실제 매수 체결 우위 미확인)"
         cost_line = (f"호가 검증: {quote_label}\n"
                      f"추정 왕복 비용: {float(cost.get('estimated_round_trip_cost_pct') or 0):.2f}% "
                      f"(스프레드+수수료·슬리피지 가정) · 비용 차감 계획 손익비 {float(cost.get('net_risk_reward') or 0):.2f}\n")
@@ -2236,10 +2245,11 @@ class AlertDispatcher:
                 and candidate.get("double_bb_confirmed")
                 and book.get("confirmed") and book.get("sample_count", 0) >= 3
                 and 0 <= time.time() - float(book.get("as_of") or 0) <= 10
-                and quote.get("nearby_depth_supported") and ask > 0
-                and float(quote.get("bid_value_krw") or 0) / ask >= .5
+                and structure_quote_supported(quote, cfg, flow_supported=bool(
+                    book.get("flow_supported") and _structure_buy_flow(
+                        candidate.get("survival_structure_trade_flow"),
+                        float(candidate.get("current_price") or 0), time.time())))
                 and 0 <= time.time() - float(quote.get("as_of") or 0) <= 10
-                and float(quote.get("spread_pct", float("inf"))) <= cfg.max_spread_pct
                 and all(candidate.get(k) is not None and float(candidate[k]) > limit for k, limit in (
                     ("survival_btc_5m_pct", cfg.btc_crash_5m_pct),
                     ("survival_btc_15m_pct", cfg.btc_crash_15m_pct),
@@ -4132,6 +4142,7 @@ class CandidateAnalyzer:
             btc_candles_15m=snapshot["btc_candles_15m"],
             orderbook_samples=snapshot["orderbooks"],
             as_of=snapshot.get("as_of"),
+            execution_as_of=datetime.now(timezone.utc),
         )
 
     def _relative_survival_rejections(
@@ -4327,6 +4338,7 @@ class CandidateAnalyzer:
                     survival_snapshot["candles_1m"],
                     self.config,
                     as_of=survival_snapshot.get("as_of"),
+                    execution_as_of=datetime.now(timezone.utc),
                     candles_5m=survival_snapshot.get("candles_5m"),
                     candles_15m=survival_snapshot.get("candles_15m"),
                     trade_flow_context=survival_relative.get("trade_flow_context"),

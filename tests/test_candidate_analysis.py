@@ -1086,9 +1086,9 @@ def test_default_candidate_config_is_accuracy_first(monkeypatch):
     assert config.survival_confirm_seconds == 60
     assert config.fast_leader_enabled is True
     assert config.fast_leader_confirm_seconds == 6
-    assert config.fast_leader_max_percentile == 2.0
-    assert config.fast_leader_min_value_ratio_10m == 5.0
-    assert config.fast_leader_min_value_ratio_30m == 5.0
+    assert config.fast_leader_max_percentile == 10.0
+    assert config.fast_leader_min_value_ratio_10m == 1.5
+    assert config.fast_leader_min_value_ratio_30m == 1.2
     assert config.fast_leader_max_extension_pct == 1.5
     assert config.repeat_cooldown_seconds == 14400
     assert config.hard_min_market_breadth_pct == 35.0
@@ -2165,6 +2165,12 @@ def test_fast_leader_can_pass_before_completed_minute_without_chasing(monkeypatc
     five = _candles()
     current = float(one[0]["trade_price"])
     opened = datetime(2026, 9, 16, tzinfo=timezone.utc)
+    fifteen = _candles()
+    for minutes, bars in ((5, five), (15, fifteen)):
+        for i, bar in enumerate(bars):
+            bar["candle_date_time_utc"] = (opened - timedelta(minutes=minutes * i)).isoformat()
+        bars[1]["candle_acc_trade_volume"] = 3000
+        bars[1]["candle_acc_trade_price"] = bars[1]["trade_price"] * 3000
     for index, candle in enumerate(one):
         candle["candle_date_time_utc"] = (opened - timedelta(minutes=index)).isoformat()
     ticker = {
@@ -2205,6 +2211,7 @@ def test_fast_leader_can_pass_before_completed_minute_without_chasing(monkeypatc
         five,
         _config(min_score=80, availability_balance_enabled=False),
         as_of=opened + timedelta(seconds=55),
+        candles_15m=fifteen,
     )
 
     assert rejected == []
@@ -2221,6 +2228,13 @@ def test_fast_leader_can_pass_before_completed_minute_without_chasing(monkeypatc
 def test_fast_leader_rejects_price_beyond_initial_chase_cap():
     one = _candles()
     five = _candles()
+    opened = datetime(2026, 9, 16, tzinfo=timezone.utc)
+    fifteen = _candles()
+    for minutes, bars in ((5, five), (15, fifteen)):
+        for i, bar in enumerate(bars):
+            bar["candle_date_time_utc"] = (opened - timedelta(minutes=minutes * i)).isoformat()
+        bars[1]["candle_acc_trade_volume"] = 3000
+        bars[1]["candle_acc_trade_price"] = bars[1]["trade_price"] * 3000
     signal_price = float(one[0]["trade_price"])
     current = signal_price * 1.02
     ticker = {
@@ -2255,6 +2269,8 @@ def test_fast_leader_rejects_price_beyond_initial_chase_cap():
         one,
         five,
         _config(min_score=80, availability_balance_enabled=False),
+        as_of=opened + timedelta(seconds=55),
+        candles_15m=fifteen,
     )
 
     assert candidate is None
