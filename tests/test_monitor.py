@@ -1877,8 +1877,25 @@ def test_exceptional_narrow_market_leader_can_receive_fast_check_without_watch_n
     assert scheduled[0]["fast_leader"] is True
     assert "KRW-FOLD" not in analyzer._early_watch_tracks
 
-    weaker = dict(alert, market="KRW-SECOND", relative_strength_percentile=1.5)
+    # The previous 1% / 2% momentum cut discarded otherwise strong leaders.
+    # This profile mirrors the observed IOTA setup: top 1.16%, +2.08% 5m,
+    # and sustained turnover expansion across both preleader windows.
+    recovered = dict(
+        alert,
+        market="KRW-IOTA",
+        relative_strength_percentile=1.16,
+        momentum_5m_pct=2.08,
+        preleader_volume_ratio_10m=16.82,
+        preleader_volume_ratio_30m=11.08,
+    )
+    assert analyzer._qualifies_fast_leader(recovered) is True
+
+    weaker = dict(alert, market="KRW-SECOND", relative_strength_percentile=3.1)
     assert analyzer._qualifies_fast_leader(weaker) is False
+    weak_momentum = dict(recovered, market="KRW-WEAK", momentum_5m_pct=0.99)
+    assert analyzer._qualifies_fast_leader(weak_momentum) is False
+    weak_turnover = dict(recovered, market="KRW-LOW-VOLUME", preleader_volume_ratio_30m=2.99)
+    assert analyzer._qualifies_fast_leader(weak_turnover) is False
 
     # A fresh volume acceleration must still get its fast check when this
     # market is already on the 12-hour watchlist from an earlier signal.

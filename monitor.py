@@ -38,7 +38,7 @@ from upbit_client import UpbitPublicClient
 from trade_flow import TradeFlow, buying_persistent
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "verification-audit-v3.13"
+STRATEGY_VERSION = "verification-audit-v3.14"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -2576,10 +2576,10 @@ class CandidateAnalyzer:
             float(momentum_15m_value) if momentum_15m_value is not None else None
         )
         narrow_market_leader = bool(
-            percentile <= 1.0
-            and momentum_5m >= 2.0
-            and ratio_10m >= 8.0
-            and ratio_30m >= 8.0
+            percentile <= 3.0
+            and momentum_5m >= 1.0
+            and ratio_10m >= 5.0
+            and ratio_30m >= 3.0
             and float(alert.get("market_breadth_5m_pct") or 0.0) >= 20.0
         )
         return bool(
@@ -2589,10 +2589,18 @@ class CandidateAnalyzer:
             and alert.get("relative_strength_eligible")
             and percentile <= self.config.fast_leader_max_percentile
             and alert.get("early_trend")
-            and momentum_5m >= self.config.relative_strength_min_5m_pct
+            and (
+                momentum_5m >= self.config.relative_strength_min_5m_pct
+                or narrow_market_leader
+            )
             and (momentum_15m is None or momentum_15m > 0)
-            and ratio_10m >= self.config.fast_leader_min_value_ratio_10m
-            and ratio_30m >= self.config.fast_leader_min_value_ratio_30m
+            and (
+                (
+                    ratio_10m >= self.config.fast_leader_min_value_ratio_10m
+                    and ratio_30m >= self.config.fast_leader_min_value_ratio_30m
+                )
+                or narrow_market_leader
+            )
             and (
                 str(alert.get("market_regime") or "neutral") != "risk_off"
                 or narrow_market_leader
