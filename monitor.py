@@ -377,6 +377,11 @@ class MonitorState:
                 self.audit_error = type(exc).__name__ + ": " + str(exc)
                 LOGGER.error("AUDIT_STORAGE_UNAVAILABLE %s", self.audit_error)
                 self.audit_store = None
+        LOGGER.info("AUDIT_STORAGE_STATUS %s", json.dumps({
+            "strategy_version": STRATEGY_VERSION,
+            "persistent": bool(self.audit_store and not self.audit_error),
+            "collection_started_at_utc": self.collection_started_at,
+            "error": self.audit_error}, ensure_ascii=False))
 
     def _persist_event(self, field, payload):
         if self.audit_store:
@@ -406,6 +411,7 @@ class MonitorState:
             if markets is not None:
                 self.subscribed_markets = set(markets)
                 self.received_markets.clear()
+        LOGGER.info("MONITOR_STARTED markets=%s notification_mode=%s strategy=%s", market_count, notification_mode, STRATEGY_VERSION)
 
     def mark_connected(self) -> None:
         with self._lock:
