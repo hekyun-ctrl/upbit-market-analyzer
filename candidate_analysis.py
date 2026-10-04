@@ -977,45 +977,109 @@ def _completed_leader_context(candles_1m, candles_5m, candles_15m, now):
 
 
 def _completed_structure_context(candles_1m, candles_5m, candles_15m, now, config):
-    """An independent completed WB breakout, not an inferred first pullback.
+    """Completed price structure is independent of moving band clearance.
 
-    Aligned 15m volume may lag a new inflow. Its alternative requires exactly
-    63 consecutive completed 5m bars and 20 non-overlapping baseline blocks.
-    One-minute execution must still hold the level; its candle shape is not
-    substituted for the five-minute structural candle's shape.
+    WB is reported as corroborating evidence, never fabricated. A first
+    pullback needs a historical completed 20-bar breakout, bounded contact
+    episode and contracting but non-vanishing volume. No forming bar is used.
     """
     five = completed_context_candles(candles_5m, 5, now)
     fifteen = completed_context_candles(candles_15m, 15, now)
-    missing = {"confirmed": False, "status": "완료 5분 구조·거래량 미확인"}
-    if len(five) < 21 or len(fifteen) < 21 or not recent_minute_candles_contiguous(candles_1m, now):
-        return missing
+    continuity = recent_minute_candles_contiguous(candles_1m, now)
+    checks = {"history_5m": len(five) >= 21, "history_15m": len(fifteen) >= 21,
+              "minute_continuity": continuity}
+    if not checks["history_5m"] or not checks["history_15m"]:
+        return {"confirmed": False, "status": "완료봉 데이터·시간 연속성 미확인",
+                "as_of": now.timestamp(), "checks": checks,
+                "blockers": [k for k, v in checks.items() if not v]}
+
+    def volume_context(offset=0):
+        selected = five[offset:]
+        v5, previous = _volume_metrics(selected)
+        cutoff = _parse_time(selected[0].get("candle_date_time_utc")) + timedelta(minutes=5)
+        aligned = completed_context_candles(candles_15m, 15, min(now, cutoff)) if offset else fifteen
+        v15 = _volume_metrics(aligned)[0]
+        rolling, continuous = None, False
+        if len(selected) >= 63:
+            dates = [_parse_time(b.get("candle_date_time_utc")) for b in selected[:63]]
+            expected = cutoff - timedelta(minutes=5)
+            continuous = bool(dates[0] == expected and all(a is not None and b is not None
+                and a - b == timedelta(minutes=5) for a, b in zip(dates, dates[1:])))
+            if continuous:
+                volumes = [float(b["candle_acc_trade_volume"]) for b in selected[:63]]
+                baseline = mean(sum(volumes[i:i + 3]) for i in range(3, 63, 3))
+                rolling = sum(volumes[:3]) / baseline if baseline > 0 else 0.0
+        return {"volume_5m": v5, "volume_previous_5m": previous, "volume_15m": v15,
+            "volume_mode": "standard" if v15 >= 1 else "completed_rolling_breakout",
+            "rolling_15m_volume_ratio": rolling, "rolling_history_contiguous": continuous,
+            "rolling_baseline_blocks": 20 if continuous else 0,
+            "volume_15m_confirmed": v15 >= 1 or (continuous and rolling is not None and rolling >= 1)}
+
+    volume = volume_context()
     wb = _double_bollinger_context(five, 0, lookback=1,
         retest_tolerance_pct=config.retest_tolerance_pct,
         reversal_wick_ratio=config.double_bb_reversal_wick_ratio)
-    v5, previous = _volume_metrics(five)
-    v15 = _volume_metrics(fifteen)[0]
-    position, wick = _candle_shape(five[0])
-    rolling, continuous = None, False
-    if len(five) >= 63:
-        dates = [_parse_time(b.get("candle_date_time_utc")) for b in five[:63]]
-        last = now.astimezone(timezone.utc).replace(minute=now.minute // 5 * 5, second=0, microsecond=0) - timedelta(minutes=5)
-        continuous = bool(dates[0] == last and all(a is not None and b is not None
-            and a - b == timedelta(minutes=5) for a, b in zip(dates, dates[1:])))
-        if continuous:
-            volumes = [float(b["candle_acc_trade_volume"]) for b in five[:63]]
-            baseline = mean(sum(volumes[i:i + 3]) for i in range(3, 63, 3))
-            rolling = sum(volumes[:3]) / baseline if baseline > 0 else 0.0
-    mode = "standard" if v15 >= 1 else "completed_rolling_breakout"
-    volume_ok = v15 >= 1 or (continuous and rolling is not None and rolling >= 1)
-    return {"confirmed": bool(wb.get("true_breakout") and not wb.get("fake_breakout")
-            and v5 >= 1.5 and volume_ok and position >= .65 and wick <= .35),
-        "status": "완료 5분 WB 거래량 동반 돌파", "as_of": now.timestamp(),
-        "volume_mode": mode, "volume_5m": v5, "volume_previous_5m": previous,
-        "volume_15m": v15, "rolling_15m_volume_ratio": rolling,
-        "rolling_history_contiguous": continuous, "rolling_baseline_blocks": 20 if continuous else 0,
-        "close_position": position, "upper_wick": wick, "retest": False,
-        "level": float(wb.get("structure_high") or 0),
-        "low": float(five[0]["low_price"]), "close": float(five[0]["trade_price"])}
+    bar = five[0]
+    position, wick = _candle_shape(bar)
+    close = float(bar["trade_price"])
+    prior_high = max(float(b["high_price"]) for b in five[1:21])
+    price_breakout = close > prior_high and close > float(bar["opening_price"])
+    wb_breakout = bool(wb.get("true_breakout") and not wb.get("fake_breakout"))
+    # WB mode retains its real 20-bar anchor. The price mode uses the same
+    # historical prices; a projected Bollinger upper is not a supply order.
+    checks.update(price_structure=bool(price_breakout or wb_breakout),
+                  volume_5m=volume["volume_5m"] >= 1.5,
+                  volume_15m=bool(volume["volume_15m_confirmed"]),
+                  close_quality=position >= .65 and wick <= .35)
+    proof = {**volume, "confirmed": all(checks.values()), "checks": checks,
+        "status": "완료 5분 WB 거래량 동반 돌파" if wb_breakout else "완료 5분 과거 가격대·거래량 돌파",
+        "structure_mode": "wb_breakout" if wb_breakout else "price_breakout",
+        "wb_confirmed": wb_breakout, "as_of": now.timestamp(), "retest": False,
+        "level": prior_high, "low": float(bar["low_price"]), "close": close,
+        "close_position": position, "upper_wick": wick}
+    if not proof["confirmed"] and continuity:
+        for offset in range(1, 4):
+            if len(five) < offset + 21:
+                break
+            impulse = five[offset]
+            anchor = max(float(b["high_price"]) for b in five[offset+1:offset+21])
+            impulse_shape, impulse_wick = _candle_shape(impulse)
+            impulse_volume = volume_context(offset)
+            if not (float(impulse["trade_price"]) > anchor
+                    and impulse_shape >= .65 and impulse_wick <= .35
+                    and impulse_volume["volume_5m"] >= 1.5
+                    and impulse_volume["volume_15m_confirmed"]):
+                continue
+            newer = list(reversed(five[:offset]))
+            floor, ceiling = anchor * .992, anchor * 1.008
+            touches = [i for i, b in enumerate(newer) if float(b["low_price"]) <= ceiling]
+            contact = bool(touches and touches == list(range(touches[0], touches[-1]+1))
+                           and touches[-1]-touches[0] <= 1 and touches[0] == 0
+                           and (touches[-1] == len(newer)-1 or (
+                               touches[-1] == len(newer)-2
+                               and float(newer[-1]["low_price"]) >= float(newer[-2]["low_price"])
+                               and close > float(newer[-2]["trade_price"]))))
+            held = all(float(b["low_price"]) >= floor and float(b["trade_price"]) >= anchor for b in newer)
+            impulse_units = float(impulse["candle_acc_trade_volume"])
+            contraction = all(0 < float(b["candle_acc_trade_volume"]) < impulse_units for b in newer)
+            retest_checks = {**checks, "price_structure": contact and held,
+                "volume_5m": volume["volume_5m"] >= .5,
+                "volume_15m": bool(volume["volume_15m_confirmed"]),
+                "volume_contraction": contraction}
+            if all(retest_checks.values()):
+                impulse_wb = _double_bollinger_context(five[offset:], 0, lookback=1)
+                proof.update(confirmed=True, checks=retest_checks, structure_mode="first_retest",
+                    status="과거 가격대 돌파 후 첫 눌림·거래량 감소·재지지",
+                    retest=True, wb_confirmed=bool(impulse_wb.get("true_breakout")),
+                    level=anchor, breakout_offset=offset,
+                    impulse_volume_5m=impulse_volume["volume_5m"],
+                    impulse_volume_15m_verified=bool(impulse_volume["volume_15m_confirmed"]),
+                    volume_contraction=True, first_contact_confirmed=True)
+                break
+    proof["blockers"] = [k for k, v in proof["checks"].items() if not v]
+    if not proof["confirmed"]:
+        proof["status"] = "완료 5분 구조·거래량 검증 미충족"
+    return proof
 
 
 def _structure_buy_flow(context, current, now):
@@ -1076,13 +1140,23 @@ def _structure_book_context(samples, current, config, now, trade_flow_context=No
 def structure_volume_verified(candidate, now):
     """Fail closed at delivery on stale, missing or changed volume evidence."""
     proof = candidate.get("survival_structure_context") or {}
-    if not (proof.get("confirmed") and 0 <= now - float(proof.get("as_of") or 0) <= 10
-            and float(proof.get("volume_5m") or 0) >= 1.5
+    if not (proof.get("confirmed")
+            and proof.get("structure_mode") in {"wb_breakout", "price_breakout", "first_retest"}
+            and (proof.get("structure_mode") == "first_retest") == bool(proof.get("retest"))
+            and 0 <= now - float(proof.get("as_of") or 0) <= 10
+            and float(proof.get("volume_5m") or 0) >= (.5 if proof.get("structure_mode") == "first_retest" else 1.5)
             and float(proof.get("close_position") or 0) >= .65
             and float(proof.get("upper_wick", 1)) <= .35
-            and not proof.get("retest")
             and 0 < float(proof.get("level") or 0) <= float(candidate.get("current_price") or 0)
             <= float(proof.get("close") or 0) * 1.005):
+        return False
+    if proof.get("retest"):
+        if not (proof.get("structure_mode") == "first_retest"
+                and proof.get("first_contact_confirmed") and proof.get("volume_contraction")
+                and float(proof.get("impulse_volume_5m") or 0) >= 1.5
+                and proof.get("impulse_volume_15m_verified")):
+            return False
+    elif not float(proof.get("close") or 0) > float(proof.get("level") or 0):
         return False
     if proof.get("volume_mode") == "standard":
         return float(proof.get("volume_15m") or 0) >= 1
@@ -1845,7 +1919,8 @@ def evaluate_candidate(
         "breadth": float(alert.get("market_breadth_5m_pct") or 0) >= 20,
         "level_hold": bool(current >= max(breakout, float(structure_context.get("level") or 0))
             and completed_close >= max(breakout, float(structure_context.get("level") or 0))),
-        "chase": current <= float(structure_context.get("close") or 0) * 1.005,
+        "chase": (current <= float(structure_context["close"]) * 1.005
+                  if structure_context.get("close") else None),
         "btc": bool(not btc_crash and btc_change > config.max_btc_decline_pct),
         "selling_and_heat": bool(not known_selling and rsi1 < 95 and rsi5 < 95),
     }
@@ -1860,13 +1935,13 @@ def evaluate_candidate(
         extension = (current / signal_price - 1) * 100
         rsi_context = structure_context
         hourly_trend_core = True
-        retest_confirmed = False
+        retest_confirmed = bool(structure_context.get("retest"))
     if completed_wb_retest_entry:
         # Keep 1m execution quality, but use a 5m structural initial stop.
         fast_leader_core = False
         rsi_context = wb_retest_volume
     wb_confirmation_timeframe = "1분"
-    if completed_structure_entry or completed_wb_retest_entry or ((completed_breakout_entry or flow_leader)
+    if (completed_structure_entry and structure_context.get("wb_confirmed")) or completed_wb_retest_entry or ((completed_breakout_entry or flow_leader)
             and not wb_confirmed and (wb_five_breakout or wb_five_retest)):
         # A completed 5m WB breakout can confirm the structural route even
         # when the short 1m bands no longer signal. Keep 1m hold/quality gates.
@@ -1984,6 +2059,7 @@ def evaluate_candidate(
         and not fast_leader_core
         and not elite_leader_retest
         and not explosive_core
+        and not completed_structure_entry
     ):
         wb_rejection_label = ("완료 5분 WB 구조 확인·진입 실행조건 미충족"
                               if wb_five_breakout or wb_five_retest or continuation_context.get("confirmed")
@@ -2058,9 +2134,14 @@ def evaluate_candidate(
         (rejected if strict_quality else soft_warnings).append(message)
 
     contracting_flow_retest = bool(flow_leader and rsi_context.get("volume_mode") == "contracting_first_retest")
-    if not fast_leader_core and not contracting_flow_retest and volume_ratio < config.availability_min_volume_ratio:
+    contracting_structure_retest = bool(completed_structure_entry
+        and structure_context.get("structure_mode") == "first_retest")
+    # This lane already verifies >=0.5x current activity, contraction from a
+    # >=1.5x completed impulse, 15m activity and ten uninterrupted minutes.
+    # Requiring another impulse here contradicts a qualified first pullback.
+    if not fast_leader_core and not contracting_flow_retest and not contracting_structure_retest and volume_ratio < config.availability_min_volume_ratio:
         rejected.append(f"완료 1분봉 거래량 절대 부족({volume_ratio:.2f}배)")
-    elif not fast_leader_core and not contracting_flow_retest and volume_ratio < config.min_completed_volume_ratio:
+    elif not fast_leader_core and not contracting_flow_retest and not contracting_structure_retest and volume_ratio < config.min_completed_volume_ratio:
         message = f"완료 1분봉 거래량 다소 부족({volume_ratio:.2f}배)"
         (rejected if strict_quality else soft_warnings).append(message)
 
@@ -2309,7 +2390,10 @@ def evaluate_candidate(
         "completed_structure_entry": completed_structure_entry,
         "completed_structure_context": structure_context,
         "completed_structure_checks": structure_checks,
-        "completed_structure_blockers": [k for k, v in structure_checks.items() if not v],
+        "completed_structure_blockers": [k for k, v in structure_checks.items() if v is False],
+        "completed_structure_unverified": [k for k, v in structure_checks.items() if v is None],
+        "completed_structure_proof_blockers": structure_context.get("blockers", []),
+        "recent_completed_minute_starts": [c.get("candle_date_time_utc") for c in c1[:12]],
         "structure_book_context": structure_book,
         "ordinary_breakout_context": rsi_context,
         "wb_confirmation_timeframe": wb_confirmation_timeframe,
@@ -2523,7 +2607,13 @@ def evaluate_candidate(
             f"RSI 주의 -{config.rsi_score_penalty}점(1분 {rsi1:.1f}/5분 {rsi5:.1f})"
         )
     wb_bonus = config.double_bb_score_bonus if wb_confirmed else 0
-    if config.double_bb_enabled and wb_ready and not wb_confirmed:
+    # Award the independently completed price proof in place of (never in
+    # addition to) WB evidence. Do not penalize the very WB absence that this
+    # separately verified lane is designed to handle.
+    price_structure_bonus = config.double_bb_score_bonus if completed_structure_entry and not wb_confirmed else 0
+    if price_structure_bonus:
+        risk_notes.append("WB 보조 미확인·완료 가격 구조를 별도 검증(필수 실행·위험 조건 유지)")
+    if config.double_bb_enabled and wb_ready and not wb_confirmed and not completed_structure_entry:
         score_penalty += config.double_bb_unconfirmed_penalty
         risk_notes.append(
             "WB 동시 돌파 미확정 "
@@ -2558,6 +2648,7 @@ def evaluate_candidate(
         + relative_strength_bonus
         + early_leader_bonus
         + wb_bonus
+        + price_structure_bonus
         + regime_bonus,
     )
     score = max(0, score_before_penalties - score_penalty)
@@ -2793,7 +2884,7 @@ def evaluate_candidate(
         reasons.insert(0, "완료 5분봉 거래량 동반 돌파 확인(첫 눌림 대안)")
     if completed_structure_entry:
         reasons = [r for r in reasons if r != "완료 1분봉 돌파 확정"]
-        reasons.insert(0, "완료 5분봉 WB 돌파·거래량·가까운 반복 호가 확인")
+        reasons.insert(0, str(structure_context["status"]) + "·가까운 반복 호가 확인")
         reasons.insert(0, "새 돌파 구조에서 진입·손절 계획 재계산(첫 눌림과 구분)")
     if wb_confirmed:
         reasons.insert(0, str(double_bb["status"]))
@@ -2901,6 +2992,7 @@ def evaluate_candidate(
         "sustained_retest": sustained_retest,
         "score_before_penalties": score_before_penalties,
         "score_penalty": score_penalty,
+        "price_structure_score_bonus": price_structure_bonus,
         "completed_5m_volume_ratio": round(_volume_metrics(c5)[0], 2),
         "completed_15m_volume_ratio": round(_volume_metrics(c15)[0], 2),
         "stop_timeframe": "5분 구조" if hourly_trend_core or explosive_core or completed_wb_retest_entry else "초기 신호 구조",

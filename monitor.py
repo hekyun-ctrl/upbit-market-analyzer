@@ -38,9 +38,10 @@ from filter_audit import filter_audit, REJECTIONS
 from exit_plan import exit_plan_metrics, execution_cost_metrics, modeled_exit_return, partial_plan_summary
 from upbit_client import UpbitPublicClient
 from trade_flow import TradeFlow, buying_persistent
+from audit_store import AuditStore, configured_audit_path
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "verification-audit-v3.15"
+STRATEGY_VERSION = "structure-and-audit-v3.16"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -348,6 +349,50 @@ class MonitorState:
         self.candidate_delivery_min_daily = 0
         self.candidate_delivery_max_daily = 0
         self.last_candidate_delivery_at: str | None = None
+        self.audit_store = None
+        self.audit_error = None
+        self.collection_started_at = None
+        path = configured_audit_path()
+        if path:
+            try:
+                self.audit_store = AuditStore(path)
+                self.collection_started_at = self.audit_store.started_at
+                for field in ("candidate_outcomes", "signal_outcomes", "early_watch_events", "trend_outcomes", "screening_records"):
+                    target = getattr(self, field)
+                    target.extend(self.audit_store.read(field, target.maxlen))
+                # A restart cannot prove which threshold was reached first
+                # during the disconnected interval. Preserve the cohort and
+                # explicitly mark unfinished observations as ungradable.
+                events = list(self.early_watch_events)
+                terminal = {r.get("lifecycle_id") for r in events if r.get("event") in {"outcome", "interrupted"}}
+                for row in events:
+                    if row.get("event") == "started" and row.get("lifecycle_id") not in terminal:
+                        event = {**row, "time_utc": self._now(), "event": "interrupted",
+                                 "reason": "서비스 재시작으로 관찰 공백·선도달 순서 확인 불가"}
+                        self.early_watch_events.appendleft(event)
+                        self.audit_store.append("early_watch_events", event)
+                        terminal.add(row.get("lifecycle_id"))
+                self.audit_store.prune()
+            except Exception as exc:
+                self.audit_error = type(exc).__name__ + ": " + str(exc)
+                LOGGER.error("AUDIT_STORAGE_UNAVAILABLE %s", self.audit_error)
+                self.audit_store = None
+
+    def _persist_event(self, field, payload):
+        if self.audit_store:
+            try:
+                self.audit_store.append(field, payload)
+            except Exception as exc:
+                self.audit_error = type(exc).__name__ + ": " + str(exc)
+                LOGGER.error("AUDIT_STORAGE_WRITE_FAILED %s", self.audit_error)
+
+    def _audit_rows(self, field):
+        if self.audit_store:
+            try:
+                return self.audit_store.read(field)
+            except Exception as exc:
+                self.audit_error = type(exc).__name__ + ": " + str(exc)
+        return list(getattr(self, field))
 
     @staticmethod
     def _now() -> str:
@@ -399,28 +444,33 @@ class MonitorState:
     def add_candidate_outcome(self, outcome: dict[str, Any]) -> None:
         with self._lock:
             self.candidate_outcomes.appendleft(dict(outcome))
+            self._persist_event("candidate_outcomes", outcome)
         LOGGER.warning("CANDIDATE_OUTCOME %s", json.dumps(outcome, ensure_ascii=False))
 
     def add_signal_outcome(self, outcome: dict[str, Any]) -> None:
         """Record every screened raw signal, including candidates not sent."""
         with self._lock:
             self.signal_outcomes.appendleft(dict(outcome))
+            self._persist_event("signal_outcomes", outcome)
         LOGGER.warning("RAW_SIGNAL_OUTCOME %s", json.dumps(outcome, ensure_ascii=False))
 
     def add_early_watch_event(self, event: dict[str, Any]) -> None:
         """Audit an early leader from detection through two-hour follow-through."""
         with self._lock:
             self.early_watch_events.appendleft(dict(event))
+            self._persist_event("early_watch_events", event)
         LOGGER.info("EARLY_WATCH_AUDIT %s", json.dumps(event, ensure_ascii=False))
 
     def add_trend_outcome(self, outcome: dict[str, Any]) -> None:
         with self._lock:
             self.trend_outcomes.appendleft(dict(outcome))
+            self._persist_event("trend_outcomes", outcome)
         LOGGER.warning("TREND_OUTCOME %s", json.dumps(outcome, ensure_ascii=False))
 
     def add_screening_record(self, record: dict[str, Any]) -> None:
         with self._lock:
             self.screening_records.appendleft(dict(record))
+            self._persist_event("screening_records", record)
         LOGGER.info("CANDIDATE_SCREENING %s", json.dumps(record, ensure_ascii=False))
 
     def update_candidate_delivery(
@@ -460,6 +510,9 @@ class MonitorState:
     @staticmethod
     def _early_watch_summary(events: list[dict[str, Any]]) -> dict[str, Any]:
         starts = [item for item in events if item.get("event") == "started"]
+        start_ids = {item.get("lifecycle_id") for item in starts}
+        interrupted_ids = {item.get("lifecycle_id") for item in events if item.get("event") == "interrupted"}
+        completed_ids = {item.get("lifecycle_id") for item in events if item.get("event") == "outcome"}
         outcomes = [item for item in events if item.get("event") == "outcome"]
         approved_ids = {
             item.get("lifecycle_id")
@@ -513,6 +566,8 @@ class MonitorState:
             }
         return {
             "started_count": len(starts),
+            "pending_count": len(start_ids - completed_ids - interrupted_ids),
+            "interrupted_count": len(start_ids & interrupted_ids),
             "completed_count": len(outcomes),
             "candidate_approved_count": len(approved_ids),
             "candidate_conversion_rate_pct": (
@@ -547,13 +602,13 @@ class MonitorState:
         return observed.astimezone(_KST).date().isoformat() == day_kst
 
     def daily_performance(self, day_kst: str, cost_pct: float = 0.2) -> dict[str, Any]:
-        """Return a restart-scoped daily audit without assuming real fills."""
+        """Read retained audit events without assuming actual account fills."""
         with self._lock:
-            candidate_outcomes = list(self.candidate_outcomes)
-            trend_outcomes = list(self.trend_outcomes)
-            signal_outcomes = list(self.signal_outcomes)
-            early_watch_events = list(self.early_watch_events)
-            screening_records = list(self.screening_records)
+            candidate_outcomes = self._audit_rows("candidate_outcomes")
+            trend_outcomes = self._audit_rows("trend_outcomes")
+            signal_outcomes = self._audit_rows("signal_outcomes")
+            early_watch_events = self._audit_rows("early_watch_events")
+            screening_records = self._audit_rows("screening_records")
         outcomes = [
             item
             for item in candidate_outcomes
@@ -574,7 +629,7 @@ class MonitorState:
             [
                 item
                 for item in early_watch_events
-                if self._on_kst_day(item.get("time_utc"), day_kst)
+                if self._on_kst_day(item.get("signal_time_utc") or item.get("time_utc"), day_kst)
             ]
         )
         target_count = sum(item.get("result") == "target_1_first" for item in outcomes)
@@ -639,16 +694,20 @@ class MonitorState:
                 "missed_target_first"
             ],
             "early_watch_horizons": early_watch["horizons"],
-            "restart_scoped": True,
+            "early_watch_pending": early_watch["pending_count"],
+            "early_watch_interrupted": early_watch["interrupted_count"],
+            "restart_scoped": not bool(self.audit_store and not self.audit_error),
+            "collection_started_at_utc": self.collection_started_at or self.started_at,
+            "audit_storage_error": self.audit_error,
         }
 
     def candidate_performance(self) -> dict[str, Any]:
         with self._lock:
-            outcomes = list(self.candidate_outcomes)
-            signal_outcomes = list(self.signal_outcomes)
-            early_watch_events = list(self.early_watch_events)
-            trend_outcomes = list(self.trend_outcomes)
-            screening_records = list(self.screening_records)
+            outcomes = self._audit_rows("candidate_outcomes")
+            signal_outcomes = self._audit_rows("signal_outcomes")
+            early_watch_events = self._audit_rows("early_watch_events")
+            trend_outcomes = self._audit_rows("trend_outcomes")
+            screening_records = self._audit_rows("screening_records")
         targets = sum(item.get("result") == "target_1_first" for item in outcomes)
         stops = sum(item.get("result") == "stop_first" for item in outcomes)
         decided = targets + stops
@@ -728,13 +787,17 @@ class MonitorState:
             "recent": partial[:100],
         }
         report["strategy_version"] = STRATEGY_VERSION
-        report["restart_scoped"] = True
-        report["collection_started_at_utc"] = self.started_at
+        report["restart_scoped"] = not bool(self.audit_store and not self.audit_error)
+        report["collection_started_at_utc"] = self.collection_started_at or self.started_at
+        report["audit_storage_error"] = self.audit_error
         return report
 
     def snapshot(self) -> dict[str, Any]:
         with self._lock:
             return {
+                "audit_storage_enabled": bool(self.audit_store),
+                "audit_storage_error": self.audit_error,
+                "audit_collection_started_at_utc": self.collection_started_at,
                 "enabled": _enabled("ENABLE_MARKET_MONITOR"),
                 "started_at_utc": self.started_at,
                 "connected": self.connected,
@@ -1554,7 +1617,7 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     risk_line = f"위험 감점: {risk_notes}\n" if risk_notes else ""
     labels = []
     if candidate.get("completed_structure_entry"):
-        labels.append("완료 5분 구조 돌파형")
+        labels.append("완료 5분 첫 재지지형" if candidate.get("first_retest_confirmed") else "완료 5분 구조 돌파형")
     elif candidate.get("trade_flow_leader"):
         labels.append("완료봉 상승 지속형" if candidate.get("flow_continuation_entry") else "체결 매수 지속형")
     elif candidate.get("selection_lane") == "explosive_leader":
@@ -1659,7 +1722,8 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
                         "(직전 20개 완료 구간 대비·진행봉 제외)\n")
     if candidate.get("completed_structure_entry"):
         proof = candidate.get("survival_structure_context") or candidate.get("completed_structure_context") or {}
-        wb_line = f"진입형: 눌림 없는 완료 5분 WB 돌파\n5분 WB 판정: {candidate.get('double_bb_status')}\n"
+        wb_line = (f"진입형: {proof.get('status', '완료 5분 구조 검증')}\n"
+                   f"WB 보조 확인: {'확인' if proof.get('wb_confirmed') else '미확인(가격 구조로 별도 검증)'}\n")
         if proof.get("volume_mode") == "completed_rolling_breakout":
             volume_line += (f"15분 대안: 완료 5분봉 3개 합산 {float(proof.get('rolling_15m_volume_ratio') or 0):.2f}배"
                             "(연속 63봉·이전 20개 비중복 구간 대비)\n")
@@ -1753,6 +1817,21 @@ def _daily_performance_text(report: dict[str, Any]) -> str:
         f"비용 차감 모의 평균 {partial_average_text}\n"
         "1차 도달률은 전체 청산 수익률이 아닙니다.\n"
     ) if report.get("partial_exit_plan_performance") is not None else ""
+    pending = int(report.get("early_watch_pending", 0))
+    interrupted = int(report.get("early_watch_interrupted", 0))
+    completed = int(report.get("early_watch_completed", 0))
+    missed = int(report.get("early_watch_missed_target_first", 0))
+    missed_text = (f"확인 {missed}건·미완료 {pending}건은 아직 판정하지 않음"
+                   if pending else f"확인 {missed}건") if completed else "판정 가능한 완료 표본 없음"
+    coverage = ("영속 저장 표본 기준" if not report.get("restart_scoped", True)
+                else "재시작 이후 표본 기준(하루 전체가 아닐 수 있음)")
+    started = report.get("collection_started_at_utc")
+    coverage_line = f"수집 범위: {coverage}"
+    if started:
+        coverage_line += " · 기록 시작 " + datetime.fromisoformat(started).astimezone(_KST).strftime("%m/%d %H:%M")
+    coverage_line += "\n"
+    if report.get("audit_storage_error"):
+        coverage_line += "기록 저장 오류: 수집 범위가 불완전할 수 있음\n"
     return (
         f"[일일 후보 성과 | {report['day_kst']}]\n"
         f"확인된 후보: {int(report['accepted_count'])}건 · "
@@ -1767,15 +1846,15 @@ def _daily_performance_text(report: dict[str, Any]) -> str:
         f"+5% 선도달 {int(report['raw_target_first'])}건\n"
         f"최종 후보에서 놓친 원시 +5% 신호: {int(report['missed_raw_winners'])}건\n"
         f"초기 포착: {int(report.get('early_watch_started', 0))}건 · "
-        f"2시간 관찰 완료 {int(report.get('early_watch_completed', 0))}건 · "
+        f"2시간 관찰 완료 {completed}건 · 관찰 중 {pending}건 · 중단 {interrupted}건\n"
         f"+5% 선도달 {int(report.get('early_watch_target_first', 0))}건 · "
         f"손절 선도달 {int(report.get('early_watch_stop_first', 0))}건\n"
         f"초기 포착→조건부 후보 전환: "
         f"{int(report.get('early_watch_candidate_approved', 0))}건 · "
-        f"놓친 +5% 초기 포착 "
-        f"{int(report.get('early_watch_missed_target_first', 0))}건\n"
+        f"놓친 +5% 초기 포착: {missed_text}\n"
+        f"{coverage_line}"
         "이 성과표는 실제 계좌 수익이 아닌 공개 시세 모의 추적이며, "
-        "서비스 재시작 이후 수집된 표본 기준입니다."
+        "관찰 중단 구간은 선도달 판정과 적중률 계산에서 제외합니다."
     )
 
 
@@ -1978,9 +2057,13 @@ class AlertDispatcher:
         self._last_candidate_delivery_at = now
         self._last_inactivity_status_at = now
         self._candidate_delivery_day = self._today_kst()
-        self._candidate_delivery_count = 0
+        self._candidate_delivery_count = sum(r.get("decision") == "accepted"
+            and MONITOR_STATE._on_kst_day(r.get("time_utc"), self._candidate_delivery_day)
+            for r in MONITOR_STATE._audit_rows("screening_records"))
         self._early_watch_delivery_count = 0
-        self._last_daily_performance_day: str | None = None
+        self._last_daily_performance_day: str | None = (
+            MONITOR_STATE.audit_store.get("last_daily_performance_day")
+            if MONITOR_STATE.audit_store and not MONITOR_STATE.audit_error else None)
         self._last_availability_delivery_at = 0.0
         self._raw_signal_times: deque[float] = deque(maxlen=5000)
         self._candidate_rejections: deque[tuple[float, tuple[str, ...]]] = deque(
@@ -2149,6 +2232,13 @@ class AlertDispatcher:
         except Exception:
             self._last_daily_performance_day = None
             raise
+        if MONITOR_STATE.audit_store:
+            try:
+                MONITOR_STATE.audit_store.set("last_daily_performance_day", day)
+                MONITOR_STATE.audit_store.prune()
+            except Exception as exc:
+                MONITOR_STATE.audit_error = type(exc).__name__ + ": " + str(exc)
+                LOGGER.error("AUDIT_STORAGE_WRITE_FAILED %s", MONITOR_STATE.audit_error)
         LOGGER.warning("DAILY_CANDIDATE_PERFORMANCE %s", json.dumps(report, ensure_ascii=False))
         return True
 
@@ -2242,7 +2332,6 @@ class AlertDispatcher:
                 and float(candidate.get("survival_seconds") or 0) >= max(60, cfg.survival_confirm_seconds)
                 and 0 < float(candidate.get("relative_strength_percentile") or 100) <= 2
                 and structure_volume_verified(candidate, time.time())
-                and candidate.get("double_bb_confirmed")
                 and book.get("confirmed") and book.get("sample_count", 0) >= 3
                 and 0 <= time.time() - float(book.get("as_of") or 0) <= 10
                 and structure_quote_supported(quote, cfg, flow_supported=bool(
@@ -2536,6 +2625,13 @@ class CandidateAnalyzer:
         self._dispatch_locks: dict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
         self._tasks: set[asyncio.Task[None]] = set()
         self._semaphore = asyncio.Semaphore(2)
+        for row in MONITOR_STATE._audit_rows("screening_records"):
+            if row.get("decision") == "accepted":
+                try:
+                    stamp = datetime.fromisoformat(row["time_utc"]).timestamp()
+                    self._last_delivered_at[row["market"]] = max(stamp, self._last_delivered_at.get(row["market"], 0))
+                except (KeyError, TypeError, ValueError):
+                    pass
 
     @staticmethod
     def _signal_priority(alert: dict[str, Any]) -> int:
