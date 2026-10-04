@@ -1,6 +1,6 @@
 import pytest
 
-from candidate_analysis import CandidateConfig
+from candidate_analysis import CandidateConfig, _trade_value_metrics
 from monitor import MonitorConfig
 
 
@@ -36,3 +36,14 @@ def test_fast_candidate_uses_broader_rank_and_multi_window_volume_defaults(monke
     assert config.fast_leader_max_percentile == 10.0
     assert config.fast_leader_min_value_ratio_10m == 1.5
     assert config.fast_leader_min_value_ratio_30m == 1.2
+
+
+def test_completed_turnover_ratios_use_krw_trade_value():
+    candles = [
+        {"candle_acc_trade_price": 150.0 - index} for index in range(21)
+    ]
+
+    latest_vs_baseline, latest_vs_previous = _trade_value_metrics(candles)
+
+    assert latest_vs_baseline == 150.0 / 139.5
+    assert latest_vs_previous == 150.0 / 149.0
