@@ -26,6 +26,7 @@ from candidate_analysis import (
     _completed,
     _quote_execution_context,
     flow_volume_verified,
+    structure_volume_verified,
     evaluate_candidate,
     validate_candidate_survival,
     validate_btc_survival,
@@ -37,7 +38,7 @@ from upbit_client import UpbitPublicClient
 from trade_flow import TradeFlow, buying_persistent
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "verification-audit-v3.10"
+STRATEGY_VERSION = "verification-audit-v3.11"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -1541,7 +1542,9 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     risk_notes = "·".join(candidate.get("risk_notes", []))
     risk_line = f"위험 감점: {risk_notes}\n" if risk_notes else ""
     labels = []
-    if candidate.get("trade_flow_leader"):
+    if candidate.get("completed_structure_entry"):
+        labels.append("완료 5분 구조 돌파형")
+    elif candidate.get("trade_flow_leader"):
         labels.append("완료봉 상승 지속형" if candidate.get("flow_continuation_entry") else "체결 매수 지속형")
     elif candidate.get("selection_lane") == "explosive_leader":
         labels.append("완료 5분 폭발적 선도주")
@@ -1549,7 +1552,7 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         labels.append("초고속 선도주")
     elif candidate.get("selection_lane") == "early_leader":
         labels.append("선도주 정밀형")
-    if candidate.get("leader_pullback_recheck"):
+    if candidate.get("leader_pullback_recheck") and not candidate.get("completed_structure_entry"):
         labels.append("선도주 눌림")
     elif candidate.get("is_reentry"):
         labels.append("재지지")
@@ -1643,11 +1646,19 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         volume_line += (f"거래량 검증 방식: {mode_label}\n"
                         f"최근 완료 15분 합산: {float(proof.get('rolling_15m_volume_ratio') or 0):.2f}배"
                         "(직전 20개 완료 구간 대비·진행봉 제외)\n")
+    if candidate.get("completed_structure_entry"):
+        proof = candidate.get("survival_structure_context") or candidate.get("completed_structure_context") or {}
+        wb_line = f"진입형: 눌림 없는 완료 5분 WB 돌파\n5분 WB 판정: {candidate.get('double_bb_status')}\n"
+        if proof.get("volume_mode") == "completed_rolling_breakout":
+            volume_line += (f"15분 대안: 완료 5분봉 3개 합산 {float(proof.get('rolling_15m_volume_ratio') or 0):.2f}배"
+                            "(연속 63봉·이전 20개 비중복 구간 대비)\n")
     cost_line = ""
-    if candidate.get("tick_spread_exception") or candidate.get("flow_execution_override"):
+    if candidate.get("tick_spread_exception") or candidate.get("flow_execution_override") or candidate.get("completed_structure_entry"):
         cost = candidate.get("execution_cost") or {}
         quote_label = ("공식 최소 1호가 단위·반복 호가·매수 체결 통과" if candidate.get("tick_spread_exception")
                        else "가까운 호가 깊이·실제 매수 체결·전송 직전 호가 확인")
+        if candidate.get("completed_structure_entry"):
+            quote_label = "가까운 호가 깊이 3회·전송 직전 호가 확인(매수 체결 우위와 구분)"
         cost_line = (f"호가 검증: {quote_label}\n"
                      f"추정 왕복 비용: {float(cost.get('estimated_round_trip_cost_pct') or 0):.2f}% "
                      f"(스프레드+수수료·슬리피지 가정) · 비용 차감 계획 손익비 {float(cost.get('net_risk_reward') or 0):.2f}\n")
@@ -1853,7 +1864,7 @@ def _revalidate_candidate_for_dispatch(
         return None, f"전송 직전 {label} 손익비 부족({actual_rr:.2f})"
     if stop_pct > max_stop_loss_pct:
         return None, f"전송 직전 계획 손절폭 초과({stop_pct:.2f}%)"
-    if candidate.get("tick_spread_exception") or candidate.get("flow_execution_override"):
+    if candidate.get("tick_spread_exception") or candidate.get("flow_execution_override") or candidate.get("completed_structure_entry"):
         proof = candidate.get("survival_execution_spread_context") or candidate.get("execution_spread_context") or {}
         quote = candidate.get("dispatch_execution_quote") or {}
         if candidate.get("tick_spread_exception") and not proof.get("confirmed"):
@@ -2202,6 +2213,40 @@ class AlertDispatcher:
         """
         reasons = []
         score_floor = self._candidate_min_score
+        if candidate.get("completed_structure_entry"):
+            cfg = self._candidate_risk_config
+            book = candidate.get("survival_structure_book_context") or {}
+            quote = candidate.get("dispatch_execution_quote") or {}
+            ask = float(quote.get("ask_value_krw") or 0)
+            qualified = bool(cfg.completed_structure_enabled
+                and candidate.get("selection_lane") == "completed_structure"
+                and candidate.get("survival_confirmed")
+                and float(candidate.get("survival_seconds") or 0) >= max(60, cfg.survival_confirm_seconds)
+                and 0 < float(candidate.get("relative_strength_percentile") or 100) <= 2
+                and structure_volume_verified(candidate, time.time())
+                and candidate.get("double_bb_confirmed")
+                and book.get("confirmed") and book.get("sample_count", 0) >= 3
+                and 0 <= time.time() - float(book.get("as_of") or 0) <= 10
+                and quote.get("nearby_depth_supported") and ask > 0
+                and float(quote.get("bid_value_krw") or 0) / ask >= .5
+                and 0 <= time.time() - float(quote.get("as_of") or 0) <= 10
+                and float(quote.get("spread_pct", float("inf"))) <= cfg.max_spread_pct
+                and all(candidate.get(k) is not None and float(candidate[k]) > limit for k, limit in (
+                    ("survival_btc_5m_pct", cfg.btc_crash_5m_pct),
+                    ("survival_btc_15m_pct", cfg.btc_crash_15m_pct),
+                    ("survival_btc_live_pct", cfg.btc_crash_5m_pct))))
+            try:
+                _, reason = _revalidate_candidate_for_dispatch(candidate, float(candidate["current_price"]),
+                    min_risk_reward=cfg.min_risk_reward, max_stop_loss_pct=cfg.max_stop_loss_pct)
+                if reason:
+                    qualified = False
+                    reasons.append(f"Telegram 구조 돌파형 {reason}")
+            except (KeyError, TypeError, ValueError):
+                qualified = False
+            if qualified:
+                score_floor = max(86, cfg.trade_flow_leader_min_score)
+            else:
+                reasons.append("Telegram 구조 돌파형 최신 완료봉·반복 호가·60초 생존 미확인")
         if candidate.get("tick_spread_exception"):
             risk_config = self._candidate_risk_config
             proof = candidate.get("survival_execution_spread_context") or {}
@@ -3788,7 +3833,7 @@ class CandidateAnalyzer:
                 and (self.config.higher_timeframe_enabled or self.config.explosive_leader_enabled)):
             return False
         state = self._active_watch(market, now)
-        if (not state or state.get("leader_pullback_invalidated") or price <= 0
+        if (not state or price <= 0
                 or market in self._inflight_markets):
             return False
         if now - self._last_delivered_at.get(market, 0) < self.config.repeat_cooldown_seconds:
@@ -3826,6 +3871,11 @@ class CandidateAnalyzer:
         )
         if not (hourly_admission or breakout_admission):
             return False
+        if state.get("leader_pullback_invalidated"):
+            # A broken first dip stays invalid. Only a fresh high may enter
+            # a separate completed-breakout screen; never fabricate a retest.
+            if not self.config.completed_structure_enabled or not breakout_admission or price <= float(state.get("leader_peak_price") or price):
+                return False
         state["completed_recheck_bucket"] = bucket
         state["completed_recheck_count"] = int(state.get("completed_recheck_count", 0)) + 1
         self._last_leader_recheck_at[market] = now
@@ -4077,7 +4127,7 @@ class CandidateAnalyzer:
             return ["생존 시점 상대강도 시장표본 미확인"]
         rejected: list[str] = []
         percentile = float(relative.get("relative_strength_percentile") or 100.0)
-        if candidate.get("trade_flow_leader"):
+        if candidate.get("trade_flow_leader") or candidate.get("completed_structure_entry"):
             if (percentile > 2.0 or float(relative.get("momentum_5m_pct") or 0) < .2
                     or float(relative.get("momentum_15m_pct") or 0) < .8
                     or float(relative.get("momentum_60m_pct") or 0) < 1.5
@@ -4116,12 +4166,12 @@ class CandidateAnalyzer:
             is_reentry
             and not relative.get("relative_strength_eligible")
             and not sustained
-            and not candidate.get("trade_flow_leader")
+            and not candidate.get("trade_flow_leader") and not candidate.get("completed_structure_entry")
         ):
             rejected.append("생존 중 재진입 상대강도 자격 상실")
         min_momentum_5m = (
             self.config.relative_strength_min_5m_pct
-            if is_reentry and not sustained and not candidate.get("trade_flow_leader")
+            if is_reentry and not sustained and not candidate.get("trade_flow_leader") and not candidate.get("completed_structure_entry")
             else 0.0
         )
         if momentum_5m < min_momentum_5m or (
@@ -4205,7 +4255,7 @@ class CandidateAnalyzer:
                     alert, "rejected", rejected
                 )
                 return
-            if fast_leader and candidate.get("selection_lane") != "explosive_leader" and not candidate.get("rsi_breakout_exception") and not candidate.get("breadth_breakout_exception") and not candidate.get("completed_breakout_entry") and not candidate.get("trade_flow_leader") and not candidate.get("completed_wb_retest_entry"):
+            if fast_leader and candidate.get("selection_lane") != "explosive_leader" and not candidate.get("rsi_breakout_exception") and not candidate.get("breadth_breakout_exception") and not candidate.get("completed_breakout_entry") and not candidate.get("trade_flow_leader") and not candidate.get("completed_wb_retest_entry") and not candidate.get("completed_structure_entry"):
                 candidate["survival_confirmed"] = True
                 candidate["survival_seconds"] = max(
                     self.config.fast_leader_confirm_seconds,
@@ -4228,8 +4278,11 @@ class CandidateAnalyzer:
                     and not first_candidate.get("completed_breakout_entry")
                     and not first_candidate.get("trade_flow_leader")
                     and not first_candidate.get("completed_wb_retest_entry")
+                    and not first_candidate.get("completed_structure_entry")
                     else self.config.survival_confirm_seconds
                 )
+                if first_candidate.get("completed_structure_entry"):
+                    survival_seconds = max(60, survival_seconds)
                 LOGGER.info(
                     "CANDIDATE_SURVIVAL_PENDING market=%s seconds=%d score=%d",
                     market,
@@ -4318,7 +4371,7 @@ class CandidateAnalyzer:
                 candidate["survival_seconds"] = survival_seconds
             verification_client = UpbitPublicClient()
             try:
-                if candidate.get("tick_spread_exception") or candidate.get("flow_execution_override"):
+                if candidate.get("tick_spread_exception") or candidate.get("flow_execution_override") or candidate.get("completed_structure_entry"):
                     latest_ticker, latest_book = await asyncio.gather(
                         verification_client.ticker(market), verification_client.orderbook(market))
                     candidate["dispatch_execution_quote"] = {
@@ -4437,6 +4490,8 @@ class CandidateAnalyzer:
                 "rsi_breakout_exception",
                 "breadth_breakout_exception",
                 "completed_breakout_entry",
+                "completed_structure_entry", "completed_structure_context", "structure_book_context",
+                "survival_structure_context", "survival_structure_book_context",
                 "trade_flow_leader", "trade_flow_context", "survival_trade_flow", "completed_wb_retest_entry",
                 "flow_continuation_entry", "continuation_context", "survival_continuation_context",
                 "flow_volume_mode", "flow_entry_context", "survival_flow_entry_context", "flow_execution_override",
