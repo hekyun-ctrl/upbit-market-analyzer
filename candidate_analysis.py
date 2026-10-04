@@ -2274,7 +2274,7 @@ def evaluate_candidate(
     if hourly_trend_core or explosive_core or completed_wb_retest_entry or narrow_market_fast_core:
         # Plan a 5m initial invalidation before entry, never widen it later.
         support = min(min(float(c["low_price"]) for c in c5[:3]), breakout)
-        if explosive_core or flow_leader or completed_wb_retest_entry or narrow_market_fast_core:
+        if explosive_core or flow_leader or completed_wb_retest_entry:
             support = min(float((rsi_context if flow_leader or completed_wb_retest_entry else explosive_context)["low"]), breakout)
         if flow_continuation_entry:
             support = max(breakout, float(continuation_context["low"]))
