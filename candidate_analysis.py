@@ -193,17 +193,17 @@ class CandidateConfig:
             fast_leader_max_percentile=max(
                 1.0,
                 min(
-                    3.0,
-                    _env_float("CANDIDATE_FAST_LEADER_MAX_PERCENTILE", 2.0),
+                    10.0,
+                    _env_float("CANDIDATE_FAST_LEADER_MAX_PERCENTILE", 10.0),
                 ),
             ),
             fast_leader_min_value_ratio_10m=max(
-                2.0,
-                _env_float("CANDIDATE_FAST_LEADER_MIN_VALUE_RATIO_10M", 5.0),
+                1.2,
+                _env_float("CANDIDATE_FAST_LEADER_MIN_VALUE_RATIO_10M", 1.5),
             ),
             fast_leader_min_value_ratio_30m=max(
-                2.0,
-                _env_float("CANDIDATE_FAST_LEADER_MIN_VALUE_RATIO_30M", 5.0),
+                1.0,
+                _env_float("CANDIDATE_FAST_LEADER_MIN_VALUE_RATIO_30M", 1.2),
             ),
             fast_leader_max_extension_pct=max(
                 0.5,
@@ -1563,6 +1563,8 @@ def evaluate_candidate(
         and (momentum_15m is None or momentum_15m > 0)
         and preleader_ratio_10m >= config.fast_leader_min_value_ratio_10m
         and preleader_ratio_30m >= config.fast_leader_min_value_ratio_30m
+        and _volume_metrics(fresh_five)[0] >= 1.5
+        and _volume_metrics(fresh_fifteen)[0] >= 1.0
     )
     persistent_leader_core = bool(
         alert.get("signal") == "persistent_leader_acceleration"
