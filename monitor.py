@@ -411,7 +411,9 @@ class MonitorState:
             if markets is not None:
                 self.subscribed_markets = set(markets)
                 self.received_markets.clear()
-        LOGGER.info("MONITOR_STARTED markets=%s notification_mode=%s strategy=%s", market_count, notification_mode, STRATEGY_VERSION)
+        LOGGER.info("MONITOR_STARTED markets=%s notification_mode=%s strategy=%s audit_persistent=%s audit_started=%s restored_screenings=%s audit_error=%s", market_count, notification_mode, STRATEGY_VERSION,
+            bool(self.audit_store and not self.audit_error), self.collection_started_at,
+            len(self.screening_records), self.audit_error)
 
     def mark_connected(self) -> None:
         with self._lock:
