@@ -767,8 +767,13 @@ def test_inactivity_status_reports_screening_without_creating_candidate(monkeypa
         )
     )
     dispatcher.record_candidate_rejection(
-        ["완료봉 종가 위치 다소 약함(0.50)", "윗꼬리 주의(0.50)"]
+        ["완료봉 종가 위치 다소 약함(0.50)", "윗꼬리 주의(0.50)"],
+        signal_id="signal-a",
     )
+    dispatcher.record_candidate_rejection(
+        ["완료봉 종가 위치 다소 약함(0.48)"], signal_id="signal-a"
+    )
+    dispatcher.record_candidate_rejection(["최근 급락 발생"], signal_id="signal-b")
     clock["now"] = 4_600.0
     sent = []
 
@@ -798,8 +803,9 @@ def test_inactivity_status_reports_screening_without_creating_candidate(monkeypa
     text = sent[0]["text"]
     assert "[운영상태 | 최근 60분]" in text
     assert "원시 상승신호: 1건" in text
-    assert "심층검증 탈락: 1회(동일 후보 재검증 포함)" in text
-    assert "주요 탈락 사유(중복 집계)" in text
+    assert "심층검증 탈락: 고유 후보 2건 · 재검사 포함 3회" in text
+    assert "주요 탈락 사유(고유 후보 기준)" in text
+    assert "완료봉 종가 위치 다소 약함 1회" in text
     assert "조건부 진입 후보: 0건" in text
     assert "매수 신호가 아닙니다" in text
 

@@ -41,7 +41,7 @@ from trade_flow import TradeFlow, buying_persistent
 from audit_store import AuditStore, configured_audit_path
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "structure-and-audit-v3.16"
+STRATEGY_VERSION = "structure-and-audit-v3.17"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -2074,9 +2074,8 @@ class AlertDispatcher:
             if MONITOR_STATE.audit_store and not MONITOR_STATE.audit_error else None)
         self._last_availability_delivery_at = 0.0
         self._raw_signal_times: deque[float] = deque(maxlen=5000)
-        self._candidate_rejections: deque[tuple[float, tuple[str, ...]]] = deque(
-            maxlen=5000
-        )
+        self._candidate_rejections: dict[str, tuple[float, set[str]]] = {}
+        self._candidate_rejection_attempts: deque[float] = deque(maxlen=5000)
         self._publish_candidate_delivery_state()
 
     def _telegram_url(self) -> str:
@@ -2144,15 +2143,35 @@ class AlertDispatcher:
     def inactivity_status_seconds(self) -> int:
         return self._inactivity_status_seconds
 
-    def record_candidate_rejection(self, reasons: list[str]) -> None:
-        self._candidate_rejections.append((time.monotonic(), tuple(reasons)))
+    def record_candidate_rejection(
+        self, reasons: list[str], *, signal_id: str | None = None
+    ) -> None:
+        now = time.monotonic()
+        self._prune_activity(now)
+        key = str(signal_id or f"unkeyed:{now:.6f}:{len(self._candidate_rejection_attempts)}")
+        labels = {
+            self._reason_label(reason)
+            for reason in reasons
+            if reason and self._reason_label(reason)
+        }
+        previous = self._candidate_rejections.get(key)
+        if previous is not None:
+            labels.update(previous[1])
+        self._candidate_rejections[key] = (now, labels)
+        self._candidate_rejection_attempts.append(now)
 
     def _prune_activity(self, now: float) -> None:
         cutoff = now - self._inactivity_status_seconds
         while self._raw_signal_times and self._raw_signal_times[0] < cutoff:
             self._raw_signal_times.popleft()
-        while self._candidate_rejections and self._candidate_rejections[0][0] < cutoff:
-            self._candidate_rejections.popleft()
+        self._candidate_rejection_attempts = deque(
+            (stamp for stamp in self._candidate_rejection_attempts if stamp >= cutoff),
+            maxlen=5000,
+        )
+        self._candidate_rejections = {
+            key: row for key, row in self._candidate_rejections.items()
+            if row[0] >= cutoff
+        }
 
     @staticmethod
     def _reason_label(reason: str) -> str:
@@ -2161,8 +2180,8 @@ class AlertDispatcher:
     def _inactivity_status_text(self, now: float) -> str:
         self._prune_activity(now)
         reason_counts = Counter(
-            self._reason_label(reason)
-            for _, reasons in self._candidate_rejections
+            reason
+            for _, reasons in self._candidate_rejections.values()
             for reason in reasons
         )
         top_reasons = " · ".join(
@@ -2175,8 +2194,9 @@ class AlertDispatcher:
             f"[운영상태 | 최근 {minutes}분]\n"
             f"공개 시세 감시: {connection}\n"
             f"원시 상승신호: {len(self._raw_signal_times)}건\n"
-            f"심층검증 탈락: {len(self._candidate_rejections)}회(동일 후보 재검증 포함)\n"
-            f"주요 탈락 사유(중복 집계): {top_reasons}\n"
+            f"심층검증 탈락: 고유 후보 {len(self._candidate_rejections)}건 · "
+            f"재검사 포함 {len(self._candidate_rejection_attempts)}회\n"
+            f"주요 탈락 사유(고유 후보 기준): {top_reasons}\n"
             "조건부 진입 후보: 0건\n"
             "서비스는 계속 감시 중이며, 이 메시지는 매수 신호가 아닙니다."
         )
@@ -3127,6 +3147,21 @@ class CandidateAnalyzer:
             "screening_metrics": alert.get("screening_metrics"),
         }
 
+    @staticmethod
+    def _rejection_signal_id(alert: dict[str, Any]) -> str | None:
+        signal_id = alert.get("signal_id")
+        if signal_id:
+            return str(signal_id)
+        market = alert.get("market")
+        origin = (
+            alert.get("original_signal_time_utc")
+            or alert.get("signal_time_utc")
+            or alert.get("time_utc")
+        )
+        if market and origin:
+            return f"{market}:{alert.get('signal', 'unknown')}:{origin}"
+        return None
+
     def _start_trend_track(self, candidate: dict[str, Any], now: float) -> None:
         market = str(candidate["market"])
         entry = float(candidate["entry_reference_price"])
@@ -3596,7 +3631,9 @@ class CandidateAnalyzer:
             remaining = int(self.config.repeat_cooldown_seconds - since_delivery)
             reason = f"동일 종목 후보 재전송 제한({remaining}초 남음)"
             LOGGER.info("Candidate repeat suppressed for %s: %s", market, reason)
-            self.dispatcher.record_candidate_rejection([reason])
+            self.dispatcher.record_candidate_rejection(
+                [reason], signal_id=self._rejection_signal_id(alert)
+            )
             MONITOR_STATE.add_screening_record(
                 self._screening_record(alert, "repeat_suppressed", [reason])
             )
@@ -3640,7 +3677,10 @@ class CandidateAnalyzer:
                 if MONITOR_STATE.has_recent_signal(market, "rapid_drop", 600):
                     if not self._rapid_drop_allows_leader_recovery(scheduled, watch):
                         LOGGER.info("Candidate skipped after recent rapid drop: %s", market)
-                        self.dispatcher.record_candidate_rejection(["최근 급락 발생"])
+                        self.dispatcher.record_candidate_rejection(
+                            ["최근 급락 발생"],
+                            signal_id=self._rejection_signal_id(scheduled),
+                        )
                         return False
                 # A pending completed-candle check must not consume the only
                 # opportunity to verify an exceptional live leader. Keep both
@@ -3726,7 +3766,10 @@ class CandidateAnalyzer:
                 )
             else:
                 LOGGER.info("Candidate skipped after recent rapid drop: %s", market)
-                self.dispatcher.record_candidate_rejection(["최근 급락 발생"])
+                self.dispatcher.record_candidate_rejection(
+                    ["최근 급락 발생"],
+                    signal_id=self._rejection_signal_id(scheduled),
+                )
                 return False
 
         self._start_signal_track(scheduled, now)
@@ -4379,7 +4422,9 @@ class CandidateAnalyzer:
                 self._remember_rejected(
                     alert, rejected, float(snapshot["ticker"]["trade_price"])
                 )
-                self.dispatcher.record_candidate_rejection(rejected)
+                self.dispatcher.record_candidate_rejection(
+                    rejected, signal_id=self._rejection_signal_id(alert)
+                )
                 MONITOR_STATE.add_screening_record(
                     self._screening_record(alert, "rejected", rejected)
                 )
@@ -4491,7 +4536,9 @@ class CandidateAnalyzer:
                         reasons,
                         float(survival_snapshot["ticker"]["trade_price"]),
                     )
-                    self.dispatcher.record_candidate_rejection(reasons)
+                    self.dispatcher.record_candidate_rejection(
+                        reasons, signal_id=self._rejection_signal_id(alert)
+                    )
                     MONITOR_STATE.add_screening_record(
                         self._screening_record(alert, "survival_rejected", reasons)
                     )
@@ -4535,7 +4582,8 @@ class CandidateAnalyzer:
                     dispatch_rejection,
                 )
                 self.dispatcher.record_candidate_rejection(
-                    [str(dispatch_rejection or "전송 직전 재검증 실패")]
+                    [str(dispatch_rejection or "전송 직전 재검증 실패")],
+                    signal_id=self._rejection_signal_id(alert),
                 )
                 MONITOR_STATE.add_screening_record(
                     self._screening_record(
