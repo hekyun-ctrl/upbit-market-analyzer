@@ -39,9 +39,10 @@ from exit_plan import exit_plan_metrics, execution_cost_metrics, modeled_exit_re
 from upbit_client import UpbitPublicClient
 from trade_flow import TradeFlow, buying_persistent
 from audit_store import AuditStore, configured_audit_path
+from volume_history import build_72h_turnover_snapshot, summarize_72h_ranked_outcomes
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "structure-and-audit-v3.19"
+STRATEGY_VERSION = "structure-and-audit-v3.20"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -345,6 +346,7 @@ class MonitorState:
         self.early_watch_events: deque[dict[str, Any]] = deque(maxlen=2000)
         self.trend_outcomes: deque[dict[str, Any]] = deque(maxlen=500)
         self.screening_records: deque[dict[str, Any]] = deque(maxlen=2000)
+        self.volume_72h_snapshots: deque[dict[str, Any]] = deque(maxlen=48)
         self.candidate_delivery_day_kst: str | None = None
         self.candidate_delivery_count_today = 0
         self.candidate_delivery_min_daily = 0
@@ -361,6 +363,9 @@ class MonitorState:
                 for field in ("candidate_outcomes", "signal_outcomes", "early_watch_events", "trend_outcomes", "screening_records", "telegram_delivery_events"):
                     target = getattr(self, field)
                     target.extend(self.audit_store.read(field, target.maxlen))
+                self.volume_72h_snapshots.extend(
+                    reversed(self.audit_store.read("volume_72h_snapshots", 24))
+                )
                 # A restart cannot prove which threshold was reached first
                 # during the disconnected interval. Preserve the cohort and
                 # explicitly mark unfinished observations as ungradable.
@@ -456,6 +461,82 @@ class MonitorState:
             self.telegram_delivery_events.appendleft(dict(event))
             self._persist_event("telegram_delivery_events", event)
         LOGGER.info("TELEGRAM_DELIVERY_AUDIT %s", json.dumps(event, ensure_ascii=False))
+
+    def add_volume_72h_snapshot(self, snapshot: dict[str, Any]) -> None:
+        """Persist hourly full-universe volume ranks for shadow evaluation."""
+        with self._lock:
+            history = [*self.volume_72h_snapshots, snapshot][-24:]
+            history_by_market = [
+                {row.get("market"): row.get("rank_72h") for row in item.get("items", [])}
+                for item in history[:-1]
+            ]
+            items = []
+            for row in snapshot.get("items", []):
+                market = row.get("market")
+                rank = row.get("rank_72h")
+                observed = sum(
+                    isinstance(ranks.get(market), int) for ranks in history_by_market
+                ) + int(isinstance(rank, int))
+                top_50 = sum(
+                    1 for ranks in history_by_market
+                    if isinstance(ranks.get(market), int) and ranks[market] <= 50
+                ) + int(isinstance(rank, int) and rank <= 50)
+                items.append({
+                    **row,
+                    "top_50_observations_24h": top_50,
+                    "observed_snapshots_24h": observed,
+                })
+            stored = {**snapshot, "items": items}
+            self.volume_72h_snapshots.append(stored)
+            self._persist_event("volume_72h_snapshots", stored)
+        complete = sum(bool(row.get("history_complete")) for row in items)
+        LOGGER.info(
+            "VOLUME_72H_SNAPSHOT %s",
+            json.dumps({
+                "as_of_utc": stored.get("as_of_utc"),
+                "requested_market_count": stored.get("requested_market_count"),
+                "ranked_market_count": stored.get("ranked_market_count"),
+                "complete_market_count": complete,
+            }, ensure_ascii=False),
+        )
+
+    def volume_72h_context(self, market: str, now: int | None = None) -> dict[str, Any]:
+        with self._lock:
+            if not self.volume_72h_snapshots:
+                return {}
+            snapshot = self.volume_72h_snapshots[-1]
+            row = next((item for item in snapshot.get("items", []) if item.get("market") == market), None)
+            as_of = snapshot.get("as_of_utc")
+        if not row:
+            return {}
+        try:
+            age_seconds = max(0, int(now or time.time()) - int(datetime.fromisoformat(as_of).timestamp()))
+        except (TypeError, ValueError):
+            return {}
+        if age_seconds > 2 * 3600:
+            return {}
+        return {
+            "volume_72h_rank": row.get("rank_72h"),
+            "volume_72h_universe": snapshot.get("ranked_market_count"),
+            "volume_72h_turnover_krw": row.get("turnover_72h_krw"),
+            "volume_72h_history_complete": row.get("history_complete", False),
+            "volume_72h_top50_observations_24h": row.get("top_50_observations_24h", 0),
+            "volume_72h_observed_snapshots_24h": row.get("observed_snapshots_24h", 0),
+            "volume_72h_snapshot_at_utc": as_of,
+        }
+
+    def volume_72h_status(self) -> dict[str, Any]:
+        with self._lock:
+            latest = self.volume_72h_snapshots[-1] if self.volume_72h_snapshots else None
+            return {
+                "enabled": True,
+                "snapshot_count_restored_or_current": len(self.volume_72h_snapshots),
+                "latest_snapshot_at_utc": latest.get("as_of_utc") if latest else None,
+                "requested_market_count": latest.get("requested_market_count") if latest else 0,
+                "ranked_market_count": latest.get("ranked_market_count") if latest else 0,
+                "window_hours": 72,
+                "affects_entry_decisions": False,
+            }
 
     def telegram_deliveries(
         self, limit: int = 50, day_kst: str | None = None, market: str | None = None
@@ -762,6 +843,8 @@ class MonitorState:
             "raw_signal_performance": self._performance_summary(signal_outcomes),
             "filter_audit": filter_audit(signal_outcomes, screening_records),
             "early_watch_performance": self._early_watch_summary(early_watch_events),
+            "volume_72h_candidate_performance": summarize_72h_ranked_outcomes(outcomes),
+            "volume_72h_capture": self.volume_72h_status(),
             "six_hour_trend_performance": {
                 "sample_count": len(trend_outcomes),
                 "target_1_reached": sum(
@@ -864,6 +947,7 @@ class MonitorState:
                     "maximum": self.candidate_delivery_max_daily,
                 },
                 "last_candidate_delivery_at_utc": self.last_candidate_delivery_at,
+                "volume_72h_capture": self.volume_72h_status(),
             }
 
     def alerts(self, limit: int, market: str | None = None) -> list[dict[str, Any]]:
@@ -1041,7 +1125,10 @@ class SignalEngine:
 
     def relative_strength_snapshot(self, market: str, now: int) -> dict[str, Any]:
         """Rank the current market against fresh KRW-market rolling momentum."""
-        flow = {"trade_flow_context": self.trade_flow.snapshot(market, now)}
+        flow = {
+            "trade_flow_context": self.trade_flow.snapshot(market, now),
+            **MONITOR_STATE.volume_72h_context(market, now),
+        }
         if not self.config.relative_strength_enabled:
             return {"relative_strength_ready": False, **flow}
 
@@ -1687,8 +1774,17 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         if candidate.get("momentum_15m_pct") is not None:
             relative_line += (
                 f" · 15분 {float(candidate['momentum_15m_pct']):+.1f}%"
-            )
+        )
         relative_line += "\n"
+    volume_72h_line = ""
+    if candidate.get("volume_72h_rank") is not None:
+        observed = int(candidate.get("volume_72h_observed_snapshots_24h") or 0)
+        top50 = int(candidate.get("volume_72h_top50_observations_24h") or 0)
+        volume_72h_line = (
+            f"72시간 거래대금 순위: {int(candidate['volume_72h_rank'])}/"
+            f"{int(candidate.get('volume_72h_universe') or 0)}위 · "
+            f"최근 24시간 상위 50위 {top50}/{observed}회\n"
+        )
     regime_line = ""
     if candidate.get("relative_strength_ready"):
         regime_label = {
@@ -1806,6 +1902,7 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"목표 방식: {candidate['target_mode']}\n"
         f"추세 관리: {candidate.get('trend_management', '고정 목표 관리')}\n"
         f"{relative_line}"
+        f"{volume_72h_line}"
         f"{regime_line}"
         f"{survival_line}"
         f"{wb_line}"
@@ -1853,6 +1950,15 @@ def _early_watch_text(alert: dict[str, Any]) -> str:
     rank = int(alert.get("relative_strength_rank") or 0)
     universe = int(alert.get("relative_strength_universe") or 0)
     rank_line = f"상대강도: {rank}/{universe}위\n" if rank and universe else ""
+    volume_line = ""
+    if alert.get("volume_72h_rank") is not None:
+        observed = int(alert.get("volume_72h_observed_snapshots_24h") or 0)
+        top50 = int(alert.get("volume_72h_top50_observations_24h") or 0)
+        volume_line = (
+            f"72시간 거래대금 순위: {int(alert['volume_72h_rank'])}/"
+            f"{int(alert.get('volume_72h_universe') or 0)}위 · "
+            f"최근 24시간 상위 50위 {top50}/{observed}회\n"
+        )
     return (
         f"[초기 포착 | 진입 검증 전] {alert['market']}\n"
         f"현재가: {_format_price(float(alert['price']))}\n"
@@ -1862,6 +1968,7 @@ def _early_watch_text(alert: dict[str, Any]) -> str:
         f"{float(alert.get('preleader_volume_ratio_10m') or 0):.1f}배 · "
         f"30분 기준 {float(alert.get('preleader_volume_ratio_30m') or 0):.1f}배\n"
         f"{rank_line}"
+        f"{volume_line}"
         "아직 매수 후보가 아닙니다. 눌림·돌파선 유지·거래량과 호가 생존을 "
         "추가 확인한 경우에만 별도의 조건부 진입 후보를 보냅니다."
     )
@@ -2977,6 +3084,11 @@ class CandidateAnalyzer:
             "market": state["market"],
             "signal_time_utc": state.get("signal_time_utc"),
             "signal_price": state["signal_price"],
+            "volume_72h_rank": state.get("volume_72h_rank"),
+            "volume_72h_universe": state.get("volume_72h_universe"),
+            "volume_72h_turnover_krw": state.get("volume_72h_turnover_krw"),
+            "volume_72h_top50_observations_24h": state.get("volume_72h_top50_observations_24h"),
+            "volume_72h_observed_snapshots_24h": state.get("volume_72h_observed_snapshots_24h"),
             **values,
         }
 
@@ -3003,6 +3115,11 @@ class CandidateAnalyzer:
             "screening_count": 0,
             "last_decision": "preleader_watch",
             "last_reasons": [],
+            "volume_72h_rank": alert.get("volume_72h_rank"),
+            "volume_72h_universe": alert.get("volume_72h_universe"),
+            "volume_72h_turnover_krw": alert.get("volume_72h_turnover_krw"),
+            "volume_72h_top50_observations_24h": alert.get("volume_72h_top50_observations_24h"),
+            "volume_72h_observed_snapshots_24h": alert.get("volume_72h_observed_snapshots_24h"),
         }
         self._early_watch_tracks[market] = state
         MONITOR_STATE.add_early_watch_event(
@@ -3180,6 +3297,11 @@ class CandidateAnalyzer:
             "momentum_15m_pct": alert.get("momentum_15m_pct"),
             "momentum_60m_pct": alert.get("momentum_60m_pct"),
             "early_trend": alert.get("early_trend"),
+            "volume_72h_rank": alert.get("volume_72h_rank"),
+            "volume_72h_universe": alert.get("volume_72h_universe"),
+            "volume_72h_turnover_krw": alert.get("volume_72h_turnover_krw"),
+            "volume_72h_top50_observations_24h": alert.get("volume_72h_top50_observations_24h"),
+            "volume_72h_observed_snapshots_24h": alert.get("volume_72h_observed_snapshots_24h"),
         }
 
     def _finish_signal_track(
@@ -3217,6 +3339,11 @@ class CandidateAnalyzer:
                 "momentum_15m_pct": state.get("momentum_15m_pct"),
                 "momentum_60m_pct": state.get("momentum_60m_pct"),
                 "early_trend": state.get("early_trend"),
+                "volume_72h_rank": state.get("volume_72h_rank"),
+                "volume_72h_universe": state.get("volume_72h_universe"),
+                "volume_72h_turnover_krw": state.get("volume_72h_turnover_krw"),
+                "volume_72h_top50_observations_24h": state.get("volume_72h_top50_observations_24h"),
+                "volume_72h_observed_snapshots_24h": state.get("volume_72h_observed_snapshots_24h"),
             }
         )
         self._signal_tracks.pop(market, None)
@@ -3240,6 +3367,11 @@ class CandidateAnalyzer:
             "momentum_15m_pct": alert.get("momentum_15m_pct"),
             "momentum_60m_pct": alert.get("momentum_60m_pct"),
             "early_trend": alert.get("early_trend"),
+            "volume_72h_rank": alert.get("volume_72h_rank"),
+            "volume_72h_universe": alert.get("volume_72h_universe"),
+            "volume_72h_turnover_krw": alert.get("volume_72h_turnover_krw"),
+            "volume_72h_top50_observations_24h": alert.get("volume_72h_top50_observations_24h"),
+            "volume_72h_observed_snapshots_24h": alert.get("volume_72h_observed_snapshots_24h"),
             "change_1m_pct": alert.get("change_1m_pct"),
             "volume_ratio_vs_previous_1m": alert.get("volume_ratio_vs_previous_1m"),
             "risk_plan_diagnostics": alert.get("risk_plan_diagnostics"),
@@ -4295,6 +4427,11 @@ class CandidateAnalyzer:
                 "strategy_version": state.get("strategy_version"),
                 "candidate_id": state.get("candidate_id"),
                 "exit_plan": state.get("exit_plan"),
+                "volume_72h_rank": state.get("volume_72h_rank"),
+                "volume_72h_universe": state.get("volume_72h_universe"),
+                "volume_72h_turnover_krw": state.get("volume_72h_turnover_krw"),
+                "volume_72h_top50_observations_24h": state.get("volume_72h_top50_observations_24h"),
+                "volume_72h_observed_snapshots_24h": state.get("volume_72h_observed_snapshots_24h"),
                 "score": state["score"],
                 "is_reentry": state["is_reentry"],
                 "selection_lane": state.get("selection_lane", "standard"),
@@ -4838,9 +4975,14 @@ class CandidateAnalyzer:
             self._start_trend_track(candidate, lifecycle_now)
             self._lifecycles[market] = {
                 "strategy_version": candidate["strategy_version"],
-                "candidate_id": candidate["candidate_id"],
-                "exit_plan": candidate.get("exit_plan"),
-                "source_signal": candidate["source_signal"],
+            "candidate_id": candidate["candidate_id"],
+            "exit_plan": candidate.get("exit_plan"),
+            "volume_72h_rank": candidate.get("volume_72h_rank"),
+            "volume_72h_universe": candidate.get("volume_72h_universe"),
+            "volume_72h_turnover_krw": candidate.get("volume_72h_turnover_krw"),
+            "volume_72h_top50_observations_24h": candidate.get("volume_72h_top50_observations_24h"),
+            "volume_72h_observed_snapshots_24h": candidate.get("volume_72h_observed_snapshots_24h"),
+            "source_signal": candidate["source_signal"],
                 "entry_low": candidate["entry_low"],
                 "entry_high": candidate["entry_high"],
                 "chase_limit": candidate["chase_limit"],
@@ -4930,6 +5072,44 @@ async def _warm_signal_engine(
     return warmed, len(markets)
 
 
+async def _capture_volume_72h_snapshot(engine: SignalEngine) -> None:
+    """Backfill and rank all KRW markets by completed 72-hour turnover."""
+    markets = sorted(engine.active_markets or ())
+    if not markets:
+        return
+    semaphore = asyncio.Semaphore(4)
+    client = UpbitPublicClient()
+
+    async def fetch_one(market: str) -> tuple[str, list[dict[str, Any]]]:
+        async with semaphore:
+            try:
+                return market, await client.candles(market, "minute60", 80)
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:
+                LOGGER.warning("72h volume history failed for %s: %s", market, type(exc).__name__)
+                return market, []
+
+    try:
+        rows = await asyncio.gather(*(fetch_one(market) for market in markets))
+    finally:
+        await client.close()
+    snapshot = build_72h_turnover_snapshot(dict(rows), datetime.now(timezone.utc))
+    MONITOR_STATE.add_volume_72h_snapshot(snapshot)
+
+
+async def _volume_72h_history_loop(engine: SignalEngine) -> None:
+    """Collect hourly rank snapshots; use as context, never as a signal gate."""
+    while True:
+        try:
+            await _capture_volume_72h_snapshot(engine)
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:
+            LOGGER.exception("72h volume history refresh failed: %s", type(exc).__name__)
+        await asyncio.sleep(3600)
+
+
 def _trade_subscription(markets: list[str]) -> str:
     return json.dumps([
         {"ticket": f"upbit-monitor-{uuid.uuid4()}"},
@@ -4997,6 +5177,7 @@ async def run_monitor_forever() -> None:
     warmed_markets: set[str] = set()
     warm_tasks: set[asyncio.Task[Any]] = set()
     refresh_task: asyncio.Task[Any] | None = None
+    volume_history_task: asyncio.Task[Any] | None = None
     inactivity_status_task = asyncio.create_task(
         dispatcher.run_inactivity_status_loop()
     )
@@ -5009,6 +5190,10 @@ async def run_monitor_forever() -> None:
                     raise RuntimeError("No KRW markets were resolved")
                 MONITOR_STATE.mark_started(len(markets), dispatcher.mode, markets)
                 engine.active_markets = set(markets)
+                if volume_history_task is None:
+                    volume_history_task = asyncio.create_task(
+                        _volume_72h_history_loop(engine)
+                    )
                 added = sorted(set(markets) - warmed_markets)
                 if added:
                     task = asyncio.create_task(_warm_signal_engine(engine, added))
@@ -5093,6 +5278,9 @@ async def run_monitor_forever() -> None:
     finally:
         inactivity_status_task.cancel()
         tasks: list[asyncio.Task[Any]] = [inactivity_status_task]
+        if volume_history_task is not None:
+            volume_history_task.cancel()
+            tasks.append(volume_history_task)
         for task in warm_tasks:
             task.cancel()
             tasks.append(task)

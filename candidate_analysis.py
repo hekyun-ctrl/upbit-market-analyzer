@@ -3102,6 +3102,13 @@ def evaluate_candidate(
             round(momentum_15m, 2) if momentum_15m is not None else None
         ),
         "momentum_60m_pct": alert.get("momentum_60m_pct"),
+        "volume_72h_rank": alert.get("volume_72h_rank"),
+        "volume_72h_universe": alert.get("volume_72h_universe"),
+        "volume_72h_turnover_krw": alert.get("volume_72h_turnover_krw"),
+        "volume_72h_history_complete": alert.get("volume_72h_history_complete"),
+        "volume_72h_top50_observations_24h": alert.get("volume_72h_top50_observations_24h"),
+        "volume_72h_observed_snapshots_24h": alert.get("volume_72h_observed_snapshots_24h"),
+        "volume_72h_snapshot_at_utc": alert.get("volume_72h_snapshot_at_utc"),
         "first_retest_confirmed": retest_confirmed or completed_wb_retest_entry,
         "double_bb_enabled": config.double_bb_enabled,
         "double_bb_timeframe": wb_confirmation_timeframe,
