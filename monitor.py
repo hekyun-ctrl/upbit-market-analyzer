@@ -41,7 +41,7 @@ from trade_flow import TradeFlow, buying_persistent
 from audit_store import AuditStore, configured_audit_path
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "structure-and-audit-v3.17"
+STRATEGY_VERSION = "structure-and-audit-v3.18"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -3050,6 +3050,13 @@ class CandidateAnalyzer:
         market = str(alert["market"])
         existing = self._signal_tracks.get(market)
         if existing and now < float(existing["expires_at"]):
+            if alert.get("fresh_breakout_recheck"):
+                # Give a genuinely new structure its own screening identity.
+                # Keep the original raw-signal tracker alive for its own
+                # outcome; the early-watch tracker measures this continuation.
+                alert["parent_signal_id"] = existing["signal_id"]
+                alert["signal_id"] = uuid.uuid4().hex
+                return
             alert["signal_id"] = existing["signal_id"]
             return
         signal_id = uuid.uuid4().hex
@@ -3140,7 +3147,11 @@ class CandidateAnalyzer:
             "change_1m_pct": alert.get("change_1m_pct"),
             "volume_ratio_vs_previous_1m": alert.get("volume_ratio_vs_previous_1m"),
             "risk_plan_diagnostics": alert.get("risk_plan_diagnostics"),
+            "parent_signal_id": alert.get("parent_signal_id"),
+            "origin_signal_price": alert.get("origin_signal_price"),
             "completed_bar_recheck": bool(alert.get("completed_bar_recheck")),
+            "completed_breakout_recheck": bool(alert.get("completed_breakout_recheck")),
+            "fresh_breakout_recheck": bool(alert.get("fresh_breakout_recheck")),
             "signal_price": alert.get("price"),
             "original_signal_time_utc": alert.get("original_signal_time_utc") or alert.get("time_utc"),
             "screening_snapshot": alert.get("screening_snapshot"),
@@ -3547,8 +3558,11 @@ class CandidateAnalyzer:
         market = str(alert["market"])
         tracked = self._signal_tracks.get(market)
         if tracked:
-            tracked["last_rejections"] = list(rejected)
-            alert["signal_id"] = tracked["signal_id"]
+            if alert.get("fresh_breakout_recheck"):
+                alert.setdefault("parent_signal_id", tracked.get("signal_id"))
+            else:
+                tracked["last_rejections"] = list(rejected)
+                alert["signal_id"] = tracked["signal_id"]
         now = time.time()
         state = self._active_watch(market, now)
         if state is None:
@@ -3664,10 +3678,21 @@ class CandidateAnalyzer:
         )
         scheduled = dict(alert)
         if watchlist_recheck:
-            scheduled["is_reentry"] = True
             scheduled["watchlist_recheck"] = True
-            scheduled["original_signal_time_utc"] = watch.get(
-                "first_signal_time_utc"
+            # A scanner-detected consolidation rebreakout is a fresh structure
+            # to validate. Do not inherit the prior watch's re-entry drawdown
+            # rule or lifecycle id; genuine pullback callbacks remain reentries.
+            fresh_breakout = not bool(alert.get("is_reentry"))
+            scheduled["fresh_breakout_recheck"] = fresh_breakout
+            if not fresh_breakout:
+                scheduled["is_reentry"] = True
+            else:
+                scheduled["origin_signal_price"] = (
+                    watch.get("first_signal_price") or watch.get("signal_price")
+                )
+            scheduled["original_signal_time_utc"] = (
+                alert.get("time_utc") if fresh_breakout
+                else watch.get("first_signal_time_utc")
             )
         self._remember_best_relative_strength(scheduled)
         if market in self._inflight_markets:
@@ -4048,18 +4073,24 @@ class CandidateAnalyzer:
         if state.get("leader_pullback_invalidated"):
             # A broken first dip stays invalid. Only a fresh high may enter
             # a separate completed-breakout screen; never fabricate a retest.
-            if not self.config.completed_structure_enabled or not breakout_admission or price <= float(state.get("leader_peak_price") or price):
+            if not breakout_admission or price <= float(state.get("leader_peak_price") or price):
                 return False
         state["completed_recheck_bucket"] = bucket
         state["completed_recheck_count"] = int(state.get("completed_recheck_count", 0)) + 1
         self._last_leader_recheck_at[market] = now
+        recheck_time = datetime.now(timezone.utc).isoformat()
         alert = {
-            "time_utc": datetime.now(timezone.utc).isoformat(),
+            "time_utc": recheck_time,
             "market": market, "signal": state["source_signal"], "price": price,
             "breakout_level": breakout, "watchlist_recheck": True,
             "hourly_recheck": hourly_admission, "completed_bar_recheck": True,
             "completed_breakout_recheck": breakout_admission,
-            "original_signal_time_utc": state.get("first_signal_time_utc"),
+            "fresh_breakout_recheck": breakout_admission,
+            "origin_signal_price": state.get("first_signal_price"),
+            "original_signal_time_utc": (
+                recheck_time if breakout_admission
+                else state.get("first_signal_time_utc")
+            ),
             **relative,
         }
         # Deliberately omit is_reentry/pullback_retest: those flags would fake
@@ -4687,7 +4718,9 @@ class CandidateAnalyzer:
                 alert, "accepted", [], candidate
             )
             self._watchlist.pop(market, None)
-            if market in self._signal_tracks:
+            if (market in self._signal_tracks
+                    and not alert.get("fresh_breakout_recheck")
+                    and candidate.get("signal_id") == self._signal_tracks[market].get("signal_id")):
                 self._signal_tracks[market]["approved_candidate"] = True
             lifecycle_now = time.time()
             self._start_trend_track(candidate, lifecycle_now)

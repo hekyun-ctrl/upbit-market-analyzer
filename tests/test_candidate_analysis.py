@@ -2508,6 +2508,45 @@ def test_completed_breakout_softens_only_moderate_breadth_for_fresh_and_recheck(
     assert any("확산도 예외" in reason for reason in reasons)
 
 
+def test_fresh_breakout_recheck_does_not_inherit_old_day_high_drawdown_gate(monkeypatch):
+    setup = _ordinary_hot_breakout(monkeypatch)
+    now, one, five, fifteen, btc, alert, ticker = setup
+    current = ticker["trade_price"]
+    ticker["high_price"] = current * 1.10
+    alert.update(watchlist_recheck=True, completed_breakout_recheck=True,
+                 fresh_breakout_recheck=True, origin_signal_price=current * .98)
+
+    candidate, reasons = _evaluate_hot(setup)
+    assert candidate is not None, reasons
+    assert candidate["fresh_breakout_recheck"] is True
+    assert candidate["is_reentry"] is False
+    assert candidate["fresh_breakout_extension_pct"] == pytest.approx(2.04, abs=.02)
+
+    chased = dict(alert, origin_signal_price=current / 1.06)
+    alert.update(chased)
+    candidate, reasons = _evaluate_hot(setup)
+    assert candidate is None
+    assert any("초기 포착가 대비 5% 초과 상승" in r for r in reasons)
+
+    # The same chart still has to obey the drawdown limit on an actual retake.
+    retake = dict(alert, is_reentry=True, fresh_breakout_recheck=False,
+                  completed_breakout_recheck=False)
+    alert.update(retake)
+    candidate, reasons = _evaluate_hot(setup)
+    assert candidate is None
+    assert any("재진입 후보 당일 고점 대비 낙폭 과다" in r for r in reasons)
+
+
+def test_watchlist_recheck_without_fresh_structure_keeps_drawdown_gate(monkeypatch):
+    setup = _ordinary_hot_breakout(monkeypatch)
+    now, one, five, fifteen, btc, alert, ticker = setup
+    ticker["high_price"] = ticker["trade_price"] * 1.10
+    alert.update(watchlist_recheck=True, fresh_breakout_recheck=False)
+    candidate, reasons = _evaluate_hot(setup)
+    assert candidate is None
+    assert any("재진입 후보 당일 고점 대비 낙폭 과다" in r for r in reasons)
+
+
 @pytest.mark.parametrize("cause", ["low_breadth", "volume5", "volume15", "gap", "rank", "book", "btc", "chase", "liquidity", "wb", "broken", "hour_down"])
 def test_breadth_breakout_cannot_rescue_unsafe_or_unverified_setup(monkeypatch, cause):
     setup = _moderate_breadth_breakout(monkeypatch)

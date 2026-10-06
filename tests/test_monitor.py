@@ -2506,6 +2506,48 @@ def test_qualified_surge_reaches_validation_without_waiting_for_a_pullback(monke
     assert not seen[0].get('leader_pullback_recheck')
 
 
+def test_scanner_rebreakout_in_an_active_watch_is_a_fresh_setup(monkeypatch):
+    monkeypatch.setenv('ENABLE_CANDIDATE_ANALYSIS', 'true')
+    now = 1_800_000_000.0
+    monkeypatch.setattr(monitor.time, 'time', lambda: now)
+    monkeypatch.setattr(MONITOR_STATE, 'has_recent_signal', lambda *args: False)
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    analyzer._watchlist['KRW-ORCA'] = {
+        'market': 'KRW-ORCA', 'created_at': now - 600, 'expires_at': now + 10_000,
+        'first_signal_time_utc': '2026-10-05T13:10:36+00:00',
+        'first_signal_price': 2705, 'source_signal': 'leader_volume_acceleration',
+        'breakout_level': 2705,
+    }
+    analyzer._signal_tracks['KRW-ORCA'] = {
+        'signal_id': 'old-origin', 'expires_at': now + 10_000,
+        'market': 'KRW-ORCA', 'signal_price': 2705,
+    }
+    seen = []
+    async def analyze(alert): seen.append(dict(alert))
+    monkeypatch.setattr(analyzer, '_analyze', analyze)
+    alert_time = '2026-10-05T18:22:02+00:00'
+    alert = {'time_utc': alert_time, 'market': 'KRW-ORCA',
+        'signal': 'consolidation_rebreakout', 'price': 2818,
+        'relative_strength_ready': True, 'relative_strength_eligible': True,
+        'relative_strength_percentile': .8, 'momentum_5m_pct': 2,
+        'momentum_15m_pct': 2.5}
+
+    async def run():
+        assert analyzer.schedule(alert)
+        await asyncio.sleep(0)
+        await asyncio.sleep(0)
+    asyncio.run(run())
+
+    assert len(seen) == 1
+    fresh = seen[0]
+    assert fresh['fresh_breakout_recheck'] and fresh['watchlist_recheck']
+    assert not fresh.get('is_reentry')
+    assert fresh['original_signal_time_utc'] == alert_time
+    assert fresh['origin_signal_price'] == 2705
+    assert fresh['parent_signal_id'] == 'old-origin'
+    assert fresh['signal_id'] != 'old-origin'
+
+
 def test_completed_breakout_message_reports_actual_wb_timeframe():
     candidate = _telegram_candidate()
     candidate.update(completed_breakout_entry=True, double_bb_enabled=True,

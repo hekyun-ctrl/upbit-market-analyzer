@@ -1570,10 +1570,22 @@ def evaluate_candidate(
     day_change = float(ticker.get("signed_change_rate", 0)) * 100
     day_high = max(current, float(ticker.get("high_price") or current))
     drawdown_from_day_high_pct = max(0.0, (1 - current / day_high) * 100)
+    # A fresh completed breakout admitted from an existing watch is a new
+    # setup, not a re-entry into the old impulse. Keep its independent price
+    # structure and risk checks, but do not carry the old day-high drawdown
+    # penalty into the new setup. Actual pullback/retake checks stay reentries.
+    fresh_breakout_recheck = bool(
+        alert.get("fresh_breakout_recheck")
+        or alert.get("completed_breakout_recheck")
+    )
+    origin_signal_price = float(alert.get("origin_signal_price") or 0.0)
+    fresh_breakout_extension_pct = (
+        (current / origin_signal_price - 1) * 100 if origin_signal_price > 0 else 0.0
+    )
     is_reentry_path = bool(
         alert.get("is_reentry")
-        or alert.get("watchlist_recheck")
         or alert.get("leader_pullback_recheck")
+        or (alert.get("watchlist_recheck") and not fresh_breakout_recheck)
     )
     trade_value_24h = float(
         ticker.get("acc_trade_price_24h") or config.min_trade_value_24h_krw
@@ -1977,6 +1989,11 @@ def evaluate_candidate(
         upper_wick = float(quality_context["upper_wick"])
 
     rejected: list[str] = []
+    if fresh_breakout_recheck and fresh_breakout_extension_pct > 5.0:
+        rejected.append(
+            "초기 포착가 대비 5% 초과 상승으로 신규 진입 제한"
+            f"(+{fresh_breakout_extension_pct:.1f}%)"
+        )
     soft_warnings: list[str] = []
     if (config.completed_structure_enabled and structure_context.get("confirmed")
             and not completed_structure_entry and not flow_leader):
@@ -2927,6 +2944,10 @@ def evaluate_candidate(
         )
 
     return {
+        "signal_id": alert.get("signal_id"),
+        "parent_signal_id": alert.get("parent_signal_id"),
+        "origin_signal_price": origin_signal_price or None,
+        "fresh_breakout_extension_pct": round(fresh_breakout_extension_pct, 2),
         "time_utc": alert.get("time_utc"),
         "market": alert["market"],
         "signal": "entry_candidate",
@@ -2935,6 +2956,7 @@ def evaluate_candidate(
         "is_reentry": bool(alert.get("is_reentry")),
         "watchlist_recheck": bool(alert.get("watchlist_recheck")),
         "leader_pullback_recheck": bool(alert.get("leader_pullback_recheck")),
+        "fresh_breakout_recheck": fresh_breakout_recheck,
         "selection_lane": (
             "completed_structure" if completed_structure_entry
             else "trade_flow_leader" if flow_leader

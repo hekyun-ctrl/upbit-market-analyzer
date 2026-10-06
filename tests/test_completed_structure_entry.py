@@ -186,7 +186,7 @@ def test_broken_initial_pullback_allows_only_new_high_completed_breakout_screen(
         'relative_strength_percentile': 1, 'momentum_5m_pct': 2, 'momentum_15m_pct': 3, 'momentum_60m_pct': 5}
     analyzer = monitor.CandidateAnalyzer(ca.CandidateConfig.from_env(), monitor.AlertDispatcher(), lambda *a: relative)
     analyzer._watchlist['KRW-TEST'] = {'expires_at': 1800010000, 'source_signal': 'breakout',
-        'first_signal_price': 100, 'breakout_level': 100, 'leader_peak_price': 105,
+        'first_signal_price': 102, 'breakout_level': 100, 'leader_peak_price': 105,
         'leader_pullback_invalidated': True}
     seen = []
     async def analyze(alert): seen.append(alert)
@@ -200,6 +200,8 @@ def test_broken_initial_pullback_allows_only_new_high_completed_breakout_screen(
     asyncio.run(run())
     assert len(seen) == 1 and seen[0]['completed_bar_recheck']
     assert not seen[0].get('is_reentry') and not seen[0].get('pullback_retest')
+    assert seen[0]['fresh_breakout_recheck']
+    assert seen[0]['original_signal_time_utc'] == seen[0]['time_utc']
     assert analyzer._watchlist['KRW-TEST']['leader_pullback_invalidated']
 
 
