@@ -150,6 +150,18 @@ async def get_recent_alerts(
 
 
 @mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
+async def get_telegram_delivery_history(
+    limit: int = 50, day_kst: str | None = None, market: str | None = None
+) -> list[dict[str, Any]]:
+    """Return recorded Telegram send attempts, exact messages, and API results."""
+    if market is not None:
+        market = UpbitPublicClient.normalize_market(market)
+    return MONITOR_STATE.telegram_deliveries(
+        limit=limit, day_kst=day_kst, market=market
+    )
+
+
+@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
 async def get_candidate_performance() -> dict[str, Any]:
     """Summarize sent candidates and all screened raw-signal outcomes."""
     return MONITOR_STATE.candidate_performance()

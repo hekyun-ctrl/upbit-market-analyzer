@@ -2737,3 +2737,28 @@ def test_early_watch_priority_reserve_is_capped_and_restored_after_restart(
     assert restarted_dispatcher._early_watch_priority_delivery_count == 2
     assert restored._early_watch_summary(restored._audit_rows("early_watch_events"))[
         "priority_notification_count"
+
+def test_telegram_delivery_history_persists_exact_message_and_api_result(
+    monkeypatch, tmp_path
+):
+    monkeypatch.setenv("CANDIDATE_AUDIT_DB_PATH", str(tmp_path / "audit.sqlite3"))
+    state = monitor.MonitorState()
+    delivered_at = "2026-10-06T15:00:00+00:00"
+    state.add_telegram_delivery_event(
+        {
+            "time_utc": delivered_at,
+            "category": "entry_candidate",
+            "market": "KRW-ORCA",
+            "signal": "completed_structure_entry",
+            "message": "[조건부 진입 후보] KRW-ORCA",
+            "status": "accepted_by_telegram",
+        }
+    )
+
+    restored = monitor.MonitorState()
+    rows = restored.telegram_deliveries(
+        limit=10, day_kst="2026-10-07", market="KRW-ORCA"
+    )
+    assert len(rows) == 1
+    assert rows[0]["message"] == "[조건부 진입 후보] KRW-ORCA"
+    assert rows[0]["status"] == "accepted_by_telegram"

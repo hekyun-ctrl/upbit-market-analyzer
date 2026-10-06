@@ -15,6 +15,7 @@
 | `analyze_market` | 이동평균·RSI·변동성·거래량 기반의 객관적 요약 |
 | `get_monitor_status` | WebSocket 연결·수신·재접속 상태 |
 | `get_recent_alerts` | 최근 탐지 신호 목록 |
+| `get_telegram_delivery_history` | 텔레그램 발송 시도·성공 상태와 메시지 원문 조회 |
 | `get_candidate_performance` | 목표1·손절 선도달 적중률과 MFE·MAE 기록 |
 
 ## 실시간 감시

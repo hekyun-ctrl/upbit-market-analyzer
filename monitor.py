@@ -339,6 +339,7 @@ class MonitorState:
         self.received_markets: set[str] = set()
         self.notification_mode = "log_only"
         self.recent_alerts: deque[dict[str, Any]] = deque(maxlen=100)
+        self.telegram_delivery_events: deque[dict[str, Any]] = deque(maxlen=1000)
         self.candidate_outcomes: deque[dict[str, Any]] = deque(maxlen=500)
         self.signal_outcomes: deque[dict[str, Any]] = deque(maxlen=1000)
         self.early_watch_events: deque[dict[str, Any]] = deque(maxlen=2000)
@@ -357,7 +358,7 @@ class MonitorState:
             try:
                 self.audit_store = AuditStore(path)
                 self.collection_started_at = self.audit_store.started_at
-                for field in ("candidate_outcomes", "signal_outcomes", "early_watch_events", "trend_outcomes", "screening_records"):
+                for field in ("candidate_outcomes", "signal_outcomes", "early_watch_events", "trend_outcomes", "screening_records", "telegram_delivery_events"):
                     target = getattr(self, field)
                     target.extend(self.audit_store.read(field, target.maxlen))
                 # A restart cannot prove which threshold was reached first
@@ -448,6 +449,24 @@ class MonitorState:
     def add_alert(self, alert: dict[str, Any]) -> None:
         with self._lock:
             self.recent_alerts.appendleft(dict(alert))
+
+    def add_telegram_delivery_event(self, event: dict[str, Any]) -> None:
+        """Keep the exact message and Telegram API result in the durable audit."""
+        with self._lock:
+            self.telegram_delivery_events.appendleft(dict(event))
+            self._persist_event("telegram_delivery_events", event)
+        LOGGER.info("TELEGRAM_DELIVERY_AUDIT %s", json.dumps(event, ensure_ascii=False))
+
+    def telegram_deliveries(
+        self, limit: int = 50, day_kst: str | None = None, market: str | None = None
+    ) -> list[dict[str, Any]]:
+        rows = self._audit_rows("telegram_delivery_events")
+        if day_kst:
+            rows = [row for row in rows if self._on_kst_day(row.get("time_utc"), day_kst)]
+        if market:
+            normalized = market.strip().upper()
+            rows = [row for row in rows if row.get("market") == normalized]
+        return rows[: max(1, min(limit, 500))]
 
     def add_candidate_outcome(self, outcome: dict[str, Any]) -> None:
         with self._lock:
@@ -832,6 +851,7 @@ class MonitorState:
                 "markets_without_trade": sorted(self.subscribed_markets - self.received_markets),
                 "notification_mode": self.notification_mode,
                 "recent_alert_count": len(self.recent_alerts),
+                "telegram_delivery_event_count": len(self.telegram_delivery_events),
                 "candidate_outcome_count": len(self.candidate_outcomes),
                 "raw_signal_outcome_count": len(self.signal_outcomes),
                 "early_watch_event_count": len(self.early_watch_events),
@@ -2268,18 +2288,9 @@ class AlertDispatcher:
             return False
         # Throttle retries even when Telegram is temporarily unavailable.
         self._last_inactivity_status_at = now
-        url = self._telegram_url()
-        async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
-            response = await client.post(
-                url,
-                json={
-                    "chat_id": self._telegram_chat_id,
-                    "text": self._inactivity_status_text(now),
-                    "disable_web_page_preview": True,
-                },
-            )
-            response.raise_for_status()
-        LOGGER.info("Telegram inactivity status delivered")
+        await self._deliver_telegram(
+            self._inactivity_status_text(now), category="inactivity_status"
+        )
         return True
 
     async def send_daily_performance_if_due(self) -> bool:
@@ -2297,18 +2308,10 @@ class AlertDispatcher:
             day, self._simulated_round_trip_cost_pct
         )
         self._last_daily_performance_day = day
-        url = self._telegram_url()
         try:
-            async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
-                response = await client.post(
-                    url,
-                    json={
-                        "chat_id": self._telegram_chat_id,
-                        "text": _daily_performance_text(report),
-                        "disable_web_page_preview": True,
-                    },
-                )
-                response.raise_for_status()
+            await self._deliver_telegram(
+                _daily_performance_text(report), category="daily_performance"
+            )
         except Exception:
             self._last_daily_performance_day = None
             raise
@@ -2344,17 +2347,47 @@ class AlertDispatcher:
         LOGGER.warning("MARKET_ALERT %s", json.dumps(alert, ensure_ascii=False))
         if self.mode != "telegram" or not self._send_observation_alerts:
             return
-        url = self._telegram_url()
-        async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
-            response = await client.post(
-                url,
-                json={
-                    "chat_id": self._telegram_chat_id,
-                    "text": _alert_text(alert),
-                    "disable_web_page_preview": True,
-                },
-            )
-            response.raise_for_status()
+        await self._deliver_telegram(
+            _alert_text(alert),
+            category="market_observation",
+            market=alert.get("market"),
+            signal=alert.get("signal"),
+        )
+
+    async def _deliver_telegram(
+        self,
+        message: str,
+        *,
+        category: str,
+        market: str | None = None,
+        signal: str | None = None,
+    ) -> None:
+        """Send one Telegram message and persist accepted or failed delivery."""
+        event = {
+            "time_utc": MONITOR_STATE._now(),
+            "category": category,
+            "market": market,
+            "signal": signal,
+            "message": message,
+            "status": "failed",
+        }
+        try:
+            async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
+                response = await client.post(
+                    self._telegram_url(),
+                    json={
+                        "chat_id": self._telegram_chat_id,
+                        "text": message,
+                        "disable_web_page_preview": True,
+                    },
+                )
+                response.raise_for_status()
+        except Exception as exc:
+            event["error_type"] = type(exc).__name__
+            MONITOR_STATE.add_telegram_delivery_event(event)
+            raise
+        event["status"] = "accepted_by_telegram"
+        MONITOR_STATE.add_telegram_delivery_event(event)
 
     async def send_early_watch(self, alert: dict[str, Any]) -> bool:
         """Send a capped discovery notice that cannot be mistaken for an entry."""
@@ -2387,18 +2420,13 @@ class AlertDispatcher:
         self._early_watch_delivery_count += 1
         if can_use_reserve:
             self._early_watch_priority_delivery_count += 1
-        url = self._telegram_url()
         try:
-            async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
-                response = await client.post(
-                    url,
-                    json={
-                        "chat_id": self._telegram_chat_id,
-                        "text": _early_watch_text(alert),
-                        "disable_web_page_preview": True,
-                    },
-                )
-                response.raise_for_status()
+            await self._deliver_telegram(
+                _early_watch_text(alert),
+                category="early_watch",
+                market=alert.get("market"),
+                signal=alert.get("signal"),
+            )
         except Exception:
             self._early_watch_delivery_count -= 1
             if can_use_reserve:
@@ -2654,18 +2682,13 @@ class AlertDispatcher:
         self._candidate_delivery_count += 1
         if availability_tier:
             self._last_availability_delivery_at = now
-        url = self._telegram_url()
         try:
-            async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
-                response = await client.post(
-                    url,
-                    json={
-                        "chat_id": self._telegram_chat_id,
-                        "text": _candidate_text(candidate),
-                        "disable_web_page_preview": True,
-                    },
-                )
-                response.raise_for_status()
+            await self._deliver_telegram(
+                _candidate_text(candidate),
+                category="entry_candidate",
+                market=candidate.get("market"),
+                signal=candidate.get("signal"),
+            )
         except Exception:
             self._candidate_delivery_count -= 1
             if availability_tier:
@@ -2689,17 +2712,12 @@ class AlertDispatcher:
             or not self._send_management_alerts
         ):
             return False
-        url = self._telegram_url()
-        async with httpx.AsyncClient(timeout=10, follow_redirects=False) as client:
-            response = await client.post(
-                url,
-                json={
-                    "chat_id": self._telegram_chat_id,
-                    "text": _management_text(update),
-                    "disable_web_page_preview": True,
-                },
-            )
-            response.raise_for_status()
+        await self._deliver_telegram(
+            _management_text(update),
+            category="position_management",
+            market=update.get("market"),
+            signal=update.get("event"),
+        )
         return True
 
 
