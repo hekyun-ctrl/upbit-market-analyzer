@@ -1372,11 +1372,14 @@ def validate_candidate_survival(
     structure_evidence = _completed_structure_context(candles_1m, candles_5m or [], candles_15m or [], flow_now, config) if structure_lane else {}
     structure_book = _structure_book_context(orderbook_samples, current, config, execution_now, trade_flow_context) if structure_lane else {}
     structure_higher = higher_timeframe_context(candles_15m or [], candles_60m or [], [], now=flow_now) if structure_lane else {}
+    fresh_leadership_basis = bool(candidate.get("fresh_breakout_recheck")
+        and candidate.get("structure_confirmation_basis") == "relative_leadership")
+    structure_higher_valid = bool(structure_higher.get("ready") and structure_higher.get("fifteen_intact")
+        and structure_higher["fifteen"]["above_ma20"] and structure_higher["hourly"]["above_ma20"]
+        and structure_higher["hourly"]["support_intact"])
     structure_valid = bool(structure_lane and config.completed_structure_enabled
         and structure_evidence.get("confirmed") and structure_book.get("confirmed")
-        and structure_higher.get("ready") and structure_higher.get("fifteen_intact")
-        and structure_higher["fifteen"]["above_ma20"] and structure_higher["hourly"]["above_ma20"]
-        and structure_higher["hourly"]["support_intact"]
+        and (structure_higher_valid or fresh_leadership_basis)
         and current >= max(breakout, float(structure_evidence.get("level") or 0))
         and completed_close >= max(breakout, float(structure_evidence.get("level") or 0))
         and current <= float(structure_evidence.get("close") or 0) * 1.005
@@ -1918,16 +1921,31 @@ def evaluate_candidate(
         and 0 <= execution_now.timestamp() - float(flow_context.get("as_of") or 0) <= 10
         and sum(float(w.get("sell_krw") or 0) for w in flow_context.get("windows", []))
         > 1.5 * sum(float(w.get("buy_krw") or 0) for w in flow_context.get("windows", [])))
+    structure_higher_trend = bool(higher.get("ready") and higher.get("fifteen_intact")
+        and higher["fifteen"]["above_ma20"] and higher["hourly"]["above_ma20"]
+        and higher["hourly"]["support_intact"])
+    structure_relative_leadership = bool(relative_ready
+        and relative_percentile <= 2.0 and momentum_5m >= .2
+        and momentum_15m is not None and momentum_15m >= .8)
+    fresh_structure_recheck = bool(fresh_breakout_recheck and structure_context.get("confirmed"))
+    fresh_structure_context_ok = bool(
+        structure_relative_leadership or structure_higher_trend
+    )
     structure_checks = {
         "enabled": bool(config.completed_structure_enabled and config.double_bb_enabled),
         "completed_breakout_volume": bool(structure_context.get("confirmed")),
         "local_execution_book": bool(structure_book.get("confirmed")),
-        "relative_strength": bool(relative_ready and relative_percentile <= 2),
-        "relative_momentum": bool(momentum_5m >= .2 and momentum_15m is not None
-            and momentum_15m >= .8 and float(alert.get("momentum_60m_pct") or 0) >= 1.5),
-        "completed_higher_trend": bool(higher.get("ready") and higher.get("fifteen_intact")
-            and higher["fifteen"]["above_ma20"] and higher["hourly"]["above_ma20"]
-            and higher["hourly"]["support_intact"]),
+        # A fresh local breakout has two alternative trend proofs. Requiring
+        # top-rank momentum AND mature 15m/1h alignment duplicates correlated
+        # evidence and delays re-accelerations. The legacy route keeps its
+        # original conjunctive qualification.
+        **({"leadership_or_higher_trend": fresh_structure_context_ok}
+           if fresh_structure_recheck else {
+               "relative_strength": bool(relative_ready and relative_percentile <= 2),
+               "relative_momentum": bool(momentum_5m >= .2 and momentum_15m is not None
+                   and momentum_15m >= .8 and float(alert.get("momentum_60m_pct") or 0) >= 1.5),
+               "completed_higher_trend": structure_higher_trend,
+           }),
         "breadth": float(alert.get("market_breadth_5m_pct") or 0) >= 20,
         "level_hold": bool(current >= max(breakout, float(structure_context.get("level") or 0))
             and completed_close >= max(breakout, float(structure_context.get("level") or 0))),
@@ -1937,6 +1955,11 @@ def evaluate_candidate(
         "selling_and_heat": bool(not known_selling and rsi1 < 95 and rsi5 < 95),
     }
     completed_structure_entry = bool(not flow_leader and all(structure_checks.values()))
+    structure_confirmation_basis = (
+        "relative_leadership" if fresh_structure_recheck and structure_relative_leadership
+        else "completed_higher_trend" if fresh_structure_recheck
+        else "legacy_conjunctive"
+    )
     if completed_structure_entry:
         # A new completed breakout creates a new plan. Never move an existing
         # candidate's stop, or measure today's entry against an hours-old alert.
@@ -1946,7 +1969,9 @@ def evaluate_candidate(
         signal_price = float(structure_context["close"])
         extension = (current / signal_price - 1) * 100
         rsi_context = structure_context
-        hourly_trend_core = True
+        # A fresh leader can re-accelerate before its hourly MA turns. Keep
+        # its 5m structural stop without labeling it a mature hourly trend.
+        hourly_trend_core = bool(structure_higher_trend or not fresh_structure_recheck)
         retest_confirmed = bool(structure_context.get("retest"))
     if completed_wb_retest_entry:
         # Keep 1m execution quality, but use a 5m structural initial stop.
@@ -2001,6 +2026,7 @@ def evaluate_candidate(
             "local_execution_book": "가까운 반복 호가·비용 검증 대상 미달",
             "relative_strength": "상대강도", "relative_momentum": "15·60분 상대 추세",
             "completed_higher_trend": "완료 15·60분 추세",
+            "leadership_or_higher_trend": "최상위 상대강도 또는 완료 상위 추세",
             "breadth": "시장 확산도", "level_hold": "돌파선 유지",
             "chase": "실행 가격 이격", "btc": "BTC 보호",
             "selling_and_heat": "실제 매도 우위 또는 극단 과열",
@@ -2405,6 +2431,7 @@ def evaluate_candidate(
         "continuation_context": continuation_context,
         "completed_breakout_entry": completed_breakout_entry,
         "completed_structure_entry": completed_structure_entry,
+        "structure_confirmation_basis": structure_confirmation_basis if completed_structure_entry else None,
         "completed_structure_context": structure_context,
         "completed_structure_checks": structure_checks,
         "completed_structure_blockers": [k for k, v in structure_checks.items() if v is False],
@@ -2465,7 +2492,7 @@ def evaluate_candidate(
         min(float(c["low_price"]) for c in c1[:6]), breakout, float(one["ma20"])
     )
     atr_risk = max(_atr(c1) * 1.2, _atr(c5) * 0.35)
-    if hourly_trend_core or explosive_core or completed_wb_retest_entry or narrow_market_fast_core:
+    if hourly_trend_core or explosive_core or completed_wb_retest_entry or narrow_market_fast_core or completed_structure_entry:
         # Plan a 5m initial invalidation before entry, never widen it later.
         support = min(min(float(c["low_price"]) for c in c5[:3]), breakout)
         if explosive_core or flow_leader or completed_wb_retest_entry:
@@ -2484,7 +2511,7 @@ def evaluate_candidate(
         "max_stop_loss_pct": config.max_stop_loss_pct,
     }
     if (
-        (hourly_trend_core or explosive_core or completed_wb_retest_entry or narrow_market_fast_core)
+        (hourly_trend_core or explosive_core or completed_wb_retest_entry or narrow_market_fast_core or completed_structure_entry)
         and (1 - stop_raw / entry_reference) * 100 > config.max_stop_loss_pct
     ):
         return None, ["5분 구조 손절폭이 허용 손실폭 초과"]
@@ -2501,7 +2528,7 @@ def evaluate_candidate(
         rounded_stop_loss_pct=(1 - stop / entry_reference) * 100,
     )
     if (
-        (hourly_trend_core or explosive_core or completed_wb_retest_entry or narrow_market_fast_core)
+        (hourly_trend_core or explosive_core or completed_wb_retest_entry or narrow_market_fast_core or completed_structure_entry)
         and (1 - stop / entry_reference) * 100 > config.max_stop_loss_pct + 1e-9
     ):
         return None, ["호가 단위 반영 후 5분 구조 손절폭 초과"]
@@ -2734,6 +2761,7 @@ def evaluate_candidate(
     )
     strong_extension = (
         alert.get("signal") == "consolidation_rebreakout"
+        and not (fresh_structure_recheck and not structure_higher_trend)
         and score >= 95
         and room >= 7
         and structural_risk_reward >= 2.5
@@ -2968,6 +2996,7 @@ def evaluate_candidate(
         "rsi_breakout_exception": rsi_breakout_exception,
         "completed_breakout_entry": completed_breakout_entry,
         "completed_structure_entry": completed_structure_entry,
+        "structure_confirmation_basis": structure_confirmation_basis if completed_structure_entry else None,
         "completed_structure_context": structure_context if completed_structure_entry else None,
         "structure_book_context": structure_book if completed_structure_entry else None,
         "completed_wb_retest_entry": completed_wb_retest_entry,
@@ -3017,7 +3046,7 @@ def evaluate_candidate(
         "price_structure_score_bonus": price_structure_bonus,
         "completed_5m_volume_ratio": round(_volume_metrics(c5)[0], 2),
         "completed_15m_volume_ratio": round(_volume_metrics(c15)[0], 2),
-        "stop_timeframe": "5분 구조" if hourly_trend_core or explosive_core or completed_wb_retest_entry else "초기 신호 구조",
+        "stop_timeframe": "5분 구조" if hourly_trend_core or explosive_core or completed_wb_retest_entry or completed_structure_entry else "초기 신호 구조",
         "price_tick": tick,
         "tick_spread_exception": tick_spread_exception,
         "execution_spread_context": execution_spread_context if tick_spread_exception else None,

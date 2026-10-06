@@ -2332,9 +2332,9 @@ def test_explosive_survival_requires_leadership_to_remain_top_two_percent(monkey
 def test_new_completed_bar_is_rechecked_even_after_late_previous_bar_rejection(monkeypatch):
     monkeypatch.setenv("ENABLE_CANDIDATE_ANALYSIS", "true")
     monkeypatch.setattr(MONITOR_STATE, "has_recent_signal", lambda *args: False)
-    relative = {"relative_strength_ready": True, "relative_strength_eligible": True,
-                "relative_strength_percentile": 1, "momentum_5m_pct": 2,
-                "momentum_15m_pct": 3, "momentum_60m_pct": 4}
+    relative = {"relative_strength_ready": True, "relative_strength_eligible": False,
+                "relative_strength_percentile": 1, "momentum_5m_pct": .3,
+                "momentum_15m_pct": .9, "momentum_60m_pct": 0}
     analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher(), lambda *args: relative)
     analyzer._watchlist["KRW-TEST"] = {"created_at": 1_800_000_000,
         "expires_at": 1_800_010_000, "source_signal": "breakout", "breakout_level": 100,
@@ -2633,3 +2633,16 @@ def test_flow_survival_does_not_cool_out_an_intact_leader_but_still_requires_ran
     for key, value in [('relative_strength_percentile', 3), ('market_breadth_5m_pct', 19),
                        ('momentum_5m_pct', -.1), ('momentum_60m_pct', 0)]:
         assert analyzer._relative_survival_rejections(candidate, {**relative, key: value})
+
+
+def test_fresh_structure_survival_rechecks_selected_leadership_without_sixty_minute_gate():
+    analyzer = CandidateAnalyzer(CandidateConfig.from_env(), AlertDispatcher())
+    candidate = {"completed_structure_entry": True, "fresh_breakout_recheck": True,
+                 "structure_confirmation_basis": "relative_leadership",
+                 "relative_strength_ready": True}
+    relative = {"relative_strength_ready": True, "relative_strength_percentile": 1.2,
+                "momentum_5m_pct": .3, "momentum_15m_pct": .9,
+                "momentum_60m_pct": 0, "market_breadth_5m_pct": 27}
+    assert analyzer._relative_survival_rejections(candidate, relative) == []
+    assert analyzer._relative_survival_rejections(
+        candidate, {**relative, "momentum_15m_pct": .1})

@@ -115,6 +115,50 @@ def test_new_route_preserves_five_minute_structure_without_claiming_retest_or_bu
     assert '실제 체결:' not in text and '첫 눌림·돌파선 재지지 확인' not in text
 
 
+def test_fresh_rebreakout_accepts_leadership_instead_of_duplicate_hourly_gates(monkeypatch):
+    fixture = structure_fixture(monkeypatch)
+    alert = fixture[0][5]
+    alert.update(fresh_breakout_recheck=True, origin_signal_price=100,
+                 relative_strength_eligible=False, momentum_60m_pct=0)
+    # Keep the top-ranked 5m/15m leader evidence, while the mature hourly
+    # trend is not yet aligned. The fresh setup may use either proof.
+    fixture[1][1]['trade_price'] = 90
+    candidate, reasons = _evaluate_flow(fixture, completed_structure_enabled=True)
+    assert candidate is not None, reasons
+    assert candidate['fresh_breakout_recheck']
+    assert candidate['structure_confirmation_basis'] == 'relative_leadership'
+    _, survival_reasons = survive(candidate, fixture)
+    assert survival_reasons == []
+
+
+def test_fresh_rebreakout_requires_one_of_the_two_trend_proofs(monkeypatch):
+    higher_trend = structure_fixture(monkeypatch)
+    higher_trend[0][5].update(fresh_breakout_recheck=True, origin_signal_price=100,
+                              relative_strength_percentile=3,
+                              relative_strength_eligible=False, momentum_60m_pct=0)
+    candidate, reasons = _evaluate_flow(higher_trend, completed_structure_enabled=True)
+    assert candidate is not None, reasons
+    assert candidate['structure_confirmation_basis'] == 'completed_higher_trend'
+
+    no_trend = structure_fixture(monkeypatch)
+    no_trend[0][5].update(fresh_breakout_recheck=True, origin_signal_price=100,
+                          relative_strength_percentile=3,
+                          relative_strength_eligible=False, momentum_60m_pct=0)
+    no_trend[1][1]['trade_price'] = 90
+    candidate, reasons = _evaluate_flow(no_trend, completed_structure_enabled=True)
+    assert candidate is None
+    assert any('최상위 상대강도 또는 완료 상위 추세' in reason for reason in reasons)
+
+
+def test_ordinary_structure_route_keeps_conjunctive_higher_trend_gate(monkeypatch):
+    fixture = structure_fixture(monkeypatch)
+    fixture[0][5]['momentum_60m_pct'] = 0
+    fixture[1][1]['trade_price'] = 90
+    candidate, reasons = _evaluate_flow(fixture, completed_structure_enabled=True)
+    assert candidate is None
+    assert any('완료 15·60분 추세' in reason for reason in reasons)
+
+
 @pytest.mark.parametrize('cause', ['no_structure', 'selling', 'thin', 'far_only', 'one_book', 'wide',
     'rank', 'breadth', 'rsi', 'btc', 'below_anchor', 'chase', 'liquidity', 'risk', 'disabled'])
 def test_new_route_does_not_replace_execution_or_risk_evidence(monkeypatch, cause):

@@ -41,7 +41,7 @@ from trade_flow import TradeFlow, buying_persistent
 from audit_store import AuditStore, configured_audit_path
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "structure-and-audit-v3.18"
+STRATEGY_VERSION = "structure-and-audit-v3.19"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -4063,10 +4063,9 @@ class CandidateAnalyzer:
         breakout_admission = bool(
             self.config.explosive_leader_enabled
             and relative.get("relative_strength_ready")
-            and relative.get("relative_strength_eligible")
             and float(relative.get("relative_strength_percentile") or 100) <= 2.0
-            and float(relative.get("momentum_5m_pct") or 0) >= self.config.relative_strength_min_5m_pct
-            and float(relative.get("momentum_15m_pct") or 0) > 0
+            and float(relative.get("momentum_5m_pct") or 0) >= 0.2
+            and float(relative.get("momentum_15m_pct") or 0) >= 0.8
         )
         if not (hourly_admission or breakout_admission):
             return False
@@ -4333,12 +4332,29 @@ class CandidateAnalyzer:
             return ["생존 시점 상대강도 시장표본 미확인"]
         rejected: list[str] = []
         percentile = float(relative.get("relative_strength_percentile") or 100.0)
-        if candidate.get("trade_flow_leader") or candidate.get("completed_structure_entry"):
+        if candidate.get("trade_flow_leader"):
             if (percentile > 2.0 or float(relative.get("momentum_5m_pct") or 0) < .2
                     or float(relative.get("momentum_15m_pct") or 0) < .8
                     or float(relative.get("momentum_60m_pct") or 0) < 1.5
                     or float(relative.get("market_breadth_5m_pct") or 0) < 20):
                 rejected.append("생존 중 체결 지속형 선도 순위·추세·확산도 상실")
+        elif candidate.get("completed_structure_entry"):
+            if candidate.get("fresh_breakout_recheck"):
+                if candidate.get("structure_confirmation_basis") == "relative_leadership":
+                    # Match the fresh setup's selected proof. Short-horizon
+                    # leadership must survive, but an unrelated 60m threshold
+                    # must not be re-added after admission.
+                    if (percentile > 2.0 or float(relative.get("momentum_5m_pct") or 0) < .2
+                            or float(relative.get("momentum_15m_pct") or 0) < .8
+                            or float(relative.get("market_breadth_5m_pct") or 0) < 20):
+                        rejected.append("생존 중 신규 돌파 상대강도·단기 모멘텀·확산도 상실")
+                # The completed higher-trend alternative is checked from the
+                # freshly fetched candles in validate_candidate_survival.
+            elif (percentile > 2.0 or float(relative.get("momentum_5m_pct") or 0) < .2
+                    or float(relative.get("momentum_15m_pct") or 0) < .8
+                    or float(relative.get("momentum_60m_pct") or 0) < 1.5
+                    or float(relative.get("market_breadth_5m_pct") or 0) < 20):
+                rejected.append("생존 중 구조형 선도 순위·추세·확산도 상실")
         if candidate.get("completed_breakout_entry") or candidate.get("completed_wb_retest_entry"):
             route = "5분 WB 첫 재지지" if candidate.get("completed_wb_retest_entry") else "눌림 없는 돌파"
             if percentile > self.config.early_leader_max_percentile:
