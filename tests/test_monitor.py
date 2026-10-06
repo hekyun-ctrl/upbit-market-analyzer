@@ -85,7 +85,11 @@ def test_young_completed_breakout_is_admitted_to_recheck_without_hourly_history(
         assert analyzer._observe_completed_bar_watchlist("KRW-TEST", 101, 1_800_000_305)
         await asyncio.sleep(0)
         await asyncio.sleep(0)
+        # v3.19 intentionally no longer uses the generic +1% eligibility
+        # flag for a fresh completed breakout. It must still fail when the
+        # dedicated 15m leadership proof drops below its +0.8% floor.
         relative["relative_strength_eligible"] = False
+        relative["momentum_15m_pct"] = 0.7
         assert not analyzer._observe_completed_bar_watchlist("KRW-TEST", 101, 1_800_000_605)
     asyncio.run(run())
     assert len(seen) == 1 and seen[0]["completed_breakout_recheck"]
@@ -1438,8 +1442,10 @@ def test_rejected_candidate_is_rechecked_on_consolidation_breakout(monkeypatch):
 
     asyncio.run(run())
     assert len(seen) == 1
-    assert seen[0]["is_reentry"] is True
+    assert not seen[0].get("is_reentry")
     assert seen[0]["watchlist_recheck"] is True
+    assert seen[0]["fresh_breakout_recheck"] is True
+    assert seen[0]["origin_signal_price"] == 100.0
 
 
 @pytest.mark.parametrize("cooled", [False, True])
@@ -2140,7 +2146,9 @@ def test_stronger_signal_upgrades_inflight_candidate(monkeypatch):
     assert seen[0]["signal"] == "consolidation_rebreakout"
     assert seen[0]["superseded_signal"] == "breakout"
     assert seen[0]["watchlist_recheck"] is True
-    assert seen[0]["is_reentry"] is True
+    assert not seen[0].get("is_reentry")
+    assert seen[0]["fresh_breakout_recheck"] is True
+    assert seen[0]["origin_signal_price"] == 342.0
     assert seen[0]["breakout_level"] == 343.026
     assert seen[0]["best_relative_strength_percentile"] == 4.59
     assert "KRW-LSK" not in analyzer._inflight_markets
