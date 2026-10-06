@@ -2685,6 +2685,12 @@ def test_early_watch_priority_reserve_is_capped_and_restored_after_restart(
     monkeypatch.setattr(
         AlertDispatcher, "_today_kst", staticmethod(lambda: "2026-10-06")
     )
+    persisted_times = iter(
+        f"2026-10-06T06:00:{second:02d}+00:00" for second in range(6)
+    )
+    monkeypatch.setattr(
+        monitor.MonitorState, "_now", staticmethod(lambda: next(persisted_times))
+    )
     state = monitor.MonitorState()
     monkeypatch.setattr(monitor, "MONITOR_STATE", state)
 
@@ -2737,6 +2743,8 @@ def test_early_watch_priority_reserve_is_capped_and_restored_after_restart(
     assert restarted_dispatcher._early_watch_priority_delivery_count == 2
     assert restored._early_watch_summary(restored._audit_rows("early_watch_events"))[
         "priority_notification_count"
+    ] == 2
+
 
 def test_telegram_delivery_history_persists_exact_message_and_api_result(
     monkeypatch, tmp_path
