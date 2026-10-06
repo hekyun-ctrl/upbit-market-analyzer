@@ -2654,3 +2654,86 @@ def test_fresh_structure_survival_rechecks_selected_leadership_without_sixty_min
     assert analyzer._relative_survival_rejections(candidate, relative) == []
     assert analyzer._relative_survival_rejections(
         candidate, {**relative, "momentum_15m_pct": .1})
+
+def test_early_watch_priority_reserve_requires_top_rank_volume_and_momentum():
+    strong = {
+        "relative_strength_rank": 1,
+        "relative_strength_universe": 144,
+        "preleader_volume_ratio_10m": 14.1,
+        "preleader_volume_ratio_30m": 6.3,
+        "momentum_5m_pct": 3.4,
+    }
+    assert monitor._qualifies_for_early_watch_priority_reserve(strong)
+    assert not monitor._qualifies_for_early_watch_priority_reserve(
+        {**strong, "relative_strength_rank": 8}
+    )
+    assert not monitor._qualifies_for_early_watch_priority_reserve(
+        {**strong, "preleader_volume_ratio_10m": 2}
+    )
+    assert not monitor._qualifies_for_early_watch_priority_reserve(
+        {**strong, "momentum_5m_pct": 0.2}
+    )
+
+
+def test_early_watch_priority_reserve_is_capped_and_restored_after_restart(
+    monkeypatch, tmp_path
+):
+    monkeypatch.setenv("CANDIDATE_AUDIT_DB_PATH", str(tmp_path / "audit.sqlite3"))
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "test-chat")
+    monkeypatch.setenv("TELEGRAM_EARLY_WATCH_DAILY_MAX", "1")
+    monkeypatch.setattr(
+        AlertDispatcher, "_today_kst", staticmethod(lambda: "2026-10-06")
+    )
+    state = monitor.MonitorState()
+    monkeypatch.setattr(monitor, "MONITOR_STATE", state)
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+    class Client:
+        def __init__(self, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *args):
+            return None
+
+        async def post(self, *args, **kwargs):
+            return Response()
+
+    monkeypatch.setattr(monitor.httpx, "AsyncClient", Client)
+    base_alert = {
+        "market": "KRW-ONE",
+        "price": 100,
+        "momentum_5m_pct": 1,
+        "relative_strength_rank": 50,
+        "relative_strength_universe": 200,
+    }
+    priority_alert = {
+        **base_alert,
+        "market": "KRW-ORCA",
+        "relative_strength_rank": 1,
+        "preleader_volume_ratio_10m": 14.1,
+        "preleader_volume_ratio_30m": 6.3,
+        "momentum_5m_pct": 3.4,
+    }
+
+    async def send_sequence():
+        dispatcher = AlertDispatcher()
+        assert await dispatcher.send_early_watch(base_alert)
+        assert await dispatcher.send_early_watch(priority_alert)
+        assert await dispatcher.send_early_watch(priority_alert)
+        assert not await dispatcher.send_early_watch(priority_alert)
+
+    asyncio.run(send_sequence())
+    restored = monitor.MonitorState()
+    monkeypatch.setattr(monitor, "MONITOR_STATE", restored)
+    restarted_dispatcher = AlertDispatcher()
+    assert restarted_dispatcher._early_watch_delivery_count == 3
+    assert restarted_dispatcher._early_watch_priority_delivery_count == 2
+    assert restored._early_watch_summary(restored._audit_rows("early_watch_events"))[
+        "priority_notification_count"
