@@ -39,10 +39,11 @@ from exit_plan import exit_plan_metrics, execution_cost_metrics, modeled_exit_re
 from upbit_client import UpbitPublicClient
 from trade_flow import TradeFlow, buying_persistent
 from audit_store import AuditStore, configured_audit_path
+from alert_limits import early_watch_daily_limits
 from volume_history import build_72h_turnover_snapshot, summarize_72h_ranked_outcomes
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "structure-and-audit-v3.20"
+STRATEGY_VERSION = "structure-and-audit-v3.21"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -2507,12 +2508,16 @@ class AlertDispatcher:
         self._refresh_candidate_delivery_day()
         priority_reserved = _qualifies_for_early_watch_priority_reserve(alert)
         at_base_limit = self._early_watch_delivery_count >= self._early_watch_daily_max
+        total_limit, available_reserve = early_watch_daily_limits(
+            self._early_watch_daily_max,
+            self._early_watch_priority_reserve,
+            datetime.now(_KST).hour,
+        )
         can_use_reserve = (
             at_base_limit
             and priority_reserved
-            and self._early_watch_priority_delivery_count < self._early_watch_priority_reserve
+            and self._early_watch_priority_delivery_count < available_reserve
         )
-        total_limit = self._early_watch_daily_max + self._early_watch_priority_reserve
         if self._early_watch_delivery_count >= total_limit or (at_base_limit and not can_use_reserve):
             LOGGER.info(
                 "EARLY_WATCH_DAILY_MAX_SUPPRESSED market=%s count=%d max=%d priority=%s reserve_used=%d reserve_max=%d",
