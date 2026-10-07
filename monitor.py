@@ -39,7 +39,7 @@ from exit_plan import exit_plan_metrics, execution_cost_metrics, modeled_exit_re
 from upbit_client import UpbitPublicClient
 from trade_flow import TradeFlow, buying_persistent
 from audit_store import AuditStore, configured_audit_path
-from alert_limits import early_watch_daily_limits
+from alert_limits import early_watch_daily_limits, restored_early_watch_usage
 from volume_history import build_72h_turnover_snapshot, summarize_72h_ranked_outcomes
 
 LOGGER = logging.getLogger("upbit-monitor")
@@ -717,6 +717,18 @@ class MonitorState:
         if observed.tzinfo is None:
             observed = observed.replace(tzinfo=timezone.utc)
         return observed.astimezone(_KST).date().isoformat() == day_kst
+
+    @staticmethod
+    def _kst_hour(value: Any) -> int:
+        if not value:
+            return 0
+        try:
+            observed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        except (TypeError, ValueError):
+            return 0
+        if observed.tzinfo is None:
+            observed = observed.replace(tzinfo=timezone.utc)
+        return observed.astimezone(_KST).hour
 
     def daily_performance(self, day_kst: str, cost_pct: float = 0.2) -> dict[str, Any]:
         """Read retained audit events without assuming actual account fills."""
@@ -2241,9 +2253,25 @@ class AlertDispatcher:
                 self._candidate_delivery_day,
             )
         ]
-        self._early_watch_delivery_count = len(early_watch_notifications)
-        self._early_watch_priority_delivery_count = sum(
-            bool(row.get("priority_reserved")) for row in early_watch_notifications
+        overnight_notifications = [
+            row for row in early_watch_notifications
+            if MONITOR_STATE._kst_hour(
+                row.get("signal_time_utc") or row.get("time_utc")
+            ) < 8
+        ]
+        morning_notifications = [
+            row for row in early_watch_notifications
+            if MONITOR_STATE._kst_hour(
+                row.get("signal_time_utc") or row.get("time_utc")
+            ) >= 8
+        ]
+        self._early_watch_delivery_count, self._early_watch_priority_delivery_count = (
+            restored_early_watch_usage(
+                len(overnight_notifications),
+                len(morning_notifications),
+                sum(bool(row.get("priority_reserved")) for row in morning_notifications),
+                self._early_watch_daily_max,
+            )
         )
         self._early_watch_priority_reserve = min(
             2, max(0, 10 - self._early_watch_daily_max)

@@ -2770,3 +2770,32 @@ def test_telegram_delivery_history_persists_exact_message_and_api_result(
     assert len(rows) == 1
     assert rows[0]["message"] == "[조건부 진입 후보] KRW-ORCA"
     assert rows[0]["status"] == "accepted_by_telegram"
+
+
+def test_restart_recovers_morning_reserve_spent_by_legacy_overnight_deployment(
+    monkeypatch, tmp_path
+):
+    monkeypatch.setenv("CANDIDATE_AUDIT_DB_PATH", str(tmp_path / "audit.sqlite3"))
+    monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "test-token")
+    monkeypatch.setenv("TELEGRAM_CHAT_ID", "test-chat")
+    monkeypatch.setenv("TELEGRAM_EARLY_WATCH_DAILY_MAX", "8")
+    monkeypatch.setattr(
+        AlertDispatcher, "_today_kst", staticmethod(lambda: "2026-10-07")
+    )
+    state = monitor.MonitorState()
+    for index in range(10):
+        state.record_early_watch_notification(
+            {
+                "time_utc": f"2026-10-06T15:00:{index:02d}+00:00",
+                "signal_time_utc": f"2026-10-06T15:00:{index:02d}+00:00",
+                "market": f"KRW-LEGACY{index}",
+                "priority_reserved": index >= 8,
+            }
+        )
+
+    restored = monitor.MonitorState()
+    monkeypatch.setattr(monitor, "MONITOR_STATE", restored)
+    dispatcher = AlertDispatcher()
+
+    assert dispatcher._early_watch_delivery_count == 8
+    assert dispatcher._early_watch_priority_delivery_count == 0

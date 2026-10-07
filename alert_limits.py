@@ -17,3 +17,22 @@ def early_watch_daily_limits(base_limit: int, priority_reserve: int, local_hour:
     if hour < 8:
         return base, 0
     return base + reserve, reserve
+
+
+def restored_early_watch_usage(
+    overnight_count: int,
+    morning_count: int,
+    morning_priority_count: int,
+    base_limit: int,
+) -> tuple[int, int]:
+    """Normalize persisted usage after introducing the morning reserve.
+
+    Legacy deployments could spend priority slots before 08:00 KST. Count at
+    most the base allocation from that period so those historical overflows do
+    not keep the protected morning reserve locked for the rest of the day.
+    """
+    base = max(0, int(base_limit))
+    overnight = max(0, int(overnight_count))
+    morning = max(0, int(morning_count))
+    morning_priority = max(0, int(morning_priority_count))
+    return min(overnight, base) + morning, morning_priority
