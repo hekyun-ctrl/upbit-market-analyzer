@@ -2685,6 +2685,7 @@ def test_early_watch_priority_reserve_is_capped_and_restored_after_restart(
     monkeypatch.setattr(
         AlertDispatcher, "_today_kst", staticmethod(lambda: "2026-10-06")
     )
+    monkeypatch.setattr(AlertDispatcher, "_hour_kst", staticmethod(lambda: 15))
     persisted_times = iter(
         f"2026-10-06T06:00:{second:02d}+00:00" for second in range(6)
     )

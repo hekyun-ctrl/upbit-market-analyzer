@@ -2293,6 +2293,11 @@ class AlertDispatcher:
     def _today_kst() -> str:
         return datetime.now(_KST).date().isoformat()
 
+    @staticmethod
+    def _hour_kst() -> int:
+        """Return the local hour separately so quota tests are deterministic."""
+        return datetime.now(_KST).hour
+
     def _refresh_candidate_delivery_day(self) -> None:
         day = self._today_kst()
         if day == self._candidate_delivery_day:
@@ -2539,7 +2544,7 @@ class AlertDispatcher:
         total_limit, available_reserve = early_watch_daily_limits(
             self._early_watch_daily_max,
             self._early_watch_priority_reserve,
-            datetime.now(_KST).hour,
+            self._hour_kst(),
         )
         can_use_reserve = (
             at_base_limit
