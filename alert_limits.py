@@ -4,19 +4,22 @@ from __future__ import annotations
 
 
 def early_watch_daily_limits(base_limit: int, priority_reserve: int, local_hour: int) -> tuple[int, int]:
-    """Return (total ceiling, available reserve) without spending morning slots overnight.
+    """Return (total ceiling, available reserve) with half the quota held until 09:00 KST.
 
-    From 00:00 through 07:59 KST, only the standard daily allocation is usable.
-    At 08:00 KST the reserve becomes available to qualifying priority signals.
+    Before 09:00, no more than five discovery notices may be sent, regardless
+    of the base allocation. At 09:00 the remaining daily allocation opens, with
+    any priority reserve available only to qualifying signals. The overall
+    daily ceiling remains base_limit + priority_reserve.
     """
     base = max(0, int(base_limit))
     reserve = max(0, int(priority_reserve))
     hour = int(local_hour)
     if not 0 <= hour <= 23:
         raise ValueError("local_hour must be between 0 and 23")
-    if hour < 8:
-        return base, 0
-    return base + reserve, reserve
+    total = base + reserve
+    if hour < 9:
+        return min(total, 5), 0
+    return total, reserve
 
 
 def restored_early_watch_usage(
