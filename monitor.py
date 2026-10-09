@@ -43,7 +43,7 @@ from alert_limits import early_watch_daily_limits, restored_early_watch_usage
 from volume_history import build_72h_turnover_snapshot, summarize_72h_ranked_outcomes
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "structure-and-audit-v3.21"
+STRATEGY_VERSION = "structure-and-audit-v3.22-setup-anchor"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -1789,6 +1789,12 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
                 f" · 15분 {float(candidate['momentum_15m_pct']):+.1f}%"
         )
         relative_line += "\n"
+    setup_line = ""
+    if candidate.get("setup_anchor_reason") == "completed_5m_structure_close":
+        setup_line = (
+            f"새 설정 기준: 완료 5분 종가 {_format_price(float(candidate.get('setup_anchor_price') or candidate['current_price']))} · "
+            f"기준 이격 +{float(candidate.get('setup_extension_pct') or 0):.2f}%\n"
+        )
     volume_72h_line = ""
     if candidate.get("volume_72h_rank") is not None:
         observed = int(candidate.get("volume_72h_observed_snapshots_24h") or 0)
@@ -1903,6 +1909,7 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
         f"[조건부 진입 후보{suffix} | 조건점수 {candidate['score']}/100] "
         f"{candidate['market']}\n"
         f"현재가: {_format_price(float(candidate['current_price']))}\n"
+        f"{setup_line}"
         f"진입구간: {_format_price(float(candidate['entry_low']))} ~ "
         f"{_format_price(float(candidate['entry_high']))}\n"
         f"추격금지: {_format_price(float(candidate['chase_limit']))} 이상\n"
@@ -4615,9 +4622,9 @@ class CandidateAnalyzer:
                     # Match the fresh setup's selected proof. Short-horizon
                     # leadership must survive, but an unrelated 60m threshold
                     # must not be re-added after admission.
-                    if (percentile > 2.0 or float(relative.get("momentum_5m_pct") or 0) < .2
-                            or float(relative.get("momentum_15m_pct") or 0) < .8
-                            or float(relative.get("market_breadth_5m_pct") or 0) < 20):
+                    if (percentile > 5.0 or float(relative.get("momentum_5m_pct") or 0) < .2
+                            or float(relative.get("momentum_15m_pct") or 0) < .2
+                            or float(relative.get("market_breadth_5m_pct") or 0) < 8):
                         rejected.append("생존 중 신규 돌파 상대강도·단기 모멘텀·확산도 상실")
                 # The completed higher-trend alternative is checked from the
                 # freshly fetched candles in validate_candidate_survival.

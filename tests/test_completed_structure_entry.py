@@ -134,7 +134,7 @@ def test_fresh_rebreakout_accepts_leadership_instead_of_duplicate_hourly_gates(m
 def test_fresh_rebreakout_requires_one_of_the_two_trend_proofs(monkeypatch):
     higher_trend = structure_fixture(monkeypatch)
     higher_trend[0][5].update(fresh_breakout_recheck=True, origin_signal_price=100,
-                              relative_strength_percentile=3,
+                              relative_strength_percentile=6,
                               relative_strength_eligible=False, momentum_60m_pct=0)
     candidate, reasons = _evaluate_flow(higher_trend, completed_structure_enabled=True)
     assert candidate is not None, reasons
@@ -142,12 +142,37 @@ def test_fresh_rebreakout_requires_one_of_the_two_trend_proofs(monkeypatch):
 
     no_trend = structure_fixture(monkeypatch)
     no_trend[0][5].update(fresh_breakout_recheck=True, origin_signal_price=100,
-                          relative_strength_percentile=3,
+                          relative_strength_percentile=6,
                           relative_strength_eligible=False, momentum_60m_pct=0)
     no_trend[1][1]['trade_price'] = 90
     candidate, reasons = _evaluate_flow(no_trend, completed_structure_enabled=True)
     assert candidate is None
     assert any('최상위 상대강도 또는 완료 상위 추세' in reason for reason in reasons)
+
+
+def test_fresh_setup_reanchors_and_treats_ordinary_breadth_as_quality_not_veto(monkeypatch):
+    fixture = structure_fixture(monkeypatch)
+    now, one, five, fifteen, _, alert, ticker = fixture[0]
+    origin = float(ticker['trade_price']) * .90
+    alert.update(fresh_breakout_recheck=True, origin_signal_price=origin,
+                 relative_strength_percentile=3.0, relative_strength_eligible=False,
+                 momentum_60m_pct=0.0, market_breadth_5m_pct=17.0)
+    # The individual coin's completed 5m structure remains intact while the
+    # old impulse is >5% behind and the mature hourly trend still lags.
+    fixture[1][1]['trade_price'] = 90
+    candidate, reasons = _evaluate_flow(fixture, completed_structure_enabled=True)
+    assert candidate is not None, reasons
+    assert candidate['origin_extension_pct'] > 5
+    assert candidate['setup_anchor_reason'] == 'completed_5m_structure_close'
+    assert candidate['setup_extension_pct'] <= 1.0
+    assert candidate['setup_score_floor'] <= 80
+    _, survival_reasons = survive(candidate, fixture)
+    assert survival_reasons == []
+    analyzer = monitor.CandidateAnalyzer(_config(completed_structure_enabled=True),
+                                         monitor.AlertDispatcher())
+    relative = {'relative_strength_ready': True, 'relative_strength_percentile': 3.0,
+        'momentum_5m_pct': .5, 'momentum_15m_pct': .3, 'market_breadth_5m_pct': 17.0}
+    assert analyzer._relative_survival_rejections(candidate, relative) == []
 
 
 def test_ordinary_structure_route_keeps_conjunctive_higher_trend_gate(monkeypatch):

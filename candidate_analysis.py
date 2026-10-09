@@ -61,6 +61,38 @@ def _enabled(name: str, default: bool = False) -> bool:
     return default if raw is None else raw.strip().lower() in {"1", "true", "yes", "on"}
 
 
+def _fresh_structure_leadership_ok(ready, percentile, momentum_5m, momentum_15m):
+    """One relative-leadership proof for a new completed 5m setup."""
+    return bool(ready and float(percentile) <= 5.0 and float(momentum_5m) >= .2
+                and momentum_15m is not None and float(momentum_15m) >= .2)
+
+
+def _fresh_structure_breadth_ok(breadth_pct):
+    """Moderate breadth weakness is scored; only a near-collapse blocks."""
+    return float(breadth_pct or 0.0) >= 8.0
+
+
+def _setup_anchor_context(alert, current, structure_context, completed_structure_entry):
+    """Return the active setup's anchor separately from its original impulse."""
+    origin = float(alert.get("origin_signal_price") or 0.0)
+    origin_extension = (float(current) / origin - 1) * 100 if origin > 0 else 0.0
+    anchor = (float(structure_context.get("close") or 0.0)
+              if completed_structure_entry else float(alert.get("price") or current))
+    anchor = anchor if anchor > 0 else float(current)
+    anchor_time = (structure_context.get("as_of") if completed_structure_entry
+                   else alert.get("original_signal_time_utc") or alert.get("time_utc"))
+    setup_id = str(alert.get("setup_id") or alert.get("signal_id") or
+                   f"{alert.get('market')}:{anchor_time}:{round(anchor, 8)}")
+    return {
+        "origin_extension_pct": round(origin_extension, 3),
+        "setup_anchor_price": anchor,
+        "setup_anchor_time_utc": anchor_time,
+        "setup_anchor_reason": "completed_5m_structure_close" if completed_structure_entry else "original_signal",
+        "setup_extension_pct": round(max(0.0, (float(current) / anchor - 1) * 100), 3),
+        "setup_id": setup_id,
+    }
+
+
 @dataclass(frozen=True)
 class CandidateConfig:
     enabled: bool
@@ -1924,9 +1956,15 @@ def evaluate_candidate(
     structure_higher_trend = bool(higher.get("ready") and higher.get("fifteen_intact")
         and higher["fifteen"]["above_ma20"] and higher["hourly"]["above_ma20"]
         and higher["hourly"]["support_intact"])
-    structure_relative_leadership = bool(relative_ready
-        and relative_percentile <= 2.0 and momentum_5m >= .2
-        and momentum_15m is not None and momentum_15m >= .8)
+    # A fresh, completed 5m breakout is its own setup. Do not require the
+    # coin to be in the top 2% of the entire KRW universe as well as having
+    # the completed breakout: rank and candle impulse are correlated signals
+    # and a hard 2% cutoff excluded strong re-accelerations at rank 4/189.
+    # Keep a useful relative-strength floor while allowing broader market
+    # breadth to affect quality scoring instead of acting as a second veto.
+    structure_relative_leadership = _fresh_structure_leadership_ok(
+        relative_ready, relative_percentile, momentum_5m, momentum_15m
+    )
     fresh_structure_recheck = bool(fresh_breakout_recheck and structure_context.get("confirmed"))
     fresh_structure_context_ok = bool(
         structure_relative_leadership or structure_higher_trend
@@ -1946,7 +1984,12 @@ def evaluate_candidate(
                    and momentum_15m >= .8 and float(alert.get("momentum_60m_pct") or 0) >= 1.5),
                "completed_higher_trend": structure_higher_trend,
            }),
-        "breadth": float(alert.get("market_breadth_5m_pct") or 0) >= 20,
+        # Breadth is a context/quality input for a fresh breakout, not proof
+        # that this individual coin's completed structure failed. Only a very
+        # narrow tape remains a hard stop; ordinary weak breadth is scored.
+        "breadth": (_fresh_structure_breadth_ok(alert.get("market_breadth_5m_pct"))
+                    if fresh_structure_recheck else
+                    float(alert.get("market_breadth_5m_pct") or 0) >= 20.0),
         "level_hold": bool(current >= max(breakout, float(structure_context.get("level") or 0))
             and completed_close >= max(breakout, float(structure_context.get("level") or 0))),
         "chase": (current <= float(structure_context["close"]) * 1.005
@@ -2014,10 +2057,21 @@ def evaluate_candidate(
         upper_wick = float(quality_context["upper_wick"])
 
     rejected: list[str] = []
-    if fresh_breakout_recheck and fresh_breakout_extension_pct > 5.0:
+    setup_context = _setup_anchor_context(alert, current, structure_context, completed_structure_entry)
+    setup_anchor_price = float(setup_context["setup_anchor_price"])
+    setup_extension_pct = float(setup_context["setup_extension_pct"])
+    # Preserve the original impulse extension as audit data. Once a new
+    # completed 5m structure passes, its close becomes the active plan anchor;
+    # the stale 5% cap from the first alert must not veto that new setup.
+    if fresh_breakout_recheck and not completed_structure_entry and fresh_breakout_extension_pct > 5.0:
         rejected.append(
             "초기 포착가 대비 5% 초과 상승으로 신규 진입 제한"
             f"(+{fresh_breakout_extension_pct:.1f}%)"
+        )
+    if completed_structure_entry and setup_extension_pct > 1.0:
+        rejected.append(
+            "새 5분 구조 종가 대비 진입 이격 과다"
+            f"(+{setup_extension_pct:.2f}% > 1.00%)"
         )
     soft_warnings: list[str] = []
     if (config.completed_structure_enabled and structure_context.get("confirmed")
@@ -2716,7 +2770,16 @@ def evaluate_candidate(
     if flow_leader:
         effective_min_score = config.trade_flow_leader_min_score
     if completed_structure_entry:
-        effective_min_score = max(86, config.trade_flow_leader_min_score)
+        # A completed 5m setup has already passed explicit structure, volume,
+        # close-quality, BTC, quote-depth, level-hold and risk checks. Do not
+        # run it through a second near-perfect composite-score gate as well.
+        # Keep the normal route conservative; only a *fresh* structure gets
+        # the calibrated lower floor, with direct hard guards unchanged.
+        effective_min_score = (
+            max(75, min(80, config.min_score, config.trade_flow_leader_min_score))
+            if fresh_structure_recheck
+            else max(86, config.trade_flow_leader_min_score)
+        )
     if score < effective_min_score:
         return None, [f"후보 점수 부족({score}/{effective_min_score})"]
 
@@ -2975,7 +3038,9 @@ def evaluate_candidate(
         "signal_id": alert.get("signal_id"),
         "parent_signal_id": alert.get("parent_signal_id"),
         "origin_signal_price": origin_signal_price or None,
+        **setup_context,
         "fresh_breakout_extension_pct": round(fresh_breakout_extension_pct, 2),
+        "setup_score_floor": effective_min_score,
         "time_utc": alert.get("time_utc"),
         "market": alert["market"],
         "signal": "entry_candidate",
