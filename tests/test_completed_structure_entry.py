@@ -131,23 +131,24 @@ def test_fresh_rebreakout_accepts_leadership_instead_of_duplicate_hourly_gates(m
     assert survival_reasons == []
 
 
-def test_fresh_rebreakout_requires_one_of_the_two_trend_proofs(monkeypatch):
+def test_completed_structure_requires_two_of_four_quality_proofs(monkeypatch):
     higher_trend = structure_fixture(monkeypatch)
     higher_trend[0][5].update(fresh_breakout_recheck=True, origin_signal_price=100,
                               relative_strength_percentile=6,
                               relative_strength_eligible=False, momentum_60m_pct=0)
     candidate, reasons = _evaluate_flow(higher_trend, completed_structure_enabled=True)
     assert candidate is not None, reasons
-    assert candidate['structure_confirmation_basis'] == 'completed_higher_trend'
+    assert sum(candidate['completed_structure_quality_checks'].values()) >= 2
 
-    no_trend = structure_fixture(monkeypatch)
-    no_trend[0][5].update(fresh_breakout_recheck=True, origin_signal_price=100,
-                          relative_strength_percentile=6,
-                          relative_strength_eligible=False, momentum_60m_pct=0)
-    no_trend[1][1]['trade_price'] = 90
-    candidate, reasons = _evaluate_flow(no_trend, completed_structure_enabled=True)
+    unsupported = structure_fixture(monkeypatch)
+    unsupported[0][5].update(fresh_breakout_recheck=True, origin_signal_price=100,
+                             relative_strength_percentile=6, relative_strength_eligible=False,
+                             momentum_5m_pct=-1.0, momentum_15m_pct=-1.0,
+                             momentum_60m_pct=0, market_breadth_5m_pct=0)
+    unsupported[1][1]['trade_price'] = 90
+    candidate, reasons = _evaluate_flow(unsupported, completed_structure_enabled=True)
     assert candidate is None
-    assert any('최상위 상대강도 또는 완료 상위 추세' in reason for reason in reasons)
+    assert any('구조 보강 근거 2/4' in reason for reason in reasons)
 
 
 def test_fresh_setup_reanchors_and_treats_ordinary_breadth_as_quality_not_veto(monkeypatch):
@@ -175,17 +176,20 @@ def test_fresh_setup_reanchors_and_treats_ordinary_breadth_as_quality_not_veto(m
     assert analyzer._relative_survival_rejections(candidate, relative) == []
 
 
-def test_ordinary_structure_route_keeps_conjunctive_higher_trend_gate(monkeypatch):
+def test_ordinary_structure_route_accepts_alternative_quality_proofs(monkeypatch):
     fixture = structure_fixture(monkeypatch)
-    fixture[0][5]['momentum_60m_pct'] = 0
+    fixture[0][5].update(momentum_60m_pct=0, relative_strength_percentile=3,
+                          relative_strength_eligible=False)
     fixture[1][1]['trade_price'] = 90
     candidate, reasons = _evaluate_flow(fixture, completed_structure_enabled=True)
-    assert candidate is None
-    assert any('완료 15·60분 추세' in reason for reason in reasons)
+    assert candidate is not None, reasons
+    assert sum(candidate['completed_structure_quality_checks'].values()) >= 2
+    _, survival_reasons = survive(candidate, fixture)
+    assert survival_reasons == []
 
 
 @pytest.mark.parametrize('cause', ['no_structure', 'selling', 'thin', 'far_only', 'one_book', 'wide',
-    'rank', 'breadth', 'rsi', 'btc', 'below_anchor', 'chase', 'liquidity', 'risk', 'disabled'])
+    'quality', 'rsi', 'btc', 'below_anchor', 'chase', 'liquidity', 'risk', 'disabled'])
 def test_new_route_does_not_replace_execution_or_risk_evidence(monkeypatch, cause):
     fixture = structure_fixture(monkeypatch)
     now, one, five, fifteen, btc, alert, ticker = fixture[0]
@@ -194,13 +198,18 @@ def test_new_route_does_not_replace_execution_or_risk_evidence(monkeypatch, caus
     elif cause == 'selling': alert['trade_flow_context'] = {'ready': True, 'as_of': now.timestamp(),
         'windows': [{'buy_krw': 0, 'sell_krw': 1e8}]}
     elif cause == 'thin':
-        for u in fixture[2][0]['orderbook_units']: u['bid_size'] = 1
+        for book in fixture[2]:
+            for u in book['orderbook_units']: u['bid_size'] = 1
     elif cause == 'far_only':
-        for u in fixture[2][0]['orderbook_units']: u['bid_price'] = 90
+        for book in fixture[2]:
+            for u in book['orderbook_units']: u['bid_price'] = 90
     elif cause == 'one_book': fixture[2][:] = fixture[2][:1]
-    elif cause == 'wide': fixture[2][0]['orderbook_units'][0]['ask_price'] = 103
-    elif cause == 'rank': alert['relative_strength_percentile'] = 3
-    elif cause == 'breadth': alert['market_breadth_5m_pct'] = 19
+    elif cause == 'wide':
+        for book in fixture[2]: book['orderbook_units'][0]['ask_price'] = 103
+    elif cause == 'quality':
+        alert.update(relative_strength_percentile=6, relative_strength_eligible=False,
+                     momentum_5m_pct=-1, momentum_15m_pct=-1, market_breadth_5m_pct=0)
+        fixture[1][1]['trade_price'] = 90
     elif cause == 'rsi': monkeypatch.setattr(ca, 'analyze_candles', lambda c: {**__import__('analysis').analyze_candles(c), 'rsi14': 95})
     elif cause == 'btc': btc[1]['trade_price'] = 98
     elif cause == 'below_anchor': one[1]['trade_price'] = 100
@@ -213,7 +222,7 @@ def test_new_route_does_not_replace_execution_or_risk_evidence(monkeypatch, caus
     assert reasons
 
 
-@pytest.mark.parametrize('cause', ['volume', 'book', 'anchor', 'trend', 'selling'])
+@pytest.mark.parametrize('cause', ['volume', 'book', 'anchor', 'quality', 'selling'])
 def test_survival_recomputes_structure_and_nearby_book(monkeypatch, cause):
     fixture = structure_fixture(monkeypatch)
     c, reasons = _evaluate_flow(fixture, completed_structure_enabled=True)
@@ -221,16 +230,23 @@ def test_survival_recomputes_structure_and_nearby_book(monkeypatch, cause):
     now, one, five, _, _, alert, _ = fixture[0]
     if cause == 'volume': five[1]['candle_acc_trade_volume'] = 1
     elif cause == 'book':
-        for u in fixture[2][0]['orderbook_units']: u['bid_size'] = 1
+        for book in fixture[2]:
+            for u in book['orderbook_units']: u['bid_size'] = 1
     elif cause == 'anchor': one[1]['trade_price'] = 100
-    elif cause == 'trend': fixture[1][1]['trade_price'] = 90
+    elif cause == 'quality':
+        c['completed_structure_quality_checks'] = {
+            'relative_leadership': False, 'higher_timeframe': False,
+            'local_execution_book': False, 'market_breadth': False}
+        fixture[1][1]['trade_price'] = 90
+        for book in fixture[2]:
+            for unit in book['orderbook_units']: unit['bid_size'] = 1
     elif cause == 'selling': alert['trade_flow_context'] = {'ready': True, 'as_of': now.timestamp(),
         'windows': [{'buy_krw': 0, 'sell_krw': 1e8}]}
     _, reasons = survive(c, fixture)
     assert any('구조·거래량' in r for r in reasons)
 
 
-@pytest.mark.parametrize('cause', ['stale', 'missing', 'volume', 'gap', 'book', 'quote', 'btc', 'risk', 'cost', 'wait'])
+@pytest.mark.parametrize('cause', ['stale', 'missing', 'volume', 'gap', 'quality', 'quote', 'btc', 'risk', 'cost', 'wait'])
 def test_dispatch_rejects_stale_or_invalid_structure_evidence(monkeypatch, cause):
     c = delivery_candidate(monkeypatch, structure_fixture(monkeypatch))
     assert not monitor.AlertDispatcher().candidate_delivery_reasons(c)
@@ -238,7 +254,9 @@ def test_dispatch_rejects_stale_or_invalid_structure_evidence(monkeypatch, cause
     elif cause == 'missing': c.pop('survival_structure_context')
     elif cause == 'volume': c['survival_structure_context']['rolling_15m_volume_ratio'] = .99
     elif cause == 'gap': c['survival_structure_context']['rolling_history_contiguous'] = False
-    elif cause == 'book': c['survival_structure_book_context']['confirmed'] = False
+    elif cause == 'quality': c['survival_structure_quality_checks'] = {
+        'relative_leadership': True, 'higher_timeframe': False,
+        'local_execution_book': False, 'market_breadth': False}
     elif cause == 'quote': c['dispatch_execution_quote']['as_of'] -= 11
     elif cause == 'btc': c['survival_btc_5m_pct'] = -1
     elif cause == 'risk': c['stop_price'] = 95
@@ -292,3 +310,18 @@ def test_mocked_telegram_send_uses_new_route_and_refresh_quote(monkeypatch):
     assert asyncio.run(monitor.AlertDispatcher().send_candidate(candidate))
     assert len(sent) == 1 and '완료 5분 구조 돌파형' in sent[0]
     assert '실제 체결:' not in sent[0]
+
+
+def test_aged_raw_signal_can_use_new_completed_structure_and_calibrated_dispatch_floor(monkeypatch):
+    fixture = structure_fixture(monkeypatch)
+    fixture[0][5].update(relative_strength_percentile=3.0, relative_strength_eligible=False,
+                          momentum_60m_pct=0.0, market_breadth_5m_pct=17.0)
+    fixture[1][1]['trade_price'] = 90
+    c = delivery_candidate(monkeypatch, fixture)
+    assert not c['fresh_breakout_recheck']
+    assert c['completed_structure_entry']
+    assert c['setup_score_floor'] <= 80
+    assert c['score'] >= c['setup_score_floor']
+    c['score'] = 80
+    c['condition_score'] = 80
+    assert not monitor.AlertDispatcher().candidate_delivery_reasons(c)

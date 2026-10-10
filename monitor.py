@@ -43,7 +43,7 @@ from alert_limits import early_watch_daily_limits, restored_early_watch_usage
 from volume_history import build_72h_turnover_snapshot, summarize_72h_ranked_outcomes
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "structure-and-audit-v3.22-setup-anchor"
+STRATEGY_VERSION = "structure-and-audit-v3.23-structure-votes"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -2616,9 +2616,10 @@ class AlertDispatcher:
                 and candidate.get("selection_lane") == "completed_structure"
                 and candidate.get("survival_confirmed")
                 and float(candidate.get("survival_seconds") or 0) >= max(60, cfg.survival_confirm_seconds)
-                and 0 < float(candidate.get("relative_strength_percentile") or 100) <= 2
+                and sum(bool(v) for v in
+                    (candidate.get("survival_structure_quality_checks") or {}).values()) >= 2
                 and structure_volume_verified(candidate, time.time())
-                and book.get("confirmed") and book.get("sample_count", 0) >= 3
+                and book.get("sample_count", 0) >= 3
                 and 0 <= time.time() - float(book.get("as_of") or 0) <= 10
                 and structure_quote_supported(quote, cfg, flow_supported=bool(
                     book.get("flow_supported") and _structure_buy_flow(
@@ -2638,7 +2639,8 @@ class AlertDispatcher:
             except (KeyError, TypeError, ValueError):
                 qualified = False
             if qualified:
-                score_floor = max(86, cfg.trade_flow_leader_min_score)
+                score_floor = int(candidate.get("setup_score_floor") or
+                    max(75, min(80, cfg.min_score, cfg.trade_flow_leader_min_score)))
             else:
                 reasons.append("Telegram 구조 돌파형 최신 완료봉·반복 호가·60초 생존 미확인")
         if candidate.get("tick_spread_exception"):
@@ -2743,7 +2745,7 @@ class AlertDispatcher:
         if int(candidate.get("score", 0)) < score_floor:
             reasons.append(f"Telegram 점수 미달({candidate.get('score', 0)} < {score_floor})")
         plan = candidate.get("exit_plan")
-        if plan:
+        if plan and not candidate.get("completed_structure_entry"):
             higher = candidate.get("higher_timeframe_context") or {}
             if not (
                 int(candidate.get("score", 0)) >= (score_floor if candidate.get("trade_flow_leader") else 90)
@@ -4604,35 +4606,38 @@ class CandidateAnalyzer:
         self, candidate: dict[str, Any], relative: dict[str, Any]
     ) -> list[str]:
         """Reject a candidate that loses leadership during the survival wait."""
-        if not candidate.get("relative_strength_ready"):
+        structure_lane = bool(candidate.get("completed_structure_entry"))
+        if not candidate.get("relative_strength_ready") and not structure_lane:
             return []
-        if not relative.get("relative_strength_ready"):
+        relative_ready = bool(relative.get("relative_strength_ready"))
+        if not relative_ready and not structure_lane:
             return ["생존 시점 상대강도 시장표본 미확인"]
         rejected: list[str] = []
         percentile = float(relative.get("relative_strength_percentile") or 100.0)
         if candidate.get("trade_flow_leader"):
-            if (percentile > 2.0 or float(relative.get("momentum_5m_pct") or 0) < .2
+            if (not relative_ready or percentile > 2.0 or float(relative.get("momentum_5m_pct") or 0) < .2
                     or float(relative.get("momentum_15m_pct") or 0) < .8
                     or float(relative.get("momentum_60m_pct") or 0) < 1.5
                     or float(relative.get("market_breadth_5m_pct") or 0) < 20):
                 rejected.append("생존 중 체결 지속형 선도 순위·추세·확산도 상실")
-        elif candidate.get("completed_structure_entry"):
-            if candidate.get("fresh_breakout_recheck"):
-                if candidate.get("structure_confirmation_basis") == "relative_leadership":
-                    # Match the fresh setup's selected proof. Short-horizon
-                    # leadership must survive, but an unrelated 60m threshold
-                    # must not be re-added after admission.
-                    if (percentile > 5.0 or float(relative.get("momentum_5m_pct") or 0) < .2
-                            or float(relative.get("momentum_15m_pct") or 0) < .2
-                            or float(relative.get("market_breadth_5m_pct") or 0) < 8):
-                        rejected.append("생존 중 신규 돌파 상대강도·단기 모멘텀·확산도 상실")
-                # The completed higher-trend alternative is checked from the
-                # freshly fetched candles in validate_candidate_survival.
-            elif (percentile > 2.0 or float(relative.get("momentum_5m_pct") or 0) < .2
-                    or float(relative.get("momentum_15m_pct") or 0) < .8
-                    or float(relative.get("momentum_60m_pct") or 0) < 1.5
-                    or float(relative.get("market_breadth_5m_pct") or 0) < 20):
-                rejected.append("생존 중 구조형 선도 순위·추세·확산도 상실")
+        elif structure_lane:
+            # Recompute the same 2-of-4 evidence score from current survival
+            # rank/momentum/breadth plus the just-revalidated higher trend/book.
+            rel_vote = bool(relative_ready and percentile <= 5.0
+                and float(relative.get("momentum_5m_pct") or 0) >= .2
+                and float(relative.get("momentum_15m_pct") or 0) >= .2)
+            previous_votes = candidate.get("survival_structure_quality_checks") or {}
+            live_votes = {
+                "relative_leadership": rel_vote,
+                "higher_timeframe": bool(previous_votes.get("higher_timeframe")),
+                "local_execution_book": bool(previous_votes.get("local_execution_book")),
+                "market_breadth": float(relative.get("market_breadth_5m_pct") or 0) >= 8.0,
+            }
+            candidate["survival_structure_quality_checks"] = live_votes
+            if sum(bool(v) for v in live_votes.values()) < 2:
+                rejected.append("생존 중 완료 5분 구조 보강 근거 2/4 미충족")
+        elif not relative_ready:
+            rejected.append("생존 시점 상대강도 시장표본 미확인")
         if candidate.get("completed_breakout_entry") or candidate.get("completed_wb_retest_entry"):
             route = "5분 WB 첫 재지지" if candidate.get("completed_wb_retest_entry") else "눌림 없는 돌파"
             if percentile > self.config.early_leader_max_percentile:
@@ -4656,7 +4661,7 @@ class CandidateAnalyzer:
             or candidate.get("watchlist_recheck")
             or candidate.get("leader_pullback_recheck")
         )
-        if percentile > self.config.relative_strength_top_percent:
+        if not structure_lane and percentile > self.config.relative_strength_top_percent:
             rejected.append(f"생존 중 상대강도 이탈({percentile:.1f}백분위)")
         sustained = bool(
             candidate.get("sustained_retest")

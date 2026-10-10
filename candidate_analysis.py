@@ -1180,7 +1180,7 @@ def structure_volume_verified(candidate, now):
             and float(proof.get("close_position") or 0) >= .65
             and float(proof.get("upper_wick", 1)) <= .35
             and 0 < float(proof.get("level") or 0) <= float(candidate.get("current_price") or 0)
-            <= float(proof.get("close") or 0) * 1.005):
+            <= float(proof.get("close") or 0) * 1.01):
         return False
     if proof.get("retest"):
         if not (proof.get("structure_mode") == "first_retest"
@@ -1404,17 +1404,30 @@ def validate_candidate_survival(
     structure_evidence = _completed_structure_context(candles_1m, candles_5m or [], candles_15m or [], flow_now, config) if structure_lane else {}
     structure_book = _structure_book_context(orderbook_samples, current, config, execution_now, trade_flow_context) if structure_lane else {}
     structure_higher = higher_timeframe_context(candles_15m or [], candles_60m or [], [], now=flow_now) if structure_lane else {}
-    fresh_leadership_basis = bool(candidate.get("fresh_breakout_recheck")
-        and candidate.get("structure_confirmation_basis") == "relative_leadership")
+    structure_seed_quality = candidate.get("completed_structure_quality_checks") or {}
     structure_higher_valid = bool(structure_higher.get("ready") and structure_higher.get("fifteen_intact")
         and structure_higher["fifteen"]["above_ma20"] and structure_higher["hourly"]["above_ma20"]
         and structure_higher["hourly"]["support_intact"])
+    survival_structure_quality_checks = {
+        "relative_leadership": bool(structure_seed_quality.get("relative_leadership")),
+        "higher_timeframe": structure_higher_valid,
+        "local_execution_book": bool(structure_book.get("confirmed")),
+        "market_breadth": bool(structure_seed_quality.get("market_breadth")),
+    }
+    structure_depth_safe = bool(len(structure_book.get("quotes") or []) >= 3
+        and all(q.get("nearby_depth_supported")
+            and min(float(q.get("bid_value_krw") or 0), float(q.get("ask_value_krw") or 0)) >= 5_000_000
+            for q in structure_book.get("quotes") or []))
+    structure_book_safety = bool(
+        structure_depth_safe and hard_book_persistent
+        and spread <= config.hard_max_spread_pct
+    )
     structure_valid = bool(structure_lane and config.completed_structure_enabled
-        and structure_evidence.get("confirmed") and structure_book.get("confirmed")
-        and (structure_higher_valid or fresh_leadership_basis)
+        and structure_evidence.get("confirmed") and structure_book_safety
+        and sum(bool(v) for v in survival_structure_quality_checks.values()) >= 2
         and current >= max(breakout, float(structure_evidence.get("level") or 0))
         and completed_close >= max(breakout, float(structure_evidence.get("level") or 0))
-        and current <= float(structure_evidence.get("close") or 0) * 1.005
+        and current <= float(structure_evidence.get("close") or 0) * 1.01
         and analyze_candles(c1)["rsi14"] < 95
         and analyze_candles(completed_context_candles(candles_5m or [], 5, flow_now))["rsi14"] < 95)
     if structure_valid and (trade_flow_context or {}).get("ready"):
@@ -1521,6 +1534,7 @@ def validate_candidate_survival(
     return {
         **({"survival_structure_context": structure_evidence,
             "survival_structure_book_context": structure_book,
+            "survival_structure_quality_checks": survival_structure_quality_checks,
             "survival_structure_trade_flow": trade_flow_context,
             "completed_5m_volume_ratio": round(float(structure_evidence.get("volume_5m") or 0), 2),
             "completed_15m_volume_ratio": round(float(structure_evidence.get("volume_15m") or 0), 2)} if structure_lane else {}),
@@ -1965,43 +1979,42 @@ def evaluate_candidate(
     structure_relative_leadership = _fresh_structure_leadership_ok(
         relative_ready, relative_percentile, momentum_5m, momentum_15m
     )
-    fresh_structure_recheck = bool(fresh_breakout_recheck and structure_context.get("confirmed"))
-    fresh_structure_context_ok = bool(
-        structure_relative_leadership or structure_higher_trend
+    # Any live, completed 5m proof can establish a new setup, even if the
+    # original raw-signal recheck flag has already aged out. Hard risk controls
+    # remain conjunctive; four correlated quality filters no longer all veto.
+    fresh_structure_recheck = bool(structure_context.get("confirmed"))
+    structure_quality_checks = {
+        "relative_leadership": structure_relative_leadership,
+        "higher_timeframe": structure_higher_trend,
+        "local_execution_book": bool(structure_book.get("confirmed")),
+        "market_breadth": _fresh_structure_breadth_ok(alert.get("market_breadth_5m_pct")),
+    }
+    structure_quality_vote_count = sum(bool(v) for v in structure_quality_checks.values())
+    structure_depth_safe = bool(len(structure_book.get("quotes") or []) >= 3
+        and all(q.get("nearby_depth_supported")
+            and min(float(q.get("bid_value_krw") or 0), float(q.get("ask_value_krw") or 0)) >= 5_000_000
+            for q in structure_book.get("quotes") or []))
+    structure_book_safety = bool(
+        structure_depth_safe and hard_book_persistent
+        and spread <= config.hard_max_spread_pct
     )
     structure_checks = {
         "enabled": bool(config.completed_structure_enabled and config.double_bb_enabled),
         "completed_breakout_volume": bool(structure_context.get("confirmed")),
-        "local_execution_book": bool(structure_book.get("confirmed")),
-        # A fresh local breakout has two alternative trend proofs. Requiring
-        # top-rank momentum AND mature 15m/1h alignment duplicates correlated
-        # evidence and delays re-accelerations. The legacy route keeps its
-        # original conjunctive qualification.
-        **({"leadership_or_higher_trend": fresh_structure_context_ok}
-           if fresh_structure_recheck else {
-               "relative_strength": bool(relative_ready and relative_percentile <= 2),
-               "relative_momentum": bool(momentum_5m >= .2 and momentum_15m is not None
-                   and momentum_15m >= .8 and float(alert.get("momentum_60m_pct") or 0) >= 1.5),
-               "completed_higher_trend": structure_higher_trend,
-           }),
-        # Breadth is a context/quality input for a fresh breakout, not proof
-        # that this individual coin's completed structure failed. Only a very
-        # narrow tape remains a hard stop; ordinary weak breadth is scored.
-        "breadth": (_fresh_structure_breadth_ok(alert.get("market_breadth_5m_pct"))
-                    if fresh_structure_recheck else
-                    float(alert.get("market_breadth_5m_pct") or 0) >= 20.0),
+        "execution_book_safety": structure_book_safety,
         "level_hold": bool(current >= max(breakout, float(structure_context.get("level") or 0))
             and completed_close >= max(breakout, float(structure_context.get("level") or 0))),
-        "chase": (current <= float(structure_context["close"]) * 1.005
-                  if structure_context.get("close") else None),
+        "chase": bool(structure_context.get("close")
+            and current <= float(structure_context["close"]) * 1.01),
         "btc": bool(not btc_crash and btc_change > config.max_btc_decline_pct),
         "selling_and_heat": bool(not known_selling and rsi1 < 95 and rsi5 < 95),
+        "quality_votes_2_of_4": structure_quality_vote_count >= 2,
     }
     completed_structure_entry = bool(not flow_leader and all(structure_checks.values()))
     structure_confirmation_basis = (
-        "relative_leadership" if fresh_structure_recheck and structure_relative_leadership
-        else "completed_higher_trend" if fresh_structure_recheck
-        else "legacy_conjunctive"
+        "relative_leadership" if structure_quality_checks["relative_leadership"]
+        else "completed_higher_trend" if structure_quality_checks["higher_timeframe"]
+        else "book_and_breadth"
     )
     if completed_structure_entry:
         # A new completed breakout creates a new plan. Never move an existing
@@ -2078,6 +2091,8 @@ def evaluate_candidate(
             and not completed_structure_entry and not flow_leader):
         labels = {
             "local_execution_book": "가까운 반복 호가·비용 검증 대상 미달",
+            "execution_book_safety": "호가 안전 기준",
+            "quality_votes_2_of_4": "구조 보강 근거 2/4",
             "relative_strength": "상대강도", "relative_momentum": "15·60분 상대 추세",
             "completed_higher_trend": "완료 15·60분 추세",
             "leadership_or_higher_trend": "최상위 상대강도 또는 완료 상위 추세",
@@ -2142,7 +2157,7 @@ def evaluate_candidate(
         c1[0], confirmation_started_at
     ):
         rejected.append("신호 이후 확인시간 20초를 채운 완료 1분봉 없음")
-    if not fast_leader_core and completed_close < breakout:
+    if not fast_leader_core and not completed_structure_entry and completed_close < breakout:
         rejected.append("완료 1분봉이 돌파선 아래 마감")
     if current < breakout * 0.998:
         rejected.append("돌파선 재지지 실패")
@@ -3064,6 +3079,7 @@ def evaluate_candidate(
         "structure_confirmation_basis": structure_confirmation_basis if completed_structure_entry else None,
         "completed_structure_context": structure_context if completed_structure_entry else None,
         "structure_book_context": structure_book if completed_structure_entry else None,
+        "completed_structure_quality_checks": structure_quality_checks if completed_structure_entry else None,
         "completed_wb_retest_entry": completed_wb_retest_entry,
         "trade_flow_leader": flow_leader, "trade_flow_context": flow_context if flow_leader else None,
         "flow_volume_mode": rsi_context.get("volume_mode", "standard") if flow_leader else None,
