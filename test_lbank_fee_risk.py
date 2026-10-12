@@ -38,7 +38,7 @@ class LBankCostModelTests(unittest.TestCase):
         data = [80000. + 25 * i + (45 if i % 2 else 0) for i in range(60)]
         signal = classify(data)
         self.assertIsNotNone(signal)
-        self.assertEqual(signal["side"], "롱 관찰")
+        self.assertEqual(signal["side"], "롱")
         self.assertLessEqual(signal["net_loss"], REF_BALANCE * RISK_FRACTION + 1e-8)
         self.assertLessEqual(signal["margin"], REF_BALANCE * 0.10 + 1e-8)
         self.assertGreaterEqual(signal["rr1"], 1.5 - 1e-7)
