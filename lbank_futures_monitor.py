@@ -127,10 +127,10 @@ def run():
             price, change24 = get_perpetual_snapshot(exchange)
             now = time.time()
             if not startup_done and now >= next_startup_test:
-                note = (f"[LBank 선물 BTCUSDT] 연결 시험 알림\\n"
-                        f"선물 현재가: {price:,.1f} USDT\\n"
-                        "서버 가동 및 텔레그램 연결 확인.\\n"
-                        "가격 표본 수집 중이며 아직 진입 신호가 아닙니다.\\n"
+                note = (f"[LBank 선물 BTCUSDT] 연결 시험 알림\n"
+                        f"선물 현재가: {price:,.1f} USDT\n"
+                        "서버 가동 및 텔레그램 연결 확인.\n"
+                        "가격 표본 수집 중이며 아직 진입 신호가 아닙니다.\n"
                         "실제 주문은 자동으로 실행하지 않습니다.")
                 startup_done = telegram(note)
                 LOG.info("Telegram startup test %s", "SENT" if startup_done else "FAILED")
@@ -151,14 +151,14 @@ def run():
                 if result:
                     side = result["side"]
                     if now - last_alert.get(side, 0) >= COOLDOWN:
-                        msg = (f"[LBank BTCUSDT 무기한 선물 | {side}]\\n"
-                               "※ LBank 선물 실가격의 1분 표본 기반, 캔들 아님\\n"
-                               f"가격/관심가: {result['price']:,.1f}\\n"
-                               f"참고 손절: {result['stop']:,.1f}\\n"
-                               f"참고 목표1: {result['target1']:,.1f}\\n"
-                               f"참고 목표2: {result['target2']:,.1f}\\n"
-                               f"5분변화: {result['m5']:+.2f}% | 15분변화: {result['m15']:+.2f}%\\n"
-                               f"표본 RSI: {result['rsi']:.1f}\\n"
+                        msg = (f"[LBank BTCUSDT 무기한 선물 | {side}]\n"
+                               "※ LBank 선물 실가격의 1분 표본 기반, 캔들 아님\n"
+                               f"가격/관심가: {result['price']:,.1f}\n"
+                               f"참고 손절: {result['stop']:,.1f}\n"
+                               f"참고 목표1: {result['target1']:,.1f}\n"
+                               f"참고 목표2: {result['target2']:,.1f}\n"
+                               f"5분변화: {result['m5']:+.2f}% | 15분변화: {result['m15']:+.2f}%\n"
+                               f"표본 RSI: {result['rsi']:.1f}\n"
                                "주문 신호가 아닌 관찰 알림입니다. 50배 격리 거래 주의.")
                         if telegram(msg):
                             last_alert[side] = now
