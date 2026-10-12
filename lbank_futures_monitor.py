@@ -27,9 +27,12 @@ ENTRY_MAX_CHASE_PCT = 0.0010
 
 MAX_AGE_MS = 180_000
 # Configured values are estimates, not authenticated account fee/risk records.
-FEE_IN = 0.0006   # LBank public standard market-order Taker: 0.06%
-FEE_OUT = 0.0006  # Conservative stop or close: Taker 0.06%
-SLIPPAGE_EACH = 0.0002  # Assumed adverse fill on BOTH entry and exit (0.02% each)
+MAKER_FEE = 0.0002  # 0.02% if the LIMIT order actually adds liquidity
+TAKER_FEE = 0.0006  # 0.06% for an immediately executed order
+STOP_SLIPPAGE = 0.0002  # estimated adverse slippage 0.02% when stop executes
+# Entry=resting maker LIMIT; take-profit=resting maker LIMIT; stop=taker.
+# If entry or TP crosses the spread, the fill may incur Taker fees.
+# These model assumptions require confirmation from actual fill history.
 FUNDING_BUFFER = 0.0001  # Hypothetical 0.01% adverse funding reserve; actual rate varies
 REF_BALANCE = float(os.getenv("LBANK_REFERENCE_BALANCE_USDT", "958"))
 RISK_FRACTION = float(os.getenv("LBANK_RISK_PER_TRADE_PCT", "0.5")) / 100
@@ -95,28 +98,32 @@ def get_perpetual_snapshot(exchange):
     return price, ticker.get("percentage")
 
 
-def net_pnl_per_btc(direction, entry, exit_price):
-    """Linear USDT-per-BTC net PnL for conservative adverse fills + Taker fees.
+def net_pnl_per_btc(direction, entry, exit_price, *, exit_kind="stop"):
+    """Linear USDT PnL per BTC: maker entry + maker TP or taker STOP.
 
-    This is a cost MODEL, not a verified live execution price or funding quote.
+    Maker fees require passive fills; stop slippage is merely an estimate.
+    No actual executions or live funding quote are accessible.
     """
-    actual_entry = entry * (1 + direction * SLIPPAGE_EACH)
-    actual_exit = exit_price * (1 - direction * SLIPPAGE_EACH)
+    if exit_kind not in ("stop", "take_profit"):
+        raise ValueError("exit_kind must be stop or take_profit")
+    actual_entry = entry  # only if resting limit fills as Maker
+    actual_exit = (exit_price * (1 - direction * STOP_SLIPPAGE)
+                   if exit_kind == "stop" else exit_price)
     gross = direction * (actual_exit - actual_entry)
-    fees = actual_entry * FEE_IN + actual_exit * FEE_OUT
+    exit_fee = TAKER_FEE if exit_kind == "stop" else MAKER_FEE
+    fees = actual_entry * MAKER_FEE + actual_exit * exit_fee
     reserve = entry * FUNDING_BUFFER
     return gross - fees - reserve
-
 
 def minimum_net_rr_target(direction, entry, unit_loss, ratio):
     """Solve for price needed to achieve a specific NET R:R, not forecast."""
     low, high = 0.0, entry * 0.05
     target_net = unit_loss * ratio
-    if net_pnl_per_btc(direction, entry, entry + direction * high) < target_net:
+    if net_pnl_per_btc(direction, entry, entry + direction * high, exit_kind="take_profit") < target_net:
         return None
     for _ in range(55):
         mid = (low + high) / 2
-        if net_pnl_per_btc(direction, entry, entry + direction * mid) < target_net:
+        if net_pnl_per_btc(direction, entry, entry + direction * mid, exit_kind="take_profit") < target_net:
             low = mid
         else:
             high = mid
@@ -152,14 +159,14 @@ def calculate_plan(prices, direction):
     if abs(t1 - curr) > 1.5 * observed_range:
         return None
     permitted_loss = REF_BALANCE * RISK_FRACTION
-    effective_entry = curr * (1 + direction * SLIPPAGE_EACH)
+    effective_entry = curr
     qty = min(permitted_loss / unit_loss,
               REF_BALANCE * MAX_MARGIN_FRACTION * LEVERAGE / effective_entry)
     if qty <= 0:
         return None
     net_loss = -qty * net_pnl_per_btc(direction, curr, stop)
-    net_gain1 = qty * net_pnl_per_btc(direction, curr, t1)
-    net_gain2 = qty * net_pnl_per_btc(direction, curr, t2)
+    net_gain1 = qty * net_pnl_per_btc(direction, curr, t1, exit_kind="take_profit")
+    net_gain2 = qty * net_pnl_per_btc(direction, curr, t2, exit_kind="take_profit")
     if net_loss <= 0 or net_gain1 / net_loss < MIN_NET_RR - 1e-7:
         return None
     return {
@@ -169,8 +176,11 @@ def calculate_plan(prices, direction):
         "margin": qty * effective_entry / LEVERAGE, "notional": qty * curr,
         "net_loss": net_loss, "net_gain1": net_gain1, "net_gain2": net_gain2,
         "rr1": net_gain1 / net_loss, "rr2": net_gain2 / net_loss,
-        "fee_roundtrip_est": qty * (effective_entry * FEE_IN +
-            t1 * (1 - direction * SLIPPAGE_EACH) * FEE_OUT),
+        "fee_roundtrip_est": qty * (effective_entry * MAKER_FEE + t1 * MAKER_FEE),
+        "fee_stop_est": qty * (effective_entry * MAKER_FEE +
+            stop * (1 - direction * STOP_SLIPPAGE) * TAKER_FEE),
+        "taker_fallback_extra_fee": qty * (effective_entry * (TAKER_FEE - MAKER_FEE)
+            + t1 * (TAKER_FEE - MAKER_FEE)),
     }
 
 
@@ -238,10 +248,14 @@ def format_entry_alert(plan, observed_at_utc):
         f"손절 예상 순손실: -{plan['net_loss']:.2f} USDT\n"
         f"목표1 예상 순이익: +{plan['net_gain1']:.2f} USDT\n"
         f"목표2 예상 순이익: +{plan['net_gain2']:.2f} USDT\n"
-        f"왕복 거래수수료 추정(목표1): {plan['fee_roundtrip_est']:.2f} USDT\n"
+        f"정상 익절 왕복 Maker 수수료 추정: {plan['fee_roundtrip_est']:.2f} USDT\n"
+        f"손절 시 Maker진입/Taker청산 수수료 추정: {plan['fee_stop_est']:.2f} USDT\n"
+        f"진입·익절 모두 즉시 Taker 체결되면 추가 수수료 약 {plan['taker_fallback_extra_fee']:.2f} USDT\n"
         f"기준 시드: {REF_BALANCE:.0f} USDT / 일 순수익 10% 목표: {daily_goal:.2f} USDT (보장 불가)\n"
         f"5분 가격표본 변화 {plan['m5']:+.2f}% | 15분 {plan['m15']:+.2f}% | 표본 RSI {plan['rsi']:.1f}\n"
-        "보수적 가정: 시장가 수수료 진입/청산 각 0.06%, 슬리피지 각각 0.02%, 펀딩 완충 0.01%\n"
+        "조건부 수수료: 수동 지정가 Maker진입 0.02%/Maker익절 0.02%, 손절 Taker 0.06%\n"
+        "손절 슬리피지 0.02% 가정/펀딩 불리할 때 0.01% 완충(실제 비용 다를 수 있음)\n"
+        "※ 지정가라도 즉시 체결되면 Taker 가능, Post-Only는 미체결 위험\n"
         "목표가는 예측이 아닌 비용·손익비 계산값. 실제 호가·체결·펀딩 미확인.\n"
         "수동 거래 전 거래소 5분봉/15분봉과 호가·손절 주문을 반드시 확인하세요."
     )
