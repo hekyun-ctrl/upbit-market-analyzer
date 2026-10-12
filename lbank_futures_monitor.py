@@ -1,8 +1,9 @@
-"""LBank BTCUSDT perpetual read-only monitor (no account keys or orders).
+"""LBank BTCUSDT perpetual-only public price observation monitor.
 
-Dependencies: pip install ccxt
-Environment: TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, LBANK_POLL_SECONDS (default 60).
-Run as a separate Railway service; do NOT replace the Upbit service.
+Never creates orders or reads private LBank accounts. Since LBank's documented
+contract API lacks native OHLCV candles and CCXT routes fetch_ohlcv to SPOT,
+this monitor explicitly uses only actual LBank perpetual TICKER snapshots.
+Signals use sampled 1-minute prices (NOT trade candles or trade volume).
 """
 import json
 import logging
@@ -10,6 +11,7 @@ import os
 import time
 import urllib.parse
 import urllib.request
+from collections import deque
 from datetime import datetime, timezone
 
 import ccxt
@@ -17,125 +19,155 @@ import ccxt
 LOG = logging.getLogger("lbank_monitor")
 SYMBOL = "BTC/USDT:USDT"
 POLL = max(30, int(os.getenv("LBANK_POLL_SECONDS", "60")))
-COOLDOWN = max(300, int(os.getenv("LBANK_ALERT_COOLDOWN_SECONDS", "900")))
-MAX_STALENESS_MS = 10 * 60 * 1000
+COOLDOWN = max(900, int(os.getenv("LBANK_ALERT_COOLDOWN_SECONDS", "1200")))
+STARTUP_RETRY = 300
+MAX_AGE_MS = 180_000
 
 
 def ema(values, period):
-    alpha = 2.0 / (period + 1)
-    result = values[0]
-    out = []
+    alpha = 2 / (period + 1)
+    current = values[0]
+    result = []
     for value in values:
-        result = alpha * value + (1 - alpha) * result
-        out.append(result)
-    return out
+        current = alpha * value + (1 - alpha) * current
+        result.append(current)
+    return result
 
 
 def rsi(values, period=14):
-    changes = [values[i] - values[i - 1] for i in range(1, len(values))]
-    gains = [max(v, 0) for v in changes]
-    losses = [max(-v, 0) for v in changes]
-    avg_gain = sum(gains[:period]) / period
-    avg_loss = sum(losses[:period]) / period
-    for gain, loss in zip(gains[period:], losses[period:]):
-        avg_gain = (avg_gain * (period - 1) + gain) / period
-        avg_loss = (avg_loss * (period - 1) + loss) / period
-    return 100 if avg_loss == 0 else 100 - 100 / (1 + avg_gain / avg_loss)
-
-
-def indicators(bars):
-    # Caller excludes the current unfinished 5-minute candle.
-    closes = [float(c[4]) for c in bars]
-    volumes = [float(c[5]) for c in bars]
-    if len(closes) < 40:
-        raise ValueError("Not enough completed candles")
-    macd_line = [a - b for a, b in zip(ema(closes, 12), ema(closes, 26))]
-    signal_line = ema(macd_line, 9)
-    mean20 = sum(closes[-20:]) / 20
-    variance = sum((v - mean20) ** 2 for v in closes[-20:]) / 20
-    return {
-        "price": closes[-1],
-        "rsi": rsi(closes),
-        "macd": macd_line[-1],
-        "signal": signal_line[-1],
-        "previous_macd": macd_line[-2],
-        "previous_signal": signal_line[-2],
-        "middle": mean20,
-        "upper": mean20 + 2 * variance ** .5,
-        "lower": mean20 - 2 * variance ** .5,
-        "volume_ratio": volumes[-1] / max(1e-9, sum(volumes[-21:-1]) / 20),
-        "previous_high": max(float(c[2]) for c in bars[-7:-1]),
-        "previous_low": min(float(c[3]) for c in bars[-7:-1]),
-        "closed_at": int(bars[-1][0]) + 300_000,
-    }
-
-
-def signal(ind):
-    # Both momentum and price-structure confirmations are required.
-    bullish = (ind["price"] > ind["previous_high"] and
-               ind["macd"] > ind["signal"] and ind["rsi"] >= 55 and
-               ind["volume_ratio"] >= 1.5)
-    bearish = (ind["price"] < ind["previous_low"] and
-               ind["macd"] < ind["signal"] and ind["rsi"] <= 45 and
-               ind["volume_ratio"] >= 1.5)
-    if bullish and not bearish:
-        return "LONG_WATCH"
-    if bearish and not bullish:
-        return "SHORT_WATCH"
-    return None
+    changes = [values[i] - values[i-1] for i in range(1, len(values))]
+    ups = [max(0, x) for x in changes]
+    downs = [max(0, -x) for x in changes]
+    up = sum(ups[:period]) / period
+    down = sum(downs[:period]) / period
+    for u, d in zip(ups[period:], downs[period:]):
+        up = (up * (period - 1) + u) / period
+        down = (down * (period - 1) + d) / period
+    return 100 if down == 0 else 100 - 100 / (1 + up / down)
 
 
 def telegram(message):
     token = os.getenv("TELEGRAM_BOT_TOKEN", "")
     chat = os.getenv("TELEGRAM_CHAT_ID", "")
     if not token or not chat:
-        LOG.info("Telegram not configured; alert (local only): %s", message)
+        LOG.error("Telegram credentials missing; cannot send")
         return False
     payload = urllib.parse.urlencode({"chat_id": chat, "text": message}).encode()
-    req = urllib.request.Request(
-        "https://api.telegram.org/bot" + token + "/sendMessage",
-        data=payload, method="POST")
-    with urllib.request.urlopen(req, timeout=10) as response:
-        result = json.load(response)
-    return bool(result.get("ok"))
+    url = "https://api.telegram.org/bot" + token + "/sendMessage"
+    # Never log URL or token, including urllib exception values.
+    try:
+        with urllib.request.urlopen(urllib.request.Request(
+                url, data=payload, method="POST"), timeout=12) as resp:
+            return bool(json.load(resp).get("ok"))
+    except Exception as exc:
+        LOG.error("Telegram send failed, exception type=%s", type(exc).__name__)
+        return False
+
+
+def get_perpetual_snapshot(exchange):
+    ticker = exchange.fetch_ticker(SYMBOL)
+    if not ticker or ticker.get("symbol") != SYMBOL:
+        raise ValueError("LBank returned wrong futures ticker symbol")
+    price = float(ticker["last"])
+    if not (price > 0):
+        raise ValueError("LBank returned invalid contract last price")
+    timestamp = ticker.get("timestamp")
+    if timestamp and abs(int(time.time() * 1000) - int(timestamp)) > MAX_AGE_MS:
+        raise ValueError("Stale LBank perpetual ticker")
+    return price, ticker.get("percentage")
+
+
+def classify(prices):
+    # This is a price-snapshot momentum WATCH, not a 5m OHLCV trading signal.
+    if len(prices) < 40:
+        return None
+    curr = prices[-1]
+    m5 = (curr / prices[-6] - 1) * 100
+    m15 = (curr / prices[-16] - 1) * 100
+    macd_arr = [a - b for a, b in zip(ema(prices, 12), ema(prices, 26))]
+    macd = macd_arr[-1]
+    sig = ema(macd_arr, 9)[-1]
+    strength = rsi(prices)
+    high = max(prices[-16:-1])
+    low = min(prices[-16:-1])
+    if curr > high and macd > sig and 55 <= strength <= 80 and m5 >= .14 and m15 >= .20:
+        side = "롱 관찰"
+    elif curr < low and macd < sig and 20 <= strength <= 45 and m5 <= -.14 and m15 <= -.20:
+        side = "숏 관찰"
+    else:
+        return None
+    # Reference stop is a conservative *hypothetical* position-risk illustration.
+    risk = max(curr * .0018, abs(m15 / 100 * curr) * .35)
+    if risk / curr > .0045:
+        return None
+    direction = 1 if side.startswith("롱") else -1
+    stop = curr - direction * risk
+    return {
+        "side": side, "price": curr, "rsi": strength, "macd": macd,
+        "signal": sig, "m5": m5, "m15": m15,
+        "stop": stop, "target1": curr + direction * risk * 1.5,
+        "target2": curr + direction * risk * 2.5,
+    }
 
 
 def run():
-    exchange = ccxt.lbank({"enableRateLimit": True, "options": {"defaultType": "swap"}})
+    exchange = ccxt.lbank({"enableRateLimit": True, "timeout": 12000,
+                           "options": {"defaultType": "swap"}})
     exchange.load_markets()
-    market = exchange.market(SYMBOL)
-    if not market.get("swap"):
-        raise RuntimeError("Contract market unavailable; refuse to use spot data")
-    last_bar = None
+    if not exchange.market(SYMBOL).get("swap"):
+        raise RuntimeError("Refuse to monitor spot instrument")
+    LOG.info("LBank BTCUSDT PERPETUAL ticker monitor started (no trade permissions)")
+    observations = deque(maxlen=120)
     last_alert = {}
-    LOG.info("LBank read-only BTC perpetual monitor started")
+    last_sample = 0
+    next_startup_test = 0
+    startup_done = False
     while True:
         try:
-            rows = exchange.fetch_ohlcv(SYMBOL, "5m", limit=120)
-            now_ms = int(time.time() * 1000)
-            # Guard against partially formed OHLCV candle.
-            finished = [bar for bar in rows if int(bar[0]) + 300_000 <= now_ms]
-            if len(finished) < 40:
-                raise ValueError("Insufficient closed LBank futures candles")
-            ind = indicators(finished)
-            if now_ms - ind["closed_at"] > MAX_STALENESS_MS:
-                raise ValueError("Stale exchange candle data")
-            if ind["closed_at"] != last_bar:
-                last_bar = ind["closed_at"]
-                side = signal(ind)
-                LOG.info("closed=%s price=%.2f rsi=%.1f volratio=%.2f signal=%s",
-                         datetime.fromtimestamp(last_bar / 1000, tz=timezone.utc),
-                         ind["price"], ind["rsi"], ind["volume_ratio"], side)
-                if side and time.time() - last_alert.get(side, 0) >= COOLDOWN:
-                    message = ("[LBank BTCUSDT perpetual | observation only]\n"
-                               f"{side} | close {ind['price']:.1f}\n"
-                               f"RSI {ind['rsi']:.1f} | volume 5m/20avg {ind['volume_ratio']:.2f}x\n"
-                               f"MACD {ind['macd']:.2f} / signal {ind['signal']:.2f}\n"
-                               "NOT an entry order. Check liquidity, risk and current price.")
-                    if telegram(message):
-                        last_alert[side] = time.time()
-        except Exception:
-            LOG.exception("LBank market-data monitor error (no trading action)")
+            price, change24 = get_perpetual_snapshot(exchange)
+            now = time.time()
+            if not startup_done and now >= next_startup_test:
+                note = (f"[LBank 선물 BTCUSDT] 연결 시험 알림\\n"
+                        f"선물 현재가: {price:,.1f} USDT\\n"
+                        "서버 가동 및 텔레그램 연결 확인.\\n"
+                        "가격 표본 수집 중이며 아직 진입 신호가 아닙니다.\\n"
+                        "실제 주문은 자동으로 실행하지 않습니다.")
+                startup_done = telegram(note)
+                LOG.info("Telegram startup test %s", "SENT" if startup_done else "FAILED")
+                next_startup_test = now + STARTUP_RETRY
+            if now - last_sample >= POLL:
+                last_sample = now
+                observations.append((now, price))
+                prices = [v for _, v in observations]
+                # Reject gaps: the most recent 40 observations must be continuous.
+                recent = list(observations)[-40:]
+                continuous = len(recent) >= 40 and all(
+                    20 <= recent[i][0] - recent[i-1][0] <= max(POLL * 2.5, 150)
+                    for i in range(1, len(recent))
+                )
+                result = classify(prices) if continuous else None
+                LOG.info("contract=BTCUSDT sampled_price=%.1f samples=%d signal=%s",
+                         price, len(prices), result["side"] if result else "none")
+                if result:
+                    side = result["side"]
+                    if now - last_alert.get(side, 0) >= COOLDOWN:
+                        msg = (f"[LBank BTCUSDT 무기한 선물 | {side}]\\n"
+                               "※ LBank 선물 실가격의 1분 표본 기반, 캔들 아님\\n"
+                               f"가격/관심가: {result['price']:,.1f}\\n"
+                               f"참고 손절: {result['stop']:,.1f}\\n"
+                               f"참고 목표1: {result['target1']:,.1f}\\n"
+                               f"참고 목표2: {result['target2']:,.1f}\\n"
+                               f"5분변화: {result['m5']:+.2f}% | 15분변화: {result['m15']:+.2f}%\\n"
+                               f"표본 RSI: {result['rsi']:.1f}\\n"
+                               "주문 신호가 아닌 관찰 알림입니다. 50배 격리 거래 주의.")
+                        if telegram(msg):
+                            last_alert[side] = now
+                            LOG.info("Telegram signal alert SENT: %s", side)
+                        else:
+                            LOG.warning("Telegram signal alert FAILED")
+        except Exception as exc:
+            LOG.error("LBank perpetual price error (%s): %s",
+                      type(exc).__name__, str(exc)[:200])
         time.sleep(POLL)
 
 
