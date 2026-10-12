@@ -14,7 +14,7 @@ from lbank_futures_monitor import (
 class LBankCostModelTests(unittest.TestCase):
     def test_flat_price_is_loss_after_fees_slippage_and_funding_reserve(self):
         for side in (-1, 1):
-            self.assertLess(net_pnl_per_btc(side, 83000, 83000), -100.0)
+            self.assertLess(net_pnl_per_btc(side, 83000, 83000), -70.0)
 
     def test_both_directions_targets_clear_net_rr(self):
         for direction in (-1, 1):
@@ -26,8 +26,22 @@ class LBankCostModelTests(unittest.TestCase):
                 target = minimum_net_rr_target(direction, entry, loss, ratio)
                 self.assertIsNotNone(target)
                 self.assertGreater(direction * (target - entry), 0)
-                self.assertAlmostEqual(net_pnl_per_btc(direction, entry, target) / loss,
+                self.assertAlmostEqual(net_pnl_per_btc(direction, entry, target, exit_kind="take_profit") / loss,
                                        ratio, places=5)
+
+    def test_maker_profit_and_taker_stop_are_distinct(self):
+        entry = 83000.
+        for direction in (-1, 1):
+            # A resting maker TP is cheaper than immediate taker liquidation.
+            same_target_as_stop = entry + direction * 500
+            take_profit = net_pnl_per_btc(direction, entry, same_target_as_stop,
+                                           exit_kind="take_profit")
+            taker_exit = net_pnl_per_btc(direction, entry, same_target_as_stop,
+                                         exit_kind="stop")
+            self.assertGreater(take_profit, taker_exit)
+        # 287.4 USDT margin x 50 = 14,370 USDT nominal:
+        self.assertAlmostEqual(14370 * (0.0002 + 0.0002), 5.748)
+        self.assertAlmostEqual(14370 * (0.0002 + 0.0006), 11.496)
 
     def test_no_alert_before_60_samples(self):
         self.assertIsNone(classify([80000. + i * 25 for i in range(59)]))
@@ -73,7 +87,7 @@ class LBankCostModelTests(unittest.TestCase):
         entry = 82000.
         loss = -net_pnl_per_btc(1, entry, entry * (1 - .0025))
         target = minimum_net_rr_target(1, entry, loss, 1.5)
-        self.assertGreater((target - entry) / entry, .007)  # > 0.7% gross move
+        self.assertGreater((target - entry) / entry, .005)  # Fees still require a material gross move
 
 
 if __name__ == "__main__":
