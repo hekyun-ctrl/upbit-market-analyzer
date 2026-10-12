@@ -21,6 +21,10 @@ SYMBOL = "BTC/USDT:USDT"
 POLL = max(30, int(os.getenv("LBANK_POLL_SECONDS", "60")))
 COOLDOWN = max(900, int(os.getenv("LBANK_ALERT_COOLDOWN_SECONDS", "1200")))
 STARTUP_RETRY = 300
+STARTUP_TEST_ENABLED = os.getenv("LBANK_STARTUP_TEST_ENABLED", "false").lower() == "true"
+ENTRY_CONFIRM_MAX_AGE_SECONDS = 240
+ENTRY_MAX_CHASE_PCT = 0.0010
+
 MAX_AGE_MS = 180_000
 # Configured values are estimates, not authenticated account fee/risk records.
 FEE_IN = 0.0006   # LBank public standard market-order Taker: 0.06%
@@ -119,72 +123,128 @@ def minimum_net_rr_target(direction, entry, unit_loss, ratio):
     return entry + direction * high
 
 
-def classify(prices):
-    """Create cost-aware *observation* alerts from evenly-spaced price samples.
+def calculate_plan(prices, direction):
+    """Cost-aware hypothetical levels for a candidate, not a price prediction."""
+    if len(prices) < MIN_SAMPLES:
+        return None
+    curr = prices[-1]
+    momentum5 = (curr / prices[-6] - 1) * 100
+    momentum15 = (curr / prices[-16] - 1) * 100
+    strength = rsi(prices)
+    # Price-based local invalidation, derived from last eight sampled prices.
+    local = prices[-9:-1]
+    stop = (min(curr * (1 - .0025), min(local) * (1 - .0003))
+            if direction == 1 else
+            max(curr * (1 + .0025), max(local) * (1 + .0003)))
+    stop_distance = abs(curr - stop) / curr
+    if not (.0025 <= stop_distance <= .0060):
+        return None
+    unit_loss = -net_pnl_per_btc(direction, curr, stop)
+    if unit_loss <= 0:
+        return None
+    t1 = minimum_net_rr_target(direction, curr, unit_loss, MIN_NET_RR)
+    t2 = minimum_net_rr_target(direction, curr, unit_loss, 2.5)
+    if t1 is None or t2 is None or t1 <= 0 or t2 <= 0:
+        return None
+    # Required profit must be at least plausible compared with sampled movement,
+    # otherwise skip instead of inventing a reachable price target.
+    observed_range = max(prices[-60:]) - min(prices[-60:])
+    if abs(t1 - curr) > 1.5 * observed_range:
+        return None
+    permitted_loss = REF_BALANCE * RISK_FRACTION
+    effective_entry = curr * (1 + direction * SLIPPAGE_EACH)
+    qty = min(permitted_loss / unit_loss,
+              REF_BALANCE * MAX_MARGIN_FRACTION * LEVERAGE / effective_entry)
+    if qty <= 0:
+        return None
+    net_loss = -qty * net_pnl_per_btc(direction, curr, stop)
+    net_gain1 = qty * net_pnl_per_btc(direction, curr, t1)
+    net_gain2 = qty * net_pnl_per_btc(direction, curr, t2)
+    if net_loss <= 0 or net_gain1 / net_loss < MIN_NET_RR - 1e-7:
+        return None
+    return {
+        "direction": direction, "side": "롱" if direction == 1 else "숏",
+        "price": curr, "rsi": strength, "m5": momentum5, "m15": momentum15,
+        "stop": stop, "target1": t1, "target2": t2,
+        "margin": qty * effective_entry / LEVERAGE, "notional": qty * curr,
+        "net_loss": net_loss, "net_gain1": net_gain1, "net_gain2": net_gain2,
+        "rr1": net_gain1 / net_loss, "rr2": net_gain2 / net_loss,
+        "fee_roundtrip_est": qty * (effective_entry * FEE_IN +
+            t1 * (1 - direction * SLIPPAGE_EACH) * FEE_OUT),
+    }
 
-    No OHLCV candles, order-book spread, liquidation prices, or trading volume.
-    Forecasted market outcomes are intentionally NOT claimed.
-    """
+
+def classify(prices):
+    """Identify a breakout WATCH; not yet actionable as an entry check."""
     if len(prices) < MIN_SAMPLES:
         return None
     curr = prices[-1]
     m5 = (curr / prices[-6] - 1) * 100
     m15 = (curr / prices[-16] - 1) * 100
     macd_arr = [a - b for a, b in zip(ema(prices, 12), ema(prices, 26))]
-    macd = macd_arr[-1]
-    sig = ema(macd_arr, 9)[-1]
     strength = rsi(prices)
-    prior_high = max(prices[-16:-1])
-    prior_low = min(prices[-16:-1])
-    if curr > prior_high and macd > sig and 55 <= strength <= 80 and m5 >= .14 and m15 >= .20:
-        side, direction = "롱 관찰", 1
-        # Use a sampled local structure plus a minimum buffer, not arbitrary RR-only stop.
-        stop = min(curr * (1 - .0025), min(prices[-16:-1]) * (1 - .0003))
-    elif curr < prior_low and macd < sig and 20 <= strength <= 45 and m5 <= -.14 and m15 <= -.20:
-        side, direction = "숏 관찰", -1
-        stop = max(curr * (1 + .0025), max(prices[-16:-1]) * (1 + .0003))
+    macd, sig = macd_arr[-1], ema(macd_arr, 9)[-1]
+    if curr > max(prices[-16:-1]) and macd > sig and 55 <= strength <= 80 and m5 >= .14 and m15 >= .20:
+        direction = 1
+    elif curr < min(prices[-16:-1]) and macd < sig and 20 <= strength <= 45 and m5 <= -.14 and m15 <= -.20:
+        direction = -1
     else:
         return None
-    stop_distance = abs(curr - stop) / curr
-    if not (.0025 <= stop_distance <= .0060):
-        return None
-    loss_unit = -net_pnl_per_btc(direction, curr, stop)
-    if loss_unit <= 0:
-        return None
-    target1 = minimum_net_rr_target(direction, curr, loss_unit, MIN_NET_RR)
-    target2 = minimum_net_rr_target(direction, curr, loss_unit, 2.5)
-    if target1 is None or target2 is None or target1 <= 0 or target2 <= 0:
-        return None
-    # Reject unrealistically distant required-profit targets compared with
-    # the observable *price snapshot* range; this is not a predictive model.
-    range_60 = max(prices[-60:]) - min(prices[-60:])
-    if abs(target1 - curr) > 1.5 * range_60:
-        return None
+    return calculate_plan(prices, direction)
 
-    permitted_loss = REF_BALANCE * RISK_FRACTION
-    qty_by_loss = permitted_loss / loss_unit
-    effective_entry = curr * (1 + direction * SLIPPAGE_EACH)
-    qty_by_margin = (REF_BALANCE * MAX_MARGIN_FRACTION * LEVERAGE) / effective_entry
-    qty = min(qty_by_loss, qty_by_margin)
-    if qty <= 0:
+
+def confirm_watch(prices, watch, age_seconds):
+    """Separate second-stage ENTRY REVIEW with fresh price confirmation.
+
+    Used for user-side manual checking only, not a guaranteed market entry.
+    It never assumes orderbook depth or authentic exchange OHLCV bars.
+    """
+    if watch is None or age_seconds < 30 or age_seconds > ENTRY_CONFIRM_MAX_AGE_SECONDS:
         return None
-    net_loss = -qty * net_pnl_per_btc(direction, curr, stop)
-    net_gain1 = qty * net_pnl_per_btc(direction, curr, target1)
-    net_gain2 = qty * net_pnl_per_btc(direction, curr, target2)
-    if net_loss <= 0 or net_gain1 / net_loss < MIN_NET_RR - 1e-7:
+    if len(prices) < MIN_SAMPLES:
         return None
-    return {
-        "side": side, "price": curr, "rsi": strength, "m5": m5, "m15": m15,
-        "stop": stop, "target1": target1, "target2": target2,
-        "max_loss": permitted_loss, "notional": qty * curr,
-        "margin": qty * effective_entry / LEVERAGE,
-        "net_loss": net_loss, "net_gain1": net_gain1, "net_gain2": net_gain2,
-        "rr1": net_gain1 / net_loss, "rr2": net_gain2 / net_loss,
-        "fee_roundtrip_est": qty * (
-            effective_entry * FEE_IN
-            + target1 * (1 - direction * SLIPPAGE_EACH) * FEE_OUT
-        ),
-    }
+    direction = watch["direction"]
+    current = prices[-1]
+    initial = watch["price"]
+    relative = direction * (current / initial - 1)
+    # Do not chase >0.10% in the favorable direction or accept >0.10% failed breakout.
+    if relative < -ENTRY_MAX_CHASE_PCT or relative > ENTRY_MAX_CHASE_PCT:
+        return None
+    m5 = (current / prices[-6] - 1) * 100
+    m15 = (current / prices[-16] - 1) * 100
+    macd_line = [a - b for a, b in zip(ema(prices, 12), ema(prices, 26))]
+    macd, sig = macd_line[-1], ema(macd_line, 9)[-1]
+    strength = rsi(prices)
+    if direction == 1:
+        valid = macd > sig and strength >= 50 and m5 >= .04 and m15 >= .10
+    else:
+        valid = macd < sig and strength <= 50 and m5 <= -.04 and m15 <= -.10
+    if not valid:
+        return None
+    return calculate_plan(prices, direction)
+
+
+def format_entry_alert(plan, observed_at_utc):
+    daily_goal = REF_BALANCE * 0.10
+    return (
+        f"[LBank BTCUSDT 선물 | 조건부 진입 검토 - {plan['side']}]\n"
+        "※ 1분 간격 선물 가격 표본에서 2단계 확인한 관찰 신호\n"
+        f"확인 시각(UTC): {observed_at_utc}\n"
+        f"현재 참고가격: {plan['price']:,.1f} USDT\n"
+        f"손절 참고가: {plan['stop']:,.1f}\n"
+        f"목표1 필요가격(순손익비 {plan['rr1']:.2f}): {plan['target1']:,.1f}\n"
+        f"목표2 필요가격(순손익비 {plan['rr2']:.2f}): {plan['target2']:,.1f}\n"
+        f"증거금 한도 예시: {plan['margin']:.2f} USDT / 명목금액: {plan['notional']:.2f} USDT\n"
+        f"손절 예상 순손실: -{plan['net_loss']:.2f} USDT\n"
+        f"목표1 예상 순이익: +{plan['net_gain1']:.2f} USDT\n"
+        f"목표2 예상 순이익: +{plan['net_gain2']:.2f} USDT\n"
+        f"왕복 거래수수료 추정(목표1): {plan['fee_roundtrip_est']:.2f} USDT\n"
+        f"기준 시드: {REF_BALANCE:.0f} USDT / 일 순수익 10% 목표: {daily_goal:.2f} USDT (보장 불가)\n"
+        f"5분 가격표본 변화 {plan['m5']:+.2f}% | 15분 {plan['m15']:+.2f}% | 표본 RSI {plan['rsi']:.1f}\n"
+        "보수적 가정: 시장가 수수료 진입/청산 각 0.06%, 슬리피지 각각 0.02%, 펀딩 완충 0.01%\n"
+        "목표가는 예측이 아닌 비용·손익비 계산값. 실제 호가·체결·펀딩 미확인.\n"
+        "수동 거래 전 거래소 5분봉/15분봉과 호가·손절 주문을 반드시 확인하세요."
+    )
 
 
 def run():
@@ -193,68 +253,80 @@ def run():
     exchange.load_markets()
     if not exchange.market(SYMBOL).get("swap"):
         raise RuntimeError("Refuse to monitor spot instrument")
-    LOG.info("LBank BTCUSDT PERPETUAL COST-AWARE observation monitor started; ref_balance=%.2f, risk_pct=%.2f, maker assumed NO, taker each=%.4f, slip each=%.4f, funding buffer=%.4f; no trade permissions",
-             REF_BALANCE, RISK_FRACTION * 100, FEE_IN, SLIPPAGE_EACH, FUNDING_BUFFER)
+    LOG.info("LBank BTCUSDT: TWO-STAGE fee-aware entry-review monitor started. REF_BALANCE=%.2f risk_pct=%.2f; NO orders",
+             REF_BALANCE, 100 * RISK_FRACTION)
     observations = deque(maxlen=120)
+    watch = None
     last_alert = {}
     last_sample = 0
-    next_startup_test = 0
     startup_done = False
+    next_startup_test = 0
+    counters = {"watched": 0, "confirmed": 0, "expired": 0, "blocked": 0, "suppressed": 0}
+    next_log_summary = time.time() + 3600
     while True:
         try:
             price, change24 = get_perpetual_snapshot(exchange)
             now = time.time()
-            if not startup_done and now >= next_startup_test:
-                note = (f"[LBank 선물 BTCUSDT] 연결 시험 알림\n"
-                        f"선물 현재가: {price:,.1f} USDT\n"
-                        "서버 가동 및 텔레그램 연결 확인.\n"
-                        "가격 표본 수집 중이며 아직 진입 신호가 아닙니다.\n"
-                        "실제 주문은 자동으로 실행하지 않습니다.")
-                startup_done = telegram(note)
+            if STARTUP_TEST_ENABLED and not startup_done and now >= next_startup_test:
+                startup_done = telegram("[LBank BTCUSDT] 2단계 감시 재시작. 시험 알림이며 진입 신호 아님.")
                 LOG.info("Telegram startup test %s", "SENT" if startup_done else "FAILED")
                 next_startup_test = now + STARTUP_RETRY
             if now - last_sample >= POLL:
                 last_sample = now
                 observations.append((now, price))
                 prices = [v for _, v in observations]
-                # Reject gaps: the most recent 40 observations must be continuous.
-                recent = list(observations)[-40:]
-                continuous = len(recent) >= 40 and all(
+                recent = list(observations)[-MIN_SAMPLES:]
+                continuous = len(recent) >= MIN_SAMPLES and all(
                     20 <= recent[i][0] - recent[i-1][0] <= max(POLL * 2.5, 150)
-                    for i in range(1, len(recent))
-                )
-                result = classify(prices) if continuous else None
-                LOG.info("contract=BTCUSDT sampled_price=%.1f samples=%d signal=%s",
-                         price, len(prices), result["side"] if result else "none")
-                if result:
-                    side = result["side"]
-                    if now - last_alert.get(side, 0) >= COOLDOWN:
-                        msg = (f"[LBank BTCUSDT 무기한 선물 | {side}]\n"
-                               "※ LBank 선물 실가격의 1분 표본 기반, 캔들 아님\n"
-                               f"관찰 시점 가격(진입 확정 아님): {result['price']:,.1f}\n"
-                               f"참고 손절: {result['stop']:,.1f}\n"
-                               f"필요 목표1(순손익비 {result['rr1']:.2f}): {result['target1']:,.1f}\n"
-                               f"필요 목표2(순손익비 {result['rr2']:.2f}): {result['target2']:,.1f}\n"
-                               f"추정 증거금: {result['margin']:.2f} USDT / 명목금액: {result['notional']:.2f} USDT\n"
-                               f"손절 예상 순손실: -{result['net_loss']:.2f} USDT\n"
-                               f"목표1 예상 순이익: +{result['net_gain1']:.2f} USDT\n"
-                               f"목표2 예상 순이익: +{result['net_gain2']:.2f} USDT\n"
-                               f"예상 왕복 거래 수수료(목표1 기준): {result['fee_roundtrip_est']:.2f} USDT\n"
-                               f"참고 잔고 {REF_BALANCE:.0f} USDT / 1회 최대 손실 예산 {result['max_loss']:.2f} USDT\n"
-                               "가정: 시장가 왕복 각 0.06%, 불리한 슬리피지 각 0.02%, 펀딩 완충 0.01%\n"
-                               f"5분변화: {result['m5']:+.2f}% | 15분변화: {result['m15']:+.2f}%\n"
-                               f"표본 RSI: {result['rsi']:.1f}\n"
-                               "목표가는 해당 순손익비를 충족할 최소 필요가격일 뿐 예측치가 아닙니다.\n"
-                               "실제 계정 수수료·펀딩·호가·슬리피지는 미확인.\n"
-                               "1분 가격표본 관찰 알림이며 매수/매도 지시가 아닙니다. 50배 격리 주의.")
-                        if telegram(msg):
-                            last_alert[side] = now
-                            LOG.info("Telegram signal alert SENT: %s", side)
+                    for i in range(1, len(recent)))
+                if not continuous:
+                    watch = None
+                elif watch is not None:
+                    age = now - watch["time"]
+                    if age > ENTRY_CONFIRM_MAX_AGE_SECONDS:
+                        watch = None
+                        counters["expired"] += 1
+                        LOG.info("watch expired; no ENTRY REVIEW signal")
+                    else:
+                        plan = confirm_watch(prices, watch["plan"], age)
+                        if plan is not None:
+                            side = plan["side"]
+                            if now - last_alert.get(side, 0) >= COOLDOWN:
+                                message = format_entry_alert(
+                                    plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat())
+                                if telegram(message):
+                                    last_alert[side] = now
+                                    counters["confirmed"] += 1
+                                    LOG.info("ENTRY REVIEW SENT side=%s entry=%.1f stop=%.1f t1=%.1f net_rr=%.2f",
+                                             side, plan["price"], plan["stop"], plan["target1"], plan["rr1"])
+                                else:
+                                    LOG.warning("ENTRY REVIEW SEND FAILED")
+                            else:
+                                counters["suppressed"] += 1
+                                LOG.info("ENTRY REVIEW suppressed by cooldown side=%s", side)
+                            watch = None
+                if continuous and watch is None:
+                    proposal = classify(prices)
+                    if proposal is not None:
+                        side = proposal["side"]
+                        if now - last_alert.get(side, 0) >= COOLDOWN:
+                            watch = {"plan": proposal, "time": now}
+                            counters["watched"] += 1
+                            LOG.info("watch created %s at %.1f (no preliminary Telegram noise)",
+                                     side, proposal["price"])
                         else:
-                            LOG.warning("Telegram signal alert FAILED")
+                            counters["suppressed"] += 1
+                    else:
+                        counters["blocked"] += 1
+                LOG.info("contract=BTCUSDT price=%.1f count=%d watch=%s confirmed_total=%d",
+                         price, len(prices), watch["plan"]["side"] if watch else "none",
+                         counters["confirmed"])
+                if now >= next_log_summary:
+                    LOG.info("ALERT FUNNEL last-hour totals: %s", counters)
+                    counters = {key: 0 for key in counters}
+                    next_log_summary = now + 3600
         except Exception as exc:
-            LOG.error("LBank perpetual price error (%s): %s",
-                      type(exc).__name__, str(exc)[:200])
+            LOG.error("LBank market error (%s): %s", type(exc).__name__, str(exc)[:160])
         time.sleep(POLL)
 
 
