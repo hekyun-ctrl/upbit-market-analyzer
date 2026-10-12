@@ -7,6 +7,7 @@ import unittest
 from lbank_futures_monitor import (
     REF_BALANCE, RISK_FRACTION, classify,
     minimum_net_rr_target, net_pnl_per_btc,
+    confirm_watch, format_entry_alert,
 )
 
 
@@ -43,6 +44,30 @@ class LBankCostModelTests(unittest.TestCase):
         self.assertGreaterEqual(signal["rr1"], 1.5 - 1e-7)
         self.assertGreaterEqual(signal["rr2"], 2.5 - 1e-7)
         self.assertGreater(signal["fee_roundtrip_est"], 0)
+
+    def test_two_stage_watch_converts_to_entry_review_with_confirmation(self):
+        base = [80000. + 25 * i + (45 if i % 2 else 0) for i in range(60)]
+        watch = classify(base)
+        self.assertIsNotNone(watch)
+        self.assertEqual(watch["direction"], 1)
+        # Next one-minute quote stabilizes near the breakout rather than chasing.
+        now = base + [base[-1] + 5]
+        confirmed = confirm_watch(now, watch, 60)
+        self.assertIsNotNone(confirmed)
+        self.assertEqual(confirmed["side"], "롱")
+        self.assertLessEqual(confirmed["net_loss"], REF_BALANCE * RISK_FRACTION + 1e-8)
+        self.assertGreaterEqual(confirmed["rr1"], 1.5 - 1e-7)
+        alert = format_entry_alert(confirmed, "2026-10-13T00:00:00Z")
+        self.assertIn("조건부 진입 검토", alert)
+        self.assertIn("손절 예상 순손실", alert)
+        self.assertIn("95.80 USDT", alert)
+
+    def test_stage_two_rejects_stale_watch_and_price_chasing(self):
+        base = [80000. + 25 * i + (45 if i % 2 else 0) for i in range(60)]
+        watch = classify(base)
+        self.assertIsNotNone(watch)
+        self.assertIsNone(confirm_watch(base + [base[-1]], watch, 300))
+        self.assertIsNone(confirm_watch(base + [base[-1] * 1.003], watch, 60))
 
     def test_avoids_narrow_targets_that_only_cover_fees(self):
         entry = 82000.
