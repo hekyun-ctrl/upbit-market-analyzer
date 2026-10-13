@@ -3,6 +3,8 @@
 Run: python -m unittest test_lbank_fee_risk.py
 """
 import unittest
+from lbank_signal_risk import SignalRiskTracker, format_risk_alert
+
 
 from lbank_futures_monitor import (
     REF_BALANCE, RISK_FRACTION, classify,
@@ -89,6 +91,55 @@ class LBankCostModelTests(unittest.TestCase):
         target = minimum_net_rr_target(1, entry, loss, 1.5)
         self.assertGreater((target - entry) / entry, .005)  # Fees still require a material gross move
 
+
+
+class SignalFollowupRiskTests(unittest.TestCase):
+    def _plan(self, direction=-1):
+        return {
+            "direction": direction, "price": 81000.,
+            "stop": 81250. if direction == -1 else 80750.,
+            "target1": 80450. if direction == -1 else 81550.,
+        }
+
+    def test_no_warnings_without_a_sent_signal(self):
+        tracker = SignalRiskTracker()
+        self.assertEqual(tracker.check([81000, 81400], 300), [])
+
+    def test_urgent_stop_line_breach_not_delayed(self):
+        tracker = SignalRiskTracker()
+        sig = tracker.add_sent_signal(self._plan(), 0)
+        events = tracker.check([81000, 81255], 60)
+        self.assertEqual(len(events), 1)
+        self.assertIs(events[0][0], sig)
+        self.assertEqual(events[0][1], "stop_breached")
+        alert = format_risk_alert(sig, "stop_breached", 81255, "2026-10-13 10:00")
+        self.assertIn("시장가 청산", alert)
+        self.assertIn("미진입/기청산", alert)
+        tracker.acknowledge(sig)
+        self.assertEqual(tracker.check([81300], 120), [])
+
+    def test_early_warning_requires_two_confirmations(self):
+        tracker = SignalRiskTracker()
+        sig = tracker.add_sent_signal(self._plan(), 0)
+        sample = [80990., 81010., 81045., 81080., 81110., 81160.]
+        self.assertEqual(tracker.check(sample, 60), [])
+        events = tracker.check(sample + [81175.], 120)
+        self.assertEqual(len(events), 1)
+        self.assertEqual(events[0][1], "early_invalidation")
+        self.assertLess(events[0][2], sig.stop)
+
+    def test_rebound_and_stale_signal_do_not_spam(self):
+        tracker = SignalRiskTracker()
+        tracker.add_sent_signal(self._plan(), 0)
+        self.assertEqual(tracker.check([81000, 81005, 81010, 80995, 81003, 81000], 60), [])
+        self.assertEqual(tracker.check([81180], 7300), [])
+        self.assertEqual(len(tracker.signals), 0)
+
+    def test_first_reference_target_silently_ends_followup(self):
+        tracker = SignalRiskTracker()
+        tracker.add_sent_signal(self._plan(), 0)
+        self.assertEqual(tracker.check([80400.], 60), [])
+        self.assertEqual(len(tracker.signals), 0)
 
 if __name__ == "__main__":
     unittest.main()
