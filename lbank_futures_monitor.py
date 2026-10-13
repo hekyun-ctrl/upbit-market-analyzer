@@ -20,6 +20,7 @@ from lbank_signal_risk import SignalRiskTracker, format_risk_alert
 LOG = logging.getLogger("lbank_monitor")
 SYMBOL = "BTC/USDT:USDT"
 POLL = max(30, int(os.getenv("LBANK_POLL_SECONDS", "60")))
+RISK_POLL = max(10, min(POLL, int(os.getenv("LBANK_RISK_POLL_SECONDS", "15"))))
 COOLDOWN = max(2700, int(os.getenv("LBANK_ALERT_COOLDOWN_SECONDS", "2700")))
 REVERSAL_COOLDOWN = 5400
 MAX_DAILY_ALERTS = 8
@@ -296,6 +297,7 @@ def run():
              REF_BALANCE, 100 * RISK_FRACTION)
     observations = deque(maxlen=120)
     risk_tracker = SignalRiskTracker()
+    LOG.info("risk_snapshot_poll=%ds, entry_snapshot_poll=%ds (sampled data only)", RISK_POLL, POLL)
     watch = None
     alert_state = {"day": None, "count": 0, "last_time": None, "last_side": None}
     last_sample = 0
@@ -311,13 +313,9 @@ def run():
                 startup_done = telegram("[LBank BTCUSDT] 2단계 감시 재시작. 시험 알림이며 진입 신호 아님.")
                 LOG.info("Telegram startup test %s", "SENT" if startup_done else "FAILED")
                 next_startup_test = now + STARTUP_RETRY
-            if now - last_sample >= POLL:
-                last_sample = now
-                observations.append((now, price))
-                prices = [v for _, v in observations]
                 # Urgent risk messages bypass entry-alert cooldowns and daily quotas.
                 # Only already-SENT hypothetical signals are monitored, not real positions.
-                for tracked, reason, observed_price in risk_tracker.check(prices, now):
+                for tracked, reason, observed_price in risk_tracker.check([v for _, v in observations][-5:] + [price], now):
                     observed_kst = datetime.fromtimestamp(
                         now, tz=timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
                     warning = format_risk_alert(
@@ -330,6 +328,10 @@ def run():
                             reason, observed_price)
                     else:
                         LOG.error("SIGNAL RISK WARN SEND FAILED reference=%d", tracked.number)
+            if now - last_sample >= POLL:
+                last_sample = now
+                observations.append((now, price))
+                prices = [v for _, v in observations]
                 recent = list(observations)[-MIN_SAMPLES:]
                 continuous = len(recent) >= MIN_SAMPLES and all(
                     20 <= recent[i][0] - recent[i-1][0] <= max(POLL * 2.5, 150)
@@ -383,7 +385,7 @@ def run():
                     next_log_summary = now + 3600
         except Exception as exc:
             LOG.error("LBank market error (%s): %s", type(exc).__name__, str(exc)[:160])
-        time.sleep(POLL)
+        time.sleep(RISK_POLL)
 
 
 if __name__ == "__main__":
