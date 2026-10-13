@@ -11,6 +11,7 @@ from lbank_futures_monitor import (
     minimum_net_rr_target, net_pnl_per_btc,
     confirm_watch, format_entry_alert,
     sampled_five_minute_rsi, five_minute_rsi_entry_gate,
+    fast_sample_rsi_gate,
 )
 
 
@@ -152,6 +153,16 @@ class FiveMinuteRsiGateTests(unittest.TestCase):
         allowed, reason, rsi5 = five_minute_rsi_entry_gate(self.observations(closes), 1)
         self.assertTrue(allowed, (reason, rsi5))
         self.assertEqual(reason, "overbought_pullback_then_support")
+
+    def test_fast_sample_rsi_protects_against_late_short_and_long(self):
+        down = [83000 - 50 * i for i in range(60)]
+        permitted, reason, value = fast_sample_rsi_gate(down, -1)
+        self.assertFalse(permitted)
+        self.assertLessEqual(value, 35)
+        up = [80000 + 50 * i for i in range(60)]
+        permitted, reason, value = fast_sample_rsi_gate(up, 1)
+        self.assertFalse(permitted)
+        self.assertGreaterEqual(value, 70)
 
     def test_live_gate_fails_closed_without_real_sample_timestamps(self):
         up = [80000 + 25 * i + (45 if i % 2 else 0) for i in range(60)]
