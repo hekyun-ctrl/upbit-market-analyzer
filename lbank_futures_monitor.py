@@ -12,14 +12,16 @@ import time
 import urllib.parse
 import urllib.request
 from collections import deque
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 import ccxt
 
 LOG = logging.getLogger("lbank_monitor")
 SYMBOL = "BTC/USDT:USDT"
 POLL = max(30, int(os.getenv("LBANK_POLL_SECONDS", "60")))
-COOLDOWN = max(900, int(os.getenv("LBANK_ALERT_COOLDOWN_SECONDS", "1200")))
+COOLDOWN = max(2700, int(os.getenv("LBANK_ALERT_COOLDOWN_SECONDS", "2700")))
+REVERSAL_COOLDOWN = 5400
+MAX_DAILY_ALERTS = 8
 STARTUP_RETRY = 300
 STARTUP_TEST_ENABLED = os.getenv("LBANK_STARTUP_TEST_ENABLED", "false").lower() == "true"
 ENTRY_CONFIRM_MAX_AGE_SECONDS = 240
@@ -261,6 +263,28 @@ def format_entry_alert(plan, observed_at_utc):
     )
 
 
+def alert_gate(now, side, state):
+    day = datetime.fromtimestamp(now, tz=timezone(timedelta(hours=9))).date().isoformat()
+    if day != state["day"]:
+        state["day"], state["count"] = day, 0
+    if state["count"] >= MAX_DAILY_ALERTS:
+        return "daily_cap"
+    if state["last_time"] is not None:
+        elapsed = now - state["last_time"]
+        if elapsed < COOLDOWN:
+            return "global_cooldown"
+        if side != state["last_side"] and elapsed < REVERSAL_COOLDOWN:
+            return "reverse_cooldown"
+    return "ok"
+
+
+def record_alert(now, side, state):
+    if alert_gate(now, side, state) != "ok":
+        raise ValueError("alert gate disallowed sending")
+    state["last_time"], state["last_side"] = now, side
+    state["count"] += 1
+
+
 def run():
     exchange = ccxt.lbank({"enableRateLimit": True, "timeout": 12000,
                            "options": {"defaultType": "swap"}})
@@ -271,7 +295,7 @@ def run():
              REF_BALANCE, 100 * RISK_FRACTION)
     observations = deque(maxlen=120)
     watch = None
-    last_alert = {}
+    alert_state = {"day": None, "count": 0, "last_time": None, "last_side": None}
     last_sample = 0
     startup_done = False
     next_startup_test = 0
@@ -305,11 +329,11 @@ def run():
                         plan = confirm_watch(prices, watch["plan"], age)
                         if plan is not None:
                             side = plan["side"]
-                            if now - last_alert.get(side, 0) >= COOLDOWN:
+                            if alert_gate(now, side, alert_state) == "ok":
                                 message = format_entry_alert(
                                     plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat())
                                 if telegram(message):
-                                    last_alert[side] = now
+                                    record_alert(now, side, alert_state)
                                     counters["confirmed"] += 1
                                     LOG.info("ENTRY REVIEW SENT side=%s entry=%.1f stop=%.1f t1=%.1f net_rr=%.2f",
                                              side, plan["price"], plan["stop"], plan["target1"], plan["rr1"])
@@ -323,7 +347,7 @@ def run():
                     proposal = classify(prices)
                     if proposal is not None:
                         side = proposal["side"]
-                        if now - last_alert.get(side, 0) >= COOLDOWN:
+                        if alert_gate(now, side, alert_state) == "ok":
                             watch = {"plan": proposal, "time": now}
                             counters["watched"] += 1
                             LOG.info("watch created %s at %.1f (no preliminary Telegram noise)",
