@@ -313,21 +313,21 @@ def run():
                 startup_done = telegram("[LBank BTCUSDT] 2단계 감시 재시작. 시험 알림이며 진입 신호 아님.")
                 LOG.info("Telegram startup test %s", "SENT" if startup_done else "FAILED")
                 next_startup_test = now + STARTUP_RETRY
-                # Urgent risk messages bypass entry-alert cooldowns and daily quotas.
-                # Only already-SENT hypothetical signals are monitored, not real positions.
-                for tracked, reason, observed_price in risk_tracker.check([v for _, v in observations][-5:] + [price], now):
-                    observed_kst = datetime.fromtimestamp(
-                        now, tz=timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
-                    warning = format_risk_alert(
-                        tracked, reason, observed_price, observed_kst)
-                    if telegram(warning):
-                        risk_tracker.acknowledge(tracked)
-                        LOG.warning(
-                            "SIGNAL RISK WARN SENT reference=%d side=%s reason=%s price=%.1f",
-                            tracked.number, "LONG" if tracked.direction == 1 else "SHORT",
-                            reason, observed_price)
-                    else:
-                        LOG.error("SIGNAL RISK WARN SEND FAILED reference=%d", tracked.number)
+            # Urgent risk messages bypass entry-alert cooldowns and daily quotas.
+            # Only already-SENT hypothetical signals are monitored, not real positions.
+            for tracked, reason, observed_price in risk_tracker.check([v for _, v in observations][-5:] + [price], now):
+                observed_kst = datetime.fromtimestamp(
+                    now, tz=timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
+                warning = format_risk_alert(
+                    tracked, reason, observed_price, observed_kst)
+                if telegram(warning):
+                    risk_tracker.acknowledge(tracked)
+                    LOG.warning(
+                        "SIGNAL RISK WARN SENT reference=%d side=%s reason=%s price=%.1f",
+                        tracked.number, "LONG" if tracked.direction == 1 else "SHORT",
+                        reason, observed_price)
+                else:
+                    LOG.error("SIGNAL RISK WARN SEND FAILED reference=%d", tracked.number)
             if now - last_sample >= POLL:
                 last_sample = now
                 observations.append((now, price))
