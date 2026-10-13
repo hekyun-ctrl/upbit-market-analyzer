@@ -10,6 +10,7 @@ from lbank_futures_monitor import (
     REF_BALANCE, RISK_FRACTION, classify,
     minimum_net_rr_target, net_pnl_per_btc,
     confirm_watch, format_entry_alert,
+    sampled_five_minute_rsi, five_minute_rsi_entry_gate,
 )
 
 
@@ -95,6 +96,67 @@ class LBankCostModelTests(unittest.TestCase):
         target = minimum_net_rr_target(1, entry, loss, 1.5)
         self.assertGreater((target - entry) / entry, .005)  # Fees still require a material gross move
 
+
+
+
+class FiveMinuteRsiGateTests(unittest.TestCase):
+    @staticmethod
+    def observations(closes):
+        # Each value is a ticker snapshot series, NOT an OHLCV candle.
+        start = (1760000000 // 300) * 300
+        points = []
+        for idx, close in enumerate(closes):
+            for minute in range(5):
+                points.append((start + idx * 300 + minute * 60 + 55, float(close)))
+        points.append((start + len(closes) * 300 + 30, float(closes[-1])))
+        return points
+
+    def test_5m_rsi_requires_complete_continuous_buckets(self):
+        prices = [83000 - 30 * i for i in range(30)]
+        data = self.observations(prices)
+        state = sampled_five_minute_rsi(data)
+        self.assertIsNotNone(state)
+        self.assertEqual(len(state["closes"]), len(prices))
+        # Current unclosed bucket must never be treated as an RSI bar.
+        data[-1] = (data[-1][0], 95000.)
+        self.assertEqual(sampled_five_minute_rsi(data)["rsi"][-1], state["rsi"][-1])
+        self.assertIsNone(sampled_five_minute_rsi(data[:35]))
+        missing = [s for s in data if int(s[0] // 300) != int(data[40][0] // 300)]
+        self.assertIsNone(sampled_five_minute_rsi(missing))
+
+    def test_oversold_blocks_new_short_and_waits_for_bounce(self):
+        down = [83000 - 90 * i for i in range(25)]
+        allowed, reason, rsi5 = five_minute_rsi_entry_gate(self.observations(down), -1)
+        self.assertFalse(allowed)
+        self.assertLessEqual(rsi5, 30)
+        # One 5m bullish close is NOT enough for fresh short.
+        allowed, reason, _ = five_minute_rsi_entry_gate(
+            self.observations(down + [down[-1] + 150]), -1)
+        self.assertFalse(allowed)
+
+    def test_short_after_recovery_and_bearish_5m_rollover(self):
+        down = [83000 - 90 * i for i in range(25)]
+        up = [down[-1] + 140 * (i + 1) for i in range(6)]
+        closes = down + up + [up[-1] - 70, up[-1] - 130]
+        allowed, reason, rsi5 = five_minute_rsi_entry_gate(self.observations(closes), -1)
+        self.assertTrue(allowed, (reason, rsi5))
+        self.assertEqual(reason, "oversold_rebound_then_rollover")
+
+    def test_overbought_blocks_long_until_pullback_and_support(self):
+        up = [80000 + 100 * i for i in range(25)]
+        allowed, reason, rsi5 = five_minute_rsi_entry_gate(self.observations(up), 1)
+        self.assertFalse(allowed)
+        self.assertGreaterEqual(rsi5, 70)
+        down = [up[-1] - 200 * (i + 1) for i in range(5)]
+        closes = up + down + [down[-1] + 150, down[-1] + 240]
+        allowed, reason, rsi5 = five_minute_rsi_entry_gate(self.observations(closes), 1)
+        self.assertTrue(allowed, (reason, rsi5))
+        self.assertEqual(reason, "overbought_pullback_then_support")
+
+    def test_live_gate_fails_closed_without_real_sample_timestamps(self):
+        up = [80000 + 25 * i + (45 if i % 2 else 0) for i in range(60)]
+        self.assertIsNotNone(classify(up))
+        self.assertIsNone(classify(up, observations=[(i * 60, p) for i, p in enumerate(up)]))
 
 
 class SignalFollowupRiskTests(unittest.TestCase):
