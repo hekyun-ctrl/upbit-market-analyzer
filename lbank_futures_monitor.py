@@ -155,6 +155,20 @@ def five_minute_rsi_entry_gate(observations, direction):
                    "wait_overbought_pullback"), current
 
 
+def fast_sample_rsi_gate(prices, direction):
+    """Extra safety: stop a fast sampled-RSI 28-type late SHORT or overheated LONG.
+
+    This 1-minute ticker-based metric supplements the completed 5-minute gate,
+    never substitutes for it. No assumption of deterministic RSI reversals.
+    """
+    strength = rsi(prices)
+    if direction == -1 and strength <= 35:
+        return False, "fast_rsi_short_oversold", strength
+    if direction == 1 and strength >= 70:
+        return False, "fast_rsi_long_overbought", strength
+    return True, "fast_rsi_ok", strength
+
+
 def telegram(message):
     token = os.getenv("TELEGRAM_BOT_TOKEN", "")
     chat = os.getenv("TELEGRAM_CHAT_ID", "")
@@ -287,6 +301,11 @@ def classify(prices, observations=None):
     else:
         return None
     if observations is not None:
+        allowed_fast, fast_reason, fast_rsi = fast_sample_rsi_gate(prices, direction)
+        if not allowed_fast:
+            LOG.info("Fast sampled RSI watch BLOCKED side=%s reason=%s rsi=%.1f",
+                     "LONG" if direction == 1 else "SHORT", fast_reason, fast_rsi)
+            return None
         allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(observations, direction)
         if not allowed:
             LOG.info("5m sampled RSI watch BLOCKED side=%s reason=%s rsi=%s",
@@ -329,6 +348,11 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
     if not valid:
         return None
     if observations is not None:
+        allowed_fast, fast_reason, fast_rsi = fast_sample_rsi_gate(prices, direction)
+        if not allowed_fast:
+            LOG.info("Fast sampled RSI confirmation BLOCKED side=%s reason=%s rsi=%.1f",
+                     "LONG" if direction == 1 else "SHORT", fast_reason, fast_rsi)
+            return None
         allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(observations, direction)
         if not allowed:
             LOG.info("5m sampled RSI confirmation BLOCKED side=%s reason=%s rsi=%s",
