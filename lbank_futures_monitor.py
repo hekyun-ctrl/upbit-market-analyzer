@@ -16,6 +16,7 @@ from datetime import datetime, timezone, timedelta
 
 import ccxt
 from lbank_signal_risk import SignalRiskTracker, format_risk_alert
+from lbank_telegram_positions import PositionState, TelegramBot
 
 LOG = logging.getLogger("lbank_monitor")
 SYMBOL = "BTC/USDT:USDT"
@@ -297,6 +298,9 @@ def run():
              REF_BALANCE, 100 * RISK_FRACTION)
     observations = deque(maxlen=120)
     risk_tracker = SignalRiskTracker()
+    position_ledger = PositionState()
+    position_bot = TelegramBot(position_ledger)
+    LOG.info("position_report_tracking=enabled; recorded_position_present=%s", bool(position_ledger.position))
     LOG.info("risk_snapshot_poll=%ds, entry_snapshot_poll=%ds (sampled data only)", RISK_POLL, POLL)
     watch = None
     alert_state = {"day": None, "count": 0, "last_time": None, "last_side": None}
@@ -307,15 +311,44 @@ def run():
     next_log_summary = time.time() + 3600
     while True:
         try:
+            # Inbound updates use the same authorized existing Telegram chat.
+            position_bot.poll()
             price, change24 = get_perpetual_snapshot(exchange)
             now = time.time()
             if STARTUP_TEST_ENABLED and not startup_done and now >= next_startup_test:
                 startup_done = telegram("[LBank BTCUSDT] 2단계 감시 재시작. 시험 알림이며 진입 신호 아님.")
                 LOG.info("Telegram startup test %s", "SENT" if startup_done else "FAILED")
                 next_startup_test = now + STARTUP_RETRY
+            # Self-reported *executed* position has priority over hypothetical alerts.
+            observed_prices = [v for _, v in observations][-5:] + [price]
+            registered_risk = position_ledger.risk(observed_prices)
+            if registered_risk is not None:
+                reason, observed_price = registered_risk
+                p = position_ledger.position
+                side = "롱" if p["side"] == "LONG" else "숏"
+                kst_at = datetime.fromtimestamp(
+                    now, tz=timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
+                warning = (
+                    f"[LBank BTCUSDT | 긴급 위험 경고 - 신고 {side} 포지션]\\n"
+                    f"한국시간: {kst_at}\\n"
+                    f"위험 사유: {reason}\\n"
+                    f"현재 관측가: {observed_price:,.1f} USDT\\n"
+                    f"신고 손절가: {float(p['stop']):,.1f} USDT\\n"
+                    f"신고 잔여 수량: {p['quantity']} BTC\\n"
+                    "실제 보유 중이라면 지금 LBank 손절·포지션 상태 확인 및 "
+                    "시장가 청산을 포함한 위험 축소 검토 필요.\\n"
+                    "이 메시지는 서버에 신고된 상태 기준이며 실제 주문을 실행하지 않습니다."
+                ).replace("\\n", "\n")
+                if position_bot.send(warning):
+                    position_ledger.acknowledge_risk(reason)
+                    LOG.warning("MANUAL POSITION RISK SENT side=%s reason=%s", side, reason)
+                else:
+                    LOG.error("MANUAL POSITION RISK TELEGRAM FAILURE")
             # Urgent risk messages bypass entry-alert cooldowns and daily quotas.
             # Only already-SENT hypothetical signals are monitored, not real positions.
-            for tracked, reason, observed_price in risk_tracker.check([v for _, v in observations][-5:] + [price], now):
+            for tracked, reason, observed_price in (
+                [] if position_ledger.position else risk_tracker.check(observed_prices, now)
+            ):
                 observed_kst = datetime.fromtimestamp(
                     now, tz=timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
                 warning = format_risk_alert(
