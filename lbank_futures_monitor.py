@@ -15,6 +15,7 @@ from collections import deque
 from datetime import datetime, timezone, timedelta
 
 import ccxt
+from lbank_signal_risk import SignalRiskTracker, format_risk_alert
 
 LOG = logging.getLogger("lbank_monitor")
 SYMBOL = "BTC/USDT:USDT"
@@ -294,6 +295,7 @@ def run():
     LOG.info("LBank BTCUSDT: TWO-STAGE fee-aware entry-review monitor started. REF_BALANCE=%.2f risk_pct=%.2f; NO orders",
              REF_BALANCE, 100 * RISK_FRACTION)
     observations = deque(maxlen=120)
+    risk_tracker = SignalRiskTracker()
     watch = None
     alert_state = {"day": None, "count": 0, "last_time": None, "last_side": None}
     last_sample = 0
@@ -313,6 +315,21 @@ def run():
                 last_sample = now
                 observations.append((now, price))
                 prices = [v for _, v in observations]
+                # Urgent risk messages bypass entry-alert cooldowns and daily quotas.
+                # Only already-SENT hypothetical signals are monitored, not real positions.
+                for tracked, reason, observed_price in risk_tracker.check(prices, now):
+                    observed_kst = datetime.fromtimestamp(
+                        now, tz=timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
+                    warning = format_risk_alert(
+                        tracked, reason, observed_price, observed_kst)
+                    if telegram(warning):
+                        risk_tracker.acknowledge(tracked)
+                        LOG.warning(
+                            "SIGNAL RISK WARN SENT reference=%d side=%s reason=%s price=%.1f",
+                            tracked.number, "LONG" if tracked.direction == 1 else "SHORT",
+                            reason, observed_price)
+                    else:
+                        LOG.error("SIGNAL RISK WARN SEND FAILED reference=%d", tracked.number)
                 recent = list(observations)[-MIN_SAMPLES:]
                 continuous = len(recent) >= MIN_SAMPLES and all(
                     20 <= recent[i][0] - recent[i-1][0] <= max(POLL * 2.5, 150)
@@ -334,6 +351,7 @@ def run():
                                     plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat())
                                 if telegram(message):
                                     record_alert(now, side, alert_state)
+                                    risk_tracker.add_sent_signal(plan, now)
                                     counters["confirmed"] += 1
                                     LOG.info("ENTRY REVIEW SENT side=%s entry=%.1f stop=%.1f t1=%.1f net_rr=%.2f",
                                              side, plan["price"], plan["stop"], plan["target1"], plan["rr1"])
@@ -356,9 +374,9 @@ def run():
                             counters["suppressed"] += 1
                     else:
                         counters["blocked"] += 1
-                LOG.info("contract=BTCUSDT price=%.1f count=%d watch=%s confirmed_total=%d",
+                LOG.info("contract=BTCUSDT price=%.1f count=%d watch=%s confirmed_total=%d tracked_references=%d",
                          price, len(prices), watch["plan"]["side"] if watch else "none",
-                         counters["confirmed"])
+                         counters["confirmed"], len(risk_tracker.signals))
                 if now >= next_log_summary:
                     LOG.info("ALERT FUNNEL last-hour totals: %s", counters)
                     counters = {key: 0 for key in counters}
