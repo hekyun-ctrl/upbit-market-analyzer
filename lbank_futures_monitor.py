@@ -75,6 +75,86 @@ def rsi(values, period=14):
     return 100 if down == 0 else 100 - 100 / (1 + up / down)
 
 
+
+def sampled_five_minute_rsi(observations):
+    """RSI(14) from COMPLETED 5-minute buckets of LBank perpetual ticker samples.
+
+    This is NOT authentic exchange OHLCV RSI. Require timestamp continuity,
+    a late-in-bucket quote and a fully closed final bucket. Never mix spot data.
+    Missing or stale buckets cause entry alerts to fail closed.
+    """
+    if len(observations) < 85:
+        return None
+    final_bucket = int(observations[-1][0] // 300) - 1
+    closes_by_bucket = {}
+    for timestamp, price in observations:
+        bucket = int(timestamp // 300)
+        if bucket <= final_bucket and timestamp - bucket * 300 >= 210:
+            closes_by_bucket[bucket] = float(price)
+    buckets = sorted(closes_by_bucket)[-60:]
+    if (len(buckets) < 20 or buckets[-1] != final_bucket or
+            any(buckets[i] != buckets[i - 1] + 1 for i in range(1, len(buckets)))):
+        return None
+    closes = [closes_by_bucket[b] for b in buckets]
+    rsi_values = [rsi(closes[:i], 14) for i in range(15, len(closes) + 1)]
+    return {"closes": closes, "rsi": rsi_values}
+
+
+def five_minute_rsi_entry_gate(observations, direction):
+    """Guard against late chasing at RSI 30/70; wait for rebound or pullback.
+
+    Only completed 5-min ticker-derived RSI values are used. These heuristics
+    are conservative safeguards, NOT verified reversal probabilities.
+    """
+    state = sampled_five_minute_rsi(observations)
+    if state is None:
+        return False, "insufficient_closed_5m_samples", None
+    values, closes = state["rsi"], state["closes"]
+    current, previous = values[-1], values[-2]
+    if current <= 30 or current >= 70:
+        return False, "rsi_30_70_extreme_wait", current
+    # Leave headroom for a bounce, including before a literal 30/70 touch.
+    if direction == -1 and current < 36:
+        return False, "short_near_oversold", current
+    if direction == 1 and current > 64:
+        return False, "long_near_overbought", current
+    # Last 10 completed RSI periods (~50 minutes). Most recent extreme wins.
+    start = max(0, len(values) - 10)
+    extreme = None
+    for i in range(start, len(values)):
+        if values[i] <= 30:
+            extreme = (i, "oversold")
+        elif values[i] >= 70:
+            extreme = (i, "overbought")
+    if extreme is None:
+        return True, "normal_zone", current
+    hit, kind = extreme
+    after = values[hit + 1:]
+    if kind == "oversold":
+        if direction == -1:
+            # For SHORT: first a meaningful recovery to >=40, then a
+            # completed 5m price / RSI rollover, not a short on the RSI touch.
+            ready = (len(after) >= 2 and max(after) >= 40 and
+                     current < previous and closes[-1] < closes[-2])
+            return ready, ("oversold_rebound_then_rollover" if ready else
+                           "wait_rebound_then_bearish_rejection"), current
+        ready = (bool(after) and current >= 36 and
+                 current > previous and closes[-1] > closes[-2])
+        return ready, ("oversold_bounce_confirmed" if ready else
+                       "wait_oversold_bounce"), current
+    if direction == 1:
+        # For LONG: let the overbought market pull back to <=60, then
+        # confirm a subsequent 5m close / RSI uptick before chasing it.
+        ready = (len(after) >= 2 and min(after) <= 60 and
+                 current > previous and closes[-1] > closes[-2])
+        return ready, ("overbought_pullback_then_support" if ready else
+                       "wait_pullback_then_bullish_support"), current
+    ready = (bool(after) and current <= 64 and
+             current < previous and closes[-1] < closes[-2])
+    return ready, ("overbought_pullback_confirmed" if ready else
+                   "wait_overbought_pullback"), current
+
+
 def telegram(message):
     token = os.getenv("TELEGRAM_BOT_TOKEN", "")
     chat = os.getenv("TELEGRAM_CHAT_ID", "")
@@ -190,7 +270,7 @@ def calculate_plan(prices, direction):
     }
 
 
-def classify(prices):
+def classify(prices, observations=None):
     """Identify a breakout WATCH; not yet actionable as an entry check."""
     if len(prices) < MIN_SAMPLES:
         return None
@@ -206,10 +286,21 @@ def classify(prices):
         direction = -1
     else:
         return None
-    return calculate_plan(prices, direction)
+    if observations is not None:
+        allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(observations, direction)
+        if not allowed:
+            LOG.info("5m sampled RSI watch BLOCKED side=%s reason=%s rsi=%s",
+                     "LONG" if direction == 1 else "SHORT", reason, sampled_rsi5)
+            return None
+    else:
+        sampled_rsi5 = None
+    plan = calculate_plan(prices, direction)
+    if plan is not None:
+        plan["sampled_rsi5"] = sampled_rsi5
+    return plan
 
 
-def confirm_watch(prices, watch, age_seconds):
+def confirm_watch(prices, watch, age_seconds, observations=None):
     """Separate second-stage ENTRY REVIEW with fresh price confirmation.
 
     Used for user-side manual checking only, not a guaranteed market entry.
@@ -237,11 +328,24 @@ def confirm_watch(prices, watch, age_seconds):
         valid = macd < sig and strength <= 50 and m5 <= -.04 and m15 <= -.10
     if not valid:
         return None
-    return calculate_plan(prices, direction)
+    if observations is not None:
+        allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(observations, direction)
+        if not allowed:
+            LOG.info("5m sampled RSI confirmation BLOCKED side=%s reason=%s rsi=%s",
+                     "LONG" if direction == 1 else "SHORT", reason, sampled_rsi5)
+            return None
+    else:
+        sampled_rsi5 = None
+    plan = calculate_plan(prices, direction)
+    if plan is not None:
+        plan["sampled_rsi5"] = sampled_rsi5
+    return plan
 
 
 def format_entry_alert(plan, observed_at_utc):
     daily_goal = REF_BALANCE * 0.10
+    rsi5 = plan.get("sampled_rsi5")
+    rsi5_text = "검증전" if rsi5 is None else f"{rsi5:.1f}"
     return (
         f"[LBank BTCUSDT 선물 | 조건부 진입 검토 - {plan['side']}]\n"
         "※ 1분 간격 선물 가격 표본에서 2단계 확인한 관찰 신호\n"
@@ -258,7 +362,9 @@ def format_entry_alert(plan, observed_at_utc):
         f"시장가 가정 손절 왕복 Taker 수수료 추정: {plan['fee_stop_est']:.2f} USDT\n"
         f"진입·익절 모두 Maker로 체결되면 절감 가능 추정: {plan['maker_potential_savings']:.2f} USDT\n"
         f"기준 시드: {REF_BALANCE:.0f} USDT / 일 순수익 10% 목표: {daily_goal:.2f} USDT (보장 불가)\n"
-        f"5분 가격표본 변화 {plan['m5']:+.2f}% | 15분 {plan['m15']:+.2f}% | 표본 RSI {plan['rsi']:.1f}\n"
+        f"5분 가격표본 변화 {plan['m5']:+.2f}% | 15분 {plan['m15']:+.2f}% | 1분 표본 RSI {plan['rsi']:.1f}\n"
+        f"완료 5분 가격표본 RSI(거래소 실제 5분봉 RSI 아님): {rsi5_text}\n"
+        "RSI 30/70 접촉 후 반등·조정과 재확인을 기다리는 필터 적용\n"
         "손익 계산: 진입/조건부 익절/손절 모두 Taker 0.06% 보수적 가정\n"
         "손절 슬리피지 0.02% 가정/펀딩 불리할 때 0.01% 완충(실제 비용 다를 수 있음)\n"
         "※ 지정가라도 즉시 체결되면 Taker 가능, Post-Only는 미체결 위험\n"
@@ -299,7 +405,7 @@ def run():
              REF_BALANCE, 100 * RISK_FRACTION)
     cached_observations, cached_alert_state = load_snapshots(
         SAMPLE_STORE_PATH, SYMBOL, POLL)
-    observations = deque(cached_observations, maxlen=120)
+    observations = deque(cached_observations, maxlen=360)
     LOG.info("price_sample_cache_restored=%d", len(observations))
     risk_tracker = SignalRiskTracker()
     position_ledger = PositionState()
@@ -384,7 +490,7 @@ def run():
                         counters["expired"] += 1
                         LOG.info("watch expired; no ENTRY REVIEW signal")
                     else:
-                        plan = confirm_watch(prices, watch["plan"], age)
+                        plan = confirm_watch(prices, watch["plan"], age, observations=list(observations))
                         if plan is not None:
                             side = plan["side"]
                             if alert_gate(now, side, alert_state) == "ok":
@@ -405,7 +511,7 @@ def run():
                                 LOG.info("ENTRY REVIEW suppressed by cooldown side=%s", side)
                             watch = None
                 if continuous and watch is None:
-                    proposal = classify(prices)
+                    proposal = classify(prices, observations=list(observations))
                     if proposal is not None:
                         side = proposal["side"]
                         if alert_gate(now, side, alert_state) == "ok":
