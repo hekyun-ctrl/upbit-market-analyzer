@@ -4,6 +4,7 @@ Never creates orders or reads private LBank accounts. Since LBank's documented
 contract API lacks native OHLCV candles and CCXT routes fetch_ohlcv to SPOT,
 this monitor explicitly uses only actual LBank perpetual TICKER snapshots.
 Signals use sampled 1-minute prices (NOT trade candles or trade volume).
+Persistent observations across short restarts are still TICKER samples, not candles.
 """
 import json
 import logging
@@ -17,6 +18,7 @@ from datetime import datetime, timezone, timedelta
 import ccxt
 from lbank_signal_risk import SignalRiskTracker, format_risk_alert
 from lbank_telegram_positions import PositionState, TelegramBot
+from lbank_sample_store import load_snapshots, save_snapshots
 
 LOG = logging.getLogger("lbank_monitor")
 SYMBOL = "BTC/USDT:USDT"
@@ -35,9 +37,9 @@ MAX_AGE_MS = 180_000
 MAKER_FEE = 0.0002  # 0.02% if the LIMIT order actually adds liquidity
 TAKER_FEE = 0.0006  # 0.06% for an immediately executed order
 STOP_SLIPPAGE = 0.0002  # estimated adverse slippage 0.02% when stop executes
-# Entry=resting maker LIMIT; take-profit=resting maker LIMIT; stop=taker.
-# If entry or TP crosses the spread, the fill may incur Taker fees.
-# These model assumptions require confirmation from actual fill history.
+# User's manual entry can cross the spread, and conditional LBank TP/SL close at
+# MARKET; use conservative Taker on BOTH legs. Passive limit orders may cost less.
+# Actual personal fee tier, funding and slippage must be checked in fill history.
 FUNDING_BUFFER = 0.0001  # Hypothetical 0.01% adverse funding reserve; actual rate varies
 REF_BALANCE = float(os.getenv("LBANK_REFERENCE_BALANCE_USDT", "958"))
 RISK_FRACTION = float(os.getenv("LBANK_RISK_PER_TRADE_PCT", "0.5")) / 100
@@ -45,6 +47,7 @@ LEVERAGE = float(os.getenv("LBANK_REFERENCE_LEVERAGE", "50"))
 MAX_MARGIN_FRACTION = 0.10
 MIN_NET_RR = 1.5
 MIN_SAMPLES = 60
+SAMPLE_STORE_PATH = os.getenv("LBANK_SAMPLE_STORE_PATH", "/data/lbank_price_samples.json")
 if not (0 < REF_BALANCE <= 1000000 and 0 < RISK_FRACTION <= 0.01 and
         1 <= LEVERAGE <= 50):
     raise ValueError("Unsafe risk configuration: check balance, max 1% risk and max 50x")
@@ -104,19 +107,18 @@ def get_perpetual_snapshot(exchange):
 
 
 def net_pnl_per_btc(direction, entry, exit_price, *, exit_kind="stop"):
-    """Linear USDT PnL per BTC: maker entry + maker TP or taker STOP.
+    """Linear USDT PnL per BTC, conservative Taker entry and Taker exit.
 
-    Maker fees require passive fills; stop slippage is merely an estimate.
-    No actual executions or live funding quote are accessible.
+    Market-triggered TP/SL orders can slip; stop slippage is only a model
+    estimate. No actual executions, personalized fees or funding are available.
     """
     if exit_kind not in ("stop", "take_profit"):
         raise ValueError("exit_kind must be stop or take_profit")
-    actual_entry = entry  # only if resting limit fills as Maker
+    actual_entry = entry
     actual_exit = (exit_price * (1 - direction * STOP_SLIPPAGE)
                    if exit_kind == "stop" else exit_price)
     gross = direction * (actual_exit - actual_entry)
-    exit_fee = TAKER_FEE if exit_kind == "stop" else MAKER_FEE
-    fees = actual_entry * MAKER_FEE + actual_exit * exit_fee
+    fees = actual_entry * TAKER_FEE + actual_exit * TAKER_FEE
     reserve = entry * FUNDING_BUFFER
     return gross - fees - reserve
 
@@ -181,11 +183,10 @@ def calculate_plan(prices, direction):
         "margin": qty * effective_entry / LEVERAGE, "notional": qty * curr,
         "net_loss": net_loss, "net_gain1": net_gain1, "net_gain2": net_gain2,
         "rr1": net_gain1 / net_loss, "rr2": net_gain2 / net_loss,
-        "fee_roundtrip_est": qty * (effective_entry * MAKER_FEE + t1 * MAKER_FEE),
-        "fee_stop_est": qty * (effective_entry * MAKER_FEE +
+        "fee_roundtrip_est": qty * (effective_entry * TAKER_FEE + t1 * TAKER_FEE),
+        "fee_stop_est": qty * (effective_entry * TAKER_FEE +
             stop * (1 - direction * STOP_SLIPPAGE) * TAKER_FEE),
-        "taker_fallback_extra_fee": qty * (effective_entry * (TAKER_FEE - MAKER_FEE)
-            + t1 * (TAKER_FEE - MAKER_FEE)),
+        "maker_potential_savings": qty * (effective_entry + t1) * (TAKER_FEE - MAKER_FEE),
     }
 
 
@@ -253,12 +254,12 @@ def format_entry_alert(plan, observed_at_utc):
         f"손절 예상 순손실: -{plan['net_loss']:.2f} USDT\n"
         f"목표1 예상 순이익: +{plan['net_gain1']:.2f} USDT\n"
         f"목표2 예상 순이익: +{plan['net_gain2']:.2f} USDT\n"
-        f"정상 익절 왕복 Maker 수수료 추정: {plan['fee_roundtrip_est']:.2f} USDT\n"
-        f"손절 시 Maker진입/Taker청산 수수료 추정: {plan['fee_stop_est']:.2f} USDT\n"
-        f"진입·익절 모두 즉시 Taker 체결되면 추가 수수료 약 {plan['taker_fallback_extra_fee']:.2f} USDT\n"
+        f"시장가 가정 익절 왕복 Taker 수수료 추정: {plan['fee_roundtrip_est']:.2f} USDT\n"
+        f"시장가 가정 손절 왕복 Taker 수수료 추정: {plan['fee_stop_est']:.2f} USDT\n"
+        f"진입·익절 모두 Maker로 체결되면 절감 가능 추정: {plan['maker_potential_savings']:.2f} USDT\n"
         f"기준 시드: {REF_BALANCE:.0f} USDT / 일 순수익 10% 목표: {daily_goal:.2f} USDT (보장 불가)\n"
         f"5분 가격표본 변화 {plan['m5']:+.2f}% | 15분 {plan['m15']:+.2f}% | 표본 RSI {plan['rsi']:.1f}\n"
-        "조건부 수수료: 수동 지정가 Maker진입 0.02%/Maker익절 0.02%, 손절 Taker 0.06%\n"
+        "손익 계산: 진입/조건부 익절/손절 모두 Taker 0.06% 보수적 가정\n"
         "손절 슬리피지 0.02% 가정/펀딩 불리할 때 0.01% 완충(실제 비용 다를 수 있음)\n"
         "※ 지정가라도 즉시 체결되면 Taker 가능, Post-Only는 미체결 위험\n"
         "목표가는 예측이 아닌 비용·손익비 계산값. 실제 호가·체결·펀딩 미확인.\n"
@@ -296,15 +297,18 @@ def run():
         raise RuntimeError("Refuse to monitor spot instrument")
     LOG.info("LBank BTCUSDT: TWO-STAGE fee-aware entry-review monitor started. REF_BALANCE=%.2f risk_pct=%.2f; NO orders",
              REF_BALANCE, 100 * RISK_FRACTION)
-    observations = deque(maxlen=120)
+    cached_observations, cached_alert_state = load_snapshots(
+        SAMPLE_STORE_PATH, SYMBOL, POLL)
+    observations = deque(cached_observations, maxlen=120)
+    LOG.info("price_sample_cache_restored=%d", len(observations))
     risk_tracker = SignalRiskTracker()
     position_ledger = PositionState()
     position_bot = TelegramBot(position_ledger)
     LOG.info("position_report_tracking=enabled; recorded_position_present=%s", bool(position_ledger.position))
     LOG.info("risk_snapshot_poll=%ds, entry_snapshot_poll=%ds (sampled data only)", RISK_POLL, POLL)
     watch = None
-    alert_state = {"day": None, "count": 0, "last_time": None, "last_side": None}
-    last_sample = 0
+    alert_state = cached_alert_state
+    last_sample = observations[-1][0] if observations else 0
     startup_done = False
     next_startup_test = 0
     counters = {"watched": 0, "confirmed": 0, "expired": 0, "blocked": 0, "suppressed": 0}
@@ -364,6 +368,8 @@ def run():
             if now - last_sample >= POLL:
                 last_sample = now
                 observations.append((now, price))
+                save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
+                               observations, alert_state)
                 prices = [v for _, v in observations]
                 recent = list(observations)[-MIN_SAMPLES:]
                 continuous = len(recent) >= MIN_SAMPLES and all(
@@ -386,6 +392,8 @@ def run():
                                     plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat())
                                 if telegram(message):
                                     record_alert(now, side, alert_state)
+                                    save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
+                                                   observations, alert_state)
                                     risk_tracker.add_sent_signal(plan, now)
                                     counters["confirmed"] += 1
                                     LOG.info("ENTRY REVIEW SENT side=%s entry=%.1f stop=%.1f t1=%.1f net_rr=%.2f",

@@ -41,6 +41,10 @@ class LBankCostModelTests(unittest.TestCase):
             taker_exit = net_pnl_per_btc(direction, entry, same_target_as_stop,
                                          exit_kind="stop")
             self.assertGreater(take_profit, taker_exit)
+        # LBank conditional market TP is charged Taker; break-even is a loss.
+        self.assertAlmostEqual(
+            net_pnl_per_btc(1, 83000, 83000, exit_kind="take_profit"),
+            -(83000 * (0.0006 + 0.0006 + 0.0001)), places=6)
         # 287.4 USDT margin x 50 = 14,370 USDT nominal:
         self.assertAlmostEqual(14370 * (0.0002 + 0.0002), 5.748)
         self.assertAlmostEqual(14370 * (0.0002 + 0.0006), 11.496)
