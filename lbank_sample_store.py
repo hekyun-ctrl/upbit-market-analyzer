@@ -46,7 +46,7 @@ def load_snapshots(path, symbol, poll, now=None):
         if not isinstance(raw, list):
             return [], alert
         samples = []
-        for row in raw[-120:]:
+        for row in raw[-360:]:
             if not isinstance(row, list) or len(row) != 2:
                 return [], alert
             ts, price = float(row[0]), float(row[1])
@@ -76,7 +76,7 @@ def save_snapshots(path, symbol, poll, samples, alert):
             os.makedirs(directory, exist_ok=True)
         payload = {
             "schema": 1, "symbol": symbol, "poll": poll,
-            "samples": [[ts, price] for ts, price in list(samples)[-120:]],
+            "samples": [[ts, price] for ts, price in list(samples)[-360:]],
             "alert": alert,
         }
         tmp = path + ".tmp"
