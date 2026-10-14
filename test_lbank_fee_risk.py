@@ -168,6 +168,40 @@ class FiveMinuteRsiGateTests(unittest.TestCase):
         self.assertEqual(reason, "5m_sampled_overbought_rejection_confirmed")
         self.assertLess(value, 70)
 
+    def test_range_short_does_not_enter_from_one_overbought_fall(self):
+        up = [80000. + 100 * i for i in range(25)]
+        for closes in (up, up + [up[-1] - 100]):
+            allowed, _, _ = five_minute_rsi_entry_gate(
+                self.observations(closes), -1, setup={"strategy": "range_rebound"})
+            self.assertFalse(allowed)
+
+    def test_range_short_needs_prior_overbought_history(self):
+        flat = [83000. + (80 if i % 2 else 0) for i in range(30)]
+        allowed, reason, _ = five_minute_rsi_entry_gate(
+            self.observations(flat), -1, setup={"strategy": "range_rebound"})
+        self.assertFalse(allowed)
+        self.assertEqual(reason, "5m_overbought_not_observed")
+
+    def test_range_short_ignores_unfinished_5m_price(self):
+        up = [80000. + 100 * i for i in range(25)]
+        obs = self.observations(up + [up[-1] - 100])
+        before = five_minute_rsi_entry_gate(
+            obs, -1, setup={"strategy": "range_rebound"})
+        obs[-1] = (obs[-1][0], obs[-1][1] - 4000.)
+        self.assertEqual(five_minute_rsi_entry_gate(
+            obs, -1, setup={"strategy": "range_rebound"}), before)
+
+    def test_range_short_fails_closed_with_missing_closed_bucket(self):
+        up = [80000. + 100 * i for i in range(25)]
+        down = [up[-1] - 100 * (i + 1) for i in range(5)]
+        obs = self.observations(up + down)
+        target = int(obs[37][0] // 300)
+        obs = [p for p in obs if int(p[0] // 300) != target]
+        allowed, reason, _ = five_minute_rsi_entry_gate(
+            obs, -1, setup={"strategy": "range_rebound"})
+        self.assertFalse(allowed)
+        self.assertEqual(reason, "insufficient_closed_5m_samples")
+
     def test_range_exception_never_short_at_rsi_70_or_without_structure(self):
         up = [80000 + 100 * i for i in range(25)]
         down = [up[-1] - 100 * (i + 1) for i in range(4)]
