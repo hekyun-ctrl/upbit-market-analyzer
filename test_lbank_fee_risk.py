@@ -82,7 +82,7 @@ class LBankCostModelTests(unittest.TestCase):
         alert = format_entry_alert(confirmed, "2026-10-13T00:00:00Z")
         self.assertIn("조건부 진입 검토", alert)
         self.assertIn("손절 예상 순손실", alert)
-        self.assertIn("95.80 USDT", alert)
+        self.assertIn(f"{REF_BALANCE * 0.10:.2f} USDT", alert)
 
     def test_stage_two_rejects_stale_watch_and_price_chasing(self):
         base = [80000. + 25 * i + (45 if i % 2 else 0) for i in range(60)]
