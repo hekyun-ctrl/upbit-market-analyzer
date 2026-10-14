@@ -11,7 +11,7 @@ from lbank_futures_monitor import (
     minimum_net_rr_target, net_pnl_per_btc,
     confirm_watch, format_entry_alert,
     sampled_five_minute_rsi, five_minute_rsi_entry_gate,
-    fast_sample_rsi_gate,
+    fast_sample_rsi_gate, confirmed_sampled_5m_oversold_rebound,
 )
 
 
@@ -177,6 +177,57 @@ class FiveMinuteRsiGateTests(unittest.TestCase):
                 observations, -1, setup=setup)
             self.assertFalse(allowed, (setup, reason, current))
             self.assertGreaterEqual(current, 70)
+
+    def test_range_long_needs_real_5min_sample_rebound_after_oversold(self):
+        # Falling sampled RSI must NOT be treated as a long signal at 30.
+        down = [83000. - 90 * i for i in range(30)]
+        for closes in (down, down + [down[-1] + 140]):
+            observations = self.observations(closes)
+            ready, reason, _ = confirmed_sampled_5m_oversold_rebound(observations)
+            self.assertFalse(ready, reason)
+            allowed, reason, _ = five_minute_rsi_entry_gate(
+                observations, 1, setup={"strategy": "range_rebound"})
+            self.assertFalse(allowed, reason)
+        # 6 completed five-minute rising sample closes recover from <30
+        # without waiting for a future *unfinished* bucket.
+        up = [down[-1] + 140 * (i + 1) for i in range(6)]
+        observations = self.observations(down + up)
+        ready, reason, current = confirmed_sampled_5m_oversold_rebound(observations)
+        self.assertTrue(ready, (reason, current))
+        self.assertEqual(reason, "5m_sampled_oversold_rebound_confirmed")
+        allowed, reason, _ = five_minute_rsi_entry_gate(
+            observations, 1, setup={"strategy": "range_rebound"})
+        self.assertTrue(allowed, (reason, current))
+
+    def test_range_long_rejects_normal_rsi_without_30_touch(self):
+        closes = [83000. + (80 if i % 2 else 0) for i in range(30)]
+        observations = self.observations(closes)
+        ready, reason, _ = confirmed_sampled_5m_oversold_rebound(observations)
+        self.assertFalse(ready)
+        self.assertEqual(reason, "5m_oversold_not_observed")
+        self.assertFalse(five_minute_rsi_entry_gate(
+            observations, 1, setup={"strategy": "range_rebound"})[0])
+        # Breakout/trend context must NOT inherit range-reversal-specific rule.
+        self.assertTrue(five_minute_rsi_entry_gate(
+            observations, 1, setup={"strategy": "trend_retest"})[0])
+
+    def test_two_5min_higher_closes_cannot_be_fabricated_by_open_bucket(self):
+        down = [83000. - 90 * i for i in range(30)]
+        obs = self.observations(down + [down[-1] + 140])
+        old_result = confirmed_sampled_5m_oversold_rebound(obs)
+        obs[-1] = (obs[-1][0], obs[-1][1] + 3000)
+        self.assertEqual(confirmed_sampled_5m_oversold_rebound(obs), old_result)
+        self.assertFalse(old_result[0])
+
+    def test_missing_5min_sample_bars_fail_closed_on_rebound(self):
+        down = [83000. - 90 * i for i in range(30)]
+        up = [down[-1] + 140 * (i + 1) for i in range(6)]
+        data = self.observations(down + up)
+        deleted_bucket = int(data[37][0] // 300)
+        data = [p for p in data if int(p[0] // 300) != deleted_bucket]
+        allowed, reason, _ = confirmed_sampled_5m_oversold_rebound(data)
+        self.assertFalse(allowed)
+        self.assertEqual(reason, "5m_oversold_data_unavailable")
 
     def test_fast_sample_rsi_protects_against_late_short_and_long(self):
         down = [83000 - 50 * i for i in range(60)]
