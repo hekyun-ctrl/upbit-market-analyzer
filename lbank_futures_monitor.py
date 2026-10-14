@@ -674,11 +674,14 @@ def run():
                     if audit_state is not None:
                         ready, reason, value = confirmed_sampled_5m_oversold_rebound(
                             list(observations))
+                        short_ready, short_reason, _ = confirmed_sampled_5m_overbought_rejection(
+                            list(observations))
                         LOG.info(
                             "RSI5_SHADOW completed_bucket=%d close=%.1f rsi=%.2f "
-                            "rebound_ready=%s reason=%s source=sampled_perpetual_ticker",
+                            "rebound_ready=%s reason=%s short_rejection_ready=%s "
+                            "short_reason=%s source=sampled_perpetual_ticker",
                             bucket, audit_state["closes"][-1],
-                            value, ready, reason)
+                            value, ready, reason, short_ready, short_reason)
                 prices = [v for _, v in observations]
                 recent = list(observations)[-MIN_SAMPLES:]
                 continuous = len(recent) >= MIN_SAMPLES and all(
