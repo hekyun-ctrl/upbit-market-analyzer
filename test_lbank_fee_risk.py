@@ -218,5 +218,61 @@ class SignalFollowupRiskTests(unittest.TestCase):
         self.assertEqual(tracker.check([80400.], 60), [])
         self.assertEqual(len(tracker.signals), 0)
 
+
+class StructureReactionTests(unittest.TestCase):
+    @staticmethod
+    def ranging_long():
+        import math
+        old = [83000. + 460 * math.sin(2 * math.pi * i / 16) for i in range(66)]
+        return old + [82565., 82549., 82563., 82595., 82630., 82665.]
+
+    def test_range_support_rebound_produces_net_positive_structured_watch(self):
+        from lbank_structure_patterns import detect_structure
+        from lbank_futures_monitor import ema, rsi
+        prices = self.ranging_long()
+        setup = detect_structure(prices, ema, rsi)
+        self.assertIsNotNone(setup)
+        self.assertEqual(setup["strategy"], "range_rebound")
+        self.assertEqual(setup["direction"], 1)
+        watch = classify(prices)
+        self.assertIsNotNone(watch)
+        self.assertEqual(watch["strategy"], "range_rebound")
+        self.assertLess(watch["stop"], setup["structure_anchor"])
+        self.assertLess(watch["target1"], setup["barrier"])
+        self.assertLessEqual(watch["net_loss"], REF_BALANCE * RISK_FRACTION + 1e-8)
+        self.assertLessEqual(watch["margin"], REF_BALANCE * .10 + 1e-8)
+        self.assertGreaterEqual(watch["rr1"], 1.5 - 1e-8)
+
+    def test_range_resistance_short_and_second_stage(self):
+        prices = [166000. - p for p in self.ranging_long()]
+        watch = classify(prices)
+        self.assertIsNotNone(watch)
+        self.assertEqual(watch["strategy"], "range_rebound")
+        self.assertEqual(watch["direction"], -1)
+        confirmed = confirm_watch(prices + [prices[-1] - 20], watch, 60)
+        self.assertIsNotNone(confirmed)
+        self.assertEqual(confirmed["strategy"], "range_rebound")
+        self.assertGreater(confirmed["stop"], watch["structure_anchor"])
+        self.assertGreater(confirmed["target1"], watch["barrier"])
+
+    def test_range_two_stage_rejects_chase_and_failed_support(self):
+        prices = self.ranging_long()
+        watch = classify(prices)
+        self.assertIsNotNone(watch)
+        self.assertIsNone(confirm_watch(prices + [prices[-1] + 300], watch, 60))
+        self.assertIsNone(confirm_watch(prices + [watch["structure_anchor"] - 20], watch, 60))
+        self.assertIsNone(confirm_watch(prices + [prices[-1] + 10], watch, 300))
+
+    def test_tight_channel_is_not_a_fee_feasible_range(self):
+        import math
+        prices = [83000. + 90 * math.sin(2 * math.pi * i / 16) for i in range(66)]
+        prices += [82910., 82904., 82915., 82925., 82935., 82945.]
+        self.assertIsNone(classify(prices))
+
+    def test_5m_gate_fails_closed_for_structure_without_contiguous_samples(self):
+        prices = self.ranging_long()
+        self.assertIsNotNone(classify(prices))
+        self.assertIsNone(classify(prices, observations=[(i * 60, p) for i, p in enumerate(prices)]))
+
 if __name__ == "__main__":
     unittest.main()
