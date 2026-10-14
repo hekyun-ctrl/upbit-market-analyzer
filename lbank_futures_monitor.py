@@ -21,6 +21,7 @@ from lbank_telegram_positions import PositionState, TelegramBot
 from lbank_sample_store import load_snapshots, save_snapshots
 from lbank_structure_patterns import detect_structure, confirm_structure
 from lbank_sampled_context import sampled_context_gate
+from lbank_rsi_research import ResearchTracker, neutral_stall
 
 LOG = logging.getLogger("lbank_monitor")
 SYMBOL = "BTC/USDT:USDT"
@@ -592,6 +593,7 @@ def run():
     observations = deque(cached_observations, maxlen=360)
     LOG.info("price_sample_cache_restored=%d", len(observations))
     risk_tracker = SignalRiskTracker()
+    rsi_research = ResearchTracker()  # Shadow stats only; not an entry gate
     position_ledger = PositionState()
     position_bot = TelegramBot(position_ledger)
     LOG.info("position_report_tracking=enabled; recorded_position_present=%s", bool(position_ledger.position))
@@ -682,6 +684,53 @@ def run():
                             "short_reason=%s source=sampled_perpetual_ticker",
                             bucket, audit_state["closes"][-1],
                             value, ready, reason, short_ready, short_reason)
+                        sampled_closes = audit_state["closes"]
+                        sampled_rsis = audit_state["rsi"]
+                        hypotheses, outcomes = rsi_research.observe(
+                            bucket, sampled_closes[-1], sampled_closes, sampled_rsis)
+                        long_stall = neutral_stall(sampled_closes, sampled_rsis, 1)
+                        short_stall = neutral_stall(sampled_closes, sampled_rsis, -1)
+                        LOG.info("RSI5_STUDY completed_bucket=%d %s",
+                                 bucket, json.dumps({
+                                     "zones":hypotheses,
+                                     "neutral_stall_long":long_stall,
+                                     "neutral_stall_short":short_stall,
+                                     "close":sampled_closes[-1],
+                                     "rsi":round(sampled_rsis[-1],2),
+                                     "source":"ticker_sample_not_ohlcv",
+                                     "orderbook":"unverified"},sort_keys=True))
+                        for result in outcomes:
+                            LOG.info("RSI5_FORWARD %s",json.dumps(result,sort_keys=True))
+                        # A registered MANUAL position may receive one neutral
+                        # warning. No report: no position or automatic exit inferred.
+                        reported = position_ledger.position
+                        if (reported is not None and
+                                reported.get("opened_at") is not None and
+                                now - float(reported["opened_at"]) >= 600 and
+                                not reported.get("neutral_notice", False) and
+                                reported.get("risk_notice") is None):
+                            side_num = 1 if reported["side"] == "LONG" else -1
+                            if neutral_stall(sampled_closes, sampled_rsis, side_num):
+                                side_text = "롱" if side_num == 1 else "숏"
+                                warning = (
+                                    "[LBank BTCUSDT | RSI 5분 표본 중립 정체 주의 - "
+                                    "수동 신고 포지션]\\n"
+                                    f"신고 방향: {side_text}\\n"
+                                    f"가격 표본: {sampled_closes[-1]:,.1f} USDT\\n"
+                                    f"5분 가격표본 RSI: {sampled_rsis[-1]:.1f}\\n"
+                                    "2회 완료된 5분 구간에서 RSI 40~60 정체와 "
+                                    "가격 모멘텀 약화를 관찰했습니다.\\n"
+                                    "실제 거래소 5분봉·호가·포지션은 확인하지 못했습니다.\\n"
+                                    "목표까지 무조건 기다리지 말고 수수료, 실제 손익과 "
+                                    "LBank 포지션 상태를 확인해 조기청산을 검토하세요.\\n"
+                                    "주의 알림일 뿐 실제 청산 주문은 실행하지 않습니다."
+                                ).replace("\\\\n", "\\n")
+                                if position_bot.send(warning):
+                                    reported["neutral_notice"] = True
+                                    position_ledger.save()
+                                    LOG.warning("MANUAL POSITION NEUTRAL STALL REVIEW SENT side=%s",side_text)
+                                else:
+                                    LOG.error("MANUAL POSITION NEUTRAL STALL REVIEW SEND FAILED")
                 prices = [v for _, v in observations]
                 recent = list(observations)[-MIN_SAMPLES:]
                 continuous = len(recent) >= MIN_SAMPLES and all(
