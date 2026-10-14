@@ -168,6 +168,19 @@ def confirmed_sampled_5m_overbought_rejection(observations):
     return True, "5m_sampled_overbought_rejection_confirmed", current
 
 
+def extreme_5m_rsi_entry_gate(observations, direction):
+    """Required for ALL entry patterns: actual 30/70 extreme then 2 closed turns.
+
+    These are ticker-sampled 5m buckets, not actual LBank futures OHLCV.
+    Near-misses remain shadow research ONLY, never actionable Telegram entry.
+    """
+    if direction == 1:
+        return confirmed_sampled_5m_oversold_rebound(observations)
+    if direction == -1:
+        return confirmed_sampled_5m_overbought_rejection(observations)
+    return False, "invalid_direction", None
+
+
 def five_minute_rsi_entry_gate(observations, direction, setup=None):
     """Guard against late chasing at RSI 30/70; wait for rebound or pullback.
 
@@ -424,6 +437,11 @@ def classify(prices, observations=None):
             LOG.info("CLOSED-BUCKET watch BLOCKED side=%s reason=%s context=%s",
                      "LONG" if direction == 1 else "SHORT", context_reason, context)
             return None
+        strict_ok, strict_reason, _ = extreme_5m_rsi_entry_gate(observations, direction)
+        if not strict_ok:
+            LOG.info("STRICT 5m RSI watch BLOCKED direction=%s strategy=%s reason=%s",
+                     direction, (setup or {}).get("strategy", "breakout"), strict_reason)
+            return None
         allowed_fast, fast_reason, fast_rsi = fast_sample_rsi_gate(prices, direction)
         if not allowed_fast:
             LOG.info("Fast sampled RSI watch BLOCKED side=%s reason=%s rsi=%.1f",
@@ -484,6 +502,11 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
             LOG.info("CLOSED-BUCKET confirm BLOCKED side=%s reason=%s context=%s",
                      "LONG" if direction == 1 else "SHORT", context_reason, context)
             return None
+        strict_ok, strict_reason, _ = extreme_5m_rsi_entry_gate(observations, direction)
+        if not strict_ok:
+            LOG.info("STRICT 5m RSI confirm BLOCKED direction=%s strategy=%s reason=%s",
+                     direction, watch.get("strategy", "breakout"), strict_reason)
+            return None
         allowed_fast, fast_reason, fast_rsi = fast_sample_rsi_gate(prices, direction)
         if not allowed_fast:
             LOG.info("Fast sampled RSI confirmation BLOCKED side=%s reason=%s rsi=%.1f",
@@ -510,14 +533,13 @@ def format_entry_alert(plan, observed_at_utc):
     daily_goal = REF_BALANCE * 0.10
     rsi5 = plan.get("sampled_rsi5")
     rsi5_text = "검증전" if rsi5 is None else f"{rsi5:.1f}"
-    oversold_rebound_text = ("[반등형 롱] 완료된 5분 가격표본 RSI 30 이하 관찰 후 "
-                            "2회 연속 RSI·종가 상승 확인 (거래소 실제 5분봉 아님)\n"
-                            if plan.get("strategy") == "range_rebound" and
-                               plan.get("direction") == 1 else "")
-    overbought_rejection_text = ("[저항형 숏] 완료된 5분 가격표본 RSI 70 이상 관찰 후 "
-                                 "2회 연속 RSI·종가 하락 확인 (거래소 실제 5분봉 아님)\n"
-                                 if plan.get("strategy") == "range_rebound" and
-                                    plan.get("direction") == -1 else "")
+    reversal_text = (
+        "[롱 필수 확인] 완료 5분 가격표본 RSI 30 이하 관찰 후 "
+        "2회 연속 RSI·표본 종가 상승 확인 (거래소 실제 5분봉 아님)\n"
+        if plan.get("direction") == 1 else
+        "[숏 필수 확인] 완료 5분 가격표본 RSI 70 이상 관찰 후 "
+        "2회 연속 RSI·표본 종가 하락 확인 (거래소 실제 5분봉 아님)\n"
+    )
     context = plan.get("sampled_context") or {}
     context_text = (f"완료된 선물 가격표본: 5분 표본 15분 변화 {context['trend5_pct']:+.2f}% / "
                     f"15분 표본 45분 변화 {context['trend15_pct']:+.2f}% / "
@@ -545,11 +567,11 @@ def format_entry_alert(plan, observed_at_utc):
         f"기준 시드: {REF_BALANCE:.0f} USDT / 일 순수익 10% 목표: {daily_goal:.2f} USDT (보장 불가)\n"
         f"5분 가격표본 변화 {plan['m5']:+.2f}% | 15분 {plan['m15']:+.2f}% | 1분 표본 RSI {plan['rsi']:.1f}\n"
         f"완료 5분 가격표본 RSI(거래소 실제 5분봉 RSI 아님): {rsi5_text}\n"
-        f"{oversold_rebound_text}"
-        f"{overbought_rejection_text}"
+        f"{reversal_text}"
         f"{context_text}"
         "※ 3단계 반전은 가격표본의 마감값 비교이며 실제 캔들 3틱룰과 다름\n"
-        "RSI 30/70 접촉 후 반등·조정과 재확인을 기다리는 필터 적용\n"
+        "※ 전 유형에서 중립 RSI 진입 차단: 30 이하/70 이상 이력과 완료 5분 RSI·가격의 2회 반전 필수\n"
+        "※ 30~35/65~70 미달 예외는 연구 전용이며 진입 알람으로 사용하지 않음\n"
         "손익 계산: 진입/조건부 익절/손절 모두 Taker 0.06% 보수적 가정\n"
         "손절 슬리피지 0.02% 가정/펀딩 불리할 때 0.01% 완충(실제 비용 다를 수 있음)\n"
         "※ 지정가라도 즉시 체결되면 Taker 가능, Post-Only는 미체결 위험\n"
