@@ -19,6 +19,7 @@ import ccxt
 from lbank_signal_risk import SignalRiskTracker, format_risk_alert
 from lbank_telegram_positions import PositionState, TelegramBot
 from lbank_sample_store import load_snapshots, save_snapshots
+from lbank_structure_patterns import detect_structure, confirm_structure
 
 LOG = logging.getLogger("lbank_monitor")
 SYMBOL = "BTC/USDT:USDT"
@@ -231,21 +232,30 @@ def minimum_net_rr_target(direction, entry, unit_loss, ratio):
     return entry + direction * high
 
 
-def calculate_plan(prices, direction):
-    """Cost-aware hypothetical levels for a candidate, not a price prediction."""
+def calculate_plan(prices, direction, setup=None):
+    """Cost-aware hypothetical levels with optional structure-anchored stop."""
+    setup = setup or {"strategy": "breakout"}
+    strategy = setup.get("strategy", "breakout")
     if len(prices) < MIN_SAMPLES:
         return None
     curr = prices[-1]
     momentum5 = (curr / prices[-6] - 1) * 100
     momentum15 = (curr / prices[-16] - 1) * 100
     strength = rsi(prices)
-    # Price-based local invalidation, derived from last eight sampled prices.
-    local = prices[-9:-1]
-    stop = (min(curr * (1 - .0025), min(local) * (1 - .0003))
-            if direction == 1 else
-            max(curr * (1 + .0025), max(local) * (1 + .0003)))
+    if strategy == "breakout":
+        local = prices[-9:-1]
+        stop = (min(curr * (1 - .0025), min(local) * (1 - .0003))
+                if direction == 1 else
+                max(curr * (1 + .0025), max(local) * (1 + .0003)))
+        minimum_stop = .0025
+    else:
+        anchor = setup["structure_anchor"]
+        stop = (min(curr * (1 - .0012), anchor - curr * .0002)
+                if direction == 1 else
+                max(curr * (1 + .0012), anchor + curr * .0002))
+        minimum_stop = .0012
     stop_distance = abs(curr - stop) / curr
-    if not (.0025 <= stop_distance <= .0060):
+    if not (minimum_stop - 1e-10 <= stop_distance <= .0060):
         return None
     unit_loss = -net_pnl_per_btc(direction, curr, stop)
     if unit_loss <= 0:
@@ -258,6 +268,9 @@ def calculate_plan(prices, direction):
     # otherwise skip instead of inventing a reachable price target.
     observed_range = max(prices[-60:]) - min(prices[-60:])
     if abs(t1 - curr) > 1.5 * observed_range:
+        return None
+    barrier = setup.get("barrier")
+    if barrier is not None and direction * (barrier - t1) < curr * .00015:
         return None
     permitted_loss = REF_BALANCE * RISK_FRACTION
     effective_entry = curr
@@ -272,6 +285,9 @@ def calculate_plan(prices, direction):
         return None
     return {
         "direction": direction, "side": "롱" if direction == 1 else "숏",
+        "strategy": strategy, "level": setup.get("level"),
+        "structure_anchor": setup.get("structure_anchor"),
+        "barrier": setup.get("barrier"),
         "price": curr, "rsi": strength, "m5": momentum5, "m15": momentum15,
         "stop": stop, "target1": t1, "target2": t2,
         "margin": qty * effective_entry / LEVERAGE, "notional": qty * curr,
@@ -294,7 +310,10 @@ def classify(prices, observations=None):
     macd_arr = [a - b for a, b in zip(ema(prices, 12), ema(prices, 26))]
     strength = rsi(prices)
     macd, sig = macd_arr[-1], ema(macd_arr, 9)[-1]
-    if curr > max(prices[-16:-1]) and macd > sig and 55 <= strength <= 80 and m5 >= .14 and m15 >= .20:
+    setup = detect_structure(prices, ema, rsi)
+    if setup is not None:
+        direction = setup["direction"]
+    elif curr > max(prices[-16:-1]) and macd > sig and 55 <= strength <= 80 and m5 >= .14 and m15 >= .20:
         direction = 1
     elif curr < min(prices[-16:-1]) and macd < sig and 20 <= strength <= 45 and m5 <= -.14 and m15 <= -.20:
         direction = -1
@@ -313,7 +332,7 @@ def classify(prices, observations=None):
             return None
     else:
         sampled_rsi5 = None
-    plan = calculate_plan(prices, direction)
+    plan = calculate_plan(prices, direction, setup=setup)
     if plan is not None:
         plan["sampled_rsi5"] = sampled_rsi5
     return plan
@@ -345,6 +364,8 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
         valid = macd > sig and strength >= 50 and m5 >= .04 and m15 >= .10
     else:
         valid = macd < sig and strength <= 50 and m5 <= -.04 and m15 <= -.10
+    if watch.get("strategy", "breakout") != "breakout":
+        valid = confirm_structure(prices, watch, ema, rsi)
     if not valid:
         return None
     if observations is not None:
@@ -360,7 +381,7 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
             return None
     else:
         sampled_rsi5 = None
-    plan = calculate_plan(prices, direction)
+    plan = calculate_plan(prices, direction, setup=watch)
     if plan is not None:
         plan["sampled_rsi5"] = sampled_rsi5
     return plan
@@ -370,10 +391,13 @@ def format_entry_alert(plan, observed_at_utc):
     daily_goal = REF_BALANCE * 0.10
     rsi5 = plan.get("sampled_rsi5")
     rsi5_text = "검증전" if rsi5 is None else f"{rsi5:.1f}"
+    pattern = {"breakout": "돌파", "range_rebound": "박스권 반등·저항",
+               "trend_retest": "추세 눌림 재지지"}.get(plan.get("strategy"), "미분류")
     return (
         f"[LBank BTCUSDT 선물 | 조건부 진입 검토 - {plan['side']}]\n"
         "※ 1분 간격 선물 가격 표본에서 2단계 확인한 관찰 신호\n"
         f"확인 시각(UTC): {observed_at_utc}\n"
+        f"탐지 패턴: {pattern} (실제 5분봉·호가 미확인)\n"
         f"현재 참고가격: {plan['price']:,.1f} USDT\n"
         f"손절 참고가: {plan['stop']:,.1f}\n"
         f"목표1 필요가격(순손익비 {plan['rr1']:.2f}): {plan['target1']:,.1f}\n"
