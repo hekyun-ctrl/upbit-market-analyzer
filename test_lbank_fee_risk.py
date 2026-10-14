@@ -269,6 +269,34 @@ class StructureReactionTests(unittest.TestCase):
         prices += [82910., 82904., 82915., 82925., 82935., 82945.]
         self.assertIsNone(classify(prices))
 
+    @staticmethod
+    def trending_long():
+        old = [82000. + 24 * i + (55 if i % 2 else 0) for i in range(66)]
+        peak = old[-1]
+        return old + [peak - 140, peak - 195, peak - 220,
+                      peak - 210, peak - 170, peak - 130]
+
+    def test_trend_pullback_retest_has_confirmed_structure_stop(self):
+        prices = self.trending_long()
+        watch = classify(prices)
+        self.assertIsNotNone(watch)
+        self.assertEqual(watch["strategy"], "trend_retest")
+        self.assertEqual(watch["direction"], 1)
+        self.assertLess(watch["stop"], watch["structure_anchor"])
+        self.assertLessEqual(watch["net_loss"], REF_BALANCE * RISK_FRACTION + 1e-8)
+        confirmed = confirm_watch(prices + [prices[-1] + 8], watch, 60)
+        self.assertIsNotNone(confirmed)
+        self.assertEqual(confirmed["strategy"], "trend_retest")
+
+    def test_downtrend_pullback_rejection_symmetric(self):
+        prices = [166000. - p for p in self.trending_long()]
+        watch = classify(prices)
+        self.assertIsNotNone(watch)
+        self.assertEqual(watch["strategy"], "trend_retest")
+        self.assertEqual(watch["direction"], -1)
+        self.assertGreater(watch["stop"], watch["structure_anchor"])
+        self.assertLessEqual(watch["margin"], REF_BALANCE * .10 + 1e-8)
+
     def test_5m_gate_fails_closed_for_structure_without_contiguous_samples(self):
         prices = self.ranging_long()
         self.assertIsNotNone(classify(prices))
