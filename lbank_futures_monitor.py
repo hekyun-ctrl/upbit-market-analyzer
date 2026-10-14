@@ -157,7 +157,7 @@ def five_minute_rsi_entry_gate(observations, direction, setup=None):
     # Still forbid >=70 RSI and all late shorts after oversold extremes.
     if setup and setup.get("strategy") == "range_rebound" and direction == -1:
         prior_overbought = any(v >= 70 for v in values[-3:-1])
-        early_rejection = (prior_overbought and 55 <= current <= 69 and
+        early_rejection = (prior_overbought and 55 <= current <= 69.5 and
                            current < previous and closes[-1] < closes[-2])
         if early_rejection:
             return True, "overbought_range_rejection_confirmed", current
