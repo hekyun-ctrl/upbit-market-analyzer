@@ -22,6 +22,7 @@ from lbank_sample_store import load_snapshots, save_snapshots
 from lbank_structure_patterns import detect_structure, confirm_structure
 from lbank_sampled_context import sampled_context_gate
 from lbank_rsi_research import ResearchTracker, neutral_stall
+from lbank_rsi_plateau import consolidation_reversal_resume
 
 LOG = logging.getLogger("lbank_monitor")
 SYMBOL = "BTC/USDT:USDT"
@@ -168,17 +169,33 @@ def confirmed_sampled_5m_overbought_rejection(observations):
     return True, "5m_sampled_overbought_rejection_confirmed", current
 
 
-def extreme_5m_rsi_entry_gate(observations, direction):
-    """Required for ALL entry patterns: actual 30/70 extreme then 2 closed turns.
+def confirmed_sampled_5m_plateau_resume(observations, direction):
+    """Alternative: 1st completed RSI turn, sideways pause, later confirmed breakout."""
+    state = sampled_five_minute_rsi(observations)
+    if state is None:
+        return False, "5m_plateau_data_unavailable", None
+    ok, reason = consolidation_reversal_resume(
+        state["closes"], state["rsi"], direction)
+    return ok, reason, state["rsi"][-1]
 
-    These are ticker-sampled 5m buckets, not actual LBank futures OHLCV.
-    Near-misses remain shadow research ONLY, never actionable Telegram entry.
+
+def extreme_5m_rsi_entry_gate(observations, direction):
+    """All entries need a <=30/>=70 history AND a completed reversal path.
+
+    A) two consecutive higher/lower completed RSI + sampled price closes, OR
+    B) one first turn, 1-12 closed plateau buckets, then RSI + close breakout.
+    Sideways alone is never an entry. Ticker samples, NOT genuine 5m OHLCV.
     """
     if direction == 1:
-        return confirmed_sampled_5m_oversold_rebound(observations)
-    if direction == -1:
-        return confirmed_sampled_5m_overbought_rejection(observations)
-    return False, "invalid_direction", None
+        direct = confirmed_sampled_5m_oversold_rebound(observations)
+    elif direction == -1:
+        direct = confirmed_sampled_5m_overbought_rejection(observations)
+    else:
+        return False, "invalid_direction", None
+    if direct[0]:
+        return direct
+    delayed = confirmed_sampled_5m_plateau_resume(observations, direction)
+    return delayed if delayed[0] else direct
 
 
 def five_minute_rsi_entry_gate(observations, direction, setup=None):
@@ -192,6 +209,12 @@ def five_minute_rsi_entry_gate(observations, direction, setup=None):
         return False, "insufficient_closed_5m_samples", None
     values, closes = state["rsi"], state["closes"]
     current, previous = values[-1], values[-2]
+    # This alternative is valid for every strategy; the global extreme gate,
+    # structure, context, and fee-aware risk gate still run independently.
+    resumed, resumed_reason, _ = confirmed_sampled_5m_plateau_resume(
+        observations, direction)
+    if resumed:
+        return True, resumed_reason, current
     # A support bounce is NOT a long entry until completed sampled 5m RSI
     # actually crossed <=30 and subsequently turned up with price evidence.
     # Trend retests and breakouts remain separate strategies.
@@ -461,6 +484,7 @@ def classify(prices, observations=None):
     if plan is not None:
         plan["sampled_rsi5"] = sampled_rsi5
         plan["sampled_context"] = context
+        plan["rsi_reversal_method"] = strict_reason if observations is not None else None
     return plan
 
 
@@ -526,6 +550,7 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
     if plan is not None:
         plan["sampled_rsi5"] = sampled_rsi5
         plan["sampled_context"] = context
+        plan["rsi_reversal_method"] = strict_reason if observations is not None else None
     return plan
 
 
@@ -533,12 +558,17 @@ def format_entry_alert(plan, observed_at_utc):
     daily_goal = REF_BALANCE * 0.10
     rsi5 = plan.get("sampled_rsi5")
     rsi5_text = "검증전" if rsi5 is None else f"{rsi5:.1f}"
+    path_label = (
+        "첫 반전 → 횡보 유지 → RSI·가격 재가속 확인"
+        if plan.get("rsi_reversal_method") == "5m_extreme_then_first_turn_plateau_resume"
+        else "2회 연속 완료구간 RSI·가격 반전 확인"
+    )
     reversal_text = (
-        "[롱 필수 확인] 완료 5분 가격표본 RSI 30 이하 관찰 후 "
-        "2회 연속 RSI·표본 종가 상승 확인 (거래소 실제 5분봉 아님)\n"
+        f"[롱 필수 확인] 완료 5분 가격표본 RSI 30 이하 이력 → {path_label}"
+        " (거래소 실제 5분봉 아님)\n"
         if plan.get("direction") == 1 else
-        "[숏 필수 확인] 완료 5분 가격표본 RSI 70 이상 관찰 후 "
-        "2회 연속 RSI·표본 종가 하락 확인 (거래소 실제 5분봉 아님)\n"
+        f"[숏 필수 확인] 완료 5분 가격표본 RSI 70 이상 이력 → {path_label}"
+        " (거래소 실제 5분봉 아님)\n"
     )
     context = plan.get("sampled_context") or {}
     context_text = (f"완료된 선물 가격표본: 5분 표본 15분 변화 {context['trend5_pct']:+.2f}% / "
@@ -570,7 +600,7 @@ def format_entry_alert(plan, observed_at_utc):
         f"{reversal_text}"
         f"{context_text}"
         "※ 3단계 반전은 가격표본의 마감값 비교이며 실제 캔들 3틱룰과 다름\n"
-        "※ 전 유형에서 중립 RSI 진입 차단: 30 이하/70 이상 이력과 완료 5분 RSI·가격의 2회 반전 필수\n"
+        "※ 중립 RSI만으로 진입 금지: 30 이하/70 이상 이력 후 2회 반전 또는 첫 반전·횡보·재돌파 필수\n"
         "※ 30~35/65~70 미달 예외는 연구 전용이며 진입 알람으로 사용하지 않음\n"
         "손익 계산: 진입/조건부 익절/손절 모두 Taker 0.06% 보수적 가정\n"
         "손절 슬리피지 0.02% 가정/펀딩 불리할 때 0.01% 완충(실제 비용 다를 수 있음)\n"
