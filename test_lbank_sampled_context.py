@@ -31,7 +31,7 @@ class SampledContextTests(unittest.TestCase):
             self.assertEqual(ctx["context_type"], "sampled_perpetual_ticker_not_exchange_ohlcv")
 
     def test_impulse_rejects_late_fomo(self):
-        obs = self.snapshots(lambda i: 82000 + i * 38)
+        obs = self.snapshots(lambda i: 82000 + i * 48)
         allowed, reason, _ = sampled_context_gate(obs, 1, "breakout")
         self.assertFalse(allowed)
         self.assertEqual(reason, "avoid_late_5m_impulse_chase")
