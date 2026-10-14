@@ -465,7 +465,10 @@ def run():
     last_sample = observations[-1][0] if observations else 0
     startup_done = False
     next_startup_test = 0
-    counters = {"watched": 0, "confirmed": 0, "expired": 0, "blocked": 0, "suppressed": 0}
+    counters = {"watched": 0, "confirmed": 0, "expired": 0, "blocked": 0,
+                "suppressed": 0, "range_watch": 0, "trend_watch": 0,
+                "breakout_watch": 0, "range_confirmed": 0,
+                "trend_confirmed": 0, "breakout_confirmed": 0}
     next_log_summary = time.time() + 3600
     while True:
         try:
@@ -550,8 +553,12 @@ def run():
                                                    observations, alert_state)
                                     risk_tracker.add_sent_signal(plan, now)
                                     counters["confirmed"] += 1
-                                    LOG.info("ENTRY REVIEW SENT side=%s entry=%.1f stop=%.1f t1=%.1f net_rr=%.2f",
-                                             side, plan["price"], plan["stop"], plan["target1"], plan["rr1"])
+                                    source = plan.get("strategy", "breakout")
+                                    counters[{"range_rebound": "range_confirmed",
+                                              "trend_retest": "trend_confirmed",
+                                              "breakout": "breakout_confirmed"}[source]] += 1
+                                    LOG.info("ENTRY REVIEW SENT strategy=%s side=%s entry=%.1f stop=%.1f t1=%.1f net_rr=%.2f",
+                                             source, side, plan["price"], plan["stop"], plan["target1"], plan["rr1"])
                                 else:
                                     LOG.warning("ENTRY REVIEW SEND FAILED")
                             else:
@@ -565,8 +572,12 @@ def run():
                         if alert_gate(now, side, alert_state) == "ok":
                             watch = {"plan": proposal, "time": now}
                             counters["watched"] += 1
-                            LOG.info("watch created %s at %.1f (no preliminary Telegram noise)",
-                                     side, proposal["price"])
+                            source = proposal.get("strategy", "breakout")
+                            counters[{"range_rebound": "range_watch",
+                                      "trend_retest": "trend_watch",
+                                      "breakout": "breakout_watch"}[source]] += 1
+                            LOG.info("watch created %s strategy=%s at %.1f (no preliminary Telegram noise)",
+                                     side, source, proposal["price"])
                         else:
                             counters["suppressed"] += 1
                     else:
