@@ -154,6 +154,30 @@ class FiveMinuteRsiGateTests(unittest.TestCase):
         self.assertTrue(allowed, (reason, rsi5))
         self.assertEqual(reason, "overbought_pullback_then_support")
 
+    def test_overbought_range_rejection_can_confirm_before_rsi_64(self):
+        # Do not force a valid range-top bearish rollover to wait for RSI <=64.
+        up = [80000 + 100 * i for i in range(25)]
+        down = [up[-1] - 100 * (i + 1) for i in range(5)]
+        observations = self.observations(up + down)
+        rejected, reason, value = five_minute_rsi_entry_gate(observations, -1)
+        self.assertFalse(rejected)
+        self.assertGreater(value, 64)
+        allowed, reason, value = five_minute_rsi_entry_gate(
+            observations, -1, setup={"strategy": "range_rebound"})
+        self.assertTrue(allowed, (reason, value))
+        self.assertEqual(reason, "overbought_range_rejection_confirmed")
+        self.assertLess(value, 70)
+
+    def test_range_exception_never_short_at_rsi_70_or_without_structure(self):
+        up = [80000 + 100 * i for i in range(25)]
+        down = [up[-1] - 100 * (i + 1) for i in range(4)]
+        observations = self.observations(up + down)
+        for setup in (None, {"strategy": "breakout"}, {"strategy": "range_rebound"}):
+            allowed, reason, current = five_minute_rsi_entry_gate(
+                observations, -1, setup=setup)
+            self.assertFalse(allowed, (setup, reason, current))
+            self.assertGreaterEqual(current, 70)
+
     def test_fast_sample_rsi_protects_against_late_short_and_long(self):
         down = [83000 - 50 * i for i in range(60)]
         permitted, reason, value = fast_sample_rsi_gate(down, -1)
