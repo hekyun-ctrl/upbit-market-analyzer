@@ -20,6 +20,7 @@ from lbank_signal_risk import SignalRiskTracker, format_risk_alert
 from lbank_telegram_positions import PositionState, TelegramBot
 from lbank_sample_store import load_snapshots, save_snapshots
 from lbank_structure_patterns import detect_structure, confirm_structure
+from lbank_sampled_context import sampled_context_gate
 
 LOG = logging.getLogger("lbank_monitor")
 SYMBOL = "BTC/USDT:USDT"
@@ -333,7 +334,14 @@ def classify(prices, observations=None):
     LOG.info("PREWATCH candidate strategy=%s direction=%s price=%.1f rsi1=%.1f",
              (setup or {}).get("strategy", "breakout"),
              "LONG" if direction == 1 else "SHORT", curr, strength)
+    context = None
     if observations is not None:
+        context_ok, context_reason, context = sampled_context_gate(
+            observations, direction, (setup or {}).get("strategy", "breakout"))
+        if not context_ok:
+            LOG.info("CLOSED-BUCKET watch BLOCKED side=%s reason=%s context=%s",
+                     "LONG" if direction == 1 else "SHORT", context_reason, context)
+            return None
         allowed_fast, fast_reason, fast_rsi = fast_sample_rsi_gate(prices, direction)
         if not allowed_fast:
             LOG.info("Fast sampled RSI watch BLOCKED side=%s reason=%s rsi=%.1f",
@@ -352,6 +360,7 @@ def classify(prices, observations=None):
                  (setup or {}).get("strategy", "breakout"), direction)
     if plan is not None:
         plan["sampled_rsi5"] = sampled_rsi5
+        plan["sampled_context"] = context
     return plan
 
 
@@ -385,7 +394,14 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
         valid = confirm_structure(prices, watch, ema, rsi)
     if not valid:
         return None
+    context = None
     if observations is not None:
+        context_ok, context_reason, context = sampled_context_gate(
+            observations, direction, watch.get("strategy", "breakout"))
+        if not context_ok:
+            LOG.info("CLOSED-BUCKET confirm BLOCKED side=%s reason=%s context=%s",
+                     "LONG" if direction == 1 else "SHORT", context_reason, context)
+            return None
         allowed_fast, fast_reason, fast_rsi = fast_sample_rsi_gate(prices, direction)
         if not allowed_fast:
             LOG.info("Fast sampled RSI confirmation BLOCKED side=%s reason=%s rsi=%.1f",
@@ -404,6 +420,7 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
                  watch.get("strategy", "breakout"), direction)
     if plan is not None:
         plan["sampled_rsi5"] = sampled_rsi5
+        plan["sampled_context"] = context
     return plan
 
 
@@ -411,6 +428,12 @@ def format_entry_alert(plan, observed_at_utc):
     daily_goal = REF_BALANCE * 0.10
     rsi5 = plan.get("sampled_rsi5")
     rsi5_text = "검증전" if rsi5 is None else f"{rsi5:.1f}"
+    context = plan.get("sampled_context") or {}
+    context_text = (f"완료된 선물 가격표본: 5분 표본 15분 변화 {context['trend5_pct']:+.2f}% / "
+                    f"15분 표본 45분 변화 {context['trend15_pct']:+.2f}% / "
+                    f"최근 표본 변동폭 {context['range5_pct']:.2f}% / "
+                    f"3단계 조정 후 반전 {'관찰' if context['three_step_recovery'] else '미확인'}\\n"
+                    if context else "선물 가격표본 다중시간대 검증: 미수행\\n")
     pattern = {"breakout": "돌파", "range_rebound": "박스권 반등·저항",
                "trend_retest": "추세 눌림 재지지"}.get(plan.get("strategy"), "미분류")
     return (
@@ -432,6 +455,8 @@ def format_entry_alert(plan, observed_at_utc):
         f"기준 시드: {REF_BALANCE:.0f} USDT / 일 순수익 10% 목표: {daily_goal:.2f} USDT (보장 불가)\n"
         f"5분 가격표본 변화 {plan['m5']:+.2f}% | 15분 {plan['m15']:+.2f}% | 1분 표본 RSI {plan['rsi']:.1f}\n"
         f"완료 5분 가격표본 RSI(거래소 실제 5분봉 RSI 아님): {rsi5_text}\n"
+        f"{context_text}"
+        "※ 3단계 반전은 가격표본의 마감값 비교이며 실제 캔들 3틱룰과 다름\n"
         "RSI 30/70 접촉 후 반등·조정과 재확인을 기다리는 필터 적용\n"
         "손익 계산: 진입/조건부 익절/손절 모두 Taker 0.06% 보수적 가정\n"
         "손절 슬리피지 0.02% 가정/펀딩 불리할 때 0.01% 완충(실제 비용 다를 수 있음)\n"
