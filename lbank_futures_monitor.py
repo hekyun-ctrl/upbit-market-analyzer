@@ -102,6 +102,39 @@ def sampled_five_minute_rsi(observations):
     return {"closes": closes, "rsi": rsi_values}
 
 
+
+def confirmed_sampled_5m_oversold_rebound(observations):
+    """Wait for a genuinely turning 5m *ticker-sampled* RSI, not a touch of 30.
+
+    Designed for range-support LONG entries only; do not present as real
+    exchange OHLCV RSI. Require two consecutive COMPLETE 5m RSI improvements
+    and higher sampled closes after a confirmed RSI <= 30 in recent history.
+    Heuristic thresholds must be validated prospectively, not assumed 95%.
+    """
+    state = sampled_five_minute_rsi(observations)
+    if state is None:
+        return False, "5m_oversold_data_unavailable", None
+    values, closes = state["rsi"], state["closes"]
+    current = values[-1]
+    if len(values) < 14 or len(closes) < 20:
+        return False, "5m_oversold_history_insufficient", current
+    past_oversold = [i for i in range(max(0, len(values) - 12), len(values) - 2)
+                     if values[i] <= 30]
+    if not past_oversold:
+        return False, "5m_oversold_not_observed", current
+    if current <= 30:
+        return False, "5m_oversold_still_falling_or_unrecovered", current
+    if current >= 60:
+        return False, "5m_oversold_rebound_already_extended", current
+    if not (values[-1] > values[-2] > values[-3] and
+            values[-1] - values[-3] >= 3.0):
+        return False, "5m_rsi_two_completed_rises_missing", current
+    if not (closes[-1] > closes[-2] > closes[-3] and
+            closes[-1] >= min(closes[-6:]) * 1.0008):
+        return False, "5m_price_two_completed_rebound_closes_missing", current
+    return True, "5m_sampled_oversold_rebound_confirmed", current
+
+
 def five_minute_rsi_entry_gate(observations, direction, setup=None):
     """Guard against late chasing at RSI 30/70; wait for rebound or pullback.
 
@@ -113,6 +146,13 @@ def five_minute_rsi_entry_gate(observations, direction, setup=None):
         return False, "insufficient_closed_5m_samples", None
     values, closes = state["rsi"], state["closes"]
     current, previous = values[-1], values[-2]
+    # A support bounce is NOT a long entry until completed sampled 5m RSI
+    # actually crossed <=30 and subsequently turned up with price evidence.
+    # Trend retests and breakouts remain separate strategies.
+    if direction == 1 and setup and setup.get("strategy") == "range_rebound":
+        rebound_ok, rebound_reason, _ = confirmed_sampled_5m_oversold_rebound(observations)
+        if not rebound_ok:
+            return False, rebound_reason, current
     if current <= 30 or current >= 70:
         return False, "rsi_30_70_extreme_wait", current
     # Leave headroom for a bounce, including before a literal 30/70 touch.
@@ -428,6 +468,10 @@ def format_entry_alert(plan, observed_at_utc):
     daily_goal = REF_BALANCE * 0.10
     rsi5 = plan.get("sampled_rsi5")
     rsi5_text = "검증전" if rsi5 is None else f"{rsi5:.1f}"
+    oversold_rebound_text = ("[반등형 롱] 완료된 5분 가격표본 RSI 30 이하 관찰 후 "
+                            "2회 연속 RSI·종가 상승 확인 (거래소 실제 5분봉 아님)\n"
+                            if plan.get("strategy") == "range_rebound" and
+                               plan.get("direction") == 1 else "")
     context = plan.get("sampled_context") or {}
     context_text = (f"완료된 선물 가격표본: 5분 표본 15분 변화 {context['trend5_pct']:+.2f}% / "
                     f"15분 표본 45분 변화 {context['trend15_pct']:+.2f}% / "
@@ -455,6 +499,7 @@ def format_entry_alert(plan, observed_at_utc):
         f"기준 시드: {REF_BALANCE:.0f} USDT / 일 순수익 10% 목표: {daily_goal:.2f} USDT (보장 불가)\n"
         f"5분 가격표본 변화 {plan['m5']:+.2f}% | 15분 {plan['m15']:+.2f}% | 1분 표본 RSI {plan['rsi']:.1f}\n"
         f"완료 5분 가격표본 RSI(거래소 실제 5분봉 RSI 아님): {rsi5_text}\n"
+        f"{oversold_rebound_text}"
         f"{context_text}"
         "※ 3단계 반전은 가격표본의 마감값 비교이며 실제 캔들 3틱룰과 다름\n"
         "RSI 30/70 접촉 후 반등·조정과 재확인을 기다리는 필터 적용\n"
@@ -515,6 +560,7 @@ def run():
                 "breakout_watch": 0, "range_confirmed": 0,
                 "trend_confirmed": 0, "breakout_confirmed": 0}
     next_log_summary = time.time() + 3600
+    last_5m_audit = None
     while True:
         try:
             # Inbound updates use the same authorized existing Telegram chat.
@@ -572,6 +618,21 @@ def run():
                 observations.append((now, price))
                 save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
                                observations, alert_state)
+                # Shadow audit runs for every newly completed 5-minute sample.
+                # Capture both rejected and validated observations for 7-day
+                # forward testing; never create an order or extra entry alert.
+                bucket = int(now // 300) - 1
+                if bucket != last_5m_audit:
+                    last_5m_audit = bucket
+                    audit_state = sampled_five_minute_rsi(list(observations))
+                    if audit_state is not None:
+                        ready, reason, value = confirmed_sampled_5m_oversold_rebound(
+                            list(observations))
+                        LOG.info(
+                            "RSI5_SHADOW completed_bucket=%d close=%.1f rsi=%.2f "
+                            "rebound_ready=%s reason=%s source=sampled_perpetual_ticker",
+                            bucket, audit_state["closes"][-1],
+                            value, ready, reason)
                 prices = [v for _, v in observations]
                 recent = list(observations)[-MIN_SAMPLES:]
                 continuous = len(recent) >= MIN_SAMPLES and all(
