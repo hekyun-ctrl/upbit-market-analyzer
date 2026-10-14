@@ -135,6 +135,38 @@ def confirmed_sampled_5m_oversold_rebound(observations):
     return True, "5m_sampled_oversold_rebound_confirmed", current
 
 
+def confirmed_sampled_5m_overbought_rejection(observations):
+    """Overbought first, THEN two completed sampled 5m RSI and price declines.
+
+    Range-resistance SHORT only. LBank perpetual ticker-derived closes are NOT
+    real OHLCV bars; require a recent RSI >=70, confirmed weakening on two
+    completed buckets and price rejection. No one-bar top picking.
+    """
+    state = sampled_five_minute_rsi(observations)
+    if state is None:
+        return False, "5m_overbought_data_unavailable", None
+    values, closes = state["rsi"], state["closes"]
+    current = values[-1]
+    if len(values) < 14 or len(closes) < 20:
+        return False, "5m_overbought_history_insufficient", current
+    observed = [i for i in range(max(0, len(values) - 12), len(values) - 2)
+                if values[i] >= 70]
+    if not observed:
+        return False, "5m_overbought_not_observed", current
+    if current >= 70:
+        return False, "5m_overbought_still_rising_or_not_rejected", current
+    # Below 50 may already be late in a strong downside impulse.
+    if current < 50:
+        return False, "5m_overbought_rejection_already_extended", current
+    if not (values[-1] < values[-2] < values[-3] and
+            values[-3] - values[-1] >= 3.0):
+        return False, "5m_rsi_two_completed_falls_missing", current
+    if not (closes[-1] < closes[-2] < closes[-3] and
+            closes[-1] <= max(closes[-6:]) * (1 - .0008)):
+        return False, "5m_price_two_completed_rejection_closes_missing", current
+    return True, "5m_sampled_overbought_rejection_confirmed", current
+
+
 def five_minute_rsi_entry_gate(observations, direction, setup=None):
     """Guard against late chasing at RSI 30/70; wait for rebound or pullback.
 
@@ -149,10 +181,19 @@ def five_minute_rsi_entry_gate(observations, direction, setup=None):
     # A support bounce is NOT a long entry until completed sampled 5m RSI
     # actually crossed <=30 and subsequently turned up with price evidence.
     # Trend retests and breakouts remain separate strategies.
-    if direction == 1 and setup and setup.get("strategy") == "range_rebound":
-        rebound_ok, rebound_reason, _ = confirmed_sampled_5m_oversold_rebound(observations)
-        if not rebound_ok:
-            return False, rebound_reason, current
+    if setup and setup.get("strategy") == "range_rebound":
+        if direction == 1:
+            rebound_ok, rebound_reason, _ = confirmed_sampled_5m_oversold_rebound(observations)
+            if not rebound_ok:
+                return False, rebound_reason, current
+        elif direction == -1:
+            rejection_ok, rejection_reason, _ = confirmed_sampled_5m_overbought_rejection(observations)
+            if not rejection_ok:
+                return False, rejection_reason, current
+            # After a verified two-bar overbought rejection, avoid the prior
+            # single-bar/RSI<=64 shortcut. Still respect fast RSI, higher-timeframe
+            # context, structure and the full fee-aware risk gate elsewhere.
+            return True, rejection_reason, current
     if current <= 30 or current >= 70:
         return False, "rsi_30_70_extreme_wait", current
     # Leave headroom for a bounce, including before a literal 30/70 touch.
@@ -472,6 +513,10 @@ def format_entry_alert(plan, observed_at_utc):
                             "2회 연속 RSI·종가 상승 확인 (거래소 실제 5분봉 아님)\n"
                             if plan.get("strategy") == "range_rebound" and
                                plan.get("direction") == 1 else "")
+    overbought_rejection_text = ("[저항형 숏] 완료된 5분 가격표본 RSI 70 이상 관찰 후 "
+                                 "2회 연속 RSI·종가 하락 확인 (거래소 실제 5분봉 아님)\n"
+                                 if plan.get("strategy") == "range_rebound" and
+                                    plan.get("direction") == -1 else "")
     context = plan.get("sampled_context") or {}
     context_text = (f"완료된 선물 가격표본: 5분 표본 15분 변화 {context['trend5_pct']:+.2f}% / "
                     f"15분 표본 45분 변화 {context['trend15_pct']:+.2f}% / "
@@ -500,6 +545,7 @@ def format_entry_alert(plan, observed_at_utc):
         f"5분 가격표본 변화 {plan['m5']:+.2f}% | 15분 {plan['m15']:+.2f}% | 1분 표본 RSI {plan['rsi']:.1f}\n"
         f"완료 5분 가격표본 RSI(거래소 실제 5분봉 RSI 아님): {rsi5_text}\n"
         f"{oversold_rebound_text}"
+        f"{overbought_rejection_text}"
         f"{context_text}"
         "※ 3단계 반전은 가격표본의 마감값 비교이며 실제 캔들 3틱룰과 다름\n"
         "RSI 30/70 접촉 후 반등·조정과 재확인을 기다리는 필터 적용\n"
