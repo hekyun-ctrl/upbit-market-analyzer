@@ -101,7 +101,7 @@ def sampled_five_minute_rsi(observations):
     return {"closes": closes, "rsi": rsi_values}
 
 
-def five_minute_rsi_entry_gate(observations, direction):
+def five_minute_rsi_entry_gate(observations, direction, setup=None):
     """Guard against late chasing at RSI 30/70; wait for rebound or pullback.
 
     Only completed 5-min ticker-derived RSI values are used. These heuristics
@@ -150,6 +150,17 @@ def five_minute_rsi_entry_gate(observations, direction):
                  current > previous and closes[-1] > closes[-2])
         return ready, ("overbought_pullback_then_support" if ready else
                        "wait_pullback_then_bullish_support"), current
+    # A tightly scoped exception for genuine range-top bearish rejection.
+    # A rollover off 70+ can be actionable before RSI reaches 64. Only
+    # consider this when the structural resistance reaction already passed
+    # and the last COMPLETED 5m sample is lower in both price and RSI.
+    # Still forbid >=70 RSI and all late shorts after oversold extremes.
+    if setup and setup.get("strategy") == "range_rebound" and direction == -1:
+        prior_overbought = any(v >= 70 for v in values[-3:-1])
+        early_rejection = (prior_overbought and 55 <= current <= 69 and
+                           current < previous and closes[-1] < closes[-2])
+        if early_rejection:
+            return True, "overbought_range_rejection_confirmed", current
     ready = (bool(after) and current <= 64 and
              current < previous and closes[-1] < closes[-2])
     return ready, ("overbought_pullback_confirmed" if ready else
@@ -319,13 +330,16 @@ def classify(prices, observations=None):
         direction = -1
     else:
         return None
+    LOG.info("PREWATCH candidate strategy=%s direction=%s price=%.1f rsi1=%.1f",
+             (setup or {}).get("strategy", "breakout"),
+             "LONG" if direction == 1 else "SHORT", curr, strength)
     if observations is not None:
         allowed_fast, fast_reason, fast_rsi = fast_sample_rsi_gate(prices, direction)
         if not allowed_fast:
             LOG.info("Fast sampled RSI watch BLOCKED side=%s reason=%s rsi=%.1f",
                      "LONG" if direction == 1 else "SHORT", fast_reason, fast_rsi)
             return None
-        allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(observations, direction)
+        allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(observations, direction, setup=setup)
         if not allowed:
             LOG.info("5m sampled RSI watch BLOCKED side=%s reason=%s rsi=%s",
                      "LONG" if direction == 1 else "SHORT", reason, sampled_rsi5)
@@ -333,6 +347,9 @@ def classify(prices, observations=None):
     else:
         sampled_rsi5 = None
     plan = calculate_plan(prices, direction, setup=setup)
+    if plan is None:
+        LOG.info("PREWATCH candidate cost/risk/target rejected strategy=%s direction=%s",
+                 (setup or {}).get("strategy", "breakout"), direction)
     if plan is not None:
         plan["sampled_rsi5"] = sampled_rsi5
     return plan
@@ -374,7 +391,7 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
             LOG.info("Fast sampled RSI confirmation BLOCKED side=%s reason=%s rsi=%.1f",
                      "LONG" if direction == 1 else "SHORT", fast_reason, fast_rsi)
             return None
-        allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(observations, direction)
+        allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(observations, direction, setup=watch)
         if not allowed:
             LOG.info("5m sampled RSI confirmation BLOCKED side=%s reason=%s rsi=%s",
                      "LONG" if direction == 1 else "SHORT", reason, sampled_rsi5)
@@ -382,6 +399,9 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
     else:
         sampled_rsi5 = None
     plan = calculate_plan(prices, direction, setup=watch)
+    if plan is None:
+        LOG.info("CONFIRM candidate cost/risk/target rejected strategy=%s direction=%s",
+                 watch.get("strategy", "breakout"), direction)
     if plan is not None:
         plan["sampled_rsi5"] = sampled_rsi5
     return plan
