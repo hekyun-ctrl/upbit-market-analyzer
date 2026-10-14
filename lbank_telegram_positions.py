@@ -78,7 +78,8 @@ class PositionState:
             raise ValueError("목표가는 진입 방향의 수익 구간이어야 합니다.")
         self.state["position"] = {"side": side, "entry": str(entry),
             "quantity": str(qty), "stop": str(stop), "target": str(target),
-            "risk_notice": None, "risk_count": 0}
+            "risk_notice": None, "risk_count": 0,
+            "opened_at": time.time(), "neutral_notice": False}
         self.mutate()
         return self.status()
 
