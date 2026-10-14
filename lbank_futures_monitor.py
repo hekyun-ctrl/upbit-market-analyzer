@@ -432,8 +432,8 @@ def format_entry_alert(plan, observed_at_utc):
     context_text = (f"완료된 선물 가격표본: 5분 표본 15분 변화 {context['trend5_pct']:+.2f}% / "
                     f"15분 표본 45분 변화 {context['trend15_pct']:+.2f}% / "
                     f"최근 표본 변동폭 {context['range5_pct']:.2f}% / "
-                    f"3단계 조정 후 반전 {'관찰' if context['three_step_recovery'] else '미확인'}\\n"
-                    if context else "선물 가격표본 다중시간대 검증: 미수행\\n")
+                    f"3단계 조정 후 반전 {'관찰' if context['three_step_recovery'] else '미확인'}\n"
+                    if context else "선물 가격표본 다중시간대 검증: 미수행\n")
     pattern = {"breakout": "돌파", "range_rebound": "박스권 반등·저항",
                "trend_retest": "추세 눌림 재지지"}.get(plan.get("strategy"), "미분류")
     return (
