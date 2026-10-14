@@ -165,7 +165,7 @@ class FiveMinuteRsiGateTests(unittest.TestCase):
         allowed, reason, value = five_minute_rsi_entry_gate(
             observations, -1, setup={"strategy": "range_rebound"})
         self.assertTrue(allowed, (reason, value))
-        self.assertEqual(reason, "overbought_range_rejection_confirmed")
+        self.assertEqual(reason, "5m_sampled_overbought_rejection_confirmed")
         self.assertLess(value, 70)
 
     def test_range_exception_never_short_at_rsi_70_or_without_structure(self):
