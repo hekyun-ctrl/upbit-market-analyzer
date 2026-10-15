@@ -21,7 +21,7 @@ from lbank_telegram_positions import PositionState, TelegramBot, format_position
 from lbank_sample_store import load_snapshots, save_snapshots
 from lbank_structure_patterns import detect_structure, confirm_structure
 from lbank_sampled_context import sampled_context_gate
-from lbank_rsi_research import ResearchTracker, neutral_stall
+from lbank_rsi_research import ResearchTracker, NeutralExitStudy, neutral_stall
 from lbank_rsi_plateau import consolidation_reversal_resume
 from lbank_macro_monitor import MacroMonitor
 
@@ -666,6 +666,9 @@ def run():
     risk_tracker = SignalRiskTracker(path=os.getenv(
         "LBANK_SIGNAL_FOLLOWUP_STATE_PATH", "/data/lbank_signal_followups.json"))
     rsi_research = ResearchTracker()  # Shadow stats only; not an entry gate
+    neutral_exit_study = NeutralExitStudy(path=os.getenv(
+        "LBANK_NEUTRAL_EXIT_RESEARCH_STATE_PATH", "/data/lbank_neutral_exit_study.json"))
+    LOG.info("neutral_exit_shadow_study=enabled; logging hypotheses only, no new Telegram exit alerts")
     position_ledger = PositionState()
     position_bot = TelegramBot(position_ledger)
     LOG.info("position_report_tracking=enabled; recorded_position_present=%s", bool(position_ledger.position))
@@ -795,6 +798,11 @@ def run():
                         sampled_rsis = audit_state["rsi"]
                         hypotheses, outcomes = rsi_research.observe(
                             bucket, sampled_closes[-1], sampled_closes, sampled_rsis)
+                        neutral_outcomes = neutral_exit_study.observe(
+                            bucket, sampled_closes, sampled_rsis)
+                        for outcome in neutral_outcomes:
+                            LOG.info("NEUTRAL_EXIT_SHADOW %s",
+                                     json.dumps(outcome, sort_keys=True))
                         long_stall = neutral_stall(sampled_closes, sampled_rsis, 1)
                         short_stall = neutral_stall(sampled_closes, sampled_rsis, -1)
                         LOG.info("RSI5_STUDY completed_bucket=%d %s",
