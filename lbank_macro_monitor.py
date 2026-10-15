@@ -212,11 +212,12 @@ def format_time(timestamp):
 
 
 def release_message(event):
+    cache_note = " (사전 확인한 일정표·변경 여부 재확인 필요)" if event.get("cached") else ""
     return (
         "[LBank BTCUSDT | 미국 매크로 발표 예정 · 진입 신호 아님]\n"
         f"지표: {event['title']}\n"
         f"한국시간: {format_time(event['at'])}\n"
-        f"공식 일정: {event['source']}" + (" (사전 확인한 일정표·변경 여부 재확인 필요)\n" if event.get("cached") else "\n")
+        f"공식 일정: {event['source']}{cache_note}\n"
         "참고: 발표 전후 가격 급변, 체결 지연·슬리피지 위험을 확인하세요.\n"
         "매매 방향·컨센서스·실제 발표치는 아직 미확인입니다.\n"
         f"원문: {event['url']}"
