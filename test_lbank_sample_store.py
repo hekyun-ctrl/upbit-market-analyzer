@@ -21,7 +21,7 @@ class CachedSampleTests(unittest.TestCase):
         now = 2000000000
         samples = [(now - 120, 83200.), (now - 60, 83300.), (now, 83400.)]
         alert = {"day": "2026-10-13", "count": 2,
-                 "last_time": now - 30, "last_side": "롱"}
+                 "last_time": now - 30, "last_side": "롱", "last_reversal_preview": now - 60}
         save_snapshots(self.path, SYMBOL, 60, samples, alert)
         observed, state = load_snapshots(self.path, SYMBOL, 60, now=now + 20)
         self.assertEqual(observed, samples)
@@ -30,11 +30,30 @@ class CachedSampleTests(unittest.TestCase):
     def test_stale_history_is_dropped_without_losing_alert_cooldown(self):
         now = 2000000000
         alert = {"day": "2026-10-13", "count": 2,
-                 "last_time": now - 300, "last_side": "숏"}
+                 "last_time": now - 300, "last_side": "숏", "last_reversal_preview": None}
         save_snapshots(self.path, SYMBOL, 60, [(now - 3600, 83300.)], alert)
         observed, gate = load_snapshots(self.path, SYMBOL, 60, now=now)
         self.assertEqual(observed, [])
         self.assertEqual(gate, alert)
+
+    def test_old_cache_without_preview_field_still_loads_safely(self):
+        now = 2000000000
+        old = {"day": "2026-10-13", "count": 1,
+               "last_time": now - 70, "last_side": "숏"}
+        save_snapshots(self.path, SYMBOL, 60, [(now - 60, 83400.), (now, 83420.)], old)
+        observed, gate = load_snapshots(self.path, SYMBOL, 60, now=now + 20)
+        self.assertEqual(len(observed), 2)
+        self.assertIsNone(gate["last_reversal_preview"])
+        self.assertEqual(gate["last_side"], "숏")
+
+    def test_invalid_future_reversal_notice_timestamp_discarded(self):
+        now = 2000000000
+        alert = {"day": "2026-10-13", "count": 1,
+                 "last_time": now - 120, "last_side": "숏",
+                 "last_reversal_preview": now + 3000}
+        save_snapshots(self.path, SYMBOL, 60, [(now, 83000.)], alert)
+        _, loaded = load_snapshots(self.path, SYMBOL, 60, now=now + 1)
+        self.assertIsNone(loaded["last_reversal_preview"])
 
     def test_gap_rejects_older_part_of_history(self):
         now = 2000000000
