@@ -520,7 +520,44 @@ def format_entry_alert(plan, observed_at_utc):
     )
 
 
-def alert_gate(now, side, state):
+def verified_reversal_exception(now, side, state, plan=None):
+    """Permit early opposite-side review ONLY on a strict closed-bucket reversal.
+
+    The global 45m cooldown, daily cap, two-stage confirmation, no-chase and
+    net cost/risk checks are NOT waived. Directional RSI is secondary evidence.
+    """
+    previous_at = state.get("last_time")
+    if previous_at is None or state.get("last_side") == side:
+        return False
+    elapsed = now - previous_at
+    if not (COOLDOWN <= elapsed < REVERSAL_COOLDOWN):
+        return False
+    if not isinstance(plan, dict):
+        return False
+    if plan.get("side") != side or plan.get("strategy") not in ("breakout", "trend_retest"):
+        return False
+    context = plan.get("sampled_context") or {}
+    return (context.get("reversal_confirmed") is True and
+            plan.get("rsi_direction_status") == "5m_rsi_direction_aligned")
+
+
+def format_reversal_pre_watch(plan, at_kst):
+    """Information-only verified reversal watch, never an entry permission."""
+    context = plan.get("sampled_context") or {}
+    return (
+        f"[LBank BTCUSDT | {plan['side']} 전환 사전포착 - 진입 미확정]\n"
+        f"한국시간: {at_kst}\n"
+        f"현재 참고가격: {plan['price']:,.1f} USDT\n"
+        f"완료된 5분 가격표본 2구간 회복: {context.get('reversal_10m_pct', 0):+.2f}%\n"
+        f"완료된 최신 5분 구간 움직임: {context.get('reversal_last5_pct', 0):+.2f}%\n"
+        "기존 반대 방향 알람의 90분 제한 중 검증된 전환 후보를 포착했습니다.\n"
+        "※ 2단계 재확인 전이므로 진입 추천이나 확정 알람이 아닙니다.\n"
+        "※ 수수료 포함 위험·손절·목표의 추가 검증 및 거래소 실제 5분봉/호가 확인 필요.\n"
+        "※ 거래소 원본 OHLCV/거래량이 아닌 1분 선물 가격표본 기반입니다. 자동주문 없음."
+    )
+
+
+def alert_gate(now, side, state, plan=None):
     day = datetime.fromtimestamp(now, tz=timezone(timedelta(hours=9))).date().isoformat()
     if day != state["day"]:
         state["day"], state["count"] = day, 0
@@ -531,12 +568,13 @@ def alert_gate(now, side, state):
         if elapsed < COOLDOWN:
             return "global_cooldown"
         if side != state["last_side"] and elapsed < REVERSAL_COOLDOWN:
-            return "reverse_cooldown"
+            if not verified_reversal_exception(now, side, state, plan):
+                return "reverse_cooldown"
     return "ok"
 
 
-def record_alert(now, side, state):
-    if alert_gate(now, side, state) != "ok":
+def record_alert(now, side, state, plan=None):
+    if alert_gate(now, side, state, plan=plan) != "ok":
         raise ValueError("alert gate disallowed sending")
     state["last_time"], state["last_side"] = now, side
     state["count"] += 1
@@ -735,18 +773,24 @@ def run():
                 elif watch is not None:
                     age = now - watch["time"]
                     if age > ENTRY_CONFIRM_MAX_AGE_SECONDS:
+                        expired_plan = watch["plan"]
                         watch = None
                         counters["expired"] += 1
-                        LOG.info("watch expired; no ENTRY REVIEW signal")
+                        LOG.info("watch expired; no ENTRY REVIEW signal side=%s strategy=%s price=%.1f",
+                                 expired_plan.get("side"), expired_plan.get("strategy"),
+                                 expired_plan.get("price"))
                     else:
                         plan = confirm_watch(prices, watch["plan"], age, observations=list(observations))
                         if plan is not None:
                             side = plan["side"]
-                            if alert_gate(now, side, alert_state) == "ok":
+                            gate_reason = alert_gate(now, side, alert_state, plan=plan)
+                            if gate_reason == "ok":
                                 message = format_entry_alert(
                                     plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat())
                                 if telegram(message):
-                                    record_alert(now, side, alert_state)
+                                    reverse_exception = verified_reversal_exception(
+                                        now, side, alert_state, plan)
+                                    record_alert(now, side, alert_state, plan=plan)
                                     save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
                                                    observations, alert_state)
                                     risk_tracker.add_sent_signal(plan, now)
@@ -755,29 +799,53 @@ def run():
                                     counters[{"range_rebound": "range_confirmed",
                                               "trend_retest": "trend_confirmed",
                                               "breakout": "breakout_confirmed"}[source]] += 1
-                                    LOG.info("ENTRY REVIEW SENT strategy=%s side=%s entry=%.1f stop=%.1f t1=%.1f net_rr=%.2f",
-                                             source, side, plan["price"], plan["stop"], plan["target1"], plan["rr1"])
+                                    LOG.info("ENTRY REVIEW SENT strategy=%s side=%s entry=%.1f stop=%.1f t1=%.1f net_rr=%.2f reverse_exception=%s",
+                                             source, side, plan["price"], plan["stop"],
+                                             plan["target1"], plan["rr1"], reverse_exception)
                                 else:
                                     LOG.warning("ENTRY REVIEW SEND FAILED")
                             else:
                                 counters["suppressed"] += 1
-                                LOG.info("ENTRY REVIEW suppressed by cooldown side=%s", side)
+                                LOG.info("ENTRY REVIEW SUPPRESSED side=%s reason=%s strategy=%s price=%.1f",
+                                         side, gate_reason, plan.get("strategy", "breakout"),
+                                         plan["price"])
                             watch = None
                 if continuous and watch is None:
                     proposal = classify(prices, observations=list(observations))
                     if proposal is not None:
                         side = proposal["side"]
-                        if alert_gate(now, side, alert_state) == "ok":
+                        gate_reason = alert_gate(now, side, alert_state, plan=proposal)
+                        if gate_reason == "ok":
                             watch = {"plan": proposal, "time": now}
                             counters["watched"] += 1
                             source = proposal.get("strategy", "breakout")
                             counters[{"range_rebound": "range_watch",
                                       "trend_retest": "trend_watch",
                                       "breakout": "breakout_watch"}[source]] += 1
-                            LOG.info("watch created %s strategy=%s at %.1f (no preliminary Telegram noise)",
-                                     side, source, proposal["price"])
+                            LOG.info("watch created %s strategy=%s at %.1f context=%s",
+                                     side, source, proposal["price"],
+                                     proposal.get("sampled_context"))
+                            if verified_reversal_exception(now, side, alert_state, proposal):
+                                LOG.info("REVERSE COOLDOWN EXCEPTION WATCH side=%s strategy=%s price=%.1f",
+                                         side, source, proposal["price"])
+                                prior_preview = alert_state.get("last_reversal_preview")
+                                if prior_preview is None or now - prior_preview >= REVERSAL_COOLDOWN:
+                                    note = format_reversal_pre_watch(
+                                        proposal, datetime.fromtimestamp(
+                                            now, tz=timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M"))
+                                    if telegram(note):
+                                        alert_state["last_reversal_preview"] = now
+                                        save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
+                                                       observations, alert_state)
+                                        LOG.info("VERIFIED REVERSE PREWATCH SENT side=%s price=%.1f",
+                                                 side, proposal["price"])
+                                    else:
+                                        LOG.warning("VERIFIED REVERSE PREWATCH DELIVERY FAILED side=%s", side)
                         else:
                             counters["suppressed"] += 1
+                            LOG.info("WATCH SUPPRESSED side=%s reason=%s strategy=%s price=%.1f",
+                                     side, gate_reason, proposal.get("strategy", "breakout"),
+                                     proposal["price"])
                     else:
                         counters["blocked"] += 1
                 LOG.info("contract=BTCUSDT price=%.1f count=%d watch=%s confirmed_total=%d tracked_references=%d",
