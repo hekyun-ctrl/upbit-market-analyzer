@@ -319,6 +319,8 @@ def calculate_plan(prices, direction, setup=None):
         minimum_stop = .0012
     stop_distance = abs(curr - stop) / curr
     if not (minimum_stop - 1e-10 <= stop_distance <= .0060):
+        LOG.info("PLAN REJECT reason=stop_distance strategy=%s direction=%s price=%.1f stop=%.1f dist_pct=%.3f min_pct=%.3f max_pct=0.600",
+                 strategy, direction, curr, stop, stop_distance * 100, minimum_stop * 100)
         return None
     unit_loss = -net_pnl_per_btc(direction, curr, stop)
     if unit_loss <= 0:
@@ -331,9 +333,13 @@ def calculate_plan(prices, direction, setup=None):
     # otherwise skip instead of inventing a reachable price target.
     observed_range = max(prices[-60:]) - min(prices[-60:])
     if abs(t1 - curr) > 1.5 * observed_range:
+        LOG.info("PLAN REJECT reason=target_outside_sampled_range strategy=%s direction=%s price=%.1f target1=%.1f sampled_range=%.1f",
+                 strategy, direction, curr, t1, observed_range)
         return None
     barrier = setup.get("barrier")
     if barrier is not None and direction * (barrier - t1) < curr * .00015:
+        LOG.info("PLAN REJECT reason=target_barrier_conflict strategy=%s direction=%s price=%.1f target1=%.1f barrier=%.1f",
+                 strategy, direction, curr, t1, barrier)
         return None
     permitted_loss = REF_BALANCE * RISK_FRACTION
     effective_entry = curr
