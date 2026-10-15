@@ -169,6 +169,38 @@ def parse_bea_json(payload):
     return result
 
 
+
+# Official BLS schedule cached from published 2026 release pages on 2026-10-15.
+# Last resort when BLS blocks cloud servers; NOT an automatically updated calendar.
+# See https://www.bls.gov/schedule/2026/home.htm
+BLS_SCHEDULE_CACHE = (
+    ("2026-10-15", "08:30", "Producer Price Index for September 2026"),
+    ("2026-10-30", "08:30", "Employment Cost Index for Q3 2026"),
+    ("2026-11-03", "10:00", "Job Openings and Labor Turnover for September 2026"),
+    ("2026-11-06", "08:30", "Employment Situation for October 2026"),
+    ("2026-11-10", "08:30", "Consumer Price Index for October 2026"),
+    ("2026-11-13", "08:30", "Producer Price Index for October 2026"),
+    ("2026-12-01", "10:00", "Job Openings and Labor Turnover for October 2026"),
+    ("2026-12-04", "08:30", "Employment Situation for November 2026"),
+    ("2026-12-10", "08:30", "Consumer Price Index for November 2026"),
+    ("2026-12-15", "08:30", "Producer Price Index for November 2026"),
+)
+
+
+def bls_cached_schedule(now):
+    result = []
+    for date, clock, name in BLS_SCHEDULE_CACHE:
+        dt = datetime.strptime(date + " " + clock, "%Y-%m-%d %H:%M").replace(tzinfo=EASTERN)
+        ts = dt.timestamp()
+        if -4 * 3600 <= ts - now <= 100 * 86400:
+            result.append({
+                "title": name, "at": ts, "source": "BLS",
+                "url": "https://www.bls.gov/schedule/2026/home.htm",
+                "cached": True,
+            })
+    return result
+
+
 def event_key(event):
     return hashlib.sha256(
         (event["source"] + "|" + event["title"] + "|" +
@@ -184,7 +216,7 @@ def release_message(event):
         "[LBank BTCUSDT | 미국 매크로 발표 예정 · 진입 신호 아님]\n"
         f"지표: {event['title']}\n"
         f"한국시간: {format_time(event['at'])}\n"
-        f"공식 일정: {event['source']}\n"
+        f"공식 일정: {event['source']}" + (" (사전 확인한 일정표·변경 여부 재확인 필요)\n" if event.get("cached") else "\n")
         "참고: 발표 전후 가격 급변, 체결 지연·슬리피지 위험을 확인하세요.\n"
         "매매 방향·컨센서스·실제 발표치는 아직 미확인입니다.\n"
         f"원문: {event['url']}"
@@ -263,6 +295,10 @@ class MacroMonitor:
                 LOG.info("MACRO SOURCE OK name=%s events=%d", name, len(found))
             except Exception as exc:
                 LOG.warning("MACRO SOURCE FAILED name=%s exception=%s", name, type(exc).__name__)
+        if "BLS-calendar" not in self.feeds_ok:
+            cached = bls_cached_schedule(now)
+            entries.extend(cached)
+            LOG.warning("MACRO BLS calendar inaccessible: using verified 2026 cached schedule events=%d; schedule could change", len(cached))
         if entries:
             unique = {event_key(x): x for x in entries}
             self.calendar = list(unique.values())
