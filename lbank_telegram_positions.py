@@ -211,17 +211,17 @@ def format_position_target_alert(position, price, time_kst):
     target = float(position["target"])
     delta = direction * (target / entry - 1) * 100
     return (
-        f"[LBank BTCUSDT | 신고 {side} 포지션 1차 목표 도달]\\n"
-        f"한국시간: {time_kst}\\n"
-        f"현재 1차 목표 {target:,.1f} USDT ({delta:+.2f}%) 도달\\n"
-        f"현재 관측가격: {price:,.1f} USDT\\n"
+        f"[LBank BTCUSDT | 신고 {side} 포지션 1차 목표 도달]\n"
+        f"한국시간: {time_kst}\n"
+        f"현재 1차 목표 {target:,.1f} USDT ({delta:+.2f}%) 도달\n"
+        f"현재 관측가격: {price:,.1f} USDT\n"
         f"실제 보유 중이라면 50% 익절 후 "
-        f"잔여 손절가는 진입가 {entry:,.1f} USDT로 조정 요함.\\n"
-        "※ LBank에서 실제 청산·손절 주문을 직접 실행하고 체결을 확인하세요.\\n"
-        "※ 거래소 체결·실제 보유는 확인되지 않았습니다. 이미 청산했다면 무시하세요.\\n"
-        "※ 손절을 진입가로 옮겨도 수수료·슬리피지로 순손실이 발생할 수 있습니다.\\n"
+        f"잔여 손절가는 진입가 {entry:,.1f} USDT로 조정 요함.\n"
+        "※ LBank에서 실제 청산·손절 주문을 직접 실행하고 체결을 확인하세요.\n"
+        "※ 거래소 체결·실제 보유는 확인되지 않았습니다. 이미 청산했다면 무시하세요.\n"
+        "※ 손절을 진입가로 옮겨도 수수료·슬리피지로 순손실이 발생할 수 있습니다.\n"
         "※ 1분 가격표본은 구간내 순간 목표 터치를 놓칠 수 있습니다."
-    ).replace("\\\\n", "\\n")
+    )
 
 
 class TelegramBot:
