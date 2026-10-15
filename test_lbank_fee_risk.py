@@ -8,6 +8,8 @@ from lbank_signal_risk import SignalRiskTracker, format_risk_alert, format_targe
 
 from lbank_futures_monitor import (
     REF_BALANCE, RISK_FRACTION, classify,
+    alert_gate, record_alert, verified_reversal_exception,
+    format_reversal_pre_watch, COOLDOWN, REVERSAL_COOLDOWN, MAX_DAILY_ALERTS,
     minimum_net_rr_target, net_pnl_per_btc,
     confirm_watch, format_entry_alert,
     sampled_five_minute_rsi, five_minute_rsi_entry_gate,
@@ -98,6 +100,81 @@ class LBankCostModelTests(unittest.TestCase):
         self.assertGreater((target - entry) / entry, .005)  # Fees still require a material gross move
 
 
+
+
+class ReversalCooldownReviewTests(unittest.TestCase):
+    @staticmethod
+    def state(now, elapsed=75 * 60):
+        from datetime import datetime, timezone, timedelta
+        day = datetime.fromtimestamp(
+            now, tz=timezone(timedelta(hours=9))).date().isoformat()
+        return {"day": day, "count": 1, "last_time": now - elapsed,
+                "last_side": "숏", "last_reversal_preview": None}
+
+    @staticmethod
+    def plan():
+        return {"side": "롱", "direction": 1, "strategy": "breakout",
+                "price": 80550.9, "stop": 80077.0, "target1": 81400.,
+                "rr1": 1.5, "net_loss": 10.45,
+                "rsi_direction_status": "5m_rsi_direction_aligned",
+                "sampled_context": {
+                    "reversal_confirmed": True,
+                    "reversal_10m_pct": .788, "reversal_last5_pct": .45,
+                    "trend5_pct": .06, "trend15_pct": -.46}}
+
+    def test_verified_reversal_bypasses_only_opposing_90m_cooldown(self):
+        now = 1800000000
+        state = self.state(now)
+        plan = self.plan()
+        self.assertEqual(alert_gate(now, "롱", state), "reverse_cooldown")
+        self.assertTrue(verified_reversal_exception(now, "롱", state, plan))
+        self.assertEqual(alert_gate(now, "롱", state, plan), "ok")
+        record_alert(now, "롱", state, plan)
+        self.assertEqual(state["count"], 2)
+        self.assertEqual(state["last_side"], "롱")
+        self.assertEqual(alert_gate(now + 60, "롱", state, plan), "global_cooldown")
+
+    def test_45m_global_cooldown_and_8_daily_limit_remain(self):
+        now = 1800000000
+        state = self.state(now, elapsed=COOLDOWN - 60)
+        self.assertEqual(alert_gate(now, "롱", state, self.plan()),
+                         "global_cooldown")
+        state = self.state(now)
+        state["count"] = MAX_DAILY_ALERTS
+        self.assertEqual(alert_gate(now, "롱", state, self.plan()), "daily_cap")
+        state = self.state(now, elapsed=REVERSAL_COOLDOWN + 60)
+        self.assertEqual(alert_gate(now, "롱", state), "ok")
+
+    def test_nonverified_early_rebound_and_bad_rsi_remain_blocked(self):
+        now = 1800000000
+        state = self.state(now)
+        plan = self.plan()
+        plan["sampled_context"]["reversal_confirmed"] = False
+        self.assertEqual(alert_gate(now, "롱", state, plan), "reverse_cooldown")
+        plan = self.plan()
+        plan["rsi_direction_status"] = "5m_rsi_direction_mismatch_or_flat"
+        self.assertEqual(alert_gate(now, "롱", state, plan), "reverse_cooldown")
+        plan = self.plan()
+        plan["strategy"] = "range_rebound"
+        self.assertEqual(alert_gate(now, "롱", state, plan), "reverse_cooldown")
+
+    def test_risk_or_cost_failure_never_bypasses_cooldown(self):
+        now = 1800000000
+        for key, value in (("rr1", 1.49), ("net_loss", 25.),
+                           ("stop", 81100.), ("target1", 80400.)):
+            with self.subTest(key=key):
+                plan = self.plan()
+                plan[key] = value
+                self.assertEqual(alert_gate(now, "롱", self.state(now), plan),
+                                 "reverse_cooldown")
+
+    def test_preview_is_explicitly_not_actionable(self):
+        msg = format_reversal_pre_watch(self.plan(), "2026-10-15 23:06")
+        self.assertIn("롱 전환 사전포착", msg)
+        self.assertIn("진입 미확정", msg)
+        self.assertIn("2단계 재확인 전", msg)
+        self.assertIn("자동주문 없음", msg)
+        self.assertNotIn("매수 완료", msg)
 
 
 class FiveMinuteRsiGateTests(unittest.TestCase):
