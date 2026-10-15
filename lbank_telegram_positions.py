@@ -79,7 +79,8 @@ class PositionState:
         self.state["position"] = {"side": side, "entry": str(entry),
             "quantity": str(qty), "stop": str(stop), "target": str(target),
             "risk_notice": None, "risk_count": 0,
-            "opened_at": time.time(), "neutral_notice": False}
+            "opened_at": time.time(), "neutral_notice": False,
+            "target_notice": False}
         self.mutate()
         return self.status()
 
@@ -127,9 +128,29 @@ class PositionState:
         direction = 1 if self.position["side"] == "LONG" else -1
         if direction * (target - entry) <= 0:
             raise ValueError("익절 목표는 진입가 대비 수익 구간이어야 합니다.")
+        prior_target = num(self.position["target"])
         self.position["target"] = str(target)
+        if target != prior_target:
+            self.position["target_notice"] = False
         self.mutate()
         return "신고 목표가를 갱신했습니다. 실제 거래소 주문은 직접 확인해야 합니다.\n" + self.status()
+
+    def target_reached(self, prices):
+        """One-time alert for a user-reported target. Does not imply a fill."""
+        p = self.position
+        if not p or p.get("target_notice", False) or not prices:
+            return None
+        current = float(prices[-1])
+        direction = 1 if p["side"] == "LONG" else -1
+        if direction * (current - float(p["target"])) >= 0:
+            return current
+        return None
+
+    def acknowledge_target(self):
+        """Persist only after successful Telegram delivery."""
+        if self.position:
+            self.position["target_notice"] = True
+            self.save()
 
     def status(self):
         p = self.position
@@ -180,6 +201,27 @@ class PositionState:
         if self.position:
             self.position["risk_notice"] = reason
             self.save()
+
+
+def format_position_target_alert(position, price, time_kst):
+    """First target alert for a *reported* position, not verified exchange data."""
+    side = "롱" if position["side"] == "LONG" else "숏"
+    direction = 1 if side == "롱" else -1
+    entry = float(position["entry"])
+    target = float(position["target"])
+    delta = direction * (target / entry - 1) * 100
+    return (
+        f"[LBank BTCUSDT | 신고 {side} 포지션 1차 목표 도달]\\n"
+        f"한국시간: {time_kst}\\n"
+        f"현재 1차 목표 {target:,.1f} USDT ({delta:+.2f}%) 도달\\n"
+        f"현재 관측가격: {price:,.1f} USDT\\n"
+        f"실제 보유 중이라면 50% 익절 후 "
+        f"잔여 손절가는 진입가 {entry:,.1f} USDT로 조정 요함.\\n"
+        "※ LBank에서 실제 청산·손절 주문을 직접 실행하고 체결을 확인하세요.\\n"
+        "※ 거래소 체결·실제 보유는 확인되지 않았습니다. 이미 청산했다면 무시하세요.\\n"
+        "※ 손절을 진입가로 옮겨도 수수료·슬리피지로 순손실이 발생할 수 있습니다.\\n"
+        "※ 1분 가격표본은 구간내 순간 목표 터치를 놓칠 수 있습니다."
+    ).replace("\\\\n", "\\n")
 
 
 class TelegramBot:
