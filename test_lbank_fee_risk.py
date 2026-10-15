@@ -3,7 +3,7 @@
 Run: python -m unittest test_lbank_fee_risk.py
 """
 import unittest
-from lbank_signal_risk import SignalRiskTracker, format_risk_alert
+from lbank_signal_risk import SignalRiskTracker, format_risk_alert, format_target_alert
 
 
 from lbank_futures_monitor import (
@@ -249,11 +249,53 @@ class SignalFollowupRiskTests(unittest.TestCase):
         self.assertEqual(tracker.check([81180], 7300), [])
         self.assertEqual(len(tracker.signals), 0)
 
-    def test_first_reference_target_silently_ends_followup(self):
+    def test_reference_target1_generates_one_notice_after_delivery(self):
         tracker = SignalRiskTracker()
-        tracker.add_sent_signal(self._plan(), 0)
-        self.assertEqual(tracker.check([80400.], 60), [])
+        sig = tracker.add_sent_signal(self._plan(), 0)
+        events = tracker.check([80400.], 60)
+        self.assertEqual(len(events), 1)
+        self.assertIs(events[0][0], sig)
+        self.assertEqual(events[0][1], "target1_reached")
+        notice = format_target_alert(sig, 80400., "2026-10-15 22:00")
+        self.assertIn("현재 1차 목표 80,450.0 USDT", notice)
+        self.assertIn("50% 익절", notice)
+        self.assertIn("손절가는 진입가", notice)
+        self.assertIn("미진입", notice)
+        self.assertIn("수수료", notice)
+        # A failed Telegram send must NOT mark the event as delivered.
+        self.assertEqual(tracker.check([80390.], 75)[0][1], "target1_reached")
+        tracker.acknowledge(sig)
+        self.assertEqual(tracker.check([80390.], 90), [])
         self.assertEqual(len(tracker.signals), 0)
+
+    def test_reference_long_tp_and_stop_messages_both_preserved(self):
+        tracker = SignalRiskTracker()
+        sig = tracker.add_sent_signal(self._plan(1), 0)
+        result = tracker.check([81550.], 60)
+        self.assertEqual(result[0][1], "target1_reached")
+        self.assertIn("롱", format_target_alert(sig, 81550., "2026-10-15 22:00"))
+        tracker.acknowledge(sig)
+        short = tracker.add_sent_signal(self._plan(), 100)
+        result = tracker.check([81251.], 130)
+        self.assertEqual(result[0][1], "stop_breached")
+        self.assertIn("긴급 위험 경고", format_risk_alert(short, "stop_breached",
+                                                     81251., "2026-10-15 22:00"))
+
+    def test_reference_target1_persists_restart_and_delivered_once(self):
+        import os
+        import tempfile
+        with tempfile.TemporaryDirectory() as td:
+            path = os.path.join(td, "followup.json")
+            tracker = SignalRiskTracker(path=path)
+            tracker.add_sent_signal(self._plan(), 0)
+            resumed = SignalRiskTracker(path=path)
+            self.assertEqual(len(resumed.signals), 1)
+            reached = resumed.check([80420.], 60)
+            self.assertEqual(reached[0][1], "target1_reached")
+            resumed.acknowledge(reached[0][0])
+            restarted_again = SignalRiskTracker(path=path)
+            self.assertEqual(restarted_again.check([80390.], 90), [])
+
 
 
 class StructureReactionTests(unittest.TestCase):
