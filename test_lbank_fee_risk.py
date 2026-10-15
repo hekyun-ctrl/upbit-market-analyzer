@@ -131,7 +131,7 @@ class FiveMinuteRsiGateTests(unittest.TestCase):
         for direction, previous, current in (
                 (1, 22., 23.), (1, 72., 74.),
                 (-1, 78., 77.), (-1, 29., 28.)):
-            with self.subTest(direction=direction, previous=previous), \\
+            with self.subTest(direction=direction, previous=previous), \
                  patch("lbank_futures_monitor.sampled_five_minute_rsi",
                        return_value={"closes": [83000.] * 20,
                                      "rsi": [previous, current]}):
@@ -144,7 +144,7 @@ class FiveMinuteRsiGateTests(unittest.TestCase):
         from unittest.mock import patch
         for direction, previous, current in (
                 (1, 50., 50.), (1, 50., 49.), (-1, 50., 50.), (-1, 50., 51.)):
-            with self.subTest(direction=direction, previous=previous), \\
+            with self.subTest(direction=direction, previous=previous), \
                  patch("lbank_futures_monitor.sampled_five_minute_rsi",
                        return_value={"closes": [83000.] * 20,
                                      "rsi": [previous, current]}):
