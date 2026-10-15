@@ -3,7 +3,14 @@
 These are hypothetical signals, not confirmed positions or exchange orders.
 No private credentials, orders, or authenticated position tracking.
 """
-from dataclasses import dataclass
+import json
+import logging
+import math
+import os
+from dataclasses import dataclass, asdict
+
+LOG = logging.getLogger("lbank_signal_risk")
+
 
 SIGNAL_TTL_SECONDS = 7200
 EARLY_RISK_FRACTION = 0.55
@@ -23,9 +30,58 @@ class TrackedSignal:
 
 
 class SignalRiskTracker:
-    def __init__(self):
+    def __init__(self, path=None):
+        # Optional persistent record for a Railway mounted volume.
+        # No path = lightweight in-memory tracker in existing unit tests.
+        self.path = path
         self.signals = []
         self.next_number = 1
+        self._restore()
+
+    def _restore(self):
+        if not self.path:
+            return
+        try:
+            with open(self.path, encoding="utf-8") as f:
+                raw = json.load(f)
+            if not isinstance(raw, dict) or raw.get("schema") != 1:
+                return
+            restored = []
+            for item in raw.get("signals", [])[-3:]:
+                signal = TrackedSignal(**item)
+                if (signal.direction not in (-1, 1) or
+                    not all(math.isfinite(float(x)) for x in
+                            (signal.entry, signal.stop, signal.target1, signal.sent_at)) or
+                    signal.entry <= 0 or signal.stop <= 0 or signal.target1 <= 0 or
+                    signal.direction * (signal.entry - signal.stop) <= 0 or
+                    signal.direction * (signal.target1 - signal.entry) <= 0):
+                    raise ValueError("invalid tracked reference")
+                restored.append(signal)
+            self.signals = restored
+            self.next_number = max(int(raw.get("next_number", 1)),
+                                   max((sig.number for sig in restored), default=0) + 1)
+        except FileNotFoundError:
+            pass
+        except (OSError, ValueError, TypeError, KeyError, OverflowError):
+            LOG.warning("Saved signal references invalid; using empty tracker")
+
+    def _save(self):
+        if not self.path:
+            return
+        try:
+            directory = os.path.dirname(self.path)
+            if directory:
+                os.makedirs(directory, exist_ok=True)
+            tmp = self.path + ".tmp"
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump({"schema": 1, "next_number": self.next_number,
+                           "signals": [asdict(sig) for sig in self.signals]}, f)
+                f.flush()
+                os.fsync(f.fileno())
+            os.chmod(tmp, 0o600)
+            os.replace(tmp, self.path)
+        except (OSError, ValueError, TypeError):
+            LOG.warning("Could not persist signal followup tracker")
 
     def add_sent_signal(self, plan, now):
         direction = int(plan["direction"])
@@ -40,6 +96,7 @@ class SignalRiskTracker:
         self.next_number += 1
         self.signals.append(signal)
         self.signals = self.signals[-3:]
+        self._save()
         return signal
 
     def check(self, prices, now):
@@ -53,11 +110,16 @@ class SignalRiskTracker:
         current = prices[-1]
         events = []
         survivors = []
+        before = [(s.number, s.bad_samples) for s in self.signals]
         for item in self.signals:
             if now - item.sent_at >= SIGNAL_TTL_SECONDS:
                 continue
-            # A reference TP may have been reached; stop reporting as if open.
+            # Notify exactly once when the sampled quote reaches the first
+            # reference target; do not mistake this for an actual fill.
+            # Retain until successful Telegram delivery is acknowledged.
             if item.direction * (current - item.target1) >= 0:
+                events.append((item, "target1_reached", current))
+                survivors.append(item)
                 continue
             if item.direction * (current - item.stop) <= 0:
                 events.append((item, "stop_breached", current))
@@ -76,11 +138,34 @@ class SignalRiskTracker:
                 events.append((item, "early_invalidation", current))
             survivors.append(item)
         self.signals = survivors
+        if before != [(s.number, s.bad_samples) for s in self.signals]:
+            self._save()
         return events
 
     def acknowledge(self, signal):
         # One event per reference signal to avoid repeated emergency messages.
         self.signals = [s for s in self.signals if s is not signal]
+        self._save()
+
+
+def format_target_alert(signal, price, time_kst):
+    """One-time reference target notification, NOT a trade execution claim."""
+    side = "롱" if signal.direction == 1 else "숏"
+    move_pct = signal.direction * (signal.target1 / signal.entry - 1) * 100
+    return (
+        f"[LBank BTCUSDT | 1차 목표 도달 - {side}]\n"
+        f"한국시간: {time_kst}\n"
+        f"현재 1차 목표 {signal.target1:,.1f} USDT ({move_pct:+.2f}%) 도달\n"
+        f"현재 선물 가격표본: {price:,.1f} USDT\n"
+        f"알람 기준 진입 참고가: {signal.entry:,.1f} USDT\n"
+        f"실제 포지션 보유 중이라면 50% 익절 후 "
+        f"남은 포지션 손절가는 진입가 {signal.entry:,.1f} USDT로 조정 검토 요함.\n"
+        "※ LBank에서 실제 익절 체결 후 잔여 수량과 손절 주문을 직접 확인하세요.\n"
+        "※ 진입가 손절은 수수료·슬리피지 차감 후 완전한 손익분기점이 아닙니다.\n"
+        "※ 미진입·기청산 상태라면 관찰 참고용 알림입니다. "
+        "봇은 실제 보유·체결을 확인하거나 거래소 주문을 실행하지 않습니다.\n"
+        "※ 1분 가격표본 기준으로 확인한 목표 도달이며, 표본 사이 순간 터치는 놓칠 수 있습니다."
+    )
 
 
 def format_risk_alert(signal, reason, price, time_kst):
