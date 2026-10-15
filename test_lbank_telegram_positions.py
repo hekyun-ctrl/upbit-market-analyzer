@@ -108,6 +108,55 @@ class PositionLedgerTests(unittest.TestCase):
         self.assertEqual(self.ledger.position["quantity"], "0.0201")
         self.assertIsNone(self.ledger.target_reached([80190.]))
 
+    def test_user_registered_second_target_after_first_and_partial(self):
+        self.ledger.open("long", "81213.6", ".0400", "80992.3", "81834.0")
+        self.assertEqual(self.ledger.target_reached([81840.]), 81840.)
+        self.assertIn("1차 목표", mod.format_position_target_alert(
+            self.ledger.position, 81840., "23:49"))
+        self.ledger.acknowledge_target()
+        # Only user-reported actions. No exchange order is executed.
+        self.ledger.partial(".0200")
+        self.ledger.move_stop("81213.6")
+        self.ledger.change_target("82177.2")
+        self.assertEqual(self.ledger.position["target_stage"], 2)
+        self.assertEqual(self.ledger.position["quantity"], ".0200")
+        self.assertIsNone(self.ledger.target_reached([82000.]))
+        self.assertEqual(self.ledger.target_reached([82254.6]), 82254.6)
+        note = mod.format_position_target_alert(
+            self.ledger.position, 82254.6, "2026-10-16 00:05")
+        self.assertIn("2차 목표 82,177.2 USDT", note)
+        self.assertIn("남은 50%", note)
+        self.assertNotIn("50% 익절 후", note)
+        # A dropped Telegram send must not erase the reached-price event.
+        restarted = mod.PositionState(self.path)
+        self.assertEqual(restarted.position["target_stage"], 2)
+        self.assertEqual(restarted.target_reached([82000.]), 82254.6)
+        restarted.acknowledge_target()
+        self.assertIsNone(mod.PositionState(self.path).target_reached([82300.]))
+
+    def test_short_second_target_beyond_original_first(self):
+        self.ledger.open("short", "80757.8", ".0401", "80897.3", "80262.0")
+        self.ledger.target_reached([80250.])
+        self.ledger.acknowledge_target()
+        self.ledger.change_target("80001.5")
+        self.assertEqual(self.ledger.position["target_stage"], 2)
+        second_price = self.ledger.target_reached([79990.])
+        self.assertEqual(second_price, 79990.)
+        self.assertIn("숏 포지션 2차 목표", mod.format_position_target_alert(
+            self.ledger.position, second_price, "00:00"))
+
+    def test_adjusted_target_before_tp1_is_not_mislabeled_tp2(self):
+        self.ledger.open("long", "81213.6", ".0400", "80992.3", "81834")
+        self.ledger.change_target("81850")
+        self.assertEqual(self.ledger.position["target_stage"], 1)
+        self.assertIn("1차 목표", mod.format_position_target_alert(
+            self.ledger.position, 81860., "23:55"))
+        # Updating the same target after acknowledgement must not re-arm it.
+        self.ledger.target_reached([81860.])
+        self.ledger.acknowledge_target()
+        self.ledger.change_target("81850")
+        self.assertIsNone(self.ledger.target_reached([81900.]))
+
     def test_confirmed_button_half_close_and_stale_buttons(self):
         self.ledger.open("long", "82712.9", ".0783", "83100", "83700")
         output=[]
