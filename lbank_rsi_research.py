@@ -191,7 +191,7 @@ class NeutralExitStudy:
     def observe(self, bucket, closes, rsi_values):
         """Return only structured logs. Never create trade or Telegram alerts."""
         if (len(closes) < 4 or len(rsi_values) < 4 or
-            len(closes) != len(rsi_values) or
+            # RSI(14) starts after its price lookback; only tails align.
             not all(math.isfinite(float(x)) for x in
                     (closes[-1], closes[-2], rsi_values[-1], rsi_values[-2])) or
             min(closes[-1], closes[-2]) <= 0 or
