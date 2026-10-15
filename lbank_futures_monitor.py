@@ -295,6 +295,28 @@ def minimum_net_rr_target(direction, entry, unit_loss, ratio):
     return entry + direction * high
 
 
+
+def trend_retest_momentum_gate(prices, direction):
+    """Reject a flat/weak local retest in *both* directional horizons.
+
+    Only strategy='trend_retest' uses this gate, at both initial watch and
+    second-stage confirmation. Thresholds are on SAMPLE-PRICE momentum,
+    NOT RSI values, true 5m candles or exchange volume. Both horizons must
+    be weak to reject; a strong 5m impulse OR 15m follow-through permits
+    standard structural/cost/risk checks to continue.
+    """
+    if direction not in (-1, 1) or len(prices) < 16 or prices[-1] <= 0:
+        return False, "invalid_retest_momentum_data", 0., 0.
+    curr = float(prices[-1])
+    if min(prices[-6], prices[-16]) <= 0:
+        return False, "invalid_retest_momentum_data", 0., 0.
+    momentum5 = direction * (curr / prices[-6] - 1) * 100
+    momentum15 = direction * (curr / prices[-16] - 1) * 100
+    if momentum5 < .10 and momentum15 < .08:
+        return False, "weak_retest_momentum_both_horizons", momentum5, momentum15
+    return True, "retest_momentum_confirmed", momentum5, momentum15
+
+
 def calculate_plan(prices, direction, setup=None):
     """Cost-aware hypothetical levels with optional structure-anchored stop."""
     setup = setup or {"strategy": "breakout"}
@@ -352,6 +374,11 @@ def calculate_plan(prices, direction, setup=None):
     net_gain2 = qty * net_pnl_per_btc(direction, curr, t2, exit_kind="take_profit")
     if net_loss <= 0 or net_gain1 / net_loss < MIN_NET_RR - 1e-7:
         return None
+    # Alert risk fields always use the same reference balance, fee model and
+    # position size that generated the displayed fee-inclusive loss.
+    observed_abs_moves = sorted(abs(prices[i] / prices[i-1] - 1) * 100
+                                for i in range(max(1, len(prices) - 59), len(prices)))
+    one_min_p90 = observed_abs_moves[int(.90 * (len(observed_abs_moves) - 1))]
     return {
         "direction": direction, "side": "롱" if direction == 1 else "숏",
         "strategy": strategy, "level": setup.get("level"),
@@ -360,6 +387,9 @@ def calculate_plan(prices, direction, setup=None):
         "price": curr, "rsi": strength, "m5": momentum5, "m15": momentum15,
         "stop": stop, "target1": t1, "target2": t2,
         "margin": qty * effective_entry / LEVERAGE, "notional": qty * curr,
+        "quantity_btc": qty, "reference_risk_budget": permitted_loss,
+        "stop_distance_pct": stop_distance * 100,
+        "sampled_1m_abs_move_p90_pct": one_min_p90,
         "net_loss": net_loss, "net_gain1": net_gain1, "net_gain2": net_gain2,
         "rr1": net_gain1 / net_loss, "rr2": net_gain2 / net_loss,
         "fee_roundtrip_est": qty * (effective_entry * TAKER_FEE + t1 * TAKER_FEE),
@@ -391,6 +421,14 @@ def classify(prices, observations=None):
     LOG.info("PREWATCH candidate strategy=%s direction=%s price=%.1f rsi1=%.1f",
              (setup or {}).get("strategy", "breakout"),
              "LONG" if direction == 1 else "SHORT", curr, strength)
+    if setup is not None and setup.get("strategy") == "trend_retest":
+        momentum_ok, momentum_reason, directional5, directional15 = (
+            trend_retest_momentum_gate(prices, direction))
+        if not momentum_ok:
+            LOG.info("RETEST MOMENTUM WATCH BLOCKED side=%s reason=%s directed5m=%.3f%% directed15m=%.3f%%",
+                     "LONG" if direction == 1 else "SHORT",
+                     momentum_reason, directional5, directional15)
+            return None
     context = None
     if observations is not None:
         context_ok, context_reason, context = sampled_context_gate(
@@ -448,6 +486,14 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
         valid = confirm_structure(prices, watch, ema, rsi)
     if not valid:
         return None
+    if watch.get("strategy") == "trend_retest":
+        momentum_ok, momentum_reason, directional5, directional15 = (
+            trend_retest_momentum_gate(prices, direction))
+        if not momentum_ok:
+            LOG.info("RETEST MOMENTUM CONFIRM BLOCKED side=%s reason=%s directed5m=%.3f%% directed15m=%.3f%%",
+                     "LONG" if direction == 1 else "SHORT",
+                     momentum_reason, directional5, directional15)
+            return None
     context = None
     if observations is not None:
         context_ok, context_reason, context = sampled_context_gate(
@@ -504,6 +550,9 @@ def format_entry_alert(plan, observed_at_utc):
         f"목표1 필요가격(순손익비 {plan['rr1']:.2f}): {plan['target1']:,.1f}\n"
         f"목표2 필요가격(순손익비 {plan['rr2']:.2f}): {plan['target2']:,.1f}\n"
         f"증거금 한도 예시: {plan['margin']:.2f} USDT / 명목금액: {plan['notional']:.2f} USDT\n"
+        f"위험모델 기준 참고 최대 진입수량: {plan.get('quantity_btc', plan['notional'] / plan['price']):.5f} BTC\n"
+        f"손절폭: {plan.get('stop_distance_pct', abs(plan['price'] - plan['stop']) / plan['price'] * 100):.3f}%"
+        f" / 최근 1분 가격표본 절대변화 90백분위: {plan.get('sampled_1m_abs_move_p90_pct', 0.):.3f}%\n"
         f"손절 예상 순손실: -{plan['net_loss']:.2f} USDT\n"
         f"목표1 예상 순이익: +{plan['net_gain1']:.2f} USDT\n"
         f"목표2 예상 순이익: +{plan['net_gain2']:.2f} USDT\n"
@@ -517,6 +566,9 @@ def format_entry_alert(plan, observed_at_utc):
         f"{context_text}"
         "※ 3단계 반전은 가격표본의 마감값 비교이며 실제 캔들 3틱룰과 다름\n"
         "※ RSI는 30/70 극단값이나 이력으로 진입을 제한하지 않으며 롱 상승·숏 하락 방향만 확인\n"
+        "※ 추세 눌림 진입은 5분·15분 가격 동력이 동시에 약하면 보류(완료 5분 RSI의 방향 확인과 별개)\n"
+        "※ 실제 BTC 주문수량이 위 참고수량을 넘으면 이 알람의 0.5% 위험 한도 계산이 유지되지 않습니다.\n"
+        "※ 실제 잔고·진입 체결가·수수료를 확인해 BTC 수량과 손절 주문을 직접 재계산하세요.\n"
         "※ 기존 손절·추격금지·가격구조·비용·거시경제 주의 조건은 유지\n"
         "손익 계산: 진입/조건부 익절/손절 모두 Taker 0.06% 보수적 가정\n"
         "손절 슬리피지 0.02% 가정/펀딩 불리할 때 0.01% 완충(실제 비용 다를 수 있음)\n"
