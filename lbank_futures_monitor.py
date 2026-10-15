@@ -312,7 +312,8 @@ def trend_retest_momentum_gate(prices, direction):
         return False, "invalid_retest_momentum_data", 0., 0.
     momentum5 = direction * (curr / prices[-6] - 1) * 100
     momentum15 = direction * (curr / prices[-16] - 1) * 100
-    if momentum5 < .10 and momentum15 < .08:
+    # Tiny floating-point rounding at exactly 0.10%/0.08% is not a veto.
+    if momentum5 < .10 - 1e-10 and momentum15 < .08 - 1e-10:
         return False, "weak_retest_momentum_both_horizons", momentum5, momentum15
     return True, "retest_momentum_confirmed", momentum5, momentum15
 
