@@ -31,6 +31,8 @@ class TrackedSignal:
     target1_hit: bool = False
     target1_notified: bool = False
     target2_hit: bool = False
+    target1_hit_price: float | None = None
+    target2_hit_price: float | None = None
 
 
 class SignalRiskTracker:
@@ -131,9 +133,15 @@ class SignalRiskTracker:
             if now - item.sent_at >= SIGNAL_TTL_SECONDS:
                 continue
             if item.target2 is not None and item.direction * (current - item.target2) >= 0:
+                if not item.target2_hit:
+                    item.target2_hit_price = current
+                if not item.target1_hit:
+                    item.target1_hit_price = current
                 item.target2_hit = True
                 item.target1_hit = True
             elif item.direction * (current - item.target1) >= 0:
+                if not item.target1_hit:
+                    item.target1_hit_price = current
                 item.target1_hit = True
 
             # Urgent stop warning takes precedence over queued target notices.
@@ -142,11 +150,13 @@ class SignalRiskTracker:
                 survivors.append(item)
                 continue
             if not item.target1_notified and item.target1_hit:
-                events.append((item, "target1_reached", current))
+                events.append((item, "target1_reached",
+                               item.target1_hit_price or current))
                 survivors.append(item)
                 continue
             if item.target1_notified and item.target2 is not None and item.target2_hit:
-                events.append((item, "target2_reached", current))
+                events.append((item, "target2_reached",
+                               item.target2_hit_price or current))
                 survivors.append(item)
                 continue
 
@@ -187,7 +197,7 @@ def format_target_alert(signal, price, time_kst):
         f"[LBank BTCUSDT | 1차 목표 도달 - {side}]\n"
         f"한국시간: {time_kst}\n"
         f"현재 1차 목표 {signal.target1:,.1f} USDT ({move_pct:+.2f}%) 도달\n"
-        f"현재 선물 가격표본: {price:,.1f} USDT\n"
+        f"목표 접촉 시 선물 가격표본: {price:,.1f} USDT\n"
         f"알람 기준 진입 참고가: {signal.entry:,.1f} USDT\n"
         f"실제 포지션 보유 중이라면 50% 익절 후 "
         f"남은 포지션 손절가는 진입가 {signal.entry:,.1f} USDT로 조정 검토 요함.\n"
@@ -210,7 +220,7 @@ def format_target2_alert(signal, price, time_kst):
         f"[LBank BTCUSDT | 2차 목표 도달 - {side}]\n"
         f"한국시간: {time_kst}\n"
         f"현재 2차 목표 {signal.target2:,.1f} USDT ({move_pct:+.2f}%) 도달\n"
-        f"현재 선물 가격표본: {price:,.1f} USDT\n"
+        f"목표 접촉 시 선물 가격표본: {price:,.1f} USDT\n"
         f"알람 기준 진입 참고가: {signal.entry:,.1f} USDT\n"
         "실제 보유 중이라면 1차 익절 후 남은 50% 익절을 검토하세요.\n"
         "※ 실제 체결과 잔여 수량은 LBank 거래소에서 직접 확인해야 합니다.\n"
