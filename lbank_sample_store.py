@@ -11,7 +11,7 @@ import os
 import time
 
 LOG = logging.getLogger("lbank_sample_store")
-DEFAULT_ALERT = {"day": None, "count": 0, "last_time": None, "last_side": None}
+DEFAULT_ALERT = {"day": None, "count": 0, "last_time": None, "last_side": None, "last_reversal_preview": None}
 
 
 def load_snapshots(path, symbol, poll, now=None):
@@ -41,6 +41,11 @@ def load_snapshots(path, symbol, poll, now=None):
                 alert["last_time"] = last
             if side in (None, "롱", "숏"):
                 alert["last_side"] = side
+            preview = gate.get("last_reversal_preview")
+            if preview is None or (type(preview) in (int, float) and
+                                   math.isfinite(preview) and
+                                   0 <= preview <= current + 30):
+                alert["last_reversal_preview"] = preview
 
         raw = data.get("samples", [])
         if not isinstance(raw, list):
