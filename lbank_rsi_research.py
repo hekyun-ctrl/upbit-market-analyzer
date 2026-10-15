@@ -3,7 +3,13 @@
 LBank perpetual minute snapshots are not genuine exchange OHLCV or order flow.
 These features NEVER place orders or independently authorize entry/exit.
 """
-from dataclasses import dataclass
+import json
+import logging
+import math
+import os
+from dataclasses import dataclass, asdict
+
+LOG = logging.getLogger("lbank_neutral_shadow")
 
 
 def reversal_hypotheses(closes, values):
@@ -104,3 +110,151 @@ class ResearchTracker:
             results.append({"event":"candidate", "bucket":bucket, "side":side,
                             "zone":x["zone"],"price":close,"rsi":rsi_values[-1]})
         return verdict, results
+
+
+@dataclass
+class NeutralExitCandidate:
+    bucket: int
+    side: int
+    variant: str
+    reference_price: float
+    reference_rsi: float
+    ambiguous: bool
+
+
+class NeutralExitStudy:
+    """Prospective, non-executable study of neutral-stall exits.
+
+    Tests the existing warning separately from a STRICTER DIRECTIONAL
+    confirmation. Collects 15/30/60m *closed-sample* moves, never suggests
+    filling a trade or actually liquidates a position.
+    """
+    SCHEMA = 1
+    HORIZONS = (3, 6, 12)
+    COOLDOWN_BUCKETS = 6
+
+    def __init__(self, path=None):
+        self.path = path
+        self.pending = []
+        self.last_emitted = {}
+        self.last_bucket = None
+        self._restore()
+
+    def _restore(self):
+        if not self.path:
+            return
+        try:
+            with open(self.path, encoding="utf-8") as f:
+                state = json.load(f)
+            if state.get("schema") != self.SCHEMA:
+                return
+            pending = []
+            for item in state.get("pending", [])[-100:]:
+                candidate = NeutralExitCandidate(**item)
+                if (candidate.side not in (1, -1) or
+                    candidate.variant not in ("neutral", "direction_confirm") or
+                    not math.isfinite(candidate.reference_price) or
+                    candidate.reference_price <= 0 or
+                    not math.isfinite(candidate.reference_rsi)):
+                    raise ValueError("invalid neutral study entry")
+                pending.append(candidate)
+            self.pending = pending
+            self.last_emitted = {str(k): int(v)
+                                 for k, v in state.get("last_emitted", {}).items()}
+            seen = state.get("last_bucket")
+            self.last_bucket = None if seen is None else int(seen)
+        except FileNotFoundError:
+            pass
+        except (OSError, ValueError, TypeError, KeyError, OverflowError, AttributeError):
+            LOG.warning("Neutral study cache invalid; starting new research window")
+
+    def _save(self):
+        if not self.path:
+            return
+        try:
+            directory = os.path.dirname(self.path)
+            if directory:
+                os.makedirs(directory, exist_ok=True)
+            tmp = self.path + ".tmp"
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump({"schema": self.SCHEMA, "last_bucket": self.last_bucket,
+                           "last_emitted": self.last_emitted,
+                           "pending": [asdict(c) for c in self.pending]},
+                          f, ensure_ascii=False)
+                f.flush()
+                os.fsync(f.fileno())
+            os.chmod(tmp, 0o600)
+            os.replace(tmp, self.path)
+        except (OSError, ValueError, TypeError):
+            LOG.warning("Could not persist neutral exit research; no trading effect")
+
+    def observe(self, bucket, closes, rsi_values):
+        """Return only structured logs. Never create trade or Telegram alerts."""
+        if (len(closes) < 4 or len(rsi_values) < 4 or
+            len(closes) != len(rsi_values) or
+            not all(math.isfinite(float(x)) for x in
+                    (closes[-1], closes[-2], rsi_values[-1], rsi_values[-2])) or
+            min(closes[-1], closes[-2]) <= 0 or
+            (self.last_bucket is not None and bucket <= self.last_bucket)):
+            return []
+        events = []
+        live = []
+        price = float(closes[-1])
+        for item in self.pending:
+            age = bucket - item.bucket
+            if age in self.HORIZONS:
+                # A positive signed move favors holding the given side.
+                # Negative: exiting at signal price beats waiting to this
+                # horizon, ignoring fees and hypothetical order execution.
+                signed = item.side * (price / item.reference_price - 1) * 100
+                events.append({"event":"horizon", "variant":item.variant,
+                               "side":item.side, "start_bucket":item.bucket,
+                               "end_bucket":bucket,"minutes":age*5,
+                               "signed_hold_move_pct":round(signed,4),
+                               "exit_now_advantage_gross_pct":round(-signed,4),
+                               "reference_price":item.reference_price,
+                               "end_price":price,
+                               "ambiguous":item.ambiguous,
+                               "source":"sampled_ticker_not_ohlcv",
+                               "fills":"unverified"})
+            if 0 <= age < max(self.HORIZONS):
+                live.append(item)
+        self.pending = live
+        long_neutral = neutral_stall(closes, rsi_values, 1)
+        short_neutral = neutral_stall(closes, rsi_values, -1)
+        direction_ambiguous = long_neutral and short_neutral
+        for side in (1, -1):
+            now_neutral = long_neutral if side == 1 else short_neutral
+            previous_neutral = neutral_stall(closes[:-1], rsi_values[:-1], side)
+            adverse_5m_pct = side * (price / closes[-2] - 1) * 100
+            adverse_rsi_pts = side * (rsi_values[-1] - rsi_values[-2])
+            # Both gates were predeclared on exploratory logs; independent
+            # prospective 7/30-day validation is required before promotion.
+            directional_confirmation = (
+                previous_neutral and adverse_5m_pct <= -.025 and
+                adverse_rsi_pts <= -1.0
+            )
+            for variant, eligible in (("neutral",now_neutral),
+                                       ("direction_confirm",directional_confirmation)):
+                if not eligible:
+                    continue
+                key = f"{variant}:{side}"
+                prior = self.last_emitted.get(key, -999999999)
+                if bucket - prior < self.COOLDOWN_BUCKETS:
+                    continue
+                self.last_emitted[key] = bucket
+                candidate = NeutralExitCandidate(bucket, side, variant,
+                                                 price, float(rsi_values[-1]),
+                                                 direction_ambiguous)
+                self.pending.append(candidate)
+                events.append({"event":"candidate", "variant":variant,
+                               "side":side, "bucket":bucket,
+                               "price":price, "rsi":round(rsi_values[-1], 3),
+                               "ambiguous":direction_ambiguous,
+                               "adverse_5m_pct":round(adverse_5m_pct,4),
+                               "adverse_rsi_pts":round(adverse_rsi_pts,3),
+                               "source":"sampled_ticker_not_ohlcv",
+                               "fills":"unverified"})
+        self.last_bucket = bucket
+        self._save()
+        return events
