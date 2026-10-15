@@ -119,7 +119,7 @@ class PositionLedgerTests(unittest.TestCase):
         self.ledger.move_stop("81213.6")
         self.ledger.change_target("82177.2")
         self.assertEqual(self.ledger.position["target_stage"], 2)
-        self.assertEqual(self.ledger.position["quantity"], ".0200")
+        self.assertEqual(self.ledger.position["quantity"], "0.0200")
         self.assertIsNone(self.ledger.target_reached([82000.]))
         self.assertEqual(self.ledger.target_reached([82254.6]), 82254.6)
         note = mod.format_position_target_alert(
