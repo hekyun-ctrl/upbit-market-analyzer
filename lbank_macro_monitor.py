@@ -22,7 +22,7 @@ from zoneinfo import ZoneInfo
 LOG = logging.getLogger("lbank_macro")
 UTC = timezone.utc
 KST = ZoneInfo("Asia/Seoul")
-ET = ZoneInfo("America/New_York")
+EASTERN = ZoneInfo("America/New_York")
 FEEDS = {
     "BLS CPI": "https://www.bls.gov/feed/cpi.rss",
     "BLS PPI": "https://www.bls.gov/feed/ppi.rss",
@@ -144,7 +144,7 @@ def parse_bls_ical(payload):
             if val.endswith("Z"):
                 stamp = datetime.strptime(val, "%Y%m%dT%H%M%SZ").replace(tzinfo=UTC)
             else:
-                stamp = datetime.strptime(val[:15], "%Y%m%dT%H%M%S").replace(tzinfo=ZoneInfo("America/New_York"))
+                stamp = datetime.strptime(val[:15], "%Y%m%dT%H%M%S").replace(tzinfo=EASTERN)
             result.append({"title": title, "at": stamp.timestamp(),
                            "source": "BLS", "url": BLS_ICS})
         except (ValueError, TypeError):
