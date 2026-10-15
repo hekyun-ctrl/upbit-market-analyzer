@@ -3,7 +3,7 @@
 Run: python -m unittest test_lbank_fee_risk.py
 """
 import unittest
-from lbank_signal_risk import SignalRiskTracker, format_risk_alert, format_target_alert
+from lbank_signal_risk import SignalRiskTracker, format_risk_alert, format_target_alert, format_target2_alert
 
 
 from lbank_futures_monitor import (
@@ -373,6 +373,114 @@ class SignalFollowupRiskTests(unittest.TestCase):
             restarted_again = SignalRiskTracker(path=path)
             self.assertEqual(restarted_again.check([80390.], 90), [])
 
+
+
+class SecondTargetFollowupTests(unittest.TestCase):
+    @staticmethod
+    def plan(direction):
+        return {
+            "direction": direction, "price": 81000.,
+            "stop": 80750. if direction == 1 else 81250.,
+            "target1": 81550. if direction == 1 else 80450.,
+            "target2": 81850. if direction == 1 else 80150.,
+        }
+
+    def test_long_first_and_second_target_notified_separately_once(self):
+        tracker = SignalRiskTracker()
+        sig = tracker.add_sent_signal(self.plan(1), 0)
+        self.assertEqual(tracker.check([81400.], 40), [])
+        first = tracker.check([81560.], 60)
+        self.assertEqual(first[0][1], "target1_reached")
+        self.assertIn("1차 목표", format_target_alert(sig, first[0][2], "KST"))
+        self.assertEqual(tracker.check([81570.], 70)[0][1], "target1_reached")
+        tracker.acknowledge(sig, reason="target1_reached")
+        self.assertEqual(len(tracker.signals), 1)
+        self.assertEqual(tracker.check([81570.], 80), [])
+        self.assertEqual(tracker.check([81620.], 100), [])
+        second = tracker.check([81850.], 120)
+        self.assertEqual(second[0][1], "target2_reached")
+        text = format_target2_alert(sig, second[0][2], "2026-10-16 00:05")
+        self.assertIn("2차 목표 81,850.0", text)
+        self.assertIn("남은 50%", text)
+        self.assertIn("미진입", text)
+        self.assertEqual(tracker.check([81700.], 130)[0][1], "target2_reached")
+        tracker.acknowledge(sig, reason="target2_reached")
+        self.assertEqual(tracker.check([81900.], 140), [])
+        self.assertEqual(len(tracker.signals), 0)
+
+    def test_short_both_targets_and_completed_first_after_second_gap(self):
+        tracker = SignalRiskTracker()
+        sig = tracker.add_sent_signal(self.plan(-1), 0)
+        # A one-minute snapshot jumps straight past TP2; do not lose TP2.
+        event = tracker.check([80080.], 60)
+        self.assertEqual(event[0][1], "target1_reached")
+        tracker.acknowledge(sig, "target1_reached")
+        # Price rebounds before next polling cycle; preserve hit state.
+        event = tracker.check([80500.], 70)
+        self.assertEqual(event[0][1], "target2_reached")
+        self.assertIn("숏", format_target2_alert(sig, 80500., "KST"))
+        tracker.acknowledge(sig, "target2_reached")
+        self.assertEqual(tracker.check([79900.], 90), [])
+
+    def test_reboot_preserves_second_target_and_delivery_acknowledgment(self):
+        import tempfile
+        import os
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "tracker.json")
+            tracker = SignalRiskTracker(path=path)
+            sig = tracker.add_sent_signal(self.plan(1), 0)
+            self.assertEqual(tracker.check([81560.], 60)[0][1],
+                             "target1_reached")
+            tracker.acknowledge(sig, "target1_reached")
+            resumed = SignalRiskTracker(path=path)
+            self.assertEqual(len(resumed.signals), 1)
+            self.assertTrue(resumed.signals[0].target1_notified)
+            self.assertEqual(resumed.check([81860.], 80)[0][1],
+                             "target2_reached")
+            # Simulate failed Telegram transmission then restart and retried send
+            after_failure = SignalRiskTracker(path=path)
+            self.assertEqual(after_failure.check([81500.], 90)[0][1],
+                             "target2_reached")
+            after_failure.acknowledge(after_failure.signals[0], "target2_reached")
+            final = SignalRiskTracker(path=path)
+            self.assertEqual(final.check([81900.], 100), [])
+            self.assertEqual(len(final.signals), 0)
+
+    def test_urgent_stop_remains_priority_after_tp1(self):
+        tracker = SignalRiskTracker()
+        sig = tracker.add_sent_signal(self.plan(1), 0)
+        tracker.check([81560.], 60)
+        tracker.acknowledge(sig, "target1_reached")
+        event = tracker.check([80740.], 70)
+        self.assertEqual(event[0][1], "stop_breached")
+        tracker.acknowledge(sig, "stop_breached")
+        self.assertEqual(len(tracker.signals), 0)
+
+    def test_legacy_first_target_without_second_remains_compatible(self):
+        tracker = SignalRiskTracker()
+        older = self.plan(1)
+        del older["target2"]
+        sig = tracker.add_sent_signal(older, 0)
+        self.assertIsNone(sig.target2)
+        self.assertEqual(tracker.check([81551.], 30)[0][1], "target1_reached")
+        tracker.acknowledge(sig, "target1_reached")
+        self.assertEqual(len(tracker.signals), 0)
+
+    def test_invalid_or_unreasonable_second_target_is_rejected(self):
+        for invalid in (81550., 81300., -1., float("inf")):
+            with self.subTest(invalid=invalid):
+                p = self.plan(1)
+                p["target2"] = invalid
+                with self.assertRaises(ValueError):
+                    SignalRiskTracker().add_sent_signal(p, 0)
+
+    def test_expired_signal_does_not_send_stale_tp2(self):
+        tracker = SignalRiskTracker()
+        sig = tracker.add_sent_signal(self.plan(1), 0)
+        tracker.check([81560.], 60)
+        tracker.acknowledge(sig, "target1_reached")
+        self.assertEqual(tracker.check([81999.], 7201), [])
+        self.assertEqual(len(tracker.signals), 0)
 
 
 class StructureReactionTests(unittest.TestCase):
