@@ -23,6 +23,7 @@ from lbank_structure_patterns import detect_structure, confirm_structure
 from lbank_sampled_context import sampled_context_gate
 from lbank_rsi_research import ResearchTracker, neutral_stall
 from lbank_rsi_plateau import consolidation_reversal_resume
+from lbank_macro_monitor import MacroMonitor
 
 LOG = logging.getLogger("lbank_monitor")
 SYMBOL = "BTC/USDT:USDT"
@@ -649,6 +650,17 @@ def run():
     position_ledger = PositionState()
     position_bot = TelegramBot(position_ledger)
     LOG.info("position_report_tracking=enabled; recorded_position_present=%s", bool(position_ledger.position))
+    # Official macro feeds are polled in an independent daemon thread.
+    # No macro network call can block ticker sampling, stop-risk warning,
+    # RSI validation or any other market-monitor action.
+    try:
+        MacroMonitor(
+            sender=telegram,
+            state_path=os.getenv("LBANK_MACRO_STATE_PATH", "/data/lbank_macro_state.json"),
+        ).start()
+        LOG.info("MACRO integration enabled official BLS/Fed news + BLS/BEA schedule; informative only")
+    except Exception as exc:
+        LOG.error("MACRO integration failed to start exception=%s", type(exc).__name__)
     LOG.info("risk_snapshot_poll=%ds, entry_snapshot_poll=%ds (sampled data only)", RISK_POLL, POLL)
     watch = None
     alert_state = cached_alert_state
