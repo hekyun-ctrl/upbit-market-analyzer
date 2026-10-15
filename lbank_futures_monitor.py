@@ -16,7 +16,7 @@ from collections import deque
 from datetime import datetime, timezone, timedelta
 
 import ccxt
-from lbank_signal_risk import SignalRiskTracker, format_risk_alert, format_target_alert
+from lbank_signal_risk import SignalRiskTracker, format_risk_alert, format_target_alert, format_target2_alert
 from lbank_telegram_positions import PositionState, TelegramBot, format_position_target_alert
 from lbank_sample_store import load_snapshots, save_snapshots
 from lbank_structure_patterns import detect_structure, confirm_structure
@@ -686,10 +686,12 @@ def run():
                     p, reported_target_price, kst_at)
                 if position_bot.send(target_message):
                     position_ledger.acknowledge_target()
-                    LOG.info("MANUAL POSITION TARGET1 NOTICE SENT side=%s target=%.1f price=%.1f",
-                             p["side"], float(p["target"]), reported_target_price)
+                    LOG.info("MANUAL POSITION TARGET NOTICE SENT stage=%d side=%s target=%.1f price=%.1f",
+                             p.get("target_stage", 1), p["side"],
+                             float(p["target"]), reported_target_price)
                 else:
-                    LOG.error("MANUAL POSITION TARGET1 NOTICE DELIVERY FAILED")
+                    LOG.error("MANUAL POSITION TARGET NOTICE DELIVERY FAILED stage=%d",
+                              p.get("target_stage", 1))
             # Urgent risk messages bypass entry-alert cooldowns and daily quotas.
             # Only already-SENT hypothetical signals are monitored, not real positions.
             for tracked, reason, observed_price in (
@@ -700,10 +702,12 @@ def run():
                 notice = (
                     format_target_alert(tracked, observed_price, observed_kst)
                     if reason == "target1_reached"
+                    else format_target2_alert(tracked, observed_price, observed_kst)
+                    if reason == "target2_reached"
                     else format_risk_alert(tracked, reason, observed_price, observed_kst)
                 )
                 if telegram(notice):
-                    risk_tracker.acknowledge(tracked)
+                    risk_tracker.acknowledge(tracked, reason=reason)
                     LOG.info(
                         "SIGNAL FOLLOWUP SENT reference=%d side=%s reason=%s price=%.1f",
                         tracked.number, "LONG" if tracked.direction == 1 else "SHORT",
@@ -817,9 +821,10 @@ def run():
                                     counters[{"range_rebound": "range_confirmed",
                                               "trend_retest": "trend_confirmed",
                                               "breakout": "breakout_confirmed"}[source]] += 1
-                                    LOG.info("ENTRY REVIEW SENT strategy=%s side=%s entry=%.1f stop=%.1f t1=%.1f net_rr=%.2f reverse_exception=%s",
+                                    LOG.info("ENTRY REVIEW SENT strategy=%s side=%s entry=%.1f stop=%.1f t1=%.1f t2=%.1f net_rr=%.2f reverse_exception=%s",
                                              source, side, plan["price"], plan["stop"],
-                                             plan["target1"], plan["rr1"], reverse_exception)
+                                             plan["target1"], plan["target2"],
+                                             plan["rr1"], reverse_exception)
                                 else:
                                     LOG.warning("ENTRY REVIEW SEND FAILED")
                             else:
