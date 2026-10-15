@@ -9,6 +9,7 @@ from unittest.mock import patch
 from lbank_macro_monitor import (
     MacroMonitor, parse_rss, parse_bls_ical, parse_bea_json,
     event_key, release_message, news_message, fetch_official,
+    bls_cached_schedule,
 )
 
 
@@ -118,6 +119,30 @@ END:VCALENDAR"""
             mm.sender=lambda msg: True
             mm.refresh_news(now)
             self.assertTrue(mm.seen)
+
+
+    def test_cached_bls_schedule_when_official_server_blocks_cloud(self):
+        with tempfile.TemporaryDirectory() as t:
+            now=datetime(2026,10,15,12,0,tzinfo=timezone.utc).timestamp()
+            self.assertEqual(len(bls_cached_schedule(now)),10)
+            events=bls_cached_schedule(now)
+            ppi=next(e for e in events if "Producer Price" in e["title"])
+            self.assertIn("21:30",release_message(ppi))
+            self.assertIn("재확인 필요",release_message(ppi))
+            calls=[]
+            def fetch(url):
+                if url.endswith("bls.ics"):
+                    raise OSError("HTTP 403")
+                return json.dumps({}).encode()
+            mm=MacroMonitor(lambda msg: calls.append(msg) or True,
+                            os.path.join(t,"state.json"),fetcher=fetch)
+            mm.refresh_calendar(now)
+            self.assertIn("BLS", {x["source"] for x in mm.calendar})
+            mm.check_calendar(now)
+            self.assertEqual(len(calls),1)
+            mm.check_calendar(now)
+            self.assertEqual(len(calls),1)
+
 
     def test_feed_failure_does_not_stop_other_sources(self):
         with tempfile.TemporaryDirectory() as t:
