@@ -181,7 +181,7 @@ def confirmed_sampled_5m_plateau_resume(observations, direction):
 
 
 def extreme_5m_rsi_entry_gate(observations, direction):
-    """All entries need a <=30/>=70 history AND a completed reversal path.
+    """LEGACY SHADOW RESEARCH: extreme reversal paths (NOT a live entry gate).
 
     A) two consecutive higher/lower completed RSI + sampled price closes, OR
     B) one first turn, 1-12 closed plateau buckets, then RSI + close breakout.
@@ -220,10 +220,10 @@ def five_minute_rsi_entry_gate(observations, direction, setup=None):
 
 
 def fast_sample_rsi_gate(prices, direction):
-    """Extra safety: stop a fast sampled-RSI 28-type late SHORT or overheated LONG.
+    """Legacy research diagnostic ONLY: no longer called by live entry gates.
 
-    This 1-minute ticker-based metric supplements the completed 5-minute gate,
-    never substitutes for it. No assumption of deterministic RSI reversals.
+    Absolute fast-RSI 35/70 thresholds must not block a live LONG/SHORT.
+    Only completed ticker-sampled 5-minute RSI *direction* is checked live.
     """
     strength = rsi(prices)
     if direction == -1 and strength <= 35:
@@ -476,9 +476,9 @@ def format_entry_alert(plan, observed_at_utc):
     reversal_text = (
         f"[{'롱' if plan.get('direction') == 1 else '숏'} RSI 방향 확인] "
         f"완료 5분 가격표본 RSI {'상승' if plan.get('direction') == 1 else '하락'} 확인 "
-        "(30/70 등 절대 수치 조건 없음; 거래소 실제 5분봉 아님)\\n"
+        "(30/70 등 절대 수치 조건 없음; 거래소 실제 5분봉 아님)\n"
         if plan.get("rsi_direction_status") == "5m_rsi_direction_aligned"
-        else "완료 5분 가격표본 RSI 방향 일치: 미검증\\n"
+        else "완료 5분 가격표본 RSI 방향 일치: 미검증\n"
     )
     context = plan.get("sampled_context") or {}
     context_text = (f"완료된 선물 가격표본: 5분 표본 15분 변화 {context['trend5_pct']:+.2f}% / "
