@@ -3,6 +3,7 @@
 Run: python -m unittest test_lbank_fee_risk.py
 """
 import unittest
+from unittest.mock import patch
 from lbank_signal_risk import SignalRiskTracker, format_risk_alert, format_target_alert, format_target2_alert
 
 
@@ -11,7 +12,7 @@ from lbank_futures_monitor import (
     alert_gate, record_alert, verified_reversal_exception,
     format_reversal_pre_watch, COOLDOWN, REVERSAL_COOLDOWN, MAX_DAILY_ALERTS,
     minimum_net_rr_target, net_pnl_per_btc,
-    confirm_watch, format_entry_alert,
+    confirm_watch, format_entry_alert, trend_retest_momentum_gate,
     sampled_five_minute_rsi, five_minute_rsi_entry_gate,
     fast_sample_rsi_gate, confirmed_sampled_5m_oversold_rebound,
 )
@@ -68,6 +69,12 @@ class LBankCostModelTests(unittest.TestCase):
         self.assertGreaterEqual(signal["rr1"], 1.5 - 1e-7)
         self.assertGreaterEqual(signal["rr2"], 2.5 - 1e-7)
         self.assertGreater(signal["fee_roundtrip_est"], 0)
+        self.assertAlmostEqual(signal["quantity_btc"] * signal["price"],
+                               signal["notional"], places=7)
+        self.assertAlmostEqual(signal["reference_risk_budget"],
+                               REF_BALANCE * RISK_FRACTION, places=6)
+        self.assertGreater(signal["stop_distance_pct"], 0)
+        self.assertGreater(signal["sampled_1m_abs_move_p90_pct"], 0)
 
     def test_two_stage_watch_converts_to_entry_review_with_confirmation(self):
         base = [80000. + 25 * i + (45 if i % 2 else 0) for i in range(60)]
@@ -85,6 +92,10 @@ class LBankCostModelTests(unittest.TestCase):
         self.assertIn("조건부 진입 검토", alert)
         self.assertIn("손절 예상 순손실", alert)
         self.assertIn(f"{REF_BALANCE * 0.10:.2f} USDT", alert)
+        self.assertIn("참고 최대 진입수량", alert)
+        self.assertIn(f"{confirmed['quantity_btc']:.5f} BTC", alert)
+        self.assertIn("1분 가격표본 절대변화 90백분위", alert)
+        self.assertIn("실제 BTC 주문수량이 위 참고수량을 넘으면", alert)
 
     def test_stage_two_rejects_stale_watch_and_price_chasing(self):
         base = [80000. + 25 * i + (45 if i % 2 else 0) for i in range(60)]
@@ -100,6 +111,98 @@ class LBankCostModelTests(unittest.TestCase):
         self.assertGreater((target - entry) / entry, .005)  # Fees still require a material gross move
 
 
+
+
+class WeakRetestMomentumRegressionTests(unittest.TestCase):
+    """Protect failed 00:58 signal without relabeling past TP1 hits as failures."""
+
+    @staticmethod
+    def synthetic(direction, five_pct, fifteen_pct):
+        last = 82445.6
+        prices = [last] * 70
+        prices[-6] = last / (1 + direction * five_pct / 100)
+        prices[-16] = last / (1 + direction * fifteen_pct / 100)
+        return prices
+
+    def test_failed_long_price_impulse_blocked_both_stages(self):
+        for direction in (1, -1):
+            with self.subTest(direction=direction):
+                prices = self.synthetic(direction, .04, .01)
+                ok, reason, move5, move15 = trend_retest_momentum_gate(
+                    prices, direction)
+                self.assertFalse(ok)
+                self.assertEqual(reason, "weak_retest_momentum_both_horizons")
+                self.assertAlmostEqual(move5, .04, places=5)
+                self.assertAlmostEqual(move15, .01, places=5)
+                # Final stage must not accept a watch created earlier if the
+                # momentum fades, even when structural confirmation holds.
+                with patch("lbank_futures_monitor.detect_structure",
+                           return_value={"direction": direction,
+                                         "strategy": "trend_retest"}), \
+                     patch("lbank_futures_monitor.calculate_plan") as calc:
+                    self.assertIsNone(classify(prices))
+                    calc.assert_not_called()
+                watch = {"direction": direction, "strategy": "trend_retest",
+                         "price": prices[-1]}
+                with patch("lbank_futures_monitor.confirm_structure",
+                           return_value=True), \
+                     patch("lbank_futures_monitor.calculate_plan") as calc:
+                    self.assertIsNone(confirm_watch(prices, watch, 60))
+                    calc.assert_not_called()
+
+    def test_both_horizons_weak_blocks_preliminary_failed_watch(self):
+        prices = self.synthetic(1, .09, -.09)
+        ok, reason, _, _ = trend_retest_momentum_gate(prices, 1)
+        self.assertFalse(ok)
+        self.assertEqual(reason, "weak_retest_momentum_both_horizons")
+
+    def test_past_short_and_long_cases_keep_sufficient_momentum(self):
+        # Recorded ALARM fields: 21:51 SHORT -0.15/-0.03,
+        # 23:37 LONG +0.23/+0.10 (both sampled, not exchange OHLCV).
+        for direction, five, fifteen in ((-1, .15, .03), (1, .23, .10)):
+            with self.subTest(direction=direction):
+                prices = self.synthetic(direction, five, fifteen)
+                ok, reason, _, _ = trend_retest_momentum_gate(prices, direction)
+                self.assertTrue(ok)
+                self.assertEqual(reason, "retest_momentum_confirmed")
+                with patch("lbank_futures_monitor.detect_structure",
+                           return_value={"direction": direction,
+                                         "strategy": "trend_retest"}), \
+                     patch("lbank_futures_monitor.calculate_plan",
+                           return_value={"direction": direction,
+                                         "strategy": "trend_retest"}) as calc:
+                    self.assertIsNotNone(classify(prices))
+                    calc.assert_called_once()
+                watch = {"direction": direction, "strategy": "trend_retest",
+                         "price": prices[-1]}
+                with patch("lbank_futures_monitor.confirm_structure",
+                           return_value=True), \
+                     patch("lbank_futures_monitor.calculate_plan",
+                           return_value={"direction": direction,
+                                         "strategy": "trend_retest"}) as calc:
+                    self.assertIsNotNone(confirm_watch(prices, watch, 60))
+                    calc.assert_called_once()
+
+    def test_strong_single_horizon_suffices_and_boundaries_are_inclusive(self):
+        for five, fifteen in ((.10, 0.), (0., .08), (.20, -.15),
+                              (-.05, .23)):
+            with self.subTest(five=five, fifteen=fifteen):
+                values = self.synthetic(1, five, fifteen)
+                ok, _, _, _ = trend_retest_momentum_gate(values, 1)
+                self.assertTrue(ok)
+        self.assertFalse(trend_retest_momentum_gate([], 1)[0])
+        self.assertFalse(trend_retest_momentum_gate([82000.] * 70, 0)[0])
+
+    def test_other_structural_strategies_not_subject_to_retest_gate(self):
+        prices = self.synthetic(1, .02, .02)
+        for strategy in ("breakout", "range_rebound"):
+            with self.subTest(strategy=strategy), \
+                 patch("lbank_futures_monitor.detect_structure",
+                       return_value={"direction": 1, "strategy": strategy}), \
+                 patch("lbank_futures_monitor.calculate_plan",
+                       return_value={"direction": 1, "strategy": strategy}) as calc:
+                self.assertIsNotNone(classify(prices))
+                calc.assert_called_once()
 
 
 class ReversalCooldownReviewTests(unittest.TestCase):
