@@ -537,7 +537,19 @@ def verified_reversal_exception(now, side, state, plan=None):
     if plan.get("side") != side or plan.get("strategy") not in ("breakout", "trend_retest"):
         return False
     context = plan.get("sampled_context") or {}
-    return (context.get("reversal_confirmed") is True and
+    try:
+        direction = 1 if side == "롱" else -1
+        entry, stop, target = (float(plan[key]) for key in
+                               ("price", "stop", "target1"))
+        rr, loss = float(plan["rr1"]), float(plan["net_loss"])
+        risk_valid = (entry > 0 and stop > 0 and target > 0 and
+                      direction * (entry - stop) > 0 and
+                      direction * (target - entry) > 0 and
+                      0 < loss <= REF_BALANCE * RISK_FRACTION + 1e-7 and
+                      rr >= MIN_NET_RR - 1e-7)
+    except (KeyError, TypeError, ValueError, OverflowError):
+        return False
+    return (risk_valid and context.get("reversal_confirmed") is True and
             plan.get("rsi_direction_status") == "5m_rsi_direction_aligned")
 
 
