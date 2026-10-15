@@ -74,6 +74,11 @@ class DirectionalFiveMinuteRSITests(unittest.TestCase):
         prices = [83000. + (i % 3) * 40 for i in range(70)]
         for strategy in ("breakout", "trend_retest", "range_rebound"):
             for direction in (1, -1):
+                # Directional-RSI tests must satisfy independent trend-retest
+                # PRICE momentum requirements to isolate the RSI assertion.
+                test_prices = (
+                    [83000. + direction * i * 25 for i in range(70)]
+                    if strategy == "trend_retest" else prices)
                 mock_plan = {"direction": direction, "strategy": strategy}
                 with self.subTest(strategy=strategy, direction=direction), \
                      patch("lbank_futures_monitor.detect_structure",
@@ -85,7 +90,7 @@ class DirectionalFiveMinuteRSITests(unittest.TestCase):
                            else rsi_state(46., 45.)), \
                      patch("lbank_futures_monitor.calculate_plan",
                            return_value=mock_plan):
-                    result = classify(prices, observations=[(0., 83000.)])
+                    result = classify(test_prices, observations=[(0., 83000.)])
                     self.assertIsNotNone(result)
                     self.assertEqual(result["rsi_direction_status"],
                                      "5m_rsi_direction_aligned")
@@ -94,6 +99,9 @@ class DirectionalFiveMinuteRSITests(unittest.TestCase):
     def test_all_strategies_block_mismatched_direction_before_cost_plan(self):
         prices = [83000. + (i % 3) * 40 for i in range(70)]
         for strategy in ("breakout", "trend_retest", "range_rebound"):
+            test_prices = (
+                [83000. - i * 25 for i in range(70)]
+                if strategy == "trend_retest" else prices)
             with self.subTest(strategy=strategy), \
                  patch("lbank_futures_monitor.detect_structure",
                        return_value={"direction": -1, "strategy": strategy}), \
@@ -102,15 +110,18 @@ class DirectionalFiveMinuteRSITests(unittest.TestCase):
                  patch("lbank_futures_monitor.sampled_five_minute_rsi",
                        return_value=rsi_state(44., 45.)), \
                  patch("lbank_futures_monitor.calculate_plan") as plan:
-                self.assertIsNone(classify(prices, observations=[(0., 83000.)]))
+                self.assertIsNone(classify(test_prices, observations=[(0., 83000.)]))
                 plan.assert_not_called()
 
     def test_confirmation_uses_same_direction_only_rsi(self):
         prices = [83000. + (i % 3) * 40 for i in range(70)]
         for direction in (1, -1):
             for strategy in ("breakout", "trend_retest", "range_rebound"):
+                test_prices = (
+                    [83000. + direction * i * 25 for i in range(70)]
+                    if strategy == "trend_retest" else prices)
                 watch = {"direction": direction, "strategy": strategy,
-                         "price": prices[-1]}
+                         "price": test_prices[-1]}
                 mock_plan = {"direction": direction, "strategy": strategy}
                 with self.subTest(direction=direction, strategy=strategy), \
                      patch("lbank_futures_monitor.confirm_structure", return_value=True), \
@@ -125,7 +136,7 @@ class DirectionalFiveMinuteRSITests(unittest.TestCase):
                     if strategy == "breakout":
                         # Synthetic series may fail independent MACD/momentum confirmation.
                         continue
-                    result = confirm_watch(prices, watch, 60,
+                    result = confirm_watch(test_prices, watch, 60,
                                            observations=[(0., 83000.)])
                     self.assertIsNotNone(result)
                     self.assertEqual(result["rsi_direction_status"],
