@@ -80,7 +80,8 @@ class PositionState:
             "quantity": str(qty), "stop": str(stop), "target": str(target),
             "risk_notice": None, "risk_count": 0,
             "opened_at": time.time(), "neutral_notice": False,
-            "target_notice": False}
+            "target_notice": False, "target_stage": 1,
+            "target_hit_price": None}
         self.mutate()
         return self.status()
 
@@ -129,25 +130,35 @@ class PositionState:
         if direction * (target - entry) <= 0:
             raise ValueError("익절 목표는 진입가 대비 수익 구간이어야 합니다.")
         prior_target = num(self.position["target"])
-        self.position["target"] = str(target)
+        prior_notice = self.position.get("target_notice", False)
         if target != prior_target:
+            # The user can set TP2 using /tp only AFTER the first
+            # delivered target alert. We must never claim a TP1 notice is TP2.
+            if prior_notice and direction * (target - prior_target) > 0:
+                self.position["target_stage"] = 2
+            self.position["target"] = str(target)
             self.position["target_notice"] = False
+            self.position["target_hit_price"] = None
         self.mutate()
         return "신고 목표가를 갱신했습니다. 실제 거래소 주문은 직접 확인해야 합니다.\n" + self.status()
 
     def target_reached(self, prices):
-        """One-time alert for a user-reported target. Does not imply a fill."""
+        """One-shot reported position notice; price event survives send failure."""
         p = self.position
         if not p or p.get("target_notice", False) or not prices:
             return None
+        if p.get("target_hit_price") is not None:
+            return float(p["target_hit_price"])
         current = float(prices[-1])
         direction = 1 if p["side"] == "LONG" else -1
         if direction * (current - float(p["target"])) >= 0:
+            p["target_hit_price"] = current
+            self.save()
             return current
         return None
 
     def acknowledge_target(self):
-        """Persist only after successful Telegram delivery."""
+        """Mark as delivered, never as executed by LBank."""
         if self.position:
             self.position["target_notice"] = True
             self.save()
@@ -204,22 +215,28 @@ class PositionState:
 
 
 def format_position_target_alert(position, price, time_kst):
-    """First target alert for a *reported* position, not verified exchange data."""
+    """Notice at current *reported* target; not evidence of order execution."""
     side = "롱" if position["side"] == "LONG" else "숏"
     direction = 1 if side == "롱" else -1
     entry = float(position["entry"])
     target = float(position["target"])
     delta = direction * (target / entry - 1) * 100
-    return (
-        f"[LBank BTCUSDT | 신고 {side} 포지션 1차 목표 도달]\n"
-        f"한국시간: {time_kst}\n"
-        f"현재 1차 목표 {target:,.1f} USDT ({delta:+.2f}%) 도달\n"
-        f"현재 관측가격: {price:,.1f} USDT\n"
+    stage = 2 if position.get("target_stage") == 2 else 1
+    action = (
+        "실제 보유 중이라면 남은 50% 익절과 잔여 포지션 정리를 검토하세요.\n"
+        if stage == 2 else
         f"실제 보유 중이라면 50% 익절 후 "
         f"잔여 손절가는 진입가 {entry:,.1f} USDT로 조정 요함.\n"
+    )
+    return (
+        f"[LBank BTCUSDT | 신고 {side} 포지션 {stage}차 목표 도달]\n"
+        f"한국시간: {time_kst}\n"
+        f"현재 {stage}차 목표 {target:,.1f} USDT ({delta:+.2f}%) 도달\n"
+        f"목표 접촉 시 선물 가격표본: {price:,.1f} USDT\n"
+        f"{action}"
         "※ LBank에서 실제 청산·손절 주문을 직접 실행하고 체결을 확인하세요.\n"
         "※ 거래소 체결·실제 보유는 확인되지 않았습니다. 이미 청산했다면 무시하세요.\n"
-        "※ 손절을 진입가로 옮겨도 수수료·슬리피지로 순손실이 발생할 수 있습니다.\n"
+        "※ 진입가 손절도 수수료·슬리피지 차감 후 순손실이 날 수 있습니다.\n"
         "※ 1분 가격표본은 구간내 순간 목표 터치를 놓칠 수 있습니다."
     )
 
