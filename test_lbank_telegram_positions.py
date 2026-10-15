@@ -61,6 +61,53 @@ class PositionLedgerTests(unittest.TestCase):
         self.assertIsNotNone(event)
         self.assertIn("근접",event[0])
 
+    def test_reported_short_target1_notice_is_once_and_persists_restart(self):
+        self.ledger.open("short", "80757.8", "0.0401", "80897.3", "80262.0")
+        self.assertIsNone(self.ledger.target_reached([80300.0]))
+        price = self.ledger.target_reached([80250.0])
+        self.assertEqual(price, 80250.0)
+        note = mod.format_position_target_alert(
+            self.ledger.position, price, "2026-10-15 22:29")
+        self.assertIn("현재 1차 목표 80,262.0 USDT", note)
+        self.assertIn("50% 익절", note)
+        self.assertIn("손절가는 진입가", note)
+        self.assertIn("80,757.8", note)
+        self.assertIn("수수료", note)
+        # Simulate Telegram delivery failure by not acknowledging; retry.
+        self.assertEqual(self.ledger.target_reached([80230.0]), 80230.0)
+        self.ledger.acknowledge_target()
+        self.assertIsNone(self.ledger.target_reached([80200.0]))
+        from_disk = mod.PositionState(self.path)
+        self.assertIsNone(from_disk.target_reached([80100.0]))
+        self.assertEqual(from_disk.position["quantity"], "0.0401")
+
+    def test_reported_long_target_notice_and_changed_target(self):
+        self.ledger.open("long", "82712.9", "0.0783", "82500", "83200")
+        self.assertEqual(self.ledger.target_reached([83210.]), 83210.)
+        self.assertIn("롱", mod.format_position_target_alert(
+            self.ledger.position, 83210., "2026-10-15 22:00"))
+        self.ledger.acknowledge_target()
+        self.ledger.move_stop("82712.9")
+        self.assertIsNone(self.ledger.target_reached([83240.]))
+        self.ledger.change_target("83300")
+        self.assertIsNone(self.ledger.target_reached([83240.]))
+        self.assertEqual(self.ledger.target_reached([83310.]), 83310.)
+        self.ledger.acknowledge_target()
+        self.ledger.change_target("83300")  # unchanged target cannot rearm
+        self.assertIsNone(self.ledger.target_reached([83330.]))
+
+    def test_target_notice_does_not_change_actual_quantity_or_stop(self):
+        self.ledger.open("short", "80757.8", "0.0401", "80897.3", "80262")
+        self.ledger.acknowledge_target()
+        p = self.ledger.position
+        self.assertEqual(p["quantity"], "0.0401")
+        self.assertEqual(p["stop"], "80897.3")
+        self.assertEqual(p["target"], "80262")
+        # After executing actual partial close in LBank, the user reports it.
+        self.assertIn("부분청산", self.ledger.partial("0.0200"))
+        self.assertEqual(self.ledger.position["quantity"], "0.0201")
+        self.assertIsNone(self.ledger.target_reached([80190.]))
+
     def test_confirmed_button_half_close_and_stale_buttons(self):
         self.ledger.open("long", "82712.9", ".0783", "83100", "83700")
         output=[]
