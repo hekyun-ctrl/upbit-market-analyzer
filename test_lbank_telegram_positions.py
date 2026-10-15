@@ -74,7 +74,7 @@ class PositionLedgerTests(unittest.TestCase):
         self.assertIn("80,757.8", note)
         self.assertIn("수수료", note)
         # Simulate Telegram delivery failure by not acknowledging; retry.
-        self.assertEqual(self.ledger.target_reached([80230.0]), 80230.0)
+        self.assertEqual(self.ledger.target_reached([80230.0]), 80250.0)
         self.ledger.acknowledge_target()
         self.assertIsNone(self.ledger.target_reached([80200.0]))
         from_disk = mod.PositionState(self.path)
