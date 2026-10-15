@@ -27,6 +27,10 @@ class TrackedSignal:
     target1: float
     sent_at: float
     bad_samples: int = 0
+    target2: float | None = None
+    target1_hit: bool = False
+    target1_notified: bool = False
+    target2_hit: bool = False
 
 
 class SignalRiskTracker:
@@ -54,7 +58,12 @@ class SignalRiskTracker:
                             (signal.entry, signal.stop, signal.target1, signal.sent_at)) or
                     signal.entry <= 0 or signal.stop <= 0 or signal.target1 <= 0 or
                     signal.direction * (signal.entry - signal.stop) <= 0 or
-                    signal.direction * (signal.target1 - signal.entry) <= 0):
+                    signal.direction * (signal.target1 - signal.entry) <= 0 or
+                    (signal.target2 is not None and
+                     (not math.isfinite(float(signal.target2)) or
+                      signal.target2 <= 0 or
+                      signal.direction * (signal.target2 - signal.target1) <= 0))):
+
                     raise ValueError("invalid tracked reference")
                 restored.append(signal)
             self.signals = restored
@@ -88,11 +97,17 @@ class SignalRiskTracker:
         entry = float(plan["price"])
         stop = float(plan["stop"])
         target = float(plan["target1"])
+        target2 = float(plan["target2"]) if plan.get("target2") is not None else None
         if direction not in (-1, 1):
             raise ValueError("Invalid direction")
-        if direction * (entry - stop) <= 0 or direction * (target - entry) <= 0:
+        prices_to_check = [entry, stop, target] + ([] if target2 is None else [target2])
+        if (not all(math.isfinite(v) and v > 0 for v in prices_to_check) or
+            direction * (entry - stop) <= 0 or
+            direction * (target - entry) <= 0 or
+            (target2 is not None and direction * (target2 - target) <= 0)):
             raise ValueError("Stop/target on wrong side of entry")
-        signal = TrackedSignal(self.next_number, direction, entry, stop, target, now)
+        signal = TrackedSignal(self.next_number, direction, entry, stop, target,
+                               now, target2=target2)
         self.next_number += 1
         self.signals.append(signal)
         self.signals = self.signals[-3:]
@@ -100,31 +115,41 @@ class SignalRiskTracker:
         return signal
 
     def check(self, prices, now):
-        """Return (signal, reason, current_price) events.
+        """Return (signal, reason, current_price) events after price observations.
 
-        Events need to be acknowledged only AFTER Telegram confirms delivery.
-        Never infer real account holdings from a sent signal.
+        Target flags are latched until Telegram acknowledges delivery. TP1
+        acknowledgement keeps TP2 reference tracking alive. Targets are only
+        hypothetical price levels and never imply a filled order.
         """
         if not prices:
             return []
-        current = prices[-1]
+        current = float(prices[-1])
         events = []
         survivors = []
-        before = [(s.number, s.bad_samples) for s in self.signals]
+        before = [asdict(sig) for sig in self.signals]
         for item in self.signals:
             if now - item.sent_at >= SIGNAL_TTL_SECONDS:
                 continue
-            # Notify exactly once when the sampled quote reaches the first
-            # reference target; do not mistake this for an actual fill.
-            # Retain until successful Telegram delivery is acknowledged.
-            if item.direction * (current - item.target1) >= 0:
-                events.append((item, "target1_reached", current))
-                survivors.append(item)
-                continue
+            if item.target2 is not None and item.direction * (current - item.target2) >= 0:
+                item.target2_hit = True
+                item.target1_hit = True
+            elif item.direction * (current - item.target1) >= 0:
+                item.target1_hit = True
+
+            # Urgent stop warning takes precedence over queued target notices.
             if item.direction * (current - item.stop) <= 0:
                 events.append((item, "stop_breached", current))
                 survivors.append(item)
                 continue
+            if not item.target1_notified and item.target1_hit:
+                events.append((item, "target1_reached", current))
+                survivors.append(item)
+                continue
+            if item.target1_notified and item.target2 is not None and item.target2_hit:
+                events.append((item, "target2_reached", current))
+                survivors.append(item)
+                continue
+
             adverse = -item.direction * (current - item.entry)
             stop_gap = abs(item.entry - item.stop)
             against_5m = len(prices) >= 6 and (
@@ -138,13 +163,19 @@ class SignalRiskTracker:
                 events.append((item, "early_invalidation", current))
             survivors.append(item)
         self.signals = survivors
-        if before != [(s.number, s.bad_samples) for s in self.signals]:
+        if before != [asdict(sig) for sig in self.signals]:
             self._save()
         return events
 
-    def acknowledge(self, signal):
-        # One event per reference signal to avoid repeated emergency messages.
-        self.signals = [s for s in self.signals if s is not signal]
+    def acknowledge(self, signal, reason=None):
+        """Acknowledge only after delivery; TP1 keeps a known TP2 monitored."""
+        if reason == "target1_reached" and signal in self.signals:
+            signal.target1_notified = True
+            if signal.target2 is None:
+                self.signals = [s for s in self.signals if s is not signal]
+        else:
+            # Stop, early invalidation, second target or legacy explicit ack.
+            self.signals = [s for s in self.signals if s is not signal]
         self._save()
 
 
@@ -165,6 +196,27 @@ def format_target_alert(signal, price, time_kst):
         "※ 미진입·기청산 상태라면 관찰 참고용 알림입니다. "
         "봇은 실제 보유·체결을 확인하거나 거래소 주문을 실행하지 않습니다.\n"
         "※ 1분 가격표본 기준으로 확인한 목표 도달이며, 표본 사이 순간 터치는 놓칠 수 있습니다."
+    )
+
+
+
+def format_target2_alert(signal, price, time_kst):
+    """TP2 level observed; never imply exchange execution."""
+    side = "롱" if signal.direction == 1 else "숏"
+    if signal.target2 is None:
+        raise ValueError("No second target for this reference signal")
+    move_pct = signal.direction * (signal.target2 / signal.entry - 1) * 100
+    return (
+        f"[LBank BTCUSDT | 2차 목표 도달 - {side}]\n"
+        f"한국시간: {time_kst}\n"
+        f"현재 2차 목표 {signal.target2:,.1f} USDT ({move_pct:+.2f}%) 도달\n"
+        f"현재 선물 가격표본: {price:,.1f} USDT\n"
+        f"알람 기준 진입 참고가: {signal.entry:,.1f} USDT\n"
+        "실제 보유 중이라면 1차 익절 후 남은 50% 익절을 검토하세요.\n"
+        "※ 실제 체결과 잔여 수량은 LBank 거래소에서 직접 확인해야 합니다.\n"
+        "※ 미진입 또는 이미 청산한 경우 관찰용 알림입니다. 자동주문 없음.\n"
+        "※ 실제 순손익은 수수료·슬리피지·펀딩에 따라 달라집니다.\n"
+        "※ 1분 선물 가격표본으로 확인한 목표 접촉이며 거래소 실제 체결가가 아닙니다."
     )
 
 
