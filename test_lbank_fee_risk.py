@@ -115,7 +115,7 @@ class ReversalCooldownReviewTests(unittest.TestCase):
     def plan():
         return {"side": "롱", "direction": 1, "strategy": "breakout",
                 "price": 80550.9, "stop": 80077.0, "target1": 81400.,
-                "rr1": 1.5, "net_loss": 10.45,
+                "rr1": 1.5, "net_loss": REF_BALANCE * RISK_FRACTION * .99,
                 "rsi_direction_status": "5m_rsi_direction_aligned",
                 "sampled_context": {
                     "reversal_confirmed": True,
