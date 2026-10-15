@@ -16,8 +16,8 @@ from collections import deque
 from datetime import datetime, timezone, timedelta
 
 import ccxt
-from lbank_signal_risk import SignalRiskTracker, format_risk_alert
-from lbank_telegram_positions import PositionState, TelegramBot
+from lbank_signal_risk import SignalRiskTracker, format_risk_alert, format_target_alert
+from lbank_telegram_positions import PositionState, TelegramBot, format_position_target_alert
 from lbank_sample_store import load_snapshots, save_snapshots
 from lbank_structure_patterns import detect_structure, confirm_structure
 from lbank_sampled_context import sampled_context_gate
@@ -554,7 +554,8 @@ def run():
         SAMPLE_STORE_PATH, SYMBOL, POLL)
     observations = deque(cached_observations, maxlen=360)
     LOG.info("price_sample_cache_restored=%d", len(observations))
-    risk_tracker = SignalRiskTracker()
+    risk_tracker = SignalRiskTracker(path=os.getenv(
+        "LBANK_SIGNAL_FOLLOWUP_STATE_PATH", "/data/lbank_signal_followups.json"))
     rsi_research = ResearchTracker()  # Shadow stats only; not an entry gate
     position_ledger = PositionState()
     position_bot = TelegramBot(position_ledger)
@@ -617,6 +618,22 @@ def run():
                     LOG.warning("MANUAL POSITION RISK SENT side=%s reason=%s", side, reason)
                 else:
                     LOG.error("MANUAL POSITION RISK TELEGRAM FAILURE")
+            # A self-reported position takes priority over hypothetical signals.
+            # Goal notifications are separate from the entry cooldown/daily cap.
+            # A sampled price crossing is NOT exchange order execution.
+            reported_target_price = position_ledger.target_reached([price])
+            if reported_target_price is not None:
+                kst_at = datetime.fromtimestamp(
+                    now, tz=timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
+                p = position_ledger.position
+                target_message = format_position_target_alert(
+                    p, reported_target_price, kst_at)
+                if position_bot.send(target_message):
+                    position_ledger.acknowledge_target()
+                    LOG.info("MANUAL POSITION TARGET1 NOTICE SENT side=%s target=%.1f price=%.1f",
+                             p["side"], float(p["target"]), reported_target_price)
+                else:
+                    LOG.error("MANUAL POSITION TARGET1 NOTICE DELIVERY FAILED")
             # Urgent risk messages bypass entry-alert cooldowns and daily quotas.
             # Only already-SENT hypothetical signals are monitored, not real positions.
             for tracked, reason, observed_price in (
@@ -624,16 +641,20 @@ def run():
             ):
                 observed_kst = datetime.fromtimestamp(
                     now, tz=timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
-                warning = format_risk_alert(
-                    tracked, reason, observed_price, observed_kst)
-                if telegram(warning):
+                notice = (
+                    format_target_alert(tracked, observed_price, observed_kst)
+                    if reason == "target1_reached"
+                    else format_risk_alert(tracked, reason, observed_price, observed_kst)
+                )
+                if telegram(notice):
                     risk_tracker.acknowledge(tracked)
-                    LOG.warning(
-                        "SIGNAL RISK WARN SENT reference=%d side=%s reason=%s price=%.1f",
+                    LOG.info(
+                        "SIGNAL FOLLOWUP SENT reference=%d side=%s reason=%s price=%.1f",
                         tracked.number, "LONG" if tracked.direction == 1 else "SHORT",
                         reason, observed_price)
                 else:
-                    LOG.error("SIGNAL RISK WARN SEND FAILED reference=%d", tracked.number)
+                    LOG.error("SIGNAL FOLLOWUP SEND FAILED reference=%d reason=%s",
+                              tracked.number, reason)
             if now - last_sample >= POLL:
                 last_sample = now
                 observations.append((now, price))
