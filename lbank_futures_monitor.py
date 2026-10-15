@@ -200,91 +200,23 @@ def extreme_5m_rsi_entry_gate(observations, direction):
 
 
 def five_minute_rsi_entry_gate(observations, direction, setup=None):
-    """Guard against late chasing at RSI 30/70; wait for rebound or pullback.
+    """Require only aligned *direction* of completed ticker-sampled 5m RSI.
 
-    Only completed 5-min ticker-derived RSI values are used. These heuristics
-    are conservative safeguards, NOT verified reversal probabilities.
+    No RSI 30/70 thresholds, extreme history, price reversal path, or fast RSI
+    level veto. Price structure, closed-bucket context, costs, no-chase and
+    risk checks are separately enforced in the entry pipeline.
+    This RSI is derived from LBank perpetual 1-minute ticker snapshots,
+    not native exchange 5-minute OHLCV.
     """
+    if direction not in (1, -1):
+        return False, "invalid_direction", None
     state = sampled_five_minute_rsi(observations)
-    if state is None:
-        return False, "insufficient_closed_5m_samples", None
-    values, closes = state["rsi"], state["closes"]
-    current, previous = values[-1], values[-2]
-    # This alternative is valid for every strategy; the global extreme gate,
-    # structure, context, and fee-aware risk gate still run independently.
-    resumed, resumed_reason, _ = confirmed_sampled_5m_plateau_resume(
-        observations, direction)
-    if resumed:
-        return True, resumed_reason, current
-    # A support bounce is NOT a long entry until completed sampled 5m RSI
-    # actually crossed <=30 and subsequently turned up with price evidence.
-    # Trend retests and breakouts remain separate strategies.
-    if setup and setup.get("strategy") == "range_rebound":
-        if direction == 1:
-            rebound_ok, rebound_reason, _ = confirmed_sampled_5m_oversold_rebound(observations)
-            if not rebound_ok:
-                return False, rebound_reason, current
-        elif direction == -1:
-            rejection_ok, rejection_reason, _ = confirmed_sampled_5m_overbought_rejection(observations)
-            if not rejection_ok:
-                return False, rejection_reason, current
-            # After a verified two-bar overbought rejection, avoid the prior
-            # single-bar/RSI<=64 shortcut. Still respect fast RSI, higher-timeframe
-            # context, structure and the full fee-aware risk gate elsewhere.
-            return True, rejection_reason, current
-    if current <= 30 or current >= 70:
-        return False, "rsi_30_70_extreme_wait", current
-    # Leave headroom for a bounce, including before a literal 30/70 touch.
-    if direction == -1 and current < 36:
-        return False, "short_near_oversold", current
-    if direction == 1 and current > 64:
-        return False, "long_near_overbought", current
-    # Last 10 completed RSI periods (~50 minutes). Most recent extreme wins.
-    start = max(0, len(values) - 10)
-    extreme = None
-    for i in range(start, len(values)):
-        if values[i] <= 30:
-            extreme = (i, "oversold")
-        elif values[i] >= 70:
-            extreme = (i, "overbought")
-    if extreme is None:
-        return True, "normal_zone", current
-    hit, kind = extreme
-    after = values[hit + 1:]
-    if kind == "oversold":
-        if direction == -1:
-            # For SHORT: first a meaningful recovery to >=40, then a
-            # completed 5m price / RSI rollover, not a short on the RSI touch.
-            ready = (len(after) >= 2 and max(after) >= 40 and
-                     current < previous and closes[-1] < closes[-2])
-            return ready, ("oversold_rebound_then_rollover" if ready else
-                           "wait_rebound_then_bearish_rejection"), current
-        ready = (bool(after) and current >= 36 and
-                 current > previous and closes[-1] > closes[-2])
-        return ready, ("oversold_bounce_confirmed" if ready else
-                       "wait_oversold_bounce"), current
-    if direction == 1:
-        # For LONG: let the overbought market pull back to <=60, then
-        # confirm a subsequent 5m close / RSI uptick before chasing it.
-        ready = (len(after) >= 2 and min(after) <= 60 and
-                 current > previous and closes[-1] > closes[-2])
-        return ready, ("overbought_pullback_then_support" if ready else
-                       "wait_pullback_then_bullish_support"), current
-    # A tightly scoped exception for genuine range-top bearish rejection.
-    # A rollover off 70+ can be actionable before RSI reaches 64. Only
-    # consider this when the structural resistance reaction already passed
-    # and the last COMPLETED 5m sample is lower in both price and RSI.
-    # Still forbid >=70 RSI and all late shorts after oversold extremes.
-    if setup and setup.get("strategy") == "range_rebound" and direction == -1:
-        prior_overbought = any(v >= 70 for v in values[-3:-1])
-        early_rejection = (prior_overbought and 55 <= current <= 69.5 and
-                           current < previous and closes[-1] < closes[-2])
-        if early_rejection:
-            return True, "overbought_range_rejection_confirmed", current
-    ready = (bool(after) and current <= 64 and
-             current < previous and closes[-1] < closes[-2])
-    return ready, ("overbought_pullback_confirmed" if ready else
-                   "wait_overbought_pullback"), current
+    if state is None or len(state["rsi"]) < 2:
+        return False, "5m_rsi_direction_data_unavailable", None
+    previous, current = state["rsi"][-2:]
+    if direction * (current - previous) <= 0:
+        return False, "5m_rsi_direction_mismatch_or_flat", current
+    return True, "5m_rsi_direction_aligned", current
 
 
 def fast_sample_rsi_gate(prices, direction):
@@ -444,9 +376,9 @@ def classify(prices, observations=None):
     setup = detect_structure(prices, ema, rsi)
     if setup is not None:
         direction = setup["direction"]
-    elif curr > max(prices[-16:-1]) and macd > sig and 55 <= strength <= 80 and m5 >= .14 and m15 >= .20:
+    elif curr > max(prices[-16:-1]) and macd > sig and m5 >= .14 and m15 >= .20:
         direction = 1
-    elif curr < min(prices[-16:-1]) and macd < sig and 20 <= strength <= 45 and m5 <= -.14 and m15 <= -.20:
+    elif curr < min(prices[-16:-1]) and macd < sig and m5 <= -.14 and m15 <= -.20:
         direction = -1
     else:
         return None
@@ -461,19 +393,10 @@ def classify(prices, observations=None):
             LOG.info("CLOSED-BUCKET watch BLOCKED side=%s reason=%s context=%s",
                      "LONG" if direction == 1 else "SHORT", context_reason, context)
             return None
-        strict_ok, strict_reason, _ = extreme_5m_rsi_entry_gate(observations, direction)
-        if not strict_ok:
-            LOG.info("STRICT 5m RSI watch BLOCKED direction=%s strategy=%s reason=%s",
-                     direction, (setup or {}).get("strategy", "breakout"), strict_reason)
-            return None
-        allowed_fast, fast_reason, fast_rsi = fast_sample_rsi_gate(prices, direction)
-        if not allowed_fast:
-            LOG.info("Fast sampled RSI watch BLOCKED side=%s reason=%s rsi=%.1f",
-                     "LONG" if direction == 1 else "SHORT", fast_reason, fast_rsi)
-            return None
-        allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(observations, direction, setup=setup)
+        allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(
+            observations, direction, setup=setup)
         if not allowed:
-            LOG.info("5m sampled RSI watch BLOCKED side=%s reason=%s rsi=%s",
+            LOG.info("5m sampled RSI watch direction BLOCKED side=%s reason=%s rsi=%s",
                      "LONG" if direction == 1 else "SHORT", reason, sampled_rsi5)
             return None
     else:
@@ -485,7 +408,7 @@ def classify(prices, observations=None):
     if plan is not None:
         plan["sampled_rsi5"] = sampled_rsi5
         plan["sampled_context"] = context
-        plan["rsi_reversal_method"] = strict_reason if observations is not None else None
+        plan["rsi_direction_status"] = reason if observations is not None else None
     return plan
 
 
@@ -512,9 +435,9 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
     macd, sig = macd_line[-1], ema(macd_line, 9)[-1]
     strength = rsi(prices)
     if direction == 1:
-        valid = macd > sig and strength >= 50 and m5 >= .04 and m15 >= .10
+        valid = macd > sig and m5 >= .04 and m15 >= .10
     else:
-        valid = macd < sig and strength <= 50 and m5 <= -.04 and m15 <= -.10
+        valid = macd < sig and m5 <= -.04 and m15 <= -.10
     if watch.get("strategy", "breakout") != "breakout":
         valid = confirm_structure(prices, watch, ema, rsi)
     if not valid:
@@ -527,19 +450,10 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
             LOG.info("CLOSED-BUCKET confirm BLOCKED side=%s reason=%s context=%s",
                      "LONG" if direction == 1 else "SHORT", context_reason, context)
             return None
-        strict_ok, strict_reason, _ = extreme_5m_rsi_entry_gate(observations, direction)
-        if not strict_ok:
-            LOG.info("STRICT 5m RSI confirm BLOCKED direction=%s strategy=%s reason=%s",
-                     direction, watch.get("strategy", "breakout"), strict_reason)
-            return None
-        allowed_fast, fast_reason, fast_rsi = fast_sample_rsi_gate(prices, direction)
-        if not allowed_fast:
-            LOG.info("Fast sampled RSI confirmation BLOCKED side=%s reason=%s rsi=%.1f",
-                     "LONG" if direction == 1 else "SHORT", fast_reason, fast_rsi)
-            return None
-        allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(observations, direction, setup=watch)
+        allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(
+            observations, direction, setup=watch)
         if not allowed:
-            LOG.info("5m sampled RSI confirmation BLOCKED side=%s reason=%s rsi=%s",
+            LOG.info("5m sampled RSI confirm direction BLOCKED side=%s reason=%s rsi=%s",
                      "LONG" if direction == 1 else "SHORT", reason, sampled_rsi5)
             return None
     else:
@@ -551,7 +465,7 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
     if plan is not None:
         plan["sampled_rsi5"] = sampled_rsi5
         plan["sampled_context"] = context
-        plan["rsi_reversal_method"] = strict_reason if observations is not None else None
+        plan["rsi_direction_status"] = reason if observations is not None else None
     return plan
 
 
@@ -559,17 +473,12 @@ def format_entry_alert(plan, observed_at_utc):
     daily_goal = REF_BALANCE * 0.10
     rsi5 = plan.get("sampled_rsi5")
     rsi5_text = "검증전" if rsi5 is None else f"{rsi5:.1f}"
-    path_label = (
-        "첫 반전 → 횡보 유지 → RSI·가격 재가속 확인"
-        if plan.get("rsi_reversal_method") == "5m_extreme_then_first_turn_plateau_resume"
-        else "2회 연속 완료구간 RSI·가격 반전 확인"
-    )
     reversal_text = (
-        f"[롱 필수 확인] 완료 5분 가격표본 RSI 30 이하 이력 → {path_label}"
-        " (거래소 실제 5분봉 아님)\n"
-        if plan.get("direction") == 1 else
-        f"[숏 필수 확인] 완료 5분 가격표본 RSI 70 이상 이력 → {path_label}"
-        " (거래소 실제 5분봉 아님)\n"
+        f"[{'롱' if plan.get('direction') == 1 else '숏'} RSI 방향 확인] "
+        f"완료 5분 가격표본 RSI {'상승' if plan.get('direction') == 1 else '하락'} 확인 "
+        "(30/70 등 절대 수치 조건 없음; 거래소 실제 5분봉 아님)\\n"
+        if plan.get("rsi_direction_status") == "5m_rsi_direction_aligned"
+        else "완료 5분 가격표본 RSI 방향 일치: 미검증\\n"
     )
     context = plan.get("sampled_context") or {}
     context_text = (f"완료된 선물 가격표본: 5분 표본 15분 변화 {context['trend5_pct']:+.2f}% / "
@@ -601,8 +510,8 @@ def format_entry_alert(plan, observed_at_utc):
         f"{reversal_text}"
         f"{context_text}"
         "※ 3단계 반전은 가격표본의 마감값 비교이며 실제 캔들 3틱룰과 다름\n"
-        "※ 중립 RSI 진입 차단: 30 이하/70 이상 이력 후 2회 반전 또는 첫 반전·횡보·재돌파 필수\n"
-        "※ 30~35/65~70 미달 예외는 연구 전용이며 진입 알람으로 사용하지 않음\n"
+        "※ RSI는 30/70 극단값이나 이력으로 진입을 제한하지 않으며 롱 상승·숏 하락 방향만 확인\n"
+        "※ 기존 손절·추격금지·가격구조·비용·거시경제 주의 조건은 유지\n"
         "손익 계산: 진입/조건부 익절/손절 모두 Taker 0.06% 보수적 가정\n"
         "손절 슬리피지 0.02% 가정/펀딩 불리할 때 0.01% 완충(실제 비용 다를 수 있음)\n"
         "※ 지정가라도 즉시 체결되면 Taker 가능, Post-Only는 미체결 위험\n"
