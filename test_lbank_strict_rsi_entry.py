@@ -151,10 +151,10 @@ class DirectionalFiveMinuteRSITests(unittest.TestCase):
                 "m5": -.1, "m15": -.3, "rsi": 22., "sampled_rsi5": 19.,
                 "rsi_direction_status": "5m_rsi_direction_aligned"}
         alert = format_entry_alert(plan, "2026-10-15T12:40:00Z")
-        for label in ("현재 참고가격", "손절 참고가", "목표1", "목표2",
-                      "손절 예상 순손실", "Taker", "손절 슬리피지",
-                      "숏 RSI 방향 확인"):
+        for label in ("진입가:", "진입 증거금:", "목표가1:", "목표가2:",
+                      "예상 총손실", "포지션", "실전 진입 추천 아님"):
             self.assertIn(label, alert)
+        self.assertLessEqual(len(alert.splitlines()), 10)
         self.assertNotIn("중립 RSI 진입 차단", alert)
         self.assertNotIn("RSI 70 이상 이력", alert)
         self.assertEqual(MIN_NET_RR, 1.5)
