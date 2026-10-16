@@ -66,9 +66,14 @@ class TelegramTransportTests(unittest.TestCase):
         import os
         import tempfile
         methods = []
+        payloads = []
         def opener(request, timeout):
             method = request.full_url.rsplit("/", 1)[-1]
             methods.append(method)
+            if method == "sendMessage":
+                import urllib.parse
+                payloads.append(urllib.parse.parse_qs(
+                    request.data.decode("utf-8"))["text"][0])
             return io.BytesIO(b'{"ok":true,"result":{"message_id":13}}')
         with tempfile.TemporaryDirectory() as tmp:
             marker = os.path.join(tmp, "probe")
@@ -77,6 +82,9 @@ class TelegramTransportTests(unittest.TestCase):
             b = TelegramTransport("token", "chat", opener)
             self.assertTrue(b.startup_probe_once(marker))
             self.assertEqual(methods.count("sendMessage"), 1)
+            self.assertEqual(len(payloads), 1)
+            self.assertEqual(payloads[0].count("\n"), 2)
+            self.assertNotIn("\\n", payloads[0])
             self.assertTrue(os.path.exists(marker))
 
 
