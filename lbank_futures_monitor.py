@@ -24,6 +24,7 @@ from lbank_sampled_context import sampled_context_gate
 from lbank_rsi_research import ResearchTracker, NeutralExitStudy, neutral_stall
 from lbank_rsi_plateau import consolidation_reversal_resume
 from lbank_macro_monitor import MacroMonitor
+from lbank_orderbook_shadow import OrderBookShadowThread
 
 LOG = logging.getLogger("lbank_monitor")
 SYMBOL = "BTC/USDT:USDT"
@@ -687,6 +688,18 @@ def run():
         LOG.info("MACRO integration enabled official BLS/Fed news + BLS/BEA schedule; informative only")
     except Exception as exc:
         LOG.error("MACRO integration failed to start exception=%s", type(exc).__name__)
+    # Independent read-only LBank futures order-book data collection.
+    # Non-fatal in case this public API is inaccessible in this deployment.
+    # It NEVER affects the existing entry/safety rules or live Telegram sends.
+    if os.getenv("LBANK_ORDERBOOK_SHADOW_ENABLED", "true").lower() == "true":
+        try:
+            OrderBookShadowThread(
+                interval_seconds=int(os.getenv(
+                    "LBANK_ORDERBOOK_SHADOW_INTERVAL_SECONDS", "30"))).start()
+            LOG.info("ORDERBOOK_SHADOW integration started independent daemon")
+        except Exception as exc:
+            LOG.error("ORDERBOOK_SHADOW_INIT_FAILED exception=%s details=%s",
+                      type(exc).__name__, str(exc)[:150])
     LOG.info("risk_snapshot_poll=%ds, entry_snapshot_poll=%ds (sampled data only)", RISK_POLL, POLL)
     watch = None
     alert_state = cached_alert_state
