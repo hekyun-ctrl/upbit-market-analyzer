@@ -401,9 +401,14 @@ def calculate_plan(prices, direction, setup=None):
     }
 
 
-def classify(prices, observations=None):
-    """Identify a breakout WATCH; not yet actionable as an entry check."""
+def classify(prices, observations=None, diagnostics=None):
+    """Find a watch and optionally explain why no candidate survived."""
+    def mark(reason):
+        if diagnostics is not None:
+            diagnostics["reason"] = reason
+
     if len(prices) < MIN_SAMPLES:
+        mark("insufficient_samples")
         return None
     curr = prices[-1]
     m5 = (curr / prices[-6] - 1) * 100
@@ -419,6 +424,7 @@ def classify(prices, observations=None):
     elif curr < min(prices[-16:-1]) and macd < sig and m5 <= -.14 and m15 <= -.20:
         direction = -1
     else:
+        mark("market_no_setup")
         return None
     LOG.info("PREWATCH candidate strategy=%s direction=%s price=%.1f rsi1=%.1f",
              (setup or {}).get("strategy", "breakout"),
@@ -430,6 +436,7 @@ def classify(prices, observations=None):
             LOG.info("RETEST MOMENTUM WATCH BLOCKED side=%s reason=%s directed5m=%.3f%% directed15m=%.3f%%",
                      "LONG" if direction == 1 else "SHORT",
                      momentum_reason, directional5, directional15)
+            mark("retest_momentum")
             return None
     context = None
     if observations is not None:
@@ -438,35 +445,45 @@ def classify(prices, observations=None):
         if not context_ok:
             LOG.info("CLOSED-BUCKET watch BLOCKED side=%s reason=%s context=%s",
                      "LONG" if direction == 1 else "SHORT", context_reason, context)
+            mark("sampled_context")
             return None
         allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(
             observations, direction, setup=setup)
         if not allowed:
             LOG.info("5m sampled RSI watch direction BLOCKED side=%s reason=%s rsi=%s",
                      "LONG" if direction == 1 else "SHORT", reason, sampled_rsi5)
+            mark("rsi_direction")
             return None
     else:
         sampled_rsi5 = None
     plan = calculate_plan(prices, direction, setup=setup)
     if plan is None:
+        mark("risk_or_target")
         LOG.info("PREWATCH candidate cost/risk/target rejected strategy=%s direction=%s",
                  (setup or {}).get("strategy", "breakout"), direction)
     if plan is not None:
+        mark("qualified")
         plan["sampled_rsi5"] = sampled_rsi5
         plan["sampled_context"] = context
         plan["rsi_direction_status"] = reason if observations is not None else None
     return plan
 
 
-def confirm_watch(prices, watch, age_seconds, observations=None):
+def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=None):
     """Separate second-stage ENTRY REVIEW with fresh price confirmation.
 
     Used for user-side manual checking only, not a guaranteed market entry.
     It never assumes orderbook depth or authentic exchange OHLCV bars.
     """
+    def mark(reason):
+        if diagnostics is not None:
+            diagnostics["reason"] = reason
+
     if watch is None or age_seconds < 30 or age_seconds > ENTRY_CONFIRM_MAX_AGE_SECONDS:
+        mark("invalid_watch_age")
         return None
     if len(prices) < MIN_SAMPLES:
+        mark("insufficient_samples")
         return None
     direction = watch["direction"]
     current = prices[-1]
@@ -474,6 +491,7 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
     relative = direction * (current / initial - 1)
     # Do not chase >0.10% in the favorable direction or accept >0.10% failed breakout.
     if relative < -ENTRY_MAX_CHASE_PCT or relative > ENTRY_MAX_CHASE_PCT:
+        mark("price_deviation")
         return None
     m5 = (current / prices[-6] - 1) * 100
     m15 = (current / prices[-16] - 1) * 100
@@ -487,6 +505,7 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
     if watch.get("strategy", "breakout") != "breakout":
         valid = confirm_structure(prices, watch, ema, rsi)
     if not valid:
+        mark("structure_or_momentum")
         return None
     if watch.get("strategy") == "trend_retest":
         momentum_ok, momentum_reason, directional5, directional15 = (
@@ -495,6 +514,7 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
             LOG.info("RETEST MOMENTUM CONFIRM BLOCKED side=%s reason=%s directed5m=%.3f%% directed15m=%.3f%%",
                      "LONG" if direction == 1 else "SHORT",
                      momentum_reason, directional5, directional15)
+            mark("retest_momentum")
             return None
     context = None
     if observations is not None:
@@ -503,20 +523,24 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
         if not context_ok:
             LOG.info("CLOSED-BUCKET confirm BLOCKED side=%s reason=%s context=%s",
                      "LONG" if direction == 1 else "SHORT", context_reason, context)
+            mark("sampled_context")
             return None
         allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(
             observations, direction, setup=watch)
         if not allowed:
             LOG.info("5m sampled RSI confirm direction BLOCKED side=%s reason=%s rsi=%s",
                      "LONG" if direction == 1 else "SHORT", reason, sampled_rsi5)
+            mark("rsi_direction")
             return None
     else:
         sampled_rsi5 = None
     plan = calculate_plan(prices, direction, setup=watch)
     if plan is None:
+        mark("risk_or_target")
         LOG.info("CONFIRM candidate cost/risk/target rejected strategy=%s direction=%s",
                  watch.get("strategy", "breakout"), direction)
     if plan is not None:
+        mark("qualified")
         plan["sampled_rsi5"] = sampled_rsi5
         plan["sampled_context"] = context
         plan["rsi_direction_status"] = reason if observations is not None else None
