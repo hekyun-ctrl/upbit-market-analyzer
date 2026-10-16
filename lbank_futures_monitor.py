@@ -9,6 +9,7 @@ Persistent observations across short restarts are still TICKER samples, not cand
 import json
 import logging
 import os
+import threading
 import time
 import urllib.parse
 import urllib.request
@@ -25,8 +26,10 @@ from lbank_rsi_research import ResearchTracker, NeutralExitStudy, neutral_stall
 from lbank_rsi_plateau import consolidation_reversal_resume
 from lbank_macro_monitor import MacroMonitor
 from lbank_orderbook_shadow import OrderBookShadowThread
+from lbank_telegram_transport import TelegramTransport
 
 LOG = logging.getLogger("lbank_monitor")
+TELEGRAM_DELIVERY = TelegramTransport()
 SYMBOL = "BTC/USDT:USDT"
 POLL = max(30, int(os.getenv("LBANK_POLL_SECONDS", "60")))
 RISK_POLL = max(10, min(POLL, int(os.getenv("LBANK_RISK_POLL_SECONDS", "15"))))
@@ -235,21 +238,12 @@ def fast_sample_rsi_gate(prices, direction):
 
 
 def telegram(message):
-    token = os.getenv("TELEGRAM_BOT_TOKEN", "")
-    chat = os.getenv("TELEGRAM_CHAT_ID", "")
-    if not token or not chat:
-        LOG.error("Telegram credentials missing; cannot send")
-        return False
-    payload = urllib.parse.urlencode({"chat_id": chat, "text": message}).encode()
-    url = "https://api.telegram.org/bot" + token + "/sendMessage"
-    # Never log URL or token, including urllib exception values.
-    try:
-        with urllib.request.urlopen(urllib.request.Request(
-                url, data=payload, method="POST"), timeout=12) as resp:
-            return bool(json.load(resp).get("ok"))
-    except Exception as exc:
-        LOG.error("Telegram send failed, exception type=%s", type(exc).__name__)
-        return False
+    """Common, audited Telegram delivery; avoids logging credentials/messages.
+
+    Caller-side acknowledgement/retry remains authoritative: ambiguous timeouts
+    are never immediately resent as potentially duplicate entry alerts.
+    """
+    return TELEGRAM_DELIVERY.send(message)
 
 
 def get_perpetual_snapshot(exchange):
@@ -688,6 +682,10 @@ def run():
         raise RuntimeError("Refuse to monitor spot instrument")
     LOG.info("LBank BTCUSDT: TWO-STAGE fee-aware entry-review monitor started. REF_BALANCE=%.2f risk_pct=%.2f; NO orders",
              REF_BALANCE, 100 * RISK_FRACTION)
+    # Runs in a daemon so health checks cannot hold up market or stop warnings.
+    threading.Thread(target=TELEGRAM_DELIVERY.startup_probe_once,
+                     name="lbank-telegram-one-time-diagnostic",
+                     daemon=True).start()
     cached_observations, cached_alert_state = load_snapshots(
         SAMPLE_STORE_PATH, SYMBOL, POLL)
     observations = deque(cached_observations, maxlen=360)
