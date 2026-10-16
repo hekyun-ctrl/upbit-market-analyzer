@@ -719,5 +719,40 @@ class SignalReferenceMessagingTests(unittest.TestCase):
             format_risk_alert(s, "unknown", s.entry, "2026-10-16 09:20")
 
 
+
+class SignalDiagnosticsRegressionTests(unittest.TestCase):
+    def test_absent_market_setup_is_not_labeled_filter_failure(self):
+        diag = {}
+        self.assertIsNone(classify([80000.] * 60, diagnostics=diag))
+        self.assertEqual(diag["reason"], "market_no_setup")
+
+    def test_insufficient_market_samples_labelled_as_data_gap(self):
+        diag = {}
+        self.assertIsNone(classify([80000.] * 59, diagnostics=diag))
+        self.assertEqual(diag["reason"], "insufficient_samples")
+
+    def test_fee_or_target_rejection_distinguished_from_market_no_setup(self):
+        base = [80000. + 25 * i + (45 if i % 2 else 0) for i in range(60)]
+        diag = {}
+        with patch("lbank_futures_monitor.calculate_plan", return_value=None):
+            self.assertIsNone(classify(base, diagnostics=diag))
+        self.assertEqual(diag["reason"], "risk_or_target")
+
+    def test_second_stage_expiry_reports_real_reason(self):
+        base = [80000. + 25 * i + (45 if i % 2 else 0) for i in range(60)]
+        watch = classify(base)
+        self.assertIsNotNone(watch)
+        diag = {}
+        self.assertIsNone(confirm_watch(base, watch, 9999, diagnostics=diag))
+        self.assertEqual(diag["reason"], "invalid_watch_age")
+
+    def test_normal_qualified_watch_unaffected_by_optional_diagnostics(self):
+        base = [80000. + 25 * i + (45 if i % 2 else 0) for i in range(60)]
+        diag = {}
+        watch = classify(base, diagnostics=diag)
+        self.assertIsNotNone(watch)
+        self.assertEqual(diag["reason"], "qualified")
+
+
 if __name__ == "__main__":
     unittest.main()
