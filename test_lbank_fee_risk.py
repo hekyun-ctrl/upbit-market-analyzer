@@ -669,5 +669,55 @@ class StructureReactionTests(unittest.TestCase):
         self.assertIsNotNone(classify(prices))
         self.assertIsNone(classify(prices, observations=[(i * 60, p) for i, p in enumerate(prices)]))
 
+
+class SignalReferenceMessagingTests(unittest.TestCase):
+    """07:02 entry / 07:10 invalidation must name the SAME reference."""
+
+    @staticmethod
+    def test_plan():
+        base = [80000. + 25 * i + (45 if i % 2 else 0) for i in range(60)]
+        watch = classify(base)
+        return confirm_watch(base + [base[-1] + 5], watch, 60)
+
+    def test_numbered_entry_alert_and_freshness(self):
+        plan = self.test_plan()
+        self.assertIsNotNone(plan)
+        tr = SignalRiskTracker()
+        ref_number = tr.next_number
+        alert = format_entry_alert(plan, "2026-10-16T00:00:00Z",
+                                   reference_number=ref_number)
+        self.assertIn(f"신호번호: #{ref_number}", alert)
+        self.assertIn("5분 이상 경과하면 신규 진입 근거로 사용하지 말고", alert)
+        sent = tr.add_sent_signal(plan, 0)
+        self.assertEqual(sent.number, ref_number)
+        invalid = format_risk_alert(sent, "early_invalidation", plan["stop"] + 5,
+                                    "2026-10-16 09:10")
+        self.assertIn(f"기존 진입 알람: #{ref_number}", invalid)
+        self.assertIn("이전 조건부 진입 신호 무효화", invalid)
+        self.assertIn("신규 진입 금지", invalid)
+        self.assertIn("별도 신규 2단계 확인", invalid)
+
+    def test_stop_invalidates_and_targets_link_reference(self):
+        plan = self.test_plan()
+        tr = SignalRiskTracker()
+        s = tr.add_sent_signal(plan, 0)
+        stop = format_risk_alert(s, "stop_breached", s.stop - 5, "2026-10-16 09:10")
+        self.assertIn("신규 진입 금지", stop)
+        self.assertIn(f"기존 진입 알람: #{s.number}", stop)
+        tp1 = format_target_alert(s, s.target1 + 5, "2026-10-16 09:20")
+        tp2 = format_target2_alert(s, s.target2 + 5, "2026-10-16 09:30")
+        self.assertIn(f"기존 진입 알람: #{s.number}", tp1)
+        self.assertIn(f"기존 진입 알람: #{s.number}", tp2)
+
+    def test_legacy_alert_without_reference_remains_supported(self):
+        self.assertIn("조건부 진입 검토",
+                      format_entry_alert(self.test_plan(), "2026-10-16T00:00:00Z"))
+
+    def test_reject_unrecognized_risk_notice_reason(self):
+        s = SignalRiskTracker().add_sent_signal(self.test_plan(), 0)
+        with self.assertRaises(ValueError):
+            format_risk_alert(s, "unknown", s.entry, "2026-10-16 09:20")
+
+
 if __name__ == "__main__":
     unittest.main()
