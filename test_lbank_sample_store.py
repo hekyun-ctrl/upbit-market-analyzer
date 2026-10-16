@@ -76,5 +76,62 @@ class CachedSampleTests(unittest.TestCase):
         self.assertEqual(load_snapshots(self.path, SYMBOL, 60, now=now)[0], [])
 
 
+
+    def test_corrupt_primary_restores_valid_backup_without_waiting_an_hour(self):
+        now = 2000000000
+        observations = [(now - 59 * 60 + i * 60, 83000. + i)
+                        for i in range(60)]
+        alert = {"day": "2026-10-13", "count": 7,
+                 "last_time": now - 30, "last_side": "롱",
+                 "last_reversal_preview": now - 60}
+        save_snapshots(self.path, SYMBOL, 60, observations, alert)
+        self.assertTrue(os.path.exists(self.path + ".bak"))
+        with open(self.path, "w", encoding="utf-8") as file:
+            file.write('{"schema":1,"samples":[')
+        recovered, recovered_alert = load_snapshots(
+            self.path, SYMBOL, 60, now=now + 10)
+        self.assertEqual(recovered, observations)
+        self.assertEqual(recovered_alert, alert)
+
+    def test_corrupt_backup_keeps_valid_primary(self):
+        now = 2000000000
+        observations = [(now - 120, 83000.), (now - 60, 83020.), (now, 83040.)]
+        save_snapshots(self.path, SYMBOL, 60, observations, {})
+        with open(self.path + ".bak", "w", encoding="utf-8") as file:
+            file.write("no JSON")
+        observed, _ = load_snapshots(self.path, SYMBOL, 60, now=now + 20)
+        self.assertEqual(observed, observations)
+
+    def test_both_replicas_stale_never_resurrect_old_candles(self):
+        now = 2000000000
+        observations = [(now - 600, 83300.), (now - 540, 83320.)]
+        alert = {"day": "2026-10-13", "count": 4, "last_time": now - 600,
+                 "last_side": "숏"}
+        save_snapshots(self.path, SYMBOL, 60, observations, alert)
+        observed, restored = load_snapshots(self.path, SYMBOL, 60, now=now)
+        self.assertEqual(observed, [])
+        self.assertEqual(restored["count"], 4)
+
+    def test_crash_left_temp_file_does_not_affect_recovery(self):
+        now = 2000000000
+        observations = [(now - 60, 83300.), (now, 83320.)]
+        save_snapshots(self.path, SYMBOL, 60, observations, {})
+        with open(self.path + ".tmp", "w", encoding="utf-8") as file:
+            file.write("bad")
+        observed, _ = load_snapshots(self.path, SYMBOL, 60, now=now + 10)
+        self.assertEqual(observed, observations)
+        self.assertFalse(os.path.exists(self.path + ".tmp.tmp"))
+
+    def test_gap_in_backup_cannot_generate_synthetic_samples(self):
+        now = 2000000000
+        observations = [(now - 3500, 83300.),
+                        (now - 120, 83320.), (now - 60, 83330.), (now, 83340.)]
+        save_snapshots(self.path, SYMBOL, 60, observations, {})
+        with open(self.path, "w", encoding="utf-8") as file:
+            file.write("broken")
+        observed, _ = load_snapshots(self.path, SYMBOL, 60, now=now + 10)
+        self.assertEqual(observed, observations[-3:])
+
+
 if __name__ == "__main__":
     unittest.main()
