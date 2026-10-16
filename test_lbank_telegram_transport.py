@@ -61,5 +61,24 @@ class TelegramTransportTests(unittest.TestCase):
             self.assertFalse(transport.send("a"))
 
 
+
+    def test_one_time_probe_sends_one_non_trade_message_across_restart(self):
+        import os
+        import tempfile
+        methods = []
+        def opener(request, timeout):
+            method = request.full_url.rsplit("/", 1)[-1]
+            methods.append(method)
+            return io.BytesIO(b'{"ok":true,"result":{"message_id":13}}')
+        with tempfile.TemporaryDirectory() as tmp:
+            marker = os.path.join(tmp, "probe")
+            a = TelegramTransport("token", "chat", opener)
+            self.assertTrue(a.startup_probe_once(marker))
+            b = TelegramTransport("token", "chat", opener)
+            self.assertTrue(b.startup_probe_once(marker))
+            self.assertEqual(methods.count("sendMessage"), 1)
+            self.assertTrue(os.path.exists(marker))
+
+
 if __name__ == "__main__":
     unittest.main()
