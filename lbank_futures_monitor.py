@@ -27,6 +27,7 @@ from lbank_rsi_plateau import consolidation_reversal_resume
 from lbank_macro_monitor import MacroMonitor
 from lbank_orderbook_shadow import OrderBookShadowThread
 from lbank_notification_schedule import is_quiet_new_entry_time
+from lbank_compact_alert import format_compact_entry_alert
 from lbank_telegram_transport import TelegramTransport
 
 LOG = logging.getLogger("lbank_monitor")
@@ -59,7 +60,7 @@ MIN_NET_RR = 1.5
 MIN_SAMPLES = 60
 SAMPLE_STORE_PATH = os.getenv("LBANK_SAMPLE_STORE_PATH", "/data/lbank_price_samples.json")
 if not (0 < REF_BALANCE <= 1000000 and 0 < RISK_FRACTION <= 0.01 and
-        1 <= LEVERAGE <= 50):
+        1 <= LEVERAGE <= 50 and 0 < MAX_MARGIN_FRACTION <= 0.15):
     raise ValueError("Unsafe risk configuration: check balance, max 1% risk and max 50x")
 
 
@@ -543,84 +544,15 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
 
 
 def format_entry_alert(plan, observed_at_utc, reference_number=None):
-    daily_goal = REF_BALANCE * 0.10
-    rsi5 = plan.get("sampled_rsi5")
-    rsi5_text = "검증전" if rsi5 is None else f"{rsi5:.1f}"
-    reversal_text = (
-        f"[{'롱' if plan.get('direction') == 1 else '숏'} RSI 방향 확인] "
-        f"완료 5분 가격표본 RSI {'상승' if plan.get('direction') == 1 else '하락'} 확인 "
-        "(30/70 등 절대 수치 조건 없음; 거래소 실제 5분봉 아님)\n"
-        if plan.get("rsi_direction_status") == "5m_rsi_direction_aligned"
-        else "완료 5분 가격표본 RSI 방향 일치: 미검증\n"
-    )
-    context = plan.get("sampled_context") or {}
-    context_text = (f"완료된 선물 가격표본: 5분 표본 15분 변화 {context['trend5_pct']:+.2f}% / "
-                    f"15분 표본 45분 변화 {context['trend15_pct']:+.2f}% / "
-                    f"최근 표본 변동폭 {context['range5_pct']:.2f}% / "
-                    f"3단계 조정 후 반전 {'관찰' if context['three_step_recovery'] else '미확인'}\n"
-                    if context else "선물 가격표본 다중시간대 검증: 미수행\n")
-    pattern = {"breakout": "돌파", "range_rebound": "박스권 반등·저항",
-               "trend_retest": "추세 눌림 재지지"}.get(plan.get("strategy"), "미분류")
-    ref_line = (f"신호번호: #{reference_number} (이 번호로 후속 무효화/목표 알림 연결)\n"
-                if reference_number is not None else "")
-    move = plan.get("confirmation_progress_pct")
-    confirmation_text = (
-        f"2단계 확인 순방향 진행폭: {move:+.4f}% "
-        "(1차 후보 대비 관측가격 차이; 추세 강도 또는 수익성 검증 아님)\n"
-        if move is not None else "")
-    # The sampled 'trend15_pct' is computed using three completed 15-minute
-    # intervals = approximately 45 minutes. Do not mislabel it as a 15m move.
-    weak_context = (
-        plan.get("strategy") == "trend_retest"
-        and context
-        and plan.get("direction", 1) * context.get("trend15_pct", 0.) < 0
-        and not context.get("reversal_confirmed", False))
-    context_warning = (
-        "※ 주의: 15분 표본으로 본 최근 약 45분 가격방향은 진입 방향과 "
-        "반대이며, 반전 확인도 미충족입니다. 강한 추세 재개가 "
-        "확인된 신호로 해석하지 마세요.\n"
-        if weak_context else "")
-    return (
-        f"[LBank BTCUSDT 선물 | 조건부 진입 검토 - {plan['side']}]\n"
-        f"{ref_line}"
-        "※ 검증 중인 관찰 알람이며 실전 진입 추천이 아닙니다. "
-        "현재 전략의 수수료 차감 순기대수익은 입증되지 않았습니다.\n"
-        f"{confirmation_text}"
-        f"{context_warning}"
-        "※ 1분 간격 선물 가격 표본에서 2단계 확인한 관찰 신호\n"
-        "※ 이 메시지는 발송 당시 관찰 결과입니다. 5분 이상 경과하면 신규 진입 근거로 사용하지 말고 최신 신호·가격·무효화 경고를 재확인하세요.\n"
-        f"확인 시각(UTC): {observed_at_utc}\n"
-        f"탐지 패턴: {pattern} (실제 5분봉·호가 미확인)\n"
-        f"현재 참고가격: {plan['price']:,.1f} USDT\n"
-        f"손절 참고가: {plan['stop']:,.1f}\n"
-        f"목표1 필요가격(순손익비 {plan['rr1']:.2f}): {plan['target1']:,.1f}\n"
-        f"목표2 필요가격(순손익비 {plan['rr2']:.2f}): {plan['target2']:,.1f}\n"
-        f"증거금 한도 예시: {plan['margin']:.2f} USDT / 명목금액: {plan['notional']:.2f} USDT\n"
-        f"위험모델 기준 참고 최대 진입수량: {plan.get('quantity_btc', plan['notional'] / plan['price']):.5f} BTC\n"
-        f"손절폭: {plan.get('stop_distance_pct', abs(plan['price'] - plan['stop']) / plan['price'] * 100):.3f}%"
-        f" / 최근 1분 가격표본 절대변화 90백분위: {plan.get('sampled_1m_abs_move_p90_pct', 0.):.3f}%\n"
-        f"손절 예상 순손실: -{plan['net_loss']:.2f} USDT\n"
-        f"목표1 예상 순이익: +{plan['net_gain1']:.2f} USDT\n"
-        f"목표2 예상 순이익: +{plan['net_gain2']:.2f} USDT\n"
-        f"시장가 가정 익절 왕복 Taker 수수료 추정: {plan['fee_roundtrip_est']:.2f} USDT\n"
-        f"시장가 가정 손절 왕복 Taker 수수료 추정: {plan['fee_stop_est']:.2f} USDT\n"
-        f"진입·익절 모두 Maker로 체결되면 절감 가능 추정: {plan['maker_potential_savings']:.2f} USDT\n"
-        f"기준 시드: {REF_BALANCE:.0f} USDT / 일 순수익 10% 목표: {daily_goal:.2f} USDT (보장 불가)\n"
-        f"5분 가격표본 변화 {plan['m5']:+.2f}% | 15분 {plan['m15']:+.2f}% | 1분 표본 RSI {plan['rsi']:.1f}\n"
-        f"완료 5분 가격표본 RSI(거래소 실제 5분봉 RSI 아님): {rsi5_text}\n"
-        f"{reversal_text}"
-        f"{context_text}"
-        "※ 3단계 반전은 가격표본의 마감값 비교이며 실제 캔들 3틱룰과 다름\n"
-        "※ RSI는 30/70 극단값이나 이력으로 진입을 제한하지 않으며 롱 상승·숏 하락 방향만 확인\n"
-        "※ 추세 눌림 진입은 5분·15분 가격 동력이 동시에 약하면 보류(완료 5분 RSI의 방향 확인과 별개)\n"
-        "※ 실제 BTC 주문수량이 위 참고수량을 넘으면 이 알람의 0.5% 위험 한도 계산이 유지되지 않습니다.\n"
-        "※ 실제 잔고·진입 체결가·수수료를 확인해 BTC 수량과 손절 주문을 직접 재계산하세요.\n"
-        "※ 기존 손절·추격금지·가격구조·비용·거시경제 주의 조건은 유지\n"
-        "손익 계산: 진입/조건부 익절/손절 모두 Taker 0.06% 보수적 가정\n"
-        "손절 슬리피지 0.02% 가정/펀딩 불리할 때 0.01% 완충(실제 비용 다를 수 있음)\n"
-        "※ 지정가라도 즉시 체결되면 Taker 가능, Post-Only는 미체결 위험\n"
-        "목표가는 예측이 아닌 비용·손익비 계산값. 실제 호가·체결·펀딩 미확인.\n"
-        "수동 거래 전 거래소 5분봉/15분봉과 호가·손절 주문을 반드시 확인하세요."
+    """Send only the actionable 9-line, USDT-first, KST observation summary.
+
+    Full market diagnostics and filter decisions remain in Railway logs.
+    Manual entries must verify live venue price, contract size and fees.
+    """
+    return format_compact_entry_alert(
+        plan, observed_at_utc, reference_number=reference_number,
+        reference_balance=REF_BALANCE, leverage=LEVERAGE,
+        max_margin_fraction=MAX_MARGIN_FRACTION,
     )
 
 
@@ -706,8 +638,8 @@ def run():
     exchange.load_markets()
     if not exchange.market(SYMBOL).get("swap"):
         raise RuntimeError("Refuse to monitor spot instrument")
-    LOG.info("LBank BTCUSDT: TWO-STAGE fee-aware entry-review monitor started. REF_BALANCE=%.2f risk_pct=%.2f; NO orders",
-             REF_BALANCE, 100 * RISK_FRACTION)
+    LOG.info("LBank BTCUSDT: TWO-STAGE fee-aware entry-review monitor started. REF_BALANCE=%.4f risk_pct=%.2f leverage=%.0fx max_margin_pct=%.1f; NO orders",
+             REF_BALANCE, 100 * RISK_FRACTION, LEVERAGE, MAX_MARGIN_FRACTION * 100)
     LOG.info("ENTRY_NOTIFICATION_SCHEDULE timezone=KST quiet=Wed-Sat 23:00-to-next-day-06:00"
              " night_shifts=Sun-Mon-Tue risk_notifications=always_on")
     # Runs in a daemon so health checks cannot hold up market or stop warnings.
