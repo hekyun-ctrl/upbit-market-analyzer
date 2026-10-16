@@ -562,9 +562,30 @@ def format_entry_alert(plan, observed_at_utc, reference_number=None):
                "trend_retest": "추세 눌림 재지지"}.get(plan.get("strategy"), "미분류")
     ref_line = (f"신호번호: #{reference_number} (이 번호로 후속 무효화/목표 알림 연결)\n"
                 if reference_number is not None else "")
+    move = plan.get("confirmation_progress_pct")
+    confirmation_text = (
+        f"2단계 확인 순방향 진행폭: {move:+.4f}% "
+        "(1차 후보 대비 관측가격 차이; 추세 강도 또는 수익성 검증 아님)\n"
+        if move is not None else "")
+    # The sampled 'trend15_pct' is computed using three completed 15-minute
+    # intervals = approximately 45 minutes. Do not mislabel it as a 15m move.
+    weak_context = (
+        plan.get("strategy") == "trend_retest"
+        and context
+        and plan.get("direction", 1) * context.get("trend15_pct", 0.) < 0
+        and not context.get("reversal_confirmed", False))
+    context_warning = (
+        "※ 주의: 15분 표본으로 본 최근 약 45분 가격방향은 진입 방향과 "
+        "반대이며, 반전 확인도 미충족입니다. 강한 추세 재개가 "
+        "확인된 신호로 해석하지 마세요.\n"
+        if weak_context else "")
     return (
         f"[LBank BTCUSDT 선물 | 조건부 진입 검토 - {plan['side']}]\n"
         f"{ref_line}"
+        "※ 검증 중인 관찰 알람이며 실전 진입 추천이 아닙니다. "
+        "현재 전략의 수수료 차감 순기대수익은 입증되지 않았습니다.\n"
+        f"{confirmation_text}"
+        f"{context_warning}"
         "※ 1분 간격 선물 가격 표본에서 2단계 확인한 관찰 신호\n"
         "※ 이 메시지는 발송 당시 관찰 결과입니다. 5분 이상 경과하면 신규 진입 근거로 사용하지 말고 최신 신호·가격·무효화 경고를 재확인하세요.\n"
         f"확인 시각(UTC): {observed_at_utc}\n"
@@ -929,6 +950,28 @@ def run():
                                 # The next reference ID is assigned only after
                                 # Telegram delivery succeeds. This same ID is
                                 # shown on all later signal followups.
+                                # Record fresh stage-two *price progress* separately
+                                # from 5m/15m momentum. A structural re-test can
+                                # confirm while making almost no fresh progress.
+                                proposed_at = float(watch["plan"]["price"])
+                                stage_move = (
+                                    plan["direction"] * (plan["price"] / proposed_at - 1)
+                                    * 100 if proposed_at > 0 else 0.0)
+                                plan["confirmation_progress_pct"] = stage_move
+                                ctx = plan.get("sampled_context") or {}
+                                signed_45m = plan["direction"] * ctx.get(
+                                    "trend15_pct", 0.0)
+                                LOG.warning(
+                                    "ENTRY_EVIDENCE_AUDIT strategy=%s side=%s "
+                                    "stage2_signed_progress_pct=%.5f "
+                                    "sampled_1m_move5_pct=%.4f "
+                                    "sampled_1m_move15_pct=%.4f "
+                                    "closed_15m_samples_45m_signed_pct=%.4f "
+                                    "confirmed_reversal=%s "
+                                    "read_only_no_quality_gate_change=true",
+                                    plan.get("strategy"), side, stage_move,
+                                    plan.get("m5"), plan.get("m15"),
+                                    signed_45m, ctx.get("reversal_confirmed"))
                                 message = format_entry_alert(
                                     plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat(),
                                     reference_number=risk_tracker.next_number)
