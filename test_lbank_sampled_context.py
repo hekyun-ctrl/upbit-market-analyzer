@@ -118,7 +118,7 @@ class SampledContextTests(unittest.TestCase):
         self.assertFalse(verified_reversal_recovery(five, -1, -.0046)[0])
         self.assertFalse(verified_reversal_recovery(five, 0, -.0046)[0])
 
-    def test_existing_risk_and_alert_label_unmodified(self):
+    def test_existing_risk_limit_and_short_alert_preserved(self):
         p = [80000. + 25 * i + (45 if i % 2 else 0) for i in range(60)]
         signal = classify(p)
         self.assertIsNotNone(signal)
@@ -126,8 +126,10 @@ class SampledContextTests(unittest.TestCase):
         signal["sampled_context"] = {"range5_pct": 0.35, "trend5_pct": 0.18,
                                       "trend15_pct": 0.30, "three_step_recovery": False}
         alert = format_entry_alert(signal, "2026-10-14T05:30:00Z")
-        self.assertIn("완료된 선물 가격표본", alert)
-        self.assertIn("실제 캔들 3틱룰과 다름", alert)
+        self.assertIn("조건부 진입 검토", alert)
+        self.assertIn("진입 증거금:", alert)
+        self.assertIn("실제 5분봉/호가 미검증", alert)
+        self.assertLessEqual(len(alert.splitlines()), 10)
 
 
 if __name__ == "__main__":
