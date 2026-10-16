@@ -730,11 +730,21 @@ def run():
     last_sample = observations[-1][0] if observations else 0
     startup_done = False
     next_startup_test = 0
-    counters = {"watched": 0, "confirmed": 0, "expired": 0, "blocked": 0,
-                "suppressed": 0, "range_watch": 0, "trend_watch": 0,
-                "breakout_watch": 0, "range_confirmed": 0,
-                "trend_confirmed": 0, "breakout_confirmed": 0}
+    counter_template = {"watched": 0, "confirmed": 0, "expired": 0, "blocked": 0,
+                        "suppressed": 0, "range_watch": 0, "trend_watch": 0,
+                        "breakout_watch": 0, "range_confirmed": 0,
+                        "trend_confirmed": 0, "breakout_confirmed": 0,
+                        "data_gap": 0, "no_setup": 0, "retest_momentum": 0,
+                        "sampled_context": 0, "rsi_direction": 0,
+                        "risk_or_target": 0, "other_reject": 0,
+                        "confirm_reject": 0}
+    counters = dict(counter_template)
+    diag_counters = dict(counter_template)
+    def count_event(label):
+        counters[label] += 1
+        diag_counters[label] += 1
     next_log_summary = time.time() + 3600
+    next_diag_summary = time.time() + 600
     last_5m_audit = None
     while True:
         try:
@@ -894,17 +904,26 @@ def run():
                     for i in range(1, len(recent)))
                 if not continuous:
                     watch = None
+                    count_event("data_gap")
                 elif watch is not None:
                     age = now - watch["time"]
                     if age > ENTRY_CONFIRM_MAX_AGE_SECONDS:
                         expired_plan = watch["plan"]
                         watch = None
-                        counters["expired"] += 1
+                        count_event("expired")
                         LOG.info("watch expired; no ENTRY REVIEW signal side=%s strategy=%s price=%.1f",
                                  expired_plan.get("side"), expired_plan.get("strategy"),
                                  expired_plan.get("price"))
                     else:
-                        plan = confirm_watch(prices, watch["plan"], age, observations=list(observations))
+                        confirm_diag = {}
+                        plan = confirm_watch(prices, watch["plan"], age,
+                                             observations=list(observations),
+                                             diagnostics=confirm_diag)
+                        if plan is None:
+                            count_event("confirm_reject")
+                            LOG.info("ALERT_CONFIRM_REJECT reason=%s age_seconds=%.1f strategy=%s",
+                                     confirm_diag.get("reason", "other"), age,
+                                     watch["plan"].get("strategy"))
                         if plan is not None:
                             side = plan["side"]
                             gate_reason = alert_gate(now, side, alert_state, plan=plan)
@@ -922,11 +941,11 @@ def run():
                                     save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
                                                    observations, alert_state)
                                     risk_tracker.add_sent_signal(plan, now)
-                                    counters["confirmed"] += 1
+                                    count_event("confirmed")
                                     source = plan.get("strategy", "breakout")
-                                    counters[{"range_rebound": "range_confirmed",
-                                              "trend_retest": "trend_confirmed",
-                                              "breakout": "breakout_confirmed"}[source]] += 1
+                                    count_event({"range_rebound": "range_confirmed",
+                                                 "trend_retest": "trend_confirmed",
+                                                 "breakout": "breakout_confirmed"}[source])
                                     LOG.info("ENTRY REVIEW SENT strategy=%s side=%s entry=%.1f stop=%.1f t1=%.1f t2=%.1f net_rr=%.2f reverse_exception=%s",
                                              source, side, plan["price"], plan["stop"],
                                              plan["target1"], plan["target2"],
@@ -934,23 +953,25 @@ def run():
                                 else:
                                     LOG.warning("ENTRY REVIEW SEND FAILED")
                             else:
-                                counters["suppressed"] += 1
+                                count_event("suppressed")
                                 LOG.info("ENTRY REVIEW SUPPRESSED side=%s reason=%s strategy=%s price=%.1f",
                                          side, gate_reason, plan.get("strategy", "breakout"),
                                          plan["price"])
                             watch = None
                 if continuous and watch is None:
-                    proposal = classify(prices, observations=list(observations))
+                    rejection = {}
+                    proposal = classify(prices, observations=list(observations),
+                                        diagnostics=rejection)
                     if proposal is not None:
                         side = proposal["side"]
                         gate_reason = alert_gate(now, side, alert_state, plan=proposal)
                         if gate_reason == "ok":
                             watch = {"plan": proposal, "time": now}
-                            counters["watched"] += 1
+                            count_event("watched")
                             source = proposal.get("strategy", "breakout")
-                            counters[{"range_rebound": "range_watch",
-                                      "trend_retest": "trend_watch",
-                                      "breakout": "breakout_watch"}[source]] += 1
+                            count_event({"range_rebound": "range_watch",
+                                         "trend_retest": "trend_watch",
+                                         "breakout": "breakout_watch"}[source])
                             LOG.info("watch created %s strategy=%s at %.1f context=%s",
                                      side, source, proposal["price"],
                                      proposal.get("sampled_context"))
@@ -971,19 +992,43 @@ def run():
                                     else:
                                         LOG.warning("VERIFIED REVERSE PREWATCH DELIVERY FAILED side=%s", side)
                         else:
-                            counters["suppressed"] += 1
+                            count_event("suppressed")
                             LOG.info("WATCH SUPPRESSED side=%s reason=%s strategy=%s price=%.1f",
                                      side, gate_reason, proposal.get("strategy", "breakout"),
                                      proposal["price"])
                     else:
-                        counters["blocked"] += 1
+                        count_event("blocked")
+                        bucket = rejection.get("reason", "other_reject")
+                        if bucket == "market_no_setup":
+                            bucket = "no_setup"
+                        elif bucket == "insufficient_samples":
+                            bucket = "data_gap"
+                        if bucket not in counter_template:
+                            bucket = "other_reject"
+                        count_event(bucket)
                 LOG.info("contract=BTCUSDT price=%.1f count=%d watch=%s confirmed_total=%d tracked_references=%d",
                          price, len(prices), watch["plan"]["side"] if watch else "none",
                          counters["confirmed"], len(risk_tracker.signals))
                 if now >= next_log_summary:
                     LOG.info("ALERT FUNNEL last-hour totals: %s", counters)
-                    counters = {key: 0 for key in counters}
+                    counters = dict(counter_template)
                     next_log_summary = now + 3600
+                if now >= next_diag_summary:
+                    LOG.info("ALERT_DIAGNOSTICS_10M no_setup=%d data_gap=%d "
+                             "retest_momentum=%d sampled_context=%d "
+                             "rsi_direction=%d risk_or_target=%d "
+                             "confirm_reject=%d watched=%d confirmed=%d "
+                             "suppressed=%d (no_setup != rejected trade)",
+                             diag_counters["no_setup"], diag_counters["data_gap"],
+                             diag_counters["retest_momentum"],
+                             diag_counters["sampled_context"],
+                             diag_counters["rsi_direction"],
+                             diag_counters["risk_or_target"],
+                             diag_counters["confirm_reject"],
+                             diag_counters["watched"], diag_counters["confirmed"],
+                             diag_counters["suppressed"])
+                    diag_counters = dict(counter_template)
+                    next_diag_summary = now + 600
         except Exception as exc:
             LOG.error("LBank market error (%s): %s", type(exc).__name__, str(exc)[:160])
         time.sleep(RISK_POLL)
