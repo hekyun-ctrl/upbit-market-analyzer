@@ -93,7 +93,8 @@ class LBankCostModelTests(unittest.TestCase):
         self.assertIn("예상 총손실", alert)
         self.assertIn(f"{confirmed['margin']:.2f} USDT", alert)
         self.assertIn("진입 증거금", alert)
-        self.assertNotIn(" BTC", alert)
+        self.assertNotIn(" BTC\n", alert)
+        self.assertNotIn("참고 최대 진입수량", alert)
         self.assertIn(f"레버리지 {LEVERAGE:.0f}배", alert)
         self.assertIn("관찰 신호", alert)
 
