@@ -10,6 +10,7 @@ import time
 import urllib.parse
 import urllib.request
 from decimal import Decimal, ROUND_DOWN
+from lbank_telegram_transport import TelegramTransport
 
 LOG = logging.getLogger("lbank_position_bot")
 PATH = os.getenv("LBANK_POSITION_STATE_PATH", "/data/lbank_position_state.json")
@@ -246,6 +247,7 @@ class TelegramBot:
         self.ledger = ledger
         self.enabled = bool(TOKEN and AUTHORIZED_CHAT)
         self._initialized = False
+        self.delivery = TelegramTransport(token=TOKEN, chat_id=AUTHORIZED_CHAT)
 
     def api(self, method, args=None):
         if not self.enabled:
@@ -265,10 +267,9 @@ class TelegramBot:
             return None
 
     def send(self, message, buttons=None):
-        args = {"chat_id":AUTHORIZED_CHAT, "text": message}
-        if buttons:
-            args["reply_markup"] = {"inline_keyboard":buttons}
-        return self.api("sendMessage",args) is not None
+        # Same validated transport as market/macro alerts. getUpdates and
+        # callbackQuery handling remain in this class without modification.
+        return self.enabled and self.delivery.send(message, buttons=buttons)
 
     def keyboard(self):
         pos = self.ledger.position
