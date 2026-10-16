@@ -674,13 +674,13 @@ class SignalReferenceMessagingTests(unittest.TestCase):
     """07:02 entry / 07:10 invalidation must name the SAME reference."""
 
     @staticmethod
-    def test_plan():
+    def make_plan():
         base = [80000. + 25 * i + (45 if i % 2 else 0) for i in range(60)]
         watch = classify(base)
         return confirm_watch(base + [base[-1] + 5], watch, 60)
 
     def test_numbered_entry_alert_and_freshness(self):
-        plan = self.test_plan()
+        plan = self.make_plan()
         self.assertIsNotNone(plan)
         tr = SignalRiskTracker()
         ref_number = tr.next_number
@@ -698,7 +698,7 @@ class SignalReferenceMessagingTests(unittest.TestCase):
         self.assertIn("별도 신규 2단계 확인", invalid)
 
     def test_stop_invalidates_and_targets_link_reference(self):
-        plan = self.test_plan()
+        plan = self.make_plan()
         tr = SignalRiskTracker()
         s = tr.add_sent_signal(plan, 0)
         stop = format_risk_alert(s, "stop_breached", s.stop - 5, "2026-10-16 09:10")
@@ -711,10 +711,10 @@ class SignalReferenceMessagingTests(unittest.TestCase):
 
     def test_legacy_alert_without_reference_remains_supported(self):
         self.assertIn("조건부 진입 검토",
-                      format_entry_alert(self.test_plan(), "2026-10-16T00:00:00Z"))
+                      format_entry_alert(self.make_plan(), "2026-10-16T00:00:00Z"))
 
     def test_reject_unrecognized_risk_notice_reason(self):
-        s = SignalRiskTracker().add_sent_signal(self.test_plan(), 0)
+        s = SignalRiskTracker().add_sent_signal(self.make_plan(), 0)
         with self.assertRaises(ValueError):
             format_risk_alert(s, "unknown", s.entry, "2026-10-16 09:20")
 
