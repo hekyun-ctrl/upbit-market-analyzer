@@ -754,5 +754,49 @@ class SignalDiagnosticsRegressionTests(unittest.TestCase):
         self.assertEqual(diag["reason"], "qualified")
 
 
+
+class RetestEvidenceDisclosureTests(unittest.TestCase):
+    """Show weak evidence clearly but do not fit a hard veto to one losing trade."""
+
+    @staticmethod
+    def example_plan():
+        base = [80000. + 25 * i + (45 if i % 2 else 0) for i in range(60)]
+        plan = classify(base)
+        assert plan is not None
+        plan["strategy"] = "trend_retest"
+        plan["confirmation_progress_pct"] = .0045
+        plan["sampled_context"] = {
+            "trend5_pct": .0505, "trend15_pct": -.0329,
+            "range5_pct": .2191, "three_step_recovery": False,
+            "reversal_confirmed": False,
+        }
+        return plan
+
+    def test_weak_retest_signal_discloses_price_progress_and_45m_conflict(self):
+        plan = self.example_plan()
+        note = format_entry_alert(plan, "2026-10-16T04:25:02+00:00",
+                                  reference_number=5)
+        self.assertIn("신호번호: #5", note)
+        self.assertIn("실전 진입 추천이 아닙니다", note)
+        self.assertIn("2단계 확인 순방향 진행폭: +0.0045%", note)
+        self.assertIn("45분 가격방향", note)
+        self.assertIn("반전 확인도 미충족", note)
+        self.assertIn("15분 표본 45분 변화 -0.03%", note)
+
+    def test_aligned_or_verified_retest_does_not_show_countertrend_warning(self):
+        for context_change, verified in ((.15, False), (-.03, True)):
+            plan = self.example_plan()
+            plan["sampled_context"]["trend15_pct"] = context_change
+            plan["sampled_context"]["reversal_confirmed"] = verified
+            note = format_entry_alert(plan, "2026-10-16T04:25:02+00:00")
+            self.assertNotIn("45분 가격방향은 진입 방향과 반대", note)
+            self.assertIn("실전 진입 추천이 아닙니다", note)
+
+    def test_legacy_plan_without_stage_progress_is_compatible(self):
+        plan = self.example_plan()
+        plan.pop("confirmation_progress_pct")
+        note = format_entry_alert(plan, "2026-10-16T04:25:02+00:00")
+        self.assertNotIn("2단계 확인 순방향 진행폭", note)
+
 if __name__ == "__main__":
     unittest.main()
