@@ -8,7 +8,7 @@ from lbank_signal_risk import SignalRiskTracker, format_risk_alert, format_targe
 
 
 from lbank_futures_monitor import (
-    REF_BALANCE, RISK_FRACTION, classify,
+    REF_BALANCE, RISK_FRACTION, MAX_MARGIN_FRACTION, LEVERAGE, classify,
     alert_gate, record_alert, verified_reversal_exception,
     format_reversal_pre_watch, COOLDOWN, REVERSAL_COOLDOWN, MAX_DAILY_ALERTS,
     minimum_net_rr_target, net_pnl_per_btc,
@@ -65,7 +65,7 @@ class LBankCostModelTests(unittest.TestCase):
         self.assertIsNotNone(signal)
         self.assertEqual(signal["side"], "롱")
         self.assertLessEqual(signal["net_loss"], REF_BALANCE * RISK_FRACTION + 1e-8)
-        self.assertLessEqual(signal["margin"], REF_BALANCE * 0.10 + 1e-8)
+        self.assertLessEqual(signal["margin"], REF_BALANCE * MAX_MARGIN_FRACTION + 1e-8)
         self.assertGreaterEqual(signal["rr1"], 1.5 - 1e-7)
         self.assertGreaterEqual(signal["rr2"], 2.5 - 1e-7)
         self.assertGreater(signal["fee_roundtrip_est"], 0)
@@ -90,12 +90,12 @@ class LBankCostModelTests(unittest.TestCase):
         self.assertGreaterEqual(confirmed["rr1"], 1.5 - 1e-7)
         alert = format_entry_alert(confirmed, "2026-10-13T00:00:00Z")
         self.assertIn("조건부 진입 검토", alert)
-        self.assertIn("손절 예상 순손실", alert)
-        self.assertIn(f"{REF_BALANCE * 0.10:.2f} USDT", alert)
-        self.assertIn("참고 최대 진입수량", alert)
-        self.assertIn(f"{confirmed['quantity_btc']:.5f} BTC", alert)
-        self.assertIn("1분 가격표본 절대변화 90백분위", alert)
-        self.assertIn("실제 BTC 주문수량이 위 참고수량을 넘으면", alert)
+        self.assertIn("예상 총손실", alert)
+        self.assertIn(f"{confirmed['margin']:.2f} USDT", alert)
+        self.assertIn("진입 증거금", alert)
+        self.assertNotIn(" BTC", alert)
+        self.assertIn(f"레버리지 {LEVERAGE:.0f}배", alert)
+        self.assertIn("관찰 신호", alert)
 
     def test_stage_two_rejects_stale_watch_and_price_chasing(self):
         base = [80000. + 25 * i + (45 if i % 2 else 0) for i in range(60)]
@@ -607,7 +607,7 @@ class StructureReactionTests(unittest.TestCase):
         self.assertLess(watch["stop"], setup["structure_anchor"])
         self.assertLess(watch["target1"], setup["barrier"])
         self.assertLessEqual(watch["net_loss"], REF_BALANCE * RISK_FRACTION + 1e-8)
-        self.assertLessEqual(watch["margin"], REF_BALANCE * .10 + 1e-8)
+        self.assertLessEqual(watch["margin"], REF_BALANCE * MAX_MARGIN_FRACTION + 1e-8)
         self.assertGreaterEqual(watch["rr1"], 1.5 - 1e-8)
 
     def test_range_resistance_short_and_second_stage(self):
@@ -662,7 +662,7 @@ class StructureReactionTests(unittest.TestCase):
         self.assertEqual(watch["strategy"], "trend_retest")
         self.assertEqual(watch["direction"], -1)
         self.assertGreater(watch["stop"], watch["structure_anchor"])
-        self.assertLessEqual(watch["margin"], REF_BALANCE * .10 + 1e-8)
+        self.assertLessEqual(watch["margin"], REF_BALANCE * MAX_MARGIN_FRACTION + 1e-8)
 
     def test_5m_gate_fails_closed_for_structure_without_contiguous_samples(self):
         prices = self.ranging_long()
@@ -687,7 +687,7 @@ class SignalReferenceMessagingTests(unittest.TestCase):
         alert = format_entry_alert(plan, "2026-10-16T00:00:00Z",
                                    reference_number=ref_number)
         self.assertIn(f"신호번호: #{ref_number}", alert)
-        self.assertIn("5분 이상 경과하면 신규 진입 근거로 사용하지 말고", alert)
+        self.assertIn("유효 5분", alert)
         sent = tr.add_sent_signal(plan, 0)
         self.assertEqual(sent.number, ref_number)
         invalid = format_risk_alert(sent, "early_invalidation", plan["stop"] + 5,
@@ -777,11 +777,11 @@ class RetestEvidenceDisclosureTests(unittest.TestCase):
         note = format_entry_alert(plan, "2026-10-16T04:25:02+00:00",
                                   reference_number=5)
         self.assertIn("신호번호: #5", note)
-        self.assertIn("실전 진입 추천이 아닙니다", note)
-        self.assertIn("2단계 확인 순방향 진행폭: +0.0045%", note)
-        self.assertIn("45분 가격방향", note)
-        self.assertIn("반전 확인도 미충족", note)
-        self.assertIn("15분 표본 45분 변화 -0.03%", note)
+        self.assertIn("실전 진입 추천 아님", note)
+        self.assertIn("진입 증거금", note)
+        self.assertIn("45분 표본 역추세", note)
+        self.assertIn("반전 미확인", note)
+        self.assertLessEqual(len(note.splitlines()), 11)
 
     def test_aligned_or_verified_retest_does_not_show_countertrend_warning(self):
         for context_change, verified in ((.15, False), (-.03, True)):
@@ -789,8 +789,8 @@ class RetestEvidenceDisclosureTests(unittest.TestCase):
             plan["sampled_context"]["trend15_pct"] = context_change
             plan["sampled_context"]["reversal_confirmed"] = verified
             note = format_entry_alert(plan, "2026-10-16T04:25:02+00:00")
-            self.assertNotIn("45분 가격방향은 진입 방향과 반대", note)
-            self.assertIn("실전 진입 추천이 아닙니다", note)
+            self.assertNotIn("45분 표본 역추세", note)
+            self.assertIn("실전 진입 추천 아님", note)
 
     def test_legacy_plan_without_stage_progress_is_compatible(self):
         plan = self.example_plan()
