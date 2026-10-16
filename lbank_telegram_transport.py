@@ -118,8 +118,8 @@ class TelegramTransport:
                 record.flush()
                 os.fsync(record.fileno())
             ok = self.send(
-                "[LBank BTCUSDT | 통신 복구 검증]\\n"
-                "텔레그램 전송 경로의 시험 메시지입니다.\\n"
+                "[LBank BTCUSDT | 통신 복구 검증]\n"
+                "텔레그램 전송 경로의 시험 메시지입니다.\n"
                 "진입 알람이나 매매 신호가 아닙니다. 자동주문 없음."
             )
             if ok:
