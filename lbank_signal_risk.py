@@ -195,6 +195,7 @@ def format_target_alert(signal, price, time_kst):
     move_pct = signal.direction * (signal.target1 / signal.entry - 1) * 100
     return (
         f"[LBank BTCUSDT | 1차 목표 도달 - {side}]\n"
+        f"기존 진입 알람: #{signal.number}\n"
         f"한국시간: {time_kst}\n"
         f"현재 1차 목표 {signal.target1:,.1f} USDT ({move_pct:+.2f}%) 도달\n"
         f"목표 접촉 시 선물 가격표본: {price:,.1f} USDT\n"
@@ -218,6 +219,7 @@ def format_target2_alert(signal, price, time_kst):
     move_pct = signal.direction * (signal.target2 / signal.entry - 1) * 100
     return (
         f"[LBank BTCUSDT | 2차 목표 도달 - {side}]\n"
+        f"기존 진입 알람: #{signal.number}\n"
         f"한국시간: {time_kst}\n"
         f"현재 2차 목표 {signal.target2:,.1f} USDT ({move_pct:+.2f}%) 도달\n"
         f"목표 접촉 시 선물 가격표본: {price:,.1f} USDT\n"
@@ -233,12 +235,15 @@ def format_target2_alert(signal, price, time_kst):
 def format_risk_alert(signal, reason, price, time_kst):
     side = "롱" if signal.direction == 1 else "숏"
     move_pct = signal.direction * (price / signal.entry - 1) * 100
-    reason_ko = (
-        "참고 손절선 도달 또는 이탈" if reason == "stop_breached"
-        else "반대 방향 움직임이 2회 연속 확인됨"
-    )
+    if reason not in ("stop_breached", "early_invalidation"):
+        raise ValueError("Unknown follow-up risk reason")
+    reason_ko = ("참고 손절선 도달 또는 이탈" if reason == "stop_breached"
+                 else "반대 방향 움직임이 2회 연속 확인됨")
     return (
         f"[LBank BTCUSDT | 긴급 위험 경고 - 기존 {side} 신호]\n"
+        f"기존 진입 알람: #{signal.number}\n"
+        "상태: 이전 조건부 진입 신호 무효화 — 이 알람을 근거로 신규 진입 금지.\n"
+        "새로운 진입은 별도 신규 2단계 확인 알람이 필요합니다.\n"
         f"한국시간: {time_kst}\n"
         f"판단 근거: {reason_ko}\n"
         f"기존 신호 관심가: {signal.entry:,.1f} USDT\n"
