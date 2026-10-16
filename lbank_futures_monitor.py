@@ -522,7 +522,7 @@ def confirm_watch(prices, watch, age_seconds, observations=None):
     return plan
 
 
-def format_entry_alert(plan, observed_at_utc):
+def format_entry_alert(plan, observed_at_utc, reference_number=None):
     daily_goal = REF_BALANCE * 0.10
     rsi5 = plan.get("sampled_rsi5")
     rsi5_text = "검증전" if rsi5 is None else f"{rsi5:.1f}"
@@ -541,9 +541,13 @@ def format_entry_alert(plan, observed_at_utc):
                     if context else "선물 가격표본 다중시간대 검증: 미수행\n")
     pattern = {"breakout": "돌파", "range_rebound": "박스권 반등·저항",
                "trend_retest": "추세 눌림 재지지"}.get(plan.get("strategy"), "미분류")
+    ref_line = (f"신호번호: #{reference_number} (이 번호로 후속 무효화/목표 알림 연결)\n"
+                if reference_number is not None else "")
     return (
         f"[LBank BTCUSDT 선물 | 조건부 진입 검토 - {plan['side']}]\n"
+        f"{ref_line}"
         "※ 1분 간격 선물 가격 표본에서 2단계 확인한 관찰 신호\n"
+        "※ 이 메시지는 발송 당시 관찰 결과입니다. 5분 이상 경과하면 신규 진입 근거로 사용하지 말고 최신 신호·가격·무효화 경고를 재확인하세요.\n"
         f"확인 시각(UTC): {observed_at_utc}\n"
         f"탐지 패턴: {pattern} (실제 5분봉·호가 미확인)\n"
         f"현재 참고가격: {plan['price']:,.1f} USDT\n"
@@ -868,8 +872,12 @@ def run():
                             side = plan["side"]
                             gate_reason = alert_gate(now, side, alert_state, plan=plan)
                             if gate_reason == "ok":
+                                # The next reference ID is assigned only after
+                                # Telegram delivery succeeds. This same ID is
+                                # shown on all later signal followups.
                                 message = format_entry_alert(
-                                    plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat())
+                                    plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat(),
+                                    reference_number=risk_tracker.next_number)
                                 if telegram(message):
                                     reverse_exception = verified_reversal_exception(
                                         now, side, alert_state, plan)
