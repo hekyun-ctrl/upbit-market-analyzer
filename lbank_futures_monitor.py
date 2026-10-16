@@ -8,6 +8,7 @@ Persistent observations across short restarts are still TICKER samples, not cand
 """
 import json
 import logging
+import math
 import os
 import threading
 import time
@@ -363,8 +364,13 @@ def calculate_plan(prices, direction, setup=None):
         return None
     permitted_loss = REF_BALANCE * RISK_FRACTION
     effective_entry = curr
-    qty = min(permitted_loss / unit_loss,
-              REF_BALANCE * MAX_MARGIN_FRACTION * LEVERAGE / effective_entry)
+    raw_qty = min(permitted_loss / unit_loss,
+                  REF_BALANCE * MAX_MARGIN_FRACTION * LEVERAGE / effective_entry)
+    # Displayed entry margin is a conservative cent-rounded amount in USDT.
+    # Rounding DOWN avoids asking the user to deposit more than the modeled cap.
+    # This is still only an estimate: live venue contract steps are unverified.
+    margin = math.floor(raw_qty * effective_entry / LEVERAGE * 100) / 100
+    qty = margin * LEVERAGE / effective_entry
     if qty <= 0:
         return None
     net_loss = -qty * net_pnl_per_btc(direction, curr, stop)
@@ -384,7 +390,7 @@ def calculate_plan(prices, direction, setup=None):
         "barrier": setup.get("barrier"),
         "price": curr, "rsi": strength, "m5": momentum5, "m15": momentum15,
         "stop": stop, "target1": t1, "target2": t2,
-        "margin": qty * effective_entry / LEVERAGE, "notional": qty * curr,
+        "margin": margin, "notional": qty * curr,
         "quantity_btc": qty, "reference_risk_budget": permitted_loss,
         "stop_distance_pct": stop_distance * 100,
         "sampled_1m_abs_move_p90_pct": one_min_p90,
