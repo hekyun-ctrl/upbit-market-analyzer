@@ -32,6 +32,7 @@ from lbank_telegram_transport import TelegramTransport
 from lbank_performance import PerformanceBook
 from lbank_native_candles import NativeCandleThread
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
+from lbank_trend_runner import format_runner_alert, POLICY_VERSION
 
 LOG = logging.getLogger("lbank_monitor")
 TELEGRAM_DELIVERY = TelegramTransport()
@@ -45,6 +46,8 @@ STARTUP_RETRY = 300
 STARTUP_TEST_ENABLED = os.getenv("LBANK_STARTUP_TEST_ENABLED", "false").lower() == "true"
 ENTRY_CONFIRM_MAX_AGE_SECONDS = 240
 ENTRY_MAX_CHASE_PCT = 0.0010
+RUNNER_ENABLED = os.getenv("LBANK_TREND_RUNNER_ENABLED", "true").lower() == "true"
+DAILY_GOAL_PCT = 7.0  # Reporting objective only; never an entry/size/exit trigger.
 
 MAX_AGE_MS = 180_000
 # Configured values are estimates, not authenticated account fee/risk records.
@@ -406,6 +409,7 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
         "fee_stop_est": qty * (effective_entry * TAKER_FEE +
             stop * (1 - direction * STOP_SLIPPAGE) * TAKER_FEE),
         "maker_potential_savings": qty * (effective_entry + t1) * (TAKER_FEE - MAKER_FEE),
+        "runner_enabled": bool(native_state is not None and RUNNER_ENABLED),
     }
 
 
@@ -733,9 +737,12 @@ def run():
     try:
         performance = PerformanceBook(
             os.getenv("LBANK_PERFORMANCE_DB", "/data/lbank_performance.sqlite3"),
-            REF_BALANCE, goal_pct=5.0)
-        LOG.info("PERFORMANCE_V2 ready daily_goal_pct=5 report_kst=22:50 "
+            REF_BALANCE, goal_pct=DAILY_GOAL_PCT)
+        LOG.info("PERFORMANCE_V3 ready daily_goal_pct=7 report_kst=22:50 "
                  "partial_exit=50pct source=ticker_samples actual_account_pnl=false")
+        LOG.info("TREND_RUNNER enabled=%s policy=%s atr=14 trail_atr=2 "
+                 "ema=9/21 max_tracking_hours=6 goal_is_exit_cap=false validated_profit=false",
+                 RUNNER_ENABLED, POLICY_VERSION)
     except Exception as exc:
         LOG.error("PERFORMANCE_V2 unavailable exception=%s; new_entries_paused=true",
                   type(exc).__name__)
@@ -791,6 +798,7 @@ def run():
             position_bot.poll()
             price, change24 = get_perpetual_snapshot(exchange)
             now = time.time()
+            native_state, native_diag = native_feed.snapshot(now, price)
             audit_ready = performance is not None
             if performance is not None:
                 try:
@@ -801,7 +809,7 @@ def run():
                         method, args, kwargs = pending_journal[0]
                         getattr(performance, method)(*args, **kwargs)
                         pending_journal.pop(0)
-                    for outcome in performance.observe(now, price):
+                    for outcome in performance.observe(now, price, native_state=native_state):
                         LOG.info("SIGNAL_MODEL_OUTCOME %s", json.dumps(outcome))
                 except Exception as exc:
                     audit_ready = False
@@ -856,7 +864,8 @@ def run():
             # Urgent risk messages bypass entry-alert cooldowns and daily quotas.
             # Only already-SENT hypothetical signals are monitored, not real positions.
             for tracked, reason, observed_price in (
-                [] if position_ledger.position else risk_tracker.check(observed_prices, now)
+                [] if position_ledger.position else risk_tracker.check(
+                    observed_prices, now, native_state=native_state)
             ):
                 observed_kst = datetime.fromtimestamp(
                     now, tz=timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
@@ -865,6 +874,8 @@ def run():
                     if reason == "target1_reached"
                     else format_target2_alert(tracked, observed_price, observed_kst)
                     if reason == "target2_reached"
+                    else format_runner_alert(tracked, reason, observed_price, observed_kst)
+                    if reason in ("trail_update", "target_extended", "trend_exit", "neutral_exit", "time_exit")
                     else format_risk_alert(tracked, reason, observed_price, observed_kst)
                 )
                 if telegram(notice):
@@ -877,6 +888,9 @@ def run():
                             pending_journal.append(("early_warning",
                                 (tracked.number, tracked.sent_at, now, observed_price), {}))
                             LOG.error("PERFORMANCE_V2 warning_failed exception=%s", type(exc).__name__)
+                    if tracked.pending_runner is not None:
+                        LOG.info("RUNNER_FOLLOWUP_SENT reference=%d proposal=%s",
+                                 tracked.number, json.dumps(tracked.pending_runner, sort_keys=True))
                     risk_tracker.acknowledge(tracked, reason=reason)
                     LOG.info(
                         "SIGNAL FOLLOWUP SENT reference=%d side=%s reason=%s price=%.1f",
@@ -890,7 +904,6 @@ def run():
                 observations.append((now, price))
                 save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
                                observations, alert_state)
-                native_state, native_diag = native_feed.snapshot(now, price)
                 LOG.info("NATIVE_ENTRY_STATUS %s", json.dumps(native_diag, sort_keys=True))
                 # Research and neutral-position warnings also use native 5m RSI.
                 # Shadow audit runs for every newly completed 5-minute candle.

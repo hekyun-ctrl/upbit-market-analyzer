@@ -1,0 +1,14 @@
+{
+  "bars": 53,
+  "gaps": 0,
+  "first_start": 1792210500,
+  "last_start": 1792226100,
+  "span_hours": 4.416666666666667,
+  "total_high": 81733,
+  "total_low": 81480.7,
+  "atr14": 33.79896875222057,
+  "rsi14": 53.049193590839124,
+  "chart_parity_verified": false,
+  "trading_profit_verified": false,
+  "note": "Only data geometry/continuity audited; no minute history or fills reconstructed."
+}

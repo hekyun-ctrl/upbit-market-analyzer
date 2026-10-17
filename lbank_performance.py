@@ -1,7 +1,8 @@
 """Persistent, auditable observation accounting. Never exchange/actual PnL.
 
-Two predeclared exit policies share each delivered signal: partial targets and
-partial targets plus exit on an early warning. Entry at the signal quote and
+Predeclared exit policies share each delivered signal: partial targets,
+warning exits, and (new eligible signals only) a native-bar trend runner.
+Entry at the signal quote and
 target-touch fills are hypothetical. Missing quotes censor a result; they do
 not become wins. SQLite transactions retain TP1 state across restarts.
 """
@@ -10,9 +11,10 @@ import math
 import os
 import sqlite3
 from datetime import datetime, timedelta, timezone
+from lbank_trend_runner import runner_decision, RUNNER_TTL, POLICY_VERSION
 
 KST = timezone(timedelta(hours=9))
-POLICIES = ("levels", "warning_exit")
+POLICIES = ("levels", "warning_exit", "trend_runner")
 
 
 def day_key(ts):
@@ -33,7 +35,7 @@ def leg_pnl(p, price, fraction):
 
 
 class PerformanceBook:
-    def __init__(self, path, balance, goal_pct=5.0):
+    def __init__(self, path, balance, goal_pct=7.0):
         if not positive(balance) or not positive(goal_pct):
             raise ValueError("invalid reference balance/goal")
         self.balance, self.goal_pct = float(balance), float(goal_pct)
@@ -52,6 +54,8 @@ class PerformanceBook:
             status TEXT DEFAULT 'open', closed REAL, net REAL,
             PRIMARY KEY(id, policy));
           CREATE TABLE IF NOT EXISTS reports(day TEXT PRIMARY KEY, state TEXT, at REAL);
+          CREATE TABLE IF NOT EXISTS runner_adjustments(
+            id TEXT, ts REAL, detail TEXT NOT NULL, PRIMARY KEY(id,ts));
         ''')
         self.last_prune = 0.0
 
@@ -69,6 +73,7 @@ class PerformanceBook:
                 self.db.execute("DELETE FROM signals WHERE status!='open' AND opened<?",
                                 (ts - 90 * 86400,))
                 self.db.execute("DELETE FROM reports WHERE at<?", (ts - 90 * 86400,))
+                self.db.execute("DELETE FROM runner_adjustments WHERE ts<?", (ts - 90 * 86400,))
                 self.last_prune = ts
 
     def add(self, reference, plan, ts, fee=.0006, slippage=.0002, funding=.0001):
@@ -85,12 +90,19 @@ class PerformanceBook:
         p = {k: plan[k] for k in fields}
         p.update(direction=d, strategy=plan.get("strategy", "unknown"),
                  fee=fee, slippage=slippage, funding_reserve=funding,
-                 reference_balance=self.balance, data_source="lbank_perpetual_ticker",
+                 reference_balance=self.balance,
+                 data_source=plan.get("data_source", "lbank_perpetual_ticker"),
+                 observation_source="lbank_perpetual_ticker",
+                 runner_enabled=bool(plan.get("runner_enabled")),
+                 runner_last_bar=-1, barrier=plan.get("barrier"),
+                 policy_version=POLICY_VERSION if plan.get("runner_enabled") else "fixed_levels_v2",
                  fills="hypothetical_quote_entry_and_target_touch_not_verified")
         # Timestamp in identity prevents collisions with an older reset signal ID.
         identity = f"{int(ts * 1000)}:{reference}"
         with self.db:
             for policy in POLICIES:
+                if policy == "trend_runner" and not p["runner_enabled"]:
+                    continue
                 self.db.execute('''INSERT OR IGNORE INTO signals
                     (id,policy,opened,last_at,last_price,plan) VALUES(?,?,?,?,?,?)''',
                     (identity, policy, ts, ts, plan["price"], json.dumps(p)))
@@ -104,7 +116,7 @@ class PerformanceBook:
         return {"id": row["id"], "policy": row["policy"], "status": reason,
                 "net_usdt_model": net, "actual_pnl": False}
 
-    def observe(self, ts, price):
+    def observe(self, ts, price, native_state=None):
         if not positive(ts) or not positive(price):
             raise ValueError("invalid observation")
         events = []
@@ -116,19 +128,38 @@ class PerformanceBook:
                 if ts - row["last_at"] > 150:
                     events.append(self._close(row, ts, price, "censored_gap", p))
                     continue
-                stop = p["price"] if row["stage"] else p["stop"]
+                is_runner = row["policy"] == "trend_runner"
+                stop = p.get("runner_stop", p["price"]) if row["stage"] else p["stop"]
                 if p["direction"] * (price - stop) <= 0:
                     # Use observed adverse price, not an optimistic stop fill.
                     events.append(self._close(row, ts, price,
-                                             "entry_stop" if row["stage"] else "stop", p))
+                                             ("trailing_stop" if is_runner and stop != p["price"] else
+                                              "entry_stop") if row["stage"] else "stop", p))
                     continue
-                if ts - row["opened"] >= 7200:
+                if ts - row["opened"] >= (RUNNER_TTL if is_runner else 7200):
                     events.append(self._close(row, ts, price, "time_exit", p))
                     continue
                 if not row["stage"] and p["direction"] * (price - p["target1"]) >= 0:
                     row["stage"], row["partial"] = 1, leg_pnl(p, p["target1"], .5)
                     self.db.execute("UPDATE signals SET stage=1,partial=? WHERE id=? AND policy=?",
                                     (row["partial"], row["id"], row["policy"]))
+                if is_runner and row["stage"]:
+                    proposal = runner_decision(
+                        direction=p["direction"], entry=p["price"],
+                        stop=p.get("runner_stop", p["price"]), target2=p["target2"],
+                        sent_at=row["opened"], last_bar=p.get("runner_last_bar", -1),
+                        state=native_state, now=ts, price=price,
+                        strategy=p["strategy"], barrier=p.get("barrier"))
+                    if proposal is not None:
+                        self.db.execute("INSERT OR IGNORE INTO runner_adjustments VALUES(?,?,?)",
+                                        (row["id"], ts, json.dumps(proposal)))
+                        if proposal["reason"] in ("trend_exit", "neutral_exit"):
+                            events.append(self._close(row, ts, price, proposal["reason"], p))
+                            continue
+                        p.update(runner_stop=proposal["stop"], target2=proposal["target2"],
+                                 runner_last_bar=proposal["bar_start"])
+                        self.db.execute("UPDATE signals SET plan=? WHERE id=? AND policy=?",
+                                        (json.dumps(p), row["id"], row["policy"]))
                 if row["stage"] and p["direction"] * (price - p["target2"]) >= 0:
                     events.append(self._close(row, ts, p["target2"], "target2", p))
                 else:
@@ -138,13 +169,13 @@ class PerformanceBook:
 
     def early_warning(self, reference, sent_at, ts, price):
         identity = f"{int(sent_at * 1000)}:{reference}"
-        row = self.db.execute("SELECT * FROM signals WHERE id=? AND policy='warning_exit' AND status='open'",
-                              (identity,)).fetchone()
-        if row is not None:
-            p = json.loads(row["plan"])
-            with self.db:
-                return self._close(row, ts, price,
-                                   "censored_gap" if ts - row["last_at"] > 150 else "early_warning", p)
+        rows = self.db.execute("SELECT * FROM signals WHERE id=? AND policy IN ('warning_exit','trend_runner') AND status='open'",
+                               (identity,)).fetchall()
+        with self.db:
+            for row in rows:
+                p = json.loads(row["plan"])
+                self._close(row, ts, price,
+                            "censored_gap" if ts - row["last_at"] > 150 else "early_warning", p)
 
     def summary(self, day=None):
         result = {}
@@ -154,13 +185,49 @@ class PerformanceBook:
                         and (day is None or day_key(r["opened"]) == day)]
             finished = [r for r in selected if r["net"] is not None]
             nets = [r["net"] for r in finished]
+            gains, losses = [n for n in nets if n > 0], [n for n in nets if n < 0]
+            equity = peak = drawdown = 0.
+            for r in sorted(finished, key=lambda r: (r["closed"], r["id"])):
+                equity += r["net"]
+                peak = max(peak, equity)
+                drawdown = max(drawdown, peak - equity)
+            # Wilson interval is descriptive; serially dependent trades violate
+            # its iid assumption. It is not a predictive success probability.
+            n, w = len(nets), len(gains)
+            if n:
+                z, rate = 1.96, w / n
+                center = (rate + z*z/(2*n)) / (1+z*z/n)
+                radius = z * math.sqrt(rate*(1-rate)/n + z*z/(4*n*n)) / (1+z*z/n)
+                interval = [100*(center-radius), 100*(center+radius)]
+            else:
+                interval = None
             result[policy] = {"signals": len(selected), "closed": len(finished),
                 "open": sum(r["status"] == "open" for r in selected),
                 "censored": sum(r["status"] == "censored_gap" for r in selected),
                 "net_usdt_model": sum(nets), "wins": sum(n > 0 for n in nets),
                 "reference_return_pct": sum(nets) / self.balance * 100,
+                "losses": len(losses), "win_rate_pct": 100*w/n if n else None,
+                "mean_win_usdt": sum(gains)/len(gains) if gains else None,
+                "mean_loss_usdt": sum(losses)/len(losses) if losses else None,
+                "expectancy_usdt": sum(nets)/n if n else None,
+                "profit_factor": sum(gains)/abs(sum(losses)) if losses else None,
+                "closed_model_drawdown_usdt": drawdown,
+                "win_rate_wilson95_iid_only": interval,
                 "actual_account_pnl": False}
         return result
+
+    def paired_runner_comparison(self, day=None):
+        """Compare ONLY common completed entries; exclude censored/open pairs."""
+        pairs = self.db.execute('''SELECT a.opened,a.net AS baseline,b.net AS runner
+          FROM signals a JOIN signals b ON a.id=b.id
+          WHERE a.policy='warning_exit' AND b.policy='trend_runner'
+          AND a.net IS NOT NULL AND b.net IS NOT NULL''').fetchall()
+        pairs = [p for p in pairs if day is None or day_key(p["opened"]) == day]
+        return {"completed_pairs": len(pairs),
+                "baseline_net": sum(p["baseline"] for p in pairs),
+                "runner_net": sum(p["runner"] for p in pairs),
+                "difference_usdt": sum(p["runner"]-p["baseline"] for p in pairs),
+                "actual_account_pnl": False}
 
     def daily_message(self, now):
         """One 22:50 KST cohort report/day, reserved before sending.
@@ -178,13 +245,18 @@ class PerformanceBook:
             return None
         stats = self.summary(day)
         a, b = stats["levels"], stats["warning_exit"]
+        runner, paired = stats["trend_runner"], self.paired_runner_comparison(day)
+        rate = "미집계" if runner["win_rate_pct"] is None else f"{runner['win_rate_pct']:.1f}%"
         return (f"[LBank BTCUSDT | {day} 알람 모의 성과 중간집계]\n"
                 f"기록 시작 이후 오늘 생성 신호 {a['signals']}건 | 완료 {a['closed']} · 관찰중 {a['open']} · 자료공백 {a['censored']}\n"
                 f"50% 분할익절·진입가 손절: {a['net_usdt_model']:+.2f} USDT ({a['reference_return_pct']:+.2f}%)\n"
                 f"조기경고 청산 모형: {b['net_usdt_model']:+.2f} USDT | 완료 {b['closed']}건\n"
+                f"추세연장 모형: {runner['net_usdt_model']:+.2f} USDT | 완료 {runner['closed']} · 관찰중 {runner['open']} · 공백 {runner['censored']}\n"
+                f"추세연장 최종 순익 승률 {rate} | 동일신호 완료 {paired['completed_pairs']}쌍, 기존 대비 {paired['difference_usdt']:+.2f} USDT\n"
                 f"목표 {self.goal_pct:g}% = 기준자금의 {self.balance*self.goal_pct/100:.2f} USDT\n"
                 "미완료·자료공백·이전 날짜 신호는 순이익에서 제외됩니다.\n"
                 "비용 추정 반영·가격표본 모의계산이며 실제 체결·계좌 순수익이 아닙니다.\n"
+                "모형별 결과는 비교용으로 서로 합산하지 않습니다.\n"
                 "목표 미달을 이유로 위험이나 매매 횟수를 늘리지 않습니다.")
 
     def report_delivery(self, now, delivered):

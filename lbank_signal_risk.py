@@ -8,6 +8,7 @@ import logging
 import math
 import os
 from dataclasses import dataclass, asdict
+from lbank_trend_runner import RUNNER_TTL, runner_decision
 
 LOG = logging.getLogger("lbank_signal_risk")
 
@@ -33,6 +34,11 @@ class TrackedSignal:
     target2_hit: bool = False
     target1_hit_price: float | None = None
     target2_hit_price: float | None = None
+    runner_enabled: bool = False
+    strategy: str = "unknown"
+    barrier: float | None = None
+    runner_last_bar: int = -1
+    pending_runner: dict | None = None
 
 
 class SignalRiskTracker:
@@ -53,13 +59,14 @@ class SignalRiskTracker:
             if not isinstance(raw, dict) or raw.get("schema") != 1:
                 return
             restored = []
-            for item in raw.get("signals", [])[-3:]:
+            for item in raw.get("signals", [])[-16:]:
                 signal = TrackedSignal(**item)
                 if (signal.direction not in (-1, 1) or
                     not all(math.isfinite(float(x)) for x in
                             (signal.entry, signal.stop, signal.target1, signal.sent_at)) or
                     signal.entry <= 0 or signal.stop <= 0 or signal.target1 <= 0 or
-                    (signal.direction * (signal.entry - signal.stop) < 0 or
+                    ((signal.direction * (signal.entry - signal.stop) < 0 and
+                      not (signal.runner_enabled and signal.target1_notified)) or
                      (signal.entry == signal.stop and not signal.target1_notified)) or
                     signal.direction * (signal.target1 - signal.entry) <= 0 or
                     (signal.target2 is not None and
@@ -68,6 +75,8 @@ class SignalRiskTracker:
                       signal.direction * (signal.target2 - signal.target1) <= 0))):
 
                     raise ValueError("invalid tracked reference")
+                # Proposals are recomputed from fresh quotes/bars after restart.
+                signal.pending_runner = None
                 restored.append(signal)
             self.signals = restored
             self.next_number = max(int(raw.get("next_number", 1)),
@@ -110,14 +119,17 @@ class SignalRiskTracker:
             (target2 is not None and direction * (target2 - target) <= 0)):
             raise ValueError("Stop/target on wrong side of entry")
         signal = TrackedSignal(self.next_number, direction, entry, stop, target,
-                               now, target2=target2)
+                               now, target2=target2,
+                               runner_enabled=bool(plan.get("runner_enabled") and target2 is not None),
+                               strategy=plan.get("strategy", "unknown"), barrier=plan.get("barrier"))
         self.next_number += 1
         self.signals.append(signal)
-        self.signals = self.signals[-3:]
+        # At most eight entries/day; retain six-hour runners across midnight.
+        self.signals = self.signals[-16:]
         self._save()
         return signal
 
-    def check(self, prices, now):
+    def check(self, prices, now, native_state=None):
         """Return (signal, reason, current_price) events after price observations.
 
         Target flags are latched until Telegram acknowledges delivery. TP1
@@ -131,8 +143,9 @@ class SignalRiskTracker:
         survivors = []
         before = [asdict(sig) for sig in self.signals]
         for item in self.signals:
-            if now - item.sent_at >= SIGNAL_TTL_SECONDS:
+            if not item.runner_enabled and now - item.sent_at >= SIGNAL_TTL_SECONDS:
                 continue
+            item.pending_runner = None
             if item.target2 is not None and item.direction * (current - item.target2) >= 0:
                 if not item.target2_hit:
                     item.target2_hit_price = current
@@ -150,11 +163,33 @@ class SignalRiskTracker:
                 events.append((item, "stop_breached", current))
                 survivors.append(item)
                 continue
+            if item.runner_enabled and now - item.sent_at >= RUNNER_TTL:
+                events.append((item, "time_exit", current))
+                survivors.append(item)
+                continue
             if not item.target1_notified and item.target1_hit:
                 events.append((item, "target1_reached",
                                item.target1_hit_price or current))
                 survivors.append(item)
                 continue
+            if item.runner_enabled and item.target1_notified:
+                proposal = runner_decision(
+                    direction=item.direction, entry=item.entry, stop=item.stop,
+                    target2=item.target2, sent_at=item.sent_at,
+                    last_bar=item.runner_last_bar, state=native_state,
+                    now=now, price=current, strategy=item.strategy, barrier=item.barrier)
+                if proposal is not None:
+                    # A remembered TP2 touch cannot be extended after price has
+                    # retreated far below it. Honour the original target notice.
+                    can_extend = (not item.target2_hit or
+                                  item.direction * (current - item.target2) >= 0)
+                    if (proposal["reason"] in ("trend_exit", "neutral_exit") or
+                            (can_extend and proposal["reason"] == "target_extended") or
+                            (not item.target2_hit and proposal["reason"] == "trail_update")):
+                        item.pending_runner = proposal
+                        events.append((item, proposal["reason"], current))
+                        survivors.append(item)
+                        continue
             if item.target1_notified and item.target2 is not None and item.target2_hit:
                 events.append((item, "target2_reached",
                                item.target2_hit_price or current))
@@ -180,7 +215,19 @@ class SignalRiskTracker:
 
     def acknowledge(self, signal, reason=None):
         """Acknowledge only after delivery; TP1 keeps a known TP2 monitored."""
-        if reason == "target1_reached" and signal in self.signals:
+        if reason in ("trail_update", "target_extended") and signal in self.signals:
+            proposal = signal.pending_runner
+            if proposal is None or proposal["reason"] != reason:
+                raise ValueError("missing delivered runner proposal")
+            # Monotonic protection: never lower a long stop or raise a short.
+            if signal.direction * (proposal["stop"] - signal.stop) < 0:
+                raise ValueError("runner cannot loosen protection")
+            signal.stop, signal.target2 = proposal["stop"], proposal["target2"]
+            signal.runner_last_bar = proposal["bar_start"]
+            signal.pending_runner = None
+            if reason == "target_extended":
+                signal.target2_hit, signal.target2_hit_price = False, None
+        elif reason == "target1_reached" and signal in self.signals:
             signal.target1_notified = True
             # Model the user's remaining-half reference stop after the TP1
             # notification. This changes reference monitoring, NOT venue orders.

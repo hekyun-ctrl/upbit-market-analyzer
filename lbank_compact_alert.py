@@ -47,6 +47,7 @@ def format_compact_entry_alert(plan, observed_at_utc, reference_number=None,
         if native else
         "⚠️ 관찰 신호(실전 진입 추천 아님)·실제 5분봉/호가 미검증\n"
     )
+    runner_note = " | 추세 확인 시 목표 연장·보호선 조정" if plan.get("runner_enabled") else ""
     return (
         f"[LBank BTCUSDT | {icon} {side} | 조건부 진입 검토]\n"
         f"⏱ {kst} KST | 유효 5분{reference}\n"
@@ -60,5 +61,5 @@ def format_compact_entry_alert(plan, observed_at_utc, reference_number=None,
         f"🎯 목표가1: {plan['target1']:,.1f} USDT "
         f"| 50% 익절 가정 +{half_gain:,.2f} USDT\n"
         f"🎯 목표가2: {plan['target2']:,.1f} USDT "
-        f"| 나머지 50% 익절 시 합계 +{combined_gain:,.2f} USDT"
+        f"| 나머지 50% 익절 시 합계 +{combined_gain:,.2f} USDT{runner_note}"
     )

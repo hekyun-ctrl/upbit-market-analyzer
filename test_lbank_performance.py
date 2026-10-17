@@ -89,7 +89,7 @@ class PerformanceTests(unittest.TestCase):
             book = PerformanceBook(path, 1000)
             self.assertIsNone(book.daily_message(t-60))
             note = book.daily_message(t)
-            self.assertIn("목표 5%", note)
+            self.assertIn("목표 7%", note)
             self.assertIn("실제 체결·계좌 순수익이 아닙니다", note)
             book.report_delivery(t, False)
             book.db.close()
