@@ -7,9 +7,15 @@ fee-aware R:R and risk cap.
 
 
 def detect_structure(prices, ema, rsi):
-    """Return a conservative range bounce or trend pullback candidate, or None."""
+    candidates = detect_structures(prices, ema, rsi)
+    return candidates[0] if candidates else None
+
+
+def detect_structures(prices, ema, rsi):
+    """Return all range-bounce and trend-pullback candidates independently."""
     if len(prices) < 65:
-        return None
+        return []
+    candidates = []
     curr = prices[-1]
     tail = prices[-6:]
     swing_low, swing_high = min(tail[:-1]), max(tail[:-1])
@@ -26,14 +32,14 @@ def detect_structure(prices, ema, rsi):
                 low < curr <= low + .35 * width and
                 curr - swing_low >= curr * .00055 and curr > prices[-2] and
                 histogram[-1] > histogram[-3]):
-            return {"direction": 1, "strategy": "range_rebound",
-                    "level": low, "structure_anchor": swing_low, "barrier": high}
+            candidates.append({"direction": 1, "strategy": "range_rebound",
+                    "level": low, "structure_anchor": swing_low, "barrier": high})
         if (high - .18 * width <= swing_high <= high + curr * .00065 and
                 high - .35 * width <= curr < high and
                 swing_high - curr >= curr * .00055 and curr < prices[-2] and
                 histogram[-1] < histogram[-3]):
-            return {"direction": -1, "strategy": "range_rebound",
-                    "level": high, "structure_anchor": swing_high, "barrier": low}
+            candidates.append({"direction": -1, "strategy": "range_rebound",
+                    "level": high, "structure_anchor": swing_high, "barrier": low})
 
     # Continuation on a rising/falling 20-period EMA after local swing retest.
     # Do not fabricate resistance for an open-trend target.
@@ -46,8 +52,8 @@ def detect_structure(prices, ema, rsi):
             curr - swing_low >= curr * .00055 and
             .0015 <= (peak - swing_low) / curr <= .006 and
             histogram[-1] > histogram[-3]):
-        return {"direction": 1, "strategy": "trend_retest",
-                "level": fast[-1], "structure_anchor": swing_low}
+        candidates.append({"direction": 1, "strategy": "trend_retest",
+                "level": fast[-1], "structure_anchor": swing_low})
     if (fast[-1] < slow[-1] and fast[-1] < fast[-9] - curr * .00025 and
             slow[-1] < slow[-12] and
             fast[-1] - curr * .0006 <= swing_high <= fast[-1] + curr * .0015 and
@@ -55,9 +61,9 @@ def detect_structure(prices, ema, rsi):
             swing_high - curr >= curr * .00055 and
             .0015 <= (swing_high - trough) / curr <= .006 and
             histogram[-1] < histogram[-3]):
-        return {"direction": -1, "strategy": "trend_retest",
-                "level": fast[-1], "structure_anchor": swing_high}
-    return None
+        candidates.append({"direction": -1, "strategy": "trend_retest",
+                "level": fast[-1], "structure_anchor": swing_high})
+    return candidates
 
 
 def confirm_structure(prices, watch, ema, rsi):

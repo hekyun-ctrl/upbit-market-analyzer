@@ -21,7 +21,7 @@ import ccxt
 from lbank_signal_risk import SignalRiskTracker, format_risk_alert, format_target_alert, format_target2_alert
 from lbank_telegram_positions import PositionState, TelegramBot, format_position_target_alert
 from lbank_sample_store import load_snapshots, save_snapshots
-from lbank_structure_patterns import detect_structure, confirm_structure
+from lbank_structure_patterns import detect_structure, detect_structures, confirm_structure
 from lbank_sampled_context import sampled_context_gate
 from lbank_rsi_research import ResearchTracker, NeutralExitStudy, neutral_stall
 from lbank_rsi_plateau import consolidation_reversal_resume
@@ -30,6 +30,7 @@ from lbank_orderbook_shadow import OrderBookShadowThread
 from lbank_notification_schedule import is_quiet_new_entry_time
 from lbank_compact_alert import format_compact_entry_alert
 from lbank_telegram_transport import TelegramTransport
+from lbank_performance import PerformanceBook
 
 LOG = logging.getLogger("lbank_monitor")
 TELEGRAM_DELIVERY = TelegramTransport()
@@ -404,30 +405,53 @@ def calculate_plan(prices, direction, setup=None):
 
 
 def classify(prices, observations=None, diagnostics=None):
-    """Find a watch and optionally explain why no candidate survived."""
+    """Evaluate strategies independently; rejected candidates cannot veto others.
+
+    Existing structure priority is retained among same-direction qualified plans.
+    Opposite qualified directions abstain instead of ranking by an invented score.
+    The complete decision list is retained for opportunity-loss audits.
+    """
+    if len(prices) < MIN_SAMPLES:
+        if diagnostics is not None:
+            diagnostics.update(reason="insufficient_samples", candidates=[])
+        return None
+    first = detect_structure(prices, ema, rsi)
+    setups = ([first] if first is not None else []) + detect_structures(prices, ema, rsi)
+    curr = prices[-1]
+    m5, m15 = (curr / prices[-6] - 1) * 100, (curr / prices[-16] - 1) * 100
+    macd_arr = [a - b for a, b in zip(ema(prices, 12), ema(prices, 26))]
+    macd, sig = macd_arr[-1], ema(macd_arr, 9)[-1]
+    if curr > max(prices[-16:-1]) and macd > sig and m5 >= .14 and m15 >= .20:
+        setups.append({"direction": 1, "strategy": "breakout"})
+    if curr < min(prices[-16:-1]) and macd < sig and m5 <= -.14 and m15 <= -.20:
+        setups.append({"direction": -1, "strategy": "breakout"})
+    seen, decisions, qualified = set(), [], []
+    for setup in setups:
+        key = setup["strategy"], setup["direction"]
+        if key in seen:
+            continue
+        seen.add(key)
+        detail = {}
+        plan = assess_candidate(prices, setup["direction"], setup,
+                                observations=observations, diagnostics=detail)
+        decisions.append({"strategy": key[0], "direction": key[1],
+                          "reason": detail.get("reason", "unknown")})
+        if plan is not None:
+            qualified.append(plan)
+    conflict = len({p["direction"] for p in qualified}) > 1
+    reason = ("strategy_conflict" if conflict else "qualified" if qualified else
+              decisions[0]["reason"] if decisions else "market_no_setup")
+    if diagnostics is not None:
+        diagnostics.update(reason=reason, candidates=decisions)
+    return qualified[0] if qualified and not conflict else None
+
+
+def assess_candidate(prices, direction, setup, observations=None, diagnostics=None):
+    """Apply the SAME price, cost, context and direction gates per strategy."""
     def mark(reason):
         if diagnostics is not None:
             diagnostics["reason"] = reason
-
-    if len(prices) < MIN_SAMPLES:
-        mark("insufficient_samples")
-        return None
-    curr = prices[-1]
-    m5 = (curr / prices[-6] - 1) * 100
-    m15 = (curr / prices[-16] - 1) * 100
-    macd_arr = [a - b for a, b in zip(ema(prices, 12), ema(prices, 26))]
-    strength = rsi(prices)
-    macd, sig = macd_arr[-1], ema(macd_arr, 9)[-1]
-    setup = detect_structure(prices, ema, rsi)
-    if setup is not None:
-        direction = setup["direction"]
-    elif curr > max(prices[-16:-1]) and macd > sig and m5 >= .14 and m15 >= .20:
-        direction = 1
-    elif curr < min(prices[-16:-1]) and macd < sig and m5 <= -.14 and m15 <= -.20:
-        direction = -1
-    else:
-        mark("market_no_setup")
-        return None
+    curr, strength = prices[-1], rsi(prices)
     LOG.info("PREWATCH candidate strategy=%s direction=%s price=%.1f rsi1=%.1f",
              (setup or {}).get("strategy", "breakout"),
              "LONG" if direction == 1 else "SHORT", curr, strength)
@@ -664,6 +688,17 @@ def run():
     LOG.info("neutral_exit_shadow_study=enabled; logging hypotheses only, no new Telegram exit alerts")
     position_ledger = PositionState()
     position_bot = TelegramBot(position_ledger)
+    performance = None
+    pending_journal = []
+    try:
+        performance = PerformanceBook(
+            os.getenv("LBANK_PERFORMANCE_DB", "/data/lbank_performance.sqlite3"),
+            REF_BALANCE, goal_pct=5.0)
+        LOG.info("PERFORMANCE_V2 ready daily_goal_pct=5 report_kst=22:50 "
+                 "partial_exit=50pct source=ticker_samples actual_account_pnl=false")
+    except Exception as exc:
+        LOG.error("PERFORMANCE_V2 unavailable exception=%s; new_entries_paused=true",
+                  type(exc).__name__)
     LOG.info("position_report_tracking=enabled; recorded_position_present=%s", bool(position_ledger.position))
     # Official macro feeds are polled in an independent daemon thread.
     # No macro network call can block ticker sampling, stop-risk warning,
@@ -716,6 +751,21 @@ def run():
             position_bot.poll()
             price, change24 = get_perpetual_snapshot(exchange)
             now = time.time()
+            audit_ready = performance is not None
+            if performance is not None:
+                try:
+                    # Retry an acknowledged notification's failed write before
+                    # advancing the model or allowing another entry. A process
+                    # crash in the delivery/write interval remains unauditable.
+                    while pending_journal:
+                        method, args, kwargs = pending_journal[0]
+                        getattr(performance, method)(*args, **kwargs)
+                        pending_journal.pop(0)
+                    for outcome in performance.observe(now, price):
+                        LOG.info("SIGNAL_MODEL_OUTCOME %s", json.dumps(outcome))
+                except Exception as exc:
+                    audit_ready = False
+                    LOG.error("PERFORMANCE_V2 observe_failed exception=%s", type(exc).__name__)
             if STARTUP_TEST_ENABLED and not startup_done and now >= next_startup_test:
                 startup_done = telegram("[LBank BTCUSDT] 2단계 감시 재시작. 시험 알림이며 진입 신호 아님.")
                 LOG.info("Telegram startup test %s", "SENT" if startup_done else "FAILED")
@@ -778,6 +828,15 @@ def run():
                     else format_risk_alert(tracked, reason, observed_price, observed_kst)
                 )
                 if telegram(notice):
+                    if reason == "early_invalidation" and performance is not None:
+                        try:
+                            performance.early_warning(tracked.number, tracked.sent_at,
+                                                      now, observed_price)
+                        except Exception as exc:
+                            audit_ready = False
+                            pending_journal.append(("early_warning",
+                                (tracked.number, tracked.sent_at, now, observed_price), {}))
+                            LOG.error("PERFORMANCE_V2 warning_failed exception=%s", type(exc).__name__)
                     risk_tracker.acknowledge(tracked, reason=reason)
                     LOG.info(
                         "SIGNAL FOLLOWUP SENT reference=%d side=%s reason=%s price=%.1f",
@@ -862,11 +921,22 @@ def run():
                                 else:
                                     LOG.error("MANUAL POSITION NEUTRAL STALL REVIEW SEND FAILED")
                 prices = [v for _, v in observations]
+                # Persist raw reference quotes even when no strategy proposes a
+                # trade. A failed journal pauses entries but never risk notices.
+                if performance is not None:
+                    try:
+                        performance.sample(now, price)
+                    except Exception as exc:
+                        audit_ready = False
+                        LOG.error("PERFORMANCE_V2 sample_failed exception=%s", type(exc).__name__)
                 recent = list(observations)[-MIN_SAMPLES:]
                 continuous = len(recent) >= MIN_SAMPLES and all(
                     20 <= recent[i][0] - recent[i-1][0] <= max(POLL * 2.5, 150)
                     for i in range(1, len(recent)))
-                if not continuous:
+                if not audit_ready:
+                    watch = None
+                    LOG.error("ENTRY JOURNAL UNAVAILABLE new_entries_paused=true risk_notices=active")
+                elif not continuous:
                     watch = None
                     count_event("data_gap")
                 elif watch is not None:
@@ -926,7 +996,18 @@ def run():
                                     record_alert(now, side, alert_state, plan=plan)
                                     save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
                                                    observations, alert_state)
-                                    risk_tracker.add_sent_signal(plan, now)
+                                    sent_signal = risk_tracker.add_sent_signal(plan, now)
+                                    try:
+                                        performance.add(sent_signal.number, plan, now,
+                                                        fee=TAKER_FEE, slippage=STOP_SLIPPAGE,
+                                                        funding=FUNDING_BUFFER)
+                                    except Exception as exc:
+                                        audit_ready = False
+                                        pending_journal.append(("add", (sent_signal.number, dict(plan), now),
+                                            {"fee": TAKER_FEE, "slippage": STOP_SLIPPAGE,
+                                             "funding": FUNDING_BUFFER}))
+                                        LOG.error("PERFORMANCE_V2 delivered_signal_write_failed exception=%s",
+                                                  type(exc).__name__)
                                     count_event("confirmed")
                                     source = plan.get("strategy", "breakout")
                                     count_event({"range_rebound": "range_confirmed",
@@ -944,10 +1025,11 @@ def run():
                                          side, gate_reason, plan.get("strategy", "breakout"),
                                          plan["price"])
                             watch = None
-                if continuous and watch is None:
+                if continuous and audit_ready and watch is None:
                     rejection = {}
                     proposal = classify(prices, observations=list(observations),
                                         diagnostics=rejection)
+                    performance.sample(now, price, decision=rejection)
                     if proposal is not None:
                         side = proposal["side"]
                         gate_reason = alert_gate(now, side, alert_state, plan=proposal)
@@ -1015,6 +1097,15 @@ def run():
                              diag_counters["suppressed"])
                     diag_counters = dict(counter_template)
                     next_diag_summary = now + 600
+                if performance is not None:
+                    try:
+                        digest = performance.daily_message(now)
+                        if digest is not None:
+                            delivered = telegram(digest)
+                            performance.report_delivery(now, delivered)
+                            LOG.info("PERFORMANCE_DAILY_REPORT delivered=%s actual_pnl=false", delivered)
+                    except Exception as exc:
+                        LOG.error("PERFORMANCE_V2 report_failed exception=%s", type(exc).__name__)
         except Exception as exc:
             LOG.error("LBank market error (%s): %s", type(exc).__name__, str(exc)[:160])
         time.sleep(RISK_POLL)

@@ -25,6 +25,9 @@ def format_compact_entry_alert(plan, observed_at_utc, reference_number=None,
     icon = "🟢" if side == "롱" else "🔴"
     reference = f" | 신호번호: #{reference_number}" if reference_number is not None else ""
     margin_pct = 100 * float(plan["margin"]) / reference_balance
+    half_gain = float(plan["net_gain1"]) * .5
+    combined_gain = half_gain + float(plan["net_gain2"]) * .5
+    rr = combined_gain / float(plan["net_loss"])
 
     # A verified structure retest can still conflict with a 45m sampled trend.
     # Keep this material warning visible ABOVE the entry, not below TP2.
@@ -45,11 +48,11 @@ def format_compact_entry_alert(plan, observed_at_utc, reference_number=None,
         f"📍 진입가: {plan['price']:,.1f} USDT\n"
         f"💰 진입 증거금: {plan['margin']:,.2f} USDT "
         f"(시드 {margin_pct:.2f}%, 최대 {max_margin_fraction * 100:.0f}%)\n"
-        f"⚡ 레버리지 {leverage:.0f}배 | 포지션 {plan['notional']:,.2f} USDT\n"
+        f"⚡ 레버리지 {leverage:.0f}배 | 분할 순RR {rr:.2f} | 포지션 {plan['notional']:,.2f} USDT\n"
         f"🛑 손절가: {plan['stop']:,.1f} USDT "
         f"| 예상 총손실 -{plan['net_loss']:,.2f} USDT\n"
         f"🎯 목표가1: {plan['target1']:,.1f} USDT "
-        f"| 예상 순이익 +{plan['net_gain1']:,.2f} USDT\n"
+        f"| 50% 익절 가정 +{half_gain:,.2f} USDT\n"
         f"🎯 목표가2: {plan['target2']:,.1f} USDT "
-        f"| 예상 순이익 +{plan['net_gain2']:,.2f} USDT"
+        f"| 나머지 50% 익절 시 합계 +{combined_gain:,.2f} USDT"
     )

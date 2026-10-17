@@ -59,7 +59,8 @@ class SignalRiskTracker:
                     not all(math.isfinite(float(x)) for x in
                             (signal.entry, signal.stop, signal.target1, signal.sent_at)) or
                     signal.entry <= 0 or signal.stop <= 0 or signal.target1 <= 0 or
-                    signal.direction * (signal.entry - signal.stop) <= 0 or
+                    (signal.direction * (signal.entry - signal.stop) < 0 or
+                     (signal.entry == signal.stop and not signal.target1_notified)) or
                     signal.direction * (signal.target1 - signal.entry) <= 0 or
                     (signal.target2 is not None and
                      (not math.isfinite(float(signal.target2)) or
@@ -181,6 +182,10 @@ class SignalRiskTracker:
         """Acknowledge only after delivery; TP1 keeps a known TP2 monitored."""
         if reason == "target1_reached" and signal in self.signals:
             signal.target1_notified = True
+            # Model the user's remaining-half reference stop after the TP1
+            # notification. This changes reference monitoring, NOT venue orders.
+            signal.stop = signal.entry
+            signal.bad_samples = 0
             if signal.target2 is None:
                 self.signals = [s for s in self.signals if s is not signal]
         else:
