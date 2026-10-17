@@ -32,7 +32,7 @@ from lbank_telegram_transport import TelegramTransport
 from lbank_performance import PerformanceBook
 from lbank_native_candles import NativeCandleThread
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
-from lbank_trend_runner import format_runner_alert, POLICY_VERSION
+from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
 
 LOG = logging.getLogger("lbank_monitor")
 TELEGRAM_DELIVERY = TelegramTransport()
@@ -295,6 +295,36 @@ def minimum_net_rr_target(direction, entry, unit_loss, ratio):
     return entry + direction * high
 
 
+def native_entry_geometry(native_state):
+    """Volatility-scaled lower stop bound, not a substitute for swing anchors.
+
+Use 1.5 completed 5m ATR, with a 0.05% noise floor. The actual stop remains
+beyond the structural extreme plus its existing buffer, and never exceeds
+the existing 0.60% distance/risk/margin caps. No missing-data fallback.
+The range lower width is the necessary cost-aware minimum TP1 distance,
+not the old unconditional 0.60%. Real remaining room is checked in the plan.
+"""
+    try:
+        curr = float(native_state["quote"])
+        atr = atr_wilder(native_state["five_bars"])
+        if not (math.isfinite(curr) and curr > 0 and atr is not None
+                and math.isfinite(atr) and atr > 0):
+            return None
+        floor = max(.0005, 1.5 * atr / curr)
+        targets = []
+        for direction in (1, -1):
+            loss = -net_pnl_per_btc(direction, curr, curr*(1-direction*floor))
+            target = minimum_net_rr_target(direction, curr, loss, MIN_NET_RR)
+            if target is None:
+                return None
+            targets.append(abs(target-curr)/curr)
+        return {"atr5": atr, "stop_floor_fraction": floor,
+                "minimum_target_fraction": max(targets),
+                "min_range_fraction": max(targets)+.00015}
+    except (KeyError, TypeError, ValueError, OverflowError):
+        return None
+
+
 
 def trend_retest_momentum_gate(prices, direction):
     """Reject a flat/weak local retest in *both* directional horizons.
@@ -325,6 +355,9 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     if len(prices) < MIN_SAMPLES:
         return None
     curr = native_state["quote"] if native_state is not None else prices[-1]
+    geometry = native_entry_geometry(native_state) if native_state is not None else None
+    if native_state is not None and geometry is None:
+        return None
     momentum5 = (curr / prices[-6] - 1) * 100
     momentum15 = (curr / prices[-16] - 1) * 100
     strength = rsi(prices)
@@ -333,16 +366,16 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
         if native_state is not None:
             key = "low" if direction == 1 else "high"
             local = [bar[key] for bar in native_state["minute_bars"][-8:]]
-        stop = (min(curr * (1 - .0025), min(local) * (1 - .0003))
+        minimum_stop = geometry["stop_floor_fraction"] if geometry else .0025
+        stop = (min(curr * (1 - minimum_stop), min(local) * (1 - .0003))
                 if direction == 1 else
-                max(curr * (1 + .0025), max(local) * (1 + .0003)))
-        minimum_stop = .0025
+                max(curr * (1 + minimum_stop), max(local) * (1 + .0003)))
     else:
         anchor = setup["structure_anchor"]
-        stop = (min(curr * (1 - .0012), anchor - curr * .0002)
+        minimum_stop = geometry["stop_floor_fraction"] if geometry else .0012
+        stop = (min(curr * (1 - minimum_stop), anchor - curr * .0002)
                 if direction == 1 else
-                max(curr * (1 + .0012), anchor + curr * .0002))
-        minimum_stop = .0012
+                max(curr * (1 + minimum_stop), anchor + curr * .0002))
     stop_distance = abs(curr - stop) / curr
     if not (minimum_stop - 1e-10 <= stop_distance <= .0060):
         LOG.info("PLAN REJECT reason=stop_distance strategy=%s direction=%s price=%.1f stop=%.1f dist_pct=%.3f min_pct=%.3f max_pct=0.600",
@@ -410,6 +443,7 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
             stop * (1 - direction * STOP_SLIPPAGE) * TAKER_FEE),
         "maker_potential_savings": qty * (effective_entry + t1) * (TAKER_FEE - MAKER_FEE),
         "runner_enabled": bool(native_state is not None and RUNNER_ENABLED),
+        "native_entry_geometry": geometry,
     }
 
 
@@ -430,7 +464,22 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
                 diagnostics.update(reason="price_deviation", candidates=[])
             return None
         bars = native_state["minute_bars"]
-        setups = detect_structures(prices, ema, rsi, bars=bars)
+        geometry = native_entry_geometry(native_state)
+        if geometry is None:
+            if diagnostics is not None:
+                diagnostics.update(reason="native_volatility_unavailable", candidates=[])
+            return None
+        setup_diag = {}
+        setups = detect_structures(prices, ema, rsi, bars=bars,
+                                   min_range_fraction=geometry["min_range_fraction"],
+                                   diagnostics=setup_diag)
+        setup_diag.update(atr5=geometry["atr5"],
+                          minimum_stop_pct=geometry["stop_floor_fraction"]*100,
+                          minimum_target_pct=geometry["minimum_target_fraction"]*100,
+                          range60_pct=(max(b["high"] for b in bars[-60:])-
+                                       min(b["low"] for b in bars[-60:]))/native_state["quote"]*100)
+        if diagnostics is not None:
+            diagnostics["market"] = setup_diag
     else:
         first = detect_structure(prices, ema, rsi)
         setups = ([first] if first is not None else []) + detect_structures(prices, ema, rsi)
@@ -442,6 +491,11 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
                   if native_state is not None else max(prices[-16:-1]))
     prior_low = (min(b["low"] for b in native_state["minute_bars"][-16:-1])
                  if native_state is not None else min(prices[-16:-1]))
+    if native_state is not None and diagnostics is not None:
+        diagnostics["market"].update(
+            momentum5_pct=m5, momentum15_pct=m15,
+            breakout_long=curr>prior_high and macd>sig and m5>=.14 and m15>=.20,
+            breakout_short=curr<prior_low and macd<sig and m5<=-.14 and m15<=-.20)
     if curr > prior_high and macd > sig and m5 >= .14 and m15 >= .20:
         setups.append({"direction": 1, "strategy": "breakout"})
     if curr < prior_low and macd < sig and m5 <= -.14 and m15 <= -.20:
@@ -771,6 +825,9 @@ def run():
             LOG.error("ORDERBOOK_SHADOW_INIT_FAILED exception=%s details=%s",
                       type(exc).__name__, str(exc)[:150])
     LOG.info("risk_snapshot_poll=%ds, entry_review_poll=%ds source=native_candles quote_risk_polling=true", RISK_POLL, POLL)
+    LOG.info("NATIVE_ENTRY_GEOMETRY stop_floor=max(0.05pct,1.5ATR5) "
+             "structural_stop_preserved=true range_floor=cost_solved_TP1 "
+             "net_rr1=1.5 risk_limit_unchanged=true")
     watch = None
     alert_state = cached_alert_state
     last_sample = observations[-1][0] if observations else 0
@@ -792,6 +849,7 @@ def run():
     next_log_summary = time.time() + 3600
     next_diag_summary = time.time() + 600
     last_5m_audit = None
+    last_entry_diagnostics = {}
     while True:
         try:
             # Inbound updates use the same authorized existing Telegram chat.
@@ -904,6 +962,8 @@ def run():
                 observations.append((now, price))
                 save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
                                observations, alert_state)
+                if native_state is not None:
+                    native_diag["entry_geometry"] = native_entry_geometry(native_state)
                 LOG.info("NATIVE_ENTRY_STATUS %s", json.dumps(native_diag, sort_keys=True))
                 # Research and neutral-position warnings also use native 5m RSI.
                 # Shadow audit runs for every newly completed 5-minute candle.
@@ -986,6 +1046,9 @@ def run():
                 elif not continuous:
                     watch = None
                     count_event("data_gap")
+                    last_entry_diagnostics = {"reason": "native_data_unavailable", "native": native_diag}
+                    if performance is not None:
+                        performance.sample(now, price, decision=last_entry_diagnostics)
                 elif watch is not None:
                     age = now - watch["time"]
                     if age > ENTRY_CONFIRM_MAX_AGE_SECONDS:
@@ -1077,6 +1140,7 @@ def run():
                     proposal = classify(prices, native_state=native_state,
                                         diagnostics=rejection)
                     rejection["data_source"] = NATIVE_SOURCE
+                    last_entry_diagnostics = rejection
                     performance.sample(now, price, decision=rejection)
                     if proposal is not None:
                         side = proposal["side"]
@@ -1130,6 +1194,7 @@ def run():
                     counters = dict(counter_template)
                     next_log_summary = now + 3600
                 if now >= next_diag_summary:
+                    LOG.info("NATIVE_SETUP_DIAGNOSTICS %s", json.dumps(last_entry_diagnostics, sort_keys=True))
                     LOG.info("ALERT_DIAGNOSTICS_10M no_setup=%d data_gap=%d "
                              "retest_momentum=%d sampled_context=%d "
                              "rsi_direction=%d risk_or_target=%d "

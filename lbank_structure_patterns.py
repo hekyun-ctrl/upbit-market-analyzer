@@ -11,7 +11,7 @@ def detect_structure(prices, ema, rsi):
     return candidates[0] if candidates else None
 
 
-def detect_structures(prices, ema, rsi, bars=None):
+def detect_structures(prices, ema, rsi, bars=None, min_range_fraction=.006, diagnostics=None):
     """Return all range-bounce and trend-pullback candidates independently."""
     if len(prices) < 65:
         return []
@@ -33,8 +33,13 @@ def detect_structures(prices, ema, rsi, bars=None):
         low = min(b["low"] for b in bars[-65:-5])
         high = max(b["high"] for b in bars[-65:-5])
     width = high - low
-    balanced = (.006 <= width / curr <= .025 and
+    balanced = (min_range_fraction <= width / curr <= .025 and
                 abs(sum(channel[:30]) / 30 - sum(channel[30:]) / 30) <= .42 * width)
+    if diagnostics is not None:
+        diagnostics.update(range_width_pct=width/curr*100,
+                           range_required_pct=min_range_fraction*100,
+                           range_width_ok=min_range_fraction <= width/curr <= .025,
+                           range_balanced=balanced)
     if balanced:
         if (low - curr * .00065 <= swing_low <= low + .18 * width and
                 low < curr <= low + .35 * width and
@@ -56,6 +61,11 @@ def detect_structures(prices, ema, rsi, bars=None):
     if bars is not None:
         peak = max(b["high"] for b in bars[-30:-6])
         trough = min(b["low"] for b in bars[-30:-6])
+    if diagnostics is not None:
+        diagnostics.update(long_pullback_pct=(peak-swing_low)/curr*100,
+                           short_pullback_pct=(swing_high-trough)/curr*100,
+                           pullback_min_pct=.15,
+                           ema_direction=1 if fast[-1]>slow[-1] else -1 if fast[-1]<slow[-1] else 0)
     if (fast[-1] > slow[-1] and fast[-1] > fast[-9] + curr * .00025 and
             slow[-1] > slow[-12] and
             fast[-1] - curr * .0015 <= swing_low <= fast[-1] + curr * .0006 and

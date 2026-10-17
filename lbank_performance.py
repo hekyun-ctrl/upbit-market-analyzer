@@ -10,6 +10,7 @@ import json
 import math
 import os
 import sqlite3
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 from lbank_trend_runner import runner_decision, RUNNER_TTL, POLICY_VERSION
 
@@ -247,6 +248,14 @@ class PerformanceBook:
         a, b = stats["levels"], stats["warning_exit"]
         runner, paired = stats["trend_runner"], self.paired_runner_comparison(day)
         rate = "미집계" if runner["win_rate_pct"] is None else f"{runner['win_rate_pct']:.1f}%"
+        decisions = self.decision_summary(day)
+        market = decisions["last_market"]
+        diagnostic = (f"진입심사 기록 {decisions['checks']}회: 패턴 없음 {decisions['reasons'].get('market_no_setup',0)} · "
+                      f"비용/목표 탈락 {decisions['reasons'].get('risk_or_target',0)} · "
+                      f"데이터 대기 {decisions['reasons'].get('native_data_unavailable',0)}\n")
+        if market:
+            diagnostic += (f"최근 심사 1시간 고저폭 {market['range60_pct']:.3f}% / "
+                           f"비용 반영 최소 1차 목표 거리 {market['minimum_target_pct']:.3f}%\n")
         return (f"[LBank BTCUSDT | {day} 알람 모의 성과 중간집계]\n"
                 f"기록 시작 이후 오늘 생성 신호 {a['signals']}건 | 완료 {a['closed']} · 관찰중 {a['open']} · 자료공백 {a['censored']}\n"
                 f"50% 분할익절·진입가 손절: {a['net_usdt_model']:+.2f} USDT ({a['reference_return_pct']:+.2f}%)\n"
@@ -254,10 +263,26 @@ class PerformanceBook:
                 f"추세연장 모형: {runner['net_usdt_model']:+.2f} USDT | 완료 {runner['closed']} · 관찰중 {runner['open']} · 공백 {runner['censored']}\n"
                 f"추세연장 최종 순익 승률 {rate} | 동일신호 완료 {paired['completed_pairs']}쌍, 기존 대비 {paired['difference_usdt']:+.2f} USDT\n"
                 f"목표 {self.goal_pct:g}% = 기준자금의 {self.balance*self.goal_pct/100:.2f} USDT\n"
+                f"{diagnostic}"
                 "미완료·자료공백·이전 날짜 신호는 순이익에서 제외됩니다.\n"
                 "비용 추정 반영·가격표본 모의계산이며 실제 체결·계좌 순수익이 아닙니다.\n"
                 "모형별 결과는 비교용으로 서로 합산하지 않습니다.\n"
                 "목표 미달을 이유로 위험이나 매매 횟수를 늘리지 않습니다.")
+
+    def decision_summary(self, day):
+        """Evaluation counts, NOT distinct trade opportunities or missed wins."""
+        start = datetime.fromisoformat(day).replace(tzinfo=KST).timestamp()
+        rows = self.db.execute("SELECT detail FROM decisions WHERE ts>=? AND ts<? ORDER BY ts",
+                               (start, start+86400)).fetchall()
+        reasons, last_market = Counter(), None
+        for row in rows:
+            detail = json.loads(row["detail"])
+            reasons[detail.get("reason", "unknown")] += 1
+            if "market" in detail:
+                last_market = detail["market"]
+            elif detail.get("reason") in ("native_data_unavailable", "native_volatility_unavailable"):
+                last_market = None
+        return {"checks": len(rows), "reasons": dict(reasons), "last_market": last_market}
 
     def report_delivery(self, now, delivered):
         with self.db:
