@@ -1,0 +1,373 @@
+{
+  "baseline_commit": "9e0617a6fe366a17d9f802cfc7f1d698532d0f88",
+  "input_sha256": "6b0dd7bc672497cbb9593591572ff3e5e84cbc0ef36eae0fac18d46a48a40251",
+  "sample_count": 2927,
+  "start_epoch": 1792022440.262958,
+  "end_epoch": 1792207753.878058,
+  "limitations": [
+    "ticker log snapshots, not candles or trades",
+    "quote entry/target fills hypothetical; actual fills unknown",
+    "taker 0.06% per leg, exit slippage 0.02%, funding reserve 0.01%",
+    "sample gaps >150s censored; intragap excursions unobservable",
+    "TP1 half, remaining stop at entry; TP2 remaining half",
+    "baseline pins entry logic only; both use current paired exit accounting",
+    "two-hour timeout; independent reference trades, not an executable portfolio",
+    "short diagnostic sample selected after prior losses; no OOS claim"
+  ],
+  "baseline": {
+    "signals": [
+      {
+        "at": 1792035159.867066,
+        "kst_day": "2026-10-15",
+        "strategy": "breakout",
+        "direction": -1,
+        "entry": 80945.2,
+        "stop": 81147.563,
+        "target1": 80354.39707959091,
+        "target2": 80030.63890638728
+      },
+      {
+        "at": 1792041408.848581,
+        "kst_day": "2026-10-15",
+        "strategy": "breakout",
+        "direction": -1,
+        "entry": 81157.6,
+        "stop": 81437.12380999999,
+        "target1": 80450.27911027959,
+        "target2": 80049.02626048663
+      },
+      {
+        "at": 1792047090.410651,
+        "kst_day": "2026-10-15",
+        "strategy": "breakout",
+        "direction": -1,
+        "entry": 80799.9,
+        "stop": 81020.89898,
+        "target1": 80181.6530506318,
+        "target2": 79839.47300696612
+      },
+      {
+        "at": 1792061144.849527,
+        "kst_day": "2026-10-15",
+        "strategy": "trend_retest",
+        "direction": -1,
+        "entry": 80860.5,
+        "stop": 81139.4721,
+        "target1": 80155.06096679495,
+        "target2": 79754.80535574493
+      },
+      {
+        "at": 1792068683.222136,
+        "kst_day": "2026-10-15",
+        "strategy": "trend_retest",
+        "direction": -1,
+        "entry": 80757.8,
+        "stop": 80897.25156,
+        "target1": 80262.04801781202,
+        "target2": 80001.49482081203
+      },
+      {
+        "at": 1792101771.964265,
+        "kst_day": "2026-10-16",
+        "strategy": "breakout",
+        "direction": 1,
+        "entry": 82472.5,
+        "stop": 82266.31875,
+        "target1": 83074.64831355074,
+        "target2": 83404.56144447104
+      },
+      {
+        "at": 1792149992.215605,
+        "kst_day": "2026-10-16",
+        "strategy": "breakout",
+        "direction": 1,
+        "entry": 82828.1,
+        "stop": 82532.93269,
+        "target1": 83564.96378156908,
+        "target2": 83984.3788528119
+      }
+    ],
+    "total": {
+      "levels": {
+        "signals": 7,
+        "closed": 7,
+        "open": 0,
+        "censored": 0,
+        "net_usdt_model": -163.79629675302598,
+        "wins": 2,
+        "reference_return_pct": -1.6379629675302598,
+        "actual_account_pnl": false
+      },
+      "warning_exit": {
+        "signals": 7,
+        "closed": 7,
+        "open": 0,
+        "censored": 0,
+        "net_usdt_model": -143.1471741126125,
+        "wins": 2,
+        "reference_return_pct": -1.431471741126125,
+        "actual_account_pnl": false
+      }
+    },
+    "daily_signal_cohorts": {
+      "2026-10-15": {
+        "levels": {
+          "signals": 5,
+          "closed": 5,
+          "open": 0,
+          "censored": 0,
+          "net_usdt_model": -58.178057296986836,
+          "wins": 2,
+          "reference_return_pct": -0.5817805729698684,
+          "actual_account_pnl": false
+        },
+        "warning_exit": {
+          "signals": 5,
+          "closed": 5,
+          "open": 0,
+          "censored": 0,
+          "net_usdt_model": -46.42327480087849,
+          "wins": 2,
+          "reference_return_pct": -0.4642327480087849,
+          "actual_account_pnl": false
+        }
+      },
+      "2026-10-16": {
+        "levels": {
+          "signals": 2,
+          "closed": 2,
+          "open": 0,
+          "censored": 0,
+          "net_usdt_model": -105.61823945603915,
+          "wins": 0,
+          "reference_return_pct": -1.0561823945603914,
+          "actual_account_pnl": false
+        },
+        "warning_exit": {
+          "signals": 2,
+          "closed": 2,
+          "open": 0,
+          "censored": 0,
+          "net_usdt_model": -96.72389931173402,
+          "wins": 0,
+          "reference_return_pct": -0.9672389931173402,
+          "actual_account_pnl": false
+        }
+      },
+      "2026-10-17": {
+        "levels": {
+          "signals": 0,
+          "closed": 0,
+          "open": 0,
+          "censored": 0,
+          "net_usdt_model": 0,
+          "wins": 0,
+          "reference_return_pct": 0.0,
+          "actual_account_pnl": false
+        },
+        "warning_exit": {
+          "signals": 0,
+          "closed": 0,
+          "open": 0,
+          "censored": 0,
+          "net_usdt_model": 0,
+          "wins": 0,
+          "reference_return_pct": 0.0,
+          "actual_account_pnl": false
+        }
+      }
+    },
+    "evaluations": {
+      "data_gap_or_warmup": 118,
+      "sampled_context": 75,
+      "market_no_setup": 2455,
+      "rsi_direction": 82,
+      "risk_or_target": 56,
+      "global_cooldown": 29,
+      "retest_momentum": 8,
+      "reverse_cooldown": 21,
+      "sleep_hours": 60
+    },
+    "independent_holdout": false,
+    "normalized_reference_balance": 10000,
+    "portfolio_compounding": false
+  },
+  "candidate": {
+    "signals": [
+      {
+        "at": 1792035159.867066,
+        "kst_day": "2026-10-15",
+        "strategy": "breakout",
+        "direction": -1,
+        "entry": 80945.2,
+        "stop": 81147.563,
+        "target1": 80354.39707959091,
+        "target2": 80030.63890638728
+      },
+      {
+        "at": 1792041408.848581,
+        "kst_day": "2026-10-15",
+        "strategy": "breakout",
+        "direction": -1,
+        "entry": 81157.6,
+        "stop": 81437.12380999999,
+        "target1": 80450.27911027959,
+        "target2": 80049.02626048663
+      },
+      {
+        "at": 1792047090.410651,
+        "kst_day": "2026-10-15",
+        "strategy": "breakout",
+        "direction": -1,
+        "entry": 80799.9,
+        "stop": 81020.89898,
+        "target1": 80181.6530506318,
+        "target2": 79839.47300696612
+      },
+      {
+        "at": 1792061144.849527,
+        "kst_day": "2026-10-15",
+        "strategy": "trend_retest",
+        "direction": -1,
+        "entry": 80860.5,
+        "stop": 81139.4721,
+        "target1": 80155.06096679495,
+        "target2": 79754.80535574493
+      },
+      {
+        "at": 1792068683.222136,
+        "kst_day": "2026-10-15",
+        "strategy": "trend_retest",
+        "direction": -1,
+        "entry": 80757.8,
+        "stop": 80897.25156,
+        "target1": 80262.04801781202,
+        "target2": 80001.49482081203
+      },
+      {
+        "at": 1792101771.964265,
+        "kst_day": "2026-10-16",
+        "strategy": "breakout",
+        "direction": 1,
+        "entry": 82472.5,
+        "stop": 82266.31875,
+        "target1": 83074.64831355074,
+        "target2": 83404.56144447104
+      },
+      {
+        "at": 1792149992.215605,
+        "kst_day": "2026-10-16",
+        "strategy": "breakout",
+        "direction": 1,
+        "entry": 82828.1,
+        "stop": 82532.93269,
+        "target1": 83564.96378156908,
+        "target2": 83984.3788528119
+      }
+    ],
+    "total": {
+      "levels": {
+        "signals": 7,
+        "closed": 7,
+        "open": 0,
+        "censored": 0,
+        "net_usdt_model": -163.79629675302598,
+        "wins": 2,
+        "reference_return_pct": -1.6379629675302598,
+        "actual_account_pnl": false
+      },
+      "warning_exit": {
+        "signals": 7,
+        "closed": 7,
+        "open": 0,
+        "censored": 0,
+        "net_usdt_model": -143.1471741126125,
+        "wins": 2,
+        "reference_return_pct": -1.431471741126125,
+        "actual_account_pnl": false
+      }
+    },
+    "daily_signal_cohorts": {
+      "2026-10-15": {
+        "levels": {
+          "signals": 5,
+          "closed": 5,
+          "open": 0,
+          "censored": 0,
+          "net_usdt_model": -58.178057296986836,
+          "wins": 2,
+          "reference_return_pct": -0.5817805729698684,
+          "actual_account_pnl": false
+        },
+        "warning_exit": {
+          "signals": 5,
+          "closed": 5,
+          "open": 0,
+          "censored": 0,
+          "net_usdt_model": -46.42327480087849,
+          "wins": 2,
+          "reference_return_pct": -0.4642327480087849,
+          "actual_account_pnl": false
+        }
+      },
+      "2026-10-16": {
+        "levels": {
+          "signals": 2,
+          "closed": 2,
+          "open": 0,
+          "censored": 0,
+          "net_usdt_model": -105.61823945603915,
+          "wins": 0,
+          "reference_return_pct": -1.0561823945603914,
+          "actual_account_pnl": false
+        },
+        "warning_exit": {
+          "signals": 2,
+          "closed": 2,
+          "open": 0,
+          "censored": 0,
+          "net_usdt_model": -96.72389931173402,
+          "wins": 0,
+          "reference_return_pct": -0.9672389931173402,
+          "actual_account_pnl": false
+        }
+      },
+      "2026-10-17": {
+        "levels": {
+          "signals": 0,
+          "closed": 0,
+          "open": 0,
+          "censored": 0,
+          "net_usdt_model": 0,
+          "wins": 0,
+          "reference_return_pct": 0.0,
+          "actual_account_pnl": false
+        },
+        "warning_exit": {
+          "signals": 0,
+          "closed": 0,
+          "open": 0,
+          "censored": 0,
+          "net_usdt_model": 0,
+          "wins": 0,
+          "reference_return_pct": 0.0,
+          "actual_account_pnl": false
+        }
+      }
+    },
+    "evaluations": {
+      "data_gap_or_warmup": 118,
+      "sampled_context": 75,
+      "market_no_setup": 2455,
+      "rsi_direction": 82,
+      "risk_or_target": 56,
+      "global_cooldown": 29,
+      "retest_momentum": 8,
+      "reverse_cooldown": 21,
+      "sleep_hours": 60
+    },
+    "independent_holdout": false,
+    "normalized_reference_balance": 10000,
+    "portfolio_compounding": false
+  }
+}
