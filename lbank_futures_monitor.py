@@ -1,8 +1,8 @@
 """LBank BTCUSDT perpetual-only public price observation monitor.
 
-Never creates orders or reads private LBank accounts. Since LBank's documented
-contract API lacks native OHLCV candles and CCXT routes fetch_ohlcv to SPOT,
-this monitor explicitly uses only actual LBank perpetual TICKER snapshots.
+Never creates orders or reads private LBank accounts. CCXT routes fetch_ohlcv
+to SPOT. Entry logic currently uses LBank perpetual TICKER snapshots while
+an independent native futures WebSocket candle recorder builds validation history.
 Signals use sampled 1-minute prices (NOT trade candles or trade volume).
 Persistent observations across short restarts are still TICKER samples, not candles.
 """
@@ -31,6 +31,7 @@ from lbank_notification_schedule import is_quiet_new_entry_time
 from lbank_compact_alert import format_compact_entry_alert
 from lbank_telegram_transport import TelegramTransport
 from lbank_performance import PerformanceBook
+from lbank_native_candles import NativeCandleThread
 
 LOG = logging.getLogger("lbank_monitor")
 TELEGRAM_DELIVERY = TelegramTransport()
@@ -680,6 +681,11 @@ def run():
         SAMPLE_STORE_PATH, SYMBOL, POLL)
     observations = deque(cached_observations, maxlen=360)
     LOG.info("price_sample_cache_restored=%d", len(observations))
+    # Native candles are recorded independently until history and cross-checks
+    # are sufficient. Do not silently substitute forming bars into entry logic.
+    if os.getenv("LBANK_NATIVE_CANDLES_ENABLED", "true").lower() == "true":
+        NativeCandleThread().start()
+        LOG.info("NATIVE_CANDLES collection enabled; existing entry source unchanged")
     risk_tracker = SignalRiskTracker(path=os.getenv(
         "LBANK_SIGNAL_FOLLOWUP_STATE_PATH", "/data/lbank_signal_followups.json"))
     rsi_research = ResearchTracker()  # Shadow stats only; not an entry gate
