@@ -1,4 +1,4 @@
-"""Structural entry patterns from sampled LBank perpetual prices, NOT OHLCV candles.
+"""Structural entry patterns from closes, optionally using native candle wicks.
 
 No private API, orders or trade execution. Each proposal still needs completed
 5-minute sampled RSI *direction* alignment, fresh second-stage confirmation,
@@ -11,7 +11,7 @@ def detect_structure(prices, ema, rsi):
     return candidates[0] if candidates else None
 
 
-def detect_structures(prices, ema, rsi):
+def detect_structures(prices, ema, rsi, bars=None):
     """Return all range-bounce and trend-pullback candidates independently."""
     if len(prices) < 65:
         return []
@@ -19,11 +19,19 @@ def detect_structures(prices, ema, rsi):
     curr = prices[-1]
     tail = prices[-6:]
     swing_low, swing_high = min(tail[:-1]), max(tail[:-1])
+    if bars is not None:
+        if len(bars) != len(prices):
+            raise ValueError("native candles and closes must align")
+        swing_low = min(b["low"] for b in bars[-6:-1])
+        swing_high = max(b["high"] for b in bars[-6:-1])
     macd = [a - b for a, b in zip(ema(prices, 12), ema(prices, 26))]
     signal = ema(macd, 9)
     histogram = [a - b for a, b in zip(macd, signal)]
     channel = prices[-65:-5]
     low, high = min(channel), max(channel)
+    if bars is not None:
+        low = min(b["low"] for b in bars[-65:-5])
+        high = max(b["high"] for b in bars[-65:-5])
     width = high - low
     balanced = (.006 <= width / curr <= .025 and
                 abs(sum(channel[:30]) / 30 - sum(channel[30:]) / 30) <= .42 * width)
@@ -45,6 +53,9 @@ def detect_structures(prices, ema, rsi):
     # Do not fabricate resistance for an open-trend target.
     fast, slow = ema(prices, 20), ema(prices, 50)
     peak, trough = max(prices[-30:-6]), min(prices[-30:-6])
+    if bars is not None:
+        peak = max(b["high"] for b in bars[-30:-6])
+        trough = min(b["low"] for b in bars[-30:-6])
     if (fast[-1] > slow[-1] and fast[-1] > fast[-9] + curr * .00025 and
             slow[-1] > slow[-12] and
             fast[-1] - curr * .0015 <= swing_low <= fast[-1] + curr * .0006 and
@@ -66,11 +77,11 @@ def detect_structures(prices, ema, rsi):
     return candidates
 
 
-def confirm_structure(prices, watch, ema, rsi):
+def confirm_structure(prices, watch, ema, rsi, current_price=None):
     """Fresh quote confirms reaction is intact rather than chasing the first bounce."""
     if not watch or watch.get("strategy", "breakout") == "breakout" or len(prices) < 65:
         return False
-    curr = prices[-1]
+    curr = prices[-1] if current_price is None else current_price
     direction, level, anchor = watch["direction"], watch["level"], watch["structure_anchor"]
     macd = [a - b for a, b in zip(ema(prices, 12), ema(prices, 26))]
     sig = ema(macd, 9)

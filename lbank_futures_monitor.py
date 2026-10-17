@@ -1,10 +1,9 @@
 """LBank BTCUSDT perpetual-only public price observation monitor.
 
 Never creates orders or reads private LBank accounts. CCXT routes fetch_ohlcv
-to SPOT. Entry logic currently uses LBank perpetual TICKER snapshots while
-an independent native futures WebSocket candle recorder builds validation history.
-Signals use sampled 1-minute prices (NOT trade candles or trade volume).
-Persistent observations across short restarts are still TICKER samples, not candles.
+to SPOT. Live entries use native closed 1m candle closes with a separate current entry quote.
+5m RSI and 15m context use complete native candles; no ticker-history fallback.
+Ticker observations remain for fast risk monitoring and hypothetical accounting.
 """
 import json
 import logging
@@ -32,6 +31,7 @@ from lbank_compact_alert import format_compact_entry_alert
 from lbank_telegram_transport import TelegramTransport
 from lbank_performance import PerformanceBook
 from lbank_native_candles import NativeCandleThread
+from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
 
 LOG = logging.getLogger("lbank_monitor")
 TELEGRAM_DELIVERY = TelegramTransport()
@@ -208,18 +208,15 @@ def extreme_5m_rsi_entry_gate(observations, direction):
     return delayed if delayed[0] else direct
 
 
-def five_minute_rsi_entry_gate(observations, direction, setup=None):
-    """Require only aligned *direction* of completed ticker-sampled 5m RSI.
+def five_minute_rsi_entry_gate(observations, direction, setup=None, native_state=None):
+    """Direction only; native closed 5m RSI in live mode, legacy samples in replay.
 
-    No RSI 30/70 thresholds, extreme history, price reversal path, or fast RSI
-    level veto. Price structure, closed-bucket context, costs, no-chase and
-    risk checks are separately enforced in the entry pipeline.
-    This RSI is derived from LBank perpetual 1-minute ticker snapshots,
-    not native exchange 5-minute OHLCV.
+    No absolute RSI threshold or extreme-history veto is imposed.
     """
     if direction not in (1, -1):
         return False, "invalid_direction", None
-    state = sampled_five_minute_rsi(observations)
+    state = (native_state["rsi5"] if native_state is not None
+             else sampled_five_minute_rsi(observations))
     if state is None or len(state["rsi"]) < 2:
         return False, "5m_rsi_direction_data_unavailable", None
     previous, current = state["rsi"][-2:]
@@ -318,18 +315,21 @@ def trend_retest_momentum_gate(prices, direction):
     return True, "retest_momentum_confirmed", momentum5, momentum15
 
 
-def calculate_plan(prices, direction, setup=None):
+def calculate_plan(prices, direction, setup=None, native_state=None):
     """Cost-aware hypothetical levels with optional structure-anchored stop."""
     setup = setup or {"strategy": "breakout"}
     strategy = setup.get("strategy", "breakout")
     if len(prices) < MIN_SAMPLES:
         return None
-    curr = prices[-1]
+    curr = native_state["quote"] if native_state is not None else prices[-1]
     momentum5 = (curr / prices[-6] - 1) * 100
     momentum15 = (curr / prices[-16] - 1) * 100
     strength = rsi(prices)
     if strategy == "breakout":
         local = prices[-9:-1]
+        if native_state is not None:
+            key = "low" if direction == 1 else "high"
+            local = [bar[key] for bar in native_state["minute_bars"][-8:]]
         stop = (min(curr * (1 - .0025), min(local) * (1 - .0003))
                 if direction == 1 else
                 max(curr * (1 + .0025), max(local) * (1 + .0003)))
@@ -352,11 +352,14 @@ def calculate_plan(prices, direction, setup=None):
     t2 = minimum_net_rr_target(direction, curr, unit_loss, 2.5)
     if t1 is None or t2 is None or t1 <= 0 or t2 <= 0:
         return None
-    # Required profit must be at least plausible compared with sampled movement,
+    # Required profit must be plausible against the observed native candle range
     # otherwise skip instead of inventing a reachable price target.
     observed_range = max(prices[-60:]) - min(prices[-60:])
+    if native_state is not None:
+        bars = native_state["minute_bars"][-60:]
+        observed_range = max(b["high"] for b in bars) - min(b["low"] for b in bars)
     if abs(t1 - curr) > 1.5 * observed_range:
-        LOG.info("PLAN REJECT reason=target_outside_sampled_range strategy=%s direction=%s price=%.1f target1=%.1f sampled_range=%.1f",
+        LOG.info("PLAN REJECT reason=target_outside_observed_range strategy=%s direction=%s price=%.1f target1=%.1f observed_range=%.1f",
                  strategy, direction, curr, t1, observed_range)
         return None
     barrier = setup.get("barrier")
@@ -395,7 +398,8 @@ def calculate_plan(prices, direction, setup=None):
         "margin": margin, "notional": qty * curr,
         "quantity_btc": qty, "reference_risk_budget": permitted_loss,
         "stop_distance_pct": stop_distance * 100,
-        "sampled_1m_abs_move_p90_pct": one_min_p90,
+        "sampled_1m_abs_move_p90_pct": one_min_p90,  # Legacy compatibility key.
+        "one_minute_close_abs_move_p90_pct": one_min_p90,
         "net_loss": net_loss, "net_gain1": net_gain1, "net_gain2": net_gain2,
         "rr1": net_gain1 / net_loss, "rr2": net_gain2 / net_loss,
         "fee_roundtrip_est": qty * (effective_entry * TAKER_FEE + t1 * TAKER_FEE),
@@ -405,7 +409,7 @@ def calculate_plan(prices, direction, setup=None):
     }
 
 
-def classify(prices, observations=None, diagnostics=None):
+def classify(prices, observations=None, diagnostics=None, native_state=None):
     """Evaluate strategies independently; rejected candidates cannot veto others.
 
     Existing structure priority is retained among same-direction qualified plans.
@@ -416,15 +420,27 @@ def classify(prices, observations=None, diagnostics=None):
         if diagnostics is not None:
             diagnostics.update(reason="insufficient_samples", candidates=[])
         return None
-    first = detect_structure(prices, ema, rsi)
-    setups = ([first] if first is not None else []) + detect_structures(prices, ema, rsi)
+    if native_state is not None:
+        if abs(native_state["quote"] / prices[-1] - 1) > ENTRY_MAX_CHASE_PCT:
+            if diagnostics is not None:
+                diagnostics.update(reason="price_deviation", candidates=[])
+            return None
+        bars = native_state["minute_bars"]
+        setups = detect_structures(prices, ema, rsi, bars=bars)
+    else:
+        first = detect_structure(prices, ema, rsi)
+        setups = ([first] if first is not None else []) + detect_structures(prices, ema, rsi)
     curr = prices[-1]
     m5, m15 = (curr / prices[-6] - 1) * 100, (curr / prices[-16] - 1) * 100
     macd_arr = [a - b for a, b in zip(ema(prices, 12), ema(prices, 26))]
     macd, sig = macd_arr[-1], ema(macd_arr, 9)[-1]
-    if curr > max(prices[-16:-1]) and macd > sig and m5 >= .14 and m15 >= .20:
+    prior_high = (max(b["high"] for b in native_state["minute_bars"][-16:-1])
+                  if native_state is not None else max(prices[-16:-1]))
+    prior_low = (min(b["low"] for b in native_state["minute_bars"][-16:-1])
+                 if native_state is not None else min(prices[-16:-1]))
+    if curr > prior_high and macd > sig and m5 >= .14 and m15 >= .20:
         setups.append({"direction": 1, "strategy": "breakout"})
-    if curr < min(prices[-16:-1]) and macd < sig and m5 <= -.14 and m15 <= -.20:
+    if curr < prior_low and macd < sig and m5 <= -.14 and m15 <= -.20:
         setups.append({"direction": -1, "strategy": "breakout"})
     seen, decisions, qualified = set(), [], []
     for setup in setups:
@@ -434,7 +450,8 @@ def classify(prices, observations=None, diagnostics=None):
         seen.add(key)
         detail = {}
         plan = assess_candidate(prices, setup["direction"], setup,
-                                observations=observations, diagnostics=detail)
+                                observations=observations, diagnostics=detail,
+                                native_state=native_state)
         decisions.append({"strategy": key[0], "direction": key[1],
                           "reason": detail.get("reason", "unknown")})
         if plan is not None:
@@ -447,12 +464,13 @@ def classify(prices, observations=None, diagnostics=None):
     return qualified[0] if qualified and not conflict else None
 
 
-def assess_candidate(prices, direction, setup, observations=None, diagnostics=None):
+def assess_candidate(prices, direction, setup, observations=None, diagnostics=None, native_state=None):
     """Apply the SAME price, cost, context and direction gates per strategy."""
     def mark(reason):
         if diagnostics is not None:
             diagnostics["reason"] = reason
-    curr, strength = prices[-1], rsi(prices)
+    curr = native_state["quote"] if native_state is not None else prices[-1]
+    strength = rsi(prices)
     LOG.info("PREWATCH candidate strategy=%s direction=%s price=%.1f rsi1=%.1f",
              (setup or {}).get("strategy", "breakout"),
              "LONG" if direction == 1 else "SHORT", curr, strength)
@@ -466,41 +484,48 @@ def assess_candidate(prices, direction, setup, observations=None, diagnostics=No
             mark("retest_momentum")
             return None
     context = None
-    if observations is not None:
-        context_ok, context_reason, context = sampled_context_gate(
-            observations, direction, (setup or {}).get("strategy", "breakout"))
+    if native_state is not None or observations is not None:
+        context_ok, context_reason, context = (
+            native_context_gate(native_state, direction, (setup or {}).get("strategy", "breakout"))
+            if native_state is not None else sampled_context_gate(
+                observations, direction, (setup or {}).get("strategy", "breakout")))
         if not context_ok:
             LOG.info("CLOSED-BUCKET watch BLOCKED side=%s reason=%s context=%s",
                      "LONG" if direction == 1 else "SHORT", context_reason, context)
             mark("sampled_context")
             return None
         allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(
-            observations, direction, setup=setup)
+            observations, direction, setup=setup, native_state=native_state)
         if not allowed:
-            LOG.info("5m sampled RSI watch direction BLOCKED side=%s reason=%s rsi=%s",
+            LOG.info("5m RSI watch direction BLOCKED side=%s reason=%s rsi=%s",
                      "LONG" if direction == 1 else "SHORT", reason, sampled_rsi5)
             mark("rsi_direction")
             return None
     else:
         sampled_rsi5 = None
-    plan = calculate_plan(prices, direction, setup=setup)
+    plan = calculate_plan(prices, direction, setup=setup, native_state=native_state)
     if plan is None:
         mark("risk_or_target")
         LOG.info("PREWATCH candidate cost/risk/target rejected strategy=%s direction=%s",
                  (setup or {}).get("strategy", "breakout"), direction)
     if plan is not None:
         mark("qualified")
-        plan["sampled_rsi5"] = sampled_rsi5
+        if native_state is not None:
+            plan["data_source"] = native_state["source"]
+            plan["native_5m_start"] = native_state["last5_start"]
+            plan["native_5m_count"] = len(native_state["five_bars"])
+            plan["rsi5"] = sampled_rsi5
+        plan["sampled_rsi5"] = sampled_rsi5  # Legacy schema alias; see data_source.
         plan["sampled_context"] = context
-        plan["rsi_direction_status"] = reason if observations is not None else None
+        plan["rsi_direction_status"] = reason if native_state is not None or observations is not None else None
     return plan
 
 
-def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=None):
+def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=None, native_state=None):
     """Separate second-stage ENTRY REVIEW with fresh price confirmation.
 
     Used for user-side manual checking only, not a guaranteed market entry.
-    It never assumes orderbook depth or authentic exchange OHLCV bars.
+    Native mode verifies candle continuity; orderbook depth remains unverified.
     """
     def mark(reason):
         if diagnostics is not None:
@@ -513,7 +538,7 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
         mark("insufficient_samples")
         return None
     direction = watch["direction"]
-    current = prices[-1]
+    current = native_state["quote"] if native_state is not None else prices[-1]
     initial = watch["price"]
     relative = direction * (current / initial - 1)
     # Do not chase >0.10% in the favorable direction or accept >0.10% failed breakout.
@@ -530,7 +555,8 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
     else:
         valid = macd < sig and m5 <= -.04 and m15 <= -.10
     if watch.get("strategy", "breakout") != "breakout":
-        valid = confirm_structure(prices, watch, ema, rsi)
+        valid = (confirm_structure(prices, watch, ema, rsi, current_price=current)
+                 if native_state is not None else confirm_structure(prices, watch, ema, rsi))
     if not valid:
         mark("structure_or_momentum")
         return None
@@ -544,33 +570,40 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
             mark("retest_momentum")
             return None
     context = None
-    if observations is not None:
-        context_ok, context_reason, context = sampled_context_gate(
-            observations, direction, watch.get("strategy", "breakout"))
+    if native_state is not None or observations is not None:
+        context_ok, context_reason, context = (
+            native_context_gate(native_state, direction, watch.get("strategy", "breakout"))
+            if native_state is not None else sampled_context_gate(
+                observations, direction, watch.get("strategy", "breakout")))
         if not context_ok:
             LOG.info("CLOSED-BUCKET confirm BLOCKED side=%s reason=%s context=%s",
                      "LONG" if direction == 1 else "SHORT", context_reason, context)
             mark("sampled_context")
             return None
         allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(
-            observations, direction, setup=watch)
+            observations, direction, setup=watch, native_state=native_state)
         if not allowed:
-            LOG.info("5m sampled RSI confirm direction BLOCKED side=%s reason=%s rsi=%s",
+            LOG.info("5m RSI confirm direction BLOCKED side=%s reason=%s rsi=%s",
                      "LONG" if direction == 1 else "SHORT", reason, sampled_rsi5)
             mark("rsi_direction")
             return None
     else:
         sampled_rsi5 = None
-    plan = calculate_plan(prices, direction, setup=watch)
+    plan = calculate_plan(prices, direction, setup=watch, native_state=native_state)
     if plan is None:
         mark("risk_or_target")
         LOG.info("CONFIRM candidate cost/risk/target rejected strategy=%s direction=%s",
                  watch.get("strategy", "breakout"), direction)
     if plan is not None:
         mark("qualified")
-        plan["sampled_rsi5"] = sampled_rsi5
+        if native_state is not None:
+            plan["data_source"] = native_state["source"]
+            plan["native_5m_start"] = native_state["last5_start"]
+            plan["native_5m_count"] = len(native_state["five_bars"])
+            plan["rsi5"] = sampled_rsi5
+        plan["sampled_rsi5"] = sampled_rsi5  # Legacy schema alias; see data_source.
         plan["sampled_context"] = context
-        plan["rsi_direction_status"] = reason if observations is not None else None
+        plan["rsi_direction_status"] = reason if native_state is not None or observations is not None else None
     return plan
 
 
@@ -681,16 +714,17 @@ def run():
         SAMPLE_STORE_PATH, SYMBOL, POLL)
     observations = deque(cached_observations, maxlen=360)
     LOG.info("price_sample_cache_restored=%d", len(observations))
-    # Native candles are recorded independently until history and cross-checks
-    # are sufficient. Do not silently substitute forming bars into entry logic.
+    # Only the writer thread owns a writable native DB connection. The entry
+    # reader fails closed on missing, stale or discontinuous native history.
     if os.getenv("LBANK_NATIVE_CANDLES_ENABLED", "true").lower() == "true":
         NativeCandleThread().start()
-        LOG.info("NATIVE_CANDLES collection enabled; existing entry source unchanged")
+        LOG.info("NATIVE_CANDLES collection enabled; entry_source=native readiness_required=true")
+    native_feed = NativeEntryFeed()
     risk_tracker = SignalRiskTracker(path=os.getenv(
         "LBANK_SIGNAL_FOLLOWUP_STATE_PATH", "/data/lbank_signal_followups.json"))
     rsi_research = ResearchTracker()  # Shadow stats only; not an entry gate
     neutral_exit_study = NeutralExitStudy(path=os.getenv(
-        "LBANK_NEUTRAL_EXIT_RESEARCH_STATE_PATH", "/data/lbank_neutral_exit_study.json"))
+        "LBANK_NATIVE_NEUTRAL_EXIT_RESEARCH_STATE_PATH", "/data/lbank_native_neutral_exit_study.json"))
     LOG.info("neutral_exit_shadow_study=enabled; logging hypotheses only, no new Telegram exit alerts")
     position_ledger = PositionState()
     position_bot = TelegramBot(position_ledger)
@@ -729,7 +763,7 @@ def run():
         except Exception as exc:
             LOG.error("ORDERBOOK_SHADOW_INIT_FAILED exception=%s details=%s",
                       type(exc).__name__, str(exc)[:150])
-    LOG.info("risk_snapshot_poll=%ds, entry_snapshot_poll=%ds (sampled data only)", RISK_POLL, POLL)
+    LOG.info("risk_snapshot_poll=%ds, entry_review_poll=%ds source=native_candles quote_risk_polling=true", RISK_POLL, POLL)
     watch = None
     alert_state = cached_alert_state
     last_sample = observations[-1][0] if observations else 0
@@ -856,24 +890,19 @@ def run():
                 observations.append((now, price))
                 save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
                                observations, alert_state)
-                # Shadow audit runs for every newly completed 5-minute sample.
+                native_state, native_diag = native_feed.snapshot(now, price)
+                LOG.info("NATIVE_ENTRY_STATUS %s", json.dumps(native_diag, sort_keys=True))
+                # Research and neutral-position warnings also use native 5m RSI.
+                # Shadow audit runs for every newly completed 5-minute candle.
                 # Capture both rejected and validated observations for 7-day
                 # forward testing; never create an order or extra entry alert.
-                bucket = int(now // 300) - 1
-                if bucket != last_5m_audit:
+                bucket = native_state["last5_start"] // 300 if native_state else None
+                if bucket is not None and bucket != last_5m_audit:
                     last_5m_audit = bucket
-                    audit_state = sampled_five_minute_rsi(list(observations))
+                    audit_state = native_state["rsi5"]
                     if audit_state is not None:
-                        ready, reason, value = confirmed_sampled_5m_oversold_rebound(
-                            list(observations))
-                        short_ready, short_reason, _ = confirmed_sampled_5m_overbought_rejection(
-                            list(observations))
-                        LOG.info(
-                            "RSI5_SHADOW completed_bucket=%d close=%.1f rsi=%.2f "
-                            "rebound_ready=%s reason=%s short_rejection_ready=%s "
-                            "short_reason=%s source=sampled_perpetual_ticker",
-                            bucket, audit_state["closes"][-1],
-                            value, ready, reason, short_ready, short_reason)
+                        LOG.info("RSI5_NATIVE completed_bucket=%d close=%.1f rsi=%.2f source=%s",
+                                 bucket, audit_state["closes"][-1], audit_state["rsi"][-1], NATIVE_SOURCE)
                         sampled_closes = audit_state["closes"]
                         sampled_rsis = audit_state["rsi"]
                         hypotheses, outcomes = rsi_research.observe(
@@ -892,7 +921,7 @@ def run():
                                      "neutral_stall_short":short_stall,
                                      "close":sampled_closes[-1],
                                      "rsi":round(sampled_rsis[-1],2),
-                                     "source":"ticker_sample_not_ohlcv",
+                                     "source":NATIVE_SOURCE,
                                      "orderbook":"unverified"},sort_keys=True))
                         for result in outcomes:
                             LOG.info("RSI5_FORWARD %s",json.dumps(result,sort_keys=True))
@@ -908,14 +937,14 @@ def run():
                             if neutral_stall(sampled_closes, sampled_rsis, side_num):
                                 side_text = "롱" if side_num == 1 else "숏"
                                 warning = (
-                                    "[LBank BTCUSDT | RSI 5분 표본 중립 정체 주의 - "
+                                    "[LBank BTCUSDT | RSI 5분봉 중립 정체 주의 - "
                                     "수동 신고 포지션]\\n"
                                     f"신고 방향: {side_text}\\n"
-                                    f"가격 표본: {sampled_closes[-1]:,.1f} USDT\\n"
-                                    f"5분 가격표본 RSI: {sampled_rsis[-1]:.1f}\\n"
+                                    f"5분봉 종가: {sampled_closes[-1]:,.1f} USDT\\n"
+                                    f"5분봉 RSI: {sampled_rsis[-1]:.1f}\\n"
                                     "2회 완료된 5분 구간에서 RSI 40~60 정체와 "
                                     "가격 모멘텀 약화를 관찰했습니다.\\n"
-                                    "실제 거래소 5분봉·호가·포지션은 확인하지 못했습니다.\\n"
+                                    "원본 봉 기반이며 실제 호가·포지션·체결은 별도 확인이 필요합니다.\\n"
                                     "목표까지 무조건 기다리지 말고 수수료, 실제 손익과 "
                                     "LBank 포지션 상태를 확인해 조기청산을 검토하세요.\\n"
                                     "주의 알림일 뿐 실제 청산 주문은 실행하지 않습니다."
@@ -926,7 +955,9 @@ def run():
                                     LOG.warning("MANUAL POSITION NEUTRAL STALL REVIEW SENT side=%s",side_text)
                                 else:
                                     LOG.error("MANUAL POSITION NEUTRAL STALL REVIEW SEND FAILED")
-                prices = [v for _, v in observations]
+                # Preserve minute-indexed strategy timing with native 1m closes.
+                # The live quote is used separately for entry/confirmation prices.
+                prices = native_state["prices"] if native_state else []
                 # Persist raw reference quotes even when no strategy proposes a
                 # trade. A failed journal pauses entries but never risk notices.
                 if performance is not None:
@@ -935,10 +966,7 @@ def run():
                     except Exception as exc:
                         audit_ready = False
                         LOG.error("PERFORMANCE_V2 sample_failed exception=%s", type(exc).__name__)
-                recent = list(observations)[-MIN_SAMPLES:]
-                continuous = len(recent) >= MIN_SAMPLES and all(
-                    20 <= recent[i][0] - recent[i-1][0] <= max(POLL * 2.5, 150)
-                    for i in range(1, len(recent)))
+                continuous = native_state is not None
                 if not audit_ready:
                     watch = None
                     LOG.error("ENTRY JOURNAL UNAVAILABLE new_entries_paused=true risk_notices=active")
@@ -957,7 +985,7 @@ def run():
                     else:
                         confirm_diag = {}
                         plan = confirm_watch(prices, watch["plan"], age,
-                                             observations=list(observations),
+                                             native_state=native_state,
                                              diagnostics=confirm_diag)
                         if plan is None:
                             count_event("confirm_reject")
@@ -985,9 +1013,9 @@ def run():
                                 LOG.warning(
                                     "ENTRY_EVIDENCE_AUDIT strategy=%s side=%s "
                                     "stage2_signed_progress_pct=%.5f "
-                                    "sampled_1m_move5_pct=%.4f "
-                                    "sampled_1m_move15_pct=%.4f "
-                                    "closed_15m_samples_45m_signed_pct=%.4f "
+                                    "native_1m_to_quote_move5_pct=%.4f "
+                                    "native_1m_to_quote_move15_pct=%.4f "
+                                    "native_15m_45m_signed_pct=%.4f "
                                     "confirmed_reversal=%s "
                                     "read_only_no_quality_gate_change=true",
                                     plan.get("strategy"), side, stage_move,
@@ -1033,8 +1061,9 @@ def run():
                             watch = None
                 if continuous and audit_ready and watch is None:
                     rejection = {}
-                    proposal = classify(prices, observations=list(observations),
+                    proposal = classify(prices, native_state=native_state,
                                         diagnostics=rejection)
+                    rejection["data_source"] = NATIVE_SOURCE
                     performance.sample(now, price, decision=rejection)
                     if proposal is not None:
                         side = proposal["side"]

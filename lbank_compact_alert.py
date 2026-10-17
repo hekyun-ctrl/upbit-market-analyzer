@@ -37,14 +37,20 @@ def format_compact_entry_alert(plan, observed_at_utc, reference_number=None,
         and plan.get("direction", 0) * float(ctx.get("trend15_pct", 0.0)) < 0
         and not ctx.get("reversal_confirmed", False)
     )
-    caution = ("⚠️ 45분 표본 역추세·반전 미확인 | 신중히 판단\n"
+    native = plan.get("data_source") == "lbank_native_1m_aggregated_5m"
+    context_label = "45분 원본 봉" if native else "45분 표본"
+    caution = (f"⚠️ {context_label} 역추세·반전 미확인 | 신중히 판단\n"
                if countertrend else "")
 
+    source_note = (
+        "⚠️ 관찰 신호(실전 진입 추천 아님)·원본 5분봉 기반/호가 미검증\n"
+        if native else
+        "⚠️ 관찰 신호(실전 진입 추천 아님)·실제 5분봉/호가 미검증\n"
+    )
     return (
         f"[LBank BTCUSDT | {icon} {side} | 조건부 진입 검토]\n"
         f"⏱ {kst} KST | 유효 5분{reference}\n"
-        "⚠️ 관찰 신호(실전 진입 추천 아님)·실제 5분봉/호가 미검증\n"
-        f"{caution}"
+        f"{source_note}{caution}"
         f"📍 진입가: {plan['price']:,.1f} USDT\n"
         f"💰 진입 증거금: {plan['margin']:,.2f} USDT "
         f"(시드 {margin_pct:.2f}%, 최대 {max_margin_fraction * 100:.0f}%)\n"

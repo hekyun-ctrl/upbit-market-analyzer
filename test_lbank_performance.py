@@ -129,7 +129,7 @@ class StrategyIndependenceTests(unittest.TestCase):
     def test_opposing_qualified_strategies_abstain(self):
         setups = [{"direction": 1, "strategy": "range_rebound"},
                   {"direction": -1, "strategy": "trend_retest"}]
-        def pass_gate(prices, direction, setup, observations=None, diagnostics=None):
+        def pass_gate(prices, direction, setup, observations=None, diagnostics=None, native_state=None):
             diagnostics["reason"] = "qualified"
             return dict(setup)
         diag = {}

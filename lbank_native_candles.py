@@ -157,7 +157,7 @@ class NativeCandleStore:
                 loss = (13*loss + max(-change, 0)) / 14
             rsi14 = 50. if gain == loss == 0 else 100. if loss == 0 else 100-100/(1+gain/loss)
         return {"consecutive_closed_5m": count, "warmup_target": 250, "rsi14_wilder": rsi14,
-                "native_history_ready": count >= 250, "entry_source_switched": False,
+                "native_history_ready": count >= 250, "entry_source_status": "see_NATIVE_ENTRY_STATUS",
                 "source": "lbank_native_1m_aggregated_5m",
                 "closure": "stream_inferred_not_rest_verified"}
 
@@ -191,7 +191,7 @@ class NativeCandleThread(threading.Thread):
                             "a": {"i": "BTCUSDT_5m"},
                             "e": json.dumps({"bvc": "202", "isUsd": 1})})
                         heartbeat = asyncio.create_task(self._heartbeat(ws))
-                        LOG.info("NATIVE_CANDLES_CONNECTED entry_source_switched=false")
+                        LOG.info("NATIVE_CANDLES_CONNECTED entry_readiness=see_NATIVE_ENTRY_STATUS")
                         next_log = 0
                         async for msg in ws:
                             if msg.type in (aiohttp.WSMsgType.TEXT, aiohttp.WSMsgType.BINARY):

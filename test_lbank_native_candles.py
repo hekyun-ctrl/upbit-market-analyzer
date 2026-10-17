@@ -51,7 +51,7 @@ class NativeCandlesTests(unittest.TestCase):
         self.assertEqual(closed[0]["low"], 98)
         self.assertEqual(closed[0]["close"], 101)
         self.assertEqual(store.status()["consecutive_closed_5m"], 1)
-        self.assertFalse(store.status()["entry_source_switched"])
+        self.assertEqual(store.status()["entry_source_status"], "see_NATIVE_ENTRY_STATUS")
 
     def test_repeated_updates_replace_volume_instead_of_adding(self):
         store = self.make_store()
@@ -115,7 +115,7 @@ class NativeCandlesTests(unittest.TestCase):
         status = store.status()
         self.assertEqual(status["rsi14_wilder"],100)
         self.assertTrue(status["native_history_ready"])
-        self.assertFalse(status["entry_source_switched"])
+        self.assertEqual(status["entry_source_status"], "see_NATIVE_ENTRY_STATUS")
         store.server_time += 300
         self.assertIsNone(store.status()["rsi14_wilder"])
 
