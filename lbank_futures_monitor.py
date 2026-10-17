@@ -26,7 +26,7 @@ from lbank_rsi_research import ResearchTracker, NeutralExitStudy, neutral_stall
 from lbank_rsi_plateau import consolidation_reversal_resume
 from lbank_macro_monitor import MacroMonitor
 from lbank_orderbook_shadow import OrderBookShadowThread
-from lbank_notification_schedule import is_quiet_new_entry_time
+from lbank_notification_schedule import is_quiet_new_entry_time, quiet_hours_enabled
 from lbank_compact_alert import format_compact_entry_alert
 from lbank_telegram_transport import TelegramTransport
 from lbank_performance import PerformanceBook
@@ -762,8 +762,10 @@ def run():
         raise RuntimeError("Refuse to monitor spot instrument")
     LOG.info("LBank BTCUSDT: TWO-STAGE fee-aware entry-review monitor started. REF_BALANCE=%.4f risk_pct=%.2f leverage=%.0fx max_margin_pct=%.1f; NO orders",
              REF_BALANCE, 100 * RISK_FRACTION, LEVERAGE, MAX_MARGIN_FRACTION * 100)
-    LOG.info("ENTRY_NOTIFICATION_SCHEDULE timezone=KST quiet=Wed-Sat 23:00-to-next-day-06:00"
-             " night_shifts=Sun-Mon-Tue risk_notifications=always_on")
+    LOG.info("ENTRY_NOTIFICATION_SCHEDULE timezone=KST quiet_hours_enabled=%s "
+             "entry_hours=%s risk_notifications=always_on",
+             quiet_hours_enabled(),
+             "quiet=Wed-Sat 23:00-to-next-day-06:00" if quiet_hours_enabled() else "24h")
     # Runs in a daemon so health checks cannot hold up market or stop warnings.
     threading.Thread(target=TELEGRAM_DELIVERY.startup_probe_once,
                      name="lbank-telegram-one-time-diagnostic",

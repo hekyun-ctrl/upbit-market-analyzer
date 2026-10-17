@@ -1,4 +1,5 @@
 """Offline exact-boundary and weekday-rollover tests for Korean sleep hours."""
+import os
 import unittest
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
@@ -14,6 +15,26 @@ def at(weekday_date, hour, minute=0):
 
 
 class NotificationScheduleTests(unittest.TestCase):
+    def setUp(self):
+        # Legacy boundaries apply only when quiet hours are explicitly enabled.
+        env = patch.dict(os.environ, {"LBANK_QUIET_HOURS_ENABLED": "true"})
+        env.start()
+        self.addCleanup(env.stop)
+
+    def test_disabled_quiet_hours_allows_24h_but_preserves_daily_cap_and_cooldown(self):
+        import lbank_futures_monitor as monitor
+        with patch.dict(os.environ, {"LBANK_QUIET_HOURS_ENABLED": "false"}):
+            for day in range(14, 21):
+                for hour in range(24):
+                    now = at(f"2026-10-{day}", hour)
+                    state = {"day": None, "count": 0, "last_time": None, "last_side": None}
+                    self.assertFalse(is_quiet_new_entry_time(now))
+                    self.assertEqual(monitor.alert_gate(now, "롱", state), "ok")
+                    monitor.record_alert(now, "롱", state)
+                    self.assertEqual(monitor.alert_gate(now + 60, "롱", state), "global_cooldown")
+                    state.update(count=monitor.MAX_DAILY_ALERTS, last_time=None)
+                    self.assertEqual(monitor.alert_gate(now + 60, "롱", state), "daily_cap")
+
     def test_wednesday_through_saturday_nights_quiet_from_23_to_next_06(self):
         # 2026-10-14 = Wednesday, 15 Thu, 16 Fri, 17 Sat
         for date in ("2026-10-14", "2026-10-15", "2026-10-16", "2026-10-17"):
