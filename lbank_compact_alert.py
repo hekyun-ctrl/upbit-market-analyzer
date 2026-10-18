@@ -48,6 +48,9 @@ def format_compact_entry_alert(plan, observed_at_utc, reference_number=None,
         "⚠️ 관찰 신호(실전 진입 추천 아님)·실제 5분봉/호가 미검증\n"
     )
     runner_note = " | 추세 확인 시 목표 연장·보호선 조정" if plan.get("runner_enabled") else ""
+    context = plan.get("rsi_context") or {}
+    if context.get("ready"):
+        source_note = source_note.rstrip("\n") + " | 보조: " + context["label"] + "\n"
     return (
         f"[LBank BTCUSDT | {icon} {side} | 조건부 진입 검토]\n"
         f"⏱ {kst} KST | 유효 5분{reference}\n"

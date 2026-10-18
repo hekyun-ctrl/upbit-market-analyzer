@@ -33,6 +33,7 @@ from lbank_performance import PerformanceBook
 from lbank_native_candles import NativeCandleThread
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
+from lbank_rsi_divergence import annotate as annotate_rsi_context, DivergenceStudy
 
 LOG = logging.getLogger("lbank_monitor")
 TELEGRAM_DELIVERY = TelegramTransport()
@@ -576,6 +577,7 @@ def assess_candidate(prices, direction, setup, observations=None, diagnostics=No
         plan["sampled_rsi5"] = sampled_rsi5  # Legacy schema alias; see data_source.
         plan["sampled_context"] = context
         plan["rsi_direction_status"] = reason if native_state is not None or observations is not None else None
+        plan = annotate_rsi_context(plan, native_state)
     return plan
 
 
@@ -662,6 +664,7 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
         plan["sampled_rsi5"] = sampled_rsi5  # Legacy schema alias; see data_source.
         plan["sampled_context"] = context
         plan["rsi_direction_status"] = reason if native_state is not None or observations is not None else None
+        plan = annotate_rsi_context(plan, native_state)
     return plan
 
 
@@ -789,6 +792,14 @@ def run():
     position_ledger = PositionState()
     position_bot = TelegramBot(position_ledger)
     performance = None
+    divergence_study = None
+    try:
+        divergence_study = DivergenceStudy(os.getenv(
+            "LBANK_RSI_DIVERGENCE_STUDY_DB", "/data/lbank_rsi_divergence_study.sqlite3"), REF_BALANCE)
+        LOG.info("RSI_DIVERGENCE enabled annotation_only=true independent_paper=true live_gate=false "
+                 "pivot_right_bars=2 rsi50_required_for_existing=false")
+    except Exception as exc:
+        LOG.error("RSI_DIVERGENCE study_unavailable exception=%s existing_entries_unchanged=true", type(exc).__name__)
     pending_journal = []
     try:
         performance = PerformanceBook(
@@ -1212,10 +1223,22 @@ def run():
                              diag_counters["suppressed"])
                     diag_counters = dict(counter_template)
                     next_diag_summary = now + 600
+                if divergence_study is not None:
+                    try:
+                        study = divergence_study.step(now,price,native_state,calculate_plan,native_context_gate,
+                                  baseline_reason=last_entry_diagnostics.get("reason","not_reviewed"))
+                        LOG.info("RSI_DIVERGENCE_STUDY %s",json.dumps(study,sort_keys=True))
+                    except Exception as exc:
+                        LOG.error("RSI_DIVERGENCE study_failed exception=%s existing_entries_unchanged=true",type(exc).__name__)
                 if performance is not None:
                     try:
                         digest = performance.daily_message(now)
                         if digest is not None:
+                            if divergence_study is not None:
+                                try:
+                                    digest += divergence_study.report_line()
+                                except Exception as exc:
+                                    LOG.error("RSI_DIVERGENCE report_failed exception=%s",type(exc).__name__)
                             delivered = telegram(digest)
                             performance.report_delivery(now, delivered)
                             LOG.info("PERFORMANCE_DAILY_REPORT delivered=%s actual_pnl=false", delivered)
