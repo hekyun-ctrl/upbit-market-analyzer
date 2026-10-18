@@ -35,6 +35,7 @@ from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as N
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
 from lbank_rsi_divergence import annotate as annotate_rsi_context, DivergenceStudy
 from lbank_market_context import MarketContextThread, annotate as annotate_market_context
+from lbank_public_techniques import TechniqueStudy, annotate as annotate_public_techniques
 
 LOG = logging.getLogger("lbank_monitor")
 TELEGRAM_DELIVERY = TelegramTransport()
@@ -802,6 +803,15 @@ def run():
     position_bot = TelegramBot(position_ledger)
     performance = None
     divergence_study = None
+    technique_study = None
+    try:
+        technique_study = TechniqueStudy(os.getenv(
+            "LBANK_PUBLIC_TECHNIQUE_STUDY_DB", "/data/lbank_public_technique_study.sqlite3"),
+            REF_BALANCE, fee=TAKER_FEE, slippage=STOP_SLIPPAGE, funding=FUNDING_BUFFER)
+        LOG.info("PUBLIC_TECHNIQUES enabled paper_strategies=4 live_gate=false live_entry_added=false "
+                 "original_rsi_window=250 study_only_hourly_history=300")
+    except Exception as exc:
+        LOG.error("PUBLIC_TECHNIQUES unavailable exception=%s existing_entries_unchanged=true",type(exc).__name__)
     try:
         divergence_study = DivergenceStudy(os.getenv(
             "LBANK_RSI_DIVERGENCE_STUDY_DB", "/data/lbank_rsi_divergence_study.sqlite3"), REF_BALANCE)
@@ -1120,6 +1130,7 @@ def run():
                                     plan.get("m5"), plan.get("m15"),
                                     signed_45m, ctx.get("reversal_confirmed"))
                                 plan = annotate_market_context(plan,market_context,now)
+                                plan = annotate_public_techniques(plan,native_state,now,REF_BALANCE)
                                 message = format_entry_alert(
                                     plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat(),
                                     reference_number=risk_tracker.next_number)
@@ -1240,6 +1251,13 @@ def run():
                         LOG.info("RSI_DIVERGENCE_STUDY %s",json.dumps(study,sort_keys=True))
                     except Exception as exc:
                         LOG.error("RSI_DIVERGENCE study_failed exception=%s existing_entries_unchanged=true",type(exc).__name__)
+                if technique_study is not None:
+                    try:
+                        technique_result = technique_study.step(now,price,native_state,calculate_plan,native_context_gate,
+                            baseline_reason=last_entry_diagnostics.get("reason","not_reviewed"))
+                        LOG.info("PUBLIC_TECHNIQUES_STUDY %s",json.dumps(technique_result,sort_keys=True))
+                    except Exception as exc:
+                        LOG.error("PUBLIC_TECHNIQUES study_failed exception=%s existing_entries_unchanged=true",type(exc).__name__)
                 if performance is not None:
                     try:
                         digest = performance.daily_message(now)
@@ -1254,6 +1272,11 @@ def run():
                                     digest += divergence_study.report_line()
                                 except Exception as exc:
                                     LOG.error("RSI_DIVERGENCE report_failed exception=%s",type(exc).__name__)
+                            if technique_study is not None:
+                                try:
+                                    digest += technique_study.report_line()
+                                except Exception as exc:
+                                    LOG.error("PUBLIC_TECHNIQUES report_failed exception=%s",type(exc).__name__)
                             delivered = telegram(digest)
                             performance.report_delivery(now, delivered)
                             LOG.info("PERFORMANCE_DAILY_REPORT delivered=%s actual_pnl=false", delivered)

@@ -98,6 +98,7 @@ class PerformanceBook:
                  runner_last_bar=-1, barrier=plan.get("barrier"),
                  policy_version=POLICY_VERSION if plan.get("runner_enabled") else "fixed_levels_v2",
                  market_context=plan.get("market_context"),
+                 public_techniques=plan.get("public_techniques"),
                  fills="hypothetical_quote_entry_and_target_touch_not_verified")
         # Timestamp in identity prevents collisions with an older reset signal ID.
         identity = f"{int(ts * 1000)}:{reference}"

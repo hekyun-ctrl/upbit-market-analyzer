@@ -1,0 +1,129 @@
+{
+  "source_post": "https://gall.dcinside.com/mgallery/board/view/?id=chartanalysis&no=5051684",
+  "archive_sha256": "b6f1dc7aadf8209bf6c99fd516a06c0cabdc77c5f16f9fc8df92fdf1d8d01b9a",
+  "archive_bytes": 113381570,
+  "self_published_not_independently_authenticated": true,
+  "rows_by_file": {
+    "aoa-execution-2018-03-01-2018-12-31.csv": 164096,
+    "aoa-execution-2019-01-01-2020-12-31.csv": 529632,
+    "aoa-execution-2021-01-01-2021-06-30.csv": 457603,
+    "aoa-execution-2021-07-01-2021-12-31.csv": 293252,
+    "aoa-wallet-2018-03-01-2021-12-31.csv": 4388
+  },
+  "execution_types": {
+    "Trade": 1439207,
+    "Funding": 5368,
+    "Settlement": 8
+  },
+  "execution_symbols": {
+    "XBTUSD": 944968,
+    "XBTM18": 212,
+    "XBTU18": 36,
+    "ADAM18": 527,
+    "BCHM18": 70,
+    "XRPM18": 138,
+    "XBT7D_U110": 12,
+    "ETHM18": 5,
+    "EOSM18": 277,
+    "EOSU18": 1085,
+    "ADAU18": 654,
+    "XRPU18": 2000,
+    "ETHU18": 158,
+    "TRXU18": 776,
+    "BCHU18": 33,
+    "LTCU18": 12,
+    "ETHUSD": 328217,
+    "XRPZ18": 2849,
+    "ADAZ18": 253,
+    "TRXZ18": 147,
+    "BCHZ18": 2467,
+    "EOSZ18": 384,
+    "XBTZ18": 180,
+    "XBTH19": 532,
+    "TRXH19": 38,
+    "XRPH19": 72,
+    "LTCH19": 109,
+    "BCHM19": 46,
+    "XRPM19": 59,
+    "ADAM19": 17,
+    "XBTM19": 170,
+    "TRXU19": 497,
+    "XBTH20": 5923,
+    "BCHUSD": 9268,
+    "YFIUSDTZ20": 11,
+    "LINKUSDT": 6430,
+    "XRPUSD": 55788,
+    "XRPH21": 1809,
+    "EOSH21": 2020,
+    "LTCUSD": 17296,
+    "DOTUSDT": 11412,
+    "ADAUSDT": 485,
+    "ETHUSDM21": 5357,
+    "DOGEUSDT": 11229,
+    "BNBUSDT": 4808,
+    "XBTU21": 25747
+  },
+  "execution_first": "2018-03-05 07:28:18.063937",
+  "execution_last": "2021-12-31 20:00:00.000426",
+  "duplicate_execution_ids": 0,
+  "out_of_order_rows": 4319,
+  "distinct_trade_order_ids": 23417,
+  "xbtusd_by_year": {
+    "2018": {
+      "total_usd_notional": 1497013945,
+      "maker_usd_notional": 966506318,
+      "trades": 132752,
+      "maker_notional_share": 0.6456227887710158
+    },
+    "2019": {
+      "total_usd_notional": 3195153721,
+      "maker_usd_notional": 2169779958,
+      "trades": 207908,
+      "maker_notional_share": 0.6790846849524709
+    },
+    "2020": {
+      "total_usd_notional": 6626193455,
+      "maker_usd_notional": 4665193561,
+      "trades": 302878,
+      "maker_notional_share": 0.7040533290617607
+    },
+    "2021": {
+      "total_usd_notional": 12256095137,
+      "maker_usd_notional": 9446712749,
+      "trades": 297469,
+      "maker_notional_share": 0.7707767150469697
+    }
+  },
+  "position_episodes_reconstructed": false,
+  "wallet_transaction_statuses": {
+    "Completed": 2246,
+    "Canceled": 7
+  },
+  "wallet_completed_row_types": {
+    "Deposit": 18,
+    "RealisedPNL": 2172,
+    "Withdrawal": 56
+  },
+  "wallet_completed_amount_btc_by_type": {
+    "Deposit": 14.48925714,
+    "RealisedPNL": 3537.32369404,
+    "Withdrawal": -2814.54321713
+  },
+  "wallet_completed_cashflow_reconciliation_satoshis": 0,
+  "wallet_completed_cashflow_reconciled": true,
+  "wallet_completed_date_out_of_order": 5,
+  "wallet_times_truncated": true,
+  "intraday_equity_reconstructed": false,
+  "wallet_scientific_notation_rows": 406,
+  "wallet_blank_rows_excluded": 2135,
+  "wallet_balance_may_be_rounded_in_source": true,
+  "win_rate_computed": false,
+  "entry_rule_identified": false,
+  "caveats": [
+    "Individual fills are not independent trades.",
+    "Unsorted execution rows and unknown starting positions prevent naive episode reconstruction.",
+    "Canceled wallet withdrawals are excluded; endpoint reconciliation does not authenticate the archive or reconstruct intraday equity.",
+    "No official trade-ID match or account ownership attestation was performed.",
+    "Historical BitMEX inverse-contract execution is not current LBank linear-contract performance."
+  ]
+}

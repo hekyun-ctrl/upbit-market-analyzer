@@ -70,11 +70,14 @@ class NativeEntryFeed:
                 db.execute("BEGIN")
                 # Include gap/forming rows so a bad latest bar cannot be skipped.
                 rows1 = db.execute("SELECT * FROM native_bars WHERE period=60 AND start<=? ORDER BY start DESC LIMIT 360", (expected1,)).fetchall()
-                rows5 = db.execute("SELECT * FROM native_bars WHERE period=300 AND start<=? ORDER BY start DESC LIMIT 250", (expected5,)).fetchall()
+                rows5 = db.execute("SELECT * FROM native_bars WHERE period=300 AND start<=? ORDER BY start DESC LIMIT 300", (expected5,)).fetchall()
             finally:
                 db.close()
             minutes = recent_contiguous(rows1, expected1, 60)
-            five = recent_contiguous(rows5, expected5, 300)
+            # Preserve the original 250-bar live RSI window exactly. The wider
+            # read is ONLY for an independent 1h public-technique paper study.
+            five = recent_contiguous(rows5[:250], expected5, 300)
+            research_five = recent_contiguous(rows5, expected5, 300)
             diag = {"source": SOURCE, "closed_1m": len(minutes), "closed_5m": len(five),
                     "required_5m": MIN_FIVE_BARS, "rsi_warmup_target": 250,
                     "rsi_history_mature": len(five) >= 250,
@@ -93,6 +96,7 @@ class NativeEntryFeed:
             # Never expand a 5m bar into five fake minute closes, append a quote
             # as an extra minute, or interpolate missing data.
             state = {"minute_bars": minutes, "five_bars": five,
+                     "research_five_bars": research_five,
                      "prices": [b["close"] for b in minutes], "quote": quote,
                      "closes15": fifteen, "last5_start": five[-1]["start"],
                      "rsi5": {"closes": closes5, "rsi": wilder_rsi_series(closes5)},
