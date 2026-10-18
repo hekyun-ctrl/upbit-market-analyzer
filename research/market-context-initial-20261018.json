@@ -1,0 +1,23 @@
+{
+  "ready": true,
+  "source": "coingecko_global_v1",
+  "market_at": 1792329477.0,
+  "btc_at": 1792329709.0,
+  "usdt_at": 1792329709.0,
+  "observed_at": 1792329815.7101064,
+  "total_usd": 2756152772711.8022,
+  "btc_d": 59.51849707922722,
+  "usdt_d": 6.640340932380921,
+  "usdt_cap_usd": 183017940725.3335,
+  "btc_usd": 81835.0,
+  "usdt_usd": 0.999041,
+  "usdt_supply": 183665036252.98206,
+  "horizons": {},
+  "regime": "warming_up",
+  "label": "1시간 비교자료 축적 중",
+  "alignment_direction": 0,
+  "peg_deviation_pct": -0.09590000000000432,
+  "notes": [],
+  "live_gate": false,
+  "flow_inferred": false
+}

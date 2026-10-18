@@ -51,6 +51,9 @@ def format_compact_entry_alert(plan, observed_at_utc, reference_number=None,
     context = plan.get("rsi_context") or {}
     if context.get("ready"):
         source_note = source_note.rstrip("\n") + " | 보조: " + context["label"] + "\n"
+    market_note = (plan.get("market_context") or {}).get("line", "")
+    if market_note:
+        source_note += market_note + "\n"
     return (
         f"[LBank BTCUSDT | {icon} {side} | 조건부 진입 검토]\n"
         f"⏱ {kst} KST | 유효 5분{reference}\n"

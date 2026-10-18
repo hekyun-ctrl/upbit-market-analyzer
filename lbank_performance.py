@@ -97,6 +97,7 @@ class PerformanceBook:
                  runner_enabled=bool(plan.get("runner_enabled")),
                  runner_last_bar=-1, barrier=plan.get("barrier"),
                  policy_version=POLICY_VERSION if plan.get("runner_enabled") else "fixed_levels_v2",
+                 market_context=plan.get("market_context"),
                  fills="hypothetical_quote_entry_and_target_touch_not_verified")
         # Timestamp in identity prevents collisions with an older reset signal ID.
         identity = f"{int(ts * 1000)}:{reference}"
@@ -229,6 +230,32 @@ class PerformanceBook:
                 "runner_net": sum(p["runner"] for p in pairs),
                 "difference_usdt": sum(p["runner"]-p["baseline"] for p in pairs),
                 "actual_account_pnl": False}
+
+    def market_context_summary(self, day=None):
+        """Frozen entry-time cohorts; independent exit policies, never add them."""
+        groups = {}
+        rows = self.db.execute("SELECT policy,opened,plan,net,status FROM signals").fetchall()
+        for row in rows:
+            if day is not None and day_key(row["opened"]) != day:
+                continue
+            p = json.loads(row["plan"])
+            ctx = p.get("market_context") or {}
+            label = "unavailable"
+            if ctx.get("ready"):
+                bias = ctx.get("alignment_direction",0)
+                label = ("aligned" if bias==p["direction"] else "opposed") if bias else (
+                    "warming_up" if ctx.get("regime")=="warming_up" else "mixed")
+            group = groups.setdefault(row["policy"],{}).setdefault(label,
+                {"signals":0,"completed":0,"censored":0,"net_usdt_model":0.,"mean_net_usdt":None})
+            group["signals"] += 1
+            if row["net"] is not None:
+                group["completed"] += 1
+                group["net_usdt_model"] += row["net"]
+                group["mean_net_usdt"] = group["net_usdt_model"]/group["completed"]
+            elif row["status"]=="censored_gap":
+                group["censored"] += 1
+        return {"policies":groups,"actual_account_pnl":False,
+                "filter_effect_measured":False,"causal_improvement_verified":False}
 
     def daily_message(self, now):
         """One 22:50 KST cohort report/day, reserved before sending.

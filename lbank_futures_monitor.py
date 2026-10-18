@@ -34,6 +34,7 @@ from lbank_native_candles import NativeCandleThread
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
 from lbank_rsi_divergence import annotate as annotate_rsi_context, DivergenceStudy
+from lbank_market_context import MarketContextThread, annotate as annotate_market_context
 
 LOG = logging.getLogger("lbank_monitor")
 TELEGRAM_DELIVERY = TelegramTransport()
@@ -783,6 +784,14 @@ def run():
         NativeCandleThread().start()
         LOG.info("NATIVE_CANDLES collection enabled; entry_source=native readiness_required=true")
     native_feed = NativeEntryFeed()
+    market_context = None
+    try:
+        market_context = MarketContextThread()
+        market_context.start()
+        LOG.info("MARKET_CONTEXT enabled source=CoinGecko poll_seconds=300 "
+                 "btc_d=true usdt_d=true usdt_usd=true supply=true live_gate=false")
+    except Exception as exc:
+        LOG.warning("MARKET_CONTEXT_INIT_FAILED exception=%s existing_alerts_unchanged=true",type(exc).__name__)
     risk_tracker = SignalRiskTracker(path=os.getenv(
         "LBANK_SIGNAL_FOLLOWUP_STATE_PATH", "/data/lbank_signal_followups.json"))
     rsi_research = ResearchTracker()  # Shadow stats only; not an entry gate
@@ -1110,6 +1119,7 @@ def run():
                                     plan.get("strategy"), side, stage_move,
                                     plan.get("m5"), plan.get("m15"),
                                     signed_45m, ctx.get("reversal_confirmed"))
+                                plan = annotate_market_context(plan,market_context,now)
                                 message = format_entry_alert(
                                     plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat(),
                                     reference_number=risk_tracker.next_number)
@@ -1234,6 +1244,11 @@ def run():
                     try:
                         digest = performance.daily_message(now)
                         if digest is not None:
+                            if market_context is not None:
+                                try:
+                                    digest += market_context.report_line(now)
+                                except Exception as exc:
+                                    LOG.warning("MARKET_CONTEXT_REPORT_FAILED exception=%s",type(exc).__name__)
                             if divergence_study is not None:
                                 try:
                                     digest += divergence_study.report_line()
