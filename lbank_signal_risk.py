@@ -9,6 +9,7 @@ import math
 import os
 from dataclasses import dataclass, asdict
 from lbank_trend_runner import RUNNER_TTL, runner_decision
+from lbank_entry_quality import direction_priority, POLICY as ENTRY_PRIORITY_POLICY
 
 LOG = logging.getLogger("lbank_signal_risk")
 
@@ -39,6 +40,9 @@ class TrackedSignal:
     barrier: float | None = None
     runner_last_bar: int = -1
     pending_runner: dict | None = None
+    entry_priority_policy: str | None = None
+    caution_notified: bool = False
+    priority_evidence: dict | None = None
 
 
 class SignalRiskTracker:
@@ -121,6 +125,7 @@ class SignalRiskTracker:
         signal = TrackedSignal(self.next_number, direction, entry, stop, target,
                                now, target2=target2,
                                runner_enabled=bool(plan.get("runner_enabled") and target2 is not None),
+                               entry_priority_policy=(plan.get('entry_quality') or {}).get('policy'),
                                strategy=plan.get("strategy", "unknown"), barrier=plan.get("barrier"))
         self.next_number += 1
         self.signals.append(signal)
@@ -206,7 +211,21 @@ class SignalRiskTracker:
             else:
                 item.bad_samples = 0
             if item.bad_samples >= CONSECUTIVE_RISK_CHECKS:
-                events.append((item, "early_invalidation", current))
+                priority=(direction_priority(native_state,item.direction,current,item.target1,now)
+                          if item.entry_priority_policy==ENTRY_PRIORITY_POLICY else {})
+                item.priority_evidence=priority
+                if priority.get('dominant_intact'):
+                    key='low' if item.direction==1 else 'high'
+                    breached=any(item.direction*(b[key]-item.stop)<=0
+                                 for b in native_state['minute_bars']
+                                 if b['start']>=item.sent_at and b.get('quality')=='stream_closed')
+                    if breached:
+                        priority=dict(priority,dominant_intact=False,post_entry_stop_wick=True)
+                        item.priority_evidence=priority
+                if priority.get('dominant_intact'):
+                    if not item.caution_notified:events.append((item,'risk_caution',current))
+                else:
+                    events.append((item, "early_invalidation", current))
             survivors.append(item)
         self.signals = survivors
         if before != [asdict(sig) for sig in self.signals]:
@@ -215,7 +234,9 @@ class SignalRiskTracker:
 
     def acknowledge(self, signal, reason=None):
         """Acknowledge only after delivery; TP1 keeps a known TP2 monitored."""
-        if reason in ("trail_update", "target_extended") and signal in self.signals:
+        if reason == 'risk_caution' and signal in self.signals:
+            signal.caution_notified=True
+        elif reason in ("trail_update", "target_extended") and signal in self.signals:
             proposal = signal.pending_runner
             if proposal is None or proposal["reason"] != reason:
                 raise ValueError("missing delivered runner proposal")
@@ -287,10 +308,20 @@ def format_target2_alert(signal, price, time_kst):
 def format_risk_alert(signal, reason, price, time_kst):
     side = "롱" if signal.direction == 1 else "숏"
     move_pct = signal.direction * (price / signal.entry - 1) * 100
+    if reason == 'risk_caution':
+        return (f"[LBank BTCUSDT | 단기 역행 주의 - 기존 {side} 신호]\n"
+                f"기존 진입 알람: #{signal.number} | 한국시간: {time_kst}\n"
+                "단기 역행이 관측됐지만 완료 5분봉 고저점 구조와 15분 흐름은 유지되고 있습니다.\n"
+                "상태: 주의 관찰, 기존 신호의 완전 무효화 판정은 아닙니다.\n"
+                f"현재 관측가: {price:,.1f} USDT | 원래 참고 손절: {signal.stop:,.1f} USDT\n"
+                "실제 포지션과 위험을 확인하고 기존 손절 주문을 유지하세요.\n"
+                "새로운 진입 근거로 사용하지 마세요. 자동 주문·실제 체결 확인은 없습니다.")
     if reason not in ("stop_breached", "early_invalidation"):
         raise ValueError("Unknown follow-up risk reason")
     reason_ko = ("참고 손절선 도달 또는 이탈" if reason == "stop_breached"
                  else "반대 방향 움직임이 2회 연속 확인됨")
+    if reason=='early_invalidation' and signal.entry_priority_policy==ENTRY_PRIORITY_POLICY:
+        reason_ko='단기 역행 2회 확인·상위 구조 유지 근거 확인되지 않음'
     return (
         f"[LBank BTCUSDT | 긴급 위험 경고 - 기존 {side} 신호]\n"
         f"기존 진입 알람: #{signal.number}\n"

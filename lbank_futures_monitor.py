@@ -33,7 +33,7 @@ from lbank_performance import PerformanceBook
 from lbank_native_candles import NativeCandleThread
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
-from lbank_entry_quality import confirmation_quality, POLICY as ENTRY_QUALITY_POLICY
+from lbank_entry_quality import confirmation_quality, direction_priority, POLICY as ENTRY_QUALITY_POLICY
 from lbank_rsi_divergence import annotate as annotate_rsi_context, DivergenceStudy
 from lbank_market_context import MarketContextThread, annotate as annotate_market_context
 from lbank_public_techniques import TechniqueStudy, annotate as annotate_public_techniques
@@ -539,6 +539,11 @@ def assess_candidate(prices, direction, setup, observations=None, diagnostics=No
     if setup is not None and setup.get("strategy") == "trend_retest":
         momentum_ok, momentum_reason, directional5, directional15 = (
             trend_retest_momentum_gate(prices, direction))
+        if not momentum_ok and native_state is not None:
+            upper=direction_priority(native_state,direction,curr,None,
+                                     native_state['minute_bars'][-1]['start']+60)
+            if upper.get('dominant_intact'):
+                momentum_ok=True
         if not momentum_ok:
             LOG.info("RETEST MOMENTUM WATCH BLOCKED side=%s reason=%s directed5m=%.3f%% directed15m=%.3f%%",
                      "LONG" if direction == 1 else "SHORT",
@@ -628,11 +633,16 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
         valid = (confirm_structure(prices, watch, ema, rsi, current_price=current)
                  if native_state is not None else confirm_structure(prices, watch, ema, rsi))
     if not valid:
+        if entry_quality and entry_quality['priority'].get('dominant_intact'):
+            valid = True
+    if not valid:
         mark("structure_or_momentum")
         return None
     if watch.get("strategy") == "trend_retest":
         momentum_ok, momentum_reason, directional5, directional15 = (
             trend_retest_momentum_gate(prices, direction))
+        if not momentum_ok and entry_quality and entry_quality['priority'].get('dominant_intact'):
+            momentum_ok=True
         if not momentum_ok:
             LOG.info("RETEST MOMENTUM CONFIRM BLOCKED side=%s reason=%s directed5m=%.3f%% directed15m=%.3f%%",
                      "LONG" if direction == 1 else "SHORT",
@@ -672,6 +682,9 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
             plan["native_5m_count"] = len(native_state["five_bars"])
             plan["rsi5"] = sampled_rsi5
             plan["entry_quality"] = entry_quality
+            plan['entry_quality']['priority']=direction_priority(
+                native_state,direction,current,plan['target1'],
+                native_state['minute_bars'][-1]['start']+60)
         plan["sampled_rsi5"] = sampled_rsi5  # Legacy schema alias; see data_source.
         plan["sampled_context"] = context
         plan["rsi_direction_status"] = reason if native_state is not None or observations is not None else None
@@ -866,9 +879,9 @@ def run():
             LOG.error("ORDERBOOK_SHADOW_INIT_FAILED exception=%s details=%s",
                       type(exc).__name__, str(exc)[:150])
     LOG.info("risk_snapshot_poll=%ds, entry_review_poll=%ds source=native_candles quote_risk_polling=true", RISK_POLL, POLL)
-    LOG.info("ENTRY_QUALITY policy=%s post_watch_closed_1m=2 "
-             "positive_quote_progress=true original_breakout_level_held=true "
-             "risk_warnings_unchanged=true", ENTRY_QUALITY_POLICY)
+    LOG.info("ENTRY_QUALITY policy=%s universal_minute_wait=false "
+             "priority=hard_risk,higher_structure,target_room,minute_reaction "
+             "stop_warnings=always_on early_caution=structure_aware", ENTRY_QUALITY_POLICY)
     LOG.info("NATIVE_ENTRY_GEOMETRY stop_floor=max(0.05pct,1.5ATR5) "
              "structural_stop_preserved=true range_floor=cost_solved_TP1 "
              "net_rr1=1.5 risk_limit_unchanged=true")
@@ -981,6 +994,17 @@ def run():
                     else format_risk_alert(tracked, reason, observed_price, observed_kst)
                 )
                 if telegram(notice):
+                    if reason == "risk_caution" and performance is not None:
+                        try:
+                            performance.record_caution(tracked.number,tracked.sent_at,
+                                now,observed_price,tracked.priority_evidence)
+                        except Exception as exc:
+                            audit_ready = False
+                            pending_journal.append(("record_caution",
+                                (tracked.number,tracked.sent_at,now,observed_price,tracked.priority_evidence),{}))
+                            LOG.error("PERFORMANCE caution_write_failed exception=%s",type(exc).__name__)
+                        LOG.info("SIGNAL_PRIORITY_CAUTION reference=%d evidence=%s",
+                                 tracked.number,json.dumps(tracked.priority_evidence,sort_keys=True))
                     if reason == "early_invalidation" and performance is not None:
                         try:
                             performance.early_warning(tracked.number, tracked.sent_at,

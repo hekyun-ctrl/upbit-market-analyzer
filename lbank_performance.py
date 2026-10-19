@@ -57,6 +57,8 @@ class PerformanceBook:
           CREATE TABLE IF NOT EXISTS reports(day TEXT PRIMARY KEY, state TEXT, at REAL);
           CREATE TABLE IF NOT EXISTS runner_adjustments(
             id TEXT, ts REAL, detail TEXT NOT NULL, PRIMARY KEY(id,ts));
+          CREATE TABLE IF NOT EXISTS risk_cautions(
+            id TEXT, ts REAL, detail TEXT NOT NULL, PRIMARY KEY(id,ts));
         ''')
         self.last_prune = 0.0
 
@@ -75,6 +77,7 @@ class PerformanceBook:
                                 (ts - 90 * 86400,))
                 self.db.execute("DELETE FROM reports WHERE at<?", (ts - 90 * 86400,))
                 self.db.execute("DELETE FROM runner_adjustments WHERE ts<?", (ts - 90 * 86400,))
+                self.db.execute("DELETE FROM risk_cautions WHERE ts<?", (ts - 90 * 86400,))
                 self.last_prune = ts
 
     def add(self, reference, plan, ts, fee=.0006, slippage=.0002, funding=.0001):
@@ -170,6 +173,13 @@ class PerformanceBook:
                     self.db.execute("UPDATE signals SET last_at=?,last_price=? WHERE id=? AND policy=?",
                                     (ts, price, row["id"], row["policy"]))
         return events
+
+    def record_caution(self,reference,sent_at,ts,price,evidence):
+        identity=f"{int(sent_at*1000)}:{reference}"
+        detail=dict(price=price,evidence=evidence,invalidated=False,actual_pnl=False)
+        with self.db:
+            self.db.execute("INSERT OR IGNORE INTO risk_cautions VALUES(?,?,?)",
+                            (identity,ts,json.dumps(detail,allow_nan=False)))
 
     def early_warning(self, reference, sent_at, ts, price):
         identity = f"{int(sent_at * 1000)}:{reference}"

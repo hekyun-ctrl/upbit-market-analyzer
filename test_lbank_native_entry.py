@@ -120,7 +120,7 @@ class NativeEntryTests(unittest.TestCase):
             self.assertEqual(plan["data_source"], SOURCE)
             self.assertEqual(plan["sampled_context"]["context_type"], SOURCE)
             self.assertEqual(plan["rsi5"], 85.)  # No overbought LONG veto.
-            self.assertIsNone(monitor.confirm_watch(state["prices"], plan, 60, native_state=state))
+            self.assertIsNotNone(monitor.confirm_watch(state["prices"], plan, 60, native_state=state))
             future = future_confirmation_state(state, plan)
             confirmed = monitor.confirm_watch(future["prices"], plan, 180, native_state=future)
             self.assertIsNotNone(confirmed)
