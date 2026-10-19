@@ -1,0 +1,60 @@
+{
+  "candidate_id": "unreadable_supply_demand_7d15e_source_audit_v1",
+  "version": 1,
+  "frozen_utc": "2026-10-19T22:23:26Z",
+  "scope": "Causality,execution and cost-accounting preflight of an existing public supply/demand strategy,including ONE reused real-price month replay. Not a corrected strategy or profitability certification.",
+  "repository": "https://github.com/unreadable/trading-farm",
+  "source_commit": "7d15e7a297949e98378a4126bc3abca0d543b973",
+  "executed_source_files": [
+    {"path": "config.py", "bytes": 3820, "sha256": "1cf84c1ceb076f7460abdd73fe29a951433463e6807c50f66beb37505107f363"},
+    {"path": "structure.py", "bytes": 7848, "sha256": "30134e288b95a1be1401affd51603657810a770ed44e58d9e6c3dc2e2744d861"},
+    {"path": "zones.py", "bytes": 8752, "sha256": "8dcdf4e63fa968201edc3571791148c9c834dc786c75ba61ccaac701441a5339"},
+    {"path": "backtest.py", "bytes": 14325, "sha256": "d190d56bed70668a5562ce4aa7abc4a49c15b43961d07b9c926816638faae03d"}
+  ],
+  "additional_reviewed_sources": [
+    {"path": "README.md", "sha256": "b7d5cb7bb5ca217b63a655ecf5264637899bf0bcad2451ba3839d966764fa2b5"},
+    {"path": "CLAUDE.md", "sha256": "289907735ef98e68360ef6cab4f3a238561298df83365fa4a1b93fd1e3530e69"},
+    {"path": "main.py", "sha256": "dfe71443440c2198560485fa49fc161bf43914976c0ad1e57f9bf805301101a7"},
+    {"path": "wfo.py", "sha256": "71b78992d1b6d063a96bcddc9fafdf101065ab278257441eeaa96aaf5a7f7dd8"},
+    {"path": "data.py", "sha256": "5ea0be319f357e24584eccd589efbcc8be4fd664aca9d2171cb3f491578d8dcc"},
+    {"path": "tests/test_alignment.py", "sha256": "e042b00f320d763ee29d4af9a3ae13df8ddf1ad1f79f959badab4e4391ac61ca"},
+    {"path": "cache_data.py", "status": "read_only_source_review_no_execution"}
+  ],
+  "source_contract": {
+    "original_venue": "Kraken Futures,30m candles",
+    "rules": "Impulse body>=1.5ATR,body/range>=.55;base<=6candles;zone width<=1.2%;trend/BOS/volume/liquidity strength;zone-edge entry;stop beyond opposite edge1ATR;dynamic opposite-zone/liquidity target or2.5R;min1.5R;cluster0.8%;max4positions using source OPTIMAL_PARAMS fixed before replay.",
+    "source_costs": "Maker0.02% entry/TP,taker0.05% and additive0.05%SL slippage;entry rejected if estimated costs>0.3R;no explicit funding in engine. Source risk1%of modeled balance is only reproduced inside diagnostic simulation,not adopted operationally.",
+    "claim": "Author CLAUDE.md lists approximately27300trades,+14760R,PF2.11 for8coins;no numerical BTC-only ledger/cache in repository tree. Treat as unverified source claim.",
+    "execution": "Hash-guarded constant expressions and inspected pure function definitions only;skip imports,config mkdir,startup,main,cache download,live/,pickle,credentials and orders. No dependency installation."
+  },
+  "fixed_probes": [
+    "Future-only liquidity target level with last_idx later than the trade; compare fixed fallback target.",
+    "Only a future candle sweeps a known level; compare past zone swept flag with unchanged historical prefix.",
+    "Centered swing near prefix end requires5later candles; inspect source confirmation timing.",
+    "Full detect_zones(no_lookahead=True)+backtest on fixed31bar impulse fixture;record formation,entry and exit bar.",
+    "Previously known demand zone,gap beyond stop;compare source exit with complete bar price range.",
+    "Previously known limit zone,same OHLC except final close;test whether closing freshness suppresses an earlier stop-out.",
+    "SL/TP both touched:positive control for source stop-first handling.",
+    "No SL/TP before data end:retain source open status as unknown,not a zero-return completed trade.",
+    "Reconcile source price-fee calculation and identical-fill double-fee arithmetic on fixed control fixtures only;do not call this a market cost-stress pass."
+  ],
+  "real_price_replay": {
+    "data_kind": "Previously observed exploratory Binance USD-M BTCUSDT perpetual prices;not original Kraken replication,independent sample or native LBank fills.",
+    "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-01.zip",
+    "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-01.zip.CHECKSUM",
+    "sha256": "21eeac04a76a7a35b10467e5e752fb2f8cff77cdeb57df6b50a23ce8d69bb190",
+    "zip_bytes": 1898532,
+    "minutes": 44640,
+    "start_ms": 1704067200000,
+    "end_exclusive_ms": 1706745600000,
+    "integrity": "Exact ascending minute grid,OHLC/volume/close-time checks,30complete minutes per30m bar;no missing data/interpolation/artificial gap exits. Existing Git source catalog includes original official manifest/SHA and no January2024 quarantine.",
+    "bars": 1488,
+    "fixed_prefix_bars": 960,
+    "experiment": "Run unchanged source functions on first20days versus full31days,source OPTIMAL_PARAMS and no_lookahead=True,passing source full liquidity list exactly as original run_test. Compare historical zone attributes,entry plans and only outcomes fully inside common prefix;do not treat newly resolved past-open trades as a causality failure. Count same-formation-bar entries/exits. No optimization/parameter repair or choice of another month based on results.",
+    "outputs": "Raw provenance,compressed30m input,complete two-run zone/trade/equity diagnostics,changed historical records,small-case probes and actual result report."
+  },
+  "decision_rule": "An active future-dependence or impossible timing/fill failure rejects THIS source version as replacement evidence. Preserve numerical findings even if unexpected;do not tune to save original headline. Source-family profitability not universally invalidated.",
+  "promotion_gates": "Net expectancy95%lower,netPF,2xcost,TP1Wilson,5m native urgent events,manual fill latency,DDinR and30day/100closed forward remain unverified until a separate complete causal contract is frozen and actually evaluated.",
+  "production_changed": false,
+  "forward_collection_started": false
+}

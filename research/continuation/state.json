@@ -171,7 +171,14 @@
       "forward_started": false
     }
   ],
-  "active_run": null,
+  "active_run": {
+    "id": "supply_demand_source_audit_20261020_0723",
+    "stage": "source_and_real_price_causality_protocol_fixed_before_execution",
+    "protocol": "research/continuation/supply_demand_audit_protocol_20261020.json",
+    "code": "research/continuation/audit_supply_demand_source.py",
+    "source_commit": "7d15e7a297949e98378a4126bc3abca0d543b973",
+    "next_action": "Run10opt-in probes and unchanged source first20days/full31days replay of frozen2024January30mBTC prices;record causality/timing findings and preserve compressed input/ledgers. No parameter optimization or deployment."
+  },
   "blockers": [],
   "updated_kst": "2026-10-20T06:01:44+09:00",
   "maintained_research_candidates": [
