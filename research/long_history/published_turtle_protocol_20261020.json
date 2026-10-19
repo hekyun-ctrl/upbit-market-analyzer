@@ -1,0 +1,19 @@
+{
+  "name": "Published Turtle System 2 BTC transfer audit",
+  "source": "https://tradingblox.com/originalturtles/originalturtlerules.htm",
+  "author_copy": "https://www.kagels-trading.de/wp-content/uploads/2016/09/turtle-trading-rules.pdf",
+  "frozen_before_results": true,
+  "entry": "Intraday one tick (0.1 USDT) beyond previous 55 complete UTC days",
+  "exit": "Opposite previous 20 complete UTC days or individual 2N stop",
+  "N": "20 day mean TR seed, then (19*N+TR)/20; freeze at campaign entry",
+  "additions": "0.5 frozen N beyond previous actual slipped fill, maximum four units; move existing stops 0.5N per addition; new stop 2N from its own fill",
+  "scope_deviations": ["BTC perpetual alone, not original diversified commodity portfolio", "Fixed campaign unit quantity: 0.25% of initial reference equity per N; no original annual subjective resizing or loss scaling", "UTC cryptocurrency days and modeled exchange costs/funding", "Frozen campaign N avoids undocumented mid-campaign weekly N changes"],
+  "cost": "0.06% fee plus 0.02% adverse slippage each side; also double both",
+  "funding": "Archived settlement rates with minute trade open as mark proxy; adverse debits only, favorable receipts ignored",
+  "execution": "Both O-L-H-C and O-H-L-C minute paths, not asserted mathematical bounds; gaps fill at next observed open, tagged; no same-minute reentry after campaign exits",
+  "integrity": "Previously frozen 27 five-minute quarantines; incomplete days excluded; 55 complete consecutive days required after each gap",
+  "period": "2023-01 through 2026-09, all already observed for other hypotheses; exploratory transfer check, not blind or prospective proof",
+  "report": "Daily marked-to-market equity, yearly net return, drawdown, trade/campaign ledger, win fraction, concentration, holding time and data-gap effects",
+  "decision": "No automatic deployment. Positive historical results alone cannot certify LBank manual entry profitability. Original long-horizon exits retained; no added TP1 or tight current-monitor stop cap.",
+  "parameter_search": "None. Exactly one published system, two intraminute paths and base/double cost sensitivity. No choose-best path."
+}
