@@ -93,12 +93,14 @@ class LiveNonInterferenceTests(unittest.TestCase):
         state["rsi5"]["rsi"] = [84.,85.]
         untouched = copy.deepcopy(state)
         annotated = m.classify(state["prices"],native_state=state)
+        from test_lbank_entry_quality import future_confirmation_state
+        future = future_confirmation_state(state, annotated)
         with patch.object(m,"annotate_rsi_context",side_effect=lambda p,s:p):
             baseline = m.classify(state["prices"],native_state=state)
-            confirm_base = m.confirm_watch(state["prices"],baseline,60,native_state=state)
+            confirm_base = m.confirm_watch(future["prices"],baseline,180,native_state=future)
         self.assertIsNotNone(baseline)
         self.assertEqual({k:v for k,v in annotated.items() if k!="rsi_context"},baseline)
-        confirm_new = m.confirm_watch(state["prices"],annotated,60,native_state=state)
+        confirm_new = m.confirm_watch(future["prices"],annotated,180,native_state=future)
         self.assertEqual({k:v for k,v in confirm_new.items() if k!="rsi_context"},confirm_base)
         self.assertEqual(state,untouched)
         gate = {"day":"1970-01-01","count":0,"last_time":1000,"last_side":"롱"}

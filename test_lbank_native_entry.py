@@ -7,6 +7,7 @@ from unittest.mock import patch
 import lbank_futures_monitor as monitor
 from lbank_native_candles import NativeCandleStore
 from lbank_native_entry import NativeEntryFeed, SOURCE, wilder_rsi_series
+from test_lbank_entry_quality import future_confirmation_state
 
 
 class NativeEntryTests(unittest.TestCase):
@@ -119,7 +120,9 @@ class NativeEntryTests(unittest.TestCase):
             self.assertEqual(plan["data_source"], SOURCE)
             self.assertEqual(plan["sampled_context"]["context_type"], SOURCE)
             self.assertEqual(plan["rsi5"], 85.)  # No overbought LONG veto.
-            confirmed = monitor.confirm_watch(state["prices"], plan, 60, native_state=state)
+            self.assertIsNone(monitor.confirm_watch(state["prices"], plan, 60, native_state=state))
+            future = future_confirmation_state(state, plan)
+            confirmed = monitor.confirm_watch(future["prices"], plan, 180, native_state=future)
             self.assertIsNotNone(confirmed)
             self.assertEqual(confirmed["data_source"], SOURCE)
             self.assertLessEqual(confirmed["net_loss"], monitor.REF_BALANCE*.005)

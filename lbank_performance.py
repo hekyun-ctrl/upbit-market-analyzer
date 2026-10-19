@@ -95,6 +95,7 @@ class PerformanceBook:
                  data_source=plan.get("data_source", "lbank_perpetual_ticker"),
                  observation_source="lbank_perpetual_ticker",
                  runner_enabled=bool(plan.get("runner_enabled")),
+                 entry_quality=plan.get("entry_quality"),
                  runner_last_bar=-1, barrier=plan.get("barrier"),
                  policy_version=POLICY_VERSION if plan.get("runner_enabled") else "fixed_levels_v2",
                  market_context=plan.get("market_context"),

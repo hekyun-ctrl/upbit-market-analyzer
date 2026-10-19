@@ -57,6 +57,8 @@ def format_compact_entry_alert(plan, observed_at_utc, reference_number=None,
     technique_note = (plan.get("public_techniques") or {}).get("label", "")
     if technique_note:
         source_note = source_note.rstrip("\n") + " | 참고: " + technique_note + "\n"
+    if plan.get("entry_quality"):
+        source_note = source_note.rstrip("\n") + " | 완료 1분봉 2개 반응 확인\n"
     return (
         f"[LBank BTCUSDT | {icon} {side} | 조건부 진입 검토]\n"
         f"⏱ {kst} KST | 유효 5분{reference}\n"

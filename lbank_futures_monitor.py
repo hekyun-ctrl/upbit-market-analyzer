@@ -33,6 +33,7 @@ from lbank_performance import PerformanceBook
 from lbank_native_candles import NativeCandleThread
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
+from lbank_entry_quality import confirmation_quality, POLICY as ENTRY_QUALITY_POLICY
 from lbank_rsi_divergence import annotate as annotate_rsi_context, DivergenceStudy
 from lbank_market_context import MarketContextThread, annotate as annotate_market_context
 from lbank_public_techniques import TechniqueStudy, annotate as annotate_public_techniques
@@ -500,9 +501,9 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
             breakout_long=curr>prior_high and macd>sig and m5>=.14 and m15>=.20,
             breakout_short=curr<prior_low and macd<sig and m5<=-.14 and m15<=-.20)
     if curr > prior_high and macd > sig and m5 >= .14 and m15 >= .20:
-        setups.append({"direction": 1, "strategy": "breakout"})
+        setups.append({"direction": 1, "strategy": "breakout", "level": prior_high})
     if curr < prior_low and macd < sig and m5 <= -.14 and m15 <= -.20:
-        setups.append({"direction": -1, "strategy": "breakout"})
+        setups.append({"direction": -1, "strategy": "breakout", "level": prior_low})
     seen, decisions, qualified = set(), [], []
     for setup in setups:
         key = setup["strategy"], setup["direction"]
@@ -575,6 +576,7 @@ def assess_candidate(prices, direction, setup, observations=None, diagnostics=No
             plan["data_source"] = native_state["source"]
             plan["native_5m_start"] = native_state["last5_start"]
             plan["native_5m_count"] = len(native_state["five_bars"])
+            plan["native_watch_1m_start"] = native_state["minute_bars"][-1]["start"]
             plan["rsi5"] = sampled_rsi5
         plan["sampled_rsi5"] = sampled_rsi5  # Legacy schema alias; see data_source.
         plan["sampled_context"] = context
@@ -607,6 +609,12 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
     if relative < -ENTRY_MAX_CHASE_PCT or relative > ENTRY_MAX_CHASE_PCT:
         mark("price_deviation")
         return None
+    entry_quality = None
+    if native_state is not None:
+        quality_ok, quality_reason, entry_quality = confirmation_quality(native_state, watch)
+        if not quality_ok:
+            mark(quality_reason)
+            return None
     m5 = (current / prices[-6] - 1) * 100
     m15 = (current / prices[-16] - 1) * 100
     macd_line = [a - b for a, b in zip(ema(prices, 12), ema(prices, 26))]
@@ -663,6 +671,7 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
             plan["native_5m_start"] = native_state["last5_start"]
             plan["native_5m_count"] = len(native_state["five_bars"])
             plan["rsi5"] = sampled_rsi5
+            plan["entry_quality"] = entry_quality
         plan["sampled_rsi5"] = sampled_rsi5  # Legacy schema alias; see data_source.
         plan["sampled_context"] = context
         plan["rsi_direction_status"] = reason if native_state is not None or observations is not None else None
@@ -857,6 +866,9 @@ def run():
             LOG.error("ORDERBOOK_SHADOW_INIT_FAILED exception=%s details=%s",
                       type(exc).__name__, str(exc)[:150])
     LOG.info("risk_snapshot_poll=%ds, entry_review_poll=%ds source=native_candles quote_risk_polling=true", RISK_POLL, POLL)
+    LOG.info("ENTRY_QUALITY policy=%s post_watch_closed_1m=2 "
+             "positive_quote_progress=true original_breakout_level_held=true "
+             "risk_warnings_unchanged=true", ENTRY_QUALITY_POLICY)
     LOG.info("NATIVE_ENTRY_GEOMETRY stop_floor=max(0.05pct,1.5ATR5) "
              "structural_stop_preserved=true range_floor=cost_solved_TP1 "
              "net_rr1=1.5 risk_limit_unchanged=true")
@@ -872,7 +884,7 @@ def run():
                         "data_gap": 0, "no_setup": 0, "retest_momentum": 0,
                         "sampled_context": 0, "rsi_direction": 0,
                         "risk_or_target": 0, "other_reject": 0,
-                        "confirm_reject": 0}
+                        "confirm_reject": 0, "quality_wait": 0, "quality_reject": 0}
     counters = dict(counter_template)
     diag_counters = dict(counter_template)
     def count_event(label):
@@ -1097,6 +1109,14 @@ def run():
                                              diagnostics=confirm_diag)
                         if plan is None:
                             count_event("confirm_reject")
+                            if confirm_diag.get("reason") == "await_two_post_watch_closed_minutes":
+                                count_event("quality_wait")
+                            elif confirm_diag.get("reason") in {
+                                    "invalid_native_confirmation_evidence", "quote_not_progressing_from_watch",
+                                    "quote_lost_closed_minute_reaction", "closed_minute_followthrough_missing",
+                                    "breakout_level_unavailable", "breakout_level_not_held",
+                                    "watch_structure_stop_crossed"}:
+                                count_event("quality_reject")
                             LOG.info("ALERT_CONFIRM_REJECT reason=%s age_seconds=%.1f strategy=%s",
                                      confirm_diag.get("reason", "other"), age,
                                      watch["plan"].get("strategy"))
@@ -1141,6 +1161,8 @@ def run():
                                     save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
                                                    observations, alert_state)
                                     sent_signal = risk_tracker.add_sent_signal(plan, now)
+                                    LOG.info("ENTRY_QUALITY_SENT reference=%d evidence=%s",
+                                             sent_signal.number, json.dumps(plan["entry_quality"], sort_keys=True))
                                     try:
                                         performance.add(sent_signal.number, plan, now,
                                                         fee=TAKER_FEE, slippage=STOP_SLIPPAGE,
@@ -1233,7 +1255,8 @@ def run():
                              "retest_momentum=%d sampled_context=%d "
                              "rsi_direction=%d risk_or_target=%d "
                              "confirm_reject=%d watched=%d confirmed=%d "
-                             "suppressed=%d (no_setup != rejected trade)",
+                             "suppressed=%d quality_wait=%d quality_reject=%d "
+                             "(no_setup != rejected trade)",
                              diag_counters["no_setup"], diag_counters["data_gap"],
                              diag_counters["retest_momentum"],
                              diag_counters["sampled_context"],
@@ -1241,7 +1264,8 @@ def run():
                              diag_counters["risk_or_target"],
                              diag_counters["confirm_reject"],
                              diag_counters["watched"], diag_counters["confirmed"],
-                             diag_counters["suppressed"])
+                             diag_counters["suppressed"], diag_counters["quality_wait"],
+                             diag_counters["quality_reject"])
                     diag_counters = dict(counter_template)
                     next_diag_summary = now + 600
                 if divergence_study is not None:
