@@ -1,0 +1,216 @@
+{
+  "candidate_id": "external_ema_pullback_momentum_265209c_forensic_v1",
+  "started_utc": "2026-10-19T20:53:23.405321+00:00",
+  "completed_utc": "2026-10-19T20:53:38.294320+00:00",
+  "code_sha256": "0d4b7e602940329b52d2eeb28ad2bfc8de80d1386027b3d80791d20612f75998",
+  "protocol_sha256": "787da1c1eb0d1e8cb39dfd0d218fa05fb29df1c24884363ef830e7b5e52e00df",
+  "versions": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "2.2.3"
+  },
+  "sources": [
+    {
+      "path": "ema_pullback_momentum.py",
+      "url": "https://raw.githubusercontent.com/tradewithbhai7777-creator/ema-pullback-momentum-strategy/265209c39efc96eb97a35fd5cae45c0d6b868b30/ema_pullback_momentum.py",
+      "bytes": 50172,
+      "sha256": "0b4776a8b841531675485e8e0ea9a48685b237df6452f7a14035b1b2085cf6be"
+    },
+    {
+      "path": "momentum_strategy_results.txt",
+      "url": "https://raw.githubusercontent.com/tradewithbhai7777-creator/ema-pullback-momentum-strategy/265209c39efc96eb97a35fd5cae45c0d6b868b30/momentum_strategy_results.txt",
+      "bytes": 46699,
+      "sha256": "313e80f8aba4e81c19a4a1f224ddbcbb1303976bea078caa3a880c9def3a30bd"
+    },
+    {
+      "path": "README.md",
+      "url": "https://raw.githubusercontent.com/tradewithbhai7777-creator/ema-pullback-momentum-strategy/265209c39efc96eb97a35fd5cae45c0d6b868b30/README.md",
+      "bytes": 14372,
+      "sha256": "a614643cfefbc5d062b3014ee5a970f66334ee4f01c1d28e73ff2bc85764143d"
+    }
+  ],
+  "direct_probes": [
+    {
+      "id": "buy_prebreak_open",
+      "entry": 100.0,
+      "trigger": 105.0001,
+      "range_low": 99.0,
+      "range_high": 106.0,
+      "entry_outside_range": false,
+      "entry_on_pretrigger_side": true,
+      "initial_risk": 5.0,
+      "pending_after_trigger": 1
+    },
+    {
+      "id": "sell_prebreak_open",
+      "entry": 100.0,
+      "trigger": 94.9999,
+      "range_low": 94.0,
+      "range_high": 101.0,
+      "entry_outside_range": false,
+      "entry_on_pretrigger_side": true,
+      "initial_risk": 5.0,
+      "pending_after_trigger": 1
+    },
+    {
+      "id": "buy_gap_untraded_fill",
+      "entry": 105.0001,
+      "trigger": 105.0001,
+      "range_low": 109.0,
+      "range_high": 112.0,
+      "entry_outside_range": true,
+      "entry_on_pretrigger_side": false,
+      "initial_risk": 10.000100000000003,
+      "pending_after_trigger": 1
+    },
+    {
+      "id": "sell_gap_untraded_fill",
+      "entry": 94.9999,
+      "trigger": 94.9999,
+      "range_low": 88.0,
+      "range_high": 91.0,
+      "entry_outside_range": true,
+      "entry_on_pretrigger_side": false,
+      "initial_risk": 10.000100000000003,
+      "pending_after_trigger": 1
+    },
+    {
+      "id": "buy_negative_initial_risk",
+      "entry": 94.0,
+      "trigger": 105.0001,
+      "range_low": 93.0,
+      "range_high": 106.0,
+      "entry_outside_range": false,
+      "entry_on_pretrigger_side": true,
+      "initial_risk": -1.0,
+      "pending_after_trigger": 1
+    },
+    {
+      "id": "sell_negative_initial_risk",
+      "entry": 106.0,
+      "trigger": 94.9999,
+      "range_low": 94.0,
+      "range_high": 107.0,
+      "entry_outside_range": false,
+      "entry_on_pretrigger_side": true,
+      "initial_risk": -1.0,
+      "pending_after_trigger": 1
+    },
+    {
+      "id": "intrabar_long_stop_ignored",
+      "position_still_open": true,
+      "closed": 0,
+      "exit": null,
+      "range_low": 94.0,
+      "range_high": 103.0
+    },
+    {
+      "id": "intrabar_long_target_ignored",
+      "position_still_open": true,
+      "closed": 0,
+      "exit": null,
+      "range_low": 99.0,
+      "range_high": 106.0
+    },
+    {
+      "id": "gap_stop_fill_above_entire_range",
+      "position_still_open": false,
+      "closed": 1,
+      "exit": 95.0,
+      "range_low": 88.0,
+      "range_high": 92.0
+    },
+    {
+      "id": "consumed_signal_reused",
+      "first_trigger": true,
+      "second_trigger_without_new_setup": true,
+      "pending_remaining": 1
+    },
+    {
+      "id": "datetime_adx_alignment",
+      "input_rows": 50,
+      "output_rows": 100,
+      "finite_assigned_rows": 0
+    },
+    {
+      "id": "centered_swing_future_dependency",
+      "past_value_changes": true,
+      "swing_field_reads_in_entry_exit_methods": 0,
+      "demonstrated_active_signal_leak": false
+    },
+    {
+      "id": "flat_trade_has_no_cost",
+      "source_pnl": 0.0,
+      "net_model_exists": false
+    }
+  ],
+  "synthetic_reproduction": {
+    "total_trades": 79,
+    "winning_trades": 52,
+    "losing_trades": 27,
+    "win_rate": 0.6582278481012658,
+    "profit_factor": 7.407478555253765,
+    "total_return": 0.907984910131857,
+    "max_drawdown": -0.018100124062085107,
+    "sharpe_ratio": 1.7730754327546123,
+    "avg_trade_duration": 31.810126582278482,
+    "data_kind": "synthetic_not_exchange_data",
+    "bars": 8760,
+    "frozen_clock": "2026-03-30T08:54:15.576895",
+    "clock_is_audit_fixture_not_verified_original": true,
+    "generated_start": "2025-03-30 08:54:15.576895",
+    "generated_end": "2026-03-30 07:54:15.576895",
+    "assigned_adx_finite": 0,
+    "entries_outside_range": 0,
+    "entries_on_pretrigger_side": 59,
+    "entries_nonpositive_initial_risk": 1,
+    "reused_setup_entries": 9,
+    "short_sample_normalized_3symbols_max_abs_error": 4.440892098500626e-16,
+    "closed_trades_per_generated_day": 0.21643835616438356,
+    "market_net_performance_validated": false,
+    "stop_touched_but_close_did_not_trigger": 1862,
+    "target_touched_but_close_did_not_trigger": 255
+  },
+  "data_artifacts": [
+    {
+      "file": "source_entry_diagnostics.csv",
+      "bytes": 11576,
+      "sha256": "457f669d87dffc78a81e69a4989ae9bcac7715bb1124fbfac0037c6b92ab1771"
+    },
+    {
+      "file": "source_synthetic_equity.csv",
+      "bytes": 453258,
+      "sha256": "d6e20bdd6af86a39fda470aa6a70d2b3583b68ea1207c609b145430ddbd52022"
+    },
+    {
+      "file": "source_synthetic_trades.csv",
+      "bytes": 19848,
+      "sha256": "b2a465322abff6c5bded17a4661bd438dbf336e1b7f6e9454e9ac55f3d8fcd76"
+    },
+    {
+      "file": "synthetic_72h_sample.csv",
+      "bytes": 8766,
+      "sha256": "368f3425392ce8a861498a8c4ad0a98f2ac42f324a1c11614a217b2298f33323"
+    }
+  ],
+  "decision": "reject_source_version_as_replacement_evidence",
+  "decision_basis": [
+    "synthetic not actual venue observations",
+    "invalid breakout fill model",
+    "price-only no net costs",
+    "intrabar stop/target not checked"
+  ],
+  "scope_limit": "Forensic audit only; no corrected real-market backtest; no claim all EMA strategies fail.",
+  "promotion_gates": {
+    "net_expectancy_95lower": null,
+    "net_PF": null,
+    "double_cost_return": null,
+    "drawdown_R": null,
+    "TP1_Wilson_lower": null,
+    "native_5m_emergency_rate": null,
+    "native_manual_fill_latency": null,
+    "qualified_forward_days": null
+  },
+  "production_changed": false,
+  "forward_collection_started": false
+}

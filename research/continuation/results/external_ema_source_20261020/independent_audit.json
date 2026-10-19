@@ -1,0 +1,18 @@
+{
+  "status": "forensic_artifacts_reconciled_not_market_alpha",
+  "report_sha256": "f3baca46480b449932c46eed30e914939db4c35e57586f4b475d1def883c49ce",
+  "artifact_hashes_verified": [
+    "source_entry_diagnostics.csv",
+    "source_synthetic_equity.csv",
+    "source_synthetic_trades.csv",
+    "synthetic_72h_sample.csv"
+  ],
+  "closed_synthetic_rows": 79,
+  "gross_simple_sum": 0.907984910131857,
+  "gross_PF": 7.407478555253765,
+  "strict_pre_rejection_breakout_entries": 59,
+  "nonpositive_initial_risk_entries": 1,
+  "reused_setups": 9,
+  "max_metric_abs_difference": 0.0,
+  "market_net_profit_certified": false
+}

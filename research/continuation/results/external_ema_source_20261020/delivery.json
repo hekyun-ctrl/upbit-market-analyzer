@@ -1,0 +1,18 @@
+{
+  "protocol_checkpoint_commit": "3b946f4356c76207daac274cf62d3389f53d53d8",
+  "report_sha256": "f3baca46480b449932c46eed30e914939db4c35e57586f4b475d1def883c49ce",
+  "test_command": "LBANK_EMA_AUDIT_SOURCES=/absolute/recovered-sources python -m unittest discover -s research/continuation -p test_external_ema_source_audit.py -v",
+  "test_result": {"tests_run": 14, "failures": 0, "errors": 0, "meaning": "Tests reproduce source defects, not strategy profitability"},
+  "combined_research_regression": {"command": "LBANK_EMA_AUDIT_SOURCES=/absolute/recovered-sources python -m unittest discover -s research/continuation -p 'test_*.py' -v", "tests_run": 45, "failures": 0, "errors": 0, "note": "14new forensic tests plus31existing small unit fixtures; no repeated full strategy backtests"},
+  "equity_transport": {
+    "path": "source_synthetic_equity.csv.gz",
+    "bytes": 54290,
+    "sha256": "5c835297459577b6dbd5e89168d35763b66979d570ed8adb72482f106cd605a5",
+    "decompressed_bytes": 453258,
+    "decompressed_sha256": "d6e20bdd6af86a39fda470aa6a70d2b3583b68ea1207c609b145430ddbd52022",
+    "method": "gzip -n, lossless; original CSV SHA remains in report data_artifacts"
+  },
+  "persistence": "All code, protocol, synthetic trade/entry/sample ledgers and lossless equity artifact are in the research Git branch. No new Library duplicate of repository items. Original external source recovered by immutable URL+length+SHA, never assumed present in scratch.",
+  "data_kind": "random_seed42_generated_1h_OHLCV_not_LBank_or_any_real_exchange",
+  "production_changed": false
+}

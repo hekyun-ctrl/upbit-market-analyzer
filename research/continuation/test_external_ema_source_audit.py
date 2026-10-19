@@ -6,6 +6,8 @@ from pathlib import Path
 import audit_external_ema_source as audit
 
 
+@unittest.skipUnless(os.environ.get("LBANK_EMA_AUDIT_SOURCES"),
+                     "Opt-in forensic test: recover hash-pinned external sources first")
 class SourceAuditTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

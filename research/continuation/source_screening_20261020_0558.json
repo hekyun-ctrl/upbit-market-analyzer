@@ -1,0 +1,87 @@
+{
+  "scope": "New primary-source claim and implementation triage. Only the external EMA source received executable probes and a synthetic reproduction; none received a new real-market profitability backtest in this stage.",
+  "previous_exclusions": "research/continuation/source_screening_20261020_0505.json",
+  "sources": [
+    {
+      "id": "external_ema_pullback_momentum_265209c_forensic_v1",
+      "url": "https://github.com/tradewithbhai7777-creator/ema-pullback-momentum-strategy/tree/265209c39efc96eb97a35fd5cae45c0d6b868b30",
+      "status": "rejected_source_version_as_replacement_evidence",
+      "actual_work": "Three source files hash-verified;13direct probes,14regression tests and original365day synthetic generator/backtester run; independent output reconciliation.",
+      "report": "research/continuation/results/external_ema_source_20261020/report.json",
+      "no_repeat": "No repairs/tuning to salvage this synthetic headline; do not label this a real BTC market evaluation."
+    },
+    {
+      "id": "rapfii_bitcoin_regime_aware_forecasting",
+      "url": "https://github.com/rapfii/Bitcoin-Regime-Aware-Forecasting/tree/695d235405b3461470f434d75adc37eec89614a0",
+      "source_commit": "695d235405b3461470f434d75adc37eec89614a0",
+      "README_sha256": "9560ff6ab6ac8cf12fb9d600b62e09978e14601af8225ae0f3ddb0ef4604d409",
+      "claim": "README PF1.42 and positive Sharpe95%CI[0.45,1.82]",
+      "contradicting_artifact": {
+        "url": "https://github.com/rapfii/Bitcoin-Regime-Aware-Forecasting/blob/695d235405b3461470f434d75adc37eec89614a0/data/processed/evaluation_report.json",
+        "sha256": "04e4fa890f6c7d7dba5e65ded485a17882fdfc7c003d67590f9088eec6a69df8",
+        "reported_total_return": -0.16473570849241048,
+        "reported_profit_factor": 0.8293390925095758,
+        "reported_max_drawdown": -0.20366937484058725,
+        "reported_sharpe95lower": -1.5738244329860132,
+        "reported_n_trades": 257,
+        "caveat": "Author artifact only, not independently recomputed; code n_trades counts absolute position changes, not verified closed trades. JSON also contains nonstandard NaN in log_loss."
+      },
+      "data_provenance": {
+        "fetch_script_url": "https://github.com/rapfii/Bitcoin-Regime-Aware-Forecasting/blob/695d235405b3461470f434d75adc37eec89614a0/scripts/fetch_raw_data.py",
+        "sha256": "fab9aee56134f3668adeb0cde07d2ad2aafcf9a7ba06ac4224140e13f9ba1017",
+        "finding": "Price source is spot. Funding,OI,liquidation series are explicitly derived spot-volume/range proxies, not native futures observations."
+      },
+      "status": "not_shortlisted_positive_claim_not_supported_by_preserved_author_result",
+      "actual_work": "Read pinned README,author evaluation JSON,fetch script and vector backtester; did not execute pipeline,download models or load pickle. Do not repeat full ML fit based on README headline."
+    },
+    {
+      "id": "positioning_based_btc_eight_model_v1",
+      "url": "https://github.com/MG-Trading-Terminal/trading-strategy/blob/e6d26a6d41693ea74024cf699942f72f224e296c/strategies/positioning-based-btc.md",
+      "source_commit": "e6d26a6d41693ea74024cf699942f72f224e296c",
+      "source_file_sha256": "ff7779a7174c835a18900865a781188fdb9e3cc7232481ff8070dc4d7855add4",
+      "review_scope": "Abstract,Data/Methodology and AppendixC, not every later revision/altcoin model or code implementation.",
+      "claim": "Eight BTC positioning models290trades/733days,PF3.53; AppendixC.3 says round-trip0.105% deducted.",
+      "frequency_arithmetic": "290/733=0.3956343793 closed trades per day, below fixed>=1/day gate even before reliability review.",
+      "other_limits": "190+tests/141iterations, retrospective refinement and source forward-fill need separate leakage/selection audit; cost statement alone is not native LBank proof. Later altcoin successes are not BTC evidence.",
+      "status": "v1_combined_system_not_shortlisted_frequency_below_fixed_gate",
+      "actual_work": "Pinned source retrieval and scope-limited source screen; no strategy backtest. Do not treat this as proof positioning methods generally fail."
+    },
+    {
+      "id": "vegar_crypto_research_preliminary_read",
+      "url": "https://github.com/VegarGG/Crypto_Research",
+      "observed_HEAD": "08250d4316bb4f9245153f2706024fd6befddc5f",
+      "review_scope": "Mutable-main README read only; not frozen as quantitative evidence.",
+      "finding": "README itself describes failed regime strategies and only promising Prophet/ARIMA baseline requiring threshold optimization with0.75%per-side costs; no qualified net BTC ledger established.",
+      "retrieval_limit": "README's strategy/integrated_strategy_v4.ipynb returned404 at observed commit. This single path failure is not proof code absent elsewhere.",
+      "status": "not_shortlisted_no_positive_costed_evidence_established",
+      "actual_work": "README review and one declared notebook-path retrieval attempt; no notebooks executed."
+    },
+    {
+      "id": "milton_donchian_preliminary_read",
+      "url": "https://github.com/MiltonTulli/trading-bot",
+      "observed_HEAD": "c448d2473cc888eacf36d484e9a79a18546c7aa1",
+      "review_scope": "Public README screen, not a frozen implementation replication.",
+      "finding": "Own description8-12trades/month below fixed frequency gate; Donchian4h/volume rule,3%SL/6%TP; acknowledges no slippage/funding and bar-close execution gap.3240config selection needs independent review.",
+      "status": "not_shortlisted_frequency_and_cost_model_limits",
+      "safety": "Do not run source startup/live scripts: README warns API-key detection activates live mode. No account access or startup execution performed.",
+      "actual_work": "README review only; no repeat of prior Turtle evaluation."
+    },
+    {
+      "id": "unreadable_supply_demand_zone_source_preflight",
+      "url": "https://github.com/unreadable/trading-farm/tree/7d15e7a297949e98378a4126bc3abca0d543b973",
+      "source_commit": "7d15e7a297949e98378a4126bc3abca0d543b973",
+      "README_url": "https://raw.githubusercontent.com/unreadable/trading-farm/7d15e7a297949e98378a4126bc3abca0d543b973/README.md",
+      "README_sha256": "b7d5cb7bb5ca217b63a655ecf5264637899bf0bcad2451ba3839d966764fa2b5",
+      "known_rules_from_README": "Existing supply/demand impulse zones scored by trend/structure/liquidity/volume; zone-edge1ATR stop,2.5R target,min1.5R,4concurrent,KrakenFutures,fee-adjustedR reporting; parameters selected as OPTIMAL_PARAMS.",
+      "status": "queued_unreviewed_implementation_not_a_qualified_candidate",
+      "limits": "README does not supply a numerical positive BTC result/table. Frequency,data provenance,selection timeline,intrabar fills and fee/slippage/funding treatment not reviewed. This is a source-preflight lead,not evidence of alpha or a forward candidate.",
+      "next_exact_files": ["README.md", "config.py", "backtest.py", "zones.py", "structure.py", "data.py", "wfo.py", "tests"],
+      "next_action": "Retrieve pinned source only,inspect before any execution. Trace closed-bar zone birth,centered-swing confirmation,SL/TP order,gaps,signal reuse,fee/cost stress and BTC frequency; locate preserved original numerical BTC evidence. If absent or incompatible,record exclusion before expensive real-market compute. Do not run main.py,live/,install requirements,load credentials or optimize parameters.",
+      "actual_work": "Pinned README retrieval only; no source execution or real-market backtest."
+    }
+  ],
+  "qualified_candidates": [],
+  "forward_collection_started": false,
+  "production_changed": false,
+  "blocker": null
+}

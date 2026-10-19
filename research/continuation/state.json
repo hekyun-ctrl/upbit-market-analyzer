@@ -23,7 +23,8 @@
     "published_turtle_system2_2022_2026_strict_and_price_integrity",
     "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
     "official_raw_trade_reconciliation_5quarantines_20261020",
-    "bouri_2021_functional_curve_component_v1_all10costed_variants"
+    "bouri_2021_functional_curve_component_v1_all10costed_variants",
+    "external_ema_pullback_momentum_265209c_forensic_v1_synthetic_source_audit"
   ],
   "read_before_work": [
     "docs/lbank_strategy_rebuild_2026-10-20.md",
@@ -33,9 +34,16 @@
     "research/long_history/results"
   ],
   "next_work": {
-    "stage": "find_new_primary_source_with_public_code_costed_btc_evidence_and_manual_risk_contract",
-    "instruction": "Completed the frozen functional-curve10variant implementation and actual costed evaluation; all rejected. Do not rerun/tune this component or unchanged OBV. Start by reading research/continuation/source_screening_20261020_0505.json and exclude those source-level shortcomings without pretending their code was backtested. Search a new primary source with explicit BTC rules/public code/data and post-cost results. Before expensive computation, inspect signal frequency, fixed stop/TP1/manual execution fit, selection leakage and data provenance. Freeze source commit/SHA and replication rules before new performance, then execute one reproducible next stage. No qualified forward candidate or full alert contract exists; do not start a certified clock or deploy. Recover previous data from the Git compressed source catalog if necessary; do not depend on scratch files.",
+    "stage": "pinned_published_supply_demand_source_execution_and_evidence_preflight",
+    "instruction": "External EMA source audit completed:14tests,79synthetic trades,59pretrigger entries,9reused setups,1nonpositive risk,ADXallmissing; NOT a real BTC profitability backtest. Do not repair/tune/repeat this source,old functional curves,OBV,Turtle or prior rejected methods without new evidence. Read source_screening_20261020_0558.json plus older0505exclusions. Next concrete lead: unreadable/trading-farm commit7d15e7a297949e98378a4126bc3abca0d543b973. Inspect pinned config/backtest/zones/structure/data/wfo/tests offline before execution; trace temporal confirmation,stop/target/gap/cost model and BTC frequency,locate actual preserved costed BTC evidence. README alone has no numerical positive BTC proof. If compatible and supported,freeze exact replication protocol before performance; otherwise document preflight exclusion and search another PRIMARY source with public code/data and genuine after-cost evidence. Never run its startup/live scripts,install unreviewed dependencies or access credentials. No qualified forward candidate/full alert contract exists; keep all promotion gates unchanged and no deploy. Every future real-market input2022-Sep2026 is reused/exploratory; restore from Git source catalog if required,never presume scratch persists.",
     "sources_to_screen": [
+      {
+        "title": "Existing supply/demand zone implementation source preflight",
+        "url": "https://github.com/unreadable/trading-farm/tree/7d15e7a297949e98378a4126bc3abca0d543b973",
+        "source_commit": "7d15e7a297949e98378a4126bc3abca0d543b973",
+        "screening": "research/continuation/source_screening_20261020_0558.json",
+        "status": "queued_implementation_and_positive_BTC_evidence_unreviewed_not_shortlisted"
+      },
       {
         "title": "Are simple technical trading rules profitable in bitcoin markets?",
         "url": "https://biblio.ugent.be/publication/01HY3C3S169G1N6QNYR55NZMFB",
@@ -60,7 +68,9 @@
     "Published OBV subset positive on17complete-quality months but all2025 missing, uncertainty lower<=0 and2026 cost-stress losses; no promotion.",
     "Official raw-market-trade archive audit15,212,218rows:all5target windows fail preregistered completeness,0mask releases. IDs may omit excluded insurance/ADL; do not equate discontinuity with proven corruption or reconstruct missing trades.",
     "Functional-curve10variants all costed losses andPF<1; complete2026Jan-Sep273days all negative. Long-history totals concatenate known days and omit3-5unknown days pervariant, so are not full-calendar account returns. Not exact full-paper replication or native LBank fills.",
-    "Additional6primary sources triaged from source disclosures, not newly backtested; none establishes a qualified manual BTC replacement. New source search remains feasible."
+    "Additional6primary sources triaged from source disclosures, not newly backtested; none establishes a qualified manual BTC replacement. New source search remains feasible.",
+    "External EMA headline uses random syntheticOHLCV,not exchange observations; fixed-clock execution produced79trades with invalid fills/protection and no costs. Forensic tests are not alpha validation. Source version rejected; no universal EMA claim.",
+    "New source screens found README-versus-negative-artifact contradiction in rapfii and positioningv1 frequency290/733days below gate. These are source screens,not newly executed market backtests. Supply/demand source is only an unreviewed preflight lead."
   ],
   "iterations": [
     {
@@ -132,18 +142,38 @@
       "evidence_delivery": "research/continuation/results/functional_curve_20261020_evidence_delivery.json",
       "production_changed": false,
       "forward_started": false
+    },
+    {
+      "id": "external_ema_source_audit_20261020_0551",
+      "started_utc": "2026-10-19T20:50:57Z",
+      "evaluation_started_utc": "2026-10-19T20:53:23.405321+00:00",
+      "evaluation_completed_utc": "2026-10-19T20:53:38.294320+00:00",
+      "completed_utc": "2026-10-19T21:01:44Z",
+      "stage_completed": "hash_pinned_external_source13probes14tests_original_synthetic_execution_and_independent_artifact_reconciliation",
+      "candidate_id": "external_ema_pullback_momentum_265209c_forensic_v1",
+      "protocol_checkpoint_commit": "3b946f4356c76207daac274cf62d3389f53d53d8",
+      "implementation_tests_passed": 14,
+      "combined_research_regression_tests_passed": 45,
+      "synthetic_rows": 8760,
+      "synthetic_closed_trades": 79,
+      "pretrigger_entries": 59,
+      "reused_setups": 9,
+      "nonpositive_initial_risk": 1,
+      "ADX_finite_rows": 0,
+      "independent_max_metric_abs_error": 0.0,
+      "result": "rejected_this_source_version_as_replacement_evidence_synthetic_invalid_fills_no_costs",
+      "real_market_backtest_performed": false,
+      "report": "research/continuation/results/external_ema_source_20261020/report.json",
+      "audit": "research/continuation/results/external_ema_source_20261020/independent_audit.json",
+      "documentation": "docs/lbank_external_ema_source_audit_2026-10-20.md",
+      "source_screening": "research/continuation/source_screening_20261020_0558.json",
+      "production_changed": false,
+      "forward_started": false
     }
   ],
-  "active_run": {
-    "id": "external_ema_source_audit_20261020_0551",
-    "stage": "protocol_and_executable_audit_fixed_before_running",
-    "source_commit": "265209c39efc96eb97a35fd5cae45c0d6b868b30",
-    "protocol": "research/continuation/ema_source_audit_protocol_20261020.json",
-    "code": "research/continuation/audit_external_ema_source.py",
-    "next_action": "Recover three pinned source files, run14forensic tests and source365day synthetic reproduction. Save actual diagnostics; not a real-market performance test or strategy promotion."
-  },
+  "active_run": null,
   "blockers": [],
-  "updated_kst": "2026-10-20T05:09:46+09:00",
+  "updated_kst": "2026-10-20T06:01:44+09:00",
   "maintained_research_candidates": [
     {
       "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
@@ -154,6 +184,11 @@
       "candidate_id": "bouri_2021_functional_curve_component_v1",
       "status": "rejected_costed_component_all10variants",
       "next": "No parameter/cost relaxation to salvage results; search different published source. Source full paper and every functional method are not universally invalidated."
+    },
+    {
+      "candidate_id": "external_ema_pullback_momentum_265209c_forensic_v1",
+      "status": "rejected_synthetic_provenance_and_execution_defects_no_costed_market_evidence",
+      "next": "No unchanged repetition or tuning of source's claimed profit. Audit scope does not invalidate all EMA trading methods."
     }
   ],
   "source_reconciliation": {
