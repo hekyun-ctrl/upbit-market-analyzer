@@ -1,0 +1,15 @@
+{
+ "version":"preplanned_location_v1",
+ "motivation":"Test the user's late-entry complaint as an execution/entry-location intervention, not an additional indicator veto.",
+ "disclosed_prior_results":"Original 3 close-confirmed hypotheses, fixed meta layer and hourly EMA adaptation failed the prior long-history evaluation; those results are retained, not relabelled.",
+ "price_rules_frozen_before_new_results":true,
+ "families":{
+  "range_edge_limit":{"box_bars":20,"balanced_close_fraction":0.35,"minimum_width_atr":4,"maximum_width_atr":10,"entry":"known box edge plus 0.1 ATR inward","stop":"2 ATR beyond planned entry","target":"known box midpoint","regime":"no two aligned 15m moves with aligned 5m EMA9/21 opposing this trade"},
+  "trend_value_limit":{"direction":"two completed aligned 15m close changes and 5m EMA9/21 direction/slope","entry":"completed 5m EMA21","stop":"2 ATR beyond planned entry or known last-5-bar extreme plus 0.25 ATR, whichever is wider","target":"known last-20-bar directional extreme"},
+  "preplanned_break_stop":{"direction":"same larger-direction rule","range_bars":12,"maximum_width_atr":3,"relative_volume_minimum":1,"entry":"known range edge plus 0.1 ATR outside","stop":"opposite range edge plus 0.25 ATR, minimum 2 ATR","target":"one known box width beyond planned entry"}
+ },
+ "common":{"max_stop_fraction":0.006,"max_entry_extension_atr":2.5,"pending_expiry_minutes":15,"minimum_limit_penetration_atr":0.1,"maximum_holding_minutes":120,"cooldown_seconds":2700,"max_entries_per_day":8,"one_position_per_family":true,"entry_minute_target_credit":false,"ambiguous_entry_minute_stop_first":true,"cost_model":"same 0.06% each-side fee, 0.02% each-side adverse execution and conservative archived funding; 2x execution-cost stress","profit_protection":"observe minute closes only; after max(original price risk, 2*modeled breakeven distance) favorable movement, monotonic quarter-net-peak guard with half-ATR breathing, effective next minute and updates on new completed 5m boundary"},
+ "evaluation":{"2024_2025":"development diagnostics; no parameter changes after inspection","2026_Jan_Sep":"exploratory because other family outcomes have already been inspected; not a newly untouched final test","2023":"separate blind historical robustness check with fixed rules, not prospective or future-trained ML; do not claim it was deployed historically","familywise_uncertainty":"report all new and old attempts; use 99% day-block lower bound as a stricter screening statistic"},
+ "native_lbank_requirement":"External evidence alone does not certify native execution, warning behavior, fills, or guarantee a profit improvement.",
+ "no_threshold_search":true
+}
