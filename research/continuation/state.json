@@ -36,7 +36,7 @@
       {
         "title": "Are simple technical trading rules profitable in bitcoin markets?",
         "url": "https://biblio.ugent.be/publication/01HY3C3S169G1N6QNYR55NZMFB",
-        "status": "search_discovered_full_text_not_audited"
+        "status": "full_text_audited_unfiltered_obv_component_frozen"
       },
       {
         "title": "On the intraday return curves of Bitcoin: predictability and trading",
@@ -53,7 +53,14 @@
     "Public cross-venue tests do not establish native LBank manual fill performance."
   ],
   "iterations": [],
-  "active_run": null,
+  "active_run": {
+    "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
+    "stage": "implementation_verified_performance_pending",
+    "started_utc": "2026-10-19T18:12:53.272340+00:00",
+    "protocol": "research/continuation/obv_component_protocol_20261020.json",
+    "implementation": "research/continuation/obv_component.py",
+    "output_expected": "research/continuation/results/obv_component_20261020/"
+  },
   "blockers": [],
   "updated_kst": "2026-10-20"
 }
