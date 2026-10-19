@@ -1,0 +1,499 @@
+{
+  "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
+  "protocol_sha256": "744fcf043623ae14be39261b62f7312b7e1a2a419fcea54cd897a10570399759",
+  "code_sha256": "0cbc44172860a8dfc7f087e31513363f3228c0b2c6cc204b848af389fa1e92b0",
+  "source_pdf_sha256": "65d19149fc9d46d52af73a831638f82460953139141c5c61f764ccab26ea3b8f",
+  "original_minutes": 2496960,
+  "quarantined_minutes": 160,
+  "usable_minutes": 2496800,
+  "rule_count": 165,
+  "evaluation_months": [
+    "2024-01",
+    "2024-02",
+    "2024-03",
+    "2024-04",
+    "2024-05",
+    "2024-06",
+    "2024-07",
+    "2024-08",
+    "2024-09",
+    "2024-12",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08"
+  ],
+  "evaluation_decisions": [
+    {
+      "month": "2024-01",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2024-02",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2024-03",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2024-04",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2024-05",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2024-06",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2024-07",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2024-08",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2024-09",
+      "included": true,
+      "complete_training_months": 11,
+      "reason": "included"
+    },
+    {
+      "month": "2024-10",
+      "included": false,
+      "complete_training_months": 11,
+      "reason": "incomplete_data_or_context"
+    },
+    {
+      "month": "2024-11",
+      "included": false,
+      "complete_training_months": 10,
+      "reason": "incomplete_data_or_context"
+    },
+    {
+      "month": "2024-12",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2025-01",
+      "included": false,
+      "complete_training_months": 10,
+      "reason": "incomplete_data_or_context"
+    },
+    {
+      "month": "2025-02",
+      "included": false,
+      "complete_training_months": 9,
+      "reason": "incomplete_data_or_context"
+    },
+    {
+      "month": "2025-03",
+      "included": false,
+      "complete_training_months": 8,
+      "reason": "fewer_than9_complete_training_months"
+    },
+    {
+      "month": "2025-04",
+      "included": false,
+      "complete_training_months": 8,
+      "reason": "fewer_than9_complete_training_months"
+    },
+    {
+      "month": "2025-05",
+      "included": false,
+      "complete_training_months": 8,
+      "reason": "fewer_than9_complete_training_months"
+    },
+    {
+      "month": "2025-06",
+      "included": false,
+      "complete_training_months": 8,
+      "reason": "fewer_than9_complete_training_months"
+    },
+    {
+      "month": "2025-07",
+      "included": false,
+      "complete_training_months": 8,
+      "reason": "fewer_than9_complete_training_months"
+    },
+    {
+      "month": "2025-08",
+      "included": false,
+      "complete_training_months": 8,
+      "reason": "incomplete_data_or_context"
+    },
+    {
+      "month": "2025-09",
+      "included": false,
+      "complete_training_months": 7,
+      "reason": "incomplete_data_or_context"
+    },
+    {
+      "month": "2025-10",
+      "included": false,
+      "complete_training_months": 6,
+      "reason": "fewer_than9_complete_training_months"
+    },
+    {
+      "month": "2025-11",
+      "included": false,
+      "complete_training_months": 7,
+      "reason": "fewer_than9_complete_training_months"
+    },
+    {
+      "month": "2025-12",
+      "included": false,
+      "complete_training_months": 8,
+      "reason": "fewer_than9_complete_training_months"
+    },
+    {
+      "month": "2026-01",
+      "included": false,
+      "complete_training_months": 8,
+      "reason": "fewer_than9_complete_training_months"
+    },
+    {
+      "month": "2026-02",
+      "included": true,
+      "complete_training_months": 9,
+      "reason": "included"
+    },
+    {
+      "month": "2026-03",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2026-04",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2026-05",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2026-06",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2026-07",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2026-08",
+      "included": true,
+      "complete_training_months": 10,
+      "reason": "included"
+    },
+    {
+      "month": "2026-09",
+      "included": false,
+      "complete_training_months": 11,
+      "reason": "incomplete_data_or_context"
+    }
+  ],
+  "summaries": {
+    "best1:gross_log": {
+      "days": 517,
+      "return_pct": 113.61632098553773,
+      "observed_day_drawdown_pct": 20.133162459179456,
+      "daily_mean_log_return": 0.0014681070160294826,
+      "daily_mean_7day_block_bootstrap95": [
+        5.848687011389581e-05,
+        0.003119607133155841
+      ],
+      "years": {
+        "2024": {
+          "observed_days": 305,
+          "return_pct": 93.03346972280546,
+          "observed_day_drawdown_pct": 10.277459214774353
+        },
+        "2026": {
+          "observed_days": 212,
+          "return_pct": 10.662840642241349,
+          "observed_day_drawdown_pct": 13.935091875933281
+        }
+      },
+      "calendar_continuity": false,
+      "bootstrap_blocks_cross_missing_days": false,
+      "scope": "Concatenated complete-quality months only; excluded months have unknown strategy result, not zero return.",
+      "observed_subset_profit_factor": 1.9041949907740399
+    },
+    "best1:net_log": {
+      "days": 517,
+      "return_pct": 77.78578462068117,
+      "observed_day_drawdown_pct": 22.64423485834477,
+      "daily_mean_log_return": 0.0011129771419355736,
+      "daily_mean_7day_block_bootstrap95": [
+        -0.0002630902993467487,
+        0.0027383581044227276
+      ],
+      "years": {
+        "2024": {
+          "observed_days": 305,
+          "return_pct": 70.7816886747317,
+          "observed_day_drawdown_pct": 11.399542177022926
+        },
+        "2026": {
+          "observed_days": 212,
+          "return_pct": 4.1011984366131085,
+          "observed_day_drawdown_pct": 14.911225590942623
+        }
+      },
+      "calendar_continuity": false,
+      "bootstrap_blocks_cross_missing_days": false,
+      "scope": "Concatenated complete-quality months only; excluded months have unknown strategy result, not zero return.",
+      "observed_subset_profit_factor": 1.6255273925433458
+    },
+    "best1:stress_log": {
+      "days": 517,
+      "return_pct": 58.174752765625556,
+      "observed_day_drawdown_pct": 26.078343572850194,
+      "daily_mean_log_return": 0.0008869057369445488,
+      "daily_mean_7day_block_bootstrap95": [
+        -0.0005013651928818852,
+        0.0025149813246939236
+      ],
+      "years": {
+        "2024": {
+          "observed_days": 305,
+          "return_pct": 59.930883462394746,
+          "observed_day_drawdown_pct": 12.457108918386817
+        },
+        "2026": {
+          "observed_days": 212,
+          "return_pct": -1.0980560219203657,
+          "observed_day_drawdown_pct": 17.17761820823772
+        }
+      },
+      "calendar_continuity": false,
+      "bootstrap_blocks_cross_missing_days": false,
+      "scope": "Concatenated complete-quality months only; excluded months have unknown strategy result, not zero return.",
+      "observed_subset_profit_factor": 1.454564474267897
+    },
+    "best1:trade_diagnostics": {
+      "sleeved_closed_trades": 73,
+      "unique_observed_days": 517,
+      "win_fraction": 0.410958904109589,
+      "mean_hold_minutes": 4813.945205479452,
+      "median_hold_minutes": 3180.0,
+      "caution": "Sleeves overlap in same BTC asset; these are not independent live alerts, and no source SL/TP1/urgent-warning contract exists."
+    },
+    "best50:gross_log": {
+      "days": 517,
+      "return_pct": 69.17352832032245,
+      "observed_day_drawdown_pct": 22.265288982372276,
+      "daily_mean_log_return": 0.0010169338432042343,
+      "daily_mean_7day_block_bootstrap95": [
+        -0.000229638978030142,
+        0.002488258322137125
+      ],
+      "years": {
+        "2024": {
+          "observed_days": 305,
+          "return_pct": 56.05865206890156,
+          "observed_day_drawdown_pct": 9.577637829696595
+        },
+        "2026": {
+          "observed_days": 212,
+          "return_pct": 8.40381233437192,
+          "observed_day_drawdown_pct": 14.093841591092993
+        }
+      },
+      "calendar_continuity": false,
+      "bootstrap_blocks_cross_missing_days": false,
+      "scope": "Concatenated complete-quality months only; excluded months have unknown strategy result, not zero return.",
+      "observed_subset_profit_factor": 1.5005854027305554
+    },
+    "best50:net_log": {
+      "days": 517,
+      "return_pct": 34.572070404196474,
+      "observed_day_drawdown_pct": 24.480960442815626,
+      "daily_mean_log_return": 0.0005743321256857257,
+      "daily_mean_7day_block_bootstrap95": [
+        -0.0006450564229038678,
+        0.0020288716618877597
+      ],
+      "years": {
+        "2024": {
+          "observed_days": 305,
+          "return_pct": 34.2243087542031,
+          "observed_day_drawdown_pct": 12.690883831030009
+        },
+        "2026": {
+          "observed_days": 212,
+          "return_pct": 0.2590899168869752,
+          "observed_day_drawdown_pct": 16.012098336759706
+        }
+      },
+      "calendar_continuity": false,
+      "bootstrap_blocks_cross_missing_days": false,
+      "scope": "Concatenated complete-quality months only; excluded months have unknown strategy result, not zero return.",
+      "observed_subset_profit_factor": 1.2543193565354895
+    },
+    "best50:stress_log": {
+      "days": 517,
+      "return_pct": 14.279605635343383,
+      "observed_day_drawdown_pct": 33.15328391430895,
+      "daily_mean_log_return": 0.00025817783463295623,
+      "daily_mean_7day_block_bootstrap95": [
+        -0.0009720862016050809,
+        0.001725049591873133
+      ],
+      "years": {
+        "2024": {
+          "observed_days": 305,
+          "return_pct": 21.950508324233713,
+          "observed_day_drawdown_pct": 15.997026675001813
+        },
+        "2026": {
+          "observed_days": 212,
+          "return_pct": -6.290176887574295,
+          "observed_day_drawdown_pct": 20.793049880868907
+        }
+      },
+      "calendar_continuity": false,
+      "bootstrap_blocks_cross_missing_days": false,
+      "scope": "Concatenated complete-quality months only; excluded months have unknown strategy result, not zero return.",
+      "observed_subset_profit_factor": 1.1039004656948226
+    },
+    "best50:trade_diagnostics": {
+      "sleeved_closed_trades": 5174,
+      "unique_observed_days": 517,
+      "win_fraction": 0.38848086586780056,
+      "mean_hold_minutes": 3389.8366834170856,
+      "median_hold_minutes": 1860.0,
+      "caution": "Sleeves overlap in same BTC asset; these are not independent live alerts, and no source SL/TP1/urgent-warning contract exists."
+    },
+    "buyhold_matched:gross_log": {
+      "days": 517,
+      "return_pct": 44.789203616688546,
+      "observed_day_drawdown_pct": 37.49243266853589,
+      "daily_mean_log_return": 0.0007158776219062139,
+      "daily_mean_7day_block_bootstrap95": [
+        -0.0014126011149174294,
+        0.0028779881502770553
+      ],
+      "years": {
+        "2024": {
+          "observed_days": 305,
+          "return_pct": 45.0787834985444,
+          "observed_day_drawdown_pct": 26.2553399810745
+        },
+        "2026": {
+          "observed_days": 212,
+          "return_pct": -0.19960181280315017,
+          "observed_day_drawdown_pct": 28.684545807438255
+        }
+      },
+      "calendar_continuity": false,
+      "bootstrap_blocks_cross_missing_days": false,
+      "scope": "Concatenated complete-quality months only; excluded months have unknown strategy result, not zero return.",
+      "observed_subset_profit_factor": 1.4112043377323078
+    },
+    "buyhold_matched:net_log": {
+      "days": 517,
+      "return_pct": 24.620336529164287,
+      "observed_day_drawdown_pct": 42.7574923750764,
+      "daily_mean_log_return": 0.0004257284749845234,
+      "daily_mean_7day_block_bootstrap95": [
+        -0.0016689478053112427,
+        0.002574485403523485
+      ],
+      "years": {
+        "2024": {
+          "observed_days": 305,
+          "return_pct": 28.91502613595389,
+          "observed_day_drawdown_pct": 30.16726502000885
+        },
+        "2026": {
+          "observed_days": 212,
+          "return_pct": -3.331411190391714,
+          "observed_day_drawdown_pct": 29.247522857761254
+        }
+      },
+      "calendar_continuity": false,
+      "bootstrap_blocks_cross_missing_days": false,
+      "scope": "Concatenated complete-quality months only; excluded months have unknown strategy result, not zero return.",
+      "observed_subset_profit_factor": 1.2336158232377519
+    },
+    "buyhold_matched:stress_log": {
+      "days": 517,
+      "return_pct": 21.274119017528825,
+      "observed_day_drawdown_pct": 43.8917315364176,
+      "daily_mean_log_return": 0.00037308170943866817,
+      "daily_mean_7day_block_bootstrap95": [
+        -0.0017179521035138434,
+        0.002520121205864559
+      ],
+      "years": {
+        "2024": {
+          "observed_days": 305,
+          "return_pct": 26.867427682979194,
+          "observed_day_drawdown_pct": 30.83490028148702
+        },
+        "2026": {
+          "observed_days": 212,
+          "return_pct": -4.408782275799802,
+          "observed_day_drawdown_pct": 29.41724388859167
+        }
+      },
+      "calendar_continuity": false,
+      "bootstrap_blocks_cross_missing_days": false,
+      "scope": "Concatenated complete-quality months only; excluded months have unknown strategy result, not zero return.",
+      "observed_subset_profit_factor": 1.201680360980164
+    },
+    "buyhold_matched:trade_diagnostics": {
+      "sleeved_closed_trades": 17,
+      "unique_observed_days": 517,
+      "win_fraction": 0.5294117647058824,
+      "mean_hold_minutes": 43792.94117647059,
+      "median_hold_minutes": 44640.0,
+      "caution": "Sleeves overlap in same BTC asset; these are not independent live alerts, and no source SL/TP1/urgent-warning contract exists."
+    }
+  },
+  "artifacts": {
+    "portfolio_daily.csv.gz": "1bbf2e315cd8442525037b4c0137387ac8107983e7a435e9f9b20867838fc39a",
+    "monthly_choices.json": "8ca0d52c9ae4a37ec807f3b2e8090af9ddf886299bb0ed41b8193228dc12bcac",
+    "selected_sleeve_trades.csv.gz": "a2a4df0453441b21f37dc6fbe75c518d4c25016f6d9f6ac9c209e3705b05b54a"
+  },
+  "production_changed": false,
+  "profitable_strategy_certified": false,
+  "full_paper_replication": false,
+  "full_report": "research/continuation/results/obv_component_20261020_report.json",
+  "decision": "Not qualified: missing full-calendar coverage, negative uncertainty lower bounds, cost-stress loss in2026 subset, missing source stop/TP1/native execution contract."
+}

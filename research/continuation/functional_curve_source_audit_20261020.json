@@ -1,0 +1,17 @@
+{
+  "title": "On the intraday return curves of Bitcoin: Predictability and trading opportunities",
+  "doi": "10.1016/j.irfa.2021.101784",
+  "institution_page": "https://repository.essex.ac.uk/30487/",
+  "download_url": "https://repository.essex.ac.uk/30487/1/Bitcoin_Functional%20V8%20Clean.pdf",
+  "sha256": "e0bbea362e493bf102cdcd64e52d60c220d0c9e78b72eac058da0cf7d35785e7",
+  "bytes": 869559,
+  "status": "accepted_manuscript_downloaded_trading_section_audited_model_not_implemented",
+  "notes": [
+    "Teesside403; university author copies available; Essex V8 successfully retrieved via public download",
+    "Prior-day forecast fixes next-day entry at predicted minimum and exit at predicted later maximum; no overnight hold",
+    "FPC-score AR1 candidate with182/365day windows; rules require causal rolling FPCA and score estimation",
+    "Fee0.03% source assumption is not current LBank cost evidence",
+    "Source maximum drawdown uses log-return differences per footnote9; values below-100% are not percentage equity drawdowns",
+    "No source-proven current LBank stop/TP1/native urgent-warning contract"
+  ]
+}

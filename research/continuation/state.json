@@ -20,7 +20,8 @@
     "matched_entry_exit_interventions",
     "aggressive_flow_fixed_meta",
     "15m_channel_expansion_and_shock_reclaim",
-    "published_turtle_system2_2022_2026_strict_and_price_integrity"
+    "published_turtle_system2_2022_2026_strict_and_price_integrity",
+    "deprez_frommel_2024_unfiltered_obv_intraday_component_v1"
   ],
   "read_before_work": [
     "docs/lbank_strategy_rebuild_2026-10-20.md",
@@ -30,18 +31,20 @@
     "research/long_history/results"
   ],
   "next_work": {
-    "stage": "audit_existing_published_intraday_strategy",
-    "instruction": "Open primary full text, extract exact executable rules and authors code/data if available, audit costs/timing/risk; record reproducibility before running unchanged rules. Do not claim search snippets establish edge.",
+    "stage": "resolve_obv_source_integrity_before_full_calendar_comparison",
+    "instruction": "Audit discrepant intervals against independent official raw trade data or immutable archive versions. Do not lower9month training threshold or silently replace data based on returns. If repair is justified, preregister source-version sensitivity then repeat unchanged165component model on full calendar. If not repairable, record limitation and proceed to exact causal FPC-score AR1 candidate source reproduction.",
     "sources_to_screen": [
       {
         "title": "Are simple technical trading rules profitable in bitcoin markets?",
         "url": "https://biblio.ugent.be/publication/01HY3C3S169G1N6QNYR55NZMFB",
-        "status": "full_text_audited_unfiltered_obv_component_frozen"
+        "status": "unfiltered165component_executed_full_paper_not_replicated_no_promotion"
       },
       {
-        "title": "On the intraday return curves of Bitcoin: predictability and trading",
-        "url": "https://research.tees.ac.uk/files/25865283/Bitcoin_Functional_V5.pdf",
-        "status": "search_discovered_full_text_not_audited"
+        "title": "On the intraday return curves of Bitcoin: Predictability and trading opportunities",
+        "url": "https://repository.essex.ac.uk/30487/",
+        "accepted_pdf": "https://repository.essex.ac.uk/30487/1/Bitcoin_Functional%20V8%20Clean.pdf",
+        "source_audit": "research/continuation/functional_curve_source_audit_20261020.json",
+        "status": "accepted_source_downloaded_trading_steps_audited_model_not_implemented"
       }
     ]
   },
@@ -50,17 +53,41 @@
     "Turtle positive scenarios materially depend on artificial gap exits; not eligible.",
     "No frozen replacement candidate exists and no forward validation clock has started.",
     "Gate thresholds are preregistered research policy, not universal proof or guaranteed completion date.",
-    "Public cross-venue tests do not establish native LBank manual fill performance."
+    "Public cross-venue tests do not establish native LBank manual fill performance.",
+    "Published OBV subset positive on17complete-quality months but all2025 missing, uncertainty lower<=0 and2026 cost-stress losses; no promotion."
   ],
-  "iterations": [],
-  "active_run": {
-    "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
-    "stage": "implementation_verified_performance_pending",
-    "started_utc": "2026-10-19T18:12:53.272340+00:00",
-    "protocol": "research/continuation/obv_component_protocol_20261020.json",
-    "implementation": "research/continuation/obv_component.py",
-    "output_expected": "research/continuation/results/obv_component_20261020/"
-  },
+  "iterations": [
+    {
+      "id": "obv_component_20261020_0307",
+      "started_utc": "2026-10-19T18:12:53.272340+00:00",
+      "completed_utc": "2026-10-19T18:20:00.894933+00:00",
+      "stage_completed": "published_component_source_audit_implementation_and_real_historical_evaluation",
+      "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
+      "rules": 165,
+      "observed_months": 17,
+      "observed_days": 517,
+      "implementation_tests_passed": 8,
+      "result": "not_qualified",
+      "reason": [
+        "2025 entirely absent from complete-quality evaluation",
+        "net uncertainty lower bounds<=0",
+        "2026 observed-subset double-cost result negative",
+        "no source stop/TP1 or native LBank fill/warning evidence"
+      ],
+      "report": "research/continuation/results/obv_component_20261020_report.json",
+      "documentation": "docs/lbank_obv_component_validation_2026-10-20.md",
+      "production_changed": false,
+      "forward_started": false
+    }
+  ],
+  "active_run": null,
   "blockers": [],
-  "updated_kst": "2026-10-20"
+  "updated_kst": "2026-10-20T03:20:00.894953+09:00",
+  "maintained_research_candidates": [
+    {
+      "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
+      "status": "exploratory_component_positive_but_unqualified",
+      "next": "resolve_source_integrity_and_full_calendar_coverage_without_parameter_tuning"
+    }
+  ]
 }

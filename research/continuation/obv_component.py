@@ -88,7 +88,7 @@ def monthly_path(t,price,desired,funding,i,j):
 def select_rules(month_returns,labels,target,top):
     end=pd.Timestamp(target+'-01');begin=end-pd.DateOffset(months=12)
     train=[i for i,m in enumerate(labels) if begin<=pd.Timestamp(m+'-01')<end]
-    if len(train)<9:return None,[]
+    if len(train)<9:return None,[labels[i] for i in train]
     score=month_returns[:,train].sum(axis=1)
     order=np.lexsort((np.arange(len(score)),-score))
     return order[:top], [labels[i] for i in train]
@@ -101,16 +101,24 @@ def summarize(dates,logr,bootstrap_seed=20261020):
     if not len(logr):return dict(days=0)
     equity=np.r_[1.,np.exp(np.cumsum(logr))];dd=-(equity/np.maximum.accumulate(equity)-1).min()
     rng=np.random.default_rng(bootstrap_seed);n=len(logr);means=[]
+    ends=np.empty(n,dtype=int);last=n
+    for i in range(n-1,-1,-1):
+        if i==n-1 or dates[i+1]-dates[i]!=86400:last=i+1
+        ends[i]=min(i+7,last)
+    # Blocks end at actual calendar gaps; absent months are never made adjacent.
     for _ in range(2000):
-        starts=rng.integers(0,n,size=(n+6)//7);indices=(starts[:,None]+np.arange(7))%n
-        means.append(float(np.asarray(logr)[indices.ravel()[:n]].mean()))
+        pieces=[];count=0
+        while count<n:
+            k=int(rng.integers(0,n));piece=np.arange(k,ends[k]);pieces.append(piece);count+=len(piece)
+        indices=np.concatenate(pieces)[:n]
+        means.append(float(np.asarray(logr)[indices].mean()))
     years={}
     for year in sorted(set(pd.to_datetime(dates,unit='s',utc=True).year)):
         r=logr[pd.to_datetime(dates,unit='s',utc=True).year==year];v=np.r_[1.,np.exp(np.cumsum(r))]
         years[str(year)]=dict(observed_days=len(r),return_pct=float(np.expm1(r.sum())*100),observed_day_drawdown_pct=float(-(v/np.maximum.accumulate(v)-1).min()*100))
     return dict(days=n,return_pct=float((equity[-1]-1)*100),observed_day_drawdown_pct=float(dd*100),daily_mean_log_return=float(np.mean(logr)),
         daily_mean_7day_block_bootstrap95=[float(x) for x in np.quantile(means,[.025,.975])],years=years,
-        calendar_continuity=False,scope='Concatenated complete-quality months only; excluded months have unknown strategy result, not zero return.')
+        calendar_continuity=False,bootstrap_blocks_cross_missing_days=False,scope='Concatenated complete-quality months only; excluded months have unknown strategy result, not zero return.')
 
 def main(output):
     root=Path(__file__).resolve().parents[3];out=Path(output);out.mkdir(parents=True,exist_ok=True)
@@ -147,12 +155,35 @@ def main(output):
             returns=np.diff(np.log(np.vstack([np.ones(3),paths])),axis=0)
             for day,v in zip(d['dates'],returns):portfolio_daily.append(dict(day=int(day),month=label,portfolio=f'best{top}',gross_log=float(v[0]),net_log=float(v[1]),stress_log=float(v[2])))
             sub=trade_frame[(trade_frame.month==label)&trade_frame.rule_id.isin(ids)].copy();sub['portfolio']=f'best{top}';sub['initial_sleeve_weight']=1/len(ids);chosen_sleeves.append(sub)
+    # Matched-calendar buy/hold comparison. Missing months stay missing.
+    evaluated=sorted({x['month'] for x in portfolio_daily})
+    for label in evaluated:
+        i,j=slices[label];dates,v,trades=monthly_path(t,price,np.ones(len(one),dtype='int8'),funding,i,j)
+        for day,row in zip(dates,v):portfolio_daily.append(dict(day=int(day),month=label,portfolio='buyhold_matched',gross_log=float(row[0]),net_log=float(row[1]),stress_log=float(row[2])))
+        sub=pd.DataFrame(trades);sub['month']=label;sub['rule_id']=-1;sub['portfolio']='buyhold_matched';sub['initial_sleeve_weight']=1.;chosen_sleeves.append(sub)
     daily_frame=pd.DataFrame(portfolio_daily);selected_trades=pd.concat(chosen_sleeves,ignore_index=True) if chosen_sleeves else pd.DataFrame()
+    evaluation_decisions=[]
+    for row in quality:
+        label=row['month']
+        if not ('2024-01'<=label<='2026-09'):continue
+        _,train=select_rules(month_returns,labels,label,1)
+        evaluation_decisions.append(dict(month=label,included=label in evaluated,complete_training_months=len(train),reason='included' if label in evaluated else 'incomplete_data_or_context' if not row['valid'] else 'fewer_than9_complete_training_months'))
     summaries={}
     for name,g in daily_frame.groupby('portfolio'):
         g=g.sort_values('day')
         for field in ('gross_log','net_log','stress_log'):summaries[name+':'+field]=summarize(g.day.to_numpy(),g[field].to_numpy())
         trades=selected_trades[selected_trades.portfolio==name]
+        for field in ('gross_log','net_log','stress_log'):
+            capital=1.;positive=negative=0.
+            for label,mt in trades.groupby('month',sort=True):
+                pnl=[]
+                for _,sleeve in mt.groupby('rule_id'):
+                    amount=capital*float(sleeve.initial_sleeve_weight.iloc[0])
+                    for r in sleeve.sort_values('entry_at').to_dict('records'):
+                        change=amount*np.expm1(r[field]);pnl.append(change);amount+=change
+                positive+=sum(x for x in pnl if x>0);negative-=sum(x for x in pnl if x<0);capital+=sum(pnl)
+            if abs(capital-1-summaries[name+':'+field]['return_pct']/100)>1e-8:raise ValueError('portfolio closed-trade PnL mismatch')
+            summaries[name+':'+field]['observed_subset_profit_factor']=float(positive/negative) if negative else None
         summaries[name+':trade_diagnostics']=dict(sleeved_closed_trades=len(trades),unique_observed_days=g.day.nunique(),win_fraction=float((trades.net_log>0).mean()),
             mean_hold_minutes=float(trades.holding_minutes.mean()),median_hold_minutes=float(trades.holding_minutes.median()),
             caution='Sleeves overlap in same BTC asset; these are not independent live alerts, and no source SL/TP1/urgent-warning contract exists.')
@@ -160,7 +191,7 @@ def main(output):
     selected_trades.to_csv(out/'selected_sleeve_trades.csv.gz',index=False,compression={'method':'gzip','mtime':0})
     (out/'monthly_choices.json').write_text(json.dumps(selections,indent=2)+'\n')
     result=dict(candidate_id='deprez_frommel_2024_unfiltered_obv_intraday_component_v1',protocol_sha256=digest(Path(__file__).with_name('obv_component_protocol_20261020.json')),code_sha256=digest(__file__),source_pdf_sha256=digest(root/'published-paper-audit/deprez_frommel_2024.pdf'),
-        original_minutes=original,quarantined_minutes=removed,usable_minutes=len(one),rule_count=len(grids),quality_months=quality,evaluation_months=sorted(daily_frame.month.unique()),summaries=summaries,
+        original_minutes=original,quarantined_minutes=removed,usable_minutes=len(one),rule_count=len(grids),quality_months=quality,evaluation_months=sorted(daily_frame.month.unique()),evaluation_decisions=evaluation_decisions,summaries=summaries,
         source_manifests=sources,artifacts={p.name:digest(p) for p in out.glob('*') if p.name!='report.json'},production_changed=False,profitable_strategy_certified=False,full_paper_replication=False)
     (out/'report.json').write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')
     print(json.dumps(dict(rule_count=len(grids),evaluation_months=result['evaluation_months'],summaries=summaries),indent=2),flush=True)

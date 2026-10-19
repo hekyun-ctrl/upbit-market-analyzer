@@ -1,0 +1,7 @@
+{
+  "timing": "After the first exploratory component calculation, before completion report",
+  "signals_parameters_or_selections_changed": false,
+  "added_diagnostics": ["Matched-calendar long buy/hold comparison using identical fees, funding, monthly cash restart and excluded months", "Profit factor reconstructed from compounded closed sleeve cash PnL, reconciled to daily portfolio curve", "Seven-day resampling blocks stop at real calendar gaps instead of joining missing months", "Report actual counts of complete training months even when below the fixed nine-month minimum"],
+  "initial_result": "Preserve initial result as superseded diagnostics, not an independently validated second trial",
+  "interpretation": "Do not turn partial-month concatenated positive results into full-calendar returns; no FDR proof, source stop/TP1 contract, or native LBank execution certification."
+}
