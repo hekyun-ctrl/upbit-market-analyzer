@@ -100,7 +100,13 @@
       "forward_started": false
     }
   ],
-  "active_run": null,
+  "active_run": {
+    "id": "functional_curve_component_20261020_0454",
+    "started_utc": "2026-10-19T19:59:35Z",
+    "stage": "implementation13tests_passed_ready_for_actual_historical_evaluation",
+    "protocol": "research/continuation/functional_curve_component_protocol_20261020.json",
+    "next_command": "OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 python -m research.continuation.functional_curve --output /workspace/scratch/ba9af914844b/functional-curve-evaluation-20261020"
+  },
   "blockers": [],
   "updated_kst": "2026-10-20T03:36:46.889525+09:00",
   "maintained_research_candidates": [

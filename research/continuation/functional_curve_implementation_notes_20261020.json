@@ -1,0 +1,29 @@
+{
+  "candidate_id": "bouri_2021_functional_curve_component_v1",
+  "protocol_commit": "53ddbda8c5837e1bbdb4b831185944720b773e2a",
+  "implementation_checkpoint_utc": "2026-10-19T19:59:35Z",
+  "implementation_tests_passed": 13,
+  "actual_historical_evaluation_completed": false,
+  "details_fixed_before_execution": [
+    "Uniform discrete FPCA; eigenvector scaling cancels in score reconstruction; >=90% variance retained.",
+    "Standard Ljung-Box Q on unfitted score series, df=lag; OLS AR1 with intercept; no coefficient clipping.",
+    "60second delayed original minute-open fills at both scheduled times; no overnight position.",
+    "Unit cash funded long/cash quantity includes entry fee budget; no margin, leverage or liquidation claims.",
+    "Funding uses adverse actual rates and original funding-minute opens, with inclusive entry and exit worst-case boundary order.",
+    "Forecast table and full predicted curves saved before target-price execution evaluation; hashes checked unchanged afterwards.",
+    "Missing required execution/path data remains unknown PnL; known no-signal cash days are zero.",
+    "All10model variants and gross/base/double costs reported;7day blocks cannot cross calendar holes; unadjusted exploratory intervals, not familywise proof.",
+    "Input source catalog retains every original manifest text/SHA and archive URL/SHA plus quarantine file SHA; --restore-inputs can reconstruct fixed input bytes without prior scratch files."
+  ],
+  "tests": [
+    "Known one-factor AR1 forecast and zero-variance fallback",
+    "Future curve/validity and actual future-minute mutation invariance",
+    "Training-day minute gaps, target execution/path gaps, and missing outside-position data",
+    "Earliest minimum then suffix maximum and60second delay",
+    "Cash-budget fee/slippage/funding reconciliation and funding boundary/no-credit rules",
+    "Known no-signal cash vs unknown outcomes and hand-computed PF/drawdown/mean"
+  ],
+  "command": "OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 python -m research.continuation.functional_curve --output /workspace/scratch/ba9af914844b/functional-curve-evaluation-20261020",
+  "production_changed": false,
+  "forward_started": false
+}
