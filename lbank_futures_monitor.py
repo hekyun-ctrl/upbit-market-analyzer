@@ -34,6 +34,7 @@ from lbank_native_candles import NativeCandleThread
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
 from lbank_entry_quality import confirmation_quality, direction_priority, POLICY as ENTRY_QUALITY_POLICY
+from lbank_signal_thesis import attach_thesis, POLICY as FOLLOWUP_POLICY
 from lbank_rsi_divergence import annotate as annotate_rsi_context, DivergenceStudy
 from lbank_market_context import MarketContextThread, annotate as annotate_market_context
 from lbank_public_techniques import TechniqueStudy, annotate as annotate_public_techniques
@@ -882,6 +883,8 @@ def run():
     LOG.info("ENTRY_QUALITY policy=%s universal_minute_wait=false "
              "priority=hard_risk,higher_structure,target_room,minute_reaction "
              "stop_warnings=always_on early_caution=structure_aware", ENTRY_QUALITY_POLICY)
+    LOG.info("SIGNAL_THESIS_POLICY policy=%s entry_gates_unchanged=true missing_evidence_is_reversal=false "
+             "review_hours=6 tracking_hours=24 time_alone_is_exit=false", FOLLOWUP_POLICY)
     LOG.info("NATIVE_ENTRY_GEOMETRY stop_floor=max(0.05pct,1.5ATR5) "
              "structural_stop_preserved=true range_floor=cost_solved_TP1 "
              "net_rr1=1.5 risk_limit_unchanged=true")
@@ -1017,7 +1020,9 @@ def run():
                     if tracked.pending_runner is not None:
                         LOG.info("RUNNER_FOLLOWUP_SENT reference=%d proposal=%s",
                                  tracked.number, json.dumps(tracked.pending_runner, sort_keys=True))
-                    risk_tracker.acknowledge(tracked, reason=reason)
+                    LOG.info("SIGNAL_FOLLOWUP_EVIDENCE reference=%d reason=%s evidence=%s",
+                             tracked.number,reason,json.dumps(tracked.priority_evidence,sort_keys=True))
+                    risk_tracker.acknowledge(tracked, reason=reason, now=now)
                     LOG.info(
                         "SIGNAL FOLLOWUP SENT reference=%d side=%s reason=%s price=%.1f",
                         tracked.number, "LONG" if tracked.direction == 1 else "SHORT",
@@ -1175,6 +1180,7 @@ def run():
                                     signed_45m, ctx.get("reversal_confirmed"))
                                 plan = annotate_market_context(plan,market_context,now)
                                 plan = annotate_public_techniques(plan,native_state,now,REF_BALANCE)
+                                plan = attach_thesis(plan,native_state,now)
                                 message = format_entry_alert(
                                     plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat(),
                                     reference_number=risk_tracker.next_number)
@@ -1187,6 +1193,8 @@ def run():
                                     sent_signal = risk_tracker.add_sent_signal(plan, now)
                                     LOG.info("ENTRY_QUALITY_SENT reference=%d evidence=%s",
                                              sent_signal.number, json.dumps(plan["entry_quality"], sort_keys=True))
+                                    LOG.info("ENTRY_THESIS_SENT reference=%d evidence=%s",
+                                             sent_signal.number,json.dumps(plan.get("followup_thesis"),sort_keys=True))
                                     try:
                                         performance.add(sent_signal.number, plan, now,
                                                         fee=TAKER_FEE, slippage=STOP_SLIPPAGE,

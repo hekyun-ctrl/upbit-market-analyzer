@@ -57,7 +57,7 @@ def valid_state(state, now):
 
 
 def runner_decision(*, direction, entry, stop, target2, sent_at, last_bar,
-                    state, now, price, strategy="breakout", barrier=None):
+                    state, now, price, strategy="breakout", barrier=None,thesis_evidence=None):
     """Return an advisory proposal; caller commits it only after delivery.
 
 The previous stop must be checked BEFORE calling. No percentage-of-seed TP,
@@ -78,9 +78,11 @@ new position, leverage change or averaging down exists in this policy.
     rsis = state["rsi5"]["rsi"]
     common = {"bar_start": current_bar, "atr": atr, "stop": stop,
               "target2": target2, "policy_version": POLICY_VERSION}
-    if neutral_stall(closes, rsis, d):
+    # A weak short reaction cannot alone negate the new frozen-thesis policy.
+    allow_minor_exit=thesis_evidence is None or thesis_evidence.get('invalidated',False)
+    if neutral_stall(closes, rsis, d) and allow_minor_exit:
         return dict(common, reason="neutral_exit")
-    if (d * (closes[-1] - fast[-1]) < 0
+    if (allow_minor_exit and d * (closes[-1] - fast[-1]) < 0
             and d * (closes[-1] - closes[-2]) < 0
             and d * (closes[-2] - closes[-3]) < 0):
         return dict(common, reason="trend_exit")

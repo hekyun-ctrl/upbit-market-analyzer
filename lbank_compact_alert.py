@@ -5,6 +5,7 @@ KST display and the money-at-risk fields are before TP2, since users often
 cannot read details below it on a small Telegram screen.
 """
 from datetime import datetime, timedelta, timezone
+from lbank_signal_thesis import entry_thesis_line
 
 KST = timezone(timedelta(hours=9))
 
@@ -74,6 +75,7 @@ def format_compact_entry_alert(plan, observed_at_utc, reference_number=None,
         f"🛑 손절가: {plan['stop']:,.1f} USDT "
         f"| 예상 총손실 -{plan['net_loss']:,.2f} USDT "
         f"(기준시드 {plan['net_loss']/reference_balance*100:.2f}%)\n"
+        f"{entry_thesis_line(plan)}"
         f"🎯 목표가1: {plan['target1']:,.1f} USDT "
         f"| 50% 익절 가정 +{half_gain:,.2f} USDT\n"
         f"🎯 목표가2: {plan['target2']:,.1f} USDT "

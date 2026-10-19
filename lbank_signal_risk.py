@@ -10,6 +10,8 @@ import os
 from dataclasses import dataclass, asdict
 from lbank_trend_runner import RUNNER_TTL, runner_decision
 from lbank_entry_quality import direction_priority, POLICY as ENTRY_PRIORITY_POLICY
+from lbank_signal_thesis import (POLICY as THESIS_POLICY, REVIEW_SECONDS, TRACKING_SECONDS,
+                                 assess_thesis, observed_stop_touch)
 
 LOG = logging.getLogger("lbank_signal_risk")
 
@@ -43,6 +45,14 @@ class TrackedSignal:
     entry_priority_policy: str | None = None
     caution_notified: bool = False
     priority_evidence: dict | None = None
+    followup_thesis: dict | None = None
+    stop_active_since: float | None = None
+    last_checked_at: float | None = None
+    time_review_notified: bool = False
+    last_risk_bar: int = -1
+    thesis_status: str | None = None
+    pending_risk_reason: str | None = None
+    pending_risk_evidence: dict | None = None
 
 
 class SignalRiskTracker:
@@ -126,6 +136,8 @@ class SignalRiskTracker:
                                now, target2=target2,
                                runner_enabled=bool(plan.get("runner_enabled") and target2 is not None),
                                entry_priority_policy=(plan.get('entry_quality') or {}).get('policy'),
+                               followup_thesis=json.loads(json.dumps(plan.get('followup_thesis'))),
+                               stop_active_since=now,
                                strategy=plan.get("strategy", "unknown"), barrier=plan.get("barrier"))
         self.next_number += 1
         self.signals.append(signal)
@@ -148,9 +160,11 @@ class SignalRiskTracker:
         survivors = []
         before = [asdict(sig) for sig in self.signals]
         for item in self.signals:
-            if not item.runner_enabled and now - item.sent_at >= SIGNAL_TTL_SECONDS:
+            coherent=(item.followup_thesis or {}).get('policy')==THESIS_POLICY
+            if not coherent and not item.runner_enabled and now - item.sent_at >= SIGNAL_TTL_SECONDS:
                 continue
             item.pending_runner = None
+            if coherent:item.last_checked_at=now
             if item.target2 is not None and item.direction * (current - item.target2) >= 0:
                 if not item.target2_hit:
                     item.target2_hit_price = current
@@ -165,10 +179,34 @@ class SignalRiskTracker:
 
             # Urgent stop warning takes precedence over queued target notices.
             if item.direction * (current - item.stop) <= 0:
+                if coherent:
+                    item.pending_risk_reason='stop_breached'
+                    item.pending_risk_evidence=dict(reason='observed_stop_quote',observed_price=current,observed_at=now,stop=item.stop)
+                    item.priority_evidence=item.pending_risk_evidence
                 events.append((item, "stop_breached", current))
                 survivors.append(item)
                 continue
-            if item.runner_enabled and now - item.sent_at >= RUNNER_TTL:
+            if coherent:
+                if item.pending_risk_reason:
+                    item.priority_evidence=item.pending_risk_evidence
+                    events.append((item,item.pending_risk_reason,current));survivors.append(item);continue
+                touch=observed_stop_touch(native_state,item.direction,item.stop,
+                    item.stop_active_since if item.stop_active_since is not None else item.sent_at,now)
+                if touch:
+                    item.priority_evidence=touch
+                    item.pending_risk_reason='stop_breached';item.pending_risk_evidence=touch
+                    events.append((item,'stop_breached',current));survivors.append(item);continue
+                evidence=assess_thesis(item.followup_thesis,native_state,item.direction,current,item.sent_at,now)
+                item.priority_evidence=evidence
+                if item.thesis_status!=evidence['status']:
+                    LOG.info('SIGNAL_THESIS reference=%d evidence=%s',item.number,json.dumps(evidence,sort_keys=True))
+                    item.thesis_status=evidence['status']
+                if evidence['invalidated']:
+                    item.pending_risk_reason='early_invalidation';item.pending_risk_evidence=evidence
+                    events.append((item,'early_invalidation',current));survivors.append(item);continue
+                if now-item.sent_at>=TRACKING_SECONDS:
+                    events.append((item,'tracking_expired',current));survivors.append(item);continue
+            if not coherent and item.runner_enabled and now - item.sent_at >= RUNNER_TTL:
                 events.append((item, "time_exit", current))
                 survivors.append(item)
                 continue
@@ -182,7 +220,8 @@ class SignalRiskTracker:
                     direction=item.direction, entry=item.entry, stop=item.stop,
                     target2=item.target2, sent_at=item.sent_at,
                     last_bar=item.runner_last_bar, state=native_state,
-                    now=now, price=current, strategy=item.strategy, barrier=item.barrier)
+                    now=now, price=current, strategy=item.strategy, barrier=item.barrier,
+                    thesis_evidence=evidence if coherent else None)
                 if proposal is not None:
                     # A remembered TP2 touch cannot be extended after price has
                     # retreated far below it. Honour the original target notice.
@@ -206,6 +245,22 @@ class SignalRiskTracker:
             against_5m = len(prices) >= 6 and (
                 item.direction * (current - prices[-6]) / item.entry <= -MIN_COUNTER_MOVE_5M
             )
+            if coherent:
+                # Two polls of the same minute are not independent confirmations.
+                minute=(native_state or {}).get('minute_bars',[])
+                bar=minute[-1]['start'] if minute else -1
+                adverse_trigger=adverse>=EARLY_RISK_FRACTION*stop_gap and against_5m
+                if bar>item.last_risk_bar:
+                    item.last_risk_bar=bar
+                    item.bad_samples=item.bad_samples+1 if adverse_trigger else 0
+                if (adverse_trigger and evidence['status'] in ('weakened','unknown')
+                        and not item.caution_notified
+                        and (item.bad_samples>=CONSECUTIVE_RISK_CHECKS or evidence['status']=='unknown')):
+                    events.append((item,'risk_caution',current))
+                elif now-item.sent_at>=REVIEW_SECONDS and not item.time_review_notified:
+                    events.append((item,'time_review',current))
+                survivors.append(item)
+                continue
             if adverse >= EARLY_RISK_FRACTION * stop_gap and against_5m:
                 item.bad_samples += 1
             else:
@@ -232,10 +287,12 @@ class SignalRiskTracker:
             self._save()
         return events
 
-    def acknowledge(self, signal, reason=None):
+    def acknowledge(self, signal, reason=None, now=None):
         """Acknowledge only after delivery; TP1 keeps a known TP2 monitored."""
         if reason == 'risk_caution' and signal in self.signals:
             signal.caution_notified=True
+        elif reason == 'time_review' and signal in self.signals:
+            signal.time_review_notified=True
         elif reason in ("trail_update", "target_extended") and signal in self.signals:
             proposal = signal.pending_runner
             if proposal is None or proposal["reason"] != reason:
@@ -243,6 +300,8 @@ class SignalRiskTracker:
             # Monotonic protection: never lower a long stop or raise a short.
             if signal.direction * (proposal["stop"] - signal.stop) < 0:
                 raise ValueError("runner cannot loosen protection")
+            if proposal['stop']!=signal.stop:
+                signal.stop_active_since=now if now is not None else signal.last_checked_at or signal.sent_at
             signal.stop, signal.target2 = proposal["stop"], proposal["target2"]
             signal.runner_last_bar = proposal["bar_start"]
             signal.pending_runner = None
@@ -253,6 +312,7 @@ class SignalRiskTracker:
             # Model the user's remaining-half reference stop after the TP1
             # notification. This changes reference monitoring, NOT venue orders.
             signal.stop = signal.entry
+            signal.stop_active_since=now if now is not None else signal.last_checked_at or signal.sent_at
             signal.bad_samples = 0
             if signal.target2 is None:
                 self.signals = [s for s in self.signals if s is not signal]
@@ -308,6 +368,23 @@ def format_target2_alert(signal, price, time_kst):
 def format_risk_alert(signal, reason, price, time_kst):
     side = "롱" if signal.direction == 1 else "숏"
     move_pct = signal.direction * (price / signal.entry - 1) * 100
+    coherent=(signal.followup_thesis or {}).get('policy')==THESIS_POLICY
+    evidence=signal.priority_evidence or {}
+    if coherent and reason in ('time_review','tracking_expired'):
+        status={'intact':'큰 방향 근거 유지','weakened':'방향 근거 혼재','unknown':'원본 자료 미확인'}.get(evidence.get('status'),'상태 재확인')
+        title='6시간 재평가 · 추적 계속' if reason=='time_review' else '24시간 알림 추적 종료'
+        action=('시간 경과만으로 청산이나 새 진입을 판단하지 않습니다. 목표·손절 추적을 계속합니다.'
+                if reason=='time_review' else '이 신호의 자동 알림 추적을 종료합니다. 실제 포지션·손절 주문을 직접 확인하세요. 청산 신호가 아닙니다.')
+        return (f'[LBank BTCUSDT | {title} - {side}]\n신호 #{signal.number} | {time_kst} KST\n'
+                f'판단: {status}\n현재 {price:,.1f} USDT | 보호 손절 {signal.stop:,.1f} USDT\n'
+                f'{action}\n실제 보유·체결 미확인, 자동 주문 없음.')
+    if coherent and reason=='risk_caution':
+        why=('원본 자료 부족으로 방향을 재판정할 수 없음' if evidence.get('status')=='unknown'
+             else '단기 역행과 근거 혼재, 진입 당시 구조의 확정 이탈은 미확인')
+        return (f'[LBank BTCUSDT | 근거 재점검 · 추적 유지 - {side}]\n신호 #{signal.number} | {time_kst} KST\n'
+                f'판단: {why}\n현재 {price:,.1f} USDT | 원래 보호 손절 {signal.stop:,.1f} USDT\n'
+                '신호 무효화·새 진입 지시가 아닙니다. 실제 위험과 기존 손절 주문을 확인하세요.\n'
+                '실제 보유·체결 미확인, 자동 주문 없음.')
     if reason == 'risk_caution':
         return (f"[LBank BTCUSDT | 단기 역행 주의 - 기존 {side} 신호]\n"
                 f"기존 진입 알람: #{signal.number} | 한국시간: {time_kst}\n"
@@ -322,6 +399,14 @@ def format_risk_alert(signal, reason, price, time_kst):
                  else "반대 방향 움직임이 2회 연속 확인됨")
     if reason=='early_invalidation' and signal.entry_priority_policy==ENTRY_PRIORITY_POLICY:
         reason_ko='단기 역행 2회 확인·상위 구조 유지 근거 확인되지 않음'
+    if coherent:
+        if reason=='early_invalidation':
+            reason_ko=(f"진입 당시 고정 구조 {evidence.get('anchor'):,.1f}를 완료 5분봉 종가가 이탈"
+                       if evidence.get('reason')=='frozen_structure_close_break' else '진입 후 완료 15분 흐름·5분 추세와 고저점의 반대 방향 전환 확인')
+        elif evidence.get('reason')=='observed_stop_wick':
+            reason_ko=f"진입/보호선 변경 이후 완료 {evidence['period']//60}분봉에서 손절선 침범 관측 ({evidence['observed_extreme']:,.1f})"
+        elif evidence.get('reason')=='observed_stop_quote':
+            reason_ko=f"참고 손절선 침범 가격표본 관측 ({evidence['observed_price']:,.1f}), 이후 반등으로 취소되지 않음"
     return (
         f"[LBank BTCUSDT | 긴급 위험 경고 - 기존 {side} 신호]\n"
         f"기존 진입 알람: #{signal.number}\n"
@@ -336,6 +421,6 @@ def format_risk_alert(signal, reason, price, time_kst):
         "이 신호에 따라 실제 포지션을 보유 중이라면 즉시 포지션과 손절 주문을 확인하고 "
         "시장가 청산을 포함한 위험 축소를 검토하세요.\n"
         "미진입/기청산 상태라면 무시하세요.\n"
-        "1분 가격표본에 근거한 조건부 경고이며 포지션 보유·주문 체결·실제 손익은 확인할 수 없습니다.\n"
+        f"{'원본 완료봉과 현재가' if coherent else '1분 가격표본'}에 근거한 조건부 경고이며 포지션 보유·주문 체결·실제 손익은 확인할 수 없습니다.\n"
         "거래소 손절 주문을 해제하지 마세요. 자동 청산 주문은 실행하지 않습니다."
     )

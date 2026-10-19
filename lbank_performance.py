@@ -13,6 +13,7 @@ import sqlite3
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from lbank_trend_runner import runner_decision, RUNNER_TTL, POLICY_VERSION
+from lbank_signal_thesis import POLICY as THESIS_POLICY,REVIEW_SECONDS,TRACKING_SECONDS,assess_thesis,observed_stop_touch
 
 KST = timezone(timedelta(hours=9))
 POLICIES = ("levels", "warning_exit", "trend_runner")
@@ -99,11 +100,14 @@ class PerformanceBook:
                  observation_source="lbank_perpetual_ticker",
                  runner_enabled=bool(plan.get("runner_enabled")),
                  entry_quality=plan.get("entry_quality"),
+                 followup_thesis=plan.get("followup_thesis"),stop_active_since=ts,
                  runner_last_bar=-1, barrier=plan.get("barrier"),
                  policy_version=POLICY_VERSION if plan.get("runner_enabled") else "fixed_levels_v2",
                  market_context=plan.get("market_context"),
                  public_techniques=plan.get("public_techniques"),
                  fills="hypothetical_quote_entry_and_target_touch_not_verified")
+        if (p.get('followup_thesis') or {}).get('policy')==THESIS_POLICY:
+            p['policy_version']='native_atr_runner_frozen_thesis_v3'
         # Timestamp in identity prevents collisions with an older reset signal ID.
         identity = f"{int(ts * 1000)}:{reference}"
         with self.db:
@@ -117,7 +121,18 @@ class PerformanceBook:
 
     def _close(self, row, ts, price, reason, p):
         remain = .5 if row["stage"] else 1.0
-        net = None if reason == "censored_gap" else row["partial"] + leg_pnl(p, price, remain)
+        if ((p.get('followup_thesis') or {}).get('policy')==THESIS_POLICY
+                and row['policy']=='trend_runner' and ts-row['opened']>REVIEW_SECONDS
+                and not reason.startswith('censored_')):
+            # Longer observation is not evidence of actual funding settlements.
+            # Retain the outcome and fixed-cost estimate, but exclude it from net-return claims.
+            p=dict(p,extended_outcome=dict(reason=reason,price=price,at=ts,
+                fixed_cost_estimate_usdt=row['partial']+leg_pnl(p,price,remain),
+                funding_settlements_verified=False))
+            self.db.execute('UPDATE signals SET plan=? WHERE id=? AND policy=?',
+                            (json.dumps(p),row['id'],row['policy']))
+            reason='censored_funding_unverified'
+        net = None if reason.startswith("censored_") else row["partial"] + leg_pnl(p, price, remain)
         self.db.execute('''UPDATE signals SET status=?,closed=?,last_at=?,last_price=?,net=?
             WHERE id=? AND policy=?''', (reason, ts, ts, price, net, row["id"], row["policy"]))
         return {"id": row["id"], "policy": row["policy"], "status": reason,
@@ -136,6 +151,7 @@ class PerformanceBook:
                     events.append(self._close(row, ts, price, "censored_gap", p))
                     continue
                 is_runner = row["policy"] == "trend_runner"
+                coherent=is_runner and (p.get('followup_thesis') or {}).get('policy')==THESIS_POLICY
                 stop = p.get("runner_stop", p["price"]) if row["stage"] else p["stop"]
                 if p["direction"] * (price - stop) <= 0:
                     # Use observed adverse price, not an optimistic stop fill.
@@ -143,26 +159,38 @@ class PerformanceBook:
                                              ("trailing_stop" if is_runner and stop != p["price"] else
                                               "entry_stop") if row["stage"] else "stop", p))
                     continue
-                if ts - row["opened"] >= (RUNNER_TTL if is_runner else 7200):
-                    events.append(self._close(row, ts, price, "time_exit", p))
+                if coherent and observed_stop_touch(native_state,p['direction'],stop,p.get('stop_active_since',row['opened']),ts):
+                    # A candle proves a touch, not the order/fill. Exclude this result.
+                    events.append(self._close(row,ts,price,'censored_intrabar_stop',p))
+                    continue
+                thesis_evidence=(assess_thesis(p['followup_thesis'],native_state,p['direction'],price,row['opened'],ts)
+                                 if coherent else None)
+                if thesis_evidence and thesis_evidence['invalidated']:
+                    events.append(self._close(row,ts,price,'structure_exit',p))
+                    continue
+                if ts - row["opened"] >= (TRACKING_SECONDS if coherent else RUNNER_TTL if is_runner else 7200):
+                    events.append(self._close(row, ts, price, "censored_tracking_limit" if coherent else "time_exit", p))
                     continue
                 if not row["stage"] and p["direction"] * (price - p["target1"]) >= 0:
                     row["stage"], row["partial"] = 1, leg_pnl(p, p["target1"], .5)
-                    self.db.execute("UPDATE signals SET stage=1,partial=? WHERE id=? AND policy=?",
-                                    (row["partial"], row["id"], row["policy"]))
+                    p['stop_active_since']=ts
+                    self.db.execute("UPDATE signals SET stage=1,partial=?,plan=? WHERE id=? AND policy=?",
+                                    (row["partial"],json.dumps(p), row["id"], row["policy"]))
                 if is_runner and row["stage"]:
                     proposal = runner_decision(
                         direction=p["direction"], entry=p["price"],
                         stop=p.get("runner_stop", p["price"]), target2=p["target2"],
                         sent_at=row["opened"], last_bar=p.get("runner_last_bar", -1),
                         state=native_state, now=ts, price=price,
-                        strategy=p["strategy"], barrier=p.get("barrier"))
+                        strategy=p["strategy"], barrier=p.get("barrier"),
+                        thesis_evidence=thesis_evidence)
                     if proposal is not None:
                         self.db.execute("INSERT OR IGNORE INTO runner_adjustments VALUES(?,?,?)",
                                         (row["id"], ts, json.dumps(proposal)))
                         if proposal["reason"] in ("trend_exit", "neutral_exit"):
                             events.append(self._close(row, ts, price, proposal["reason"], p))
                             continue
+                        if proposal['stop']!=p.get('runner_stop',p['price']):p['stop_active_since']=ts
                         p.update(runner_stop=proposal["stop"], target2=proposal["target2"],
                                  runner_last_bar=proposal["bar_start"])
                         self.db.execute("UPDATE signals SET plan=? WHERE id=? AND policy=?",
@@ -217,7 +245,7 @@ class PerformanceBook:
                 interval = None
             result[policy] = {"signals": len(selected), "closed": len(finished),
                 "open": sum(r["status"] == "open" for r in selected),
-                "censored": sum(r["status"] == "censored_gap" for r in selected),
+                "censored": sum(r["status"].startswith("censored_") for r in selected),
                 "net_usdt_model": sum(nets), "wins": sum(n > 0 for n in nets),
                 "reference_return_pct": sum(nets) / self.balance * 100,
                 "losses": len(losses), "win_rate_pct": 100*w/n if n else None,
@@ -303,7 +331,7 @@ class PerformanceBook:
                 f"추세연장 최종 순익 승률 {rate} | 동일신호 완료 {paired['completed_pairs']}쌍, 기존 대비 {paired['difference_usdt']:+.2f} USDT\n"
                 f"목표 {self.goal_pct:g}% = 기준자금의 {self.balance*self.goal_pct/100:.2f} USDT\n"
                 f"{diagnostic}"
-                "미완료·자료공백·이전 날짜 신호는 순이익에서 제외됩니다.\n"
+                "미완료·자료공백·봉내 체결/연장 펀딩 미확정·추적기한 종료·이전 날짜 신호는 순이익에서 제외됩니다.\n"
                 "비용 추정 반영·가격표본 모의계산이며 실제 체결·계좌 순수익이 아닙니다.\n"
                 "모형별 결과는 비교용으로 서로 합산하지 않습니다.\n"
                 "목표 미달을 이유로 위험이나 매매 횟수를 늘리지 않습니다.")
