@@ -1,0 +1,50 @@
+{
+  "published-turtle-evaluation": {
+    "closed": 30,
+    "wins": 8,
+    "net_pct_initial": 14.38533728372522,
+    "non_gap_net_pct_initial": 2.3681283967504085,
+    "gap_net_pct_initial": 12.01720888697481,
+    "net_without_largest_win_pct_initial": 2.5511993885875492,
+    "mean_hold": 15.504490740740742,
+    "median_hold": 6.214583333333334,
+    "max_hold": 61.19861111111111,
+    "loss_fraction": 0.7333333333333333
+  },
+  "published-turtle-2022": {
+    "closed": 5,
+    "wins": 2,
+    "net_pct_initial": 4.09232101770678,
+    "non_gap_net_pct_initial": -0.47257947445185017,
+    "gap_net_pct_initial": 4.56490049215863,
+    "net_without_largest_win_pct_initial": -0.4725794744518501,
+    "mean_hold": 13.604444444444443,
+    "median_hold": 9.727083333333333,
+    "max_hold": 26.366666666666667,
+    "loss_fraction": 0.6
+  },
+  "published-turtle-2022-price-only": {
+    "closed": 9,
+    "wins": 2,
+    "net_pct_initial": -0.4335901638257899,
+    "non_gap_net_pct_initial": -0.4335901638257899,
+    "gap_net_pct_initial": 0.0,
+    "net_without_largest_win_pct_initial": -2.51523948037728,
+    "mean_hold": 12.65108024691358,
+    "median_hold": 9.727083333333333,
+    "max_hold": 26.366666666666667,
+    "loss_fraction": 0.7777777777777778
+  },
+  "published-turtle-evaluation-price-only": {
+    "closed": 31,
+    "wins": 9,
+    "net_pct_initial": 15.637767363582428,
+    "non_gap_net_pct_initial": 3.2367368936972882,
+    "gap_net_pct_initial": 12.401030469885141,
+    "net_without_largest_win_pct_initial": 3.4198078855344276,
+    "mean_hold": 16.48496863799283,
+    "median_hold": 6.340972222222222,
+    "max_hold": 61.19861111111111,
+    "loss_fraction": 0.7096774193548387
+  }
+}

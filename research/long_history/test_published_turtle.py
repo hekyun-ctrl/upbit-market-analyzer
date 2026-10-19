@@ -47,4 +47,20 @@ class TurtleAuditTests(unittest.TestCase):
         opened=replay(m,f,self.setup_context())[3]
         self.assertAlmostEqual(opened['funding'],.0025/10*.01*101.)
 
+    def test_account_reconciles_closed_and_open_pnl(self):
+        m=pd.DataFrame([dict(start=0,open=99.,high=120.,low=98.,close=118.),dict(start=60,open=118.,high=119.,low=60.,close=70.)])
+        eq,tr,fi,opened=replay(m,self.fund(),self.setup_context(),'LH')
+        self.assertAlmostEqual(eq.equity.iloc[-1]-1,tr.net.sum()+(opened['marked_net'] if opened else 0.))
+        exposure=fi.event.map({'entry':1,'add':1,'exit':-1}).cumsum()
+        self.assertLessEqual(exposure.max(),4)
+        self.assertGreaterEqual(exposure.min(),0)
+    def test_opening_gap_does_not_fill_at_stale_stop(self):
+        m=pd.DataFrame([dict(start=0,open=101.,high=102.,low=100.,close=101.),dict(start=60,open=60.,high=65.,low=55.,close=60.)])
+        eq,tr,fi,opened=replay(m,self.fund(),self.setup_context())
+        self.assertAlmostEqual(fi.loc[fi.event=='exit','price'].iloc[0],60*.9998)
+    def test_favorable_funding_not_counted_as_income(self):
+        m=pd.DataFrame([dict(start=0,open=101.,high=102.,low=100.,close=101.),dict(start=60,open=101.,high=102.,low=100.,close=101.)])
+        f=pd.DataFrame(dict(calc_time=[60000],last_funding_rate=[-.01]))
+        self.assertEqual(replay(m,f,self.setup_context())[3]['funding'],0.)
+
 if __name__=='__main__':unittest.main()

@@ -1,0 +1,223 @@
+{
+  "monthly_disagreements": [
+    {
+      "start": 1655582700,
+      "open_minute": 18046.4,
+      "open_five": 18046.4,
+      "high_minute": 18076.0,
+      "high_five": 18076.0,
+      "low_minute": 17770.0,
+      "low_five": 17770.0,
+      "close_minute": 17800.0,
+      "close_five": 17800.0,
+      "volume_minute": 19881.315,
+      "volume_five": 20048.438
+    },
+    {
+      "start": 1655897100,
+      "open_minute": 20480.0,
+      "open_five": 20480.0,
+      "high_minute": 20680.0,
+      "high_five": 20680.0,
+      "low_minute": 20467.5,
+      "low_five": 20467.5,
+      "close_minute": 20590.2,
+      "close_five": 20590.2,
+      "volume_minute": 6143.398,
+      "volume_five": 6144.327
+    },
+    {
+      "start": 1656070200,
+      "open_minute": 21142.7,
+      "open_five": 21142.7,
+      "high_minute": 21307.0,
+      "high_five": 21307.0,
+      "low_minute": 21134.8,
+      "low_five": 21134.8,
+      "close_minute": 21239.5,
+      "close_five": 21239.5,
+      "volume_minute": 8529.148,
+      "volume_five": 8530.808
+    },
+    {
+      "start": 1660868400,
+      "open_minute": 23021.9,
+      "open_five": 23021.9,
+      "high_minute": 23025.0,
+      "high_five": 23025.0,
+      "low_minute": 22865.0,
+      "low_five": 22865.0,
+      "close_minute": 22953.4,
+      "close_five": 22953.4,
+      "volume_minute": 13357.19,
+      "volume_five": 13424.323
+    },
+    {
+      "start": 1661069400,
+      "open_minute": 21290.6,
+      "open_five": 21290.6,
+      "high_minute": 21518.4,
+      "high_five": 21518.4,
+      "low_minute": 21290.6,
+      "low_five": 21290.6,
+      "close_minute": 21402.4,
+      "close_five": 21402.4,
+      "volume_minute": 15517.869,
+      "volume_five": 16014.077
+    }
+  ],
+  "daily_crosschecks": [
+    {
+      "day": "2022-06-18",
+      "daily_minute_vs_daily_five": {
+        "open": 0,
+        "high": 0,
+        "low": 0,
+        "close": 0,
+        "volume": 1
+      },
+      "monthly_minute_vs_daily_minute": {
+        "open": 0,
+        "high": 0,
+        "low": 0,
+        "close": 0,
+        "volume": 0
+      },
+      "discrepant_original_minute_starts": []
+    },
+    {
+      "day": "2022-06-22",
+      "daily_minute_vs_daily_five": {
+        "open": 0,
+        "high": 0,
+        "low": 0,
+        "close": 0,
+        "volume": 1
+      },
+      "monthly_minute_vs_daily_minute": {
+        "open": 0,
+        "high": 0,
+        "low": 0,
+        "close": 0,
+        "volume": 0
+      },
+      "discrepant_original_minute_starts": []
+    },
+    {
+      "day": "2022-06-24",
+      "daily_minute_vs_daily_five": {
+        "open": 0,
+        "high": 0,
+        "low": 0,
+        "close": 0,
+        "volume": 1
+      },
+      "monthly_minute_vs_daily_minute": {
+        "open": 0,
+        "high": 0,
+        "low": 0,
+        "close": 0,
+        "volume": 0
+      },
+      "discrepant_original_minute_starts": []
+    },
+    {
+      "day": "2022-08-19",
+      "daily_minute_vs_daily_five": {
+        "open": 0,
+        "high": 0,
+        "low": 0,
+        "close": 0,
+        "volume": 1
+      },
+      "monthly_minute_vs_daily_minute": {
+        "open": 0,
+        "high": 0,
+        "low": 0,
+        "close": 0,
+        "volume": 0
+      },
+      "discrepant_original_minute_starts": []
+    },
+    {
+      "day": "2022-08-21",
+      "daily_minute_vs_daily_five": {
+        "open": 0,
+        "high": 0,
+        "low": 0,
+        "close": 0,
+        "volume": 1
+      },
+      "monthly_minute_vs_daily_minute": {
+        "open": 0,
+        "high": 0,
+        "low": 0,
+        "close": 0,
+        "volume": 0
+      },
+      "discrepant_original_minute_starts": []
+    }
+  ],
+  "daily_sources": [
+    {
+      "url": "https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/1m/BTCUSDT-1m-2022-06-18.zip",
+      "sha256": "e07cc95f8ab4aff31cc98341caa156112b8a72b29a2c780c53755b49ddb6a64a",
+      "bytes": 64519
+    },
+    {
+      "url": "https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/5m/BTCUSDT-5m-2022-06-18.zip",
+      "sha256": "09e96221a46f43db074d43717a2ff71066b37774a4d97091271047dc71c56c3f",
+      "bytes": 14149
+    },
+    {
+      "url": "https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/1m/BTCUSDT-1m-2022-06-22.zip",
+      "sha256": "3a269a0a0469f8852b31e26ae5c1af75e679383da06b18179cddf8fc6997acfd",
+      "bytes": 63958
+    },
+    {
+      "url": "https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/5m/BTCUSDT-5m-2022-06-22.zip",
+      "sha256": "11b5a5bb456ea878f52aba17b5fbba8b796614d5d10b54bc5e0aeb588f71b44d",
+      "bytes": 14100
+    },
+    {
+      "url": "https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/1m/BTCUSDT-1m-2022-06-24.zip",
+      "sha256": "f11ae9cd7a1aca15446abfd5779c59f3e0f2c6ee7e082f6b2a24f895d8f0f297",
+      "bytes": 63453
+    },
+    {
+      "url": "https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/5m/BTCUSDT-5m-2022-06-24.zip",
+      "sha256": "16df65b8ca3fe8b57a7cc5837e8b333c56e77e10ab043591380858307dcf86b6",
+      "bytes": 13954
+    },
+    {
+      "url": "https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/1m/BTCUSDT-1m-2022-08-19.zip",
+      "sha256": "2119d7e28472663d50a79db067799d770556ab691bd9e758ae0d233b6b795419",
+      "bytes": 63418
+    },
+    {
+      "url": "https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/5m/BTCUSDT-5m-2022-08-19.zip",
+      "sha256": "a09fda993983eec62ccc7288990a379c82d028d4230f2114570c2e8f0a50cc7c",
+      "bytes": 14096
+    },
+    {
+      "url": "https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/1m/BTCUSDT-1m-2022-08-21.zip",
+      "sha256": "1a77f8d0ce141a3d8b38a95e9587c255c8ff7ce7c0ff1426819e008e8e136b56",
+      "bytes": 61082
+    },
+    {
+      "url": "https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/5m/BTCUSDT-5m-2022-08-21.zip",
+      "sha256": "4fe819c5e61bae22fa1dcafcc237ac1ddfad7434e71f89aa3181f9e5cf67833a",
+      "bytes": 13649
+    }
+  ],
+  "price_results_inspected": false,
+  "decision": "quarantine inconsistent intervals; no price interpolation or performance-dependent correction",
+  "quarantined_starts": [
+    1655582700,
+    1655897100,
+    1656070200,
+    1660868400,
+    1661069400
+  ],
+  "audit_revision": "raw-minute comparisons; earlier draft accidentally compared 5m aggregates for monthly/daily minute agreement"
+}
