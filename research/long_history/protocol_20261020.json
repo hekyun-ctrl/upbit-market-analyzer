@@ -1,0 +1,20 @@
+{
+  "version": "external_perpetual_preregistered_v1",
+  "purpose": "Seek reproducible independent evidence; do not equate Binance returns with LBank execution or user returns.",
+  "archives": "First-party Binance USD-M BTCUSDT perpetual 1m/5m klines and fundingRate monthly archives, SHA256 checked",
+  "development": ["2024-01-01", "2025-01-01"],
+  "validation": ["2025-01-01", "2026-01-01"],
+  "final_test": ["2026-01-01", "2026-10-01"],
+  "existing_intraday_rules_commit": "fe7d9b874976dbf8c7c6a42c1b2c0da2afd87ebe",
+  "intraday_families": ["hour_trend_vwap_reclaim", "range_failed_break", "volume_compression_break"],
+  "intraday_execution": "First 1m open strictly after 5m close/publication assumption of 1s; actual 1m extrema, adverse same-minute conflict; censor gaps; original structural targets; no threshold fitting to final test",
+  "intraday_common_risk": {"stop_atr_floor":1.5,"max_stop_fraction":0.006,"max_extension_atr":2.5,"cooldown_seconds":2700,"max_entries_per_day":8,"max_holding_seconds":7200},
+  "costs": {"fee_each_side":0.0006,"adverse_slippage_each_side":0.0002,"funding":"Actual archived settlements during holding; also stress fee/slippage at 2x"},
+  "meta_model": {"implementation":"HistGradientBoostingRegressor", "max_iter":150,"learning_rate":0.05,"max_leaf_nodes":7,"min_samples_leaf":100,"l2_regularization":1.0,"early_stopping":false,"random_state":20261020,"selection":"predicted net R > 0.10; opposite-direction simultaneous qualified signals abstain; highest prediction for same-side ties", "training":"2024 for 2025, then 2024+2025 for 2026; purge 1 calendar day before each split; no final-test tuning"},
+  "published_direction_research": {"paper":"https://arxiv.org/abs/2602.10785","adaptation":"EMA walk-forward long/short on 60m futures; not an exact paper reproduction","fast":[5,7,10,15,20,30],"slow":[40,50,100,150,200],"train_days":14,"test_days":10,"selection":"training net hourly Sharpe after costs; parameters recomputed only from preceding completed data","costs":"same fee/slippage and actual funding","role":"Separate direction/holding model, not a TP1-entry alert and not comparable as an intraday target hit rate"},
+  "report_all_trials": true,
+  "final_test_once": true,
+  "bootstrap": {"unit":"calendar day", "block_days":7,"samples":2000,"seed":20261020},
+  "lbank_promotion_requires": ["positive independent net expectancy with uncertainty assessment", "execution and warning behavior on native LBank records", "adequate frequency and risk", "no venue substitution or hidden cost/risk-cap relaxation"],
+  "no_profit_guarantee": true
+}
