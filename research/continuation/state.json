@@ -134,7 +134,14 @@
       "forward_started": false
     }
   ],
-  "active_run": null,
+  "active_run": {
+    "id": "external_ema_source_audit_20261020_0551",
+    "stage": "protocol_and_executable_audit_fixed_before_running",
+    "source_commit": "265209c39efc96eb97a35fd5cae45c0d6b868b30",
+    "protocol": "research/continuation/ema_source_audit_protocol_20261020.json",
+    "code": "research/continuation/audit_external_ema_source.py",
+    "next_action": "Recover three pinned source files, run14forensic tests and source365day synthetic reproduction. Save actual diagnostics; not a real-market performance test or strategy promotion."
+  },
   "blockers": [],
   "updated_kst": "2026-10-20T05:09:46+09:00",
   "maintained_research_candidates": [

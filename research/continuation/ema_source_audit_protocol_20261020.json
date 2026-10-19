@@ -1,0 +1,51 @@
+{
+  "candidate_id": "external_ema_pullback_momentum_265209c_forensic_v1",
+  "version": 1,
+  "frozen_utc": "2026-10-19T20:50:57Z",
+  "scope": "Executable forensic audit of a NEW external source's published profit claim; not another fit/tuning of the previous EMA adaptation and not a real-market profitability backtest.",
+  "source_repository": "https://github.com/tradewithbhai7777-creator/ema-pullback-momentum-strategy",
+  "source_commit": "265209c39efc96eb97a35fd5cae45c0d6b868b30",
+  "files": [
+    {
+      "path": "ema_pullback_momentum.py",
+      "bytes": 50172,
+      "sha256": "0b4776a8b841531675485e8e0ea9a48685b237df6452f7a14035b1b2085cf6be"
+    },
+    {
+      "path": "momentum_strategy_results.txt",
+      "bytes": 46699,
+      "sha256": "313e80f8aba4e81c19a4a1f224ddbcbb1303976bea078caa3a880c9def3a30bd"
+    },
+    {
+      "path": "README.md",
+      "bytes": 14372,
+      "sha256": "a614643cfefbc5d062b3014ee5a970f66334ee4f01c1d28e73ff2bc85764143d"
+    }
+  ],
+  "source_rules": {
+    "timeframe": "Code's generated 1h candles, not 5m native LBank",
+    "indicators": "EMA9/20, ADX14>25 or increasing EMA spread; EMA separation>0.15%; wick>=50% range and>=2x body; close in outer30%; EMA touch; London08-17/NY13-22UTC",
+    "entry": "Pending rejection high/low breakout, expiry5hours, one position",
+    "risk": "Rejection opposite extreme initial stop, code2.5R target (README describes2R), EMA20 trailing, max2trades/day and2consecutive losses in setup filter",
+    "changes": "No parameter tuning, no rule repairs, no real price data substituted. Preserve source defects for diagnosis; do not promote any apparent synthetic profit."
+  },
+  "fixed_experiments": [
+    "Verify all three immutable raw source files by byte length and SHA256 before loading.",
+    "Parse source AST and load only inspected strategy class and synthetic generator; do not run imports, main, plotting, external configuration or live/network/order code.",
+    "Direct BUY/SELL pre-breakout and gap fixtures: compare reported fill with trigger and candle range, including nonpositive initial risk.",
+    "Direct existing-position intrabar stop/target and gap fixtures; distinguish stop-market protection from merely close-triggered instructions.",
+    "Trigger once and call again to check consumed-signal removal; compare DatetimeIndex ADX outputs with finite counts.",
+    "Perturb future candle in centered swing calculation; separately check whether this feature is read by entry/exit functions. Do not call unused future-derived fields a demonstrated trading leak.",
+    "Run source BTC generator365days with frozen datetime.now=2026-03-30T08:54:15.576895 (audit fixture, not verified original generation timestamp); preserve source seed42 and defaults. Do not search a clock that maximizes return or label agreement an independent replication.",
+    "For shorter72h synthetic BTC/ETH/SOL samples, measure normalized OHLC path equality; these are not three independent markets.",
+    "Capture source trade/equity ledger, invalid initial risks, entries outside OHLC, pre-trigger entries, reused setups, stop/target touches ignored before close and missing ADX. No repaired-strategy PnL or new real-market validation in this stage."
+  ],
+  "interpretation": {
+    "published_claim": "README labels aggregate72trades/PF8.50/~93.7%; text log lists72 for EACH named symbol. Check provenance before treating either as market evidence.",
+    "costs": "Original calculate_pnl inspected as price-only; exact fee/slippage/funding/2x-cost net expectancy must remain unverified, not infer from this invalid synthetic ledger.",
+    "uncomputed_gates": "Net expectancy/CI, netPF, DDininitialR, TP1Wilson,5m emergency rate, native manual fills and forward30days/100closed remain unverified. Synthetic test frequency cannot satisfy observational gates.",
+    "stop_rule": "If synthetic provenance or invalid fills confirmed, reject THIS source version as replacement evidence. Do not repair/tune it merely to pursue its headline return; do not infer all EMA methods fail.",
+    "production_changed": false,
+    "forward_collection_started": false
+  }
+}
