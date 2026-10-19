@@ -1,0 +1,417 @@
+{
+  "version": "strategy_rebuild_research_v1",
+  "dataset_sha256": "b95dbe43a31ad716e58689e8be9451fdf4c03f9eb0b18f61ee022046380c56d2",
+  "bars": 703,
+  "observed_hours": 58.583333333333336,
+  "span_days": 2.451388888888889,
+  "segments": [
+    {
+      "bars": 398,
+      "start": 1792210500,
+      "end": 1792329900
+    },
+    {
+      "bars": 174,
+      "start": 1792330200,
+      "end": 1792382400
+    },
+    {
+      "bars": 128,
+      "start": 1792382700,
+      "end": 1792421100
+    },
+    {
+      "bars": 3,
+      "start": 1792421400,
+      "end": 1792422300
+    }
+  ],
+  "actual_alert_audit": {
+    "cases": [
+      {
+        "reference": 8,
+        "entry_at": "2026-10-18T22:23:37.372053472Z",
+        "followup_at": "2026-10-18T22:28:13.994250187Z",
+        "followup_reason": "early_invalidation",
+        "first_target_before_followup": false,
+        "possible_target_touch_bars": 0,
+        "complete_5m_coverage": true,
+        "target_distance_pct": 0.6676890438241934,
+        "actual_fill_verified": false
+      },
+      {
+        "reference": 9,
+        "entry_at": "2026-10-18T23:29:56.381792438Z",
+        "followup_at": "2026-10-19T05:29:55.396605767Z",
+        "followup_reason": "time_exit",
+        "first_target_before_followup": null,
+        "possible_target_touch_bars": 0,
+        "complete_5m_coverage": false,
+        "target_distance_pct": 0.9617457848247524,
+        "actual_fill_verified": false
+      },
+      {
+        "reference": 10,
+        "entry_at": "2026-10-19T01:09:46.017128150Z",
+        "followup_at": "2026-10-19T02:26:39.172591922Z",
+        "followup_reason": "early_invalidation",
+        "first_target_before_followup": false,
+        "possible_target_touch_bars": 0,
+        "complete_5m_coverage": true,
+        "target_distance_pct": 0.7593147009000933,
+        "actual_fill_verified": false
+      },
+      {
+        "reference": 11,
+        "entry_at": "2026-10-19T08:10:58.113212318Z",
+        "followup_at": "2026-10-19T08:17:55.570454681Z",
+        "followup_reason": "stop_breached",
+        "first_target_before_followup": false,
+        "possible_target_touch_bars": 0,
+        "complete_5m_coverage": true,
+        "target_distance_pct": 0.7002704434279194,
+        "actual_fill_verified": false
+      },
+      {
+        "reference": 12,
+        "entry_at": "2026-10-19T10:23:34.085248184Z",
+        "followup_at": "2026-10-19T12:40:22.980245823Z",
+        "followup_reason": "early_invalidation",
+        "first_target_before_followup": false,
+        "possible_target_touch_bars": 0,
+        "complete_5m_coverage": true,
+        "target_distance_pct": 0.7803168559354368,
+        "actual_fill_verified": false
+      }
+    ],
+    "entries": 5,
+    "risk_followups": 4,
+    "time_followups": 1,
+    "target_before_followup_confirmed_absent": 4,
+    "unknown": 1,
+    "scope": "Five original signals, old differing policy versions, not user fills or new-policy performance."
+  },
+  "setups": {
+    "hour_trend_vwap_reclaim": 13,
+    "range_failed_break": 8,
+    "volume_compression_break": 14
+  },
+  "rejections": {
+    "hour_trend_vwap_reclaim": {
+      "target_has_no_modeled_net_room": 7,
+      "target_already_passed": 2,
+      "entry_already_invalid": 1,
+      "extended": 1
+    },
+    "range_failed_break": {
+      "target_already_passed": 3,
+      "target_has_no_modeled_net_room": 2,
+      "position_or_cooldown": 1
+    },
+    "volume_compression_break": {
+      "extended": 7,
+      "target_has_no_modeled_net_room": 2,
+      "entry_bar_unavailable": 1,
+      "position_or_cooldown": 1
+    }
+  },
+  "summary": {
+    "hour_trend_vwap_reclaim": {
+      "trades": 2,
+      "closed": 1,
+      "censored": 1,
+      "first_target_count": 0,
+      "first_target_fraction": 0.0,
+      "first_target_wilson_lower": 0.0,
+      "net_expectancy_r": -1.0,
+      "net_total_r": -1.0,
+      "profit_factor": 0.0,
+      "stress_2x_expectancy_r": -1.4348801721809266,
+      "max_drawdown_r": 1.0,
+      "actual_pnl": false
+    },
+    "range_failed_break": {
+      "trades": 2,
+      "closed": 2,
+      "censored": 0,
+      "first_target_count": 1,
+      "first_target_fraction": 0.5,
+      "first_target_wilson_lower": 0.09452865480086611,
+      "net_expectancy_r": -0.2607128724526556,
+      "net_total_r": -0.5214257449053112,
+      "profit_factor": 0.4785742550946887,
+      "stress_2x_expectancy_r": -0.7408529717566704,
+      "max_drawdown_r": 1.0,
+      "actual_pnl": false
+    },
+    "volume_compression_break": {
+      "trades": 3,
+      "closed": 3,
+      "censored": 0,
+      "first_target_count": 1,
+      "first_target_fraction": 0.3333333333333333,
+      "first_target_wilson_lower": 0.061490315276160515,
+      "net_expectancy_r": -0.6304781006456817,
+      "net_total_r": -1.8914343019370452,
+      "profit_factor": 0.05428284903147743,
+      "stress_2x_expectancy_r": -1.0933224237080392,
+      "max_drawdown_r": 2.0,
+      "actual_pnl": false
+    }
+  },
+  "trades": {
+    "hour_trend_vwap_reclaim": [
+      {
+        "plan": {
+          "strategy": "hour_trend_vwap_reclaim",
+          "direction": -1,
+          "anchor": 80985.99914935125,
+          "target": 80659.3,
+          "available_at": 1792355704.539689,
+          "bar_start": 1792355400,
+          "atr": 95.99659740502737,
+          "rolling_20bar_typical_price_vwap": 80907.9805803062,
+          "relative_volume": 1.0642887621094552,
+          "entry": 80807.3,
+          "stop": 80985.99914935125,
+          "unit_net_risk": 316.2145401146272
+        },
+        "entry_at": 1792356000,
+        "reason": "stop",
+        "closed_at": 1792357500,
+        "exit": 80985.99914935125,
+        "r": -1.0,
+        "stressed_r": -1.4348801721809266,
+        "tp1": false,
+        "mfe_lower_bound_price": 34.80000000000291,
+        "mae_lower_bound_price": 140.89999999999418
+      },
+      {
+        "plan": {
+          "strategy": "hour_trend_vwap_reclaim",
+          "direction": 1,
+          "anchor": 82509.00894724866,
+          "target": 82788,
+          "available_at": 1792380909.310885,
+          "bar_start": 1792380600,
+          "atr": 91.16421100540451,
+          "rolling_20bar_typical_price_vwap": 82545.15086094818,
+          "relative_volume": 1.839717683232201,
+          "entry": 82554.2,
+          "stop": 82417.45368349188,
+          "unit_net_risk": 276.9790758644587
+        },
+        "entry_at": 1792381200,
+        "reason": "censored_gap_or_history_end",
+        "closed_at": 1792382400,
+        "r": null,
+        "stressed_r": null,
+        "tp1": null
+      }
+    ],
+    "range_failed_break": [
+      {
+        "plan": {
+          "strategy": "range_failed_break",
+          "direction": 1,
+          "anchor": 82625.94408657694,
+          "target": 82907.9,
+          "available_at": 1792396800.329409,
+          "bar_start": 1792396500,
+          "atr": 97.42365369223175,
+          "rolling_20bar_typical_price_vwap": 82861.89884615497,
+          "relative_volume": 0.8028266379906291,
+          "entry": 82630.1,
+          "stop": 82483.96451946166,
+          "unit_net_risk": 286.4897596901823
+        },
+        "entry_at": 1792397100,
+        "reason": "target",
+        "closed_at": 1792398000,
+        "exit": 82907.9,
+        "r": 0.4785742550946887,
+        "stressed_r": -0.01251942359085297,
+        "tp1": true,
+        "mfe_lower_bound_price": 53.89999999999418,
+        "mae_lower_bound_price": 76.60000000000582
+      },
+      {
+        "plan": {
+          "strategy": "range_failed_break",
+          "direction": 1,
+          "anchor": 82658.80627788312,
+          "target": 82886.35,
+          "available_at": 1792404304.626054,
+          "bar_start": 1792404000,
+          "atr": 105.97488846753618,
+          "rolling_20bar_typical_price_vwap": 82923.76282008251,
+          "relative_volume": 1.0582354411397152,
+          "entry": 82725.9,
+          "stop": 82566.93766729868,
+          "unit_net_risk": 299.4692119106283
+        },
+        "entry_at": 1792404600,
+        "reason": "stop",
+        "closed_at": 1792405200,
+        "exit": 82566.93766729868,
+        "r": -1.0,
+        "stressed_r": -1.4691865199224878,
+        "tp1": false,
+        "mfe_lower_bound_price": 19.60000000000582,
+        "mae_lower_bound_price": 88.19999999999709
+      }
+    ],
+    "volume_compression_break": [
+      {
+        "plan": {
+          "strategy": "volume_compression_break",
+          "direction": -1,
+          "anchor": 82478.64908001876,
+          "target": 82192.4,
+          "available_at": 1792376700.0944,
+          "bar_start": 1792376400,
+          "atr": 108.99632007504394,
+          "rolling_20bar_typical_price_vwap": 82423.82976090764,
+          "relative_volume": 1.9686209561665011,
+          "entry": 82342.9,
+          "stop": 82506.39448011256,
+          "unit_net_risk": 303.60822531598905
+        },
+        "entry_at": 1792377000,
+        "reason": "stop",
+        "closed_at": 1792377900,
+        "exit": 82506.39448011256,
+        "r": -1.0,
+        "stressed_r": -1.46149535078071,
+        "tp1": false,
+        "mfe_lower_bound_price": 10.599999999991269,
+        "mae_lower_bound_price": 117.5
+      },
+      {
+        "plan": {
+          "strategy": "volume_compression_break",
+          "direction": 1,
+          "anchor": 82825.62982528395,
+          "target": 83063.29999999999,
+          "available_at": 1792395300.688638,
+          "bar_start": 1792395000,
+          "atr": 85.0806988641588,
+          "rolling_20bar_typical_price_vwap": 82806.39174439468,
+          "relative_volume": 6.634090299850649,
+          "entry": 82840.3,
+          "stop": 82712.67895170377,
+          "unit_net_risk": 268.3474767721315
+        },
+        "entry_at": 1792395600,
+        "reason": "stop",
+        "closed_at": 1792396200,
+        "exit": 82712.67895170377,
+        "r": -1.0,
+        "stressed_r": -1.5244187901361124,
+        "tp1": false,
+        "mfe_lower_bound_price": 26.80000000000291,
+        "mae_lower_bound_price": 65.30000000000291
+      },
+      {
+        "plan": {
+          "strategy": "volume_compression_break",
+          "direction": 1,
+          "anchor": 82268.64240137473,
+          "target": 82655.4,
+          "available_at": 1792411807.272137,
+          "bar_start": 1792411500,
+          "atr": 108.23039450109334,
+          "rolling_20bar_typical_price_vwap": 82266.28156079241,
+          "relative_volume": 1.8102550075221624,
+          "entry": 82477.2,
+          "stop": 82268.64240137473,
+          "unit_net_risk": 348.60201757328065
+        },
+        "entry_at": 1792412100,
+        "reason": "target",
+        "closed_at": 1792415100,
+        "exit": 82655.4,
+        "r": 0.10856569806295487,
+        "stressed_r": -0.29405313020729534,
+        "tp1": true,
+        "mfe_lower_bound_price": 176.6999999999971,
+        "mae_lower_bound_price": 60.59999999999127
+      }
+    ]
+  },
+  "promotion": {
+    "hour_trend_vwap_reclaim": {
+      "eligible": false,
+      "failures": [
+        "not_untouched_forward",
+        "insufficient_forward_days",
+        "insufficient_forward_trades",
+        "net_expectancy_not_established",
+        "profit_factor",
+        "first_target_reliability",
+        "early_urgent_risk_not_validated",
+        "insufficient_frequency",
+        "insufficient_active_days",
+        "cost_stress",
+        "execution_not_validated"
+      ]
+    },
+    "range_failed_break": {
+      "eligible": false,
+      "failures": [
+        "not_untouched_forward",
+        "insufficient_forward_days",
+        "insufficient_forward_trades",
+        "net_expectancy_not_established",
+        "profit_factor",
+        "first_target_reliability",
+        "early_urgent_risk_not_validated",
+        "insufficient_frequency",
+        "insufficient_active_days",
+        "cost_stress",
+        "execution_not_validated"
+      ]
+    },
+    "volume_compression_break": {
+      "eligible": false,
+      "failures": [
+        "not_untouched_forward",
+        "insufficient_forward_days",
+        "insufficient_forward_trades",
+        "net_expectancy_not_established",
+        "profit_factor",
+        "first_target_reliability",
+        "early_urgent_risk_not_validated",
+        "insufficient_frequency",
+        "insufficient_active_days",
+        "cost_stress",
+        "execution_not_validated"
+      ]
+    }
+  },
+  "promotion_policy": {
+    "minimum_forward_days": 30,
+    "minimum_closed_forward_trades": 100,
+    "minimum_net_profit_factor": 1.2,
+    "minimum_tp1_wilson_lower": 0.5,
+    "maximum_urgent_within_5m_fraction": 0.1,
+    "minimum_signals_per_day": 1.0,
+    "minimum_active_day_fraction": 0.5,
+    "maximum_drawdown_r": 10.0,
+    "required_cost_stress_multiple": 2.0,
+    "quote_latency_validation_required": true
+  },
+  "production_monitor_changed": false,
+  "live_strategy_profitability_comparison_available": false,
+  "untouched_out_of_sample": false,
+  "actual_pnl": false,
+  "parameter_search_performed": false,
+  "limitations": [
+    "Development dataset already inspected in earlier incident reviews; not untouched holdout.",
+    "Only 5m bars, entry at the first complete bar open after publication. This deliberately coarse delay is not a proposed live execution delay.",
+    "All three alternatives use one full structural-target exit; not the live half-TP1/runner policy.",
+    "Original full minute/tick history, actual fills and urgent-warning events for these alternatives are unavailable.",
+    "Candle stop/target conflict uses stop first; gaps/end-of-history censor incomplete trades.",
+    "No live-strategy replica, no profitable alternative selected, no promotion or frequency improvement established."
+  ]
+}
