@@ -129,6 +129,7 @@
       "documentation": "docs/lbank_functional_curve_validation_2026-10-20.md",
       "source_screening": "research/continuation/source_screening_20261020_0505.json",
       "evidence_library_file_id": "libfile_c359442f2d588191874dbe81b41e56e5",
+      "evidence_delivery": "research/continuation/results/functional_curve_20261020_evidence_delivery.json",
       "production_changed": false,
       "forward_started": false
     }

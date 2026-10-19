@@ -1,0 +1,19 @@
+{
+  "research_results_commit": "5feddbb2f5cc97bb00ea9004e8d1560f89769c7b",
+  "library_file_id": "libfile_c359442f2d588191874dbe81b41e56e5",
+  "file_id": "file_00000000bbe881f5b689ed24b93dcc47",
+  "confirmed_current_version_number": 4,
+  "filename": "lbank_strategy_validation_20261020.zip",
+  "bytes": 28051234,
+  "sha256": "9bf488852e6ca801caf4301de558314d64734b294154e6d573909e4caccf2fa5",
+  "archive_manifest_revision": 5,
+  "archive_payload_files": 118,
+  "prior_contents_preserved": true,
+  "new_ledger_prefix": "ledgers/functional_curve/",
+  "new_ledgers": ["forecasts.csv.gz", "forecast_curves.npz", "forecast_checkpoint.json", "daily_and_trades.csv.gz"],
+  "ledger_checksums": "research/continuation/results/functional_curve_20261020_report.json artifacts and prediction_hashes_before_execution",
+  "save_and_identity_writeback_succeeded": true,
+  "local_files_not_required_for_continuation": true,
+  "production_replaced": false,
+  "qualified_candidate": null
+}
