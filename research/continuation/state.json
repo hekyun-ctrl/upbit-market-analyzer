@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "status": "research_active",
+  "replacement_certified": false,
+  "replacement_deployed": false,
+  "stop_condition": "Certified candidate integrated and terminal deployment SUCCESS plus runtime source/entry readiness verified; then pause this recurring task.",
+  "repo": "hekyun-ctrl/upbit-market-analyzer",
+  "research_branch": "research/lbank-long-history-20261020",
+  "production_branch": "feature/lbank-futures-monitor",
+  "baseline_research_commit": "709bc7e295c44afad117f5b4f53aecf699e02561",
+  "last_observed_production_commit": "6c3e22e6ca5c580807de83bf68e871d4c9362761",
+  "last_observed_deployment": "5c424883-8829-4610-91db-42bccf7b9ebf",
+  "eligible_candidates": [],
+  "forward_candidate": null,
+  "completed_experiments": [
+    "native_703bar_initial_3families",
+    "verified_2024_2026_3families_and_fixed_meta",
+    "preplanned_3entries_2023_and_2024_2026",
+    "hourly_EMA_adaptation",
+    "matched_entry_exit_interventions",
+    "aggressive_flow_fixed_meta",
+    "15m_channel_expansion_and_shock_reclaim",
+    "published_turtle_system2_2022_2026_strict_and_price_integrity"
+  ],
+  "read_before_work": [
+    "docs/lbank_strategy_rebuild_2026-10-20.md",
+    "docs/lbank_long_history_validation_2026-10-20.md",
+    "docs/lbank_rebuild_followthrough_2026-10-20.md",
+    "docs/lbank_published_strategy_search_2026-10-20.md",
+    "research/long_history/results"
+  ],
+  "next_work": {
+    "stage": "audit_existing_published_intraday_strategy",
+    "instruction": "Open primary full text, extract exact executable rules and authors code/data if available, audit costs/timing/risk; record reproducibility before running unchanged rules. Do not claim search snippets establish edge.",
+    "sources_to_screen": [
+      {
+        "title": "Are simple technical trading rules profitable in bitcoin markets?",
+        "url": "https://biblio.ugent.be/publication/01HY3C3S169G1N6QNYR55NZMFB",
+        "status": "search_discovered_full_text_not_audited"
+      },
+      {
+        "title": "On the intraday return curves of Bitcoin: predictability and trading",
+        "url": "https://research.tees.ac.uk/files/25865283/Bitcoin_Functional_V5.pdf",
+        "status": "search_discovered_full_text_not_audited"
+      }
+    ]
+  },
+  "known_limitations": [
+    "2023 through Sep2026 reused and exploratory; 2022 observed for Turtle; none may be relabeled untouched.",
+    "Turtle positive scenarios materially depend on artificial gap exits; not eligible.",
+    "No frozen replacement candidate exists and no forward validation clock has started.",
+    "Gate thresholds are preregistered research policy, not universal proof or guaranteed completion date.",
+    "Public cross-venue tests do not establish native LBank manual fill performance."
+  ],
+  "iterations": [],
+  "active_run": null,
+  "blockers": [],
+  "updated_kst": "2026-10-20"
+}
