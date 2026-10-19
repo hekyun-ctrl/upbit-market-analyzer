@@ -70,7 +70,10 @@ class NativeTargetRoomTests(unittest.TestCase):
         before = monitor.confirm_watch(s['prices'],watch,60,native_state=s)
         self.assertIsNotNone(before)
         self.assertFalse(before['entry_quality']['requires_two_minute_wait'])
+        # Two independent confirmed tests remain a hard obstacle even when
+        # the larger direction can outweigh a single historical pivot.
         s['five_bars'][-6]['high'] = s['quote']+50
+        s['five_bars'][-12]['high'] = s['quote']+55
         original = copy.deepcopy(s)
         for stage in ('watch','confirm'):
             diag = {}

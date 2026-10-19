@@ -24,7 +24,9 @@ class NativeEntryTests(unittest.TestCase):
                 t = self.start + i * 60
                 close = 80000. + 25 * i + (45 if i % 2 else 0)
                 self.writer.db.execute("INSERT INTO native_bars VALUES(?,?,?,?,?,?,?,?,?,?)",
-                    (60, t, close-10, close+15, close-20, close, i+1, (i+1)*close,
+                    # Synthetic baseline has enough intrabar movement that
+                    # its steady trend is not already beyond the entry cap.
+                    (60, t, close-10, close+15, close-80, close, i+1, (i+1)*close,
                      t+59, "stream_closed"))
             for t in range(self.start, self.start+300*60, 300):
                 self.writer._aggregate(t)

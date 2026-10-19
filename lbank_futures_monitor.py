@@ -35,6 +35,7 @@ from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as N
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
 from lbank_entry_quality import (confirmation_quality, direction_priority,
                                  observed_target_room, POLICY as ENTRY_QUALITY_POLICY)
+from lbank_entry_priority import ranked_entry_evidence, POLICY as ENTRY_PRIORITY_POLICY
 from lbank_signal_thesis import attach_thesis, POLICY as FOLLOWUP_POLICY
 from lbank_rsi_divergence import annotate as annotate_rsi_context, DivergenceStudy
 from lbank_market_context import MarketContextThread, annotate as annotate_market_context
@@ -364,6 +365,18 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     geometry = native_entry_geometry(native_state) if native_state is not None else None
     if native_state is not None and geometry is None:
         return None
+    ranked = (ranked_entry_evidence(native_state,direction,curr)
+              if native_state is not None else None)
+    if ranked and ranked['ready'] and not ranked['location_ok']:
+        LOG.info("PLAN REJECT reason=entry_extended_from_native_ema strategy=%s direction=%s "
+                 "price=%.1f extension_atr=%.3f limit_atr=%.1f",
+                 strategy,direction,curr,ranked['extension_atr'],ranked['max_extension_atr'])
+        return None
+    if (ranked and ranked['ready'] and strategy == 'trend_retest'
+            and direction*(curr-setup['structure_anchor']) > ranked['max_extension_atr']*ranked['atr5']):
+        LOG.info("PLAN REJECT reason=retest_recovery_already_extended strategy=%s direction=%s price=%.1f",
+                 strategy,direction,curr)
+        return None
     momentum5 = (curr / prices[-6] - 1) * 100
     momentum15 = (curr / prices[-16] - 1) * 100
     strength = rsi(prices)
@@ -394,16 +407,20 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     t2 = minimum_net_rr_target(direction, curr, unit_loss, 2.5)
     if t1 is None or t2 is None or t1 <= 0 or t2 <= 0:
         return None
-    # Required profit must be plausible against the observed native candle range
-    # otherwise skip instead of inventing a reachable price target.
+    if native_state is not None:
+        ranked = ranked_entry_evidence(native_state,direction,curr,t1)
+    # A bounded ATR alternative is available only under aligned larger
+    # direction; neither past range nor ATR is a target-reachability forecast.
     observed_range = max(prices[-60:]) - min(prices[-60:])
     if native_state is not None:
         bars = native_state["minute_bars"][-60:]
         observed_range = max(b["high"] for b in bars) - min(b["low"] for b in bars)
-    if abs(t1 - curr) > 1.5 * observed_range:
+    if abs(t1 - curr) > 1.5 * observed_range and not (ranked and ranked['atr_target_exception']):
         LOG.info("PLAN REJECT reason=target_outside_observed_range strategy=%s direction=%s price=%.1f target1=%.1f observed_range=%.1f",
                  strategy, direction, curr, t1, observed_range)
         return None
+    if abs(t1-curr) > 1.5*observed_range and ranked:
+        ranked['overrides'].append('historical_range_within_6atr')
     barrier = setup.get("barrier")
     if barrier is not None and direction * (barrier - t1) < curr * .00015:
         LOG.info("PLAN REJECT reason=target_barrier_conflict strategy=%s direction=%s price=%.1f target1=%.1f barrier=%.1f",
@@ -412,11 +429,14 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     native_target_room = None
     if native_state is not None:
         native_target_room = observed_target_room(native_state['five_bars'], direction, curr, t1)
-        if native_target_room['target_room'] == 'conflict':
+        if (native_target_room['target_room'] == 'conflict'
+                and not ranked['may_override_single_pivots']):
             LOG.info("PLAN REJECT reason=native_target_barrier_conflict strategy=%s direction=%s "
                      "price=%.1f target1=%.1f barrier=%.1f",
                      strategy, direction, curr, t1, native_target_room['observed_barrier'])
             return None
+        if native_target_room['target_room'] == 'conflict':
+            ranked['overrides'].append('single_pivots_under_aligned_15m_5m')
     permitted_loss = REF_BALANCE * RISK_FRACTION
     effective_entry = curr
     raw_qty = min(permitted_loss / unit_loss,
@@ -459,6 +479,7 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
         "runner_enabled": bool(native_state is not None and RUNNER_ENABLED),
         "native_entry_geometry": geometry,
         "native_target_room": native_target_room,
+        "entry_decision_priority": ranked,
     }
 
 
@@ -553,7 +574,8 @@ def assess_candidate(prices, direction, setup, observations=None, diagnostics=No
         if not momentum_ok and native_state is not None:
             upper=direction_priority(native_state,direction,curr,None,
                                      native_state['minute_bars'][-1]['start']+60)
-            if upper.get('dominant_intact'):
+            ranked = ranked_entry_evidence(native_state,direction,curr)
+            if upper.get('dominant_intact') or ranked['may_override_minor_reaction']:
                 momentum_ok=True
         if not momentum_ok:
             LOG.info("RETEST MOMENTUM WATCH BLOCKED side=%s reason=%s directed5m=%.3f%% directed15m=%.3f%%",
@@ -626,11 +648,13 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
         mark("price_deviation")
         return None
     entry_quality = None
+    ranked_confirmation = None
     if native_state is not None:
         quality_ok, quality_reason, entry_quality = confirmation_quality(native_state, watch)
         if not quality_ok:
             mark(quality_reason)
             return None
+        ranked_confirmation = ranked_entry_evidence(native_state,direction,current,watch.get('target1'))
     m5 = (current / prices[-6] - 1) * 100
     m15 = (current / prices[-16] - 1) * 100
     macd_line = [a - b for a, b in zip(ema(prices, 12), ema(prices, 26))]
@@ -644,7 +668,8 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
         valid = (confirm_structure(prices, watch, ema, rsi, current_price=current)
                  if native_state is not None else confirm_structure(prices, watch, ema, rsi))
     if not valid:
-        if entry_quality and entry_quality['priority'].get('dominant_intact'):
+        if entry_quality and (entry_quality['priority'].get('dominant_intact')
+                or ranked_confirmation['may_override_minor_reaction']):
             valid = True
     if not valid:
         mark("structure_or_momentum")
@@ -652,7 +677,8 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
     if watch.get("strategy") == "trend_retest":
         momentum_ok, momentum_reason, directional5, directional15 = (
             trend_retest_momentum_gate(prices, direction))
-        if not momentum_ok and entry_quality and entry_quality['priority'].get('dominant_intact'):
+        if not momentum_ok and entry_quality and (entry_quality['priority'].get('dominant_intact')
+                or ranked_confirmation['may_override_minor_reaction']):
             momentum_ok=True
         if not momentum_ok:
             LOG.info("RETEST MOMENTUM CONFIRM BLOCKED side=%s reason=%s directed5m=%.3f%% directed15m=%.3f%%",
@@ -696,6 +722,7 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
             plan['entry_quality']['priority']=direction_priority(
                 native_state,direction,current,plan['target1'],
                 native_state['minute_bars'][-1]['start']+60)
+            plan['entry_quality']['ranked_entry'] = plan['entry_decision_priority']
         plan["sampled_rsi5"] = sampled_rsi5  # Legacy schema alias; see data_source.
         plan["sampled_context"] = context
         plan["rsi_direction_status"] = reason if native_state is not None or observations is not None else None
@@ -893,10 +920,11 @@ def run():
     LOG.info("ENTRY_QUALITY policy=%s universal_minute_wait=false "
              "priority=hard_risk,higher_structure,target_room,minute_reaction "
              "stop_warnings=always_on early_caution=structure_aware", ENTRY_QUALITY_POLICY)
-    LOG.info("SIGNAL_THESIS_POLICY policy=%s entry_gates_unchanged=true missing_evidence_is_reversal=false "
+    LOG.info("SIGNAL_THESIS_POLICY policy=%s frozen_followup_policy_unchanged=true missing_evidence_is_reversal=false "
              "review_hours=6 tracking_hours=24 time_alone_is_exit=false", FOLLOWUP_POLICY)
-    LOG.info("NATIVE_TARGET_ROOM policy=confirmed_native_pivot_room_v1 "
-             "known_conflict_blocks_plan=true stages=watch,confirm additional_wait=false")
+    LOG.info("NATIVE_TARGET_ROOM policy=%s "
+             "single_pivot=ranked repeated_barrier=block stages=watch,confirm additional_wait=false "
+             "direction=15m_and_5m_ema max_extension_atr=2.5 historical_range_exception_cap_atr=6", ENTRY_PRIORITY_POLICY)
     LOG.info("NATIVE_ENTRY_GEOMETRY stop_floor=max(0.05pct,1.5ATR5) "
              "structural_stop_preserved=true range_floor=cost_solved_TP1 "
              "net_rr1=1.5 risk_limit_unchanged=true")
@@ -1205,6 +1233,8 @@ def run():
                                     sent_signal = risk_tracker.add_sent_signal(plan, now)
                                     LOG.info("ENTRY_QUALITY_SENT reference=%d evidence=%s",
                                              sent_signal.number, json.dumps(plan["entry_quality"], sort_keys=True))
+                                    LOG.info("ENTRY_PRIORITY_SENT reference=%d evidence=%s",
+                                             sent_signal.number,json.dumps(plan.get('entry_decision_priority'),sort_keys=True))
                                     LOG.info("ENTRY_THESIS_SENT reference=%d evidence=%s",
                                              sent_signal.number,json.dumps(plan.get("followup_thesis"),sort_keys=True))
                                     try:

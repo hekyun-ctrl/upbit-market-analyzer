@@ -10,6 +10,18 @@ from lbank_trend_runner import valid_state, ema_series
 POLICY = "native_structure_priority_v2"
 
 
+def confirmed_pivot_barriers(bars, direction, price):
+    """Only extrema with two already completed bars on each side."""
+    if direction not in (-1, 1) or not bars:
+        return []
+    d = direction
+    key = 'high' if d == 1 else 'low'
+    return [dict(price=b['high' if d == 1 else 'low'], start=b.get('start'))
+            for i,b in enumerate(bars) if 2 <= i < len(bars)-2
+            and d*(b[key]-price) > 0
+            and all(d*(b[key]-bars[j][key]) > 0 for j in (i-2,i-1,i+1,i+2))]
+
+
 def observed_target_room(bars, direction, price, target):
     """Use confirmed native pivots; unknown room is never labeled clear.
 
@@ -22,13 +34,7 @@ def observed_target_room(bars, direction, price, target):
     if direction not in (-1, 1) or not bars:
         return unknown
     d = direction
-    key = 'high' if d == 1 else 'low'
-    obstacles = []
-    for i in range(2, len(bars)-2):
-        v = bars[i][key]
-        if (all(d*(v-bars[j][key]) > 0 for j in (i-2, i-1, i+1, i+2))
-                and d*(v-price) > 0):
-            obstacles.append(v)
+    obstacles = [b['price'] for b in confirmed_pivot_barriers(bars, d, price)]
     barrier = (min(obstacles) if d == 1 else max(obstacles)) if obstacles else None
     room = ('unknown' if barrier is None or target is None else
             'clear' if d*(barrier-target) >= price*.00015 else 'conflict')

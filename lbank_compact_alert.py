@@ -60,7 +60,10 @@ def format_compact_entry_alert(plan, observed_at_utc, reference_number=None,
         source_note = source_note.rstrip("\n") + " | 참고: " + technique_note + "\n"
     if plan.get("entry_quality"):
         quality=plan['entry_quality']
-        label=('상위 구조 우선' if quality.get('priority',{}).get('dominant_intact')
+        ranked = plan.get('entry_decision_priority') or {}
+        label=('15분·5분 방향 우선·앞선 지지/저항 유의' if ranked.get('overrides')
+               else '15분·5분 방향 일치' if ranked.get('higher_direction_intact')
+               else '상위 구조 우선' if quality.get('priority',{}).get('dominant_intact')
                else '기존 심사 통과·보조근거 점검')
         source_note = source_note.rstrip("\n") + " | " + label + "\n"
     return (
