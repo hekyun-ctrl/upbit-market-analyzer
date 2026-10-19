@@ -1,0 +1,16 @@
+{
+  "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
+  "source": "https://biblio.ugent.be/publication/01HY3C3S169G1N6QNYR55NZMFB/file/01HY60XZGZYHNQ6188MSVJT0SG.pdf",
+  "source_sections": "B.1, B.6, B.7 and 3.4",
+  "pre_result_freeze": true,
+  "scope": "Published OBV rule component, not full paper replication, not a complete stop/TP1 alert contract",
+  "grid": {"short": [2,6,12,18,24,30,48,96,144,168],"long": [2,6,12,18,24,30,48,96,144,168,192],"short_less_than_long":true,"percentage_band":0,"confirmation_delay_bars":0,"hold_until_opposite":true,"frequencies_minutes":[10,30,60]},
+  "rules": "OBV adds completed-bar base volume if close>=previous close, subtracts otherwise. Flat close therefore adds volume as in paper. Long if short SMA(OBV)>=long SMA(OBV), cash otherwise. No shorts.",
+  "execution": "Completed bar known at end; earliest proxy fill is following minute open after one minute publication buffer. Returns use original minute open-to-next-open. Long/cash 1x normalized return model, no leverage. No source hard stop/TP1. Not an actual futures fill simulation.",
+  "costs": {"fee_per_side":0.0006,"adverse_slippage_per_side":0.0002,"funding":"Archived adverse long funding only, applied before position changes at settlement using simple-return proxy","stress":"Double fee and slippage on same monthly selection; do not refit stress winner"},
+  "selection": "Each UTC month select best1 and best50 by prior12 calendar months net log return; deterministic parameter-order tie; at least9 complete usable training months. Fixed equal capital sleeves, no intra-month rebalance; liquidate and restart sleeves at monthly boundaries, charging costs. Same universe common quality coverage, no pick-best test rule.",
+  "data": "Verified Binance USD-M BTCUSDT original minute, 2022 warmup/2023 train and 2024-Jan through 2026-Sep exploratory evaluation; all periods previously observed for other hypotheses",
+  "integrity": "Previously quarantined minute intervals split histories; require192 full60m bars before common usable coverage after a gap. A month is included only if every original minute is present and full prior context is known throughout. Exclude incomplete months wholly before returns. No synthetic gap liquidation or zero-filled unknown PnL.",
+  "disclosures": ["Three intraday frequencies and unfiltered subset165 rules, not all75360 rules", "No FDR portfolios or Sharpe selection reproduced", "Bitstamp spot original replaced by Binance perpetual proxy with added funding", "T-bill cash yield set0", "One minute open execution and monthly cash restart differ from paper", "No native LBank warning, manual fill, stop, TP1 or 30day forward evidence"],
+  "report": "All monthly choices and selected sleeved ledgers; base and double costs, gross before costs, matched quality months, net return and drawdown, daily7day-block bootstrap2000 and candidate count. No production promotion from this partial test."
+}
