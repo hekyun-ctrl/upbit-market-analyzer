@@ -1,0 +1,22 @@
+{
+  "scope": "Confirmation scheduling correction only; no validated strategy replacement",
+  "production_commit": "6c3e22e6ca5c580807de83bf68e871d4c9362761",
+  "deployment": {
+    "id": "5c424883-8829-4610-91db-42bccf7b9ebf",
+    "status": "SUCCESS",
+    "observed_updated_utc": "2026-10-19T16:56:33.258Z"
+  },
+  "runtime_schedule_log": {
+    "at": "2026-10-19T16:56:30.413590950Z",
+    "message": "risk_snapshot_poll=15s setup_review_poll=60s watch_confirmation_poll=15s min_watch_age=30 source=native_candles quote_risk_polling=true"
+  },
+  "native_status_observation": [
+    {
+      "at": "2026-10-19T16:57:35.084247618Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 131, \"closed_5m\": 25, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 118.93263618190244, \"min_range_fraction\": 0.006965832374671264, \"minimum_target_fraction\": 0.0068158323746712645, \"stop_floor_fraction\": 0.0021763560738605617}, \"entry_source_switched\": true, \"last5_start\": 1792428600, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 42.55715699567156, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    }
+  ],
+  "interpretation": "Entry-native readiness remained true after next minute. Full 250x5m RSI history is still immature and is separate from entry readiness.",
+  "tests": 326,
+  "profitability_validated": false
+}
