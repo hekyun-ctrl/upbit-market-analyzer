@@ -1,0 +1,181 @@
+{
+  "candidate_id": "unreadable_supply_demand_7d15e_source_audit_v1",
+  "started_utc": "2026-10-19T22:26:51.391839+00:00",
+  "completed_utc": "2026-10-19T22:26:51.950932+00:00",
+  "protocol_sha256": "d98b023d7bd356c16bbb5ad354bfa337b3b9c7598655e267b448cc98eaf54c7c",
+  "code_sha256": "af5402b9389bf4f8e6990a331842cefb401ff3183a549277ab797bc422fd9eec",
+  "versions": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "2.2.3"
+  },
+  "source_commit": "7d15e7a297949e98378a4126bc3abca0d543b973",
+  "sources": [
+    {
+      "path": "config.py",
+      "bytes": 3820,
+      "sha256": "1cf84c1ceb076f7460abdd73fe29a951433463e6807c50f66beb37505107f363",
+      "url": "https://raw.githubusercontent.com/unreadable/trading-farm/7d15e7a297949e98378a4126bc3abca0d543b973/config.py"
+    },
+    {
+      "path": "structure.py",
+      "bytes": 7848,
+      "sha256": "30134e288b95a1be1401affd51603657810a770ed44e58d9e6c3dc2e2744d861",
+      "url": "https://raw.githubusercontent.com/unreadable/trading-farm/7d15e7a297949e98378a4126bc3abca0d543b973/structure.py"
+    },
+    {
+      "path": "zones.py",
+      "bytes": 8752,
+      "sha256": "8dcdf4e63fa968201edc3571791148c9c834dc786c75ba61ccaac701441a5339",
+      "url": "https://raw.githubusercontent.com/unreadable/trading-farm/7d15e7a297949e98378a4126bc3abca0d543b973/zones.py"
+    },
+    {
+      "path": "backtest.py",
+      "bytes": 14325,
+      "sha256": "d190d56bed70668a5562ce4aa7abc4a49c15b43961d07b9c926816638faae03d",
+      "url": "https://raw.githubusercontent.com/unreadable/trading-farm/7d15e7a297949e98378a4126bc3abca0d543b973/backtest.py"
+    }
+  ],
+  "fixed_OPTIMAL_PARAMS": {
+    "BT_SL_ATR_MULT": 1.0,
+    "BT_TP_RR": 2.5,
+    "BT_MAX_OPEN_TRADES": 4,
+    "BT_ZONE_CLUSTER_PCT": 0.008,
+    "BT_MIN_RR": 1.5
+  },
+  "small_probes": {
+    "future_target": {
+      "fallback": 112.5,
+      "with_future_level": 108.0,
+      "level_first_bar": 90,
+      "level_last_bar": 100,
+      "entry_zone_known_at_bar": 19
+    },
+    "future_sweep": {
+      "before": false,
+      "after_future_low_change": true,
+      "zone_impulse_bar": 19,
+      "only_changed_bar": 45,
+      "historical_prefix_unchanged": true
+    },
+    "unconfirmed_swing": {
+      "swing25_in_full": true,
+      "swing25_in_prefix_ending26": false,
+      "first_confirmation_bar": 30
+    },
+    "forming_bar_round_trip": [
+      {
+        "entry_bar": 20,
+        "exit_bar": 20,
+        "impulse_bar": 20,
+        "result": "win",
+        "entry_price": 100.1,
+        "tp": 101.5
+      }
+    ],
+    "gap_stop": {
+      "exit_price": 98.0,
+      "bar_open": 95.0,
+      "bar_high": 96.0,
+      "bar_low": 94.0,
+      "source_net_R": -1.059
+    },
+    "closing_freshness": {
+      "unchanged_OHL_close100_trades": 1,
+      "same_OHL_close98_trades": 0,
+      "first_result_with_close100": "loss"
+    },
+    "both_touched_stop_first": {
+      "result": "loss",
+      "exit": 98.0
+    },
+    "unresolved_data_end": {
+      "result": "open",
+      "reported_R": 0.0,
+      "completed_trade": false
+    },
+    "fee_arithmetic_control": {
+      "recorded_fee": 5.9,
+      "unrounded_price_fee": 5.9,
+      "source_gross_R": -1.0,
+      "base_R_from_same_fills": -1.059,
+      "double_fee_R_same_fills": -1.118,
+      "actual_funding_included": false
+    }
+  },
+  "real_price_provenance": {
+    "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-01.zip",
+    "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-01.zip.CHECKSUM",
+    "zip_sha256": "21eeac04a76a7a35b10467e5e752fb2f8cff77cdeb57df6b50a23ce8d69bb190",
+    "zip_bytes": 1898532,
+    "csv_bytes_sha256": "ab25f0fee86faa93df62f800adf92b742abdc60982e023159d0ca9faf3a4ba14",
+    "minute_rows": 44640,
+    "missing_minutes": 0,
+    "duplicate_minutes": 0,
+    "bad_OHLC_or_volume": 0,
+    "quarantined_minutes_in_frozen_month": 0,
+    "aggregate_bars": 1488,
+    "first": "2024-01-01 00:00:00+00:00",
+    "last": "2024-01-31 23:30:00+00:00",
+    "previously_observed": true,
+    "native_LBank": false
+  },
+  "causality_replay": {
+    "prefix": {
+      "zones": 35,
+      "entries": 29,
+      "closed_diagnostic_rows": 27,
+      "unresolved_open_rows": 2,
+      "entry_on_formation_bar": 25,
+      "round_trip_on_formation_bar": 0,
+      "apparent_source_fee_adjusted_R_invalid_as_alpha": 15.846000000000002,
+      "market_profitability_validated": false
+    },
+    "full": {
+      "zones": 60,
+      "entries": 47,
+      "closed_diagnostic_rows": 46,
+      "unresolved_open_rows": 1,
+      "entry_on_formation_bar": 43,
+      "round_trip_on_formation_bar": 0,
+      "apparent_source_fee_adjusted_R_invalid_as_alpha": 33.065,
+      "market_profitability_validated": false
+    },
+    "cutoff_bars": 960,
+    "prefix_identical": true,
+    "common_past_zone_changes": 6,
+    "past_entry_key_difference": 0,
+    "common_past_trade_plan_changes": 3,
+    "fully_inside_prefix_outcome_changes": 2
+  },
+  "artifacts": [
+    {
+      "file": "input_30m.csv.gz",
+      "compressed_bytes": 32458,
+      "sha256": "650db64559b1eacac89e25d15ba9c0a41b660400d525bcb16f9861f9ed5ab630",
+      "uncompressed_bytes": 153776,
+      "uncompressed_sha256": "fb060602bd22a253d2a49c29fab4b7e58d127a7cf3cebef9faf400024c9e14cf"
+    },
+    {
+      "file": "diagnostic_ledgers.json.gz",
+      "compressed_bytes": 35108,
+      "sha256": "1f298b8d4e95bfa7f4701f8b2597fb9753f553f46f6ee7ff89f59c659e4584bb",
+      "uncompressed_bytes": 662799,
+      "uncompressed_sha256": "56f9a84b94fd443378a422ea9191ab08d5b2c0fb229809f682e7f3d0be9ca70c"
+    }
+  ],
+  "interpretation": "Source defects and real-price replay diagnostics only;no corrected strategy or native LBank profitability test.",
+  "decision": "reject_this_source_version_for_causality_and_execution",
+  "unverified_promotion_gates": [
+    "net_expectancy95lower",
+    "netPF",
+    "same_signal_double_cost_profit",
+    "TP1Wilson",
+    "DDinitialR",
+    "native5min_urgent",
+    "manual_native_fill_latency",
+    "forward30days100closed"
+  ],
+  "production_changed": false,
+  "forward_collection_started": false
+}

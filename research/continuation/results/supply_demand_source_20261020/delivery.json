@@ -1,0 +1,34 @@
+{
+  "stage": "completed_source_causality_audit_with_reused_real_BTC_month",
+  "candidate_id": "unreadable_supply_demand_7d15e_source_audit_v1",
+  "protocol_checkpoint_commit": "b8644cfd68ce0e9a903802e1930be412b98abbcc",
+  "protocol_frozen_utc": "2026-10-19T22:23:26Z",
+  "evaluation_started_utc": "2026-10-19T22:26:51.391839+00:00",
+  "evaluation_completed_utc": "2026-10-19T22:26:51.950932+00:00",
+  "actual_execution_commands": [
+    "LBANK_SUPPLY_DEMAND_SOURCES=/workspace/scratch/ba9af914844b/supply-demand-source.0f1CIG python -m unittest discover -s research/continuation -p test_supply_demand_source_audit.py -v",
+    "OPENBLAS_NUM_THREADS=2 OMP_NUM_THREADS=2 python research/continuation/audit_supply_demand_source.py --sources /workspace/scratch/ba9af914844b/supply-demand-source.0f1CIG --archive /workspace/scratch/ba9af914844b/binance-futures-verified/klines/1m/BTCUSDT-1m-2024-01.zip --output research/continuation/results/supply_demand_source_20261020",
+    "python research/continuation/verify_supply_demand_outputs.py research/continuation/results/supply_demand_source_20261020 --output research/continuation/results/supply_demand_source_20261020/independent_audit.json"
+  ],
+  "implementation_tests_passed": 10,
+  "independent_artifact_and_ledger_reconciliation_passed": true,
+  "independence_scope": "Separate standard-library calculation of preserved ledgers,not an independent researcher or institution.",
+  "official_raw_checksum_freshly_retrieved_and_matched": true,
+  "report_sha256": "5e014494a5c55d4bbc5992af17efc370cc48eba87e07f99d067a7e93c66d8d8b",
+  "independent_audit_sha256": "5d322b48269c01f665f0df9a705607c5a17f8e65281c564652d8c471db8321a8",
+  "preserved_in_git": [
+    "Frozen protocol,execution code and opt-in tests",
+    "Source immutable URLs,4guardedSHA and additional reviewed-source hashes",
+    "Official raw source URL/ZIP SHA/row integrity diagnostics",
+    "input_30m.csv.gz:1488complete aggregated bars",
+    "diagnostic_ledgers.json.gz:both full source zone/trade/equity ledgers and differences",
+    "report.json,independent_audit.json,verifier code,source screens and Korean report"
+  ],
+  "raw_zip_and_external_source_recovery": "Execution code --download recovers4pinned source files and official ZIP with frozen SHA guards. Raw1.9MB ZIP and external repository are not vendored. A clean-environment combined recovery run was not performed this run.",
+  "market_profitability_validated": false,
+  "new_forward_sample": false,
+  "native_LBank_fills": false,
+  "production_changed": false,
+  "forward_collection_started": false,
+  "decision": "Reject this source version for future dependence and invalid candle/stop timing;do not generalize to every supply-demand method."
+}

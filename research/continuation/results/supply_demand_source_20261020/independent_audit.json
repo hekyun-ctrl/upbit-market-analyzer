@@ -1,0 +1,70 @@
+{
+  "status": "causality_defects_and_artifacts_independently_reconciled",
+  "report_sha256": "5e014494a5c55d4bbc5992af17efc370cc48eba87e07f99d067a7e93c66d8d8b",
+  "artifacts_verified": [
+    "input_30m.csv.gz",
+    "diagnostic_ledgers.json.gz"
+  ],
+  "input_bars": 1488,
+  "counts": {
+    "prefix": {
+      "zones": 35,
+      "entries": 29,
+      "closed_diagnostic_rows": 27,
+      "unresolved_open_rows": 2,
+      "entry_on_formation_bar": 25,
+      "round_trip_on_formation_bar": 0
+    },
+    "full": {
+      "zones": 60,
+      "entries": 47,
+      "closed_diagnostic_rows": 46,
+      "unresolved_open_rows": 1,
+      "entry_on_formation_bar": 43,
+      "round_trip_on_formation_bar": 0
+    }
+  },
+  "changed_past_zones": 6,
+  "past_entry_key_difference": 0,
+  "changed_past_plans": [
+    {
+      "entry_time_utc": "2024-01-01T18:00:00+00:00",
+      "type": "demand",
+      "target_prefix": 43592.4,
+      "target_with_future": 43792.7
+    },
+    {
+      "entry_time_utc": "2024-01-18T18:00:00+00:00",
+      "type": "supply",
+      "target_prefix": 39655.8,
+      "target_with_future": 40316.5
+    },
+    {
+      "entry_time_utc": "2024-01-19T14:00:00+00:00",
+      "type": "supply",
+      "target_prefix": 40407.5,
+      "target_with_future": 40316.5
+    }
+  ],
+  "changed_closed_outcomes": [
+    {
+      "entry_time_utc": "2024-01-01T18:00:00+00:00",
+      "prefix_exit_utc": "2024-01-01T19:30:00+00:00",
+      "full_exit_utc": "2024-01-01T20:00:00+00:00",
+      "prefix_result": "win",
+      "full_result": "win",
+      "prefix_R": 1.892,
+      "with_future_R": 2.452
+    },
+    {
+      "entry_time_utc": "2024-01-19T14:00:00+00:00",
+      "prefix_exit_utc": "2024-01-19T16:30:00+00:00",
+      "full_exit_utc": "2024-01-19T16:30:00+00:00",
+      "prefix_result": "win",
+      "full_result": "win",
+      "prefix_R": 2.452,
+      "with_future_R": 2.713
+    }
+  ],
+  "market_profitability_certified": false
+}

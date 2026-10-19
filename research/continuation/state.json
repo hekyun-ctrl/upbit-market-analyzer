@@ -24,7 +24,8 @@
     "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
     "official_raw_trade_reconciliation_5quarantines_20261020",
     "bouri_2021_functional_curve_component_v1_all10costed_variants",
-    "external_ema_pullback_momentum_265209c_forensic_v1_synthetic_source_audit"
+    "external_ema_pullback_momentum_265209c_forensic_v1_synthetic_source_audit",
+    "unreadable_supply_demand_7d15e_source_audit_v1_real_price_causality"
   ],
   "read_before_work": [
     "docs/lbank_strategy_rebuild_2026-10-20.md",
@@ -34,15 +35,17 @@
     "research/long_history/results"
   ],
   "next_work": {
-    "stage": "pinned_published_supply_demand_source_execution_and_evidence_preflight",
-    "instruction": "External EMA source audit completed:14tests,79synthetic trades,59pretrigger entries,9reused setups,1nonpositive risk,ADXallmissing; NOT a real BTC profitability backtest. Do not repair/tune/repeat this source,old functional curves,OBV,Turtle or prior rejected methods without new evidence. Read source_screening_20261020_0558.json plus older0505exclusions. Next concrete lead: unreadable/trading-farm commit7d15e7a297949e98378a4126bc3abca0d543b973. Inspect pinned config/backtest/zones/structure/data/wfo/tests offline before execution; trace temporal confirmation,stop/target/gap/cost model and BTC frequency,locate actual preserved costed BTC evidence. README alone has no numerical positive BTC proof. If compatible and supported,freeze exact replication protocol before performance; otherwise document preflight exclusion and search another PRIMARY source with public code/data and genuine after-cost evidence. Never run its startup/live scripts,install unreviewed dependencies or access credentials. No qualified forward candidate/full alert contract exists; keep all promotion gates unchanged and no deploy. Every future real-market input2022-Sep2026 is reused/exploratory; restore from Git source catalog if required,never presume scratch persists.",
+    "stage": "new_primary_source_code_data_cost_and_turnover_feasibility",
+    "instruction": "Completed supply/demand source7d15e audit under checkpointb8644cfd68ce0e9a903802e1930be412b98abbcc:10tests and actual previously observed2024January BTC30m prefix/full replay. Appending futureJan21-31changed6pastzoneattributes,3pasttargets and2alreadyclosedoutcomes;43of47entriesuseformationbar. This source version is excluded,not alpha validated. Do not repair/tune/repeat it or earlier rejected sources unchanged. Read docs/lbank_supply_demand_source_audit_2026-10-20.md and source_screening_20261020_0740.json plus older exclusions. Additional CacheCarti passedBTCcardsareallnegative and JuliusScheuererTSMOMsourceusesriskamountfees/TPfirst;exclude those versions as positive exchange-cost evidence without redundant market reruns. Concrete next primary lead: Garcia/Schweitzer2015 DOI10.1098/rsos.150288 with advertised public data/scripts at sg.ethz.ch/btc. Retrieve complete paper and source data/scripts,hash exact artifacts,trace fixed rules/netcosts/actualdecisionfrequency,currentliveinputavailability and manualBTC suitability. This is unreviewed metadata,NOT a maintained candidate. Immediatelyexclude lowfrequency or unavailableinputs that fail policy and continue targeted PRIMARY intraday BTC code+data+aftercost evidence search. Produce a source contract and freeze ONE executable feasible next audit before any performance calculation;do not spend market-replay compute on already known incompatible methods. No qualified forward candidate/full alert contract exists;no deploy,all gates unchanged. Every historical input2022-Sep2026 is reused/exploratory;never presume scratch/source ZIPs persist or collectorsrunbetweenexecutions.",
     "sources_to_screen": [
       {
-        "title": "Existing supply/demand zone implementation source preflight",
-        "url": "https://github.com/unreadable/trading-farm/tree/7d15e7a297949e98378a4126bc3abca0d543b973",
-        "source_commit": "7d15e7a297949e98378a4126bc3abca0d543b973",
-        "screening": "research/continuation/source_screening_20261020_0558.json",
-        "status": "queued_implementation_and_positive_BTC_evidence_unreviewed_not_shortlisted"
+        "title": "Social signals and algorithmic trading of Bitcoin",
+        "url": "https://arxiv.org/abs/1506.01513",
+        "DOI": "10.1098/rsos.150288",
+        "advertised_data_and_scripts": "https://www.sg.ethz.ch/btc",
+        "author_page": "https://dgarcia.eu/2015/06/05/social-signals-and-algorithmic-trading-of-bitcoin/",
+        "screening": "research/continuation/source_screening_20261020_0740.json",
+        "status": "queued_unreviewed_primary_source_feasibility_only;not_shortlisted_no_profitability_or_frequency_claim"
       },
       {
         "title": "Are simple technical trading rules profitable in bitcoin markets?",
@@ -70,7 +73,9 @@
     "Functional-curve10variants all costed losses andPF<1; complete2026Jan-Sep273days all negative. Long-history totals concatenate known days and omit3-5unknown days pervariant, so are not full-calendar account returns. Not exact full-paper replication or native LBank fills.",
     "Additional6primary sources triaged from source disclosures, not newly backtested; none establishes a qualified manual BTC replacement. New source search remains feasible.",
     "External EMA headline uses random syntheticOHLCV,not exchange observations; fixed-clock execution produced79trades with invalid fills/protection and no costs. Forensic tests are not alpha validation. Source version rejected; no universal EMA claim.",
-    "New source screens found README-versus-negative-artifact contradiction in rapfii and positioningv1 frequency290/733days below gate. These are source screens,not newly executed market backtests. Supply/demand source is only an unreviewed preflight lead."
+    "New source screens found README-versus-negative-artifact contradiction in rapfii and positioningv1 frequency290/733days below gate. These are source screens,not newly executed market backtests.",
+    "Supply/demand source7d15e failed real-price future-append invariance:6pastzones,3targets,2closedoutcomeschange;43/47formationbarentries. Apparent positiveR is invalid as alpha;no valid PF,fullcoststress,TP1/nativeurgent/manualfill gates computed. This source version excluded;no universal supply-demand claim.",
+    "Additional primary screens:CacheCarti all4passedBTCcardsnegative;TSMOM sourcefeesappliedtorisknotnotional andTPfirst;Frontiers licensedrawdata/riskcontract notpubliclyreproducible. These are source screens only,not newly executed market backtests. Next social-signal paper/script lead remains unreviewed,not qualified."
   ],
   "iterations": [
     {
@@ -169,18 +174,46 @@
       "source_screening": "research/continuation/source_screening_20261020_0558.json",
       "production_changed": false,
       "forward_started": false
+    },
+    {
+      "id": "supply_demand_source_audit_20261020_0723",
+      "protocol_frozen_utc": "2026-10-19T22:23:26Z",
+      "evaluation_started_utc": "2026-10-19T22:26:51.391839+00:00",
+      "evaluation_completed_utc": "2026-10-19T22:26:51.950932+00:00",
+      "completed_utc": "2026-10-19T22:39:00Z",
+      "stage_completed": "pinned_source10tests_actualBTCprefix_future_append_causality_replay_and_independent_ledger_reconciliation",
+      "candidate_id": "unreadable_supply_demand_7d15e_source_audit_v1",
+      "protocol_checkpoint_commit": "b8644cfd68ce0e9a903802e1930be412b98abbcc",
+      "source_commit": "7d15e7a297949e98378a4126bc3abca0d543b973",
+      "implementation_tests_passed": 10,
+      "raw_minute_rows": 44640,
+      "raw_missing_or_duplicate_minutes": 0,
+      "complete_30minute_bars": 1488,
+      "prefix_bars": 960,
+      "past_zone_changes_after_future_append": 6,
+      "past_target_plan_changes": 3,
+      "already_closed_outcome_changes": 2,
+      "past_entry_key_difference": 0,
+      "full_replay_diagnostic_entries": 47,
+      "full_replay_formation_bar_entries": 43,
+      "full_replay_same_formation_bar_round_trips": 0,
+      "independent_artifact_ledger_audit_passed": true,
+      "result": "reject_this_source_version_for_future_dependence_and_invalid_entry_stop_timing",
+      "real_price_causality_replay_performed": true,
+      "valid_market_profitability_backtest_performed": false,
+      "previously_observed_crossvenue_sample": true,
+      "report": "research/continuation/results/supply_demand_source_20261020/report.json",
+      "audit": "research/continuation/results/supply_demand_source_20261020/independent_audit.json",
+      "documentation": "docs/lbank_supply_demand_source_audit_2026-10-20.md",
+      "source_screening": "research/continuation/source_screening_20261020_0740.json",
+      "delivery": "research/continuation/results/supply_demand_source_20261020/delivery.json",
+      "production_changed": false,
+      "forward_started": false
     }
   ],
-  "active_run": {
-    "id": "supply_demand_source_audit_20261020_0723",
-    "stage": "source_and_real_price_causality_protocol_fixed_before_execution",
-    "protocol": "research/continuation/supply_demand_audit_protocol_20261020.json",
-    "code": "research/continuation/audit_supply_demand_source.py",
-    "source_commit": "7d15e7a297949e98378a4126bc3abca0d543b973",
-    "next_action": "Run10opt-in probes and unchanged source first20days/full31days replay of frozen2024January30mBTC prices;record causality/timing findings and preserve compressed input/ledgers. No parameter optimization or deployment."
-  },
+  "active_run": null,
   "blockers": [],
-  "updated_kst": "2026-10-20T06:01:44+09:00",
+  "updated_kst": "2026-10-20T07:39:00+09:00",
   "maintained_research_candidates": [
     {
       "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
@@ -196,6 +229,11 @@
       "candidate_id": "external_ema_pullback_momentum_265209c_forensic_v1",
       "status": "rejected_synthetic_provenance_and_execution_defects_no_costed_market_evidence",
       "next": "No unchanged repetition or tuning of source's claimed profit. Audit scope does not invalidate all EMA trading methods."
+    },
+    {
+      "candidate_id": "unreadable_supply_demand_7d15e_source_audit_v1",
+      "status": "rejected_real_price_future_dependence_and_invalid_formation_entry_gap_execution",
+      "next": "Preserved input/ledgers/10tests and independent reconciliation;no unchanged repetition,salvage tuning or alpha interpretation of apparent positiveR. Audit does not invalidate every supply-demand strategy."
     }
   ],
   "source_reconciliation": {

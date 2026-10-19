@@ -1,0 +1,68 @@
+{
+  "scope": "Additional primary-source preflights only;none is a newly executed market profitability backtest or qualified replacement.",
+  "screened_kst_date": "2026-10-20",
+  "fixed_policy": "docs/lbank_strategy_rebuild_2026-10-20.md",
+  "sources": [
+    {
+      "id": "cachecarti_crypto_strategies_f8e3259",
+      "url": "https://github.com/CacheCarti/Crypto-Strategies/tree/f8e32599c192b823dbe7aea77a2b9341c6114527",
+      "source_commit": "f8e32599c192b823dbe7aea77a2b9341c6114527",
+      "reviewed": "README,FINDINGS,index and all4BTC cards under the10passed releases;one complete released BTC strategy implementation.",
+      "author_card_OOS": [
+        {"path": "cards/asia_drift_btc_v2.json", "sha256": "fffa487ae696d81ff5cf1708b7e20e4d881f355c97539f7438753083e56a5ce3", "total_return_bps": -155.76, "trades": 9},
+        {"path": "cards/asia_drift_btc_v3.json", "sha256": "9ddc91b194aa28b8b5b62eaae11c1c524b96c9e5e6bcdbe6abd91e73f2cafff9", "total_return_bps": -165.26, "trades": 8},
+        {"path": "cards/asia_drift_btc_v9.json", "sha256": "9341ee995957fe48501334ec8c82a4a166c813309158911afcf5ed67b733f943", "total_return_bps": -176.87, "trades": 4},
+        {"path": "cards/gap_fade_btc_v8.json", "sha256": "93d8d3c9ca7cbf4194f675c1e2dc52be76ad7418e8404c927e23475d76806d12", "total_return_bps": -372.46, "trades": 49}
+      ],
+      "findings": [
+        "All4public BTC releases labeled passed have negative author-reported OOS totals;not reproduced after-cost returns.",
+        "Cards say stages_passed2 while note claims full7stage;index406allrejected differs from README indexall416passesfirst description.",
+        "Private harness/domain contract absent;source label is not sufficient positive BTC evidence. asia_drift_v2 permits at most1filtered daily entry,so frequency cannot be assumed."
+      ],
+      "decision": "exclude_as_positive_costed_BTC_evidence;do_not_execute_or_tune_based_on_passed_label"
+    },
+    {
+      "id": "juliusscheuerer_tsmom_a025141",
+      "url": "https://github.com/JuliusScheuerer/tsmom-backtest/tree/a0251413c0037f743ff2253b44fd9a1b73f5b78d",
+      "source_commit": "a0251413c0037f743ff2253b44fd9a1b73f5b78d",
+      "reviewed_files": [
+        {"path": "strategy.py", "sha256": "3bef0369437312319e534a36e46dc8fd94e6a9d1853c4d0e6c6e44e3e901cc5f"},
+        {"path": "backtest.py", "sha256": "013a7ab753237837bcf8cc41b11097ac0d4b22cff4945f9a2acb67c7f0ae5147"},
+        {"path": "data_handler.py", "sha256": "bbcda46299ec470186c62b1f62ebbb921f518a9389904d8e77c1acc9a289509d"},
+        {"path": "results/backtest_results_BTCUSD_fee_0_5.txt", "sha256": "538ae79db268eefc0fab88258e222fb63b5e6a5127b3c866a8882526ebfb15cb"}
+      ],
+      "author_reported_session_return_pct_at_labeled_half_percent_fee": {"asian": -56.69, "london": 58.95, "us": 36.26},
+      "findings": [
+        "Fee formula uses risk_amount*trading_fee*2 instead of entry/exit notional. With BASE_RISK_PCT=.005,the labeled fee percentage is not an exchange notional fee. Positive session headlines do not establish exchange-cost profitability.",
+        "TP checked before SL when both touched;stop re-entry uses previous stop price without new manual fill/latency evidence;session end can use stale last_price stamped as session_end.",
+        "Raw1minute BID data absent;loaderBTC filenamesbegin2022 while stored reportperiodbegins2020,provenance requires reconciliation.",
+        "No source code executed and no original/corrected market backtest performed;do not select only positive sessions from this report."
+      ],
+      "decision": "exclude_this_version_as_exchange_costed_manual_replacement_evidence;no_salvage_tuning"
+    },
+    {
+      "id": "frontiers_2026_1888767",
+      "title": "Intraday trading strategy selection under transaction costs with machine learning",
+      "url": "https://www.frontiersin.org/journals/applied-mathematics-and-statistics/articles/10.3389/fams.2026.1888767/full",
+      "review_scope": "Primary full-page data-availability,risk-management and code-link screening;not a numerical replication.",
+      "findings": [
+        "Paper describes commercially licensed TwelveData2022-2023minute inputs,raw redistribution restricted,processed data/methoddetails on request.",
+        "SL/TP integrated risk management is futurework;no public implementation link found in reviewed primary page. No author outreach performed."
+      ],
+      "decision": "not_priority_reproducible_manual_alert_source_under_current_public_material;no_strategy_family_claim"
+    }
+  ],
+  "next_unreviewed_primary_lead": {
+    "title": "Social signals and algorithmic trading of Bitcoin",
+    "authors": "Garcia and Schweitzer,2015",
+    "DOI": "10.1098/rsos.150288",
+    "primary_paper": "https://arxiv.org/abs/1506.01513",
+    "author_page": "https://dgarcia.eu/2015/06/05/social-signals-and-algorithmic-trading-of-bitcoin/",
+    "advertised_data_and_scripts": "https://www.sg.ethz.ch/btc",
+    "status": "unreviewed_lead_not_qualified;public_search_mentions_cost_sensitivity_but_exact_rules_net_results_code_data_and_turnover_not_verified",
+    "next_action": "Read complete primary paper and linked scripts/data;record immutable hashes,actualdecisionfrequency,currentinputavailability,and exact fee/fill/net evidence. Immediatelyexclude if daily/lowfrequency or inaccessibleliveinputs fail fixedmanualgate. If unsuitable,continue targetedPRIMARYcode/data/costedBTCsearch rather than market-testing known-incompatible sources. Freeze next execution protocol only after feasibility."
+  },
+  "replacement_certified": false,
+  "forward_started": false,
+  "production_changed": false
+}
