@@ -1,0 +1,108 @@
+{
+  "source": "research/fixtures/lbank_strategy_rebuild_native_20261020.json",
+  "cases": [
+    {
+      "reference": 8,
+      "entry_at": "2026-10-18T22:23:37.372053472Z",
+      "entry": 81639.8,
+      "stop": 81469.7,
+      "target": 82184.9,
+      "required_target_pct": 0.6676890438242025,
+      "initial_stop_pct": 0.20835425858466805,
+      "full_bars_before_followup": 0,
+      "observed_favorable_pct": null,
+      "observed_adverse_pct": null,
+      "interior_gaps": [],
+      "followup": {
+        "at": "2026-10-18T22:28:13.994250187Z",
+        "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=8 side=LONG reason=early_invalidation price=81530.9"
+      },
+      "partial_entry_and_followup_candles_excluded": true,
+      "completeness_or_actual_fills_verified": false
+    },
+    {
+      "reference": 9,
+      "entry_at": "2026-10-18T23:29:56.381792438Z",
+      "entry": 82090.3,
+      "stop": 81758.3,
+      "target": 82879.8,
+      "required_target_pct": 0.96174578482476,
+      "initial_stop_pct": 0.4044326796223184,
+      "full_bars_before_followup": 70,
+      "observed_favorable_pct": 0.9315351509252581,
+      "observed_adverse_pct": 0.13655693790862722,
+      "interior_gaps": [
+        {
+          "after": 1792382400,
+          "before": 1792382700
+        }
+      ],
+      "followup": {
+        "at": "2026-10-19T05:29:55.396605767Z",
+        "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=9 side=LONG reason=time_exit price=82637.0"
+      },
+      "partial_entry_and_followup_candles_excluded": true,
+      "completeness_or_actual_fills_verified": false
+    },
+    {
+      "reference": 10,
+      "entry_at": "2026-10-19T01:09:46.017128150Z",
+      "entry": 82469.1,
+      "stop": 82246.9,
+      "target": 83095.3,
+      "required_target_pct": 0.7593147009000911,
+      "initial_stop_pct": 0.2694342487064993,
+      "full_bars_before_followup": 15,
+      "observed_favorable_pct": 0.1361722148052887,
+      "observed_adverse_pct": 0.154603360531399,
+      "interior_gaps": [],
+      "followup": {
+        "at": "2026-10-19T02:26:39.172591922Z",
+        "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=10 side=LONG reason=early_invalidation price=82325.5"
+      },
+      "partial_entry_and_followup_candles_excluded": true,
+      "completeness_or_actual_fills_verified": false
+    },
+    {
+      "reference": 11,
+      "entry_at": "2026-10-19T08:10:58.113212318Z",
+      "entry": 82568.1,
+      "stop": 82758.2,
+      "target": 81989.9,
+      "required_target_pct": 0.7002704434279239,
+      "initial_stop_pct": 0.2302341945618117,
+      "full_bars_before_followup": 0,
+      "observed_favorable_pct": null,
+      "observed_adverse_pct": null,
+      "interior_gaps": [],
+      "followup": {
+        "at": "2026-10-19T08:17:55.570454681Z",
+        "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=11 side=SHORT reason=stop_breached price=82799.9"
+      },
+      "partial_entry_and_followup_candles_excluded": true,
+      "completeness_or_actual_fills_verified": false
+    },
+    {
+      "reference": 12,
+      "entry_at": "2026-10-19T10:23:34.085248184Z",
+      "entry": 82466.5,
+      "stop": 82700.4,
+      "target": 81823.0,
+      "required_target_pct": 0.7803168559354405,
+      "initial_stop_pct": 0.28363032261584303,
+      "full_bars_before_followup": 27,
+      "observed_favorable_pct": 0.48116507915335666,
+      "observed_adverse_pct": 0.22724378990255945,
+      "interior_gaps": [],
+      "followup": {
+        "at": "2026-10-19T12:40:22.980245823Z",
+        "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=12 side=SHORT reason=early_invalidation price=82566.2"
+      },
+      "partial_entry_and_followup_candles_excluded": true,
+      "completeness_or_actual_fills_verified": false
+    }
+  ],
+  "applies_to": "Five historical alerts before production 139c23d; not current policy performance.",
+  "target_generation": "Production minimum_net_rr_target solves a net reward/risk equation; this is not a calibrated probability of reaching target.",
+  "interpretation": "A favorable observed excursion is not a realizable profit. Missing partial minutes or gaps remain unknown. Do not infer a global rate or exact root cause for every fill from five examples."
+}
