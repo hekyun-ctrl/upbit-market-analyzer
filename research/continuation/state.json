@@ -80,7 +80,12 @@
       "forward_started": false
     }
   ],
-  "active_run": null,
+  "active_run": {
+    "id": "source_reconciliation_20261020",
+    "stage": "raw_archive_access_and_reconstruction",
+    "started_utc": "2026-10-19T18:27:08.902081+00:00",
+    "protocol": "research/continuation/source_reconciliation_protocol_20261020.json"
+  },
   "blockers": [],
   "updated_kst": "2026-10-20T03:20:00.894953+09:00",
   "maintained_research_candidates": [

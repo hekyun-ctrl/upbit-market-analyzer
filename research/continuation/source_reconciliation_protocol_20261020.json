@@ -1,0 +1,12 @@
+{
+  "purpose": "Resolve disputed input data before any repeated OBV performance calculation",
+  "baseline_strategy_commit": "7ebda181d1ca292d2d00ad94ed91d5f006120e84",
+  "scope": "Five existing quarantined five-minute intervals on four UTC dates2024-10-28,2025-01-14,2025-01-29,2025-08-29; do not change2022/2023 quarantines in this experiment",
+  "sources": "Official Binance USD-M daily original trades ZIP plus published .CHECKSUM. If unavailable, report access state; aggregated trades are an explicitly separate market-only source, not a silent substitute.",
+  "reconstruction": "Read original raw rows in ID/time order, validate positive prices and nonnegative quantities, unique strictly consecutive trade IDs within target interval plus neighboring observations, and observations before/after every target five-minute window. Rebuild each target1m OHLC/base volume from actual rows without price interpolation or synthetic trades.",
+  "release_rule": "Release an existing five-minute quarantine only when every one of its five original monthly1m OHLCV bars agrees with the complete raw-trade reconstruction to absolute tolerance1e-6. Record other fields and five-minute comparison. If source incomplete, access denied or mismatch remains, retain quarantine. No performance-dependent source choice or correcting prices to improve returns.",
+  "boundary_quote": "May retrieve checksum-verified official1m daily archive2026-10-01 and append only its first row as September monthly liquidation boundary. Do not evaluate or train October returns.",
+  "sensitivity": "Only if evidence releases inputs, run unchanged165component/9complete-training-month OBV model and base/double costs with explicit released-data mask; retain strict baseline. Label all results exploratory and source-contingent; do not claim full native LBank execution validation.",
+  "limits": "No API keys, accounts, orders or production mutation. Current market-trade APIs exclude insurance/ADL and have historical lookback restrictions; raw archive evidence does not prove every trade category or venue execution.",
+  "stop_this_stage": "If raw source unavailable or cannot justify input release, preserve unresolved verdict and progress to the already acquired functional-curve source candidate. This is not a reason to invent repairs or repeatedly retry unchanged failed requests."
+}
