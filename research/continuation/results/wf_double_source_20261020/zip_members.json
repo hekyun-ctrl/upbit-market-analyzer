@@ -1,0 +1,462 @@
+[
+  {
+    "path": "global_training_period_results/20260113_exp_global_train_unseen.csv",
+    "bytes": 586484,
+    "sha256": "7a93650e8a09f46ec2975ab12192b907c72c4b7183e69360feeeb2f8e08646a0"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/02_downsampled.rds",
+    "bytes": 125336,
+    "sha256": "922952dd352a868591ab02601925f84dfc94016c24883cccb97b018d1303d140"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/03_precalculated.rds",
+    "bytes": 1333576,
+    "sha256": "3bc3fa61d75ff20a0eda7f8e4a5905df7dc5f0b8e616b472dcdab74b77e0a785"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/04_positions.rds",
+    "bytes": 154435,
+    "sha256": "763286688ac032dee74e0e848cf451eb0601f0880214b876dcec7856c79cb5bc"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/05_pnl.rds",
+    "bytes": 3168429,
+    "sha256": "51f4b791c916c6b5bf75f73ea952b0d6c94cb9c23cdd05755abae0bf4e72c467"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/06_wf_indexes.rds",
+    "bytes": 707,
+    "sha256": "705fd3ce7b756ce487e3c13d0a1754695a3dbf01b34e3e39945e936385bfc3f2"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/07_wf_metrics.rds",
+    "bytes": 294963,
+    "sha256": "d2a28386df90a3812aa6a9ae9a382bdf4056aefd9d3dc737289fa9871c77aa14"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/08_wf_best_params.rds",
+    "bytes": 1514,
+    "sha256": "fdd1691916a3cf87270f0c25d071d4f6877323dad1f436d3f31b958db2b465ba"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/09_wf_test_evalued.rds",
+    "bytes": 362324,
+    "sha256": "3b4c68d1ab047cd7657873d01047ba68857cd0a28d61fda8811950850aa845ca"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/dfresult.yaml",
+    "bytes": 5689,
+    "sha256": "88b3c95ed51243ba54ed6b0abaf577f36fe29fe73122e5c29a0c9fe5228d2917"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/metrics.yaml",
+    "bytes": 326,
+    "sha256": "d117239898bee7065e14b6d41f6c15e03c1af45e5ea1eb65c5b31e830175725f"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/params.yaml",
+    "bytes": 374,
+    "sha256": "afa8eeb22e41b67743fae532b60993221a72d02704d8df4fbbc69d21e1172495"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/01_converted_to_xts.rds",
+    "bytes": 35650614,
+    "sha256": "3f18194b9a844770b4a70679be3944d346d0349cf0e9ddd65e3ff420b1746ef2"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/02_downsampled.rds",
+    "bytes": 125336,
+    "sha256": "922952dd352a868591ab02601925f84dfc94016c24883cccb97b018d1303d140"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/03_precalculated.rds",
+    "bytes": 1333576,
+    "sha256": "3bc3fa61d75ff20a0eda7f8e4a5905df7dc5f0b8e616b472dcdab74b77e0a785"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/04_positions.rds",
+    "bytes": 154435,
+    "sha256": "763286688ac032dee74e0e848cf451eb0601f0880214b876dcec7856c79cb5bc"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/05_pnl.rds",
+    "bytes": 3168429,
+    "sha256": "51f4b791c916c6b5bf75f73ea952b0d6c94cb9c23cdd05755abae0bf4e72c467"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/06_wf_indexes.rds",
+    "bytes": 394,
+    "sha256": "aee369e615b1e4d8e620bfb82a9aa27dd3c0591ddb3021e6b9fcf2343c5f80cb"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/07_wf_metrics.rds",
+    "bytes": 101817,
+    "sha256": "a7ea15ec4bf9cdc1b0521373cbf564a3d9fd0f3290d193032444e53470df64be"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/08_wf_best_params.rds",
+    "bytes": 726,
+    "sha256": "c49981f11437d63c453f6bf2e4d3635824e1a0f8b3175936cbe7236bd51e3a61"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/09_wf_test_evalued.rds",
+    "bytes": 365703,
+    "sha256": "9c325a584893766d06ab9d0d60fbb4e7086126ac5cfcef91a690f4e4b1313ea8"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/dfresult.yaml",
+    "bytes": 2110,
+    "sha256": "6100fa0363d39a7334475352c30b518afe768799ebdac7e77e7a61678245bde6"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/metrics.yaml",
+    "bytes": 323,
+    "sha256": "31acf915965a5cf06f94ba88c1bb78bfd6ed52cbe02eccc79a601c65896d5d34"
+  },
+  {
+    "path": "global_training_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/params.yaml",
+    "bytes": 373,
+    "sha256": "40096b652b3ea6eeef3a0aec9316f58e55aae83dc3b8ea2c9fd422a543caed2f"
+  },
+  {
+    "path": "unseen_period_results/20240105_unseed_data.csv",
+    "bytes": 15526,
+    "sha256": "c654053988f6b302a44dfd5cccc72a32506e9168000bd255875f72a354cb45a0"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BNB/02_downsampled.rds",
+    "bytes": 122993,
+    "sha256": "445f2572970d196e0ad13074d04bd9d0e7964b84beb11bff31e2f4711177f070"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BNB/03_precalculated.rds",
+    "bytes": 1499559,
+    "sha256": "a04a41f3081286bdec6f26168d838c888ad59a0a92559c835404c3b56328af8f"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BNB/04_positions.rds",
+    "bytes": 153725,
+    "sha256": "d6aaae9e6f9b9da03b75b0b4bb09d478b6876066e008bbb87a1da9df15acafb6"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BNB/05_pnl.rds",
+    "bytes": 3686528,
+    "sha256": "da1c84f62613474b7bf748ed46a13da8fa9a4724df074af96004123c3757b043"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BNB/06_wf_indexes.rds",
+    "bytes": 771,
+    "sha256": "48ad8297e17f68cbaca11c0a745fee97d57a0c4db1a5c5f6b201d4a09815ca06"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BNB/07_wf_metrics.rds",
+    "bytes": 329102,
+    "sha256": "200ec7ecec0c6478b5b5f8b466b6f77b0caeeea162cee2dabda0d0519296140e"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BNB/08_wf_best_params.rds",
+    "bytes": 1690,
+    "sha256": "821b6d89f9c867d5e61042f465a8d7049fe5c6f704a27db690aaf8b28dc65f1e"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BNB/09_wf_test_evalued.rds",
+    "bytes": 400248,
+    "sha256": "a20aaf4b128f3040b0af634f5dbf120f203faebc8d6081d1b74415b453661765"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BNB/dfresult.yaml",
+    "bytes": 6454,
+    "sha256": "966b9d92b0c0855ea34290801f3bcb0f9c36831624a07e9016494ff09999081d"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BNB/metrics.yaml",
+    "bytes": 328,
+    "sha256": "31de12e85e680e1b0c5eb8b3dbf92b64980543f5ea9a022292bac5e0c23ef696"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BNB/params.yaml",
+    "bytes": 367,
+    "sha256": "9e8777af7c7b2b20c9fa7dd9c462a657a6fd149388303f31cd8d8e87ef0dccf2"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/02_downsampled.rds",
+    "bytes": 149346,
+    "sha256": "1a60292454b5b8aeed914a0cda02eb6e9c5807afd247c8afddcc5aede41a9030"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/03_precalculated.rds",
+    "bytes": 1517184,
+    "sha256": "35af3202610c97435135f3df8ef4cba8342e0c0b49bcae7fa5dcf74ad10a5113"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/04_positions.rds",
+    "bytes": 177131,
+    "sha256": "7eb2a94a0101fd8513e4d72aa8b848bce4523e82a4fa5e50bc8ac551f45a81f5"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/05_pnl.rds",
+    "bytes": 3589057,
+    "sha256": "b6f7edd9212f293f8a4142d2fb583521ac96d655c17c3d4f2061cfae8a87e336"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/06_wf_indexes.rds",
+    "bytes": 771,
+    "sha256": "48ad8297e17f68cbaca11c0a745fee97d57a0c4db1a5c5f6b201d4a09815ca06"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/07_wf_metrics.rds",
+    "bytes": 328762,
+    "sha256": "cc7fbccad4f214630ad1c7e1d0b253533e677a9b9bc4a40ac45623f013dd2813"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/08_wf_best_params.rds",
+    "bytes": 1700,
+    "sha256": "f4dc19fad749e83a61270fe9f049434fa1eba17298114ff51de4dc2dc7d642b6"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/09_wf_test_evalued.rds",
+    "bytes": 415017,
+    "sha256": "abcf96636539115484437f816ec2997570b2e1f726cfd2e34339c11bcca5d320"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/dfresult.yaml",
+    "bytes": 6456,
+    "sha256": "db17052c9337d8ef36a935925882900f4a659a3a4824fedafcad1031a6a770b2"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/metrics.yaml",
+    "bytes": 328,
+    "sha256": "99ea4e8644b0b666cc65ead3c844768aafed535b95bc39062310351ae6e42c6a"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_BTC/params.yaml",
+    "bytes": 367,
+    "sha256": "d4cbeda23ec095f5e2de0b22a40228f500d15ec7a98041f9ebdaafc00bc359df"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_ETH/02_downsampled.rds",
+    "bytes": 134060,
+    "sha256": "ff6794975fbe6bedefc2a245a129b053af18035bcff678e74d4ee5594e7fedbf"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_ETH/03_precalculated.rds",
+    "bytes": 1510658,
+    "sha256": "d8fd9adc3eb261689c07da0fbe5796117b26b715556e7ef038aafebc589c6b9d"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_ETH/04_positions.rds",
+    "bytes": 167141,
+    "sha256": "6a3e725bbf0778fbff91c2473d0f3d2f5552a456efcc79e99cd3602496ca7071"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_ETH/05_pnl.rds",
+    "bytes": 3647089,
+    "sha256": "711593f436f77661324f420c23d3290c37439a3eda7f55ed0946862c6b2495c5"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_ETH/06_wf_indexes.rds",
+    "bytes": 771,
+    "sha256": "48ad8297e17f68cbaca11c0a745fee97d57a0c4db1a5c5f6b201d4a09815ca06"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_ETH/07_wf_metrics.rds",
+    "bytes": 331451,
+    "sha256": "713adbfe35aadac4dfd6b9c2b355e34aa7605214aea568f179bc98d47d740e9f"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_ETH/08_wf_best_params.rds",
+    "bytes": 1708,
+    "sha256": "65fc4b4676059874fba0370a8966460c4cafa1af6451f777f362d3249c64cba4"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_ETH/09_wf_test_evalued.rds",
+    "bytes": 407324,
+    "sha256": "8eb99c95d81e42d40e9c67dc787b58f3c7da46c3c383052e9575b33b87f9fd0f"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_ETH/dfresult.yaml",
+    "bytes": 6446,
+    "sha256": "ab6ab9663ecb78cf12b9fcc77d7598627f3dce20df422afb0ffb4d1b17646dd6"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_ETH/metrics.yaml",
+    "bytes": 327,
+    "sha256": "ebc162e89ff342c4226cae29cc6c9a10076767529e65cc9f72f4ea31ec7d6fa6"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_14_TEST_10_ETH/params.yaml",
+    "bytes": 367,
+    "sha256": "181b4024d9ba9f3153628ee50e5b1b8dd55e89651ddb24941af8e5923afcc371"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BNB/02_downsampled.rds",
+    "bytes": 122993,
+    "sha256": "445f2572970d196e0ad13074d04bd9d0e7964b84beb11bff31e2f4711177f070"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BNB/03_precalculated.rds",
+    "bytes": 1499559,
+    "sha256": "a04a41f3081286bdec6f26168d838c888ad59a0a92559c835404c3b56328af8f"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BNB/04_positions.rds",
+    "bytes": 153725,
+    "sha256": "d6aaae9e6f9b9da03b75b0b4bb09d478b6876066e008bbb87a1da9df15acafb6"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BNB/05_pnl.rds",
+    "bytes": 3686528,
+    "sha256": "da1c84f62613474b7bf748ed46a13da8fa9a4724df074af96004123c3757b043"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BNB/06_wf_indexes.rds",
+    "bytes": 421,
+    "sha256": "e07d2e658a420098c57441fb472db527e9dbcef65737a72eb461e06a2e1843b4"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BNB/07_wf_metrics.rds",
+    "bytes": 117314,
+    "sha256": "28585cc86d24c2629b88db8b4f84045c1fb47b288abbaa5f223c7a7342c5716d"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BNB/08_wf_best_params.rds",
+    "bytes": 803,
+    "sha256": "cb833e5c80b02c7002bcc262c0c32bf974e4a1ec6321a0b71cf1838fadef6102"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BNB/09_wf_test_evalued.rds",
+    "bytes": 405359,
+    "sha256": "7eb5b533b70d31ed250df685c15ea03de37b65e79a29ada1134a6d27aaacc6aa"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BNB/dfresult.yaml",
+    "bytes": 2397,
+    "sha256": "ec5bb773c083ffa0a3dcc00dc4627141a1ae3d2f4533d7cdd4d93ed4e9585ada"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BNB/metrics.yaml",
+    "bytes": 328,
+    "sha256": "7dd5e798286820c839741a69d3bd2290984a5c09eb14bc015bb1af1e6a9c0245"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BNB/params.yaml",
+    "bytes": 366,
+    "sha256": "f47a927a7ea4b3521f2b2c2b9ef0653ee13d5457130c82dbb3436265e2bf0102"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/02_downsampled.rds",
+    "bytes": 149346,
+    "sha256": "1a60292454b5b8aeed914a0cda02eb6e9c5807afd247c8afddcc5aede41a9030"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/03_precalculated.rds",
+    "bytes": 1517184,
+    "sha256": "35af3202610c97435135f3df8ef4cba8342e0c0b49bcae7fa5dcf74ad10a5113"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/04_positions.rds",
+    "bytes": 177131,
+    "sha256": "7eb2a94a0101fd8513e4d72aa8b848bce4523e82a4fa5e50bc8ac551f45a81f5"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/05_pnl.rds",
+    "bytes": 3589057,
+    "sha256": "b6f7edd9212f293f8a4142d2fb583521ac96d655c17c3d4f2061cfae8a87e336"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/06_wf_indexes.rds",
+    "bytes": 421,
+    "sha256": "e07d2e658a420098c57441fb472db527e9dbcef65737a72eb461e06a2e1843b4"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/07_wf_metrics.rds",
+    "bytes": 115962,
+    "sha256": "a013d67c70dd1d8694e9041a37b211b18388d19e2371d32a66be68bc805b84b1"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/08_wf_best_params.rds",
+    "bytes": 807,
+    "sha256": "0ab32b43012853d798631c90057f2dc3f35605b7eee042a68744a2d09514f8d2"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/09_wf_test_evalued.rds",
+    "bytes": 420395,
+    "sha256": "965f55acc59bb9c4d4f4d353abf23866e7d00dadb6d8fa487431f289e7e7f5a5"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/dfresult.yaml",
+    "bytes": 2402,
+    "sha256": "cae8df27de766883315c80ce5c8c90c00fd3527021e9ed721f0106323b4c473a"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/metrics.yaml",
+    "bytes": 328,
+    "sha256": "a80e99d93df3821aea0aa2fed54c5cd719a18e266fc599095931af8fb5e89117"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_BTC/params.yaml",
+    "bytes": 366,
+    "sha256": "c42f244fc7864db652485950cb7a7670b67c95f44ba2841d8f4c07747e96b70d"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_ETH/02_downsampled.rds",
+    "bytes": 134060,
+    "sha256": "ff6794975fbe6bedefc2a245a129b053af18035bcff678e74d4ee5594e7fedbf"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_ETH/03_precalculated.rds",
+    "bytes": 1510658,
+    "sha256": "d8fd9adc3eb261689c07da0fbe5796117b26b715556e7ef038aafebc589c6b9d"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_ETH/04_positions.rds",
+    "bytes": 167141,
+    "sha256": "6a3e725bbf0778fbff91c2473d0f3d2f5552a456efcc79e99cd3602496ca7071"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_ETH/05_pnl.rds",
+    "bytes": 3647089,
+    "sha256": "711593f436f77661324f420c23d3290c37439a3eda7f55ed0946862c6b2495c5"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_ETH/06_wf_indexes.rds",
+    "bytes": 421,
+    "sha256": "e07d2e658a420098c57441fb472db527e9dbcef65737a72eb461e06a2e1843b4"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_ETH/07_wf_metrics.rds",
+    "bytes": 117992,
+    "sha256": "0e18c947ce0841fad122e06f5662d52c8c994d709605e34ba62d19394d1b45f3"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_ETH/08_wf_best_params.rds",
+    "bytes": 801,
+    "sha256": "9ce5db0bdd9f9490ea1d30631c5e99e5b7d288033e9e5a7f520e2a8cbbfb10dd"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_ETH/09_wf_test_evalued.rds",
+    "bytes": 411652,
+    "sha256": "1c7192676ee88ea6b32ab3ddaa62b49791f76bb9b3039827b89e36dddb92c35c"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_ETH/dfresult.yaml",
+    "bytes": 2398,
+    "sha256": "a07b5bb8c7a7ad657b183eeca754584e2def52d6b84e53a80375a178b0d831a7"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_ETH/metrics.yaml",
+    "bytes": 327,
+    "sha256": "2378c9456801f9e8c62ad34b9f3d08d95b4e1b24fc6837c105eede5e90ebd9ab"
+  },
+  {
+    "path": "unseen_period_results/dvc-exps/TRAIN_7_TEST_28_ETH/params.yaml",
+    "bytes": 366,
+    "sha256": "25a14577e6351b113c3bae265db8c2bca5553364d9f9c4af27ca1f0efddebf23"
+  },
+  {
+    "path": "btcusd_d.csv",
+    "bytes": 141178,
+    "sha256": "5d62f4a11b65e244b961fd9c0a6cb73ed8b73ff93b7736622351f04f2047061c"
+  }
+]

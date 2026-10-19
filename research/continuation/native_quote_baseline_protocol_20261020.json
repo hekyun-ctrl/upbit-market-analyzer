@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "status": "queued_not_started",
+  "scope": "Candidate-independent PUBLIC native LBank quote/HTTP roundtrip baseline for future manual-fill feasibility audits;NOT a strategy,alert,forwardcandidateclock or realized fill test.",
+  "existing_parser": "lbank_orderbook_shadow.py",
+  "parser_sha256": "2092f843e793fb03c8d888ec804e652b3adadb7c86e917220a1bc79bbb6a9496",
+  "public_endpoint_from_existing_reviewed_code": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketOrder?depth=5&symbol=BTCUSDT",
+  "next_run": "Confirm current public endpoint provenance/access without credentials;use ONLY fetch_public_orderbook/extract_features or equivalent inspected read-only code. Do not start OrderBookShadow/Thread,shadow_direction,production services or Telegram.",
+  "fixed_capture": {"maximum_attempts": 12, "target_interval_seconds": 5, "http_timeout_seconds": 5, "hard_stop_seconds": 120, "background_continuation": false},
+  "raw_record_fields": ["attempt_number","request_start_utc","response_received_utc","monotonic_request_duration_seconds","HTTP_status","server_headers_time_if_any","raw_response","payload_sha256","parse_status_or_error"],
+  "analysis": [
+    "Count attempted,successful,failed,unattempted;preserve real capture start/end and all inter-sample gaps,never fill missing or claim collection between runs.",
+    "Validate bid<ask,positive finite levels/instrument where exposed;record spread/depth/duplicatepayloads and HTTP roundtripdistribution.",
+    "Preserve exchange-event timestamp if actually present;missing event time is unknown freshness,not assumed current. HTTP Date and RTT/2 are not one-way quote latency.",
+    "No candle manufacture,TP1/urgentlabels,profit,edge or manual fill inference from snapshots alone. No unchanged past strategy reruns.",
+    "Save bounded raw JSONL,hashes,summary and next source checkpoint in research branch. Existing5m candle snapshot is not a verified closed5m bar."
+  ],
+  "why_next": "Both newly audited source BTC models remain positive only in historical fee-only diagnostics,but fixed frequency/uncertainty/native-risk gates fail. Native quote/freshness evidence is still missing for any future eligible source;collecting a bounded baseline addresses this independent input gap without deploying an unqualified strategy.",
+  "after_capture": "Continue PRIMARY published intradayBTCcode/data/aftercost source search using all stored exclusions;require explicit SL/TP1 and plausible>=1entry/day before expensive market replay. Do not alter priorWFparameters,add arbitrary exits or reinterpret the baseline as candidateforwardvalidation.",
+  "account_or_order_access": false,
+  "production_changed": false,
+  "forward_candidate_started": false
+}

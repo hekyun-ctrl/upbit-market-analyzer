@@ -25,7 +25,9 @@
     "official_raw_trade_reconciliation_5quarantines_20261020",
     "bouri_2021_functional_curve_component_v1_all10costed_variants",
     "external_ema_pullback_momentum_265209c_forensic_v1_synthetic_source_audit",
-    "unreadable_supply_demand_7d15e_source_audit_v1_real_price_causality"
+    "unreadable_supply_demand_7d15e_source_audit_v1_real_price_causality",
+    "garcia_schweitzer_2015_public_data_and_alert_contract_preflight",
+    "mroziewicz_slepaczuk_2026_two_released_BTC_ledger_cost_frequency_audit_v1"
   ],
   "read_before_work": [
     "docs/lbank_strategy_rebuild_2026-10-20.md",
@@ -35,17 +37,29 @@
     "research/long_history/results"
   ],
   "next_work": {
-    "stage": "new_primary_source_code_data_cost_and_turnover_feasibility",
-    "instruction": "Completed supply/demand source7d15e audit under checkpointb8644cfd68ce0e9a903802e1930be412b98abbcc:10tests and actual previously observed2024January BTC30m prefix/full replay. Appending futureJan21-31changed6pastzoneattributes,3pasttargets and2alreadyclosedoutcomes;43of47entriesuseformationbar. This source version is excluded,not alpha validated. Do not repair/tune/repeat it or earlier rejected sources unchanged. Read docs/lbank_supply_demand_source_audit_2026-10-20.md and source_screening_20261020_0740.json plus older exclusions. Additional CacheCarti passedBTCcardsareallnegative and JuliusScheuererTSMOMsourceusesriskamountfees/TPfirst;exclude those versions as positive exchange-cost evidence without redundant market reruns. Concrete next primary lead: Garcia/Schweitzer2015 DOI10.1098/rsos.150288 with advertised public data/scripts at sg.ethz.ch/btc. Retrieve complete paper and source data/scripts,hash exact artifacts,trace fixed rules/netcosts/actualdecisionfrequency,currentliveinputavailability and manualBTC suitability. This is unreviewed metadata,NOT a maintained candidate. Immediatelyexclude lowfrequency or unavailableinputs that fail policy and continue targeted PRIMARY intraday BTC code+data+aftercost evidence search. Produce a source contract and freeze ONE executable feasible next audit before any performance calculation;do not spend market-replay compute on already known incompatible methods. No qualified forward candidate/full alert contract exists;no deploy,all gates unchanged. Every historical input2022-Sep2026 is reused/exploratory;never presume scratch/source ZIPs persist or collectorsrunbetweenexecutions.",
+    "stage": "bounded_native_LBank_public_quote_quality_baseline_then_new_primary_source",
+    "instruction": "Completed new publishedWFsource actual2BTC ledger audit under checkpointa6b05c283f8399222d9f866ee75d158ca10e28ef:8tests,80.3MBauthorZIP SHA,original2resultRDS preserved. SourceWFboundary missingfees4/7transitions corrected without changing signals;both historical modelbase/doublefee sums remainpositive. Yet paperclip frequency0.440/0.449perday,opportunitydays32.21/32.06%,dailyblockbootstrap95lowernegative,DD53.96/49.79%,noSLTP1/nativecost/funding/urgent/forwardcontract. This is positive historical fee-only model evidence,NOT qualified replacement. Do not rerun/optimize it to force policy. Garcia2015lead completed:advertiseddata/scriptsHTTP404,dailypositions,nointradayriskcontract;no marketbacktest. Read docs/lbank_published_wf_ledger_audit_2026-10-20.md. Next concrete finite step:follow research/continuation/native_quote_baseline_protocol_20261020.json,validate current PUBLICnativeendpoint then bounded12attempts5secondinterval rawquote+HTTPRTT collection using reviewed existing fetch_public_orderbook/extract_features only. Record timestamps,missingeventtime,failures,spread,duplicates,rawSHA;stopatbatchend,preserveGit. No shadow_direction/daemon/Telegram/signals/accounts/orders,productionrestart or inference that collector runsbetweenexecutions. This baseline is NOT candidateforwardvalidation and cannot cureWFfrequency/risk failures. AfterbaselinecontinuePRIMARYintradayBTCcode/data/aftercostsourcefeasibility;rejectknownincompatiblefrequency/SLTP1 before costlymarketreplay. No eligiblecandidate exists;allpromotiongatesunchanged,no deploy. All2022-Sep2026reused;published2019-2021sourceoutcomesalsoalreadyknown,notnewuntouchedforwarddata.",
     "sources_to_screen": [
       {
+        "title": "Native LBank PUBLIC quote baseline for manual fill feasibility",
+        "url": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketOrder?depth=5&symbol=BTCUSDT",
+        "existing_code": "lbank_orderbook_shadow.py",
+        "protocol": "research/continuation/native_quote_baseline_protocol_20261020.json",
+        "status": "queued_bounded_input_quality_observation_NOT_strategy_or_candidateforward"
+      },
+      {
+        "title": "A novel approach to trading strategy parameter optimization using double out-of-sample data and walk-forward techniques",
+        "url": "https://arxiv.org/html/2602.10785v1",
+        "source_engine_commit": "8be3ecf0019e991962f6f59bf9938cfa56411350",
+        "source_analysis_commit": "a9b4d8d09da162c970253c0b8cb5e5b3f2400444",
+        "report": "research/continuation/results/wf_double_source_20261020/report.json",
+        "status": "audit_completed_historical_fee_only_positive_BUT_fixed_frequency_uncertainty_and_alertcontract_fail;no_repeat_or_tuning"
+      },
+      {
         "title": "Social signals and algorithmic trading of Bitcoin",
-        "url": "https://arxiv.org/abs/1506.01513",
-        "DOI": "10.1098/rsos.150288",
-        "advertised_data_and_scripts": "https://www.sg.ethz.ch/btc",
-        "author_page": "https://dgarcia.eu/2015/06/05/social-signals-and-algorithmic-trading-of-bitcoin/",
-        "screening": "research/continuation/source_screening_20261020_0740.json",
-        "status": "queued_unreviewed_primary_source_feasibility_only;not_shortlisted_no_profitability_or_frequency_claim"
+        "url": "https://arxiv.org/html/1506.01513v2",
+        "screening": "research/continuation/social_signal_source_screen_20261020.json",
+        "status": "preflight_completed_not_immediately_reproducible_manual_alert;advertisedendpoint404_nointradayriskcontract"
       },
       {
         "title": "Are simple technical trading rules profitable in bitcoin markets?",
@@ -75,7 +89,9 @@
     "External EMA headline uses random syntheticOHLCV,not exchange observations; fixed-clock execution produced79trades with invalid fills/protection and no costs. Forensic tests are not alpha validation. Source version rejected; no universal EMA claim.",
     "New source screens found README-versus-negative-artifact contradiction in rapfii and positioningv1 frequency290/733days below gate. These are source screens,not newly executed market backtests.",
     "Supply/demand source7d15e failed real-price future-append invariance:6pastzones,3targets,2closedoutcomeschange;43/47formationbarentries. Apparent positiveR is invalid as alpha;no valid PF,fullcoststress,TP1/nativeurgent/manualfill gates computed. This source version excluded;no universal supply-demand claim.",
-    "Additional primary screens:CacheCarti all4passedBTCcardsnegative;TSMOM sourcefeesappliedtorisknotnotional andTPfirst;Frontiers licensedrawdata/riskcontract notpubliclyreproducible. These are source screens only,not newly executed market backtests. Next social-signal paper/script lead remains unreviewed,not qualified."
+    "Additional primary screens:CacheCarti all4passedBTCcardsnegative;TSMOM sourcefeesappliedtorisknotnotional andTPfirst;Frontiers licensedrawdata/riskcontract notpubliclyreproducible. These are source screens only,not newly executed market backtests. Social-signal paper now screened:dailyinput,riskcontract unavailable,advertisedendpoint404;not qualified.",
+    "New publishedWFtwoBTCsourceledgers remainpositive after sourcefee reconciliation and2xfeemodel,but source processedKaggleprices/rawimputation not reconciled,logshortapproximation,nativefunding/latency/TP1 absent. Both frequency<.45/day,opportunitydays~32%,95lowernegative. PaperclipDD~50-54% is percent,notinitialR. No promotion or universalEMAconclusion.",
+    "Next PUBLICnativebook baseline12attempts is queued,not started,not strategyforwardcollection or proof of freshness/manualfills;do not assume continual collection between runs."
   ],
   "iterations": [
     {
@@ -209,20 +225,46 @@
       "delivery": "research/continuation/results/supply_demand_source_20261020/delivery.json",
       "production_changed": false,
       "forward_started": false
+    },
+    {
+      "id": "published_wf_ledger_audit_20261020_0747",
+      "protocol_frozen_utc": "2026-10-19T22:47:17Z",
+      "evaluation_started_utc": "2026-10-19T22:50:54.707078+00:00",
+      "evaluation_completed_utc": "2026-10-19T22:50:55.597263+00:00",
+      "completed_utc": "2026-10-19T22:56:13Z",
+      "stage_completed": "publicauthorZIP2BTCsourceledger_cost_boundary_fee_frequency_uncertainty_reconciliation8tests_and_separate_cash_audit",
+      "candidate_id": "mroziewicz_slepaczuk_2026_released_BTC_ledger_audit_v1",
+      "protocol_checkpoint_commit": "a6b05c283f8399222d9f866ee75d158ca10e28ef",
+      "author_ZIP_bytes": 80263893,
+      "input_member_count": 92,
+      "source_model_count": 2,
+      "paper_clip_observed_days_per_model": 655,
+      "paper_clip_rows_per_model": 15720,
+      "paper_clip_position_flips": [288,294],
+      "paper_clip_opportunity_days": [211,210],
+      "paper_clip_closed_diagnostic_segments": [287,293],
+      "model_trades_are_overlapping_not_independent": true,
+      "source_missing_fee_transitions": [4,7],
+      "paper_clip_fee_reconciled_logmodel_return_pct": [237.73906690050902,404.88240730031464],
+      "paper_clip_same_signal_double_fee_logmodel_return_pct": [89.85746490594533,180.4303942504376],
+      "implementation_tests_passed": 8,
+      "separate_arithmetic_audit_passed": true,
+      "result": "historical_fee_only_positive_NOT_qualified;frequency_opportunitydays_uncertainty_fail_no_full_manualrisk_native_forwardcontract",
+      "full_raw_strategy_backtest_performed": false,
+      "published_source_ledger_calculation_performed": true,
+      "report": "research/continuation/results/wf_double_source_20261020/report.json",
+      "audit": "research/continuation/results/wf_double_source_20261020/independent_audit.json",
+      "documentation": "docs/lbank_published_wf_ledger_audit_2026-10-20.md",
+      "source_screening": "research/continuation/social_signal_source_screen_20261020.json",
+      "delivery": "research/continuation/results/wf_double_source_20261020/delivery.json",
+      "next_protocol": "research/continuation/native_quote_baseline_protocol_20261020.json",
+      "production_changed": false,
+      "forward_started": false
     }
   ],
-  "active_run": {
-    "id": "published_wf_ledger_audit_20261020_0747",
-    "stage": "fixed_both_published_BTC_ledgers_before_reconciliation_calculation",
-    "protocol": "research/continuation/wf_double_source_audit_protocol_20261020.json",
-    "code": "research/continuation/audit_wf_double_source.py",
-    "source_engine_commit": "8be3ecf0019e991962f6f59bf9938cfa56411350",
-    "source_analysis_commit": "a9b4d8d09da162c970253c0b8cb5e5b3f2400444",
-    "downloaded_author_zip_sha256": "2bb40a7860733ba073a089c82b3424f4551d101d061fb31f4e9f51da978a81fd",
-    "next_action": "Run8smalltests,then frozen bothBTC RDS ledger cost/turnover/frequency reconciliation. Social-signal nextlead screened unavailable404/nointradayriskcontract;record saved. No original R/DVC code execution,no performance tuning,native or forward validation claim."
-  },
+  "active_run": null,
   "blockers": [],
-  "updated_kst": "2026-10-20T07:39:00+09:00",
+  "updated_kst": "2026-10-20T07:56:13+09:00",
   "maintained_research_candidates": [
     {
       "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
@@ -243,6 +285,11 @@
       "candidate_id": "unreadable_supply_demand_7d15e_source_audit_v1",
       "status": "rejected_real_price_future_dependence_and_invalid_formation_entry_gap_execution",
       "next": "Preserved input/ledgers/10tests and independent reconciliation;no unchanged repetition,salvage tuning or alpha interpretation of apparent positiveR. Audit does not invalidate every supply-demand strategy."
+    },
+    {
+      "candidate_id": "mroziewicz_slepaczuk_2026_released_BTC_ledger_audit_v1",
+      "status": "historical_fee_only_positive_not_qualified_for_manual_alert_frequency_uncertainty_and_contract",
+      "next": "Retain original positive/negative evidence,not eligiblecandidate. No repeated optimization or added arbitrary exits to pass gates;no claim of nativeaftercostprofit. Observe bounded nativeinputbaseline and continue another compatible PRIMARY source."
     }
   ],
   "source_reconciliation": {

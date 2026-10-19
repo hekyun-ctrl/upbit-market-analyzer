@@ -1,0 +1,74 @@
+{
+  "status": "artifact_hashes_scalar_cost_and_closed_cash_ledgers_reconciled",
+  "report_sha256": "d9d8afe929fc82532c3d475078323517789269fa97fe8e25c9bd598c5c527d35",
+  "checks": [
+    {
+      "dataset": "TRAIN_7_TEST_28_BTC",
+      "scope": "full",
+      "rows": 16800,
+      "cost_disagreements": 4,
+      "missing_charged_sides": 8.0,
+      "actual_flips": 296,
+      "gaps": [
+        {
+          "previous_utc": "2019-10-23T09:59:00+00:00",
+          "next_utc": "2019-10-23T10:58:00+00:00",
+          "seconds": 3540.0
+        },
+        {
+          "previous_utc": "2019-10-23T10:58:00+00:00",
+          "next_utc": "2019-10-23T11:59:00+00:00",
+          "seconds": 3660.0
+        }
+      ],
+      "closed_segments_checked": 294,
+      "source_and_two_fee_sums_reconciled": true
+    },
+    {
+      "dataset": "TRAIN_7_TEST_28_BTC",
+      "scope": "paper_clip",
+      "rows": 15720,
+      "cost_disagreements": 4,
+      "missing_charged_sides": 8.0,
+      "actual_flips": 288,
+      "gaps": [],
+      "closed_segments_checked": 287,
+      "source_and_two_fee_sums_reconciled": true
+    },
+    {
+      "dataset": "TRAIN_14_TEST_10_BTC",
+      "scope": "full",
+      "rows": 16560,
+      "cost_disagreements": 7,
+      "missing_charged_sides": 14.0,
+      "actual_flips": 310,
+      "gaps": [
+        {
+          "previous_utc": "2019-10-23T09:59:00+00:00",
+          "next_utc": "2019-10-23T10:58:00+00:00",
+          "seconds": 3540.0
+        },
+        {
+          "previous_utc": "2019-10-23T10:58:00+00:00",
+          "next_utc": "2019-10-23T11:59:00+00:00",
+          "seconds": 3660.0
+        }
+      ],
+      "closed_segments_checked": 309,
+      "source_and_two_fee_sums_reconciled": true
+    },
+    {
+      "dataset": "TRAIN_14_TEST_10_BTC",
+      "scope": "paper_clip",
+      "rows": 15720,
+      "cost_disagreements": 7,
+      "missing_charged_sides": 14.0,
+      "actual_flips": 294,
+      "gaps": [],
+      "closed_segments_checked": 293,
+      "source_and_two_fee_sums_reconciled": true
+    }
+  ],
+  "scope": "Separate arithmetic path,same researcher;no external institutional validation or bootstrap re-estimation.",
+  "market_profitability_certified": false
+}

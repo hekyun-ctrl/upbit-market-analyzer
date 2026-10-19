@@ -1,0 +1,22 @@
+{
+  "protocol_checkpoint_commit": "a6b05c283f8399222d9f866ee75d158ca10e28ef",
+  "protocol_sha256": "772995d6d7fc59b407c4786203f69f2b8f6f04025e43b4fef174063a7280fd53",
+  "code_sha256": "1e4f2e8b9c4ce6b8fef9d9274451a90444d0ba50b91caf08cc6f18ad9a4e21d4",
+  "report_sha256": "d9d8afe929fc82532c3d475078323517789269fa97fe8e25c9bd598c5c527d35",
+  "independent_audit_sha256": "86ce93cc20dece974da7cc52d0a8e01fadf10053b69cebb9dbde804b0b0f0289",
+  "commands_actually_run": [
+    "python -m pip install --only-binary=:all: --no-deps --target /tmp/lbank-rdata-1.0.0 rdata==1.0.0",
+    "python -m pip install --only-binary=:all: --no-deps --target /tmp/lbank-rdata-1.0.0 xarray==2025.1.2",
+    "PYTHONPATH=/tmp/lbank-rdata-1.0.0 python -m unittest discover -s research/continuation -p test_wf_double_source_audit.py -v",
+    "PYTHONPATH=/tmp/lbank-rdata-1.0.0 OPENBLAS_NUM_THREADS=2 OMP_NUM_THREADS=2 python research/continuation/audit_wf_double_source.py --archive /tmp/lbank-wf-published.zip --output research/continuation/results/wf_double_source_20261020",
+    "PYTHONPATH=/tmp/lbank-rdata-1.0.0 python research/continuation/verify_wf_double_outputs.py research/continuation/results/wf_double_source_20261020 --output research/continuation/results/wf_double_source_20261020/independent_audit.json"
+  ],
+  "tests_passed": 8,
+  "separate_arithmetic_audit_passed": true,
+  "environment": "No Rscript,rdata,xarray initially. Pinned numeric RDS parser installed to temporary target;no production dependency changes or external R/DVC/strategy code execution.",
+  "preservation": "Original2BTC resultRDS,2selectionRDS,2rangeYAML,4complete closed-segmentCSVgz,92memberSHAmanifest,report,audit,code,protocol,docs,state in research Git.80.3MBauthorZIP represented by URL/SHA;source ledgers preserved independently of ZIP availability.",
+  "recovery_not_performed": "Combined --download run in a clean environment was not executed. Actual existing ZIP download and hashcheck succeeded.",
+  "native_forward_or_account_validation": false,
+  "production_changed": false,
+  "deployment_performed": false
+}

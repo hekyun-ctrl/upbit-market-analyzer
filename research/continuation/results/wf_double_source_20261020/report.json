@@ -1,0 +1,651 @@
+{
+  "candidate_id": "mroziewicz_slepaczuk_2026_released_BTC_ledger_audit_v1",
+  "started_utc": "2026-10-19T22:50:54.707078+00:00",
+  "completed_utc": "2026-10-19T22:50:55.597263+00:00",
+  "protocol_sha256": "772995d6d7fc59b407c4786203f69f2b8f6f04025e43b4fef174063a7280fd53",
+  "code_sha256": "1e4f2e8b9c4ce6b8fef9d9274451a90444d0ba50b91caf08cc6f18ad9a4e21d4",
+  "versions": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "rdata": "1.0.0"
+  },
+  "results": {
+    "TRAIN_7_TEST_28_BTC": {
+      "full": {
+        "rows": 16800,
+        "known_return_rows": 16797,
+        "first_utc": "2019-10-16T06:59:00+00:00",
+        "last_utc": "2021-09-15T05:59:00+00:00",
+        "observed_days": 701,
+        "nonhourly_edges": 2,
+        "duplicate_timestamps": 0,
+        "source_price_return_max_error": 1.7763568394002505e-15,
+        "position_flips": 296,
+        "flips_per_day": 0.4222539229671897,
+        "opportunity_days": 219,
+        "opportunity_day_fraction": 0.3124108416547789,
+        "selected_path_fee_disagreements": 4,
+        "disagreements_on_WF_boundaries": 4,
+        "missing_charged_sides": 8.0,
+        "extra_charged_sides": 0.0,
+        "inherited_start_and_unresolved_end_are_not_closed": true,
+        "closed_diagnostic_segments": 294,
+        "closed_equal_entry_notional_fee_only": {
+          "gains": 5.758939912927111,
+          "losses": 4.457655121279089,
+          "PF": 1.2919213703716559,
+          "mean": 0.004426138747102113
+        },
+        "closed_equal_entry_notional_double_fee_only": {
+          "gains": 5.6027666013690265,
+          "losses": 4.891913272888502,
+          "PF": 1.1453119237456946,
+          "mean": 0.002417868464219472
+        },
+        "return_models": {
+          "source": {
+            "sum_log_return": 0.9024034481423207,
+            "exp_log_return_pct_diagnostic": 146.55217494062433,
+            "max_drawdown_pct_diagnostic": 63.29487497088995,
+            "daily_uncertainty": {
+              "days": 701,
+              "mean_daily_log_return": 0.0012873087705311272,
+              "block_days": 7,
+              "replicates": 2000,
+              "seed": 20261020,
+              "ci95": [
+                -0.001423948783629482,
+                0.004058104865935393
+              ]
+            }
+          },
+          "fee_reconciled": {
+            "sum_log_return": 0.8944034481423206,
+            "exp_log_return_pct_diagnostic": 144.58762621358952,
+            "max_drawdown_pct_diagnostic": 63.44140222113628,
+            "daily_uncertainty": {
+              "days": 701,
+              "mean_daily_log_return": 0.0012758965023428248,
+              "block_days": 7,
+              "replicates": 2000,
+              "seed": 20261020,
+              "ci95": [
+                -0.0014409958592357588,
+                0.004046591033650138
+              ]
+            }
+          },
+          "double_fee": {
+            "sum_log_return": 0.3024034481423207,
+            "exp_log_return_pct_diagnostic": 35.31070251170467,
+            "max_drawdown_pct_diagnostic": 67.44547447942385,
+            "daily_uncertainty": {
+              "days": 701,
+              "mean_daily_log_return": 0.00043138865640844485,
+              "block_days": 7,
+              "replicates": 2000,
+              "seed": 20261020,
+              "ci95": [
+                -0.002386272470042578,
+                0.003263699110925217
+              ]
+            }
+          }
+        },
+        "cost_disagreement_records": [
+          {
+            "utc": "2020-08-19T06:59:00+00:00",
+            "previous_position": 1,
+            "current_position": -1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.001522224017211471
+          },
+          {
+            "utc": "2020-10-14T06:59:00+00:00",
+            "previous_position": -1,
+            "current_position": 1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": 0.0011444502018918001
+          },
+          {
+            "utc": "2021-06-23T06:59:00+00:00",
+            "previous_position": -1,
+            "current_position": 1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.012921658092837518
+          },
+          {
+            "utc": "2021-08-18T06:59:00+00:00",
+            "previous_position": -1,
+            "current_position": 1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.0007560132554349508
+          }
+        ]
+      },
+      "paper_clip": {
+        "rows": 15720,
+        "known_return_rows": 15719,
+        "first_utc": "2019-11-07T00:59:00+00:00",
+        "last_utc": "2021-08-22T23:59:00+00:00",
+        "observed_days": 655,
+        "nonhourly_edges": 0,
+        "duplicate_timestamps": 0,
+        "source_price_return_max_error": 1.7763568394002505e-15,
+        "position_flips": 288,
+        "flips_per_day": 0.4396946564885496,
+        "opportunity_days": 211,
+        "opportunity_day_fraction": 0.32213740458015266,
+        "selected_path_fee_disagreements": 4,
+        "disagreements_on_WF_boundaries": 4,
+        "missing_charged_sides": 8.0,
+        "extra_charged_sides": 0.0,
+        "inherited_start_and_unresolved_end_are_not_closed": true,
+        "closed_diagnostic_segments": 287,
+        "closed_equal_entry_notional_fee_only": {
+          "gains": 5.6950081967370565,
+          "losses": 4.206622317048512,
+          "PF": 1.353819707953444,
+          "mean": 0.005186013518078552
+        },
+        "closed_equal_entry_notional_double_fee_only": {
+          "gains": 5.542902884894878,
+          "losses": 4.6309138595044415,
+          "PF": 1.196935000965021,
+          "mean": 0.0031776621093743433
+        },
+        "return_models": {
+          "source": {
+            "sum_log_return": 1.2251034199374895,
+            "exp_log_return_pct_diagnostic": 240.45181596398743,
+            "max_drawdown_pct_diagnostic": 53.77279896087514,
+            "daily_uncertainty": {
+              "days": 655,
+              "mean_daily_log_return": 0.0018703869006679223,
+              "block_days": 7,
+              "replicates": 2000,
+              "seed": 20261020,
+              "ci95": [
+                -0.00102971505172425,
+                0.004935929073618729
+              ]
+            }
+          },
+          "fee_reconciled": {
+            "sum_log_return": 1.2171034199374895,
+            "exp_log_return_pct_diagnostic": 237.73906690050902,
+            "max_drawdown_pct_diagnostic": 53.95733844002078,
+            "daily_uncertainty": {
+              "days": 655,
+              "mean_daily_log_return": 0.001858173160209907,
+              "block_days": 7,
+              "replicates": 2000,
+              "seed": 20261020,
+              "ci95": [
+                -0.0010419507417441193,
+                0.004923791669038575
+              ]
+            }
+          },
+          "double_fee": {
+            "sum_log_return": 0.6411034199374895,
+            "exp_log_return_pct_diagnostic": 89.85746490594533,
+            "max_drawdown_pct_diagnostic": 58.588095329936806,
+            "daily_uncertainty": {
+              "days": 655,
+              "mean_daily_log_return": 0.0009787838472328073,
+              "block_days": 7,
+              "replicates": 2000,
+              "seed": 20261020,
+              "ci95": [
+                -0.0019827684868387544,
+                0.0041629999922256165
+              ]
+            }
+          }
+        },
+        "cost_disagreement_records": [
+          {
+            "utc": "2020-08-19T06:59:00+00:00",
+            "previous_position": 1,
+            "current_position": -1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.001522224017211471
+          },
+          {
+            "utc": "2020-10-14T06:59:00+00:00",
+            "previous_position": -1,
+            "current_position": 1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": 0.0011444502018918001
+          },
+          {
+            "utc": "2021-06-23T06:59:00+00:00",
+            "previous_position": -1,
+            "current_position": 1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.012921658092837518
+          },
+          {
+            "utc": "2021-08-18T06:59:00+00:00",
+            "previous_position": -1,
+            "current_position": 1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.0007560132554349508
+          }
+        ]
+      },
+      "window_count": 25,
+      "train_end_before_test_start": true,
+      "source_parameter_selection_not_reoptimized": true,
+      "stored_source_metrics": {
+        "sharpe_ratio": 0.8307068,
+        "stdev": 0.0087819,
+        "ir2": 1.3191393,
+        "sortino_ratio": 1.2198012,
+        "start": "start 2019-11-07 00:59:00",
+        "end": "end 2021-08-22 23:59:00",
+        "sharpe_ratio_full": 0.5790367,
+        "stdev_full": 0.0087088,
+        "ir2_full": 0.5229402,
+        "sortino_ratio_full": 0.8486369,
+        "start_full": "start 2019-10-16 06:59:00",
+        "end_full": "end 2021-09-15 05:59:00"
+      },
+      "no_SL_TP1_contract": true
+    },
+    "TRAIN_14_TEST_10_BTC": {
+      "full": {
+        "rows": 16560,
+        "known_return_rows": 16557,
+        "first_utc": "2019-10-23T06:59:00+00:00",
+        "last_utc": "2021-09-12T05:59:00+00:00",
+        "observed_days": 691,
+        "nonhourly_edges": 2,
+        "duplicate_timestamps": 0,
+        "source_price_return_max_error": 1.7763568394002505e-15,
+        "position_flips": 310,
+        "flips_per_day": 0.44862518089725034,
+        "opportunity_days": 223,
+        "opportunity_day_fraction": 0.3227206946454414,
+        "selected_path_fee_disagreements": 7,
+        "disagreements_on_WF_boundaries": 7,
+        "missing_charged_sides": 14.0,
+        "extra_charged_sides": 0.0,
+        "inherited_start_and_unresolved_end_are_not_closed": true,
+        "closed_diagnostic_segments": 309,
+        "closed_equal_entry_notional_fee_only": {
+          "gains": 6.314892492936,
+          "losses": 4.431053281859068,
+          "PF": 1.4251447886644593,
+          "mean": 0.006096567026138937
+        },
+        "closed_equal_entry_notional_double_fee_only": {
+          "gains": 6.142424139424355,
+          "losses": 4.879170644556832,
+          "PF": 1.2589074223662988,
+          "mean": 0.004088199012516255
+        },
+        "return_models": {
+          "source": {
+            "sum_log_return": 1.5000235724187936,
+            "exp_log_return_pct_diagnostic": 348.17947158348886,
+            "max_drawdown_pct_diagnostic": 49.68998828048111,
+            "daily_uncertainty": {
+              "days": 691,
+              "mean_daily_log_return": 0.0021708011178274865,
+              "block_days": 7,
+              "replicates": 2000,
+              "seed": 20261020,
+              "ci95": [
+                -0.0007203402560779426,
+                0.005133844248060588
+              ]
+            }
+          },
+          "fee_reconciled": {
+            "sum_log_return": 1.4860235724187936,
+            "exp_log_return_pct_diagnostic": 341.94867631750543,
+            "max_drawdown_pct_diagnostic": 49.790507750943206,
+            "daily_uncertainty": {
+              "days": 691,
+              "mean_daily_log_return": 0.0021505406257869655,
+              "block_days": 7,
+              "replicates": 2000,
+              "seed": 20261020,
+              "ci95": [
+                -0.0007435674630243969,
+                0.005122317949098363
+              ]
+            }
+          },
+          "double_fee": {
+            "sum_log_return": 0.8660235724187937,
+            "exp_log_return_pct_diagnostic": 137.74383212733136,
+            "max_drawdown_pct_diagnostic": 54.79595944333031,
+            "daily_uncertainty": {
+              "days": 691,
+              "mean_daily_log_return": 0.0012532902639924646,
+              "block_days": 7,
+              "replicates": 2000,
+              "seed": 20261020,
+              "ci95": [
+                -0.001731651858287811,
+                0.00434567192802525
+              ]
+            }
+          }
+        },
+        "cost_disagreement_records": [
+          {
+            "utc": "2020-01-21T06:59:00+00:00",
+            "previous_position": -1,
+            "current_position": 1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.001152407170659231
+          },
+          {
+            "utc": "2020-07-19T06:59:00+00:00",
+            "previous_position": 1,
+            "current_position": -1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.0012817500770285761
+          },
+          {
+            "utc": "2020-11-26T06:59:00+00:00",
+            "previous_position": 1,
+            "current_position": -1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.002001606537527678
+          },
+          {
+            "utc": "2021-01-25T06:59:00+00:00",
+            "previous_position": 1,
+            "current_position": -1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.004670582319443284
+          },
+          {
+            "utc": "2021-03-06T06:59:00+00:00",
+            "previous_position": -1,
+            "current_position": 1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": 0.00915555132441348
+          },
+          {
+            "utc": "2021-05-25T06:59:00+00:00",
+            "previous_position": 1,
+            "current_position": -1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.01346890934892997
+          },
+          {
+            "utc": "2021-08-13T06:59:00+00:00",
+            "previous_position": -1,
+            "current_position": 1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": 0.012759080634916486
+          }
+        ]
+      },
+      "paper_clip": {
+        "rows": 15720,
+        "known_return_rows": 15719,
+        "first_utc": "2019-11-07T00:59:00+00:00",
+        "last_utc": "2021-08-22T23:59:00+00:00",
+        "observed_days": 655,
+        "nonhourly_edges": 0,
+        "duplicate_timestamps": 0,
+        "source_price_return_max_error": 1.7763568394002505e-15,
+        "position_flips": 294,
+        "flips_per_day": 0.4488549618320611,
+        "opportunity_days": 210,
+        "opportunity_day_fraction": 0.32061068702290074,
+        "selected_path_fee_disagreements": 7,
+        "disagreements_on_WF_boundaries": 7,
+        "missing_charged_sides": 14.0,
+        "extra_charged_sides": 0.0,
+        "inherited_start_and_unresolved_end_are_not_closed": true,
+        "closed_diagnostic_segments": 293,
+        "closed_equal_entry_notional_fee_only": {
+          "gains": 6.190017818898849,
+          "losses": 4.214172030990995,
+          "PF": 1.4688574109878516,
+          "mean": 0.006743500982620662
+        },
+        "closed_equal_entry_notional_double_fee_only": {
+          "gains": 6.02167846906492,
+          "losses": 4.634286126712467,
+          "PF": 1.2993756329276676,
+          "mean": 0.0047351274483018865
+        },
+        "return_models": {
+          "source": {
+            "sum_log_return": 1.633155359340847,
+            "exp_log_return_pct_diagnostic": 412.0004711884053,
+            "max_drawdown_pct_diagnostic": 49.689988280481124,
+            "daily_uncertainty": {
+              "days": 655,
+              "mean_daily_log_return": 0.00249336696082572,
+              "block_days": 7,
+              "replicates": 2000,
+              "seed": 20261020,
+              "ci95": [
+                -0.000639593124106782,
+                0.005533757527464806
+              ]
+            }
+          },
+          "fee_reconciled": {
+            "sum_log_return": 1.619155359340847,
+            "exp_log_return_pct_diagnostic": 404.88240730031464,
+            "max_drawdown_pct_diagnostic": 49.790507750943206,
+            "daily_uncertainty": {
+              "days": 655,
+              "mean_daily_log_return": 0.0024719929150241932,
+              "block_days": 7,
+              "replicates": 2000,
+              "seed": 20261020,
+              "ci95": [
+                -0.0006608865455526098,
+                0.005515402516198096
+              ]
+            }
+          },
+          "double_fee": {
+            "sum_log_return": 1.0311553593408471,
+            "exp_log_return_pct_diagnostic": 180.4303942504376,
+            "max_drawdown_pct_diagnostic": 53.85229423999767,
+            "daily_uncertainty": {
+              "days": 655,
+              "mean_daily_log_return": 0.0015742829913600708,
+              "block_days": 7,
+              "replicates": 2000,
+              "seed": 20261020,
+              "ci95": [
+                -0.0016414160084330539,
+                0.004703900277706395
+              ]
+            }
+          }
+        },
+        "cost_disagreement_records": [
+          {
+            "utc": "2020-01-21T06:59:00+00:00",
+            "previous_position": -1,
+            "current_position": 1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.001152407170659231
+          },
+          {
+            "utc": "2020-07-19T06:59:00+00:00",
+            "previous_position": 1,
+            "current_position": -1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.0012817500770285761
+          },
+          {
+            "utc": "2020-11-26T06:59:00+00:00",
+            "previous_position": 1,
+            "current_position": -1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.002001606537527678
+          },
+          {
+            "utc": "2021-01-25T06:59:00+00:00",
+            "previous_position": 1,
+            "current_position": -1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.004670582319443284
+          },
+          {
+            "utc": "2021-03-06T06:59:00+00:00",
+            "previous_position": -1,
+            "current_position": 1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": 0.00915555132441348
+          },
+          {
+            "utc": "2021-05-25T06:59:00+00:00",
+            "previous_position": 1,
+            "current_position": -1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": -0.01346890934892997
+          },
+          {
+            "utc": "2021-08-13T06:59:00+00:00",
+            "previous_position": -1,
+            "current_position": 1,
+            "source_charged_sides": 0,
+            "actual_sides": 2,
+            "WF_boundary": true,
+            "source_net_log_return": 0.012759080634916486
+          }
+        ]
+      },
+      "window_count": 69,
+      "train_end_before_test_start": true,
+      "source_parameter_selection_not_reoptimized": true,
+      "stored_source_metrics": {
+        "sharpe_ratio": 1.1064495,
+        "stdev": 0.0087783,
+        "ir2": 2.6274789,
+        "sortino_ratio": 1.6248771,
+        "start": "start 2019-11-07 00:59:00",
+        "end": "end 2021-08-22 23:59:00",
+        "sharpe_ratio_full": 0.9713215,
+        "stdev_full": 0.0087403,
+        "ir2_full": 2.1238679,
+        "sortino_ratio_full": 1.4249272,
+        "start_full": "start 2019-10-23 06:59:00",
+        "end_full": "end 2021-09-12 05:59:00"
+      },
+      "no_SL_TP1_contract": true
+    }
+  },
+  "artifacts": [
+    {
+      "path": "TRAIN_7_TEST_28_BTC_09_wf_test_evalued.rds",
+      "bytes": 420395,
+      "sha256": "965f55acc59bb9c4d4f4d353abf23866e7d00dadb6d8fa487431f289e7e7f5a5"
+    },
+    {
+      "path": "TRAIN_7_TEST_28_BTC_08_wf_best_params.rds",
+      "bytes": 807,
+      "sha256": "0ab32b43012853d798631c90057f2dc3f35605b7eee042a68744a2d09514f8d2"
+    },
+    {
+      "path": "TRAIN_7_TEST_28_BTC_metrics.yaml",
+      "bytes": 328,
+      "sha256": "a80e99d93df3821aea0aa2fed54c5cd719a18e266fc599095931af8fb5e89117"
+    },
+    {
+      "path": "TRAIN_7_TEST_28_BTC_full_closed.csv.gz",
+      "bytes": 16685,
+      "sha256": "5b3b0fedd35d7bb255d7f55d65405554c0bc2a4116b248c331b7d77aeace9ffd"
+    },
+    {
+      "path": "TRAIN_7_TEST_28_BTC_paper_clip_closed.csv.gz",
+      "bytes": 16284,
+      "sha256": "803ce838110728f9f680c596c96ce94d94d0824248e4ee76e0eeb72fd4fe18ac"
+    },
+    {
+      "path": "TRAIN_14_TEST_10_BTC_09_wf_test_evalued.rds",
+      "bytes": 415017,
+      "sha256": "abcf96636539115484437f816ec2997570b2e1f726cfd2e34339c11bcca5d320"
+    },
+    {
+      "path": "TRAIN_14_TEST_10_BTC_08_wf_best_params.rds",
+      "bytes": 1700,
+      "sha256": "f4dc19fad749e83a61270fe9f049434fa1eba17298114ff51de4dc2dc7d642b6"
+    },
+    {
+      "path": "TRAIN_14_TEST_10_BTC_metrics.yaml",
+      "bytes": 328,
+      "sha256": "99ea4e8644b0b666cc65ead3c844768aafed535b95bc39062310351ae6e42c6a"
+    },
+    {
+      "path": "TRAIN_14_TEST_10_BTC_full_closed.csv.gz",
+      "bytes": 17471,
+      "sha256": "67ec24f8c814cf8cb155f95eb1af0a356d339f9182355a010c0d4c9681c639a7"
+    },
+    {
+      "path": "TRAIN_14_TEST_10_BTC_paper_clip_closed.csv.gz",
+      "bytes": 16621,
+      "sha256": "1e1044c16ce90cf394ca3f2fa1c42057ca7a0086e53e532ead5cadb6bd1cdd6a"
+    }
+  ],
+  "limitations": [
+    "Source .1% aggregatefee model;actual slippage/spread/funding not separately observed.",
+    "Log-short return approximation and equal-entry-notional closed segments are diagnostic models,not a native account replay.",
+    "Author prices processed with imputation;hourly-grid checks do not validate original raw observations.",
+    "No initial-R,TP1,5minurgent,manualfilllatency,forward30days100closed evidence."
+  ],
+  "decision": "not_qualified_as_standalone_manual_alert",
+  "valid_native_profitability_backtest": false,
+  "production_changed": false,
+  "forward_started": false
+}
