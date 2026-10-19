@@ -1,0 +1,10 @@
+{
+  "version": "entry_location_implementation_clarifications_v1",
+  "outcome_tables_not_yet_inspected": true,
+  "range_edge_proximity_fraction": 0.35,
+  "contiguous_warmup_five_bars": 250,
+  "daily_caps_timezone": "UTC for this external experiment; production remains KST",
+  "profit_guard_atr": "frozen at plan, with accrued modeled adverse funding in break-even",
+  "entry_location_source_sha256": "53e4178c3718808e7b02fdd8e2d738421154a34ff410c3aa4f891ea6878e9278",
+  "policy": "No parameter change; record implementation assumptions before viewing outcome tables. All research methods retain their actual protocol hashes."
+}

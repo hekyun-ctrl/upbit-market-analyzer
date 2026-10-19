@@ -1,0 +1,492 @@
+{
+  "protocol_sha256": "64c2c69a5a77f8b811a3f8dabf242f75218b3d44ab84426b2e9d1f1fd69d5672",
+  "original_minute_rows": 525600,
+  "usable_minute_rows": 525490,
+  "quarantined_starts": [
+    1692200400,
+    1699628700,
+    1699629000,
+    1699629300,
+    1699629600,
+    1699629900,
+    1699630200,
+    1699630500,
+    1699630800,
+    1699631100,
+    1699631400,
+    1699631700,
+    1699632000,
+    1699632300,
+    1699632600,
+    1699632900,
+    1699633200,
+    1699633500,
+    1699633800,
+    1699634100,
+    1699634400,
+    1699634700
+  ],
+  "eligible_plans": 30609,
+  "unfilled": {
+    "target_before_fill": 5834,
+    "unfilled_expiry": 5772
+  },
+  "summary": {
+    "2023:range_edge_limit": {
+      "trades": 856,
+      "closed": 856,
+      "censored": 0,
+      "target_count": 273,
+      "target_fraction": 0.3189252336448598,
+      "target_wilson_lower": 0.2885715394308739,
+      "net_total_r": -405.5561355169376,
+      "net_expectancy_r": -0.47378053214595517,
+      "profit_factor": 0.16602619865065174,
+      "stress_2x_total_r": -722.2364804449063,
+      "stress_2x_mean_r": -0.8437342061272269,
+      "max_drawdown_r": 405.7742176254878,
+      "early_stop_5m_fraction": 0.10163551401869159,
+      "signals_per_day": 2.345205479452055,
+      "active_day_fraction": 0.8849315068493151,
+      "daily_net_r_ci": {
+        "lower95": -1.2441476089333938,
+        "upper95": -0.9928645380546205,
+        "lower99": -1.2833130822256036
+      },
+      "actual_pnl": false,
+      "venue": "Binance USD-M, not LBank",
+      "net_win_fraction": 0.3516355140186916,
+      "profit_guard_exits": 10,
+      "gap_risk_cap_breaches": 0
+    },
+    "2023:trend_value_limit": {
+      "trades": 1586,
+      "closed": 1585,
+      "censored": 1,
+      "target_count": 588,
+      "target_fraction": 0.37097791798107255,
+      "target_wilson_lower": 0.3475345932380647,
+      "net_total_r": -620.9620579400068,
+      "net_expectancy_r": -0.39177416904732293,
+      "profit_factor": 0.23327536220357595,
+      "stress_2x_total_r": -1202.7111909103758,
+      "stress_2x_mean_r": -0.7588083223409311,
+      "max_drawdown_r": 622.3883120139827,
+      "early_stop_5m_fraction": 0.043533123028391164,
+      "signals_per_day": 4.345205479452055,
+      "active_day_fraction": 0.9616438356164384,
+      "daily_net_r_ci": {
+        "lower95": -1.8749488932267464,
+        "upper95": -1.52264839796965,
+        "lower99": -1.922877635221126
+      },
+      "actual_pnl": false,
+      "venue": "Binance USD-M, not LBank",
+      "net_win_fraction": 0.4170347003154574,
+      "profit_guard_exits": 35,
+      "gap_risk_cap_breaches": 0
+    },
+    "2023:preplanned_break_stop": {
+      "trades": 482,
+      "closed": 482,
+      "censored": 0,
+      "target_count": 207,
+      "target_fraction": 0.42946058091286304,
+      "target_wilson_lower": 0.3859985430521395,
+      "net_total_r": -160.19090749337425,
+      "net_expectancy_r": -0.3323462811065856,
+      "profit_factor": 0.24744245970220843,
+      "stress_2x_total_r": -315.5477932906054,
+      "stress_2x_mean_r": -0.6546634715572726,
+      "max_drawdown_r": 160.2056349294983,
+      "early_stop_5m_fraction": 0.006224066390041493,
+      "signals_per_day": 1.3205479452054794,
+      "active_day_fraction": 0.7342465753424657,
+      "daily_net_r_ci": {
+        "lower95": -0.506212444871889,
+        "upper95": -0.3721188444472439,
+        "lower99": -0.5317482857096446
+      },
+      "actual_pnl": false,
+      "venue": "Binance USD-M, not LBank",
+      "net_win_fraction": 0.4315352697095436,
+      "profit_guard_exits": 0,
+      "gap_risk_cap_breaches": 7
+    }
+  },
+  "source_manifest": [
+    {
+      "month": "2023-01",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-01.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-01.zip.CHECKSUM",
+      "sha256": "b7b04483464b36c89f519bf35d6461d278c709577562108b6a00fb786b92e6a6",
+      "zip_bytes": 1824474,
+      "csv_rows": 44640
+    },
+    {
+      "month": "2023-02",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-02.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-02.zip.CHECKSUM",
+      "sha256": "b62ca5df57b1715109cb1fd57097529b28410fb36b0db5bd41dbefe7e070db68",
+      "zip_bytes": 1688103,
+      "csv_rows": 40320
+    },
+    {
+      "month": "2023-03",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-03.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-03.zip.CHECKSUM",
+      "sha256": "1cb47aae71e941d3e9d333f9c96723eb35c8b4a7ec90e819c59a7c02f89b03bb",
+      "zip_bytes": 1907895,
+      "csv_rows": 44640
+    },
+    {
+      "month": "2023-04",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-04.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-04.zip.CHECKSUM",
+      "sha256": "2c22e2e460bf0e41884bf71031eebf60224ba470b25777a4d17ddc9298390650",
+      "zip_bytes": 1810833,
+      "csv_rows": 43200
+    },
+    {
+      "month": "2023-05",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-05.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-05.zip.CHECKSUM",
+      "sha256": "cf9e0ab390e3872ddb9d807ad161933a28e374e09dbee2b9addf659856d1e656",
+      "zip_bytes": 1859563,
+      "csv_rows": 44640
+    },
+    {
+      "month": "2023-06",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-06.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-06.zip.CHECKSUM",
+      "sha256": "8dac3fe301198e752b257817542a7ded393dbe00b604f67aba6bc0090778ae95",
+      "zip_bytes": 1806762,
+      "csv_rows": 43200
+    },
+    {
+      "month": "2023-07",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-07.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-07.zip.CHECKSUM",
+      "sha256": "5cc84c767c9f4d1fa3cb3d33bd009a0b5e3a445e9c89ad2ef259c90b0365cbc3",
+      "zip_bytes": 1805388,
+      "csv_rows": 44640
+    },
+    {
+      "month": "2023-08",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-08.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-08.zip.CHECKSUM",
+      "sha256": "8d77e6f898fba3aa5bf643d128e0aaa1b722ea6881cd26a3d19088705117a1d7",
+      "zip_bytes": 1781029,
+      "csv_rows": 44640
+    },
+    {
+      "month": "2023-09",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-09.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-09.zip.CHECKSUM",
+      "sha256": "ea43f6e612b54e165c47ea30955b8d9e825b1d3ad1846f12c03ad0f0fced9029",
+      "zip_bytes": 1729534,
+      "csv_rows": 43200
+    },
+    {
+      "month": "2023-10",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-10.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-10.zip.CHECKSUM",
+      "sha256": "153f1322695d16a12cab261b7798045323d9f893b19d35d95ffe94a62530b4de",
+      "zip_bytes": 1829597,
+      "csv_rows": 44640
+    },
+    {
+      "month": "2023-11",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-11.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-11.zip.CHECKSUM",
+      "sha256": "63aa156170b2316927ae4c4928cc78866934a02b4bbc14c730b5fe4790383a80",
+      "zip_bytes": 1783820,
+      "csv_rows": 43200
+    },
+    {
+      "month": "2023-12",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-12.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-12.zip.CHECKSUM",
+      "sha256": "947ea9b1c5dfa301f1d5ff89d28f3ee49bc73eef2cfa1f0dc4024048458eb60b",
+      "zip_bytes": 1874380,
+      "csv_rows": 44640
+    },
+    {
+      "month": "2023-01",
+      "kind": "fundingRate",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-01.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-01.zip.CHECKSUM",
+      "sha256": "05e3df32f28d0d50f4c5a280adee9368b4a66fc68c6ddca1b3277087ac0d19f5",
+      "zip_bytes": 863,
+      "csv_rows": 93
+    },
+    {
+      "month": "2023-02",
+      "kind": "fundingRate",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-02.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-02.zip.CHECKSUM",
+      "sha256": "5227accd9aaa59f71f5e682abffb58be5f99573ed208ab968b1704c81ac11345",
+      "zip_bytes": 808,
+      "csv_rows": 84
+    },
+    {
+      "month": "2023-03",
+      "kind": "fundingRate",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-03.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-03.zip.CHECKSUM",
+      "sha256": "ab022adff9b853d2f33cf80154e77c770f57c3392f0bbc36564b2e2cdbd0e872",
+      "zip_bytes": 956,
+      "csv_rows": 93
+    },
+    {
+      "month": "2023-04",
+      "kind": "fundingRate",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-04.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-04.zip.CHECKSUM",
+      "sha256": "2931039d26818edc65d4faefba84945fd1ba52989dd58fb127dc3cd7a12c7fbf",
+      "zip_bytes": 952,
+      "csv_rows": 90
+    },
+    {
+      "month": "2023-05",
+      "kind": "fundingRate",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-05.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-05.zip.CHECKSUM",
+      "sha256": "5d026fece46df86293054c8c56c2c8de575d30161b82979b11831831217a246e",
+      "zip_bytes": 983,
+      "csv_rows": 93
+    },
+    {
+      "month": "2023-06",
+      "kind": "fundingRate",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-06.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-06.zip.CHECKSUM",
+      "sha256": "3ffdde6f1dc9c3c065d77ae43f3ba64d19d4cb76512d4bc1d541933d4fb2e6f7",
+      "zip_bytes": 845,
+      "csv_rows": 90
+    },
+    {
+      "month": "2023-07",
+      "kind": "fundingRate",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-07.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-07.zip.CHECKSUM",
+      "sha256": "0304baed9fd407293a8a8040b30a1b68bd344803b630d33530375b421733a930",
+      "zip_bytes": 861,
+      "csv_rows": 93
+    },
+    {
+      "month": "2023-08",
+      "kind": "fundingRate",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-08.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-08.zip.CHECKSUM",
+      "sha256": "516a8f50631c6ede6a9642f6d1590b6a22c33ba09935501d2ace8dc1396501fd",
+      "zip_bytes": 846,
+      "csv_rows": 93
+    },
+    {
+      "month": "2023-09",
+      "kind": "fundingRate",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-09.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-09.zip.CHECKSUM",
+      "sha256": "3fd9df6fd1eef33cf5fe625c27012359bc6d64a68c109305d7b44a0354f533c2",
+      "zip_bytes": 914,
+      "csv_rows": 90
+    },
+    {
+      "month": "2023-10",
+      "kind": "fundingRate",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-10.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-10.zip.CHECKSUM",
+      "sha256": "03105cc140150bffca834bcccbddc6cfee245e079d2df1759653243bd6e92448",
+      "zip_bytes": 865,
+      "csv_rows": 93
+    },
+    {
+      "month": "2023-11",
+      "kind": "fundingRate",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-11.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-11.zip.CHECKSUM",
+      "sha256": "8015d2997f8d5e757ff3707ee87800ca30a74da0129daa747b64117f07bcc186",
+      "zip_bytes": 696,
+      "csv_rows": 90
+    },
+    {
+      "month": "2023-12",
+      "kind": "fundingRate",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-12.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2023-12.zip.CHECKSUM",
+      "sha256": "8f02fdd2a2da261bbf13ab301c74bdb57fae005f19d5088e9ece5f8824c1a2a7",
+      "zip_bytes": 810,
+      "csv_rows": 93
+    },
+    {
+      "month": "2023-01",
+      "kind": "klines",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-01.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-01.zip.CHECKSUM",
+      "sha256": "583e2d1f1779434d0876ac5c84a55dd5c9e8700f21420762fe50483fab839dd0",
+      "zip_bytes": 395339,
+      "csv_rows": 8928
+    },
+    {
+      "month": "2023-02",
+      "kind": "klines",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-02.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-02.zip.CHECKSUM",
+      "sha256": "23afe68a8d8fb826b86a174fdefdb42aa750504221092c9456ad770935feeed2",
+      "zip_bytes": 363867,
+      "csv_rows": 8064
+    },
+    {
+      "month": "2023-03",
+      "kind": "klines",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-03.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-03.zip.CHECKSUM",
+      "sha256": "2ea92cf315951301af005c4cd14ade06d7bd2dba546eb088f43773c52c85eaee",
+      "zip_bytes": 409500,
+      "csv_rows": 8928
+    },
+    {
+      "month": "2023-04",
+      "kind": "klines",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-04.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-04.zip.CHECKSUM",
+      "sha256": "9fc287898ccd0c82506dd82e57faf1d0d9ae6102555af21364a36dea1b42d817",
+      "zip_bytes": 390441,
+      "csv_rows": 8640
+    },
+    {
+      "month": "2023-05",
+      "kind": "klines",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-05.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-05.zip.CHECKSUM",
+      "sha256": "def79dfc73dc7031f961a7cdd83eb9f815a0775502829201e793876b61065eeb",
+      "zip_bytes": 401781,
+      "csv_rows": 8928
+    },
+    {
+      "month": "2023-06",
+      "kind": "klines",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-06.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-06.zip.CHECKSUM",
+      "sha256": "daa3032bf548140b54baeb8515c1801e46af1cf3d8a9546d66e0e9c4e3adcbe7",
+      "zip_bytes": 389916,
+      "csv_rows": 8640
+    },
+    {
+      "month": "2023-07",
+      "kind": "klines",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-07.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-07.zip.CHECKSUM",
+      "sha256": "0054f032805e0e903cb2c73212a5d271dc2c1cd6fba4a74729587b8ad08c27fb",
+      "zip_bytes": 393612,
+      "csv_rows": 8928
+    },
+    {
+      "month": "2023-08",
+      "kind": "klines",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-08.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-08.zip.CHECKSUM",
+      "sha256": "92635591e3c813ff17a3d3c55dbef62e7379f6f17a54b0bcbe64f909f0fc052b",
+      "zip_bytes": 389403,
+      "csv_rows": 8928
+    },
+    {
+      "month": "2023-09",
+      "kind": "klines",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-09.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-09.zip.CHECKSUM",
+      "sha256": "7f44a35a1dc7f23c82a35c9afcaa8c64bf533734c913ab7c5f85eb0e5fbc76e1",
+      "zip_bytes": 376011,
+      "csv_rows": 8640
+    },
+    {
+      "month": "2023-10",
+      "kind": "klines",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-10.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-10.zip.CHECKSUM",
+      "sha256": "41fd943f5349a7417b17684c3d0fd1c13df779fea921a00742f3f4af3986f8ba",
+      "zip_bytes": 395692,
+      "csv_rows": 8928
+    },
+    {
+      "month": "2023-11",
+      "kind": "klines",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-11.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-11.zip.CHECKSUM",
+      "sha256": "c386879e037bdac37634b2cfd43d0e00033bcf9eef5d8a42284927314d727cfb",
+      "zip_bytes": 384879,
+      "csv_rows": 8640
+    },
+    {
+      "month": "2023-12",
+      "kind": "klines",
+      "interval": "5m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-12.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2023-12.zip.CHECKSUM",
+      "sha256": "2c6f4d22a095de8df65e7661231eaeb8344345674e65c478ba1efa2f1e0fb5c5",
+      "zip_bytes": 404700,
+      "csv_rows": 8928
+    }
+  ],
+  "trade_ledger_sha256": "2fd97de4d75098e1a24fdf6d4eded64bf21716782f32de8b020eb89a19924441",
+  "venue": "Binance USD-M BTCUSDT, not LBank",
+  "actual_pnl": false,
+  "production_changed": false,
+  "entry_fill_assumptions": "Hypothetical conservative penetrated limits / adverse stop-market gaps; no queue/fill verification. Same entry-minute profit touches not credited.",
+  "native_execution_verified": false,
+  "packaging_note": "Deterministic gzip recompression only; no performance/parameter changes. Raw-minute daily archive audit corrected an earlier draft label; 2024-2026 quarantine intervals remained unchanged.",
+  "research_versions": {
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "scikit-learn": "1.8.0",
+    "scipy": "1.17.0"
+  }
+}

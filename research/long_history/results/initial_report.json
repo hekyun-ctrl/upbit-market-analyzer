@@ -1,0 +1,707 @@
+{
+  "protocol_sha256": "0acbffa8e8b397bf61fb7a696a9801b35e04b8bf9fde19e09aa6139ab4303695",
+  "data_quality": {
+    "source_minute_rows": 1445760,
+    "quarantined_intervals": [
+      1730149800,
+      1736861400,
+      1736866800,
+      1738114500,
+      1756449300
+    ],
+    "quarantined_minute_count": 25,
+    "minute_rows": 1445735,
+    "five_rows": 289147,
+    "original_five_rows": 289152,
+    "funding_rows": 3012,
+    "minute_gaps": 5,
+    "five_gaps": 5,
+    "aggregate_archive_differences": {
+      "open": 0,
+      "high": 0,
+      "low": 0,
+      "close": 0,
+      "volume": 0
+    }
+  },
+  "raw_patterns": 16737,
+  "modelled_candidates": 8555,
+  "rejections": {
+    "entry_extended": 2065,
+    "no_net_target_room": 4155,
+    "stop_cap": 1452,
+    "target_passed": 438,
+    "entry_invalidated": 72
+  },
+  "meta_fit": {
+    "2025": {
+      "training_cases": 3463,
+      "training_latest_exit": 1735591080,
+      "prediction_cases": 2905,
+      "minimum_prediction": -0.758534057100282,
+      "maximum_prediction": 0.035696543954971696
+    },
+    "2026": {
+      "training_cases": 6375,
+      "training_latest_exit": 1767128940,
+      "prediction_cases": 2175,
+      "minimum_prediction": -0.7437082006805165,
+      "maximum_prediction": 0.16006305386275235
+    }
+  },
+  "intraday": {
+    "2025:hour_trend_vwap_reclaim": {
+      "trades": 655,
+      "closed": 655,
+      "censored": 0,
+      "target_count": 290,
+      "target_fraction": 0.44274809160305345,
+      "target_wilson_lower": 0.40515159746510737,
+      "net_total_r": -264.23797967161136,
+      "net_expectancy_r": -0.4034167628574219,
+      "profit_factor": 0.23507618532831911,
+      "stress_2x_total_r": -517.9806301282558,
+      "stress_2x_mean_r": -0.790810122333215,
+      "max_drawdown_r": 264.99501207131067,
+      "early_stop_5m_fraction": 0.035114503816793895,
+      "signals_per_day": 1.7945205479452055,
+      "active_day_fraction": 0.8273972602739726,
+      "daily_net_r_ci": {
+        "lower95": -0.8195222894896543,
+        "upper95": -0.6304942508656874,
+        "lower99": -0.8520717912712159
+      },
+      "actual_pnl": false,
+      "venue": "Binance USD-M, not LBank"
+    },
+    "2025:range_failed_break": {
+      "trades": 237,
+      "closed": 237,
+      "censored": 0,
+      "target_count": 138,
+      "target_fraction": 0.5822784810126582,
+      "target_wilson_lower": 0.5186650104043266,
+      "net_total_r": -71.9451861330964,
+      "net_expectancy_r": -0.3035661862155966,
+      "profit_factor": 0.24189919160580078,
+      "stress_2x_total_r": -156.9458032322994,
+      "stress_2x_mean_r": -0.662218579039238,
+      "max_drawdown_r": 73.2078893364904,
+      "early_stop_5m_fraction": 0.03375527426160337,
+      "signals_per_day": 0.6493150684931507,
+      "active_day_fraction": 0.4547945205479452,
+      "daily_net_r_ci": {
+        "lower95": -0.253483837441127,
+        "upper95": -0.1403397842114628,
+        "lower99": -0.2777604186057363
+      },
+      "actual_pnl": false,
+      "venue": "Binance USD-M, not LBank"
+    },
+    "2025:volume_compression_break": {
+      "trades": 1540,
+      "closed": 1540,
+      "censored": 0,
+      "target_count": 627,
+      "target_fraction": 0.40714285714285714,
+      "target_wilson_lower": 0.38286509492658405,
+      "net_total_r": -598.4054866445446,
+      "net_expectancy_r": -0.38857499132762635,
+      "profit_factor": 0.28267058740856815,
+      "stress_2x_total_r": -1216.6690669901461,
+      "stress_2x_mean_r": -0.7900448486949001,
+      "max_drawdown_r": 598.5366210353417,
+      "early_stop_5m_fraction": 0.033116883116883114,
+      "signals_per_day": 4.219178082191781,
+      "active_day_fraction": 0.958904109589041,
+      "daily_net_r_ci": {
+        "lower95": -1.7974257094056154,
+        "upper95": -1.4845449931609407,
+        "lower99": -1.8386330736909577
+      },
+      "actual_pnl": false,
+      "venue": "Binance USD-M, not LBank"
+    },
+    "2025:all_unfiltered": {
+      "trades": 2043,
+      "closed": 2043,
+      "censored": 0,
+      "target_count": 860,
+      "target_fraction": 0.4209495839451787,
+      "target_wilson_lower": 0.3997085968790683,
+      "net_total_r": -818.3302135997202,
+      "net_expectancy_r": -0.40055321272624583,
+      "profit_factor": 0.2532628409596627,
+      "stress_2x_total_r": -1634.5211338564231,
+      "stress_2x_mean_r": -0.80005929214705,
+      "max_drawdown_r": 818.4613479905174,
+      "early_stop_5m_fraction": 0.0381791483113069,
+      "signals_per_day": 5.597260273972603,
+      "active_day_fraction": 0.9863013698630136,
+      "daily_net_r_ci": {
+        "lower95": -2.4287683637685693,
+        "upper95": -2.0634756152753977,
+        "lower99": -2.4679063322453465
+      },
+      "actual_pnl": false,
+      "venue": "Binance USD-M, not LBank"
+    },
+    "2025:fixed_meta_net_r": {
+      "trades": 0,
+      "closed": 0,
+      "censored": 0,
+      "target_count": 0,
+      "target_fraction": null,
+      "target_wilson_lower": null,
+      "net_total_r": 0.0,
+      "net_expectancy_r": null,
+      "profit_factor": null,
+      "stress_2x_total_r": 0.0,
+      "stress_2x_mean_r": null,
+      "max_drawdown_r": 0.0,
+      "early_stop_5m_fraction": null,
+      "signals_per_day": 0.0,
+      "active_day_fraction": 0.0,
+      "daily_net_r_ci": {
+        "lower95": 0.0,
+        "upper95": 0.0,
+        "lower99": 0.0
+      },
+      "actual_pnl": false,
+      "venue": "Binance USD-M, not LBank"
+    },
+    "2026:hour_trend_vwap_reclaim": {
+      "trades": 479,
+      "closed": 479,
+      "censored": 0,
+      "target_count": 223,
+      "target_fraction": 0.46555323590814196,
+      "target_wilson_lower": 0.42133356664239185,
+      "net_total_r": -165.61223622232922,
+      "net_expectancy_r": -0.345745795871251,
+      "profit_factor": 0.30013220387303535,
+      "stress_2x_total_r": -348.12075140489753,
+      "stress_2x_mean_r": -0.7267656605530219,
+      "max_drawdown_r": 165.61223622232913,
+      "early_stop_5m_fraction": 0.029227557411273485,
+      "signals_per_day": 1.7545787545787546,
+      "active_day_fraction": 0.7875457875457875,
+      "daily_net_r_ci": {
+        "lower95": -0.7304413153339111,
+        "upper95": -0.48692452021518173,
+        "lower99": -0.7697538576047472
+      },
+      "actual_pnl": false,
+      "venue": "Binance USD-M, not LBank"
+    },
+    "2026:range_failed_break": {
+      "trades": 193,
+      "closed": 193,
+      "censored": 0,
+      "target_count": 98,
+      "target_fraction": 0.5077720207253886,
+      "target_wilson_lower": 0.43777841818194385,
+      "net_total_r": -72.51261069041647,
+      "net_expectancy_r": -0.37571300875863456,
+      "profit_factor": 0.21104395172463433,
+      "stress_2x_total_r": -140.5845427741891,
+      "stress_2x_mean_r": -0.7284173200735186,
+      "max_drawdown_r": 72.87572911314106,
+      "early_stop_5m_fraction": 0.07253886010362694,
+      "signals_per_day": 0.706959706959707,
+      "active_day_fraction": 0.4725274725274725,
+      "daily_net_r_ci": {
+        "lower95": -0.3389891755736856,
+        "upper95": -0.19527765577861322,
+        "lower99": -0.36498059260257554
+      },
+      "actual_pnl": false,
+      "venue": "Binance USD-M, not LBank"
+    },
+    "2026:volume_compression_break": {
+      "trades": 1132,
+      "closed": 1131,
+      "censored": 1,
+      "target_count": 461,
+      "target_fraction": 0.40760389036251105,
+      "target_wilson_lower": 0.37932498302650874,
+      "net_total_r": -452.2525107130763,
+      "net_expectancy_r": -0.39986959391076593,
+      "profit_factor": 0.27684780101348927,
+      "stress_2x_total_r": -893.5463966240656,
+      "stress_2x_mean_r": -0.7900498643890942,
+      "max_drawdown_r": 452.56123672263595,
+      "early_stop_5m_fraction": 0.04420866489832007,
+      "signals_per_day": 4.146520146520147,
+      "active_day_fraction": 0.9523809523809523,
+      "daily_net_r_ci": {
+        "lower95": -1.8844212054244593,
+        "upper95": -1.4053370120004218,
+        "lower99": -1.9685148778335513
+      },
+      "actual_pnl": false,
+      "venue": "Binance USD-M, not LBank"
+    },
+    "2026:all_unfiltered": {
+      "trades": 1508,
+      "closed": 1507,
+      "censored": 1,
+      "target_count": 660,
+      "target_fraction": 0.43795620437956206,
+      "target_wilson_lower": 0.41309578552948256,
+      "net_total_r": -566.7479671348777,
+      "net_expectancy_r": -0.37607695231246036,
+      "profit_factor": 0.2836780116146211,
+      "stress_2x_total_r": -1150.9074903341034,
+      "stress_2x_mean_r": -0.7637076909980779,
+      "max_drawdown_r": 567.0566931444376,
+      "early_stop_5m_fraction": 0.043132050431320505,
+      "signals_per_day": 5.523809523809524,
+      "active_day_fraction": 0.967032967032967,
+      "daily_net_r_ci": {
+        "lower95": -2.315973723006814,
+        "upper95": -1.8137931115561001,
+        "lower99": -2.4084322408053565
+      },
+      "actual_pnl": false,
+      "venue": "Binance USD-M, not LBank"
+    },
+    "2026:fixed_meta_net_r": {
+      "trades": 2,
+      "closed": 2,
+      "censored": 0,
+      "target_count": 1,
+      "target_fraction": 0.5,
+      "target_wilson_lower": 0.09452865480086611,
+      "net_total_r": -0.15504702106879564,
+      "net_expectancy_r": -0.07752351053439782,
+      "profit_factor": 0.8449529789312044,
+      "stress_2x_total_r": -0.5878082998779639,
+      "stress_2x_mean_r": -0.29390414993898195,
+      "max_drawdown_r": 1.0,
+      "early_stop_5m_fraction": 0.0,
+      "signals_per_day": 0.007326007326007326,
+      "active_day_fraction": 0.007326007326007326,
+      "daily_net_r_ci": {
+        "lower95": -0.01098901098901099,
+        "upper95": 0.009285197570672575,
+        "lower99": -0.014652014652014652
+      },
+      "actual_pnl": false,
+      "venue": "Binance USD-M, not LBank"
+    }
+  },
+  "hourly_ema": {
+    "summary": {
+      "2025": {
+        "first_execution_utc": "2025-08-29T08:01:00+00:00",
+        "last_execution_utc": "2025-12-31T23:01:00+00:00",
+        "hourly_observations": 2992,
+        "net_return_unlevered": -0.32475147482871736,
+        "stress_return_unlevered": -0.3782246644962277,
+        "buy_hold_return": -0.20444924680607635,
+        "annualized_sharpe": -2.6337655436416143,
+        "max_drawdown_fraction": 0.4281118206783786,
+        "position_change_units": 103.0,
+        "daily_return_ci": {
+          "lower95": -0.007433063217142819,
+          "upper95": 0.0016378353286789233,
+          "lower99": -0.009092977787067722
+        },
+        "interpretation": "Separate always-long/short hourly direction research; no TP1/stop contract, not approved for leveraged live entry"
+      },
+      "2026": {
+        "first_execution_utc": "2026-01-01T00:01:00+00:00",
+        "last_execution_utc": "2026-09-30T22:01:00+00:00",
+        "hourly_observations": 6551,
+        "net_return_unlevered": 0.01108784461742962,
+        "stress_return_unlevered": -0.19347034399845664,
+        "buy_hold_return": -0.04492277560412172,
+        "annualized_sharpe": 0.24741560463902387,
+        "max_drawdown_fraction": 0.40034226984335064,
+        "position_change_units": 282.0,
+        "daily_return_ci": {
+          "lower95": -0.002547337644748872,
+          "upper95": 0.0034801389786347212,
+          "lower99": -0.003220583731802027
+        },
+        "interpretation": "Separate always-long/short hourly direction research; no TP1/stop contract, not approved for leveraged live entry"
+      }
+    },
+    "walkforward_steps": [
+      {
+        "first_exec": 1757667660,
+        "last_training_exec": 1757664060,
+        "parameters": [
+          20,
+          200
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1758531660,
+        "last_training_exec": 1758528060,
+        "parameters": [
+          30,
+          150
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1759395660,
+        "last_training_exec": 1759392060,
+        "parameters": [
+          5,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1760259660,
+        "last_training_exec": 1760256060,
+        "parameters": [
+          20,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1761123660,
+        "last_training_exec": 1761120060,
+        "parameters": [
+          30,
+          100
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1761987660,
+        "last_training_exec": 1761984060,
+        "parameters": [
+          30,
+          50
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1762851660,
+        "last_training_exec": 1762848060,
+        "parameters": [
+          5,
+          100
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1763715660,
+        "last_training_exec": 1763712060,
+        "parameters": [
+          30,
+          50
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1764579660,
+        "last_training_exec": 1764576060,
+        "parameters": [
+          30,
+          50
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1765443660,
+        "last_training_exec": 1765440060,
+        "parameters": [
+          5,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1766307660,
+        "last_training_exec": 1766304060,
+        "parameters": [
+          30,
+          150
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1767171660,
+        "last_training_exec": 1767168060,
+        "parameters": [
+          15,
+          150
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1768035660,
+        "last_training_exec": 1768032060,
+        "parameters": [
+          20,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1768899660,
+        "last_training_exec": 1768896060,
+        "parameters": [
+          20,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1769763660,
+        "last_training_exec": 1769760060,
+        "parameters": [
+          30,
+          50
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1770627660,
+        "last_training_exec": 1770624060,
+        "parameters": [
+          30,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1771491660,
+        "last_training_exec": 1771488060,
+        "parameters": [
+          7,
+          150
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1772355660,
+        "last_training_exec": 1772352060,
+        "parameters": [
+          7,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1773219660,
+        "last_training_exec": 1773216060,
+        "parameters": [
+          15,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1774083660,
+        "last_training_exec": 1774080060,
+        "parameters": [
+          5,
+          100
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1774947660,
+        "last_training_exec": 1774944060,
+        "parameters": [
+          20,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1775811660,
+        "last_training_exec": 1775808060,
+        "parameters": [
+          5,
+          150
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1776675660,
+        "last_training_exec": 1776672060,
+        "parameters": [
+          7,
+          200
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1777539660,
+        "last_training_exec": 1777536060,
+        "parameters": [
+          30,
+          150
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1778403660,
+        "last_training_exec": 1778400060,
+        "parameters": [
+          7,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1779267660,
+        "last_training_exec": 1779264060,
+        "parameters": [
+          5,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1780131660,
+        "last_training_exec": 1780128060,
+        "parameters": [
+          30,
+          200
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1780995660,
+        "last_training_exec": 1780992060,
+        "parameters": [
+          5,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1781859660,
+        "last_training_exec": 1781856060,
+        "parameters": [
+          15,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1782723660,
+        "last_training_exec": 1782720060,
+        "parameters": [
+          15,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1783587660,
+        "last_training_exec": 1783584060,
+        "parameters": [
+          10,
+          100
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1784451660,
+        "last_training_exec": 1784448060,
+        "parameters": [
+          7,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1785315660,
+        "last_training_exec": 1785312060,
+        "parameters": [
+          20,
+          50
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1786179660,
+        "last_training_exec": 1786176060,
+        "parameters": [
+          5,
+          100
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1787043660,
+        "last_training_exec": 1787040060,
+        "parameters": [
+          5,
+          100
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1787907660,
+        "last_training_exec": 1787904060,
+        "parameters": [
+          10,
+          100
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1788771660,
+        "last_training_exec": 1788768060,
+        "parameters": [
+          10,
+          200
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1789635660,
+        "last_training_exec": 1789632060,
+        "parameters": [
+          20,
+          40
+        ],
+        "training_bars": 336
+      },
+      {
+        "first_exec": 1790499660,
+        "last_training_exec": 1790496060,
+        "parameters": [
+          30,
+          40
+        ],
+        "training_bars": 336
+      }
+    ]
+  },
+  "execution": "First original minute open after 5m-close + 1s publication assumption. Minute conflict stop first; zero quote liquidity or exact fills claimed.",
+  "funding": "Archived settlement rates; adverse payments at trade-price proxy, favorable receipts ignored. Not actual account funding or mark-price verification.",
+  "final_test_hyperparameter_changes": 0,
+  "production_changed": false,
+  "lbank_profitability_validated": false,
+  "output_files": {
+    "selected_trades.csv.gz": {
+      "sha256": "70bbbf5cfeb1dbe6f61289ab5b19b020ab6403620da1b52c1571591e6a75be48",
+      "bytes": 2232197
+    },
+    "labelled_development_and_test.csv.gz": {
+      "sha256": "397cfd869e6e2079daa4b621e8743eca5961536f9d0042060f91f37b14aad30f",
+      "bytes": 2322323
+    }
+  },
+  "packaging_note": "Deterministic gzip recompression only; no performance/parameter changes. Raw-minute daily archive audit corrected an earlier draft label; 2024-2026 quarantine intervals remained unchanged.",
+  "research_versions": {
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "scikit-learn": "1.8.0",
+    "scipy": "1.17.0"
+  }
+}

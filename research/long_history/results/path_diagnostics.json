@@ -1,0 +1,98 @@
+{
+  "initial_2026:2026:all_unfiltered": {
+    "trades": 1507,
+    "mean_gross_price_pnl_per_original_net_risk": 0.011947243441342566,
+    "mean_net_r": -0.37607695231246036,
+    "mean_deduction_r": 0.38802419575380287,
+    "exit_reasons": {
+      "stop": 762,
+      "target": 660,
+      "time_exit": 85
+    }
+  },
+  "initial_2026:2026:fixed_meta_net_r": {
+    "trades": 2,
+    "mean_gross_price_pnl_per_original_net_risk": 0.1388571621959051,
+    "mean_net_r": -0.07752351053439782,
+    "mean_deduction_r": 0.21638067273030293,
+    "exit_reasons": {
+      "stop": 1,
+      "target": 1
+    }
+  },
+  "initial_2026:2026:hour_trend_vwap_reclaim": {
+    "trades": 479,
+    "mean_gross_price_pnl_per_original_net_risk": 0.03574528410888441,
+    "mean_net_r": -0.345745795871251,
+    "mean_deduction_r": 0.38149107998013543,
+    "exit_reasons": {
+      "stop": 228,
+      "target": 223,
+      "time_exit": 28
+    }
+  },
+  "initial_2026:2026:range_failed_break": {
+    "trades": 193,
+    "mean_gross_price_pnl_per_original_net_risk": -0.022975699743989726,
+    "mean_net_r": -0.37571300875863456,
+    "mean_deduction_r": 0.35273730901464473,
+    "exit_reasons": {
+      "target": 98,
+      "stop": 91,
+      "time_exit": 4
+    }
+  },
+  "initial_2026:2026:volume_compression_break": {
+    "trades": 1131,
+    "mean_gross_price_pnl_per_original_net_risk": -0.009285501095655596,
+    "mean_net_r": -0.39986959391076593,
+    "mean_deduction_r": 0.3905840928151103,
+    "exit_reasons": {
+      "stop": 599,
+      "target": 461,
+      "time_exit": 71
+    }
+  },
+  "preplanned_2023:0": {
+    "trades": 856,
+    "mean_gross_price_pnl_per_original_net_risk": -0.10301235743161634,
+    "mean_net_r": -0.47378053214595517,
+    "mean_deduction_r": 0.3707681747143387,
+    "exit_reasons": {
+      "stop": 442,
+      "target": 273,
+      "time_exit": 129,
+      "profit_guard_exit": 10,
+      "ambiguous_stop_first": 1,
+      "gap_stop": 1
+    }
+  },
+  "preplanned_2023:1": {
+    "trades": 1585,
+    "mean_gross_price_pnl_per_original_net_risk": -0.024018179682371427,
+    "mean_net_r": -0.39177416904732293,
+    "mean_deduction_r": 0.3677559893649514,
+    "exit_reasons": {
+      "stop": 731,
+      "target": 588,
+      "time_exit": 228,
+      "profit_guard_exit": 35,
+      "ambiguous_stop_first": 2,
+      "gap_stop": 1
+    }
+  },
+  "preplanned_2023:2": {
+    "trades": 482,
+    "mean_gross_price_pnl_per_original_net_risk": -0.008708649061031335,
+    "mean_net_r": -0.3323462811065856,
+    "mean_deduction_r": 0.32363763204555424,
+    "exit_reasons": {
+      "target": 207,
+      "stop": 166,
+      "time_exit": 106,
+      "gap_chase_exit": 1,
+      "ambiguous_stop_first": 1,
+      "gap_stop": 1
+    }
+  }
+}

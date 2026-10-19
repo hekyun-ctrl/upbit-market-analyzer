@@ -1,0 +1,16 @@
+{
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "outcome_parameters_changed_after_inspection": false,
+  "entry_location_pre_outcome_sha256": "53e4178c3718808e7b02fdd8e2d738421154a34ff410c3aa4f891ea6878e9278",
+  "entry_location_packaged_sha256": "a3ca307409cdfb07eadb29608272733af6dd353fc3575177c94112440b558e41",
+  "entry_source_change": "gzip timestamp only, reversible to recorded pre-outcome hash",
+  "evaluate_change": "deterministic gzip plus byte-identical copies of NAMES and Wilson formula in place of importing the prior module",
+  "post_outcome_diagnostics": "descriptive gross price vs net PnL only; no candidate changes",
+  "source_hashes": {
+    "research/long_history/diagnose_results.py": "512d7190614cd5a1a2cbeb968cd0a5eefaa0d486b8a85aaf41fd6880a0dfb139",
+    "research/long_history/evaluate.py": "6f21363d98cd58e588bc292efbe820472a51a9f35d3d67829d22bf9fb48141e2",
+    "research/long_history/download_binance.py": "df99dc5f917b43d53bb33165cd0097843211c50cc6026df7e523eea627a41b26",
+    "research/long_history/audit_integrity.py": "1c48fa37cb88b95440d486943aa8ae374e57a9455209b2b58cc49822fef7369d",
+    "research/long_history/entry_location.py": "a3ca307409cdfb07eadb29608272733af6dd353fc3575177c94112440b558e41"
+  }
+}

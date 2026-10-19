@@ -1,0 +1,150 @@
+{
+  "source": "Binance USD-M BTCUSDT perpetual, not LBank",
+  "retrieved_utc": "2026-10-19T15:49:29.630558+00:00",
+  "archives": [
+    {
+      "month": "2023-01",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-01.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-01.zip.CHECKSUM",
+      "sha256": "b7b04483464b36c89f519bf35d6461d278c709577562108b6a00fb786b92e6a6",
+      "zip_bytes": 1824474,
+      "csv_rows": 44640,
+      "first": "1672531200000,16537.50,16538.00,16534.30,16538.00,170.576,1672531259999,2820697.45580,946,103.782,1716164.80590,0",
+      "last": "1675209540000,23123.10,23125.70,23116.00,23119.40,150.422,1675209599999,3477809.85850,1123,63.771,1474429.47480,0"
+    },
+    {
+      "month": "2023-02",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-02.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-02.zip.CHECKSUM",
+      "sha256": "b62ca5df57b1715109cb1fd57097529b28410fb36b0db5bd41dbefe7e070db68",
+      "zip_bytes": 1688103,
+      "csv_rows": 40320,
+      "first": "1675209600000,23119.50,23134.20,23119.40,23129.90,449.836,1675209659999,10403241.33910,3187,314.554,7274600.41510,0",
+      "last": "1677628740000,23110.00,23130.00,23110.00,23129.60,221.399,1677628799999,5118709.62940,1562,176.405,4078455.39290,0"
+    },
+    {
+      "month": "2023-03",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-03.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-03.zip.CHECKSUM",
+      "sha256": "1cb47aae71e941d3e9d333f9c96723eb35c8b4a7ec90e819c59a7c02f89b03bb",
+      "zip_bytes": 1907895,
+      "csv_rows": 44640,
+      "first": "1677628800000,23129.70,23141.30,23120.30,23132.70,847.786,1677628859999,19610979.37900,3880,525.846,12164545.71380,0",
+      "last": "1680307140000,28461.80,28466.60,28454.80,28454.90,115.634,1680307199999,3291032.62060,1275,44.420,1264290.46540,0"
+    },
+    {
+      "month": "2023-04",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-04.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-04.zip.CHECKSUM",
+      "sha256": "2c22e2e460bf0e41884bf71031eebf60224ba470b25777a4d17ddc9298390650",
+      "zip_bytes": 1810833,
+      "csv_rows": 43200,
+      "first": "1680307200000,28454.80,28475.60,28454.80,28474.80,356.923,1680307259999,10161040.04380,2905,231.685,6595516.13920,0",
+      "last": "1682899140000,29247.00,29253.20,29145.50,29223.00,2888.894,1682899199999,84350780.42010,16907,1111.102,32454167.94210,0"
+    },
+    {
+      "month": "2023-05",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-05.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-05.zip.CHECKSUM",
+      "sha256": "cf9e0ab390e3872ddb9d807ad161933a28e374e09dbee2b9addf659856d1e656",
+      "zip_bytes": 1859563,
+      "csv_rows": 44640,
+      "first": "1682899200000,29223.00,29245.80,29206.90,29240.70,1550.598,1682899259999,45324631.03610,9667,1007.084,29438603.65700,0",
+      "last": "1685577540000,27200.20,27205.00,27197.00,27201.10,313.679,1685577599999,8532151.58490,1658,89.298,2428830.85140,0"
+    },
+    {
+      "month": "2023-06",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-06.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-06.zip.CHECKSUM",
+      "sha256": "8dac3fe301198e752b257817542a7ded393dbe00b604f67aba6bc0090778ae95",
+      "zip_bytes": 1806762,
+      "csv_rows": 43200,
+      "first": "1685577600000,27201.10,27214.20,27200.00,27202.90,436.256,1685577659999,11868892.68700,3164,279.448,7602628.27410,0",
+      "last": "1688169540000,30460.20,30471.90,30460.00,30460.20,114.721,1688169599999,3494926.79660,1244,83.034,2529631.81400,0"
+    },
+    {
+      "month": "2023-07",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-07.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-07.zip.CHECKSUM",
+      "sha256": "5cc84c767c9f4d1fa3cb3d33bd009a0b5e3a445e9c89ad2ef259c90b0365cbc3",
+      "zip_bytes": 1805388,
+      "csv_rows": 44640,
+      "first": "1688169600000,30460.20,30476.00,30460.20,30470.60,146.200,1688169659999,4454083.21290,1762,71.606,2181619.43300,0",
+      "last": "1690847940000,29220.80,29220.90,29220.80,29220.80,20.112,1690847999999,587689.43290,292,7.033,205510.58970,0"
+    },
+    {
+      "month": "2023-08",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-08.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-08.zip.CHECKSUM",
+      "sha256": "8d77e6f898fba3aa5bf643d128e0aaa1b722ea6881cd26a3d19088705117a1d7",
+      "zip_bytes": 1781029,
+      "csv_rows": 44640,
+      "first": "1690848000000,29220.80,29220.90,29214.90,29214.90,148.016,1690848059999,4324517.57220,1104,10.485,306338.13350,0",
+      "last": "1693526340000,25927.30,25931.50,25925.80,25928.00,73.217,1693526399999,1898336.89700,970,45.569,1181507.25020,0"
+    },
+    {
+      "month": "2023-09",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-09.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-09.zip.CHECKSUM",
+      "sha256": "ea43f6e612b54e165c47ea30955b8d9e825b1d3ad1846f12c03ad0f0fced9029",
+      "zip_bytes": 1729534,
+      "csv_rows": 43200,
+      "first": "1693526400000,25928.00,25941.20,25918.90,25920.10,490.209,1693526459999,12710875.69900,3496,306.153,7938934.80330,0",
+      "last": "1696118340000,26951.70,26952,26949.20,26950.90,58.310,1696118399999,1571480.74770,621,37.835,1019661.00830,0"
+    },
+    {
+      "month": "2023-10",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-10.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-10.zip.CHECKSUM",
+      "sha256": "153f1322695d16a12cab261b7798045323d9f893b19d35d95ffe94a62530b4de",
+      "zip_bytes": 1829597,
+      "csv_rows": 44640,
+      "first": "1696118400000,26951,26951,26946.40,26948.70,68.826,1696118459999,1854684.25100,1043,19.159,516281.80290,0",
+      "last": "1698796740000,34671.70,34675.40,34651.30,34651.40,119.791,1698796799999,4152396.02730,1895,27.437,951023.57900,0"
+    },
+    {
+      "month": "2023-11",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-11.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-11.zip.CHECKSUM",
+      "sha256": "63aa156170b2316927ae4c4928cc78866934a02b4bbc14c730b5fe4790383a80",
+      "zip_bytes": 1783820,
+      "csv_rows": 43200,
+      "first": "1698796800000,34651.40,34676.50,34650,34669.90,376.040,1698796859999,13036100.92890,4214,199.885,6929500.65670,0",
+      "last": "1701388740000,37697.70,37716.90,37691.90,37716.80,54.218,1701388799999,2044064.10230,963,44.746,1686964.85560,0"
+    },
+    {
+      "month": "2023-12",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-12.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2023-12.zip.CHECKSUM",
+      "sha256": "947ea9b1c5dfa301f1d5ff89d28f3ee49bc73eef2cfa1f0dc4024048458eb60b",
+      "zip_bytes": 1874380,
+      "csv_rows": 44640,
+      "first": "1701388800000,37716.90,37734.60,37711,37729,184.741,1701388859999,6969186.79070,2115,127.350,4804046.46900,0",
+      "last": "1704067140000,42312.70,42314.00,42293.70,42314.00,125.766,1704067199999,5320355.53740,1287,51.227,2167048.28460,0"
+    }
+  ]
+}
