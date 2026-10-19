@@ -1,0 +1,42 @@
+{
+  "candidate_id": "mroziewicz_slepaczuk_2026_released_BTC_ledger_audit_v1",
+  "version": 1,
+  "frozen_utc": "2026-10-19T22:47:17Z",
+  "scope": "Audit both published BTC test-period ledgers for return/position/cost reconciliation,window-boundary turnover,frequency and data integrity. No parameter search,new strategy or native LBank performance claim.",
+  "paper": "https://arxiv.org/html/2602.10785v1",
+  "analysis_source": "https://github.com/tmr-crypto/wf_optim_crypto_analysis/tree/a9b4d8d09da162c970253c0b8cb5e5b3f2400444",
+  "engine_source": "https://github.com/tmr-crypto/wf_optim_crypto/tree/8be3ecf0019e991962f6f59bf9938cfa56411350",
+  "reviewed_engine_hashes": {
+    "master/rcode/logic/strategy.r": "b0ab6e6ced79ee67f2f67e4d2bb4d42dfb381ed5a361b1e6af2294eae59db723",
+    "master/rcode/logic/WfHelper.r": "08c72cc07b469372d7a365a994d8dcc795eff4a3efa04bfd1d18de182319504a"
+  },
+  "data": {
+    "author_public_link": "https://drive.google.com/file/d/1y7J3cGFEYYBufVTACzPYr4GXiUSCOKm7/view",
+    "download_url": "https://drive.usercontent.google.com/download?id=1y7J3cGFEYYBufVTACzPYr4GXiUSCOKm7&export=download&confirm=t",
+    "zip_bytes": 80263893,
+    "zip_sha256": "2bb40a7860733ba073a089c82b3424f4551d101d061fb31f4e9f51da978a81fd",
+    "source_kind": "Author-derived Kaggle price/position/return data,not original exchange OHLC/orderbook,raw imputation not independently reconciled.",
+    "datasets": [
+      {"name": "TRAIN_7_TEST_28_BTC", "ledger_sha256": "965f55acc59bb9c4d4f4d353abf23866e7d00dadb6d8fa487431f289e7e7f5a5", "best_params_sha256": "0ab32b43012853d798631c90057f2dc3f35605b7eee042a68744a2d09514f8d2", "metrics_sha256": "a80e99d93df3821aea0aa2fed54c5cd719a18e266fc599095931af8fb5e89117"},
+      {"name": "TRAIN_14_TEST_10_BTC", "ledger_sha256": "abcf96636539115484437f816ec2997570b2e1f726cfd2e34339c11bcca5d320", "best_params_sha256": "f4dc19fad749e83a61270fe9f049434fa1eba17298114ff51de4dc2dc7d642b6", "metrics_sha256": "99ea4e8644b0b666cc65ead3c844768aafed535b95bc39062310351ae6e42c6a"}
+    ],
+    "fixed_paper_clip_utc": ["2019-11-07T00:59:00Z", "2021-08-22T23:59:00Z"],
+    "selection": "Both author-selected BTC windows,full released range AND common published clipped range. Do not choose best source/session/period after calculation. This is published exploratory historical evidence,not a new prospective or untouched sample."
+  },
+  "source_rules": "Completed EMAfast/slow comparison lagged1hour,always+1/-1;fast{5,7,10,15,20,30},slow{40,50,100,150,200};sourceWF7/28and14/10days with prior-window selection. Do not optimize or repair rules.",
+  "source_costs": "Source gross log return=position*asset_log_return;source fees=.001*abs(diff(native parameter position)). Selected WF paths may differ at boundaries;compare source-implied turnover with actual selected-position turnover. Initial exposure is inherited/unknown;do not label uncharged initial position a verified newly opened trade.",
+  "fixed_calculations": [
+    "Parse numeric RDS only using rdata1.0.0 and xarray2025.1.2,not R scripts/pickles/startup/DVC. Verify ZIP and member SHA before decoding.",
+    "Validate timestamp ordering,duplicates,1hour gaps,finite positive prices,+/-1positions,finite returns and overlapping/causal train/test boundaries;do not fill or close at missing data.",
+    "Reconcile source asset returns with price changes;infer charged transaction sides=(position*Asset_returns-source_return)/.001 and require near0or2. Compare with actual selected-position changes,excluding first unknown exposure and missing gaps.",
+    "Compare fee-only source logreturn and SAME selected signals recomputed at0.1%and0.2%per side;record boundary missing/extra fees,both full and published clipped periods,not only positive periods.",
+    "Daily mean log-return moving-block bootstrap7days,2000replicates,seed20261020,95%interval;diagnostic only,not an initial-R expectancy or untouched validation pass.",
+    "Count actual position flips and opportunity-day fraction;initial inherited exposure is not a new alert. Preserve closed segments between known flips,excluding inherited first and unresolved last;equal entry notional cash payoff side*(exit/entry-1)-fee*(1+exit/entry). Calculate base/doublefee closed-segment PF as diagnostic only.",
+    "Source cumulative exp(logreturns) drawdown percent is not initial-R drawdown. Do not infer TP1,5minute adverse excursions/urgent warnings,manual-fill latency or native funding from hourly closes.",
+    "Save original2BTC RDS ledgers,their parameter-window records/metrics,ZIP member hash manifest,actual results and closed-segment ledger. No strategy rerun or corrected complete execution backtest claim."
+  ],
+  "cost_limitations": "Published .001cost is a modeled aggregate. Actual exchange fees,spread,manual slippage and funding unavailable;2xmodeledfee test does NOT satisfy full native doubled-cost gate. No leverage/risk increase.",
+  "decision_rule": "Any source accounting defect or fixed frequency shortfall excludes this version as standalone manual-alert replacement evidence;do not relax thresholds or salvage tune. Even positive diagnostic results cannot qualify without full frozen SL/TP1/warning contract and all prospective/native gates.",
+  "forward_collection_started": false,
+  "production_changed": false
+}

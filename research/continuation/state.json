@@ -211,7 +211,16 @@
       "forward_started": false
     }
   ],
-  "active_run": null,
+  "active_run": {
+    "id": "published_wf_ledger_audit_20261020_0747",
+    "stage": "fixed_both_published_BTC_ledgers_before_reconciliation_calculation",
+    "protocol": "research/continuation/wf_double_source_audit_protocol_20261020.json",
+    "code": "research/continuation/audit_wf_double_source.py",
+    "source_engine_commit": "8be3ecf0019e991962f6f59bf9938cfa56411350",
+    "source_analysis_commit": "a9b4d8d09da162c970253c0b8cb5e5b3f2400444",
+    "downloaded_author_zip_sha256": "2bb40a7860733ba073a089c82b3424f4551d101d061fb31f4e9f51da978a81fd",
+    "next_action": "Run8smalltests,then frozen bothBTC RDS ledger cost/turnover/frequency reconciliation. Social-signal nextlead screened unavailable404/nointradayriskcontract;record saved. No original R/DVC code execution,no performance tuning,native or forward validation claim."
+  },
   "blockers": [],
   "updated_kst": "2026-10-20T07:39:00+09:00",
   "maintained_research_candidates": [

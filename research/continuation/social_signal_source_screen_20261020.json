@@ -1,0 +1,19 @@
+{
+  "source": "Garcia and Schweitzer2015,Social signals and algorithmic trading of Bitcoin",
+  "paper": "https://arxiv.org/html/1506.01513v2",
+  "paper_html_sha256": "22ca89de0eacd92cb5af0569f3a02837e5e919d4a79d0d1e528639fdab0d8b12",
+  "author": "https://dgarcia.eu/2015/06/05/social-signals-and-algorithmic-trading-of-bitcoin/",
+  "advertised_scripts_data": "https://www.sg.ethz.ch/btc",
+  "access_attempt_utc": "2026-10-19T22:43:16Z",
+  "actual_access_result": "curl--fail--location returned HTTP404;public-web retrieval also failed. This does not prove no relocated archive exists.",
+  "source_rule_summary": "Daily signs of changes in Twitter valence,polarization and exchange volume;majority vote. Long positions persist on same signal,shorts limited to one iteration. Daily price execution,no predefined intraday SL/TP1 contract.",
+  "cost_model": "Proportional trading/borrowing cost sensitivity is actually discussed in paper,including daily forced-close sensitivity. Exact original scripts/data were not recovered,so no costed result replicated.",
+  "frequency": "Daily decision frequency is not equivalent to one new manual entry every day;actual completed-trade frequency unverified. No fabricated numerical failure rate.",
+  "current_inputs": "Exact comparable Twitter sentiment/polarization feed and collection timestamps not established. Do not replace inputs or add intraday exits and call it the published method.",
+  "decision": "not_feasible_as_immediate_standalone_manual_alert_under_recovered_material",
+  "source_profitability_claim_replicated": false,
+  "market_backtest_performed": false,
+  "next": "Move to separately identified primary costedWFpaper with publicly downloadable author ledgers;no request for user accounts or author contact.",
+  "production_changed": false,
+  "forward_started": false
+}
