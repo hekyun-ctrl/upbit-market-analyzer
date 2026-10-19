@@ -5,7 +5,7 @@
   "download_url": "https://repository.essex.ac.uk/30487/1/Bitcoin_Functional%20V8%20Clean.pdf",
   "sha256": "e0bbea362e493bf102cdcd64e52d60c220d0c9e78b72eac058da0cf7d35785e7",
   "bytes": 869559,
-  "status": "accepted_manuscript_downloaded_trading_section_audited_model_not_implemented",
+  "status": "methods_audited_component_adaptation_protocol_fixed_no_model_performance_yet",
   "notes": [
     "Teesside403; university author copies available; Essex V8 successfully retrieved via public download",
     "Prior-day forecast fixes next-day entry at predicted minimum and exit at predicted later maximum; no overnight hold",
@@ -13,5 +13,20 @@
     "Fee0.03% source assumption is not current LBank cost evidence",
     "Source maximum drawdown uses log-return differences per footnote9; values below-100% are not percentage equity drawdowns",
     "No source-proven current LBank stop/TP1/native urgent-warning contract"
-  ]
+  ],
+  "methods_reviewed_utc": "2026-10-19T18:36:46.889525+00:00",
+  "next_protocol": "research/continuation/functional_curve_component_protocol_20261020.json",
+  "remaining_ambiguities": [
+    "Manuscript says290 daily5m observations;24h has288 nonoverlapping5m intervals. Use288 actual minute-open grid observations00:00 through23:55 UTC; disclose difference.",
+    "Score Ljung-Box lag length and AR1 estimator not explicitly fixed in reviewed model section. The separate curve-dependence section reports1/5/10/20; use these as disclosed sensitivity lags, not assert exact score-test original settings.",
+    "No source-specific hard stop,TP1,initialR or native urgent-warning contract. These gates remain unverified."
+  ],
+  "author_code_search": {
+    "searched_utc": "2026-10-19T18:36:46.889525+00:00",
+    "scope": [
+      "Essex institutional landing page and accepted manuscript",
+      "Scoped exact-title code replication web searches"
+    ],
+    "result": "No author execution code obtained; not evidence that none exists elsewhere"
+  }
 }

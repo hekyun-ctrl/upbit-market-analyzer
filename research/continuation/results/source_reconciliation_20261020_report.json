@@ -1,0 +1,599 @@
+{
+  "started_or_retrieved_utc": "2026-10-19T18:35:25.548992+00:00",
+  "completed_utc": "2026-10-19T18:35:33.431288+00:00",
+  "protocol_sha256": "b6956b0929dc108cef06be352b1215930db768928a4f88de46341b2b15b10814",
+  "code_sha256": "c736af5f9dc6a7b6d010ca24367dc69668dbd5330074578ae5763368f19692e7",
+  "inputs": {
+    "frozen_manifest_sha256": {
+      "research/long_history/results/source_manifest_2024_2026_1m.json": "84df11fac070c74139c642e61a00668aa76f9c4651976c86dd64a47e4ccf1c48",
+      "research/long_history/results/source_manifest_2024_2026_5m.json": "5b8b4291f8a09b6e72cbd395b6c1e82b716446c878b611c40f6a0509998ecbe4"
+    },
+    "archives": [
+      {
+        "month": "2024-10",
+        "kind": "klines",
+        "interval": "1m",
+        "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-10.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-10.zip.CHECKSUM",
+        "sha256": "aa8c79ad120a8d870e23276d1ad5966f99f59bc0a1886ef5927a3808a5efee36"
+      },
+      {
+        "month": "2025-01",
+        "kind": "klines",
+        "interval": "1m",
+        "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-01.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-01.zip.CHECKSUM",
+        "sha256": "b69ca5b2c2d1ae00d68d2790d09138cb2a44085ff19e0da5dc98b569ea7e489e"
+      },
+      {
+        "month": "2025-08",
+        "kind": "klines",
+        "interval": "1m",
+        "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-08.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-08.zip.CHECKSUM",
+        "sha256": "eaf41354fc1aa96eac94ee50b3fda603cd595f95030ebf30b2ab5bea7a4462c3"
+      },
+      {
+        "month": "2024-10",
+        "kind": "klines",
+        "interval": "5m",
+        "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2024-10.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2024-10.zip.CHECKSUM",
+        "sha256": "024d574aec22d830443dfe557c12137d24423c18b228e2c10045851cd056434d"
+      },
+      {
+        "month": "2025-01",
+        "kind": "klines",
+        "interval": "5m",
+        "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2025-01.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2025-01.zip.CHECKSUM",
+        "sha256": "0c99422d64fa3cc58564cf77969fc5a96d6f44783c79ecfcf94b103753bf7570"
+      },
+      {
+        "month": "2025-08",
+        "kind": "klines",
+        "interval": "5m",
+        "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2025-08.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2025-08.zip.CHECKSUM",
+        "sha256": "7f78f6f88ae1946f8bd8312a37d1d74b24e24d6b13bc37d2909ad7c8c0c7e9ae"
+      }
+    ]
+  },
+  "target_dates": [
+    {
+      "day": "2024-10-28",
+      "source": {
+        "url": "https://data.binance.vision/data/futures/um/daily/trades/BTCUSDT/BTCUSDT-trades-2024-10-28.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/daily/trades/BTCUSDT/BTCUSDT-trades-2024-10-28.zip.CHECKSUM",
+        "sha256": "d0f82b3cf3d8d3930c41db7f5aced627e384e9dfbd262e138add65ada9d26309",
+        "bytes": 28837819,
+        "retrieved_utc": "2026-10-19T18:35:25.780311+00:00"
+      },
+      "raw_statistics": {
+        "archive_rows": 3458400,
+        "archive_id_gap_count": 490
+      },
+      "windows": [
+        {
+          "start": 1730149800,
+          "day": "2024-10-28",
+          "released": false,
+          "coverage_diagnostics": {
+            "window_start_utc": "2024-10-28T21:10:00+00:00",
+            "target_rows": 9136,
+            "before_present": true,
+            "after_present": true,
+            "target_minute_counts": {
+              "1730149800": 3498,
+              "1730149860": 1444,
+              "1730149920": 1555,
+              "1730149980": 1613,
+              "1730150040": 1026
+            },
+            "first_target_time_ms": 1730149800130,
+            "last_target_time_ms": 1730150099969,
+            "context_id_discontinuities": 2,
+            "missing_context_ids": 2,
+            "id_gap_examples": [
+              {
+                "before_id": 5510842793,
+                "after_id": 5510842795,
+                "missing_ids": 1,
+                "before_time_ms": 1730149912482,
+                "after_time_ms": 1730149912548
+              },
+              {
+                "before_id": 5510843490,
+                "after_id": 5510843492,
+                "missing_ids": 1,
+                "before_time_ms": 1730149943397,
+                "after_time_ms": 1730149943444
+              }
+            ],
+            "examples_truncated": false
+          },
+          "verdict": "retain_quarantine_incomplete_raw_evidence",
+          "error": "target trade IDs incomplete or duplicated"
+        }
+      ]
+    },
+    {
+      "day": "2025-01-14",
+      "source": {
+        "url": "https://data.binance.vision/data/futures/um/daily/trades/BTCUSDT/BTCUSDT-trades-2025-01-14.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/daily/trades/BTCUSDT/BTCUSDT-trades-2025-01-14.zip.CHECKSUM",
+        "sha256": "52658476c98cf8ef583a6a3f72d8d2a54476364f4007a2c57994231c070ee7d5",
+        "bytes": 34223515,
+        "retrieved_utc": "2026-10-19T18:35:25.548992+00:00"
+      },
+      "raw_statistics": {
+        "archive_rows": 4065158,
+        "archive_id_gap_count": 600
+      },
+      "windows": [
+        {
+          "start": 1736861400,
+          "day": "2025-01-14",
+          "released": false,
+          "coverage_diagnostics": {
+            "window_start_utc": "2025-01-14T13:30:00+00:00",
+            "target_rows": 129271,
+            "before_present": true,
+            "after_present": true,
+            "target_minute_counts": {
+              "1736861400": 48925,
+              "1736861460": 33848,
+              "1736861520": 19139,
+              "1736861580": 16374,
+              "1736861640": 10985
+            },
+            "first_target_time_ms": 1736861400010,
+            "last_target_time_ms": 1736861699935,
+            "context_id_discontinuities": 10,
+            "missing_context_ids": 10,
+            "id_gap_examples": [
+              {
+                "before_id": 5838210229,
+                "after_id": 5838210231,
+                "missing_ids": 1,
+                "before_time_ms": 1736861428574,
+                "after_time_ms": 1736861428586
+              },
+              {
+                "before_id": 5838212077,
+                "after_id": 5838212079,
+                "missing_ids": 1,
+                "before_time_ms": 1736861431116,
+                "after_time_ms": 1736861431119
+              },
+              {
+                "before_id": 5838236987,
+                "after_id": 5838236989,
+                "missing_ids": 1,
+                "before_time_ms": 1736861469856,
+                "after_time_ms": 1736861469878
+              },
+              {
+                "before_id": 5838238032,
+                "after_id": 5838238034,
+                "missing_ids": 1,
+                "before_time_ms": 1736861471115,
+                "after_time_ms": 1736861471116
+              },
+              {
+                "before_id": 5838242496,
+                "after_id": 5838242498,
+                "missing_ids": 1,
+                "before_time_ms": 1736861476647,
+                "after_time_ms": 1736861476661
+              },
+              {
+                "before_id": 5838248928,
+                "after_id": 5838248930,
+                "missing_ids": 1,
+                "before_time_ms": 1736861489156,
+                "after_time_ms": 1736861489212
+              },
+              {
+                "before_id": 5838261207,
+                "after_id": 5838261209,
+                "missing_ids": 1,
+                "before_time_ms": 1736861512777,
+                "after_time_ms": 1736861512788
+              },
+              {
+                "before_id": 5838287504,
+                "after_id": 5838287506,
+                "missing_ids": 1,
+                "before_time_ms": 1736861598283,
+                "after_time_ms": 1736861598320
+              },
+              {
+                "before_id": 5838306686,
+                "after_id": 5838306688,
+                "missing_ids": 1,
+                "before_time_ms": 1736861681639,
+                "after_time_ms": 1736861681654
+              },
+              {
+                "before_id": 5838308258,
+                "after_id": 5838308260,
+                "missing_ids": 1,
+                "before_time_ms": 1736861688734,
+                "after_time_ms": 1736861688801
+              }
+            ],
+            "examples_truncated": false
+          },
+          "verdict": "retain_quarantine_incomplete_raw_evidence",
+          "error": "target trade IDs incomplete or duplicated"
+        },
+        {
+          "start": 1736866800,
+          "day": "2025-01-14",
+          "released": false,
+          "coverage_diagnostics": {
+            "window_start_utc": "2025-01-14T15:00:00+00:00",
+            "target_rows": 27680,
+            "before_present": true,
+            "after_present": true,
+            "target_minute_counts": {
+              "1736866800": 5878,
+              "1736866860": 6459,
+              "1736866920": 5738,
+              "1736866980": 4445,
+              "1736867040": 5160
+            },
+            "first_target_time_ms": 1736866800024,
+            "last_target_time_ms": 1736867099980,
+            "context_id_discontinuities": 9,
+            "missing_context_ids": 9,
+            "id_gap_examples": [
+              {
+                "before_id": 5838797695,
+                "after_id": 5838797697,
+                "missing_ids": 1,
+                "before_time_ms": 1736866800866,
+                "after_time_ms": 1736866800883
+              },
+              {
+                "before_id": 5838797732,
+                "after_id": 5838797734,
+                "missing_ids": 1,
+                "before_time_ms": 1736866801039,
+                "after_time_ms": 1736866801108
+              },
+              {
+                "before_id": 5838799761,
+                "after_id": 5838799763,
+                "missing_ids": 1,
+                "before_time_ms": 1736866821866,
+                "after_time_ms": 1736866821903
+              },
+              {
+                "before_id": 5838799836,
+                "after_id": 5838799838,
+                "missing_ids": 1,
+                "before_time_ms": 1736866822450,
+                "after_time_ms": 1736866822594
+              },
+              {
+                "before_id": 5838800418,
+                "after_id": 5838800420,
+                "missing_ids": 1,
+                "before_time_ms": 1736866828829,
+                "after_time_ms": 1736866828901
+              },
+              {
+                "before_id": 5838800424,
+                "after_id": 5838800426,
+                "missing_ids": 1,
+                "before_time_ms": 1736866829077,
+                "after_time_ms": 1736866829158
+              },
+              {
+                "before_id": 5838801600,
+                "after_id": 5838801602,
+                "missing_ids": 1,
+                "before_time_ms": 1736866841232,
+                "after_time_ms": 1736866841295
+              },
+              {
+                "before_id": 5838816503,
+                "after_id": 5838816505,
+                "missing_ids": 1,
+                "before_time_ms": 1736866990840,
+                "after_time_ms": 1736866990902
+              },
+              {
+                "before_id": 5838820651,
+                "after_id": 5838820653,
+                "missing_ids": 1,
+                "before_time_ms": 1736867045777,
+                "after_time_ms": 1736867045804
+              }
+            ],
+            "examples_truncated": false
+          },
+          "verdict": "retain_quarantine_incomplete_raw_evidence",
+          "error": "target trade IDs incomplete or duplicated"
+        }
+      ]
+    },
+    {
+      "day": "2025-01-29",
+      "source": {
+        "url": "https://data.binance.vision/data/futures/um/daily/trades/BTCUSDT/BTCUSDT-trades-2025-01-29.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/daily/trades/BTCUSDT/BTCUSDT-trades-2025-01-29.zip.CHECKSUM",
+        "sha256": "ec489fc590f8afa18e41739e2f4e1bfcf6762855d978a52d5fd3402d92aaf267",
+        "bytes": 33305981,
+        "retrieved_utc": "2026-10-19T18:35:25.810517+00:00"
+      },
+      "raw_statistics": {
+        "archive_rows": 3968545,
+        "archive_id_gap_count": 570
+      },
+      "windows": [
+        {
+          "start": 1738114500,
+          "day": "2025-01-29",
+          "released": false,
+          "coverage_diagnostics": {
+            "window_start_utc": "2025-01-29T01:35:00+00:00",
+            "target_rows": 8605,
+            "before_present": true,
+            "after_present": true,
+            "target_minute_counts": {
+              "1738114500": 2596,
+              "1738114560": 1456,
+              "1738114620": 1230,
+              "1738114680": 1004,
+              "1738114740": 2319
+            },
+            "first_target_time_ms": 1738114500000,
+            "last_target_time_ms": 1738114799677,
+            "context_id_discontinuities": 2,
+            "missing_context_ids": 2,
+            "id_gap_examples": [
+              {
+                "before_id": 5910175957,
+                "after_id": 5910175959,
+                "missing_ids": 1,
+                "before_time_ms": 1738114508898,
+                "after_time_ms": 1738114509024
+              },
+              {
+                "before_id": 5910180249,
+                "after_id": 5910180251,
+                "missing_ids": 1,
+                "before_time_ms": 1738114640666,
+                "after_time_ms": 1738114640690
+              }
+            ],
+            "examples_truncated": false
+          },
+          "verdict": "retain_quarantine_incomplete_raw_evidence",
+          "error": "target trade IDs incomplete or duplicated"
+        }
+      ]
+    },
+    {
+      "day": "2025-08-29",
+      "source": {
+        "url": "https://data.binance.vision/data/futures/um/daily/trades/BTCUSDT/BTCUSDT-trades-2025-08-29.zip",
+        "checksum_url": "https://data.binance.vision/data/futures/um/daily/trades/BTCUSDT/BTCUSDT-trades-2025-08-29.zip.CHECKSUM",
+        "sha256": "e44e5c96a223a3b957bb7197baf2da67e9b65d0a3b03e23122a070e9cd64ee47",
+        "bytes": 29539509,
+        "retrieved_utc": "2026-10-19T18:35:25.693372+00:00"
+      },
+      "raw_statistics": {
+        "archive_rows": 3720115,
+        "archive_id_gap_count": 11431
+      },
+      "windows": [
+        {
+          "start": 1756449300,
+          "day": "2025-08-29",
+          "released": false,
+          "coverage_diagnostics": {
+            "window_start_utc": "2025-08-29T06:35:00+00:00",
+            "target_rows": 10458,
+            "before_present": false,
+            "after_present": true,
+            "target_minute_counts": {
+              "1756449420": 3276,
+              "1756449480": 3383,
+              "1756449540": 3799
+            },
+            "first_target_time_ms": 1756449424431,
+            "last_target_time_ms": 1756449599984,
+            "context_id_discontinuities": 162,
+            "missing_context_ids": 180,
+            "id_gap_examples": [
+              {
+                "before_id": 6594571762,
+                "after_id": 6594571765,
+                "missing_ids": 2,
+                "before_time_ms": 1756449429809,
+                "after_time_ms": 1756449429830
+              },
+              {
+                "before_id": 6594571765,
+                "after_id": 6594571772,
+                "missing_ids": 6,
+                "before_time_ms": 1756449429830,
+                "after_time_ms": 1756449429849
+              },
+              {
+                "before_id": 6594571772,
+                "after_id": 6594571778,
+                "missing_ids": 5,
+                "before_time_ms": 1756449429849,
+                "after_time_ms": 1756449429938
+              },
+              {
+                "before_id": 6594571793,
+                "after_id": 6594571795,
+                "missing_ids": 1,
+                "before_time_ms": 1756449430178,
+                "after_time_ms": 1756449430212
+              },
+              {
+                "before_id": 6594571834,
+                "after_id": 6594571836,
+                "missing_ids": 1,
+                "before_time_ms": 1756449430323,
+                "after_time_ms": 1756449430333
+              },
+              {
+                "before_id": 6594571839,
+                "after_id": 6594571842,
+                "missing_ids": 2,
+                "before_time_ms": 1756449430364,
+                "after_time_ms": 1756449430384
+              },
+              {
+                "before_id": 6594571847,
+                "after_id": 6594571849,
+                "missing_ids": 1,
+                "before_time_ms": 1756449430456,
+                "after_time_ms": 1756449430464
+              },
+              {
+                "before_id": 6594571849,
+                "after_id": 6594571851,
+                "missing_ids": 1,
+                "before_time_ms": 1756449430464,
+                "after_time_ms": 1756449430504
+              },
+              {
+                "before_id": 6594571851,
+                "after_id": 6594571853,
+                "missing_ids": 1,
+                "before_time_ms": 1756449430504,
+                "after_time_ms": 1756449430511
+              },
+              {
+                "before_id": 6594571861,
+                "after_id": 6594571863,
+                "missing_ids": 1,
+                "before_time_ms": 1756449430654,
+                "after_time_ms": 1756449430684
+              },
+              {
+                "before_id": 6594571877,
+                "after_id": 6594571879,
+                "missing_ids": 1,
+                "before_time_ms": 1756449430872,
+                "after_time_ms": 1756449430888
+              },
+              {
+                "before_id": 6594571881,
+                "after_id": 6594571884,
+                "missing_ids": 2,
+                "before_time_ms": 1756449430888,
+                "after_time_ms": 1756449430938
+              },
+              {
+                "before_id": 6594571884,
+                "after_id": 6594571886,
+                "missing_ids": 1,
+                "before_time_ms": 1756449430938,
+                "after_time_ms": 1756449431000
+              },
+              {
+                "before_id": 6594571888,
+                "after_id": 6594571890,
+                "missing_ids": 1,
+                "before_time_ms": 1756449431027,
+                "after_time_ms": 1756449431042
+              },
+              {
+                "before_id": 6594571894,
+                "after_id": 6594571896,
+                "missing_ids": 1,
+                "before_time_ms": 1756449431088,
+                "after_time_ms": 1756449431168
+              },
+              {
+                "before_id": 6594571900,
+                "after_id": 6594571902,
+                "missing_ids": 1,
+                "before_time_ms": 1756449431205,
+                "after_time_ms": 1756449431243
+              },
+              {
+                "before_id": 6594571905,
+                "after_id": 6594571908,
+                "missing_ids": 2,
+                "before_time_ms": 1756449431267,
+                "after_time_ms": 1756449431324
+              },
+              {
+                "before_id": 6594571915,
+                "after_id": 6594571917,
+                "missing_ids": 1,
+                "before_time_ms": 1756449431581,
+                "after_time_ms": 1756449431598
+              },
+              {
+                "before_id": 6594571918,
+                "after_id": 6594571920,
+                "missing_ids": 1,
+                "before_time_ms": 1756449431606,
+                "after_time_ms": 1756449431661
+              },
+              {
+                "before_id": 6594571930,
+                "after_id": 6594571933,
+                "missing_ids": 2,
+                "before_time_ms": 1756449431736,
+                "after_time_ms": 1756449431839
+              }
+            ],
+            "examples_truncated": true
+          },
+          "verdict": "retain_quarantine_incomplete_raw_evidence",
+          "error": "target window lacks edge coverage"
+        }
+      ]
+    }
+  ],
+  "released_starts": [],
+  "unresolved_starts": [
+    1730149800,
+    1736861400,
+    1736866800,
+    1738114500,
+    1756449300
+  ],
+  "boundary": {
+    "source": {
+      "url": "https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/1m/BTCUSDT-1m-2026-10-01.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/daily/klines/BTCUSDT/1m/BTCUSDT-1m-2026-10-01.zip.CHECKSUM",
+      "sha256": "062f32fefdfb1d1cfbb6d58ee04c28dd6c45dbf2b52ed60fa4ad6a27b0b19bc5",
+      "bytes": 61756,
+      "retrieved_utc": "2026-10-19T18:35:33.426889+00:00"
+    },
+    "used_rows": 1,
+    "purpose": "September monthly closing boundary only, no October strategy returns",
+    "minute": {
+      "start": 1790812800.0,
+      "open": 83576.8,
+      "high": 83612.6,
+      "low": 83536.5,
+      "close": 83536.5,
+      "volume": 165.529,
+      "close_time": 1790812859999.0,
+      "quote_volume": 13835811.7518,
+      "trades": 4471.0,
+      "buy_volume": 73.888,
+      "buy_quote_volume": 6175639.6228,
+      "ignore": 0.0
+    }
+  },
+  "repair_scope": "Only validation-mask release of unchanged original1m bars when every core field has complete raw market-trade support. No synthetic price repairs.",
+  "strategy_performance_examined": false,
+  "production_changed": false,
+  "native_lbank_execution_verified": false
+}

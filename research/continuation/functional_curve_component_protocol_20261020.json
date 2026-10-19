@@ -1,0 +1,56 @@
+{
+  "candidate_id": "bouri_2021_functional_curve_component_v1",
+  "version": 1,
+  "frozen_utc": "2026-10-19T18:36:46.889525+00:00",
+  "status": "historical_component_protocol_fixed_model_not_implemented_or_evaluated",
+  "source": {
+    "doi": "10.1016/j.irfa.2021.101784",
+    "institution_page": "https://repository.essex.ac.uk/30487/",
+    "accepted_pdf": "https://repository.essex.ac.uk/30487/1/Bitcoin_Functional%20V8%20Clean.pdf",
+    "pdf_sha256": "e0bbea362e493bf102cdcd64e52d60c220d0c9e78b72eac058da0cf7d35785e7",
+    "methods": "Accepted manuscript sections3-5; K>=90% variance; rolling S=182/365; score Ljung-Box5% then AR1 otherwise0; predicted minimum then later maximum"
+  },
+  "replication_scope": "Explicit component adaptation of published Fmean/FPAR methods, not exact full-paper replication. No author execution code obtained from the institutional copies and scoped title/code search. Does not establish absence of any code elsewhere.",
+  "source_ambiguities": [
+    "Manuscript says290 daily5m observations;24h has288 nonoverlapping5m intervals. Use288 actual minute-open grid observations00:00 through23:55 UTC; disclose difference.",
+    "Score Ljung-Box lag length and AR1 estimator not explicitly fixed in reviewed model section. The separate curve-dependence section reports1/5/10/20; use these as disclosed sensitivity lags, not assert exact score-test original settings.",
+    "No source-specific hard stop,TP1,initialR or native urgent-warning contract. These gates remain unverified."
+  ],
+  "data": {
+    "venues": "Existing checksum-verified Binance USD-M BTCUSDT perpetual1m and actual funding, not Bitstamp source or LBank fills",
+    "training_input": "All2022-Sep2026 data have already been viewed in other research; reused/exploratory, no untouched claims. Keep all existing quarantine masks; current raw-trade audit released none.",
+    "day_curve": "100*log(original1m open at each5min grid /day00:00 open),288 samples. Complete original1440minutes and no quarantined minute required for a valid training day; never interpolate.",
+    "window": "Previous S valid observed UTC days ending before forecast day; retained dates and calendar span saved. Validity of training days is known before forecast. Do not select target-day predictions using future returns or later quality facts.",
+    "target_quality": "Generate and save prediction before inspecting target-day prices. If required execution/path data missing, keep forecast as unevaluable, record unknown PnL; do not assignzero or artificially liquidate."
+  },
+  "models": {
+    "windows": [
+      182,
+      365
+    ],
+    "fmean": "Rolling mean curve for each window, published benchmark;2variants.",
+    "fpar": "Centered empirical discrete FPCA on rolling training matrix, retain smallestK explaining>=90% variance. For each retained score series Ljung-Box p<.05 fits AR1 by OLS with intercept, otherwise predicted score0. Add predicted scores times fitted bases to training mean. Recompute bases and tests causally each day. Zero total variance returns mean.",
+    "score_lags": [
+      1,
+      5,
+      10,
+      20
+    ],
+    "multiplicity": "8FPAR+2Fmean variants, all reported together. No best-lag/window cherry-pick or label research-selected winner independent. No coefficient clipping or return-driven tuning."
+  },
+  "trade_rule": {
+    "direction": "1x long/cash return proxy; no short/order/account access",
+    "entry_exit": "Before target day, fix earliest predicted global-min grid time, then earliest predicted maximum in its inclusive suffix. If exit<=entry, no trade. Fill both scheduled times at first original minute open60seconds later, before UTC midnight. No overnight position.",
+    "costs": "Per side fee0.0006 and adverse slippage0.0002; charge adverse actual funding only while held, do not credit favorable funding. Repeat identical signals at2x fees,slippage,funding charges. Source fee0.03% not treated as native LBank cost."
+  },
+  "required_output": [
+    "Full and per-year net results for every variant and both cost levels; calendar coverage/unknown outcomes; cost-free results separately",
+    "Closed trade ledger, actual entry/exit timestamps, fees/funding/slippage and daily equity; positive/negative net PnL totals,PF,drawdown and7day calendar-gap-preserving block uncertainty; state repeated selection/multiplicity limits",
+    "Signals per calendar/observable day, opportunity-day fraction, holding time, raw5min post-entry adverse excursion/path coverage; never label price excursion native emergency-warning rate",
+    "TP1 Wilson,initialR/DDinR,and5min actual urgent-warning rate unverified until separately specified/frozen adapter and native prospective observations; do not invent them from time exits",
+    "Future-price mutation invariance, rolling-training causality, delayed fills, minimum-before-exit, gap/unknown handling and cost reconciliation tests"
+  ],
+  "adoption": "Historical component screening only. Positive exploratory results cannot start certified forward validation until a fixed complete alert/risk/TP1/native-observation contract exists. All existing promotion gates remain unchanged.",
+  "production_changed": false,
+  "forward_collection_started": false
+}

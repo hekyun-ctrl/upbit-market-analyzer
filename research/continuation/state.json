@@ -21,7 +21,8 @@
     "aggressive_flow_fixed_meta",
     "15m_channel_expansion_and_shock_reclaim",
     "published_turtle_system2_2022_2026_strict_and_price_integrity",
-    "deprez_frommel_2024_unfiltered_obv_intraday_component_v1"
+    "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
+    "official_raw_trade_reconciliation_5quarantines_20261020"
   ],
   "read_before_work": [
     "docs/lbank_strategy_rebuild_2026-10-20.md",
@@ -31,20 +32,20 @@
     "research/long_history/results"
   ],
   "next_work": {
-    "stage": "resolve_obv_source_integrity_before_full_calendar_comparison",
-    "instruction": "Audit discrepant intervals against independent official raw trade data or immutable archive versions. Do not lower9month training threshold or silently replace data based on returns. If repair is justified, preregister source-version sensitivity then repeat unchanged165component model on full calendar. If not repairable, record limitation and proceed to exact causal FPC-score AR1 candidate source reproduction.",
+    "stage": "implement_frozen_functional_curve_component_then_real_costed_screen",
+    "instruction": "Raw source audit completed:0/5quarantines releasable; do not repeat unchanged OBV/source repair or lower its coverage gate. Implement research/continuation/functional_curve_component_protocol_20261020.json with complete causal/gap/cost tests, then execute all10variants on reused2022-Sep2026 data and save full and per-year results plus ledgers. If runtime long, checkpoint implementation and exact next command before data computation. Report source differences; no forward promotion without complete alert/risk/native contract.",
     "sources_to_screen": [
       {
         "title": "Are simple technical trading rules profitable in bitcoin markets?",
         "url": "https://biblio.ugent.be/publication/01HY3C3S169G1N6QNYR55NZMFB",
-        "status": "unfiltered165component_executed_full_paper_not_replicated_no_promotion"
+        "status": "parked_unqualified_source_reconciliation_completed0of5released_full_calendar_not_repaired"
       },
       {
         "title": "On the intraday return curves of Bitcoin: Predictability and trading opportunities",
         "url": "https://repository.essex.ac.uk/30487/",
         "accepted_pdf": "https://repository.essex.ac.uk/30487/1/Bitcoin_Functional%20V8%20Clean.pdf",
         "source_audit": "research/continuation/functional_curve_source_audit_20261020.json",
-        "status": "accepted_source_downloaded_trading_steps_audited_model_not_implemented"
+        "status": "methods_audited_component_adaptation_protocol_fixed_model_not_implemented"
       }
     ]
   },
@@ -54,7 +55,8 @@
     "No frozen replacement candidate exists and no forward validation clock has started.",
     "Gate thresholds are preregistered research policy, not universal proof or guaranteed completion date.",
     "Public cross-venue tests do not establish native LBank manual fill performance.",
-    "Published OBV subset positive on17complete-quality months but all2025 missing, uncertainty lower<=0 and2026 cost-stress losses; no promotion."
+    "Published OBV subset positive on17complete-quality months but all2025 missing, uncertainty lower<=0 and2026 cost-stress losses; no promotion.",
+    "Official raw-market-trade archive audit15,212,218rows:all5target windows fail preregistered completeness,0mask releases. IDs may omit excluded insurance/ADL; do not equate discontinuity with proven corruption or reconstruct missing trades."
   ],
   "iterations": [
     {
@@ -78,21 +80,50 @@
       "documentation": "docs/lbank_obv_component_validation_2026-10-20.md",
       "production_changed": false,
       "forward_started": false
+    },
+    {
+      "id": "source_reconciliation_20261020",
+      "started_utc": "2026-10-19T18:27:08.902081+00:00",
+      "completed_utc": "2026-10-19T18:36:46.889525+00:00",
+      "stage_completed": "download_checksum_and_raw_trade_continuity_audit_on_all5disputed_windows",
+      "original_raw_trade_rows": 15212218,
+      "raw_zip_bytes": 125906824,
+      "quarantines_released": 0,
+      "quarantines_retained": 5,
+      "implementation_tests_passed": 10,
+      "result": "source_path_exhausted_under_frozen_release_rule_move_to_next_published_candidate",
+      "report": "research/continuation/results/source_reconciliation_20261020_report.json",
+      "documentation": "docs/lbank_source_reconciliation_2026-10-20.md",
+      "next_protocol": "research/continuation/functional_curve_component_protocol_20261020.json",
+      "strategy_performance_repeated": false,
+      "production_changed": false,
+      "forward_started": false
     }
   ],
-  "active_run": {
-    "id": "source_reconciliation_20261020",
-    "stage": "raw_archive_access_and_reconstruction",
-    "started_utc": "2026-10-19T18:27:08.902081+00:00",
-    "protocol": "research/continuation/source_reconciliation_protocol_20261020.json"
-  },
+  "active_run": null,
   "blockers": [],
-  "updated_kst": "2026-10-20T03:20:00.894953+09:00",
+  "updated_kst": "2026-10-20T03:36:46.889525+09:00",
   "maintained_research_candidates": [
     {
       "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
-      "status": "exploratory_component_positive_but_unqualified",
-      "next": "resolve_source_integrity_and_full_calendar_coverage_without_parameter_tuning"
+      "status": "parked_unqualified_source_repair_not_supported",
+      "next": "Do not repeat unchanged165rule evaluation or source audit; only revisit with materially new verified data evidence."
     }
-  ]
+  ],
+  "source_reconciliation": {
+    "report": "research/continuation/results/source_reconciliation_20261020_report.json",
+    "protocol_commit": "888df860a45eed1a7e392e2662c53608f12fbe5b",
+    "released_starts": [],
+    "unresolved_starts": [
+      1730149800,
+      1736861400,
+      1736866800,
+      1738114500,
+      1756449300
+    ],
+    "boundary_quote_available": true,
+    "obv_rerun": false,
+    "raw_archives_persisted_as": "Official source URLs,checksums and target coverage diagnostics in Git report;125.9MB public ZIPs are reproducibly downloadable,not required to survive locally."
+  },
+  "continuation_initial_commit": "1a49eb690be5a360543181dc92a37308b87a7a1e"
 }
