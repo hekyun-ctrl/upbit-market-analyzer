@@ -917,7 +917,9 @@ def run():
         except Exception as exc:
             LOG.error("ORDERBOOK_SHADOW_INIT_FAILED exception=%s details=%s",
                       type(exc).__name__, str(exc)[:150])
-    LOG.info("risk_snapshot_poll=%ds, entry_review_poll=%ds source=native_candles quote_risk_polling=true", RISK_POLL, POLL)
+    LOG.info("risk_snapshot_poll=%ds setup_review_poll=%ds watch_confirmation_poll=%ds "
+             "min_watch_age=30 source=native_candles quote_risk_polling=true",
+             RISK_POLL, POLL, RISK_POLL)
     LOG.info("ENTRY_QUALITY policy=%s universal_minute_wait=false "
              "priority=hard_risk,higher_structure,target_room,minute_reaction "
              "stop_warnings=always_on early_caution=structure_aware", ENTRY_QUALITY_POLICY)
@@ -1080,7 +1082,11 @@ def run():
                 else:
                     LOG.error("SIGNAL FOLLOWUP SEND FAILED reference=%d reason=%s",
                               tracked.number, reason)
-            if now - last_sample >= POLL:
+            # A completed setup is discovered on the existing minute cadence.
+            # Its fresh-price confirmation must not wait for that cadence again.
+            sample_due = now - last_sample >= POLL
+            confirm_due = watch is not None and now - watch["time"] >= 30
+            if sample_due:
                 last_sample = now
                 observations.append((now, price))
                 save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
@@ -1151,6 +1157,7 @@ def run():
                                     LOG.warning("MANUAL POSITION NEUTRAL STALL REVIEW SENT side=%s",side_text)
                                 else:
                                     LOG.error("MANUAL POSITION NEUTRAL STALL REVIEW SEND FAILED")
+            if sample_due or confirm_due:
                 # Preserve minute-indexed strategy timing with native 1m closes.
                 # The live quote is used separately for entry/confirmation prices.
                 prices = native_state["prices"] if native_state else []
@@ -1277,7 +1284,7 @@ def run():
                                          side, gate_reason, plan.get("strategy", "breakout"),
                                          plan["price"])
                             watch = None
-                if continuous and audit_ready and watch is None:
+                if sample_due and continuous and audit_ready and watch is None:
                     rejection = {}
                     proposal = classify(prices, native_state=native_state,
                                         diagnostics=rejection)
@@ -1328,6 +1335,7 @@ def run():
                         if bucket not in counter_template:
                             bucket = "other_reject"
                         count_event(bucket)
+            if sample_due:
                 LOG.info("contract=BTCUSDT price=%.1f count=%d watch=%s confirmed_total=%d tracked_references=%d",
                          price, len(prices), watch["plan"]["side"] if watch else "none",
                          counters["confirmed"], len(risk_tracker.signals))
