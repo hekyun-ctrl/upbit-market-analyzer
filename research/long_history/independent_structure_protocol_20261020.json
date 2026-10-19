@@ -1,0 +1,14 @@
+{
+  "version": "minute_triggered_independent_structures_v1",
+  "prior_data_disclosure": "All 2023-2026 price/result periods have already been used. These outcomes are exploratory. Static rules are frozen before seeing their results; 2022, if obtained, is a separate historical check, not forward live certification.",
+  "rules": {
+    "15m_channel_expansion": "Use the last 20 fully closed 15m bars, available before the signal minute starts. Trigger on a completed original minute close crossing the known channel by 0.1 ATR5, without waiting for a 15m closing breakout. Stop at 2 ATR15 from execution, max 0.6%; target one frozen channel width from execution. No EMA/RSI/MACD agreement requirement.",
+    "sell_buy_shock_reclaim": "After a directional adverse 5-minute close move exceeding 2 ATR5, a completed original 1m bar crosses the preceding 20-minute extreme and closes back inside with a directional body. Require that minute's aggressive-flow imbalance >=0.2 in the recovery direction and volume >=2 times the preceding 60-minute median. Stop is wider of 2 ATR5 and last3-minute extreme plus 0.25 ATR5, max0.6%; target the already-known rolling 20x5m VWAP. No balanced-box or EMA trend requirement. Long/short symmetric."
+  },
+  "execution": "Completed original minute trigger, first minute open strictly after end+1sec => signal_start+120. No synthetic minute reconstruction. Reject passed targets or nonpositive modeled net target. Same-minute target/stop conflict is stop first; gap through stop uses open.",
+  "management": "Keep original hard stop; full target or 6h timeout. Net-profit guard only after 0.5 net R observed on minute close, protecting 25% of net peak with 0.5 ATR5 breathing, new5m and0.25ATR ratchet, effective next minute. No actual-warning contract inferred.",
+  "portfolio": "Independent families, one position per family, 45-minute minimum entry spacing, max8UTCday. No combining simultaneous family profits into one account.",
+  "costs": "Same0.06% each-side fees,0.02% adverse slippage, archived adverse funding at trade-price proxy; favorable funding ignored;2x fee/slip stress. No risk-cap relaxation.",
+  "report_all": true,
+  "production_changed": false
+}
