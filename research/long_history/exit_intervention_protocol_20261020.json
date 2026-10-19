@@ -1,0 +1,13 @@
+{
+  "version": "matched_entry_exit_and_flow_v1",
+  "purpose": "Test whether attainable earlier profit protection and new causal aggressive-flow features improve the existing research entries; not a replication of native production signals.",
+  "prior_results_seen": "All prior 2023-2026 tables have been seen. Every result in these reused periods is exploratory. No new independent proof or production promotion is implied.",
+  "candidate_universe": "The unchanged 8555 eligible original research candidates; baseline selected portfolio schedules remain fixed. No earlier hypothetical entries or increased signal frequency.",
+  "policies": ["original_target", "original_target_with_guard", "cap_target_at_0.5_net_R_with_guard", "cap_target_at_1.0_net_R_with_guard"],
+  "stop_and_target": "Keep original stop, original target as maximum distance, original 120 minute horizon, original risk and costs. Never widen stop or move target farther away.",
+  "profit_guard": "Observe completed minute closes only; arm after 0.5 net R; candidate protects 25% of observed peak net R; require 0.5 frozen ATR breathing room; ratchet only on a new 5m interval and at least 0.25 ATR; effective next minute. Original stop wins intraminute conflicts.",
+  "models": "Two fixed HGB net-R regressions per exit policy, identical 150 iterations, 0.05 learning rate, 7 leaves, min leaf 100, L2 1, no early stopping, seed 20261020. Compare original price features versus those features plus aggressive-flow summaries. Train 2024 for 2025, then 2024+2025 for 2026, purged 1 day. Select largest predicted net R >0.10; do not tune threshold after viewing results.",
+  "flow_features": "Only completed original minutes before signal publication: buy/sell volume imbalance over 5/15/60m, change of imbalance, relative quote volume and trade count, average trade size and aggressive-buy flow vs price sign. No fabricated book depth or liquidations; no claim Binance flow is native LBank flow.",
+  "comparisons": "Report every fixed policy and both models, matched baseline schedule and uncertainty. Improvements from a negative baseline do not establish positive edge. Models that abstain or have inadequate frequency fail usefulness.",
+  "production_changed": false
+}
