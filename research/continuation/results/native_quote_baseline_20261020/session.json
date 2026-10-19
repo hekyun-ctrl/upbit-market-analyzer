@@ -1,0 +1,16 @@
+{
+  "started_utc": "2026-10-19T23:35:32.429269+00:00",
+  "protocol_sha256": "6e710d540d4396de18067c82f452ebc1665dea157b3929f7fa93cb5ae6eb5e0c",
+  "code_sha256": "c796027764604ed91bd498d9b29ab278f06146939304a49884b832a78edbe5c6",
+  "parser_sha256": "2092f843e793fb03c8d888ec804e652b3adadb7c86e917220a1bc79bbb6a9496",
+  "URL": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketOrder?depth=5&symbol=BTCUSDT",
+  "fixed_capture": {
+    "maximum_attempts": 12,
+    "target_interval_seconds": 5,
+    "http_timeout_seconds": 5,
+    "hard_stop_seconds": 120,
+    "background_continuation": false
+  },
+  "background_continuation": false,
+  "freshness_policy": "No inferred event-age or fills"
+}

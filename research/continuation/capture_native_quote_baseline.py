@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 PROTOCOL = Path(__file__).with_name("native_quote_baseline_protocol_20261020.json")
 PUBLIC_URL = "https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketOrder?depth=5&symbol=BTCUSDT"
 MAX_BYTES = 150000
+IMPLEMENTATION_VERSION = 2
 HEADERS = {"date", "age", "cache-control", "content-type", "content-length", "server", "via", "x-cache"}
 
 
@@ -57,11 +58,11 @@ def classify(raw, extractor):
     payload = json.loads(raw)
     if not isinstance(payload, dict):
         raise ValueError("Depth response must be an object")
-    if payload.get("success") is False or payload.get("result") is False:
-        raise ValueError("API explicitly reported failure")
     code = payload.get("error_code")
     if code is not None and str(code) not in ("0", "0.0", ""):
         raise ValueError("API error_code="+str(code))
+    if payload.get("success") is False or payload.get("result") is False:
+        raise ValueError("API explicitly reported failure")
     symbols = metadata_fields(payload, {"symbol"})
     if any(x["value"] != "BTCUSDT" for x in symbols):
         raise ValueError("Response instrument mismatch")
@@ -136,7 +137,8 @@ def capture(output, getter=get_raw, clock=time.monotonic, sleeper=time.sleep, no
     extractor = extractor or load_parser()
     start = clock()
     deadline = start+fixed["hard_stop_seconds"]
-    session = {"started_utc": now(), "protocol_sha256": sha(PROTOCOL.read_bytes()),
+    session = {"started_utc": now(), "implementation_version": IMPLEMENTATION_VERSION,
+        "protocol_sha256": sha(PROTOCOL.read_bytes()),
         "code_sha256": sha(Path(__file__).read_bytes()), "parser_sha256": p["parser_sha256"],
         "URL": PUBLIC_URL, "fixed_capture": fixed, "background_continuation": False,
         "freshness_policy": "No inferred event-age or fills"}

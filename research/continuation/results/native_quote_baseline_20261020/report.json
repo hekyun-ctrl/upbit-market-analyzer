@@ -1,0 +1,99 @@
+{
+  "started_utc": "2026-10-19T23:35:32.429269+00:00",
+  "protocol_sha256": "6e710d540d4396de18067c82f452ebc1665dea157b3929f7fa93cb5ae6eb5e0c",
+  "code_sha256": "c796027764604ed91bd498d9b29ab278f06146939304a49884b832a78edbe5c6",
+  "parser_sha256": "2092f843e793fb03c8d888ec804e652b3adadb7c86e917220a1bc79bbb6a9496",
+  "URL": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketOrder?depth=5&symbol=BTCUSDT",
+  "fixed_capture": {
+    "maximum_attempts": 12,
+    "target_interval_seconds": 5,
+    "http_timeout_seconds": 5,
+    "hard_stop_seconds": 120,
+    "background_continuation": false
+  },
+  "background_continuation": false,
+  "freshness_policy": "No inferred event-age or fills",
+  "completed_utc": "2026-10-19T23:36:27.943679+00:00",
+  "duration_seconds": 55.51442385599995,
+  "stop_reason": "maximum_attempts_completed",
+  "summary": {
+    "requested_attempts": 12,
+    "attempted": 12,
+    "successful_depth": 7,
+    "failed_or_invalid": 5,
+    "unattempted": 0,
+    "HTTP_status_counts": {
+      "200": 7,
+      "None": 5
+    },
+    "error_records": [
+      {
+        "attempt": 3,
+        "status": null,
+        "error": "URLError: <urlopen error timed out>"
+      },
+      {
+        "attempt": 5,
+        "status": null,
+        "error": "URLError: <urlopen error timed out>"
+      },
+      {
+        "attempt": 7,
+        "status": null,
+        "error": "URLError: <urlopen error timed out>"
+      },
+      {
+        "attempt": 9,
+        "status": null,
+        "error": "URLError: <urlopen error timed out>"
+      },
+      {
+        "attempt": 11,
+        "status": null,
+        "error": "URLError: <urlopen error timed out>"
+      }
+    ],
+    "HTTP_roundtrip_seconds": {
+      "min": 0.4661080390000052,
+      "median": 4.014771317499992,
+      "p95": 5.005719973900011,
+      "max": 5.005732426999998
+    },
+    "request_start_gaps_seconds": [
+      4.999904,
+      4.99999,
+      5.006356,
+      4.99367,
+      5.006396,
+      4.993603,
+      5.006734,
+      4.993261,
+      5.008945,
+      4.991061,
+      5.006513
+    ],
+    "spread_bps": {
+      "min": 0.01219,
+      "median": 0.01219,
+      "p95": 0.01219,
+      "max": 0.01219
+    },
+    "raw_unique": 7,
+    "raw_duplicate_observations": 0,
+    "book_unique": 7,
+    "book_duplicate_observations": 0,
+    "response_symbol_verified": 7,
+    "rows_with_any_timestamp_candidate": 0,
+    "verified_book_event_times": 0,
+    "unknown_book_freshness": 7,
+    "source_event_time_policy": "Unverified fields/HTTP Date are not book generation time;RTT/2 is not one-way latency.",
+    "profitability_tested": false,
+    "manual_fills_verified": false,
+    "candidate_forward_started": false
+  },
+  "raw_jsonl_sha256": "86fd3677627b3d876d8df3ea22e927cd7af1c8f4fcb3c79792119a59ffd0d685",
+  "raw_jsonl_bytes": 17648,
+  "production_changed": false,
+  "account_or_order_access": false,
+  "interpretation": "One bounded public depth input-quality baseline,not alpha or forward strategy validation."
+}

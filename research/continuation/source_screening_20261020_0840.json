@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "reviewed_utc": "2026-10-19T23:39:17Z",
+  "scope": "Primary documentation and exact commit preflight only;no source strategy code execution,training,market backtest,live bot or profitability certification.",
+  "production_changed": false,
+  "candidate_forward_started": false,
+  "sources": [
+    {
+      "repository": "jsinn003/btc_macd_trading_strategy",
+      "commit": "08e5f1af36d66b6e071d64b98882f771397a63a4",
+      "url": "https://github.com/jsinn003/btc_macd_trading_strategy/tree/08e5f1af36d66b6e071d64b98882f771397a63a4",
+      "full_file_read": {
+        "path": "README.md",
+        "git_blob_sha": "696b7f652c14c8e9b40f4194158785977e54625d"
+      },
+      "contract_summary": "Binance BTCUSDC 1m input;MACD on15/30/60m,EMA200 andATR stop.",
+      "source_caveat": "Author describes cost drag and insufficient alpha,not established after-cost profitability.",
+      "decision": "exclude_as_priority_positive_evidence_lead;not an independent replay or universal MACD verdict"
+    },
+    {
+      "repository": "Tobias-Steinbach-TS/systematic-trading-btc",
+      "commit": "3e5dfaf00baea805f29cbf693046ad72e28668a4",
+      "url": "https://github.com/Tobias-Steinbach-TS/systematic-trading-btc/tree/3e5dfaf00baea805f29cbf693046ad72e28668a4",
+      "full_file_read": {
+        "path": "README.md",
+        "git_blob_sha": "71881907efacc5e733f9b6b013c72ba81f5d3763"
+      },
+      "contract_summary": "Hourly LightGBM classification,confidence0.55,SMA50/200 regime,EMA12/time exits,0.1% per side documented.",
+      "source_caveat": "Source disclaims profitability,uses iterated history without walk-forward,omits slippage/partialfills and uses bar-close fills. Engineered pickle absent.",
+      "decision": "exclude_as_priority_positive_evidence_lead;no external pickle loaded or source backtest performed"
+    },
+    {
+      "repository": "djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen",
+      "commit": "1274eac3f8e02ddce6be7ff3b48887a971932f35",
+      "url": "https://github.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/tree/1274eac3f8e02ddce6be7ff3b48887a971932f35",
+      "full_files_read": [
+        {
+          "path": "EXPECTED_PERFORMANCE.md",
+          "git_blob_sha": "cf9b5e0105a6c825cb032869bdee4cd61bbfd3c4"
+        },
+        {
+          "path": "STRATEGY.md",
+          "git_blob_sha": "a9f36f480db29a110d8ebe24040de39b5b2e91de"
+        },
+        {
+          "path": "config.json",
+          "git_blob_sha": "fbb359d9d85b22369e432d5f0aab51855d50a533"
+        }
+      ],
+      "documented_not_code_verified_contract": {
+        "interval": "15m",
+        "instrument": "BTCUSDT",
+        "side": "long only",
+        "training_symbols": [
+          "BTCUSDT",
+          "ETHUSDT"
+        ],
+        "train_months": 12,
+        "validation": "monthly12train/1test;20bar embargo/symbol;last10%validation",
+        "model": "LightGBM next-bar simple open-to-close return",
+        "signal": "rolling quantile100 entry/90 exit;month-end flat;first hour blocked",
+        "stoploss": -0.2,
+        "fee_per_transition": 0.0003,
+        "TP1": "not specified in documents reviewed",
+        "contract_owned_by": "freqtrade_live/shared/models/model_info.json;defaults src/strategy_contract.py"
+      },
+      "original_claim_not_reproduced": {
+        "period": "2020-12-01 through2026-07-03",
+        "trades": 2682,
+        "gross_return_pct": 743.6,
+        "fee_only_net_return_pct": 277.4,
+        "artifact_for_claim": "2026-07-04 retraining",
+        "current_artifact_training_date_reported": "2026-08-13T21:19:40Z",
+        "caveat": "Source explicitly warns handwritten figures predate current artifact;not current model performance or LBank realized profit."
+      },
+      "unresolved_before_computation": [
+        "Hundreds of configurations scored on reused OOF predictions;no untouched holdout behind selected headline.",
+        "alpha001 changed from expanding to rolling480bar rank on2026-06-10;older artifacts noncomparable.",
+        "Generic simulator cumulative bar open-close stop differs from intrabar entry-price stop;funding/slippage not fully modeled.",
+        "Author18/20June dry-run/replay parity is signal/bar alignment evidence,not live realized profit.",
+        "No fixed TP1 contract in reviewed documents;-20% stop is not approved for this user;must establish risk compatibility before expensive training.",
+        "No current source code,data completeness,model artifact provenance,leakage,frequency95%CI or native LBank manual fill evidence independently checked."
+      ],
+      "decision": "unreviewed_primary_code_artifact_contract_lead_only;not eligible,maintained alpha candidate or forward study",
+      "next_step": {
+        "stage": "pinned_contract_cost_artifact_risk_preflight",
+        "read_first": [
+          "src/strategy_contract.py",
+          "freqtrade_live/shared/models/model_info.json",
+          "REVIEW_FINDINGS.md",
+          "freqtrade_live/backtest_live_window.py"
+        ],
+        "inspect_after_tree": "Exact signal engine,training split/feature timing,fee sides,funding,stop sequencing and June evidence.",
+        "completion": "Preserve pinned code/blob SHA,actual contract table and risk/TP1/frequency/cost/leakage feasibility decision. Freeze an execution protocol only if compatible;otherwise exclude without salvage tuning.",
+        "forbidden": "Do not start Freqtrade/live bot,use accounts/orders/SQL/webhooks,load unreviewed pickles or install/run unreviewed code."
+      }
+    }
+  ],
+  "fixed_policy": "All promotion gates unchanged;2022-Sep2026 reused. Published earlier outcomes are not unseen prospective observations.",
+  "qualified_candidates": 0
+}

@@ -77,5 +77,14 @@ class NativeBaselineTests(unittest.TestCase):
                 self.assertEqual(r["summary"]["unattempted"],11)
                 self.assertEqual(r["summary"]["successful_depth"],0)
 
+    def test_API_permission_code_stops_even_failure_wrapper(self):
+        clock=Clock()
+        def get(url,timeout):return 200,{},b'{"success":false,"error_code":10009}',url
+        with tempfile.TemporaryDirectory() as d, contextlib.redirect_stdout(io.StringIO()):
+            r=capture(Path(d)/"capture",get,clock,clock.sleep,clock.now,self.extractor)
+            self.assertEqual(r["summary"]["attempted"],1)
+            self.assertEqual(r["summary"]["unattempted"],11)
+            self.assertEqual(r["stop_reason"],"API_permission_or_rate_limit_stop_no_credentials")
+
 
 if __name__ == "__main__":unittest.main()

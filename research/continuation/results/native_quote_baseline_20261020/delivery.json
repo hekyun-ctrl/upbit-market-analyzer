@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "stage": "bounded_native_public_depth_capture_and_separate_saved_raw_audit",
+  "completed_utc": "2026-10-19T23:42:35Z",
+  "executed_checkpoint_commit": "910e888abba4f525cab3a91cc5a58ef55c4ac526",
+  "capture_started_utc": "2026-10-19T23:35:32.429269+00:00",
+  "capture_ended_utc": "2026-10-19T23:36:27.943679+00:00",
+  "duration_seconds": 55.51442385599995,
+  "commands": {
+    "actual_capture": "python research/continuation/capture_native_quote_baseline.py --capture --output research/continuation/results/native_quote_baseline_20261020",
+    "current_tests": "python -m unittest discover -s research/continuation -p test_native_quote_baseline.py -v",
+    "saved_raw_audit": "python research/continuation/verify_native_quote_baseline.py research/continuation/results/native_quote_baseline_20261020"
+  },
+  "SHA256": {
+    "raw_jsonl": "86fd3677627b3d876d8df3ea22e927cd7af1c8f4fcb3c79792119a59ffd0d685",
+    "report_json": "b60b260fe4442cb4c4771e195e91a5236677f6cc4832ea17c354400796395794",
+    "session_json": "9b3a2ac813d49fac170a39dd974c79a2aee6f7293d0e068af5b1730958fd22ce",
+    "independent_audit_json": "0d2e9f6c527b71f47139b91562dd86e3bed8dca1b522e87ddad9eb0c53f77b1b",
+    "protocol": "6e710d540d4396de18067c82f452ebc1665dea157b3929f7fa93cb5ae6eb5e0c",
+    "parser": "2092f843e793fb03c8d888ec804e652b3adadb7c86e917220a1bc79bbb6a9496",
+    "executed_capture_v1": "c796027764604ed91bd498d9b29ab278f06146939304a49884b832a78edbe5c6",
+    "current_capture_v2": "b063e192002506e911295fc5b1193c93c3b1da294d80725a492de2d91fe3ccc9",
+    "separate_verifier": "4458b48a7dbe8f932e3ee801a856184cec4ebd9d932cc1a2d9cf7eb7e4d18809",
+    "current_tests": "34c72b300d78465a19bb3d3723d9b1ecbc807f27f93fbad15f7edebf42aa2dd7"
+  },
+  "tests": {
+    "before_live_v1": 8,
+    "after_capture_v2": 9,
+    "network_free": true,
+    "separate_decimal_scalar_audit_passed": true
+  },
+  "post_capture_code_change": "v2 checks nonzero API error_code before success=false wrapper so future permission errors fail fast;adds implementation_version metadata. This response did not occur in saved dataset. No second capture,no modification to original raw/report/session.",
+  "actual_observation": {
+    "attempts": 12,
+    "valid_depth": 7,
+    "timeouts": 5,
+    "unattempted": 0,
+    "raw_bytes": 17648,
+    "verified_book_event_times": 0,
+    "unknown_book_freshness": 7,
+    "duplicate_raw_or_normalized_books": 0
+  },
+  "supplemental_success_only_duration_seconds": {
+    "count": 7,
+    "min": 0.4661080390000052,
+    "median": 0.5806012909999936,
+    "max": 4.049548107999954,
+    "calculation": "Median/min/max of monotonic_request_duration_seconds where parse_status=valid_depth in saved raw.jsonl."
+  },
+  "inference_limits": [
+    "Research-host request/read/parse time,not exchange event age or one-way latency.",
+    "No attribution to production alert cause,exchange outage or user-device latency.",
+    "No fills,costs,profitability,TP1,urgentwarnings,frequency or prospective candidate validation."
+  ],
+  "source_screening": "research/continuation/source_screening_20261020_0840.json",
+  "documentation": "docs/lbank_native_quote_baseline_2026-10-20.md",
+  "production_changed": false,
+  "railway_accessed": false,
+  "background_collector_running": false,
+  "forward_started": false,
+  "replacement_certified": false
+}

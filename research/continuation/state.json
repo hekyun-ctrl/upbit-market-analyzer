@@ -27,7 +27,8 @@
     "external_ema_pullback_momentum_265209c_forensic_v1_synthetic_source_audit",
     "unreadable_supply_demand_7d15e_source_audit_v1_real_price_causality",
     "garcia_schweitzer_2015_public_data_and_alert_contract_preflight",
-    "mroziewicz_slepaczuk_2026_two_released_BTC_ledger_cost_frequency_audit_v1"
+    "mroziewicz_slepaczuk_2026_two_released_BTC_ledger_cost_frequency_audit_v1",
+    "native_LBank_public_depth_bounded12attempts_v1_raw_hash_and_decimal_quality_audit"
   ],
   "read_before_work": [
     "docs/lbank_strategy_rebuild_2026-10-20.md",
@@ -37,15 +38,34 @@
     "research/long_history/results"
   ],
   "next_work": {
-    "stage": "bounded_native_LBank_public_quote_quality_baseline_then_new_primary_source",
-    "instruction": "Completed new publishedWFsource actual2BTC ledger audit under checkpointa6b05c283f8399222d9f866ee75d158ca10e28ef:8tests,80.3MBauthorZIP SHA,original2resultRDS preserved. SourceWFboundary missingfees4/7transitions corrected without changing signals;both historical modelbase/doublefee sums remainpositive. Yet paperclip frequency0.440/0.449perday,opportunitydays32.21/32.06%,dailyblockbootstrap95lowernegative,DD53.96/49.79%,noSLTP1/nativecost/funding/urgent/forwardcontract. This is positive historical fee-only model evidence,NOT qualified replacement. Do not rerun/optimize it to force policy. Garcia2015lead completed:advertiseddata/scriptsHTTP404,dailypositions,nointradayriskcontract;no marketbacktest. Read docs/lbank_published_wf_ledger_audit_2026-10-20.md. Next concrete finite step:follow research/continuation/native_quote_baseline_protocol_20261020.json,validate current PUBLICnativeendpoint then bounded12attempts5secondinterval rawquote+HTTPRTT collection using reviewed existing fetch_public_orderbook/extract_features only. Record timestamps,missingeventtime,failures,spread,duplicates,rawSHA;stopatbatchend,preserveGit. No shadow_direction/daemon/Telegram/signals/accounts/orders,productionrestart or inference that collector runsbetweenexecutions. This baseline is NOT candidateforwardvalidation and cannot cureWFfrequency/risk failures. AfterbaselinecontinuePRIMARYintradayBTCcode/data/aftercostsourcefeasibility;rejectknownincompatiblefrequency/SLTP1 before costlymarketreplay. No eligiblecandidate exists;allpromotiongatesunchanged,no deploy. All2022-Sep2026reused;published2019-2021sourceoutcomesalsoalreadyknown,notnewuntouchedforwarddata.",
+    "stage": "pinned_15m_LightGBM_source_contract_cost_artifact_risk_preflight",
+    "instruction": "Completed actual bounded native PUBLICdepth batch under pre-request code checkpoint910e888abba4f525cab3a91cc5a58ef55c4ac526:12attempts,7valid,5researchhost5secondtimeouts,7unknownbookeventages;rawbytes/hash and separateDecimaltiming audit preserved. This is input quality,not alpha/fills/forwardvalidation or productiondelayattribution. No continuouscollector remains. Read docs/lbank_native_quote_baseline_2026-10-20.md and source_screening_20261020_0840.json. Next single finite step:read pinned djienne15mLightGBM source contract/artifact/replay/evidence at1274eac3f8e02ddce6be7ff3b48887a971932f35 WITHOUT executing externalcode. Audit modelartifact date vsstalehandwrittenperformance,signal/feature/splitcausality,feesides/funding/slippage,bar-vs-intrabarstop,frequency and current risk/TP1compatibility. Documented-20%stop is NOT approved for user;no currentTP1 inread docs. Reject incompatible originalcontract rather than relaxgates/increaserisk/salvagetune. Onlyifcompatible freeze bounded execution protocol before training/backtest;otherwise continue another primarysource with code/data/aftercostevidence. Do not run Freqtrade,accounts,orders,webhooks,SQL,unreviewedpickles or dependencies. Newsource remains unreviewedlead,NOT maintained/eligiblecandidate or forwardclock. Do not repeat prior failedcalculation/README-onlyresearch. Allpromotiongatesunchanged;2022-Sep2026alreadyobserved and publishedolderoutcomesnot prospective. No deploy.",
     "sources_to_screen": [
+      {
+        "title": "15m BTC long-only LightGBM artifact-owned contract",
+        "url": "https://github.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/tree/1274eac3f8e02ddce6be7ff3b48887a971932f35",
+        "source_commit": "1274eac3f8e02ddce6be7ff3b48887a971932f35",
+        "screening": "research/continuation/source_screening_20261020_0840.json",
+        "status": "unreviewed_code_artifact_risk_contract_lead_only;3documentsread;no code/dataexecution",
+        "read_first": [
+          "src/strategy_contract.py",
+          "freqtrade_live/shared/models/model_info.json",
+          "REVIEW_FINDINGS.md",
+          "freqtrade_live/backtest_live_window.py"
+        ],
+        "known_caveats": [
+          "Stale2026-07-04performance predates reported2026-08-13artifact.",
+          "Selectionbias reusedOOF,partialcosts,barstopnotintrabar,documented-20%stopnotapproved,TP1notestablished."
+        ]
+      },
       {
         "title": "Native LBank PUBLIC quote baseline for manual fill feasibility",
         "url": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketOrder?depth=5&symbol=BTCUSDT",
         "existing_code": "lbank_orderbook_shadow.py",
         "protocol": "research/continuation/native_quote_baseline_protocol_20261020.json",
-        "status": "queued_bounded_input_quality_observation_NOT_strategy_or_candidateforward"
+        "status": "completed_bounded12observations;7valid5timeouts;not strategyforward_or_full_nativegate",
+        "report": "research/continuation/results/native_quote_baseline_20261020/report.json",
+        "documentation": "docs/lbank_native_quote_baseline_2026-10-20.md"
       },
       {
         "title": "A novel approach to trading strategy parameter optimization using double out-of-sample data and walk-forward techniques",
@@ -91,7 +111,8 @@
     "Supply/demand source7d15e failed real-price future-append invariance:6pastzones,3targets,2closedoutcomeschange;43/47formationbarentries. Apparent positiveR is invalid as alpha;no valid PF,fullcoststress,TP1/nativeurgent/manualfill gates computed. This source version excluded;no universal supply-demand claim.",
     "Additional primary screens:CacheCarti all4passedBTCcardsnegative;TSMOM sourcefeesappliedtorisknotnotional andTPfirst;Frontiers licensedrawdata/riskcontract notpubliclyreproducible. These are source screens only,not newly executed market backtests. Social-signal paper now screened:dailyinput,riskcontract unavailable,advertisedendpoint404;not qualified.",
     "New publishedWFtwoBTCsourceledgers remainpositive after sourcefee reconciliation and2xfeemodel,but source processedKaggleprices/rawimputation not reconciled,logshortapproximation,nativefunding/latency/TP1 absent. Both frequency<.45/day,opportunitydays~32%,95lowernegative. PaperclipDD~50-54% is percent,notinitialR. No promotion or universalEMAconclusion.",
-    "Next PUBLICnativebook baseline12attempts is queued,not started,not strategyforwardcollection or proof of freshness/manualfills;do not assume continual collection between runs."
+    "NativePUBLICdepth12attempts completed08:35:32-08:36:27KST:7valid5timeouts at5sec inresearchhost. No bookeventtime in7validresponses;HTTPDate not eventtime,RTTnotoneway. No productiondelaycause/exchangeuptime/fill inference;no collector between runs. Full nativegate still missing.",
+    "Additional sources jsinn003/TobiasREADME preflights lack positive aftercostproof;no marketbacktest. New djienne15mMLlead3docs only,currentartifact and staleperformance dates differ,-20%stop/TP1/cost/selectionbias unresolved. Not qualified or forward-ready."
   ],
   "iterations": [
     {
@@ -152,8 +173,14 @@
       "max_cash_pnl_abs_error": 7.008282842946301e-16,
       "result": "rejected_all10fixed_components_costed_losses_PFbelow1_expectancy_lower_not_positive",
       "common2026days": 273,
-      "common2026base_return_pct_range": [-44.70, -20.43],
-      "common2026double_cost_return_pct_range": [-64.32, -48.77],
+      "common2026base_return_pct_range": [
+        -44.7,
+        -20.43
+      ],
+      "common2026double_cost_return_pct_range": [
+        -64.32,
+        -48.77
+      ],
       "report": "research/continuation/results/functional_curve_20261020_report.json",
       "audit": "research/continuation/results/functional_curve_20261020_audit.json",
       "source_catalog": "research/continuation/results/functional_curve_20261020_input_sources.json.gz",
@@ -181,7 +208,7 @@
       "reused_setups": 9,
       "nonpositive_initial_risk": 1,
       "ADX_finite_rows": 0,
-      "independent_max_metric_abs_error": 0.0,
+      "independent_max_metric_abs_error": 0,
       "result": "rejected_this_source_version_as_replacement_evidence_synthetic_invalid_fills_no_costs",
       "real_market_backtest_performed": false,
       "report": "research/continuation/results/external_ema_source_20261020/report.json",
@@ -240,13 +267,31 @@
       "source_model_count": 2,
       "paper_clip_observed_days_per_model": 655,
       "paper_clip_rows_per_model": 15720,
-      "paper_clip_position_flips": [288,294],
-      "paper_clip_opportunity_days": [211,210],
-      "paper_clip_closed_diagnostic_segments": [287,293],
+      "paper_clip_position_flips": [
+        288,
+        294
+      ],
+      "paper_clip_opportunity_days": [
+        211,
+        210
+      ],
+      "paper_clip_closed_diagnostic_segments": [
+        287,
+        293
+      ],
       "model_trades_are_overlapping_not_independent": true,
-      "source_missing_fee_transitions": [4,7],
-      "paper_clip_fee_reconciled_logmodel_return_pct": [237.73906690050902,404.88240730031464],
-      "paper_clip_same_signal_double_fee_logmodel_return_pct": [89.85746490594533,180.4303942504376],
+      "source_missing_fee_transitions": [
+        4,
+        7
+      ],
+      "paper_clip_fee_reconciled_logmodel_return_pct": [
+        237.73906690050902,
+        404.88240730031464
+      ],
+      "paper_clip_same_signal_double_fee_logmodel_return_pct": [
+        89.85746490594533,
+        180.4303942504376
+      ],
       "implementation_tests_passed": 8,
       "separate_arithmetic_audit_passed": true,
       "result": "historical_fee_only_positive_NOT_qualified;frequency_opportunitydays_uncertainty_fail_no_full_manualrisk_native_forwardcontract",
@@ -260,20 +305,44 @@
       "next_protocol": "research/continuation/native_quote_baseline_protocol_20261020.json",
       "production_changed": false,
       "forward_started": false
+    },
+    {
+      "id": "native_quote_baseline_20261020_0834",
+      "implementation_fixed_utc": "2026-10-19T23:34:33Z",
+      "capture_started_utc": "2026-10-19T23:35:32.429269+00:00",
+      "capture_completed_utc": "2026-10-19T23:36:27.943679+00:00",
+      "completed_utc": "2026-10-19T23:44:23Z",
+      "stage_completed": "actual_bounded_PUBLICdepth_capture_rawbytes_SHA_timing_and_Decimal_integrity_audit_plus_pinned_next_source_document_preflight",
+      "protocol_checkpoint_commit": "910e888abba4f525cab3a91cc5a58ef55c4ac526",
+      "fixture_tests_before_live_v1": 8,
+      "current_fixture_tests_v2": 9,
+      "requests": 12,
+      "valid_depth": 7,
+      "research_host_5second_timeouts": 5,
+      "unattempted": 0,
+      "verified_book_event_times": 0,
+      "unknown_book_freshness": 7,
+      "raw_bytes": 17648,
+      "raw_sha256": "86fd3677627b3d876d8df3ea22e927cd7af1c8f4fcb3c79792119a59ffd0d685",
+      "valid_request_duration_median_seconds": 0.5806012909999936,
+      "all_attempt_duration_median_seconds": 4.014771317499992,
+      "spread_median_bps_rounded": 0.01219,
+      "separate_arithmetic_audit_passed": true,
+      "result": "descriptive_inputbaseline_completed;native_eventfreshness_manualfill_and_strategygates_NOTfulfilled",
+      "report": "research/continuation/results/native_quote_baseline_20261020/report.json",
+      "audit": "research/continuation/results/native_quote_baseline_20261020/independent_audit.json",
+      "documentation": "docs/lbank_native_quote_baseline_2026-10-20.md",
+      "source_screening": "research/continuation/source_screening_20261020_0840.json",
+      "delivery": "research/continuation/results/native_quote_baseline_20261020/delivery.json",
+      "real_market_strategy_backtest_performed": false,
+      "background_collector_running": false,
+      "production_changed": false,
+      "forward_started": false
     }
   ],
-  "active_run": {
-    "id": "native_quote_baseline_20261020_0834",
-    "stage": "bounded_public_capture_code_and_protocol_fixed_before_requests",
-    "implementation_fixed_utc": "2026-10-19T23:34:33Z",
-    "protocol": "research/continuation/native_quote_baseline_protocol_20261020.json",
-    "preflight": "research/continuation/native_quote_execution_preflight_20261020.json",
-    "code": "research/continuation/capture_native_quote_baseline.py",
-    "fixture_tests_passed": 8,
-    "next_action": "Execute fixed maximum12PUBLICdepthGETs at5secondtargetinterval,save rawsession/headers/bodySHA and actualgaps. No background,orders,signals or candidateforwardclock. Stop on permission/rate limits without credentials/bypass. Then preserve results and next PRIMARY source checkpoint."
-  },
+  "active_run": null,
   "blockers": [],
-  "updated_kst": "2026-10-20T07:56:13+09:00",
+  "updated_kst": "2026-10-20T08:44:23+09:00",
   "maintained_research_candidates": [
     {
       "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
@@ -316,5 +385,14 @@
     "obv_rerun": false,
     "raw_archives_persisted_as": "Official source URLs,checksums and target coverage diagnostics in Git report;125.9MB public ZIPs are reproducibly downloadable,not required to survive locally."
   },
-  "continuation_initial_commit": "1a49eb690be5a360543181dc92a37308b87a7a1e"
+  "continuation_initial_commit": "1a49eb690be5a360543181dc92a37308b87a7a1e",
+  "last_native_input_observation": {
+    "start_utc": "2026-10-19T23:35:32.429269+00:00",
+    "end_utc": "2026-10-19T23:36:27.943679+00:00",
+    "report": "research/continuation/results/native_quote_baseline_20261020/report.json",
+    "native_gate_satisfied": false,
+    "candidate_forward_started": false,
+    "continuous_collection": false,
+    "next": "No more same batch required for alpha;perform next pinned source-code contract/risk feasibility audit."
+  }
 }

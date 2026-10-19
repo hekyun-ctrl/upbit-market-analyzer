@@ -1,0 +1,25 @@
+{
+  "status": "raw_bytes_hashes_decimal_spreads_and_capture_times_reconciled",
+  "report_sha256": "b60b260fe4442cb4c4771e195e91a5236677f6cc4832ea17c354400796395794",
+  "records_checked": 12,
+  "valid_depth": 7,
+  "timeouts_or_errors": 5,
+  "unverified_book_event_times": 7,
+  "spread_bps_unrounded": [
+    0.012188321759506128,
+    0.012188321759506128,
+    0.012188321759506128,
+    0.01218769785965744,
+    0.012190253282987588,
+    0.012190253282987588,
+    0.012190149262282643
+  ],
+  "HTTP_statuses": {
+    "200": 7,
+    "None": 5
+  },
+  "median_request_duration_seconds": 4.014771317499992,
+  "independence": "Separate decimal/scalar check by same researcher,not external institutional validation.",
+  "native_fills_verified": false,
+  "strategy_forward_started": false
+}
