@@ -1,0 +1,8 @@
+{
+  "purpose": "Audit whether artificial gap exits, rather than published price rules, explain positive results",
+  "timing": "After observing strict-all-fields-quarantine 2022 and 2023-2026 results; this is an additional disclosed sensitivity, never a blind test",
+  "fixed_price_strategy": "Unchanged 55/20 day, 20 day N, 2N stop and 0.5N adds; no parameter tuning",
+  "price_data_policy": "Ignore volume-only archive differences because this strategy consumes no volume. Quarantine any OHLC mismatch between monthly minute aggregation and monthly five-minute, and any raw monthly-vs-daily minute OHLC mismatch. Verify daily source checksums. Never interpolate prices.",
+  "report_both": "Retain all-fields strict result and OHLC-only result side by side; do not choose best result. Report data-gap-affected campaigns and their net contribution separately. Artificial next-observed-open gap exit remains a scenario, not an executable historical fill.",
+  "interpretation": "Neither scenario alone proves profitability or authorizes live-entry promotion. If profit depends on artificial gap exits, reject the certification claim."
+}

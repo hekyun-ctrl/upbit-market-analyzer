@@ -1,11 +1,11 @@
 """Published System-2 price mechanics; explicit BTC/risk/execution adaptations.
 Research only. No production imports, signals, orders, or parameter search.
 """
-import json
+import json,io,zipfile,hashlib
 from pathlib import Path
 import numpy as np
 import pandas as pd
-from research.long_history.evaluate import load_archives, verify_manifests, digest
+from research.long_history.evaluate import load_archives, verify_manifests, digest, COLUMNS
 
 TICK=.1
 
@@ -151,17 +151,37 @@ def metrics(eq,trades):
         win_fraction=float((trades.net>0).mean()) if len(trades) else None)
 
 
-def main(single_2022=False):
-    root=Path(__file__).resolve().parents[3];out=root/('published-turtle-2022' if single_2022 else 'published-turtle-evaluation');out.mkdir(exist_ok=True)
-    folders=[root/'binance-futures-blind-2023',root/'binance-futures-verified'];parts=[];fund=[];sources=[]
+def price_quarantines(folder,one,audit):
+    bad=set()
+    for r in audit['monthly_disagreements']:
+        if any(abs(r[k+'_minute']-r[k+'_five'])>1e-6 for k in ('open','high','low','close')):bad.add(int(r['start']))
+    for check in audit['daily_crosschecks']:
+        day=check['day'];path=folder/'daily_audit'/f'BTCUSDT-1m-{day}.zip'
+        source=next(x for x in audit['daily_sources'] if x['url'].endswith(path.name))
+        if digest(path)!=source['sha256']:raise ValueError('daily audit checksum changed')
+        with zipfile.ZipFile(path) as z:raw=z.read(z.namelist()[0])
+        f=pd.read_csv(io.BytesIO(raw),header=0 if not raw[:1].isdigit() else None);f.columns=COLUMNS
+        f=f.astype(float);f['start']=(f['start']/1000).astype('int64')
+        j=one[['start','open','high','low','close']].merge(f[['start','open','high','low','close']],on='start',suffixes=('_monthly','_daily'))
+        mask=np.zeros(len(j),dtype=bool)
+        for k in ('open','high','low','close'):mask|=abs(j[k+'_monthly']-j[k+'_daily'])>1e-6
+        bad.update(int(t//300*300) for t in j.loc[mask,'start'])
+    return sorted(bad)
+
+
+def main(single_2022=False,price_only=False):
+    root=Path(__file__).resolve().parents[3];out=root/('published-turtle-2022' if single_2022 else 'published-turtle-evaluation');
+    if price_only:out=out.with_name(out.name+'-price-only')
+    out.mkdir(exist_ok=True)
+    folders=[root/'binance-futures-blind-2023',root/'binance-futures-verified'];parts=[];fund=[];sources=[];quarantines={}
     audits=[Path(__file__).with_name('integrity_final_2023.json'),Path(__file__).with_name('integrity_final_2024_2026.json')]
     if single_2022:
         folders=[root/'binance-futures-blind-2022'];audits=[folders[0]/'integrity_audit.json']
     for folder,audit in zip(folders,audits):
-        sources+=verify_manifests(folder);m=load_archives(folder,'1m');bad=json.loads(audit.read_text())['quarantined_starts']
+        sources+=verify_manifests(folder);m=load_archives(folder,'1m');audit_data=json.loads(audit.read_text());bad=price_quarantines(folder,m,audit_data) if price_only else audit_data['quarantined_starts'];quarantines[folder.name]=bad
         parts.append(m[~(m.start//300*300).isin(bad)]);fund.append(load_archives(folder,'5m','fundingRate'))
     one=pd.concat(parts).sort_values('start').reset_index(drop=True);fund=pd.concat(fund).sort_values('calc_time');ctx=daily_context(one)
-    result=dict(protocol_sha256=digest(Path(__file__).with_name('published_turtle_protocol_20261020.json')),code_sha256=digest(__file__),minutes=len(one),scenarios={},sources=sources,production_changed=False,profitable_strategy_certified=False)
+    result=dict(protocol_sha256=digest(Path(__file__).with_name('published_turtle_protocol_20261020.json')),code_sha256=digest(__file__),minutes=len(one),quarantines=quarantines,price_only_integrity=price_only,scenarios={},sources=sources,production_changed=False,profitable_strategy_certified=False)
     for path in ('LH','HL'):
         for stress in (1.,2.):
             eq,trades,fills,opened=replay(one,fund,ctx,path,stress);name=f'{path}_cost{int(stress)}'
@@ -173,4 +193,4 @@ def main(single_2022=False):
 
 if __name__=='__main__':
     import argparse
-    p=argparse.ArgumentParser();p.add_argument('--single-2022',action='store_true');main(p.parse_args().single_2022)
+    p=argparse.ArgumentParser();p.add_argument('--single-2022',action='store_true');p.add_argument('--price-only',action='store_true');args=p.parse_args();main(args.single_2022,args.price_only)
