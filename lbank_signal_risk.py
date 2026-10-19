@@ -13,6 +13,8 @@ from lbank_entry_quality import direction_priority, POLICY as ENTRY_PRIORITY_POL
 from lbank_signal_thesis import (POLICY as THESIS_POLICY, REVIEW_SECONDS, TRACKING_SECONDS,
                                  assess_thesis, observed_stop_touch)
 
+from lbank_profit_protection import enabled as profit_enabled, observe as profit_observe, acknowledge as profit_ack
+
 LOG = logging.getLogger("lbank_signal_risk")
 
 
@@ -53,6 +55,8 @@ class TrackedSignal:
     thesis_status: str | None = None
     pending_risk_reason: str | None = None
     pending_risk_evidence: dict | None = None
+    profit_policy: dict | None = None
+    profit_state: dict | None = None
 
 
 class SignalRiskTracker:
@@ -137,6 +141,7 @@ class SignalRiskTracker:
                                runner_enabled=bool(plan.get("runner_enabled") and target2 is not None),
                                entry_priority_policy=(plan.get('entry_quality') or {}).get('policy'),
                                followup_thesis=json.loads(json.dumps(plan.get('followup_thesis'))),
+                               profit_policy=json.loads(json.dumps(plan.get('profit_policy'))),
                                stop_active_since=now,
                                strategy=plan.get("strategy", "unknown"), barrier=plan.get("barrier"))
         self.next_number += 1
@@ -196,7 +201,8 @@ class SignalRiskTracker:
                     item.priority_evidence=touch
                     item.pending_risk_reason='stop_breached';item.pending_risk_evidence=touch
                     events.append((item,'stop_breached',current));survivors.append(item);continue
-                evidence=assess_thesis(item.followup_thesis,native_state,item.direction,current,item.sent_at,now)
+                evidence=assess_thesis(item.followup_thesis,native_state,item.direction,current,item.sent_at,now,
+                                       allow_profitable_reversal=profit_enabled(item.profit_policy))
                 item.priority_evidence=evidence
                 if item.thesis_status!=evidence['status']:
                     LOG.info('SIGNAL_THESIS reference=%d evidence=%s',item.number,json.dumps(evidence,sort_keys=True))
@@ -206,6 +212,12 @@ class SignalRiskTracker:
                     events.append((item,'early_invalidation',current));survivors.append(item);continue
                 if now-item.sent_at>=TRACKING_SECONDS:
                     events.append((item,'tracking_expired',current));survivors.append(item);continue
+            if profit_enabled(item.profit_policy) and not item.target1_notified and (not item.target1_hit or (item.profit_state or {}).get('guard') is not None):
+                item.profit_state, profit_reason = profit_observe(item.profit_policy,item.profit_state,
+                    direction=item.direction,entry=item.entry,price=current,now=now,native_state=native_state)
+                if profit_reason:
+                    item.priority_evidence=dict(profit_policy=item.profit_policy,profit_state=item.profit_state)
+                    events.append((item,profit_reason,current));survivors.append(item);continue
             if not coherent and item.runner_enabled and now - item.sent_at >= RUNNER_TTL:
                 events.append((item, "time_exit", current))
                 survivors.append(item)
@@ -289,7 +301,9 @@ class SignalRiskTracker:
 
     def acknowledge(self, signal, reason=None, now=None):
         """Acknowledge only after delivery; TP1 keeps a known TP2 monitored."""
-        if reason == 'risk_caution' and signal in self.signals:
+        if reason in ('profit_guard_armed','profit_guard_updated') and signal in self.signals:
+            profit_ack(signal.profit_state,reason)
+        elif reason == 'risk_caution' and signal in self.signals:
             signal.caution_notified=True
         elif reason == 'time_review' and signal in self.signals:
             signal.time_review_notified=True
@@ -311,7 +325,8 @@ class SignalRiskTracker:
             signal.target1_notified = True
             # Model the user's remaining-half reference stop after the TP1
             # notification. This changes reference monitoring, NOT venue orders.
-            signal.stop = signal.entry
+            guard=(signal.profit_state or {}).get('guard',signal.entry)
+            signal.stop = (max(signal.entry,guard) if signal.direction==1 else min(signal.entry,guard))
             signal.stop_active_since=now if now is not None else signal.last_checked_at or signal.sent_at
             signal.bad_samples = 0
             if signal.target2 is None:
@@ -326,6 +341,11 @@ def format_target_alert(signal, price, time_kst):
     """One-time reference target notification, NOT a trade execution claim."""
     side = "롱" if signal.direction == 1 else "숏"
     move_pct = signal.direction * (signal.target1 / signal.entry - 1) * 100
+    guard=(signal.profit_state or {}).get('guard',signal.entry)
+    protection=max(signal.entry,guard) if signal.direction==1 else min(signal.entry,guard)
+    protection_line=(f"남은 포지션 보호 손절은 {protection:,.1f} USDT를 기준으로 유지하고, 기존 보호보다 불리하게 변경하지 마세요.\n"
+                     if profit_enabled(signal.profit_policy) else
+                     f"남은 포지션 손절가는 진입가 {signal.entry:,.1f} USDT로 조정 검토 요함.\n")
     return (
         f"[LBank BTCUSDT | 1차 목표 도달 - {side}]\n"
         f"기존 진입 알람: #{signal.number}\n"
@@ -334,7 +354,7 @@ def format_target_alert(signal, price, time_kst):
         f"목표 접촉 시 선물 가격표본: {price:,.1f} USDT\n"
         f"알람 기준 진입 참고가: {signal.entry:,.1f} USDT\n"
         f"실제 포지션 보유 중이라면 50% 익절 후 "
-        f"남은 포지션 손절가는 진입가 {signal.entry:,.1f} USDT로 조정 검토 요함.\n"
+        f"{protection_line}"
         "※ LBank에서 실제 익절 체결 후 잔여 수량과 손절 주문을 직접 확인하세요.\n"
         "※ 진입가 손절은 수수료·슬리피지 차감 후 완전한 손익분기점이 아닙니다.\n"
         "※ 미진입·기청산 상태라면 관찰 참고용 알림입니다. "

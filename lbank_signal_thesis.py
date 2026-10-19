@@ -59,7 +59,7 @@ def observed_stop_touch(state,d,stop,active_since,now):
     return None
 
 
-def assess_thesis(thesis,state,d,price,sent_at,now):
+def assess_thesis(thesis,state,d,price,sent_at,now,allow_profitable_reversal=False):
     """Require affirmative failure; a lost AND component is just weaker evidence."""
     result=dict(policy=POLICY,status='unknown',reason='native_evidence_unavailable',
                 invalidated=False,anchor=thesis.get('anchor'),evaluated_at=now)
@@ -86,7 +86,7 @@ def assess_thesis(thesis,state,d,price,sent_at,now):
     # Both 15m changes must be fully after entry, not a pre-entry countertrend.
     reversal_since=int(now//900)*900-2700
     reversal=(reversal_since>=sent_at and opposite15 and opposite_ema and opposite_swings
-              and d*(price-thesis['entry'])<0)
+              and (allow_profitable_reversal or d*(price-thesis['entry'])<0))
     result.update(opposite15=opposite15,opposite_ema=opposite_ema,
                   opposite_swings=opposite_swings,reversal_since=reversal_since)
     if reversal:

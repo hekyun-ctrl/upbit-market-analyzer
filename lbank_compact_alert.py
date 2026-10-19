@@ -22,6 +22,9 @@ def format_compact_entry_alert(plan, observed_at_utc, reference_number=None,
     if seen.tzinfo is None:
         seen = seen.replace(tzinfo=timezone.utc)
     kst = seen.astimezone(KST).strftime("%m/%d %H:%M")
+    expiry=(seen+timedelta(minutes=5)).astimezone(KST).strftime('%H:%M:%S')
+    validity=f"유효 5분({expiry}까지)" if plan.get('profit_policy') else '유효 5분'
+    protection_note=' | 1차 목표 전 수익 보호' if plan.get('profit_policy') else ''
     side = plan["side"]
     icon = "🟢" if side == "롱" else "🔴"
     reference = f" | 신호번호: #{reference_number}" if reference_number is not None else ""
@@ -68,9 +71,9 @@ def format_compact_entry_alert(plan, observed_at_utc, reference_number=None,
         source_note = source_note.rstrip("\n") + " | " + label + "\n"
     return (
         f"[LBank BTCUSDT | {icon} {side} | 조건부 진입 검토]\n"
-        f"⏱ {kst} KST | 유효 5분{reference}\n"
+        f"⏱ {kst} KST | {validity}{reference}\n"
         f"{source_note}{caution}"
-        f"📍 진입가: {plan['price']:,.1f} USDT\n"
+        f"📍 진입가: {plan['price']:,.1f} USDT{protection_note}\n"
         f"💰 진입 증거금: {plan['margin']:,.2f} USDT "
         f"(시드 {margin_pct:.2f}%, 최대 {max_margin_fraction * 100:.0f}%)\n"
         f"⚡ 레버리지 {leverage:.0f}배 | 분할 순RR {rr:.2f} | 포지션 {plan['notional']:,.2f} USDT "

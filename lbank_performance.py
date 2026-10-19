@@ -12,6 +12,7 @@ import os
 import sqlite3
 from collections import Counter
 from datetime import datetime, timedelta, timezone
+from lbank_profit_protection import enabled as profit_enabled, observe as profit_observe, acknowledge as profit_ack
 from lbank_trend_runner import runner_decision, RUNNER_TTL, POLICY_VERSION
 from lbank_signal_thesis import POLICY as THESIS_POLICY,REVIEW_SECONDS,TRACKING_SECONDS,assess_thesis,observed_stop_touch
 
@@ -99,6 +100,7 @@ class PerformanceBook:
                  data_source=plan.get("data_source", "lbank_perpetual_ticker"),
                  observation_source="lbank_perpetual_ticker",
                  runner_enabled=bool(plan.get("runner_enabled")),
+                 profit_policy=plan.get("profit_policy"),
                  entry_quality=plan.get("entry_quality"),
                  followup_thesis=plan.get("followup_thesis"),stop_active_since=ts,
                  runner_last_bar=-1, barrier=plan.get("barrier"),
@@ -112,11 +114,16 @@ class PerformanceBook:
         identity = f"{int(ts * 1000)}:{reference}"
         with self.db:
             for policy in POLICIES:
-                if policy == "trend_runner" and not p["runner_enabled"]:
+                if policy == "trend_runner" and not p["runner_enabled"] and not profit_enabled(p.get("profit_policy")):
                     continue
+                row_plan=dict(p)
+                if policy=='trend_runner' and profit_enabled(p.get('profit_policy')):
+                    row_plan['policy_version']='native_pre_tp_profit_v1'
+                else:
+                    row_plan.pop('profit_policy',None)
                 self.db.execute('''INSERT OR IGNORE INTO signals
                     (id,policy,opened,last_at,last_price,plan) VALUES(?,?,?,?,?,?)''',
-                    (identity, policy, ts, ts, plan["price"], json.dumps(p)))
+                    (identity, policy, ts, ts, plan["price"], json.dumps(row_plan)))
         return identity
 
     def _close(self, row, ts, price, reason, p):
@@ -163,7 +170,8 @@ class PerformanceBook:
                     # A candle proves a touch, not the order/fill. Exclude this result.
                     events.append(self._close(row,ts,price,'censored_intrabar_stop',p))
                     continue
-                thesis_evidence=(assess_thesis(p['followup_thesis'],native_state,p['direction'],price,row['opened'],ts)
+                thesis_evidence=(assess_thesis(p['followup_thesis'],native_state,p['direction'],price,row['opened'],ts,
+                                                allow_profitable_reversal=profit_enabled(p.get('profit_policy')))
                                  if coherent else None)
                 if thesis_evidence and thesis_evidence['invalidated']:
                     events.append(self._close(row,ts,price,'structure_exit',p))
@@ -171,12 +179,28 @@ class PerformanceBook:
                 if ts - row["opened"] >= (TRACKING_SECONDS if coherent else RUNNER_TTL if is_runner else 7200):
                     events.append(self._close(row, ts, price, "censored_tracking_limit" if coherent else "time_exit", p))
                     continue
+                if (is_runner and not row['stage'] and profit_enabled(p.get('profit_policy'))
+                        and (p['direction']*(price-p['target1'])<0 or (p.get('profit_state') or {}).get('guard') is not None)):
+                    ps, event = profit_observe(p['profit_policy'],p.get('profit_state'),
+                        direction=p['direction'],entry=p['price'],price=price,now=ts,native_state=native_state)
+                    p['profit_state']=ps
+                    self.db.execute('UPDATE signals SET plan=? WHERE id=? AND policy=?',
+                                    (json.dumps(p),row['id'],row['policy']))
+                    if event=='profit_guard_touched':
+                        reason='censored_intrabar_profit_guard' if ps.get('touch',{}).get('reason')=='observed_stop_wick' else 'profit_guard_exit'
+                        events.append(self._close(row,ts,price,reason,p));continue
+                    if event:
+                        profit_ack(ps,event)
+                    self.db.execute('UPDATE signals SET plan=? WHERE id=? AND policy=?',
+                                    (json.dumps(p),row['id'],row['policy']))
                 if not row["stage"] and p["direction"] * (price - p["target1"]) >= 0:
                     row["stage"], row["partial"] = 1, leg_pnl(p, p["target1"], .5)
                     p['stop_active_since']=ts
+                    guard=(p.get('profit_state') or {}).get('guard',p['price'])
+                    p['runner_stop']=max(p['price'],guard) if p['direction']==1 else min(p['price'],guard)
                     self.db.execute("UPDATE signals SET stage=1,partial=?,plan=? WHERE id=? AND policy=?",
                                     (row["partial"],json.dumps(p), row["id"], row["policy"]))
-                if is_runner and row["stage"]:
+                if is_runner and row["stage"] and p["runner_enabled"]:
                     proposal = runner_decision(
                         direction=p["direction"], entry=p["price"],
                         stop=p.get("runner_stop", p["price"]), target2=p["target2"],

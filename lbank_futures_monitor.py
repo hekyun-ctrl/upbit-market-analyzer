@@ -18,7 +18,7 @@ from datetime import datetime, timezone, timedelta
 
 import ccxt
 from lbank_signal_risk import SignalRiskTracker, format_risk_alert, format_target_alert, format_target2_alert
-from lbank_telegram_positions import PositionState, TelegramBot, format_position_target_alert
+from lbank_telegram_positions import PositionState, TelegramBot, format_position_target_alert, format_position_management
 from lbank_sample_store import load_snapshots, save_snapshots
 from lbank_structure_patterns import detect_structure, detect_structures, confirm_structure
 from lbank_sampled_context import sampled_context_gate
@@ -37,6 +37,7 @@ from lbank_entry_quality import (confirmation_quality, direction_priority,
                                  observed_target_room, POLICY as ENTRY_QUALITY_POLICY)
 from lbank_entry_priority import ranked_entry_evidence, POLICY as ENTRY_PRIORITY_POLICY
 from lbank_signal_thesis import attach_thesis, POLICY as FOLLOWUP_POLICY
+from lbank_profit_protection import new_policy, format_notice as format_profit_notice, POLICY as PROFIT_POLICY
 from lbank_rsi_divergence import annotate as annotate_rsi_context, DivergenceStudy
 from lbank_market_context import MarketContextThread, annotate as annotate_market_context
 from lbank_public_techniques import TechniqueStudy, annotate as annotate_public_techniques
@@ -920,6 +921,7 @@ def run():
     LOG.info("ENTRY_QUALITY policy=%s universal_minute_wait=false "
              "priority=hard_risk,higher_structure,target_room,minute_reaction "
              "stop_warnings=always_on early_caution=structure_aware", ENTRY_QUALITY_POLICY)
+    LOG.info("PROFIT_PROTECTION_POLICY policy=%s pre_tp1=true profitable_reversal=true legacy_policy_unchanged=true",PROFIT_POLICY)
     LOG.info("SIGNAL_THESIS_POLICY policy=%s frozen_followup_policy_unchanged=true missing_evidence_is_reversal=false "
              "review_hours=6 tracking_hours=24 time_alone_is_exit=false", FOLLOWUP_POLICY)
     LOG.info("NATIVE_TARGET_ROOM policy=%s "
@@ -1001,6 +1003,12 @@ def run():
                     LOG.warning("MANUAL POSITION RISK SENT side=%s reason=%s", side, reason)
                 else:
                     LOG.error("MANUAL POSITION RISK TELEGRAM FAILURE")
+            profit_reason = position_ledger.profit_check(price,now,native_state) if registered_risk is None else None
+            if profit_reason:
+                kst_at=datetime.fromtimestamp(now,tz=timezone(timedelta(hours=9))).strftime('%Y-%m-%d %H:%M')
+                if position_bot.send(format_position_management(position_ledger.position,profit_reason,price,kst_at)):
+                    position_ledger.acknowledge_profit(profit_reason)
+                    LOG.info('MANUAL_PROFIT_NOTICE_SENT reason=%s',profit_reason)
             # A self-reported position takes priority over hypothetical signals.
             # Goal notifications are separate from the entry cooldown/daily cap.
             # A sampled price crossing is NOT exchange order execution.
@@ -1028,7 +1036,9 @@ def run():
                 observed_kst = datetime.fromtimestamp(
                     now, tz=timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
                 notice = (
-                    format_target_alert(tracked, observed_price, observed_kst)
+                    format_profit_notice(tracked.profit_state,reason,observed_price,observed_kst,f"신호 #{tracked.number} 참고가 기준")
+                    if reason.startswith("profit_guard_")
+                    else format_target_alert(tracked, observed_price, observed_kst)
                     if reason == "target1_reached"
                     else format_target2_alert(tracked, observed_price, observed_kst)
                     if reason == "target2_reached"
@@ -1221,6 +1231,8 @@ def run():
                                 plan = annotate_market_context(plan,market_context,now)
                                 plan = annotate_public_techniques(plan,native_state,now,REF_BALANCE)
                                 plan = attach_thesis(plan,native_state,now)
+                                plan['profit_policy']=new_policy(plan['direction'],plan['price'],plan['stop'],
+                                    TAKER_FEE,STOP_SLIPPAGE,FUNDING_BUFFER)
                                 message = format_entry_alert(
                                     plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat(),
                                     reference_number=risk_tracker.next_number)

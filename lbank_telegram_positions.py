@@ -11,6 +11,9 @@ import urllib.parse
 import urllib.request
 from decimal import Decimal, ROUND_DOWN
 from lbank_telegram_transport import TelegramTransport
+from lbank_profit_protection import new_policy, observe as profit_observe, acknowledge as profit_ack, format_notice as format_profit_notice
+
+from lbank_signal_thesis import POLICY as THESIS_POLICY, assess_thesis
 
 LOG = logging.getLogger("lbank_position_bot")
 PATH = os.getenv("LBANK_POSITION_STATE_PATH", "/data/lbank_position_state.json")
@@ -77,12 +80,16 @@ class PositionState:
         sign = 1 if side == "LONG" else -1
         if sign * (target - entry) <= 0:
             raise ValueError("목표가는 진입 방향의 수익 구간이어야 합니다.")
+        opened_at=time.time()
         self.state["position"] = {"side": side, "entry": str(entry),
             "quantity": str(qty), "stop": str(stop), "target": str(target),
             "risk_notice": None, "risk_count": 0,
-            "opened_at": time.time(), "neutral_notice": False,
+            "opened_at": opened_at, "neutral_notice": False,
             "target_notice": False, "target_stage": 1,
-            "target_hit_price": None}
+            "target_hit_price": None,
+            "profit_policy": new_policy(sign,float(entry),float(stop)), "profit_state": None,
+            "management_thesis": dict(policy=THESIS_POLICY,entry=float(entry),anchor=None,initial_stop=float(stop)),
+            "management_pending": None, "management_exit_notice": None}
         self.mutate()
         return self.status()
 
@@ -143,10 +150,38 @@ class PositionState:
         self.mutate()
         return "신고 목표가를 갱신했습니다. 실제 거래소 주문은 직접 확인해야 합니다.\n" + self.status()
 
+    def profit_check(self, price, now, native_state=None):
+        p=self.position
+        if not p or not p.get('profit_policy'):
+            return None
+        if p.get('management_thesis'):
+            evidence=assess_thesis(p['management_thesis'],native_state,1 if p['side']=='LONG' else -1,
+                price,p['opened_at'],now,allow_profitable_reversal=True)
+            if evidence['invalidated'] or p.get('management_pending'):
+                if not p.get('management_pending'):p['management_pending']=evidence
+                self.save()
+                return 'position_reversal'
+        if p.get('target_notice'):
+            return None
+        p['profit_state'], reason=profit_observe(p['profit_policy'],p.get('profit_state'),
+            direction=1 if p['side']=='LONG' else -1,entry=float(p['entry']),
+            price=price,now=now,native_state=native_state,minimum_guard=float(p['stop']))
+        self.save()
+        return reason
+
+    def acknowledge_profit(self, reason):
+        if reason!='position_reversal':
+            profit_ack(self.position['profit_state'],reason)
+        if reason in ('profit_guard_touched','position_reversal'):
+            # Keep the user-reported position until /close; avoid repeated exits.
+            self.position['profit_policy']=None
+            self.position['management_exit_notice']=reason
+        self.save()
+
     def target_reached(self, prices):
         """One-shot reported position notice; price event survives send failure."""
         p = self.position
-        if not p or p.get("target_notice", False) or not prices:
+        if not p or p.get("target_notice", False) or p.get("management_exit_notice") or not prices:
             return None
         if p.get("target_hit_price") is not None:
             return float(p["target_hit_price"])
@@ -171,11 +206,13 @@ class PositionState:
                     "/open long 진입가 수량 손절가 목표가\n"
                     "예: /open long 82712.9 0.0783 83100 83700")
         side = "롱" if p["side"] == "LONG" else "숏"
+        guard=(p.get('profit_state') or {}).get('guard')
+        protection=f"목표 전 수익 보호 기준 {guard:,.1f} USDT (주문 미확인)\n" if guard is not None else ''
         return (f"[BTCUSDT 보유 신고 · {side}]\n"
                 f"진입가 {fmt(p['entry'],1)} USDT\n"
                 f"잔여 수량 {fmt(p['quantity'])} BTC\n"
                 f"신고 손절가 {fmt(p['stop'],1)} / 목표가 {fmt(p['target'],1)}\n"
-                "※ 텔레그램 신고 기준이며 거래소 체결·잔고와 자동 동기화되지 않습니다.\n"
+                f"{protection}※ 텔레그램 신고 기준이며 거래소 체결·잔고와 자동 동기화되지 않습니다.\n"
                 "실제 손절·익절 주문 변경은 LBank에서 별도 진행하세요.")
 
     def half(self):
@@ -213,6 +250,16 @@ class PositionState:
         if self.position:
             self.position["risk_notice"] = reason
             self.save()
+
+
+def format_position_management(position, reason, price, time_kst):
+    if reason=='position_reversal':
+        return (f"[LBank BTCUSDT | 신고 포지션 큰 방향 반전 확인]\n{time_kst} KST\n"
+                f"신고 진입가 {float(position['entry']):,.1f} | 현재 {price:,.1f} USDT\n"
+                "신고 이후 완료 15분 방향·5분 EMA와 고저점이 반대로 전환됐습니다.\n"
+                "수익·손실 여부와 관계없이 실제 보유와 청산 여부를 확인하세요.\n"
+                "새 진입 신호가 아닙니다. 신고 기준·실제 체결 미확인·자동주문 없음.")
+    return format_profit_notice(position['profit_state'],reason,price,time_kst,'사용자 신고 체결가 기준')
 
 
 def format_position_target_alert(position, price, time_kst):
