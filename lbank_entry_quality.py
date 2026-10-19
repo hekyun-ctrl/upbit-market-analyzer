@@ -10,6 +10,31 @@ from lbank_trend_runner import valid_state, ema_series
 POLICY = "native_structure_priority_v2"
 
 
+def observed_target_room(bars, direction, price, target):
+    """Use confirmed native pivots; unknown room is never labeled clear.
+
+    This is shared by structural ranking and the monetary plan gate so a
+    known obstacle cannot merely disable a ranking bonus and then be ignored.
+    The caller supplies the already validated, closed native candle snapshot.
+    """
+    unknown = dict(policy="confirmed_native_pivot_room_v1",
+                   target_room="unknown", observed_barrier=None)
+    if direction not in (-1, 1) or not bars:
+        return unknown
+    d = direction
+    key = 'high' if d == 1 else 'low'
+    obstacles = []
+    for i in range(2, len(bars)-2):
+        v = bars[i][key]
+        if (all(d*(v-bars[j][key]) > 0 for j in (i-2, i-1, i+1, i+2))
+                and d*(v-price) > 0):
+            obstacles.append(v)
+    barrier = (min(obstacles) if d == 1 else max(obstacles)) if obstacles else None
+    room = ('unknown' if barrier is None or target is None else
+            'clear' if d*(barrier-target) >= price*.00015 else 'conflict')
+    return dict(unknown, target_room=room, observed_barrier=barrier)
+
+
 def direction_priority(state, direction, price, target, now):
     """Unknown or stale data never grants dominant structural support."""
     unknown = dict(policy=POLICY, dominant_intact=False, ready=False,
@@ -28,15 +53,8 @@ def direction_priority(state, direction, price, target, now):
         closes=[b['close'] for b in bars]
         fast,slow=ema_series(closes,9),ema_series(closes,21)
         alignment=d*(fast[-1]-slow[-1])>0 and d*(fast[-1]-fast[-2])>0
-        # Only already confirmed local extrema can bound target room.
-        key='high' if d==1 else 'low'; obstacles=[]
-        for i in range(2,len(bars)-2):
-            v=bars[i][key]
-            if (all(d*(v-bars[j][key])>0 for j in (i-2,i-1,i+1,i+2))
-                    and d*(v-price)>0):obstacles.append(v)
-        barrier=(min(obstacles) if d==1 else max(obstacles)) if obstacles else None
-        room=('unknown' if barrier is None or target is None else
-              'clear' if d*(barrier-target)>=price*.00015 else 'conflict')
+        target_evidence = observed_target_room(bars, d, price, target)
+        barrier, room = target_evidence['observed_barrier'], target_evidence['target_room']
         return dict(unknown,ready=True,bar_start=bars[-1]['start'],
                     swing_structure=swings,support=support,support_intact=intact,
                     trend15_aligned=trend15,ema_aligned=alignment,target_room=room,

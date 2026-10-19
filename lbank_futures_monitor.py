@@ -33,7 +33,8 @@ from lbank_performance import PerformanceBook
 from lbank_native_candles import NativeCandleThread
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
-from lbank_entry_quality import confirmation_quality, direction_priority, POLICY as ENTRY_QUALITY_POLICY
+from lbank_entry_quality import (confirmation_quality, direction_priority,
+                                 observed_target_room, POLICY as ENTRY_QUALITY_POLICY)
 from lbank_signal_thesis import attach_thesis, POLICY as FOLLOWUP_POLICY
 from lbank_rsi_divergence import annotate as annotate_rsi_context, DivergenceStudy
 from lbank_market_context import MarketContextThread, annotate as annotate_market_context
@@ -408,6 +409,14 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
         LOG.info("PLAN REJECT reason=target_barrier_conflict strategy=%s direction=%s price=%.1f target1=%.1f barrier=%.1f",
                  strategy, direction, curr, t1, barrier)
         return None
+    native_target_room = None
+    if native_state is not None:
+        native_target_room = observed_target_room(native_state['five_bars'], direction, curr, t1)
+        if native_target_room['target_room'] == 'conflict':
+            LOG.info("PLAN REJECT reason=native_target_barrier_conflict strategy=%s direction=%s "
+                     "price=%.1f target1=%.1f barrier=%.1f",
+                     strategy, direction, curr, t1, native_target_room['observed_barrier'])
+            return None
     permitted_loss = REF_BALANCE * RISK_FRACTION
     effective_entry = curr
     raw_qty = min(permitted_loss / unit_loss,
@@ -449,6 +458,7 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
         "maker_potential_savings": qty * (effective_entry + t1) * (TAKER_FEE - MAKER_FEE),
         "runner_enabled": bool(native_state is not None and RUNNER_ENABLED),
         "native_entry_geometry": geometry,
+        "native_target_room": native_target_room,
     }
 
 
@@ -885,6 +895,8 @@ def run():
              "stop_warnings=always_on early_caution=structure_aware", ENTRY_QUALITY_POLICY)
     LOG.info("SIGNAL_THESIS_POLICY policy=%s entry_gates_unchanged=true missing_evidence_is_reversal=false "
              "review_hours=6 tracking_hours=24 time_alone_is_exit=false", FOLLOWUP_POLICY)
+    LOG.info("NATIVE_TARGET_ROOM policy=confirmed_native_pivot_room_v1 "
+             "known_conflict_blocks_plan=true stages=watch,confirm additional_wait=false")
     LOG.info("NATIVE_ENTRY_GEOMETRY stop_floor=max(0.05pct,1.5ATR5) "
              "structural_stop_preserved=true range_floor=cost_solved_TP1 "
              "net_rr1=1.5 risk_limit_unchanged=true")
