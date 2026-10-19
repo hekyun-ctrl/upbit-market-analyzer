@@ -1,0 +1,10 @@
+{
+  "purpose": "Newly retrieved 2022 historical regime check of unchanged published System 2",
+  "ordering": "Written after seeing first 2023-2026 exploratory positive result; before inspecting any 2022 strategy return",
+  "frozen": "Same 55/20 day, 20 day N, 2N individual stop, 0.5N adds, max4 held units, costs and fixed normalized unit quantity",
+  "implementation_fix": "First exploratory version allowed reentry on incomplete gap day. Block all new entries immediately after gap until next valid 55 complete-day context. Seven targeted tests pass. Rerun all original scenarios without parameter changes. Preserve pre-fix output separately as superseded.",
+  "new_data": "2022-01 to 2022-12 Binance USD-M BTCUSDT 1m/5m and funding original ZIP plus official checksums",
+  "integrity": "Same raw minute vs five-minute and discrepant-day daily archive checks before performance. Quarantine union without interpolation.",
+  "scope": "Historical reverse-time regime check, not prospective out-of-sample or evidence of future income. No production changes or exchange orders.",
+  "promotion": "None automatic, regardless of result. Both minute path scenarios and double-cost sensitivity must be reported. No threshold tuning."
+}
