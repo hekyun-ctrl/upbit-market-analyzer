@@ -1,0 +1,15 @@
+{
+  "protocol": "research/continuation/native_quote_baseline_protocol_20261020.json",
+  "protocol_sha256": "6e710d540d4396de18067c82f452ebc1665dea157b3929f7fa93cb5ae6eb5e0c",
+  "parser_sha256": "2092f843e793fb03c8d888ec804e652b3adadb7c86e917220a1bc79bbb6a9496",
+  "official_current_provenance": "https://www.lbank.com/docs/contract.html",
+  "provenance_checked_utc": "2026-10-19T23:32:28Z",
+  "implementation_fixed_utc": "2026-10-19T23:34:33Z",
+  "fixture_tests_passed_before_live_capture": 8,
+  "provenance": "Official ContractAPI document declares public market interfaces and GET/cfd/openApi/v1/pub/marketOrder with depth and symbol. Response schema includes asks/bids/price/volume/symbol,but no certified book event time. Actual authentication-free access will be tested by bounded capture,not presumed from docs.",
+  "scope": "12attempts,5secondtargetinterval,5secondHTTPtimeout,120secondbudget;HTTP401/403/429orAPIpermission/ratelimitfailuresstopwithoutbypass. All missing/unattempted rows explicit.",
+  "implementation": "Existing reviewed extract_features only;equivalent inspected publicGET preserves exact rawbody/hash and allowlisted responseheaders. No classes/daemon/shadow_direction/Telegram/account/order execution. Cookies not requested or persisted.",
+  "symbol_discovery": "CMCsearch identified BitcoinBTCid1;aggregatedCMCprices are not used as native LBank data.",
+  "forward_candidate": null,
+  "production_changed": false
+}

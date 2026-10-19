@@ -262,7 +262,16 @@
       "forward_started": false
     }
   ],
-  "active_run": null,
+  "active_run": {
+    "id": "native_quote_baseline_20261020_0834",
+    "stage": "bounded_public_capture_code_and_protocol_fixed_before_requests",
+    "implementation_fixed_utc": "2026-10-19T23:34:33Z",
+    "protocol": "research/continuation/native_quote_baseline_protocol_20261020.json",
+    "preflight": "research/continuation/native_quote_execution_preflight_20261020.json",
+    "code": "research/continuation/capture_native_quote_baseline.py",
+    "fixture_tests_passed": 8,
+    "next_action": "Execute fixed maximum12PUBLICdepthGETs at5secondtargetinterval,save rawsession/headers/bodySHA and actualgaps. No background,orders,signals or candidateforwardclock. Stop on permission/rate limits without credentials/bypass. Then preserve results and next PRIMARY source checkpoint."
+  },
   "blockers": [],
   "updated_kst": "2026-10-20T07:56:13+09:00",
   "maintained_research_candidates": [
