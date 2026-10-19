@@ -3,7 +3,12 @@
   "protocol_commit": "53ddbda8c5837e1bbdb4b831185944720b773e2a",
   "implementation_checkpoint_utc": "2026-10-19T19:59:35Z",
   "implementation_tests_passed": 13,
-  "actual_historical_evaluation_completed": false,
+  "actual_historical_evaluation_completed": true,
+  "evaluation_completed_utc": "2026-10-19T20:01:11.965567+00:00",
+  "actual_results": "research/continuation/results/functional_curve_20261020_report.json",
+  "output_audit": "research/continuation/results/functional_curve_20261020_audit.json",
+  "model_count": 10,
+  "candidate_decision": "all10fixed_components_rejected_costed_losses_PFbelow1_no_native_or_prospective_proof",
   "details_fixed_before_execution": [
     "Uniform discrete FPCA; eigenvector scaling cancels in score reconstruction; >=90% variance retained.",
     "Standard Ljung-Box Q on unfitted score series, df=lag; OLS AR1 with intercept; no coefficient clipping.",

@@ -5,7 +5,9 @@
   "download_url": "https://repository.essex.ac.uk/30487/1/Bitcoin_Functional%20V8%20Clean.pdf",
   "sha256": "e0bbea362e493bf102cdcd64e52d60c220d0c9e78b72eac058da0cf7d35785e7",
   "bytes": 869559,
-  "status": "methods_audited_component_adaptation_protocol_fixed_no_model_performance_yet",
+  "status": "frozen10component_variants_executed_rejected_costed_losses_full_paper_not_replicated",
+  "evaluation_report": "research/continuation/results/functional_curve_20261020_report.json",
+  "evaluation_documentation": "docs/lbank_functional_curve_validation_2026-10-20.md",
   "notes": [
     "Teesside403; university author copies available; Essex V8 successfully retrieved via public download",
     "Prior-day forecast fixes next-day entry at predicted minimum and exit at predicted later maximum; no overnight hold",

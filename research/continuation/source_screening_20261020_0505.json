@@ -1,0 +1,55 @@
+{
+  "screened_kst": "2026-10-20T05:05:00+09:00",
+  "scope": "Source-level triage for a next existing strategy; none of these sources was backtested or adopted in this run. Source claims are not independently verified returns.",
+  "sources": [
+    {
+      "url": "https://github.com/octopus444/technical-trading-rules-based-strategies-btc",
+      "status": "not_shortlisted_for_current_alert_policy",
+      "basis": "Primary README discloses WRC p=.846 for selected MAc(7,10), weak2023-2026Sharpe=.112, and151trades in2017-2022. These disclosures do not support stable net alpha or mean daily opportunity requirement. No repeat of the old OBV family under a new name.",
+      "original_code_audited": false,
+      "actual_new_backtest": false
+    },
+    {
+      "url": "https://arxiv.org/html/2606.00060v1",
+      "title": "Machine Learning-Based Bitcoin Trading Under Transaction Costs: Evidence From Walk-Forward Forecasting",
+      "status": "parked_source_and_execution_fit_unresolved",
+      "basis": "Full text says author code available upon request, not public download. Cost sensitivity regenerates positions rather than stressing fixed signals. Main selected example251trades over multi-year period and MD67.42%; no current stop/TP1/native proof. Source uses122synthetic gap bars. Claimed2017-start futures instrument provenance needs separate checking. Do not copy abstract return as verified LBank result.",
+      "contact_author_authorized": false,
+      "original_code_obtained": false,
+      "actual_new_backtest": false
+    },
+    {
+      "url": "https://github.com/paultrassaert/btc-systematic-trading-research",
+      "status": "not_shortlisted_costed_edge_not_established_by_source",
+      "basis": "Primary audit README explicitly reports original negative result and weak costed reference models, including13trades in2023 for logistic model. Data venue/timezone not independently established and no native funding/liquidation model. Do not infer profitable XGBoost from repository label.",
+      "actual_new_backtest": false
+    },
+    {
+      "url": "https://arxiv.org/html/2506.11921v1",
+      "author_code": "https://github.com/colachenkc/Dynamic-Grid-Trading",
+      "status": "not_shortlisted_incompatible_inventory_risk_contract",
+      "basis": "Original algorithm holds spot inventory after lower boundary break and restarts grid. Author source includes fees and public code, but this is not a bounded-loss single-position manual futures alert. Do not reinterpret unsold inventory as lossless or remove current loss caps to imitate it.",
+      "actual_new_backtest": false
+    },
+    {
+      "url": "https://www.mdpi.com/2571-9394/8/3/40",
+      "doi": "10.3390/forecast8030040",
+      "status": "not_shortlisted_source_itself_does_not_establish_net_profitability",
+      "basis": "Publisher text reports2025gross upper-bound+35.97%with185trades and says realistic costed net result likely negligible. Corrected lookahead issue and AUC~.60 are useful audit lessons, not positive post-cost performance proof. Direct page retrieval429; publisher-indexed full text and author preprint crosschecked.",
+      "author_preprint": "https://www.preprints.org/manuscript/202603.0994",
+      "actual_new_backtest": false
+    },
+    {
+      "url": "https://github.com/jehumtine/markov-chain-trading-strategy",
+      "readme_version": "11286554f829529a3c9a4dfb6439a1decbec42b9",
+      "readme_url": "https://raw.githubusercontent.com/jehumtine/markov-chain-trading-strategy/11286554f829529a3c9a4dfb6439a1decbec42b9/README.md",
+      "status": "not_shortlisted_original_btc_and_frequency_evidence_missing",
+      "basis": "Pinned primary README claims111trades on SOL/USDT2019-2024, while example main script configuredETH. Source is not BTC costed evidence and reported multi-year frequency is far below daily1. Claims of Sharpe/PF require original code/data audit; not accepted as verified.",
+      "original_code_audited": false,
+      "actual_new_backtest": false
+    }
+  ],
+  "next_action": "Search a new primary source with explicit BTC rules/public code/data and costed results plus a plausible fixed stop/TP1/manual execution contract. Triage frequency, risk scope, selection and provenance before expensive replication. Retain rejected source URLs; do not rerun these unchanged failures or weaken fixed promotion gates.",
+  "qualified_candidate": null,
+  "production_changed": false
+}

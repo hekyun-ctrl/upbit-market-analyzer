@@ -1,0 +1,1733 @@
+{
+  "candidate_id": "bouri_2021_functional_curve_component_v1",
+  "started_utc": "2026-10-19T20:00:17.705952+00:00",
+  "completed_utc": "2026-10-19T20:01:11.965567+00:00",
+  "protocol_sha256": "c018a1e44b389146e3ab7725664fb30ccfbda6525b6f3232f824ab425da03d5f",
+  "code_sha256": "c295e7c87f37e1e34d7c6a546437e56159025b174afde7c16263e14210482d2f",
+  "versions": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "scipy": "1.17.0"
+  },
+  "original_minutes": 2496960,
+  "quarantined_minutes": 160,
+  "calendar_days": 1734,
+  "complete_training_days": 1723,
+  "invalid_training_days": [
+    1655510400,
+    1655856000,
+    1656028800,
+    1660867200,
+    1661040000,
+    1692144000,
+    1699574400,
+    1730073600,
+    1736812800,
+    1738108800,
+    1756425600
+  ],
+  "model_count": 10,
+  "forecast_rows": 14565,
+  "prediction_hashes_before_execution": {
+    "forecasts.csv.gz": "f80736b1ebeab8285a2e74514cfa858325d86057b0ca49fd1830e3f9c1dcb000",
+    "forecast_curves.npz": "3f2207c35c45ad20b7ef86f1e3b5934aece9cd277cae894d87ae4c69c9f72fc7",
+    "forecast_checkpoint.json": "d375ca4ffc4ad6f92e49977713b928874079f8b24cc75cd2bc1f2499f3aaa8db"
+  },
+  "summaries": {
+    "fmean_s182": {
+      "forecast_days": 1549,
+      "first_forecast_day": 1656979200,
+      "last_forecast_day": 1790726400,
+      "evaluable_days": 1544,
+      "unknown_days": 5,
+      "closed_trades": 1544,
+      "signals": 1549,
+      "signals_per_forecast_calendar_day": 1.0,
+      "opportunity_day_fraction": 1.0,
+      "evaluable_signals_per_evaluable_day": 1.0,
+      "status_counts": {
+        "closed": 1544,
+        "unknown_missing_execution_or_path": 5
+      },
+      "mean_holding_minutes": 647.3866580310881,
+      "median_mae_5min_ref_pct": -0.05120279117428739,
+      "price_adverse_within5m_fraction": 0.9410621761658031,
+      "worst_trade_mae_ref_pct": -16.504775315091848,
+      "five_minute_complete_path_fraction": 1.0,
+      "costs": {
+        "gross": {
+          "observed_subsequence_return_pct": 190.6898495590891,
+          "observed_daily_drawdown_pct": 25.525668700360015,
+          "mean_daily_return": 0.000835415463772395,
+          "mean_closed_trade_return": 0.000835415463772395,
+          "daily_mean_block95": [
+            3.419439408724191e-05,
+            0.0016029129947544322
+          ],
+          "closed_trade_mean_day_block95": [
+            3.419439408724191e-05,
+            0.0016029129947544322
+          ],
+          "pf_trade_returns": 1.169303524117782,
+          "pf_compounded_cash": 1.1320116830689655,
+          "positive_trade_return_sum": 8.908632962697702,
+          "negative_trade_return_abs_sum": 7.618751486633123,
+          "positive_cash_pnl_sum": 16.351820727168544,
+          "negative_cash_pnl_abs_sum": 14.44492223157766,
+          "closed_trade_win_rate": 0.5239637305699482
+        },
+        "base": {
+          "observed_subsequence_return_pct": -78.51281414429215,
+          "observed_daily_drawdown_pct": 80.42894587209344,
+          "mean_daily_return": -0.0008516690042633386,
+          "mean_closed_trade_return": -0.0008516690042633386,
+          "daily_mean_block95": [
+            -0.0016522475368316947,
+            -9.351133409205263e-05
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.0016522475368316947,
+            -9.351133409205263e-05
+          ],
+          "pf_trade_returns": 0.8536448905944736,
+          "pf_compounded_cash": 0.8374853631681479,
+          "positive_trade_return_sum": 7.669861017115868,
+          "negative_trade_return_abs_sum": 8.984837959698464,
+          "positive_cash_pnl_sum": 4.045994499253533,
+          "negative_cash_pnl_abs_sum": 4.831122640696456,
+          "closed_trade_win_rate": 0.41515544041450775
+        },
+        "double_cost": {
+          "observed_subsequence_return_pct": -98.41213745149598,
+          "observed_daily_drawdown_pct": 98.47724443696897,
+          "mean_daily_return": -0.002536057237719023,
+          "mean_closed_trade_return": -0.002536057237719023,
+          "daily_mean_block95": [
+            -0.0033283119035464707,
+            -0.0017853553065013193
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.0033283119035464707,
+            -0.0017853553065013193
+          ],
+          "pf_trade_returns": 0.6297876162256308,
+          "pf_compounded_cash": 0.5870654722057462,
+          "positive_trade_return_sum": 6.661154729223769,
+          "negative_trade_return_abs_sum": 10.576827104261941,
+          "positive_cash_pnl_sum": 1.3991169072818628,
+          "negative_cash_pnl_abs_sum": 2.3832382817968223,
+          "closed_trade_win_rate": 0.344559585492228
+        }
+      },
+      "years": {
+        "2022": {
+          "observed_days": 180,
+          "closed_trades": 180,
+          "gross": {
+            "return_pct": 3.356190243535395,
+            "mean_closed_trade_return": 0.00023896542051787508
+          },
+          "base": {
+            "return_pct": -22.507500318243622,
+            "mean_closed_trade_return": -0.0013601374499661565
+          },
+          "double_cost": {
+            "return_pct": -41.899110984297906,
+            "mean_closed_trade_return": -0.0029566846947313165
+          }
+        },
+        "2023": {
+          "observed_days": 364,
+          "closed_trades": 364,
+          "gross": {
+            "return_pct": 23.82927949417106,
+            "mean_closed_trade_return": 0.0007115235739971767
+          },
+          "base": {
+            "return_pct": -32.79733961397624,
+            "mean_closed_trade_return": -0.0009672455586119253
+          },
+          "double_cost": {
+            "return_pct": -63.53084939541087,
+            "mean_closed_trade_return": -0.002643331745895509
+          }
+        },
+        "2024": {
+          "observed_days": 365,
+          "closed_trades": 365,
+          "gross": {
+            "return_pct": 86.69809099733745,
+            "mean_closed_trade_return": 0.0019990294770902257
+          },
+          "base": {
+            "return_pct": -3.4461717450383955,
+            "mean_closed_trade_return": 0.0001903891855536269
+          },
+          "double_cost": {
+            "return_pct": -50.073660411866626,
+            "mean_closed_trade_return": -0.001615360605483849
+          }
+        },
+        "2025": {
+          "observed_days": 362,
+          "closed_trades": 362,
+          "gross": {
+            "return_pct": -1.566148465310102,
+            "mean_closed_trade_return": 0.00010216103828285196
+          },
+          "base": {
+            "return_pct": -46.29377338796954,
+            "mean_closed_trade_return": -0.001570273041151761
+          },
+          "double_cost": {
+            "return_pct": -70.69885500875627,
+            "mean_closed_trade_return": -0.003240034299703209
+          }
+        },
+        "2026": {
+          "observed_days": 273,
+          "closed_trades": 273,
+          "gross": {
+            "return_pct": 23.590666032068896,
+            "mean_closed_trade_return": 0.0008104214814654326
+          },
+          "base": {
+            "return_pct": -20.43184895269219,
+            "mean_closed_trade_return": -0.00080266677686477
+          },
+          "double_cost": {
+            "return_pct": -48.774033445744514,
+            "mean_closed_trade_return": -0.00241317705855825
+          }
+        }
+      },
+      "uncertainty": "Unadjusted exploratory2000resample7day blocks, never cross calendar holes; not an independent or familywise alpha proof.",
+      "equity_scope": "Concatenated evaluable day subsequence. Unknown days have unknown returns, not0; full-calendar account return/drawdown not established.",
+      "tp1_wilson_lower": null,
+      "max_drawdown_r": null,
+      "native_urgent_followup_5min_rate": null,
+      "native_manual_fills_verified": false,
+      "forward_evidence": false
+    },
+    "fmean_s365": {
+      "forecast_days": 1364,
+      "first_forecast_day": 1672963200,
+      "last_forecast_day": 1790726400,
+      "evaluable_days": 1360,
+      "unknown_days": 4,
+      "closed_trades": 1360,
+      "signals": 1364,
+      "signals_per_forecast_calendar_day": 1.0,
+      "opportunity_day_fraction": 1.0,
+      "evaluable_signals_per_evaluable_day": 1.0,
+      "status_counts": {
+        "closed": 1360,
+        "unknown_missing_execution_or_path": 4
+      },
+      "mean_holding_minutes": 788.2279411764706,
+      "median_mae_5min_ref_pct": -0.05667207281450648,
+      "price_adverse_within5m_fraction": 0.925,
+      "worst_trade_mae_ref_pct": -16.585525380583444,
+      "five_minute_complete_path_fraction": 1.0,
+      "costs": {
+        "gross": {
+          "observed_subsequence_return_pct": 176.0797712801134,
+          "observed_daily_drawdown_pct": 29.096281134849413,
+          "mean_daily_return": 0.0009063260230470635,
+          "mean_closed_trade_return": 0.0009063260230470635,
+          "daily_mean_block95": [
+            6.225420245289408e-05,
+            0.0017988043302862666
+          ],
+          "closed_trade_mean_day_block95": [
+            6.225420245289408e-05,
+            0.0017988043302862666
+          ],
+          "pf_trade_returns": 1.1705413260108475,
+          "pf_compounded_cash": 1.1067185295157218,
+          "positive_trade_return_sum": 8.460196961629755,
+          "negative_trade_return_abs_sum": 7.227593570285748,
+          "positive_cash_pnl_sum": 18.260254000209315,
+          "negative_cash_pnl_abs_sum": 16.499456287408183,
+          "closed_trade_win_rate": 0.49926470588235294
+        },
+        "base": {
+          "observed_subsequence_return_pct": -72.82033740163666,
+          "observed_daily_drawdown_pct": 74.88326690210019,
+          "mean_daily_return": -0.0007983993268114897,
+          "mean_closed_trade_return": -0.0007983993268114897,
+          "daily_mean_block95": [
+            -0.0016336707543860847,
+            9.777288750340692e-05
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.0016336707543860847,
+            9.777288750340692e-05
+          ],
+          "pf_trade_returns": 0.8718908308339133,
+          "pf_compounded_cash": 0.8837772155413343,
+          "positive_trade_return_sum": 7.389940918469785,
+          "negative_trade_return_abs_sum": 8.47576400293341,
+          "positive_cash_pnl_sum": 5.5373785203440065,
+          "negative_cash_pnl_abs_sum": 6.265581894360371,
+          "closed_trade_win_rate": 0.40661764705882353
+        },
+        "double_cost": {
+          "observed_subsequence_return_pct": -97.32495604480677,
+          "observed_daily_drawdown_pct": 97.42002898885896,
+          "mean_daily_return": -0.0025004002490999796,
+          "mean_closed_trade_return": -0.0025004002490999796,
+          "daily_mean_block95": [
+            -0.0033235157095303962,
+            -0.001598677646430145
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.0033235157095303962,
+            -0.001598677646430145
+          ],
+          "pf_trade_returns": 0.6560716274092403,
+          "pf_compounded_cash": 0.6854076062285207,
+          "positive_trade_return_sum": 6.486817710362899,
+          "negative_trade_return_abs_sum": 9.887362049138869,
+          "positive_cash_pnl_sum": 2.1204347743201737,
+          "negative_cash_pnl_abs_sum": 3.0936843347682412,
+          "closed_trade_win_rate": 0.35661764705882354
+        }
+      },
+      "years": {
+        "2023": {
+          "observed_days": 359,
+          "closed_trades": 359,
+          "gross": {
+            "return_pct": 38.067763492445025,
+            "mean_closed_trade_return": 0.0009981286869356338
+          },
+          "base": {
+            "return_pct": -24.220507927156653,
+            "mean_closed_trade_return": -0.000673237410565032
+          },
+          "double_cost": {
+            "return_pct": -58.40994908520505,
+            "mean_closed_trade_return": -0.0023419323939908652
+          }
+        },
+        "2024": {
+          "observed_days": 365,
+          "closed_trades": 365,
+          "gross": {
+            "return_pct": 106.64481412681303,
+            "mean_closed_trade_return": 0.002304839316545953
+          },
+          "base": {
+            "return_pct": 6.05688308508594,
+            "mean_closed_trade_return": 0.0004748301933015438
+          },
+          "double_cost": {
+            "return_pct": -45.57756607562161,
+            "mean_closed_trade_return": -0.0013522542785852393
+          }
+        },
+        "2025": {
+          "observed_days": 363,
+          "closed_trades": 363,
+          "gross": {
+            "return_pct": -7.545263917573585,
+            "mean_closed_trade_return": -5.166158625465752e-05
+          },
+          "base": {
+            "return_pct": -49.98909234497604,
+            "mean_closed_trade_return": -0.001742898988017479
+          },
+          "double_cost": {
+            "return_pct": -72.949537909771,
+            "mean_closed_trade_return": -0.003431433518138687
+          }
+        },
+        "2026": {
+          "observed_days": 273,
+          "closed_trades": 273,
+          "gross": {
+            "return_pct": 4.661901912412403,
+            "mean_closed_trade_return": 0.00018960438829773555
+          },
+          "base": {
+            "return_pct": -32.377881092317786,
+            "mean_closed_trade_return": -0.0014094195676758177
+          },
+          "double_cost": {
+            "return_pct": -56.30931825738465,
+            "mean_closed_trade_return": -0.0030058880240487014
+          }
+        }
+      },
+      "uncertainty": "Unadjusted exploratory2000resample7day blocks, never cross calendar holes; not an independent or familywise alpha proof.",
+      "equity_scope": "Concatenated evaluable day subsequence. Unknown days have unknown returns, not0; full-calendar account return/drawdown not established.",
+      "tp1_wilson_lower": null,
+      "max_drawdown_r": null,
+      "native_urgent_followup_5min_rate": null,
+      "native_manual_fills_verified": false,
+      "forward_evidence": false
+    },
+    "fpar_lag10_s182": {
+      "forecast_days": 1549,
+      "first_forecast_day": 1656979200,
+      "last_forecast_day": 1790726400,
+      "evaluable_days": 1544,
+      "unknown_days": 5,
+      "closed_trades": 1544,
+      "signals": 1549,
+      "signals_per_forecast_calendar_day": 1.0,
+      "opportunity_day_fraction": 1.0,
+      "evaluable_signals_per_evaluable_day": 1.0,
+      "status_counts": {
+        "closed": 1544,
+        "unknown_missing_execution_or_path": 5
+      },
+      "mean_holding_minutes": 643.8698186528497,
+      "median_mae_5min_ref_pct": -0.051447604500282074,
+      "price_adverse_within5m_fraction": 0.9378238341968912,
+      "worst_trade_mae_ref_pct": -16.504775315091848,
+      "five_minute_complete_path_fraction": 1.0,
+      "costs": {
+        "gross": {
+          "observed_subsequence_return_pct": 150.03197715944862,
+          "observed_daily_drawdown_pct": 28.01583650462832,
+          "mean_daily_return": 0.0007390823440229747,
+          "mean_closed_trade_return": 0.0007390823440229747,
+          "daily_mean_block95": [
+            -1.53047756716115e-05,
+            0.0015587970037122497
+          ],
+          "closed_trade_mean_day_block95": [
+            -1.53047756716115e-05,
+            0.0015587970037122497
+          ],
+          "pf_trade_returns": 1.148122084797419,
+          "pf_compounded_cash": 1.1081571755965847,
+          "positive_trade_return_sum": 8.845214687530877,
+          "negative_trade_return_abs_sum": 7.704071548359403,
+          "positive_cash_pnl_sum": 15.371981668448482,
+          "negative_cash_pnl_abs_sum": 13.871661896853992,
+          "closed_trade_win_rate": 0.5239637305699482
+        },
+        "base": {
+          "observed_subsequence_return_pct": -81.52789643388768,
+          "observed_daily_drawdown_pct": 82.78666000872886,
+          "mean_daily_return": -0.0009481745012093271,
+          "mean_closed_trade_return": -0.0009481745012093271,
+          "daily_mean_block95": [
+            -0.0017020062697378244,
+            -0.0001368458057415945
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.0017020062697378244,
+            -0.0001368458057415945
+          ],
+          "pf_trade_returns": 0.8387230468089898,
+          "pf_compounded_cash": 0.8238062959374878,
+          "positive_trade_return_sum": 7.613455866045229,
+          "negative_trade_return_abs_sum": 9.077437295912429,
+          "positive_cash_pnl_sum": 3.8118952509760033,
+          "negative_cash_pnl_abs_sum": 4.627174215314881,
+          "closed_trade_win_rate": 0.4112694300518135
+        },
+        "double_cost": {
+          "observed_subsequence_return_pct": -98.63566700277195,
+          "observed_daily_drawdown_pct": 98.66139702321463,
+          "mean_daily_return": -0.002632734836374868,
+          "mean_closed_trade_return": -0.002632734836374868,
+          "daily_mean_block95": [
+            -0.0033860732519982286,
+            -0.0018271039673552817
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.0033860732519982286,
+            -0.0018271039673552817
+          ],
+          "pf_trade_returns": 0.6193690317071068,
+          "pf_compounded_cash": 0.5718781273615715,
+          "positive_trade_return_sum": 6.614542073577473,
+          "negative_trade_return_abs_sum": 10.679484660940268,
+          "positive_cash_pnl_sum": 1.3175589508888255,
+          "negative_cash_pnl_abs_sum": 2.303915620916544,
+          "closed_trade_win_rate": 0.3393782383419689
+        }
+      },
+      "years": {
+        "2022": {
+          "observed_days": 180,
+          "closed_trades": 180,
+          "gross": {
+            "return_pct": 1.02349247391178,
+            "mean_closed_trade_return": 0.00011153785641917059
+          },
+          "base": {
+            "return_pct": -24.256467465196906,
+            "mean_closed_trade_return": -0.0014873612929636312
+          },
+          "double_cost": {
+            "return_pct": -43.21041913043542,
+            "mean_closed_trade_return": -0.0030837051422069163
+          }
+        },
+        "2023": {
+          "observed_days": 364,
+          "closed_trades": 364,
+          "gross": {
+            "return_pct": 20.037117388072033,
+            "mean_closed_trade_return": 0.0006271008407577846
+          },
+          "base": {
+            "return_pct": -34.87091976511915,
+            "mean_closed_trade_return": -0.001052183099992204
+          },
+          "double_cost": {
+            "return_pct": -64.6645833532055,
+            "mean_closed_trade_return": -0.0027287832726697763
+          }
+        },
+        "2024": {
+          "observed_days": 365,
+          "closed_trades": 365,
+          "gross": {
+            "return_pct": 86.69809099733745,
+            "mean_closed_trade_return": 0.0019990294770902257
+          },
+          "base": {
+            "return_pct": -3.4461717450383955,
+            "mean_closed_trade_return": 0.0001903891855536269
+          },
+          "double_cost": {
+            "return_pct": -50.073660411866626,
+            "mean_closed_trade_return": -0.001615360605483849
+          }
+        },
+        "2025": {
+          "observed_days": 362,
+          "closed_trades": 362,
+          "gross": {
+            "return_pct": 4.079355307125443,
+            "mean_closed_trade_return": 0.0002503085909392017
+          },
+          "base": {
+            "return_pct": -43.19157957722989,
+            "mean_closed_trade_return": -0.0014212846845769946
+          },
+          "double_cost": {
+            "return_pct": -68.99434906574629,
+            "mean_closed_trade_return": -0.003090206482951056
+          }
+        },
+        "2026": {
+          "observed_days": 273,
+          "closed_trades": 273,
+          "gross": {
+            "return_pct": 6.109226441583782,
+            "mean_closed_trade_return": 0.00026572948689474395
+          },
+          "base": {
+            "return_pct": -31.732556057597105,
+            "mean_closed_trade_return": -0.0013488965042006843
+          },
+          "double_cost": {
+            "return_pct": -56.07913110879815,
+            "mean_closed_trade_return": -0.002960942061113058
+          }
+        }
+      },
+      "uncertainty": "Unadjusted exploratory2000resample7day blocks, never cross calendar holes; not an independent or familywise alpha proof.",
+      "equity_scope": "Concatenated evaluable day subsequence. Unknown days have unknown returns, not0; full-calendar account return/drawdown not established.",
+      "tp1_wilson_lower": null,
+      "max_drawdown_r": null,
+      "native_urgent_followup_5min_rate": null,
+      "native_manual_fills_verified": false,
+      "forward_evidence": false
+    },
+    "fpar_lag10_s365": {
+      "forecast_days": 1364,
+      "first_forecast_day": 1672963200,
+      "last_forecast_day": 1790726400,
+      "evaluable_days": 1361,
+      "unknown_days": 3,
+      "closed_trades": 1361,
+      "signals": 1364,
+      "signals_per_forecast_calendar_day": 1.0,
+      "opportunity_day_fraction": 1.0,
+      "evaluable_signals_per_evaluable_day": 1.0,
+      "status_counts": {
+        "closed": 1361,
+        "unknown_missing_execution_or_path": 3
+      },
+      "mean_holding_minutes": 775.7935341660544,
+      "median_mae_5min_ref_pct": -0.05305166617523005,
+      "price_adverse_within5m_fraction": 0.9331373989713446,
+      "worst_trade_mae_ref_pct": -16.585525380583444,
+      "five_minute_complete_path_fraction": 1.0,
+      "costs": {
+        "gross": {
+          "observed_subsequence_return_pct": 327.5370260026302,
+          "observed_daily_drawdown_pct": 23.904888543412728,
+          "mean_daily_return": 0.0012332879484794593,
+          "mean_closed_trade_return": 0.0012332879484794593,
+          "daily_mean_block95": [
+            0.0003858478038764107,
+            0.0021234659363044543
+          ],
+          "closed_trade_mean_day_block95": [
+            0.0003858478038764107,
+            0.0021234659363044543
+          ],
+          "pf_trade_returns": 1.2398059453134185,
+          "pf_compounded_cash": 1.1506871740792814,
+          "positive_trade_return_sum": 8.677934773093988,
+          "negative_trade_return_abs_sum": 6.999429875213445,
+          "positive_cash_pnl_sum": 25.011594859360947,
+          "negative_cash_pnl_abs_sum": 21.736224599334648,
+          "closed_trade_win_rate": 0.5128581925055107
+        },
+        "base": {
+          "observed_subsequence_return_pct": -57.834653544519036,
+          "observed_daily_drawdown_pct": 64.34216690566336,
+          "mean_daily_return": -0.00046943605429518006,
+          "mean_closed_trade_return": -0.00046943605429518006,
+          "daily_mean_block95": [
+            -0.001314041742104554,
+            0.00041088400286672436
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.001314041742104554,
+            0.00041088400286672436
+          ],
+          "pf_trade_returns": 0.9223213539344473,
+          "pf_compounded_cash": 0.9217754608105633,
+          "positive_trade_return_sum": 7.58604096380639,
+          "negative_trade_return_abs_sum": 8.22494343370213,
+          "positive_cash_pnl_sum": 6.815069155308908,
+          "negative_cash_pnl_abs_sum": 7.393415690754098,
+          "closed_trade_win_rate": 0.4129316678912564
+        },
+        "double_cost": {
+          "observed_subsequence_return_pct": -95.84263551129945,
+          "observed_daily_drawdown_pct": 95.9903911699201,
+          "mean_daily_return": -0.0021694388279769597,
+          "mean_closed_trade_return": -0.0021694388279769597,
+          "daily_mean_block95": [
+            -0.00300834416221626,
+            -0.001297710753595704
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.00300834416221626,
+            -0.001297710753595704
+          ],
+          "pf_trade_returns": 0.6934647885089797,
+          "pf_compounded_cash": 0.7168721315357339,
+          "positive_trade_return_sum": 6.6795865153444325,
+          "negative_trade_return_abs_sum": 9.632192760221074,
+          "positive_cash_pnl_sum": 2.4267096977653866,
+          "negative_cash_pnl_abs_sum": 3.385136052878382,
+          "closed_trade_win_rate": 0.35488611315209406
+        }
+      },
+      "years": {
+        "2023": {
+          "observed_days": 359,
+          "closed_trades": 359,
+          "gross": {
+            "return_pct": 50.84167201431051,
+            "mean_closed_trade_return": 0.0012453440111104515
+          },
+          "base": {
+            "return_pct": -17.1921508031722,
+            "mean_closed_trade_return": -0.0004258221606646758
+          },
+          "double_cost": {
+            "return_pct": -54.54303999425927,
+            "mean_closed_trade_return": -0.002094317537878703
+          }
+        },
+        "2024": {
+          "observed_days": 365,
+          "closed_trades": 365,
+          "gross": {
+            "return_pct": 129.07013067405515,
+            "mean_closed_trade_return": 0.0025801501488446144
+          },
+          "base": {
+            "return_pct": 17.683311688582304,
+            "mean_closed_trade_return": 0.0007523412531286775
+          },
+          "double_cost": {
+            "return_pct": -39.55129316551789,
+            "mean_closed_trade_return": -0.0010725465075500384
+          }
+        },
+        "2025": {
+          "observed_days": 364,
+          "closed_trades": 364,
+          "gross": {
+            "return_pct": 44.364530711553684,
+            "mean_closed_trade_return": 0.0011547131804518923
+          },
+          "base": {
+            "return_pct": -21.75703716357943,
+            "mean_closed_trade_return": -0.000528555512253634
+          },
+          "double_cost": {
+            "return_pct": -57.59595797040847,
+            "mean_closed_trade_return": -0.002209134068606935
+          }
+        },
+        "2026": {
+          "observed_days": 273,
+          "closed_trades": 273,
+          "gross": {
+            "return_pct": -14.291592224508697,
+            "mean_closed_trade_return": -0.0004785494656442542
+          },
+          "base": {
+            "return_pct": -44.70014410144031,
+            "mean_closed_trade_return": -0.002081474963914894
+          },
+          "double_cost": {
+            "return_pct": -64.32011524796961,
+            "mean_closed_trade_return": -0.003681838727287543
+          }
+        }
+      },
+      "uncertainty": "Unadjusted exploratory2000resample7day blocks, never cross calendar holes; not an independent or familywise alpha proof.",
+      "equity_scope": "Concatenated evaluable day subsequence. Unknown days have unknown returns, not0; full-calendar account return/drawdown not established.",
+      "tp1_wilson_lower": null,
+      "max_drawdown_r": null,
+      "native_urgent_followup_5min_rate": null,
+      "native_manual_fills_verified": false,
+      "forward_evidence": false
+    },
+    "fpar_lag1_s182": {
+      "forecast_days": 1549,
+      "first_forecast_day": 1656979200,
+      "last_forecast_day": 1790726400,
+      "evaluable_days": 1546,
+      "unknown_days": 3,
+      "closed_trades": 1546,
+      "signals": 1549,
+      "signals_per_forecast_calendar_day": 1.0,
+      "opportunity_day_fraction": 1.0,
+      "evaluable_signals_per_evaluable_day": 1.0,
+      "status_counts": {
+        "closed": 1546,
+        "unknown_missing_execution_or_path": 3
+      },
+      "mean_holding_minutes": 615.630659767141,
+      "median_mae_5min_ref_pct": -0.05231094953080939,
+      "price_adverse_within5m_fraction": 0.9417852522639069,
+      "worst_trade_mae_ref_pct": -16.504775315091848,
+      "five_minute_complete_path_fraction": 1.0,
+      "costs": {
+        "gross": {
+          "observed_subsequence_return_pct": 219.74301751243135,
+          "observed_daily_drawdown_pct": 22.367939597735443,
+          "mean_daily_return": 0.0008908404385704502,
+          "mean_closed_trade_return": 0.0008908404385704502,
+          "daily_mean_block95": [
+            0.0001522729466345893,
+            0.0016838217559332098
+          ],
+          "closed_trade_mean_day_block95": [
+            0.0001522729466345893,
+            0.0016838217559332098
+          ],
+          "pf_trade_returns": 1.1861945739910138,
+          "pf_compounded_cash": 1.1518965541392538,
+          "positive_trade_return_sum": 8.77401403873893,
+          "negative_trade_return_abs_sum": 7.396774720709014,
+          "positive_cash_pnl_sum": 16.664053118458362,
+          "negative_cash_pnl_abs_sum": 14.46662294333405,
+          "closed_trade_win_rate": 0.5245795601552393
+        },
+        "base": {
+          "observed_subsequence_return_pct": -76.20190024625501,
+          "observed_daily_drawdown_pct": 77.39573760092298,
+          "mean_daily_return": -0.0007897303869110833,
+          "mean_closed_trade_return": -0.0007897303869110833,
+          "daily_mean_block95": [
+            -0.0015276387048476347,
+            1.0153671049800355e-06
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.0015276387048476347,
+            1.0153671049800355e-06
+          ],
+          "pf_trade_returns": 0.8605972023947208,
+          "pf_compounded_cash": 0.8421308109155755,
+          "positive_trade_return_sum": 7.537316965778594,
+          "negative_trade_return_abs_sum": 8.758240143943128,
+          "positive_cash_pnl_sum": 4.06488235100575,
+          "negative_cash_pnl_abs_sum": 4.826901353468301,
+          "closed_trade_win_rate": 0.41332470892626133
+        },
+        "double_cost": {
+          "observed_subsequence_return_pct": -98.22917342155446,
+          "observed_daily_drawdown_pct": 98.30178246471546,
+          "mean_daily_return": -0.002467615387669705,
+          "mean_closed_trade_return": -0.002467615387669705,
+          "daily_mean_block95": [
+            -0.0032014154770615083,
+            -0.0016678907865186263
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.0032014154770615083,
+            -0.0016678907865186263
+          ],
+          "pf_trade_returns": 0.63125537596989,
+          "pf_compounded_cash": 0.5880529410296057,
+          "positive_trade_return_sum": 6.530799512861785,
+          "negative_trade_return_abs_sum": 10.345732902199149,
+          "positive_cash_pnl_sum": 1.402217908044434,
+          "negative_cash_pnl_abs_sum": 2.3845096422599794,
+          "closed_trade_win_rate": 0.3428201811125485
+        }
+      },
+      "years": {
+        "2022": {
+          "observed_days": 180,
+          "closed_trades": 180,
+          "gross": {
+            "return_pct": 3.356190243535395,
+            "mean_closed_trade_return": 0.00023896542051787508
+          },
+          "base": {
+            "return_pct": -22.507500318243622,
+            "mean_closed_trade_return": -0.0013601374499661565
+          },
+          "double_cost": {
+            "return_pct": -41.899110984297906,
+            "mean_closed_trade_return": -0.0029566846947313165
+          }
+        },
+        "2023": {
+          "observed_days": 364,
+          "closed_trades": 364,
+          "gross": {
+            "return_pct": 20.94589428287128,
+            "mean_closed_trade_return": 0.0006442210347409114
+          },
+          "base": {
+            "return_pct": -34.148832697849826,
+            "mean_closed_trade_return": -0.001025536128847917
+          },
+          "double_cost": {
+            "return_pct": -64.14786669919783,
+            "mean_closed_trade_return": -0.0026926247496992213
+          }
+        },
+        "2024": {
+          "observed_days": 365,
+          "closed_trades": 365,
+          "gross": {
+            "return_pct": 87.01160508725326,
+            "mean_closed_trade_return": 0.001995102277639575
+          },
+          "base": {
+            "return_pct": -2.9979314999389217,
+            "mean_closed_trade_return": 0.00019445225820456584
+          },
+          "double_cost": {
+            "return_pct": -49.69318617970519,
+            "mean_closed_trade_return": -0.0016033200304819458
+          }
+        },
+        "2025": {
+          "observed_days": 364,
+          "closed_trades": 364,
+          "gross": {
+            "return_pct": 13.78565193075918,
+            "mean_closed_trade_return": 0.0004888189449719299
+          },
+          "base": {
+            "return_pct": -37.8765990045555,
+            "mean_closed_trade_return": -0.001173263148625784
+          },
+          "double_cost": {
+            "return_pct": -66.08391783252856,
+            "mean_closed_trade_return": -0.0028326889654925144
+          }
+        },
+        "2026": {
+          "observed_days": 273,
+          "closed_trades": 273,
+          "gross": {
+            "return_pct": 20.2035756503965,
+            "mean_closed_trade_return": 0.0007091086387647595
+          },
+          "base": {
+            "return_pct": -22.61034444762683,
+            "mean_closed_trade_return": -0.0009037017377833923
+          },
+          "double_cost": {
+            "return_pct": -50.1751774542065,
+            "mean_closed_trade_return": -0.0025139345817949636
+          }
+        }
+      },
+      "uncertainty": "Unadjusted exploratory2000resample7day blocks, never cross calendar holes; not an independent or familywise alpha proof.",
+      "equity_scope": "Concatenated evaluable day subsequence. Unknown days have unknown returns, not0; full-calendar account return/drawdown not established.",
+      "tp1_wilson_lower": null,
+      "max_drawdown_r": null,
+      "native_urgent_followup_5min_rate": null,
+      "native_manual_fills_verified": false,
+      "forward_evidence": false
+    },
+    "fpar_lag1_s365": {
+      "forecast_days": 1364,
+      "first_forecast_day": 1672963200,
+      "last_forecast_day": 1790726400,
+      "evaluable_days": 1360,
+      "unknown_days": 4,
+      "closed_trades": 1360,
+      "signals": 1364,
+      "signals_per_forecast_calendar_day": 1.0,
+      "opportunity_day_fraction": 1.0,
+      "evaluable_signals_per_evaluable_day": 1.0,
+      "status_counts": {
+        "closed": 1360,
+        "unknown_missing_execution_or_path": 4
+      },
+      "mean_holding_minutes": 759.2941176470588,
+      "median_mae_5min_ref_pct": -0.05433003073299081,
+      "price_adverse_within5m_fraction": 0.9316176470588236,
+      "worst_trade_mae_ref_pct": -16.585525380583444,
+      "five_minute_complete_path_fraction": 1.0,
+      "costs": {
+        "gross": {
+          "observed_subsequence_return_pct": 101.64007788548646,
+          "observed_daily_drawdown_pct": 32.8303991669538,
+          "mean_daily_return": 0.0006722625593066033,
+          "mean_closed_trade_return": 0.0006722625593066033,
+          "daily_mean_block95": [
+            -0.00017614993135231638,
+            0.0015578341632936827
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.00017614993135231638,
+            0.0015578341632936827
+          ],
+          "pf_trade_returns": 1.1257184250734231,
+          "pf_compounded_cash": 1.0768385544148593,
+          "positive_trade_return_sum": 8.18669621988035,
+          "negative_trade_return_abs_sum": 7.272419139223369,
+          "positive_cash_pnl_sum": 14.244145452019886,
+          "negative_cash_pnl_abs_sum": 13.227744673165029,
+          "closed_trade_win_rate": 0.5029411764705882
+        },
+        "base": {
+          "observed_subsequence_return_pct": -79.9881500878625,
+          "observed_daily_drawdown_pct": 80.9255855663502,
+          "mean_daily_return": -0.001026065118233803,
+          "mean_closed_trade_return": -0.001026065118233803,
+          "daily_mean_block95": [
+            -0.001859402094539993,
+            -0.00014184673152213185
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.001859402094539993,
+            -0.00014184673152213185
+          ],
+          "pf_trade_returns": 0.8359738593545237,
+          "pf_compounded_cash": 0.8454019021974574,
+          "positive_trade_return_sum": 7.1120280847330255,
+          "negative_trade_return_abs_sum": 8.507476645530998,
+          "positive_cash_pnl_sum": 4.374059913977955,
+          "negative_cash_pnl_abs_sum": 5.173941414856578,
+          "closed_trade_win_rate": 0.4088235294117647
+        },
+        "double_cost": {
+          "observed_subsequence_return_pct": -98.01444099920974,
+          "observed_daily_drawdown_pct": 98.06090245435297,
+          "mean_daily_return": -0.002721678592722038,
+          "mean_closed_trade_return": -0.002721678592722038,
+          "daily_mean_block95": [
+            -0.0035503346579123275,
+            -0.0018427579480296754
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.0035503346579123275,
+            -0.0018427579480296754
+          ],
+          "pf_trade_returns": 0.6266478031974568,
+          "pf_compounded_cash": 0.6351175532772365,
+          "positive_trade_return_sum": 6.212702480429021,
+          "negative_trade_return_abs_sum": 9.914185366530994,
+          "positive_cash_pnl_sum": 1.706047865891232,
+          "negative_cash_pnl_abs_sum": 2.6861922758833296,
+          "closed_trade_win_rate": 0.3558823529411765
+        }
+      },
+      "years": {
+        "2023": {
+          "observed_days": 359,
+          "closed_trades": 359,
+          "gross": {
+            "return_pct": 33.393246156486576,
+            "mean_closed_trade_return": 0.0008970162398518874
+          },
+          "base": {
+            "return_pct": -26.751383056664213,
+            "mean_closed_trade_return": -0.0007728561691490382
+          },
+          "double_cost": {
+            "return_pct": -59.77982083599347,
+            "mean_closed_trade_return": -0.0024400598512315966
+          }
+        },
+        "2024": {
+          "observed_days": 365,
+          "closed_trades": 365,
+          "gross": {
+            "return_pct": 62.52382421170197,
+            "mean_closed_trade_return": 0.001621390168048427
+          },
+          "base": {
+            "return_pct": -16.17683056411131,
+            "mean_closed_trade_return": -0.00019369209417368478
+          },
+          "double_cost": {
+            "return_pct": -56.774411542493496,
+            "mean_closed_trade_return": -0.0020058735605828176
+          }
+        },
+        "2025": {
+          "observed_days": 363,
+          "closed_trades": 363,
+          "gross": {
+            "return_pct": -1.5594069857565174,
+            "mean_closed_trade_return": 0.00011708103085369799
+          },
+          "base": {
+            "return_pct": -46.60084396643751,
+            "mean_closed_trade_return": -0.0015666928622595864
+          },
+          "double_cost": {
+            "return_pct": -71.03515713325366,
+            "mean_closed_trade_return": -0.003247775811628453
+          }
+        },
+        "2026": {
+          "observed_days": 273,
+          "closed_trades": 273,
+          "gross": {
+            "return_pct": -5.517416250213958,
+            "mean_closed_trade_return": -0.00015406437724327992
+          },
+          "base": {
+            "return_pct": -38.96354004161749,
+            "mean_closed_trade_return": -0.0017530625373620601
+          },
+          "double_cost": {
+            "return_pct": -60.57000657595539,
+            "mean_closed_trade_return": -0.0033495052391061225
+          }
+        }
+      },
+      "uncertainty": "Unadjusted exploratory2000resample7day blocks, never cross calendar holes; not an independent or familywise alpha proof.",
+      "equity_scope": "Concatenated evaluable day subsequence. Unknown days have unknown returns, not0; full-calendar account return/drawdown not established.",
+      "tp1_wilson_lower": null,
+      "max_drawdown_r": null,
+      "native_urgent_followup_5min_rate": null,
+      "native_manual_fills_verified": false,
+      "forward_evidence": false
+    },
+    "fpar_lag20_s182": {
+      "forecast_days": 1549,
+      "first_forecast_day": 1656979200,
+      "last_forecast_day": 1790726400,
+      "evaluable_days": 1544,
+      "unknown_days": 5,
+      "closed_trades": 1544,
+      "signals": 1549,
+      "signals_per_forecast_calendar_day": 1.0,
+      "opportunity_day_fraction": 1.0,
+      "evaluable_signals_per_evaluable_day": 1.0,
+      "status_counts": {
+        "closed": 1544,
+        "unknown_missing_execution_or_path": 5
+      },
+      "mean_holding_minutes": 646.6904145077721,
+      "median_mae_5min_ref_pct": -0.04991836269717109,
+      "price_adverse_within5m_fraction": 0.9371761658031088,
+      "worst_trade_mae_ref_pct": -16.504775315091848,
+      "five_minute_complete_path_fraction": 1.0,
+      "costs": {
+        "gross": {
+          "observed_subsequence_return_pct": 163.91847090764094,
+          "observed_daily_drawdown_pct": 27.24048366319488,
+          "mean_daily_return": 0.0007747047869773893,
+          "mean_closed_trade_return": 0.0007747047869773893,
+          "daily_mean_block95": [
+            1.6035576653581173e-05,
+            0.00156779264235982
+          ],
+          "closed_trade_mean_day_block95": [
+            1.6035576653581173e-05,
+            0.00156779264235982
+          ],
+          "pf_trade_returns": 1.1552981943791898,
+          "pf_compounded_cash": 1.11246279951905,
+          "positive_trade_return_sum": 8.898385649048972,
+          "negative_trade_return_abs_sum": 7.702241457955885,
+          "positive_cash_pnl_sum": 16.21453510126323,
+          "negative_cash_pnl_abs_sum": 14.575350392186818,
+          "closed_trade_win_rate": 0.5233160621761658
+        },
+        "base": {
+          "observed_subsequence_return_pct": -80.50130072002544,
+          "observed_daily_drawdown_pct": 82.38651653140906,
+          "mean_daily_return": -0.0009125921246615881,
+          "mean_closed_trade_return": -0.0009125921246615881,
+          "daily_mean_block95": [
+            -0.0016679003208837394,
+            -0.00012652575439957444
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.0016679003208837394,
+            -0.00012652575439957444
+          ],
+          "pf_trade_returns": 0.8446812847055142,
+          "pf_compounded_cash": 0.8337623037908398,
+          "positive_trade_return_sum": 7.662898882689373,
+          "negative_trade_return_abs_sum": 9.071941123166866,
+          "positive_cash_pnl_sum": 4.037528880455518,
+          "negative_cash_pnl_abs_sum": 4.842541887655772,
+          "closed_trade_win_rate": 0.41580310880829013
+        },
+        "double_cost": {
+          "observed_subsequence_return_pct": -98.55979338580444,
+          "observed_daily_drawdown_pct": 98.63023196482604,
+          "mean_daily_return": -0.0025971924622011865,
+          "mean_closed_trade_return": -0.0025971924622011865,
+          "daily_mean_block95": [
+            -0.003348798451501789,
+            -0.0018189398990906696
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.003348798451501789,
+            -0.0018189398990906696
+          ],
+          "pf_trade_returns": 0.6238999786093241,
+          "pf_compounded_cash": 0.587959984364426,
+          "positive_trade_return_sum": 6.652165451406603,
+          "negative_trade_return_abs_sum": 10.662230613045235,
+          "positive_cash_pnl_sum": 1.4063977375763288,
+          "negative_cash_pnl_abs_sum": 2.3919956714343735,
+          "closed_trade_win_rate": 0.3439119170984456
+        }
+      },
+      "years": {
+        "2022": {
+          "observed_days": 180,
+          "closed_trades": 180,
+          "gross": {
+            "return_pct": 4.215317430104815,
+            "mean_closed_trade_return": 0.00028590691971119544
+          },
+          "base": {
+            "return_pct": -21.863359768219915,
+            "mean_closed_trade_return": -0.0013132709971254584
+          },
+          "double_cost": {
+            "return_pct": -41.416159230758765,
+            "mean_closed_trade_return": -0.002909893168306997
+          }
+        },
+        "2023": {
+          "observed_days": 364,
+          "closed_trades": 364,
+          "gross": {
+            "return_pct": 21.553265114814437,
+            "mean_closed_trade_return": 0.0006610010344283837
+          },
+          "base": {
+            "return_pct": -34.04599500573712,
+            "mean_closed_trade_return": -0.0010182423408426945
+          },
+          "double_cost": {
+            "return_pct": -64.21577454407374,
+            "mean_closed_trade_return": -0.0026948020128715706
+          }
+        },
+        "2024": {
+          "observed_days": 365,
+          "closed_trades": 365,
+          "gross": {
+            "return_pct": 88.66414922520794,
+            "mean_closed_trade_return": 0.002027995061998474
+          },
+          "base": {
+            "return_pct": -2.4055798777119386,
+            "mean_closed_trade_return": 0.00021996867675880112
+          },
+          "double_cost": {
+            "return_pct": -49.52324905043608,
+            "mean_closed_trade_return": -0.00158516818910357
+          }
+        },
+        "2025": {
+          "observed_days": 362,
+          "closed_trades": 362,
+          "gross": {
+            "return_pct": 0.9988536051404262,
+            "mean_closed_trade_return": 0.000171601748395262
+          },
+          "base": {
+            "return_pct": -44.87729977330569,
+            "mean_closed_trade_return": -0.0015000991344478129
+          },
+          "double_cost": {
+            "return_pct": -69.91676565334417,
+            "mean_closed_trade_return": -0.0031691283681747843
+          }
+        },
+        "2026": {
+          "observed_days": 273,
+          "closed_trades": 273,
+          "gross": {
+            "return_pct": 9.336653114774496,
+            "mean_closed_trade_return": 0.0003726686390645214
+          },
+          "base": {
+            "return_pct": -29.66779006689395,
+            "mean_closed_trade_return": -0.0012427323416667503
+          },
+          "double_cost": {
+            "return_pct": -54.75824752340546,
+            "mean_closed_trade_return": -0.0028555516496558474
+          }
+        }
+      },
+      "uncertainty": "Unadjusted exploratory2000resample7day blocks, never cross calendar holes; not an independent or familywise alpha proof.",
+      "equity_scope": "Concatenated evaluable day subsequence. Unknown days have unknown returns, not0; full-calendar account return/drawdown not established.",
+      "tp1_wilson_lower": null,
+      "max_drawdown_r": null,
+      "native_urgent_followup_5min_rate": null,
+      "native_manual_fills_verified": false,
+      "forward_evidence": false
+    },
+    "fpar_lag20_s365": {
+      "forecast_days": 1364,
+      "first_forecast_day": 1672963200,
+      "last_forecast_day": 1790726400,
+      "evaluable_days": 1361,
+      "unknown_days": 3,
+      "closed_trades": 1361,
+      "signals": 1364,
+      "signals_per_forecast_calendar_day": 1.0,
+      "opportunity_day_fraction": 1.0,
+      "evaluable_signals_per_evaluable_day": 1.0,
+      "status_counts": {
+        "closed": 1361,
+        "unknown_missing_execution_or_path": 3
+      },
+      "mean_holding_minutes": 751.0249816311535,
+      "median_mae_5min_ref_pct": -0.05440168826024161,
+      "price_adverse_within5m_fraction": 0.9279941219691403,
+      "worst_trade_mae_ref_pct": -16.585525380583444,
+      "five_minute_complete_path_fraction": 1.0,
+      "costs": {
+        "gross": {
+          "observed_subsequence_return_pct": 220.81663820598058,
+          "observed_daily_drawdown_pct": 22.415759045425464,
+          "mean_daily_return": 0.001011079867685401,
+          "mean_closed_trade_return": 0.001011079867685401,
+          "daily_mean_block95": [
+            0.00013942150714425864,
+            0.0018710263161943559
+          ],
+          "closed_trade_mean_day_block95": [
+            0.00013942150714425864,
+            0.0018710263161943559
+          ],
+          "pf_trade_returns": 1.1979627954505374,
+          "pf_compounded_cash": 1.131441917547309,
+          "positive_trade_return_sum": 8.3272833176908,
+          "negative_trade_return_abs_sum": 6.951203617770969,
+          "positive_cash_pnl_sum": 19.00772639505977,
+          "negative_cash_pnl_abs_sum": 16.79956001299996,
+          "closed_trade_win_rate": 0.5055106539309331
+        },
+        "base": {
+          "observed_subsequence_return_pct": -68.24155744277535,
+          "observed_daily_drawdown_pct": 70.16472735073663,
+          "mean_daily_return": -0.0006885300287263545,
+          "mean_closed_trade_return": -0.0006885300287263545,
+          "daily_mean_block95": [
+            -0.001547626582679019,
+            0.000167904013696883
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.001547626582679019,
+            0.000167904013696883
+          ],
+          "pf_trade_returns": 0.8856265517319449,
+          "pf_compounded_cash": 0.8893277577844081,
+          "positive_trade_return_sum": 7.256152885000112,
+          "negative_trade_return_abs_sum": 8.193242254096681,
+          "positive_cash_pnl_sum": 5.483679561680477,
+          "negative_cash_pnl_abs_sum": 6.16609513610823,
+          "closed_trade_win_rate": 0.4055841293166789
+        },
+        "double_cost": {
+          "observed_subsequence_return_pct": -96.85699529070412,
+          "observed_daily_drawdown_pct": 96.97560214933752,
+          "mean_daily_return": -0.0023854236728922443,
+          "mean_closed_trade_return": -0.0023854236728922443,
+          "daily_mean_block95": [
+            -0.003235329538221287,
+            -0.0015329508835110774
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.003235329538221287,
+            -0.0015329508835110774
+          ],
+          "pf_trade_returns": 0.6621160479715748,
+          "pf_compounded_cash": 0.6794100669748692,
+          "positive_trade_return_sum": 6.3619492303067835,
+          "negative_trade_return_abs_sum": 9.608510849113127,
+          "positive_cash_pnl_sum": 2.0526414237805586,
+          "negative_cash_pnl_abs_sum": 3.0212113766875994,
+          "closed_trade_win_rate": 0.3504775900073475
+        }
+      },
+      "years": {
+        "2023": {
+          "observed_days": 359,
+          "closed_trades": 359,
+          "gross": {
+            "return_pct": 34.004728922744995,
+            "mean_closed_trade_return": 0.0009143037627651816
+          },
+          "base": {
+            "return_pct": -26.411406215340193,
+            "mean_closed_trade_return": -0.0007554204947065398
+          },
+          "double_cost": {
+            "return_pct": -59.59083291838536,
+            "mean_closed_trade_return": -0.0024224762620300615
+          }
+        },
+        "2024": {
+          "observed_days": 365,
+          "closed_trades": 365,
+          "gross": {
+            "return_pct": 105.16017454737722,
+            "mean_closed_trade_return": 0.002281175095001716
+          },
+          "base": {
+            "return_pct": 5.588588869186273,
+            "mean_closed_trade_return": 0.0004588190511597755
+          },
+          "double_cost": {
+            "return_pct": -45.66643729971786,
+            "mean_closed_trade_return": -0.0013606245721865466
+          }
+        },
+        "2025": {
+          "observed_days": 364,
+          "closed_trades": 364,
+          "gross": {
+            "return_pct": 30.746514705160344,
+            "mean_closed_trade_return": 0.0008710028060797547
+          },
+          "base": {
+            "return_pct": -29.08988849291365,
+            "mean_closed_trade_return": -0.0008099466098769075
+          },
+          "double_cost": {
+            "return_pct": -61.54402042952041,
+            "mean_closed_trade_return": -0.002488209596061716
+          }
+        },
+        "2026": {
+          "observed_days": 273,
+          "closed_trades": 273,
+          "gross": {
+            "return_pct": -10.748899793743572,
+            "mean_closed_trade_return": -0.0003730010329726254
+          },
+          "base": {
+            "return_pct": -42.360057590800324,
+            "mean_closed_trade_return": -0.001972680583058771
+          },
+          "double_cost": {
+            "return_pct": -62.77514013660769,
+            "mean_closed_trade_return": -0.003569803585798529
+          }
+        }
+      },
+      "uncertainty": "Unadjusted exploratory2000resample7day blocks, never cross calendar holes; not an independent or familywise alpha proof.",
+      "equity_scope": "Concatenated evaluable day subsequence. Unknown days have unknown returns, not0; full-calendar account return/drawdown not established.",
+      "tp1_wilson_lower": null,
+      "max_drawdown_r": null,
+      "native_urgent_followup_5min_rate": null,
+      "native_manual_fills_verified": false,
+      "forward_evidence": false
+    },
+    "fpar_lag5_s182": {
+      "forecast_days": 1549,
+      "first_forecast_day": 1656979200,
+      "last_forecast_day": 1790726400,
+      "evaluable_days": 1545,
+      "unknown_days": 4,
+      "closed_trades": 1545,
+      "signals": 1549,
+      "signals_per_forecast_calendar_day": 1.0,
+      "opportunity_day_fraction": 1.0,
+      "evaluable_signals_per_evaluable_day": 1.0,
+      "status_counts": {
+        "closed": 1545,
+        "unknown_missing_execution_or_path": 4
+      },
+      "mean_holding_minutes": 636.3236245954693,
+      "median_mae_5min_ref_pct": -0.051433290079039296,
+      "price_adverse_within5m_fraction": 0.9359223300970874,
+      "worst_trade_mae_ref_pct": -16.504775315091848,
+      "five_minute_complete_path_fraction": 1.0,
+      "costs": {
+        "gross": {
+          "observed_subsequence_return_pct": 193.44054071824152,
+          "observed_daily_drawdown_pct": 27.334003075301638,
+          "mean_daily_return": 0.0008371063713767319,
+          "mean_closed_trade_return": 0.0008371063713767319,
+          "daily_mean_block95": [
+            1.8740052966725166e-05,
+            0.0016636828325938163
+          ],
+          "closed_trade_mean_day_block95": [
+            1.8740052966725166e-05,
+            0.0016636828325938163
+          ],
+          "pf_trade_returns": 1.1721268657549415,
+          "pf_compounded_cash": 1.1441747020352524,
+          "positive_trade_return_sum": 8.807143867178501,
+          "negative_trade_return_abs_sum": 7.51381452340145,
+          "positive_cash_pnl_sum": 15.351498557889453,
+          "negative_cash_pnl_abs_sum": 13.41709315070704,
+          "closed_trade_win_rate": 0.5249190938511327
+        },
+        "base": {
+          "observed_subsequence_return_pct": -78.31035375213405,
+          "observed_daily_drawdown_pct": 79.75636813038633,
+          "mean_daily_return": -0.0008489020897349848,
+          "mean_closed_trade_return": -0.0008489020897349848,
+          "daily_mean_block95": [
+            -0.0016708253831865048,
+            -2.80826594058283e-05
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.0016708253831865048,
+            -2.80826594058283e-05
+          ],
+          "pf_trade_returns": 0.8523612059410743,
+          "pf_compounded_cash": 0.8281285074148685,
+          "positive_trade_return_sum": 7.571976762113,
+          "negative_trade_return_abs_sum": 8.88353049075355,
+          "positive_cash_pnl_sum": 3.773228206286909,
+          "negative_cash_pnl_abs_sum": 4.556331743808247,
+          "closed_trade_win_rate": 0.41359223300970877
+        },
+        "double_cost": {
+          "observed_subsequence_return_pct": -98.39723563012403,
+          "observed_daily_drawdown_pct": 98.42497209360573,
+          "mean_daily_return": -0.0025322160359002198,
+          "mean_closed_trade_return": -0.0025322160359002198,
+          "daily_mean_block95": [
+            -0.0033403951483132696,
+            -0.0017131846086272167
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.0033403951483132696,
+            -0.0017131846086272167
+          ],
+          "pf_trade_returns": 0.6267524851852982,
+          "pf_compounded_cash": 0.5709940837270833,
+          "positive_trade_return_sum": 6.569440422706602,
+          "negative_trade_return_abs_sum": 10.48171419817244,
+          "positive_cash_pnl_sum": 1.3096378690534987,
+          "negative_cash_pnl_abs_sum": 2.29361022535474,
+          "closed_trade_win_rate": 0.34110032362459547
+        }
+      },
+      "years": {
+        "2022": {
+          "observed_days": 180,
+          "closed_trades": 180,
+          "gross": {
+            "return_pct": 1.0451179421788748,
+            "mean_closed_trade_return": 0.00011279065925023738
+          },
+          "base": {
+            "return_pct": -24.24025352011191,
+            "mean_closed_trade_return": -0.0014861104930145486
+          },
+          "double_cost": {
+            "return_pct": -43.198262539439334,
+            "mean_closed_trade_return": -0.003082456341938889
+          }
+        },
+        "2023": {
+          "observed_days": 364,
+          "closed_trades": 364,
+          "gross": {
+            "return_pct": 23.82927949417106,
+            "mean_closed_trade_return": 0.0007115235739971767
+          },
+          "base": {
+            "return_pct": -32.79733961397624,
+            "mean_closed_trade_return": -0.0009672455586119253
+          },
+          "double_cost": {
+            "return_pct": -63.53084939541087,
+            "mean_closed_trade_return": -0.002643331745895509
+          }
+        },
+        "2024": {
+          "observed_days": 365,
+          "closed_trades": 365,
+          "gross": {
+            "return_pct": 73.49030259711733,
+            "mean_closed_trade_return": 0.0017877999861798154
+          },
+          "base": {
+            "return_pct": -10.253006588829994,
+            "mean_closed_trade_return": -1.9712766796308073e-05
+          },
+          "double_cost": {
+            "return_pct": -53.58103688343701,
+            "mean_closed_trade_return": -0.0018243368212627813
+          }
+        },
+        "2025": {
+          "observed_days": 363,
+          "closed_trades": 363,
+          "gross": {
+            "return_pct": 9.375627080125648,
+            "mean_closed_trade_return": 0.00038633714815796186
+          },
+          "base": {
+            "return_pct": -40.3420514183532,
+            "mean_closed_trade_return": -0.0012827913680398273
+          },
+          "double_cost": {
+            "return_pct": -67.4615535276065,
+            "mean_closed_trade_return": -0.0029492523461805966
+          }
+        },
+        "2026": {
+          "observed_days": 273,
+          "closed_trades": 273,
+          "gross": {
+            "return_pct": 23.590666032068896,
+            "mean_closed_trade_return": 0.0008104214814654326
+          },
+          "base": {
+            "return_pct": -20.43184895269219,
+            "mean_closed_trade_return": -0.00080266677686477
+          },
+          "double_cost": {
+            "return_pct": -48.774033445744514,
+            "mean_closed_trade_return": -0.00241317705855825
+          }
+        }
+      },
+      "uncertainty": "Unadjusted exploratory2000resample7day blocks, never cross calendar holes; not an independent or familywise alpha proof.",
+      "equity_scope": "Concatenated evaluable day subsequence. Unknown days have unknown returns, not0; full-calendar account return/drawdown not established.",
+      "tp1_wilson_lower": null,
+      "max_drawdown_r": null,
+      "native_urgent_followup_5min_rate": null,
+      "native_manual_fills_verified": false,
+      "forward_evidence": false
+    },
+    "fpar_lag5_s365": {
+      "forecast_days": 1364,
+      "first_forecast_day": 1672963200,
+      "last_forecast_day": 1790726400,
+      "evaluable_days": 1361,
+      "unknown_days": 3,
+      "closed_trades": 1361,
+      "signals": 1364,
+      "signals_per_forecast_calendar_day": 1.0,
+      "opportunity_day_fraction": 1.0,
+      "evaluable_signals_per_evaluable_day": 1.0,
+      "status_counts": {
+        "closed": 1361,
+        "unknown_missing_execution_or_path": 3
+      },
+      "mean_holding_minutes": 755.7788390889052,
+      "median_mae_5min_ref_pct": -0.05368039678637082,
+      "price_adverse_within5m_fraction": 0.9279941219691403,
+      "worst_trade_mae_ref_pct": -16.585525380583444,
+      "five_minute_complete_path_fraction": 1.0,
+      "costs": {
+        "gross": {
+          "observed_subsequence_return_pct": 312.2280925109215,
+          "observed_daily_drawdown_pct": 20.82012749088359,
+          "mean_daily_return": 0.0011969551784915854,
+          "mean_closed_trade_return": 0.0011969551784915854,
+          "daily_mean_block95": [
+            0.0003205976835381206,
+            0.0020645916665846054
+          ],
+          "closed_trade_mean_day_block95": [
+            0.0003205976835381206,
+            0.0020645916665846054
+          ],
+          "pf_trade_returns": 1.2376731925149949,
+          "pf_compounded_cash": 1.167793671415914,
+          "positive_trade_return_sum": 8.48324085861246,
+          "negative_trade_return_abs_sum": 6.854184860685412,
+          "positive_cash_pnl_sum": 21.730139605130233,
+          "negative_cash_pnl_abs_sum": 18.60785868002102,
+          "closed_trade_win_rate": 0.5121234386480529
+        },
+        "base": {
+          "observed_subsequence_return_pct": -59.20999462495578,
+          "observed_daily_drawdown_pct": 67.18816316907817,
+          "mean_daily_return": -0.0005032501577692293,
+          "mean_closed_trade_return": -0.0005032501577692293,
+          "daily_mean_block95": [
+            -0.0013709774470519278,
+            0.00036011775541106657
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.0013709774470519278,
+            0.00036011775541106657
+          ],
+          "pf_trade_returns": 0.9152184105536019,
+          "pf_compounded_cash": 0.9137177095496888,
+          "positive_trade_return_sum": 7.393758112211522,
+          "negative_trade_return_abs_sum": 8.078681576935443,
+          "positive_cash_pnl_sum": 6.270257823338625,
+          "negative_cash_pnl_abs_sum": 6.862357769588182,
+          "closed_trade_win_rate": 0.41440117560617196
+        },
+        "double_cost": {
+          "observed_subsequence_return_pct": -95.96491171288866,
+          "observed_daily_drawdown_pct": 96.10832158928395,
+          "mean_daily_return": -0.0022007382901747356,
+          "mean_closed_trade_return": -0.0022007382901747356,
+          "daily_mean_block95": [
+            -0.00306972249127337,
+            -0.0013418262166767093
+          ],
+          "closed_trade_mean_day_block95": [
+            -0.00306972249127337,
+            -0.0013418262166767093
+          ],
+          "pf_trade_returns": 0.6839093688323672,
+          "pf_compounded_cash": 0.7087476820267935,
+          "positive_trade_return_sum": 6.48057370623799,
+          "negative_trade_return_abs_sum": 9.475778519165805,
+          "positive_cash_pnl_sum": 2.335257250679554,
+          "negative_cash_pnl_abs_sum": 3.2949063678084407,
+          "closed_trade_win_rate": 0.35929463629684055
+        }
+      },
+      "years": {
+        "2023": {
+          "observed_days": 359,
+          "closed_trades": 359,
+          "gross": {
+            "return_pct": 59.61321618708657,
+            "mean_closed_trade_return": 0.0013993786202628835
+          },
+          "base": {
+            "return_pct": -12.202961675007806,
+            "mean_closed_trade_return": -0.0002664670010124797
+          },
+          "double_cost": {
+            "return_pct": -51.70843403706746,
+            "mean_closed_trade_return": -0.0019296503308292947
+          }
+        },
+        "2024": {
+          "observed_days": 365,
+          "closed_trades": 365,
+          "gross": {
+            "return_pct": 89.89315924284324,
+            "mean_closed_trade_return": 0.0020766094469045473
+          },
+          "base": {
+            "return_pct": -2.452385160640702,
+            "mean_closed_trade_return": 0.0002494686001633793
+          },
+          "double_cost": {
+            "return_pct": -49.898630229049424,
+            "mean_closed_trade_return": -0.0015747521791911695
+          }
+        },
+        "2025": {
+          "observed_days": 364,
+          "closed_trades": 364,
+          "gross": {
+            "return_pct": 29.948357254874658,
+            "mean_closed_trade_return": 0.0008707544701297555
+          },
+          "base": {
+            "return_pct": -29.56825205569832,
+            "mean_closed_trade_return": -0.0008119404078147697
+          },
+          "double_cost": {
+            "return_pct": -61.828139168523855,
+            "mean_closed_trade_return": -0.0024919460664561167
+          }
+        },
+        "2026": {
+          "observed_days": 273,
+          "closed_trades": 273,
+          "gross": {
+            "return_pct": 4.661901912412403,
+            "mean_closed_trade_return": 0.00018960438829773555
+          },
+          "base": {
+            "return_pct": -32.377881092317786,
+            "mean_closed_trade_return": -0.0014094195676758177
+          },
+          "double_cost": {
+            "return_pct": -56.30931825738465,
+            "mean_closed_trade_return": -0.0030058880240487014
+          }
+        }
+      },
+      "uncertainty": "Unadjusted exploratory2000resample7day blocks, never cross calendar holes; not an independent or familywise alpha proof.",
+      "equity_scope": "Concatenated evaluable day subsequence. Unknown days have unknown returns, not0; full-calendar account return/drawdown not established.",
+      "tp1_wilson_lower": null,
+      "max_drawdown_r": null,
+      "native_urgent_followup_5min_rate": null,
+      "native_manual_fills_verified": false,
+      "forward_evidence": false
+    }
+  },
+  "source_catalog_sha256": "f61385dc53398324bdbc3917eb0b590410d4addd3aa25e1e7cd678a00c925200",
+  "artifacts": {
+    "forecast_checkpoint.json": "d375ca4ffc4ad6f92e49977713b928874079f8b24cc75cd2bc1f2499f3aaa8db",
+    "input_sources.json": "f61385dc53398324bdbc3917eb0b590410d4addd3aa25e1e7cd678a00c925200",
+    "forecast_curves.npz": "3f2207c35c45ad20b7ef86f1e3b5934aece9cd277cae894d87ae4c69c9f72fc7",
+    "forecasts.csv.gz": "f80736b1ebeab8285a2e74514cfa858325d86057b0ca49fd1830e3f9c1dcb000",
+    "daily_and_trades.csv.gz": "9c2607f20c9a07d0c63df4e456a1d4d0cc496eb4146b8f1f0d6e9f4e669efdcd"
+  },
+  "all_data_previously_observed": true,
+  "full_original_paper_replication": false,
+  "unresolved_source_differences": [
+    "Manuscript says290 daily5m observations;24h has288 nonoverlapping5m intervals. Use288 actual minute-open grid observations00:00 through23:55 UTC; disclose difference.",
+    "Score Ljung-Box lag length and AR1 estimator not explicitly fixed in reviewed model section. The separate curve-dependence section reports1/5/10/20; use these as disclosed sensitivity lags, not assert exact score-test original settings.",
+    "No source-specific hard stop,TP1,initialR or native urgent-warning contract. These gates remain unverified."
+  ],
+  "implementation_details": [
+    "Unit funded long/cash return proxy, not margin/liquidation accounting; no leverage.",
+    "Funding debits use actual funding-minute original opens, adverse rates only, inclusive entry/exit boundary worst-case order.",
+    "Uniform discrete FPCA basis scaling cancels in score reconstruction; OLS AR1 intercept; no coefficient clipping.",
+    "No hard stop/TP1/R/native warning contract in source, these promotion metrics remain unknown."
+  ],
+  "production_changed": false,
+  "forward_collection_started": false,
+  "profitable_replacement_certified": false
+}

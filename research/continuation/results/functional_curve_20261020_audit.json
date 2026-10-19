@@ -1,0 +1,19 @@
+{
+  "forecast_rows": 14565,
+  "closed_model_trade_rows": 14526,
+  "unknown_model_trade_rows": 39,
+  "overlapping_models_not_independent_trades": true,
+  "max_cash_pnl_abs_error": 7.008282842946301e-16,
+  "max_scheduled_time_error_seconds": 0,
+  "predictions_unchanged_after_evaluation": true,
+  "unknown_returns_not_imputed": true,
+  "all10variants_complete2026days": 273,
+  "raw_source_catalog_sha256": "f61385dc53398324bdbc3917eb0b590410d4addd3aa25e1e7cd678a00c925200",
+  "compressed_source_catalog_sha256": "d73838ec6dc9c79aeb31745faf4268bb543af281e268c7db5c200f9e6285cb15",
+  "report_sha256": "bd376943a6a418028401355b1a3e3b32f3345cdf4a3d735de9a39c61e5b67e6b",
+  "audit_code_sha256": "9741b5f440244cc315530bdac6eda91984831355234c21a1e77dbb2f732131dd",
+  "funding_boundary_order": "adverse debits inclusive at entry and exit",
+  "actual_original_paper_replication": false,
+  "native_lbank_execution_verified": false,
+  "candidate_decision": "reject_this_fixed_component: all10costed scenarios negative,PF<1,expectancy95lower<=0; TP1/R/native/prospective unknown"
+}
