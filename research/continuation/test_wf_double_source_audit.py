@@ -1,7 +1,11 @@
 import unittest
+import importlib.util
 import numpy as np
 import pandas as pd
-from audit_wf_double_source import actual_turnover, audit_frame, closed_segments, drawdown
+
+HAS_RESEARCH_PARSER = all(importlib.util.find_spec(p) is not None for p in ["rdata", "xarray"])
+if HAS_RESEARCH_PARSER:
+    from audit_wf_double_source import actual_turnover, audit_frame, closed_segments, drawdown
 
 
 def fixture():
@@ -15,6 +19,7 @@ def fixture():
         index=pd.date_range("2020-01-01", periods=len(prices), freq="h", tz="UTC"))
 
 
+@unittest.skipUnless(HAS_RESEARCH_PARSER, "Install pinned optional research RDS parser to run this audit's tests")
 class ReconciliationTests(unittest.TestCase):
     def test_inherited_start_unknown(self):
         a = actual_turnover([1, 1, -1])

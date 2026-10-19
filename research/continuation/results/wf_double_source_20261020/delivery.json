@@ -12,6 +12,7 @@
     "PYTHONPATH=/tmp/lbank-rdata-1.0.0 python research/continuation/verify_wf_double_outputs.py research/continuation/results/wf_double_source_20261020 --output research/continuation/results/wf_double_source_20261020/independent_audit.json"
   ],
   "tests_passed": 8,
+  "post_execution_optional_dependency_guard": "With pinned parser path8tests passed again;without optional parser8tests explicitly skipped,not counted as passes. Research tests do not require production dependency installation.",
   "separate_arithmetic_audit_passed": true,
   "environment": "No Rscript,rdata,xarray initially. Pinned numeric RDS parser installed to temporary target;no production dependency changes or external R/DVC/strategy code execution.",
   "preservation": "Original2BTC resultRDS,2selectionRDS,2rangeYAML,4complete closed-segmentCSVgz,92memberSHAmanifest,report,audit,code,protocol,docs,state in research Git.80.3MBauthorZIP represented by URL/SHA;source ledgers preserved independently of ZIP availability.",
