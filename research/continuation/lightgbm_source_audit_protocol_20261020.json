@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "id": "djienne_lightgbm_1274e_contract_forensic_v1",
+  "frozen_utc": "2026-10-20T00:57:35Z",
+  "stage": "source code/artifact/fee/stop/causality diagnostic audit;NOT alpha model training or market backtest",
+  "source_manifest": "research/continuation/lightgbm_source_manifest_20261020.json",
+  "source_commit": "1274eac3f8e02ddce6be7ff3b48887a971932f35",
+  "code": "research/continuation/audit_lightgbm_source_contract.py",
+  "execution_boundary": "Only hash-verified reviewed pure functions AST-selected below;remove numba decorators;do NOT import source modules or run Freqtrade,retrainer,modeling train,network endpoints,account/order,logging functions or external install.",
+  "allow_functions": {
+    "src/utils.py": [
+      "get_time_index",
+      "get_symbol_key",
+      "interval_to_minutes",
+      "bars_per_year",
+      "rolling_pct_rank",
+      "assign_decile_rolling"
+    ],
+    "src/signal_engine.py": [
+      "_hysteresis_signal",
+      "_hysteresis_signal_low",
+      "quantile_window_bars",
+      "_normalize_datetime_index",
+      "compute_prediction_quantiles",
+      "compute_desired_position",
+      "compute_live_level_signals",
+      "shift_position_for_execution"
+    ],
+    "src/backtest.py": [
+      "_apply_stoploss",
+      "compute_signal_returns"
+    ],
+    "freqtrade_live/backtest_live_window.py": [
+      "build_trade_table"
+    ],
+    "src/features.py": [
+      "_resolve_group_key",
+      "engineer_features"
+    ]
+  },
+  "controls": [
+    "Rolling quantile prefix invariance on deterministic800predictions,prefix600,window100.",
+    "OHLCV feature future-append invariance on deterministic800bars,prefix600.",
+    "One-bar held position convention;ordinary entry+exit counts two transitions."
+  ],
+  "adverse_cases": [
+    "Flat state receives q100 on month-end bar;check forced-flat contract.",
+    "Unknown/NaN quantile in a held run;check live exit flag vsno action.",
+    "Entry-bar stop breach;compare gross return,fee transition count and closed table;stress fee0.0003 then0.0006 on SAME signal.",
+    "Stop lock vs persistent live-level entry flags;do not infer actual Freqtrade fills.",
+    "Intra-bar low crosses nominal20% stop then recovers;input kernel has open-close returns only.",
+    "Held position spans adverse close-to-next-open price jump;compare continuous held price vsopen-close-product."
+  ],
+  "fixed_inputs": {
+    "bins": 100,
+    "entry_quantile": 100,
+    "exit_quantile": 90,
+    "interval": "15m",
+    "stoploss": -0.2,
+    "fees": [
+      0.0003,
+      0.0006
+    ],
+    "market_data_used": false,
+    "synthetic_fixture_only": true,
+    "parameter_search": false
+  },
+  "reporting": "Preserve raw diagnostic inputs/outputs/function line spans,source and code SHA. Separate correct controls from counterexamples. No inference about prevalence or original historical profit impact without artifacts.",
+  "promotion_gate_results": "not evaluated:PF,expectancy95lower,doubleALLcost,TP1Wilson,DD_R,5minurgent,frequency,prospective30d/100/nativefills. No zero-filled unknowns.",
+  "decision_rule": "Absent authoritative artifacts plus incompatible/unverified execution/SLTP1 contract =>exclude this released version as replacement evidence;no repair/tuning merely to salvage headline. Do not generalize to all ML/RSI/BTC methods."
+}

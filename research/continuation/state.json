@@ -340,7 +340,15 @@
       "forward_started": false
     }
   ],
-  "active_run": null,
+  "active_run": {
+    "id": "lightgbm_source_contract_audit_20261020_0957",
+    "protocol_frozen_utc": "2026-10-20T00:57:35Z",
+    "stage": "reviewed_allowlist_kernel_diagnostic_code_and_protocol_fixed_before_execution",
+    "source_commit": "1274eac3f8e02ddce6be7ff3b48887a971932f35",
+    "protocol": "research/continuation/lightgbm_source_audit_protocol_20261020.json",
+    "manifest": "research/continuation/lightgbm_source_manifest_20261020.json",
+    "next_action": "Execute deterministic synthetic kernel diagnostic fixtures and controls only,no modeltraining/fullmarketbacktest/livebot. Preserve all outcomes and separate fee/ledger verification."
+  },
   "blockers": [],
   "updated_kst": "2026-10-20T08:44:23+09:00",
   "maintained_research_candidates": [

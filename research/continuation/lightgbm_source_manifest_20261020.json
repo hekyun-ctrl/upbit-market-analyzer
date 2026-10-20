@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "repository": "djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen",
+  "commit": "1274eac3f8e02ddce6be7ff3b48887a971932f35",
+  "reviewed_utc": "2026-10-20T00:57:35Z",
+  "retrieval": "GitHub connector fetch_file with exact commit;every local byte file checked against both returned Git blob SHA and recursive tree. No module startup or model load.",
+  "files": [
+    {
+      "path": "src/strategy_contract.py",
+      "bytes": 4323,
+      "sha256": "9d75f43f02549c529feffadf7b7183461526ac64b688dab085f4e5674858b006",
+      "git_blob_sha": "d277cd8c2204367f8c2e5db3c831bbb202fc4f38",
+      "url": "https://raw.githubusercontent.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/1274eac3f8e02ddce6be7ff3b48887a971932f35/src/strategy_contract.py"
+    },
+    {
+      "path": "REVIEW_FINDINGS.md",
+      "bytes": 11066,
+      "sha256": "2665e36fc837c431787c55c789a4c9907da612972887254afdb0e516187e3238",
+      "git_blob_sha": "5c38a2cb2a388c0611ce3ce426d35ed4404e67da",
+      "url": "https://raw.githubusercontent.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/1274eac3f8e02ddce6be7ff3b48887a971932f35/REVIEW_FINDINGS.md"
+    },
+    {
+      "path": "freqtrade_live/backtest_live_window.py",
+      "bytes": 22343,
+      "sha256": "b98bfd46d9ea563be9cc766c9243ffa127cbcd1d029ba4457b0d7e6948f6c8eb",
+      "git_blob_sha": "e44745d4f1e792d4ff27810ca169c1763298a7cb",
+      "url": "https://raw.githubusercontent.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/1274eac3f8e02ddce6be7ff3b48887a971932f35/freqtrade_live/backtest_live_window.py"
+    },
+    {
+      "path": "src/signal_engine.py",
+      "bytes": 7118,
+      "sha256": "82e5bd0b158e1c9a6ce94352caab401e543744e7ec1c89a853febbfa37123625",
+      "git_blob_sha": "157e5fd667d3bf489539fdcc7cc714a23b9ca4be",
+      "url": "https://raw.githubusercontent.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/1274eac3f8e02ddce6be7ff3b48887a971932f35/src/signal_engine.py"
+    },
+    {
+      "path": "src/backtest.py",
+      "bytes": 22370,
+      "sha256": "9a3e088ec5ab404258a549e8e3cbc2c6a9ee062cf570a36ccfa5080218fa8c12",
+      "git_blob_sha": "8bf16c98c9c154920ea94382d2b736d00c9ca0a5",
+      "url": "https://raw.githubusercontent.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/1274eac3f8e02ddce6be7ff3b48887a971932f35/src/backtest.py"
+    },
+    {
+      "path": "src/modeling.py",
+      "bytes": 11731,
+      "sha256": "90da95c651736a74f5d4c8882b4332990b32ca6e66db8761647cd813811c307e",
+      "git_blob_sha": "f089c50c8ce5794c10b2dc91097f70de04a11989",
+      "url": "https://raw.githubusercontent.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/1274eac3f8e02ddce6be7ff3b48887a971932f35/src/modeling.py"
+    },
+    {
+      "path": "src/features.py",
+      "bytes": 9604,
+      "sha256": "0f389117508e1afee2ad7f9c557ca6405796400fd35414b954a87d101b24676a",
+      "git_blob_sha": "484e3c01f7de05515072b548f9888643d88be72d",
+      "url": "https://raw.githubusercontent.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/1274eac3f8e02ddce6be7ff3b48887a971932f35/src/features.py"
+    },
+    {
+      "path": "src/utils.py",
+      "bytes": 8450,
+      "sha256": "1050adf632a857e9f98a572b382af2722b1b0c39aa51b3027116070d6a7ecf50",
+      "git_blob_sha": "c37766b48dcdf7b21bb93c169e2a65f94db413f0",
+      "url": "https://raw.githubusercontent.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/1274eac3f8e02ddce6be7ff3b48887a971932f35/src/utils.py"
+    },
+    {
+      "path": "src/pipeline.py",
+      "bytes": 13522,
+      "sha256": "e5691d2b7c9c1a5b7294ef0e35921f901967c92d731c3cbd87d2ad9ece6e9459",
+      "git_blob_sha": "6488b2d8893309dfc4c1c32fbab53c12e5c95ec1",
+      "url": "https://raw.githubusercontent.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/1274eac3f8e02ddce6be7ff3b48887a971932f35/src/pipeline.py"
+    },
+    {
+      "path": "tests/test_live_backtest_parity.py",
+      "bytes": 12160,
+      "sha256": "6f6e453e13910f2ae20ba7c0443040a75ee76af884e5a4ef9abdb33e019a0dcc",
+      "git_blob_sha": "8c8ec93b4f9875dd8db9c464086c69cbcc8ca892",
+      "url": "https://raw.githubusercontent.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/1274eac3f8e02ddce6be7ff3b48887a971932f35/tests/test_live_backtest_parity.py"
+    },
+    {
+      "path": "freqtrade_live/user_data/strategies/LightGBMStrategy.py",
+      "bytes": 17547,
+      "sha256": "8d1b3b4cf2865525bc6ed32e34d8bc650390610c030aa3bfb86ba4fd5dc1c7fb",
+      "git_blob_sha": "8c4c66f14f0001f9ad959d149b4e7571b869a02e",
+      "url": "https://raw.githubusercontent.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/1274eac3f8e02ddce6be7ff3b48887a971932f35/freqtrade_live/user_data/strategies/LightGBMStrategy.py"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 518,
+      "sha256": "5472a4ea0565795e746ee3284c1e1bbe26c72c2570d1768b2b588ddffd0e99be",
+      "git_blob_sha": "58f5b1443d8b0a585ab857335fc16a47d8e7a2d4",
+      "url": "https://raw.githubusercontent.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/1274eac3f8e02ddce6be7ff3b48887a971932f35/.gitignore"
+    }
+  ],
+  "tree": {
+    "path": "source_tree.json",
+    "sha256": "266986ef8677fa8e63aea79f708571d0c9712ce73ecdf8f1b009e9b68ef2fad8",
+    "bytes": 15177,
+    "url": "https://api.github.com/repos/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/git/trees/1274eac3f8e02ddce6be7ff3b48887a971932f35?recursive=1",
+    "truncated": false,
+    "entries": 56
+  },
+  "required_artifacts": [
+    "freqtrade_live/shared/models/model_info.json",
+    "freqtrade_live/shared/models/latest_model.txt",
+    "freqtrade_live/shared/models/latest_predictions.feather"
+  ],
+  "retrieval_failures": [
+    {
+      "path": "freqtrade_live/shared/models/model_info.json",
+      "status": 404,
+      "reason": "NOT_FOUND;consistent with complete tree and tracked .gitignore. No credential bypass or private-artifact search."
+    }
+  ],
+  "model_training_date": "Not independently verifiable from public artifact;2026-08-13 date is document claim only.",
+  "notes": "Public tree contains code,not advertised deployed artifact/OOF history/raw exchange data or dry-run transaction ledger. No raw market sample is fabricated from documentation."
+}
