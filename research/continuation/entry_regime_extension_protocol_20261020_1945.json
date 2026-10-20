@@ -1,0 +1,50 @@
+{
+  "version": "current_native_first_event_regime_extension_v1",
+  "status": "frozen_before_extension_outcomes",
+  "created_utc": "2026-10-20T10:47:00Z",
+  "base_protocol": "research/continuation/current_native_offline_protocol_20261020.json",
+  "base_implementation_git_blob": "d4648371316580ae7c8ac9b43309476297063821",
+  "source_commit": "5c977a7f51cea67048f95791d1dcc4230634939a",
+  "gates_unchanged_from": "862339db2c4f69facc9ba6626e2826d475504174",
+  "intervals": [
+    {
+      "id": "2024Jan_remaining",
+      "month": "2024-01",
+      "start": "2024-01-15T00:00:00Z",
+      "end": "2024-02-01T00:00:00Z"
+    },
+    {
+      "id": "2025Jan_same_day_numbers",
+      "month": "2025-01",
+      "start": "2025-01-08T00:00:00Z",
+      "end": "2025-01-15T00:00:00Z"
+    }
+  ],
+  "choice": "Continue remaining first retained Jan2024 without repeating completed Jan8-15; different-year counterpart Jan2025 same day-of-month window, no outcome/regime label inspection to choose dates. Both already-seen development history, not untouched OOS.",
+  "variants": [
+    "unchanged current baseline",
+    "existing higher_direction_intact mandatory for trend_retest at setup/confirm only"
+  ],
+  "rule_changes": false,
+  "execution_contract": "Inherit fixed initial-stop/TP1/urgent proxy/minute-open/60-second confirmation/cost2x/funding contracts unchanged; date/month inputs and days denominator only generalized. No full live preTP protection/partial-runner PnL claim.",
+  "uncertainty": "5000 conditional circular calendar UTC day block resamples at lengths2 and7, zero-entry days retained; means over completed reference rows by entry day; two overlapping variants not independent; selection bias not corrected.",
+  "checks": [
+    "original archive SHA against retained official manifest",
+    "continuous minute timestamps/OHLC; complete5m aggregation",
+    "Decimal cash/funding/cost both models",
+    "frozen core source equality latest paper vs old production",
+    "past input/classify invariance against future HLC mutation sampled deterministically across intervals"
+  ],
+  "limits": [
+    "Binance venue model, not LBank execution",
+    "already observed archives and chosen strategy family",
+    "one asset, not broad universe or survivorship proof",
+    "minute timing not exact15s/30s or manual fills",
+    "initial-stop/TP1 diagnostic excludes actual full management",
+    "closed-reference realized DD not MTM account DD",
+    "no new30day/100trade forward evidence",
+    "actual LBank5m urgent rate unknown"
+  ],
+  "promotion": false,
+  "production_change": false
+}
