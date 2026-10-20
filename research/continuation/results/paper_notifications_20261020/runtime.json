@@ -1,0 +1,71 @@
+{
+  "policy": "native_paper_notifications_v1",
+  "commit": "5c977a7f51cea67048f95791d1dcc4230634939a",
+  "deployment": "23799b11-6f14-4e93-aacf-78ce691f9393",
+  "terminal_status": "SUCCESS",
+  "source_monitor_sha256": "4f8928f2bd7b4e52d2358594b5dad592be444218d92862825b46e1d52eab0d5e",
+  "tests_local": 350,
+  "tests_server": 350,
+  "telegram_api_progress_acknowledged": true,
+  "device_receipt_verified": false,
+  "observed_new_candidate_count": 0,
+  "observed_new_paper_entry_count": 0,
+  "native_ready": {
+    "minute_bars": 360,
+    "five_bars": 103,
+    "rsi_history_mature": false,
+    "hourly_study_ready": false
+  },
+  "live_gates_changed": false,
+  "replacement_certified": false,
+  "replacement_deployed": false,
+  "orders": false,
+  "records": [
+    {
+      "at": "2026-10-20T10:21:56.087600775Z",
+      "message": "OK"
+    },
+    {
+      "at": "2026-10-20T10:21:56.087628810Z",
+      "message": "Ran 350 tests in 2.812s"
+    },
+    {
+      "at": "2026-10-20T10:22:15.901641786Z",
+      "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATIONS_STARTED policy=native_paper_notifications_v1 source=existing_native_study_ledgers poll=15 event_batch_min_seconds=60 progress_seconds=900 trade_signal=false"
+    },
+    {
+      "at": "2026-10-20T10:22:16.246912016Z",
+      "message": "INFO:lbank_monitor:ENTRY_TIMING_RUNTIME commit=5c977a7f51cea67048f95791d1dcc4230634939a monitor_sha256=4f8928f2bd7b4e52d2358594b5dad592be444218d92862825b46e1d52eab0d5e timing_sha256=8de5b4747d9dd39b6de1392a438697fc3d7f12ec0ac15261460b0755014435f5"
+    },
+    {
+      "at": "2026-10-20T10:22:16.841068945Z",
+      "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=progress orders=false live_gate=false"
+    },
+    {
+      "at": "2026-10-20T10:23:07.806077908Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 103, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 86.30399898849717, \"min_range_fraction\": 0.0060821845156980876, \"minimum_target_fraction\": 0.005932184515698088, \"stop_floor_fraction\": 0.0015871396579286582}, \"entry_source_switched\": true, \"last5_start\": 1792491300, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 57.75119518958328, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:23:07.807423719Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:23:07.807429045Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    }
+  ],
+  "rollback": {
+    "commit": "862339db2c4f69facc9ba6626e2826d475504174",
+    "deployment": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01"
+  },
+  "blocked_predeploys": [
+    {
+      "deployment": "3b42b081-4f79-4767-aee9-b97694d8c2fa",
+      "reason": "upload truncation; code never activated"
+    },
+    {
+      "deployment": "2231dfa8-bcbd-4dba-b0d0-a8ea35039cbc",
+      "reason": "new test ast.dump portability; code never activated"
+    }
+  ]
+}
