@@ -1235,5 +1235,6 @@
     "capture_deployed": false,
     "full_exit_replay": false
   },
-  "updated_utc": "2026-10-20 09:56:16 UTC"
+  "updated_utc": "2026-10-20 09:56:16 UTC",
+  "updated_kst": "2026-10-20T18:56:16.000+09:00"
 }
