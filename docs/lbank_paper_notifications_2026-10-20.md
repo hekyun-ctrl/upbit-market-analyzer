@@ -29,3 +29,8 @@ LBANK_PAPER_NOTIFICATIONS_ENABLED 기본true이며 false로 끌 수 있다. 위�
 
 
 구현 소스: [80dcd657](https://github.com/hekyun-ctrl/upbit-market-analyzer/commit/80dcd65701fb08df4c0e738705d69b84f6274b54). 배포3b42b081 진행 중이며 최종 런타임 증거는 state.json과 후속 절에 누적한다.
+
+
+## 실제 배포·런타임 확인
+
+최종 구현 [5c977a7](https://github.com/hekyun-ctrl/upbit-market-analyzer/commit/5c977a7f51cea67048f95791d1dcc4230634939a), 배포23799b11-6f14-4e93-aacf-78ce691f9393 SUCCESS. 초기80dcd65의 잘린 업로드와336cd3f의 추가 검사 AST버전차이는 각각 predeploy에서 차단되어 새운영으로 활성화되지 않았다. 최종350검사 서버 통과·모니터 원문SHA256 일치·19:22:15KST 발신기 시작·19:22:16 progress Telegram API성공응답·19:23:07 원본360/103 준비와 연구 ready=true를 확인했다. [원본 실행 증거](../research/continuation/results/paper_notifications_20261020/runtime.json). 아직 새후보/모의진입/종료0건이고 사용자 기기수신은 미검증이다. 시간봉연구 미준비/RSI250미성숙을 표시하며 수익성 후보가 합격한 것으로 세지 않는다. 설정된 모의사건 추적과 후속 성능검증은 계속한다.
