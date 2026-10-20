@@ -67,8 +67,8 @@
     "docs/lbank_full_management_replay_2026-10-20.md"
   ],
   "next_work": {
-    "stage": "native_box_episode_followup_and_existing_RSI_chronological_protocol",
-    "instruction": "BBsix-event numeric attribution completed0607; read document/report.60evaluations!=60trades: sequential context5/RSI30/plan25; aftercontext+RSI25 alltargetgates setupbarrier15/range10, no directstopdistance rejection. All6priorreasonsets matched,329Decimalpredicatechecks,11fixtures, reportreadback73095de43375c45ee89240c9a52bbaba03e5a82d. No repeatBBcalendar/timing/rejectioncalculation or relaxingtarget/riskgates toforceentries. FIRST follow genuinely new native paper boxLONG public_techniques_v1:box_retest_5m:1:1792530000 candidate06:08:04KST/opened06:10:11/APIopenedack06:10:41. Linkactualclosed/censoredoutcome+deliveryfailures+gaps via boundedlogs and preservedoriginalledger if accessible; candidate1+opened1=oneepisode, progressnottrade, no yetprofitclaim. Latestprod25388deploy4bbda6c7SUCCESS; no restartforresearch. Next finite computation: freeze original existing lbank_rsi_divergence.DivergenceStudy chronological7day2025Jan8-15+Jan16followup on sameSHAdata as controls. No newmethod/threshold/calendar. Explicitly preserve sourcebook.observe withoutnative_state (different thanTechniqueStudy) and runner_enabledFalse, do not silently repair; exactsourcefixtures, uniqueepisodes/cost/funding/2xcost/censors/nullnativewarning/manualfill. Localexec nowavailable, ccxt4.5.89 installed, sourceclone25388 available THISrun only; recover inputs viaGitHub everyrun. Persist frozenprotocol/code before outcomes. Existingreferencealerts/riskwarnings and fullreplacementcriteria unchanged.",
+    "stage": "existing_RSI_actual20_plan_rejection_feasibility_and_native_episode_followup",
+    "instruction": "0703 actual RSI continuous replay complete, read docs/lbank_RSI_chronological_replay_2026-10-21.md/report. Frozen1bc60bb5/adfed6c beforeoutcomes; same2025week11520polls/10080ready,37unique(26pullback11divergence),0watch/open/close;8sourcefixtures,0Decimalfinancialchecks because0legs. Sourceobserve withoutnative_state andrunner_enabledFalse preserved. ResultSHA23df7ed066604c4ef439dcb6e36010742657b57dfc28a65bac74c05bcae1bde5 readbackc4bd2a21c8409135cfd74362843b8ecef9ddfb2e. Do notcalendar-sweep or unchangedreplay/loosenentry. NEXT onefinite attribution ONLY actual20 calculate_plan calls that original RSI confirmation/context/RSI had passed: capture exact returnNone branch and numeric stop/target/barrier/cost, calculate feasible costedR before samebarrier vs original1.5R required, countuniqueIDs fromreport(not20trades). No hypotheticalacceptedtrades/alpha from diagnostic, no originalsourcecompletionclaims. Compare to BBknownsharedtargetcontract, select atmostone source-grounded correction onlyif evidence supplies missingcontract; do not invent stop/targets or fitweights. Continue nativebox1792530000 opened06:10KST outcome linkage;07:03boundednet_usdt_modelsearch0rows/latestreadylogs notproofopen ornogap/zeroprofit. Currenttools noactiveDBaccess, preserveunknown and boundedcoverage. No restartfordocs. Latestuser clarified paperpurpose=measuredaccuracyvsbaseline, notmessages; current0entry comparison isnotimprovement. All live referencealerts/risk/promotion limits unchanged.",
     "sources_to_screen": [
       {
         "title": "The Recurrent Reinforcement Learning Crypto Agent",
@@ -2049,5 +2049,29 @@
     "independent_OOS": false,
     "production_changed": false,
     "promotion": false
+  },
+  "RSI_chronological_replay": {
+    "code": "research/continuation/replay_RSI_20261021_0703.py",
+    "protocol": "research/continuation/RSI_protocol_20261021_0703.json",
+    "document": "docs/lbank_RSI_chronological_replay_2026-10-21.md",
+    "report": "research/continuation/results/RSI_20261021_0703/report.json",
+    "verification": "research/continuation/results/RSI_20261021_0703/verification.json",
+    "report_sha256": "23df7ed066604c4ef439dcb6e36010742657b57dfc28a65bac74c05bcae1bde5",
+    "remote_verified_blob": "c4bd2a21c8409135cfd74362843b8ecef9ddfb2e",
+    "unique_candidates": 37,
+    "divergence": 11,
+    "pullback": 26,
+    "opens": 0,
+    "closed": 0,
+    "source_fixture_tests": 8,
+    "Decimal_cash_checks": 0,
+    "expectancy": null,
+    "promotion": false,
+    "production_changed": false
+  },
+  "latest_user_accuracy_requirement": {
+    "at_kst": "2026-10-21 morning",
+    "purpose": "Paper alerts must close the loop to measured accuracy/net profitability improvement vs existing alerts; delivery/heartbeat counts are not performance.",
+    "implemented_comparison_status": "Same-window source4 negative trades and RSI0 entries now measured; no demonstrated improvement, do not claim superiority from no trades."
   }
 }
