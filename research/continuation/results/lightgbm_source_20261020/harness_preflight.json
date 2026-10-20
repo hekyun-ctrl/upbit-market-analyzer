@@ -5,6 +5,11 @@
   "failure": "Isolated harness omitted pure builtin hasattr needed by original compute_signal_returns;setUpClass NameError before a complete diagnostic report.",
   "classification": "research_harness_error_not_external_strategy_failure",
   "fix": "Allow reviewed pure hasattr and sorted builtins;no source body,probe inputs,policy or expected outcomes changed.",
+  "second_checkpoint_commit": "8b68c3b187626cce47049b62a97d8129a7c3b8f2",
+  "second_test_exit_code": 5,
+  "second_tests_completed": 0,
+  "second_failure": "Installed NumPy reduction lazily requests __import__;isolation wrapper originally omitted it.",
+  "second_fix": "Permit installed numpy/pandas helper imports only via checked dispatcher;reject os/source modules and all explicit source import nodes. Not an OS security sandbox. No source body or fixtures changed.",
   "frozen_protocol_changed": false,
   "original_source_modified": false
 }

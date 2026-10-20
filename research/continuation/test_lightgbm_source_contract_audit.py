@@ -32,7 +32,8 @@ class SourceContractAuditTests(unittest.TestCase):
         self.assertEqual(len(spans), 19)
         for name in ["lgb", "os", "main", "train_and_predict", "discover_snapshots"]:
             self.assertNotIn(name, kernels)
-        self.assertNotIn("__import__", kernels["__builtins__"])
+        with self.assertRaisesRegex(ValueError, "Only installed"):
+            kernels["__builtins__"]["__import__"]("os")
 
     def test_entry_bar_stop_fee_events_disappear(self):
         row = self.result["entry_bar_stop_fee_and_ledger"]["cases"][0]

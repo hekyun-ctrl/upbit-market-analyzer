@@ -1,6 +1,6 @@
 """Pinned source-kernel forensic probes; no model training, orders or market backtest.
 
-External modules are never imported. Only reviewed, manifest-hash-verified pure
+External strategy modules are never imported. Only reviewed, hash-verified pure
 function bodies are AST-selected; numba decorators are removed. The live/retrainer
 and network main functions cannot execute. Fetching is opt-in, public and pinned.
 """
@@ -59,8 +59,16 @@ def load_kernels(source_dir):
     safe_names = ("abs", "bool", "dict", "enumerate", "float", "hasattr", "int", "isinstance",
                   "len", "list", "max", "min", "print", "range", "set", "str",
                   "sorted", "tuple", "zip", "ValueError")
+    def dependency_import(name, globals=None, locals=None, fromlist=(), level=0):
+        # NumPy reductions may import their installed internal helpers lazily.
+        # No original strategy module or network/account package can load here.
+        if level or not any(name == p or name.startswith(p + ".") for p in ("numpy", "pandas")):
+            raise ValueError("Only installed numpy/pandas dependency imports allowed")
+        return builtins.__import__(name, globals, locals, fromlist, level)
+
     namespace = {"np": np, "pd": pd, "__builtins__": {
         name: getattr(builtins, name) for name in safe_names}}
+    namespace["__builtins__"]["__import__"] = dependency_import
     spans = []
     blocked_calls = {"open", "exec", "eval", "compile", "__import__", "input"}
     for relative, names in protocol["allow_functions"].items():
