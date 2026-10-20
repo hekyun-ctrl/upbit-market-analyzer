@@ -1,0 +1,56 @@
+{
+  "version": "frozen_entries_existing_management_v1",
+  "frozen_before_management_outcomes": true,
+  "frozen_at_utc": "2026-10-20T11:33:19.493700+00:00",
+  "source_commit": "5c977a7f51cea67048f95791d1dcc4230634939a",
+  "source_runtime_monitor_sha256": "4f8928f2bd7b4e52d2358594b5dad592be444218d92862825b46e1d52eab0d5e",
+  "prior_entry_ledger": {
+    "path": "research/continuation/results/entry_regime_extension_20261020_1945/2025_jan.json",
+    "git_blob": "f219ca7c2e0cfbf7f0b299861024965a381d4850",
+    "variant": "baseline",
+    "entries": 22
+  },
+  "entry_window": [
+    "2025-01-08T00:00:00Z",
+    "2025-01-15T00:00:00Z"
+  ],
+  "followup_end_exclusive": "2025-01-16T00:00:00Z",
+  "entry_choice": "Use all22 already fixed baseline entries in last tested second interval; no winner/loser selection. One extra followup day covers existing24h tracking horizon, no new entries.",
+  "reconstruction": "Prior first-event ledger omitted target2/full frozen thesis/quality. Instrument unchanged attach_thesis during original entry schedule to reconstruct those missing fields, then require all22 timestamp/strategy/direction/entry/stop/TP1 match frozen prior ledger. This is necessary new metadata reconstruction for a different endpoint, not a rerun claimed as new initial-stop performance.",
+  "source_call_order": [
+    "At each minute-open quote construct only completed native-adapter1m/5m/15m history",
+    "PerformanceBook.observe including partialTP1/runner/profitguard and source censors",
+    "SignalRiskTracker.check using last5 sampled quotes plus current quote",
+    "Assume successful hypothetical notification acknowledgment; record_caution or early_warning as source; tracker.acknowledge",
+    "Add new frozen entry after old-reference followup, with original attach_thesis and new_policy; book.add all original policy comparators"
+  ],
+  "policies": [
+    "levels existing partialTP1/entry-stop/TP2 legacy2h reference",
+    "warning_exit same levels plus acknowledged early warning",
+    "trend_runner existing frozen thesis/preTP profitguard/native runner/24h tracking/source funding and intrabar censoring"
+  ],
+  "golden_cases": [
+    "TP1 partial + remaining stop both directions",
+    "minor retracement no reversal both directions",
+    "guard worse quote exit plus unacknowledged latch/rebound both directions",
+    "gap>150seconds source censor both directions",
+    "same completed bar TP1/stop touch source intrabar censor and urgent precedence both directions",
+    "postTP1 native runner extension monotonic both directions",
+    "profitable confirmed reversal: book first then risk warning"
+  ],
+  "accounting": "Keep original source model USDT and statuses distinct. Independently recompute exact emitted partial/close legs with entry+exit2bp adverse slip,6bp taker eachside, actual archived Binance funding using settlement-minute-open proxy. Fractional entry fees/slippage/funding allocated to emitted exit legs. Double fixed-path costs, not policy recomputation; funding debits doubled, receipts not amplified. All original censored or open references stay excluded from complete returns, even if known partial leg profitable. Retain known-leg cash separately; no censor becomes zero or win.",
+  "uncertainty": "Report conditional complete cases and censor coverage first, optional paired-complete subset explicitly selected. UTC2day circular block5000 conditional meanR intervals; no selection-bias correction. No 7day-block certainty from7days.",
+  "remaining_limits": [
+    "Already seen Binance development, not LBank execution",
+    "Minute quote cadence not actual15s/30s",
+    "Paper full existing management logic, not user fills/account outcome",
+    "No subminute H/L order assumption; source intrabar ambiguity censors",
+    "All notification acknowledgments assumed, actual delivery/manual followthrough unknown",
+    "Overlapping references not independent account exposure; realized closedR DD not MTM",
+    "No new forward candidate qualified; unchanged promotion policy"
+  ],
+  "rule_changes": false,
+  "live_edits": false,
+  "orders": false,
+  "promotion": false
+}
