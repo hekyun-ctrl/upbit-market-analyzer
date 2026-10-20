@@ -8,8 +8,8 @@
   "research_branch": "research/lbank-long-history-20261020",
   "production_branch": "feature/lbank-futures-monitor",
   "baseline_research_commit": "709bc7e295c44afad117f5b4f53aecf699e02561",
-  "last_observed_production_commit": "6c3e22e6ca5c580807de83bf68e871d4c9362761",
-  "last_observed_deployment": "5c424883-8829-4610-91db-42bccf7b9ebf",
+  "last_observed_production_commit": "862339db2c4f69facc9ba6626e2826d475504174",
+  "last_observed_deployment": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
   "eligible_candidates": [],
   "forward_candidate": null,
   "completed_experiments": [
@@ -120,7 +120,8 @@
         "research/continuation/source_screening_20261020_0840.json",
         "research/continuation/source_screening_20261020_1007.json"
       ]
-    }
+    },
+    "operational_check_before_research": "Before the next finite source-research step, query the latest production head/deployment and bounded live logs. Verify current source/hash/policies and NATIVE_ENTRY_STATUS reason=native_ready/entry_source_switched=true with >=65 contiguous closed1m and >=20 closed5m, plus actual ENTRY_SETUP_EVALUATED new_completed_bar or periodic_and_new_bar. If still warming up, record exact counts/gaps, do not alter thresholds or restart; continue the existing independent source research step, without duplicate unchanged notifications. When readiness is actually restored, persist evidence and send one concise update; do NOT disable the alternative-strategy research automation because this hotfix is not a certified replacement."
   },
   "known_limitations": [
     "2023 through Sep2026 reused and exploratory; 2022 observed for Turtle; none may be relabeled untouched.",
@@ -407,11 +408,26 @@
       "next_preflight": "research/continuation/rlxbt_combo_source_preflight_20261020.json",
       "production_changed": false,
       "forward_started": false
+    },
+    {
+      "id": "entry_timing_hotfix_20261020_1019",
+      "category": "user_requested_operational_confirmation_hotfix_not_replacement_research",
+      "production_changed": true,
+      "implementation_tests_passed": 343,
+      "production_commit": "862339db2c4f69facc9ba6626e2826d475504174",
+      "deployment_id": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
+      "deployment_status": "SUCCESS",
+      "runtime_source_and_policy_verified": true,
+      "native_entry_ready": false,
+      "full_rollout_complete": false,
+      "replacement_certified": false,
+      "forward_started": false,
+      "report": "research/continuation/results/entry_timing_hotfix_20261020_deployment.json"
     }
   ],
   "active_run": null,
   "blockers": [],
-  "updated_kst": "2026-10-20T10:09:49+09:00",
+  "updated_kst": "2026-10-20T10:45:13+09:00",
   "maintained_research_candidates": [
     {
       "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
@@ -468,5 +484,70 @@
     "candidate_forward_started": false,
     "continuous_collection": false,
     "next": "No more same batch required for alpha;perform next pinned source-code contract/risk feasibility audit."
+  },
+  "pending_operational_validation": {
+    "version": 1,
+    "observed_utc": "2026-10-20T01:45:13Z",
+    "scope": {
+      "projectId": "e7d240ac-2468-45c9-8411-33f5e24f425b",
+      "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+      "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34"
+    },
+    "status": "code_deployed_runtime_verified_entry_readiness_pending",
+    "production_commit": "862339db2c4f69facc9ba6626e2826d475504174",
+    "production_tree": "cbf343b437ba1379dc2304f706db30b0f8746814",
+    "deployment_id": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
+    "deployment_status": "SUCCESS",
+    "deployment_success_updated_utc": "2026-10-20T01:42:48.186Z",
+    "implementation_tests": 343,
+    "raw_incident_archive_sha256": "cee6a09c95cbc9e34a62c74d48fed4dcde33e793908bf2964565e3905edcc861",
+    "monitor_sha256": "7fcfe413a6c2918893b8fc77ebf42c350f42ae42898f5ca7d329e813cc176293",
+    "timing_sha256": "8de5b4747d9dd39b6de1392a438697fc3d7f12ec0ac15261460b0755014435f5",
+    "policy": "native_breakout_trigger_or_higher_priority_v1",
+    "scheduling_policy": "native_completed_bar_schedule_v1",
+    "incident13_replay": {
+      "original_confirmation_accepted": true,
+      "original_price_stop_tp1_match": true,
+      "changed_confirmation_accepted": false,
+      "changed_reason": "breakout_trigger_lost_without_higher_priority",
+      "recorded_watch_utc": "2026-10-20T01:10:43.0965466Z",
+      "confirmation_utc": "2026-10-20T01:11:14.574107Z",
+      "confirmation_age_seconds": 31.47756028175354,
+      "development_case_not_independent_evidence": true,
+      "all_tick_first_qualification_known": false,
+      "profitability_verified": false
+    },
+    "native_readiness": {
+      "ready": false,
+      "reason": "native_history_missing_stale_or_gapped",
+      "last_observed_utc": "2026-10-20T01:44:56.841072054Z",
+      "consecutive_closed_1m": 2,
+      "consecutive_closed_5m_at_that_time": 130,
+      "required_closed_1m": 65,
+      "required_closed_5m": 20,
+      "rsi_history_mature": false,
+      "rsi_warmup_target": 250,
+      "note": "A restart crossed a candle boundary; older 5m tail count can reset at the next 5m boundary. Do not infer readiness from 130 cached 5m bars. No interpolation or quality relabeling. Entry resumes only after the existing full contiguous feed contract."
+    },
+    "full_rollout_complete": false,
+    "replacement_certified": false,
+    "replacement_deployed": false,
+    "forward_candidate_started": false,
+    "existing_loss_margin_limits_changed": false,
+    "orders_or_accounts_accessed": false,
+    "existing_risk_warnings_suppressed": false,
+    "rollback": {
+      "stable_source": "6c3e22e6ca5c580807de83bf68e871d4c9362761",
+      "stable_deployment": "5c424883-8829-4610-91db-42bccf7b9ebf",
+      "previous_source": "f6a727b6e5397995c2e57837d3dcd623a2fdc619",
+      "previous_deployment": "7aa20e74-d4c7-4c0e-af5a-ca2d4a72dfc1",
+      "note": "An image rollback alone cannot repair the source history gap; do not restart only to store research or hide expected warmup."
+    },
+    "source_documentation": "https://github.com/hekyun-ctrl/upbit-market-analyzer/blob/862339db2c4f69facc9ba6626e2826d475504174/docs/lbank_entry_timing_2026-10-20.md",
+    "original_replay": "https://github.com/hekyun-ctrl/upbit-market-analyzer/blob/862339db2c4f69facc9ba6626e2826d475504174/research/lbank_signal13_replay_result_20261020.json",
+    "changed_replay": "https://github.com/hekyun-ctrl/upbit-market-analyzer/blob/862339db2c4f69facc9ba6626e2826d475504174/research/lbank_signal13_changed_confirmation_20261020.json",
+    "next_check": "Before the next finite source-research step, query the latest production head/deployment and bounded live logs. Verify current source/hash/policies and NATIVE_ENTRY_STATUS reason=native_ready/entry_source_switched=true with >=65 contiguous closed1m and >=20 closed5m, plus actual ENTRY_SETUP_EVALUATED new_completed_bar or periodic_and_new_bar. If still warming up, record exact counts/gaps, do not alter thresholds or restart; continue the existing independent source research step, without duplicate unchanged notifications. When readiness is actually restored, persist evidence and send one concise update; do NOT disable the alternative-strategy research automation because this hotfix is not a certified replacement.",
+    "followup_via_existing_enabled_research_task": true,
+    "evidence_path": "research/continuation/results/entry_timing_hotfix_20261020_deployment.json"
   }
 }
