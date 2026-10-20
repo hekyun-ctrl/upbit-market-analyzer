@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "date_utc": "2026-10-20",
+  "scope": "New primary README preflights, not code/ledger replays or certified strategies. Existing exclusions checked before discovery.",
+  "preflights": [
+    {
+      "repository": "Pavdot/btcusdt-strategy-optimizer",
+      "commit": "12f27c0b5fd6e095e683b13beb1fb58a4827f6aa",
+      "url": "https://github.com/Pavdot/btcusdt-strategy-optimizer/tree/12f27c0b5fd6e095e683b13beb1fb58a4827f6aa",
+      "readme_git_blob_sha": "03d57eea0905fa7347131c1872cba9601e59c18b",
+      "read_scope": "Full README; raw strategy, public results tables and CPCV artifacts not inspected/executed",
+      "status": "not_qualified_source_snapshot_only_not_next_execution_priority",
+      "basis": "Authorselected103trade fullhistory snapshot/PF1.77 and22.43%annualized return not certified. Raw CSV excluded fromGit,exact fullcost/cashflow/timestamps need verification. README also preserves reoptimizedPBO.357failure. No untouched30day/100closed or nativeBTC evidence. Headline trades must not be treated as daily opportunities;no new optimization or parameter adoption."
+    },
+    {
+      "repository": "liampgrichardson/Cryptocurrency_Trading_Bot",
+      "commit": "b29864573254bf62c7975bec9eeabb51b79d67ee",
+      "url": "https://github.com/liampgrichardson/Cryptocurrency_Trading_Bot/tree/b29864573254bf62c7975bec9eeabb51b79d67ee",
+      "readme_git_blob_sha": "e4ac7e1bfc9ca67b3285b2b56fbffcbdb294ed33",
+      "read_scope": "README GeneralInformation/DataProcessing/Performance/Execution/Optimisation text; underlying sample code and images not replayed",
+      "status": "exclude_current_public_description_for_missing_exact_preprocessing_rules_and_risk_contract",
+      "basis": "Author2021Jan-Jun+54.49% and1289orders (747buys/542sells),not matched closedtrades. README explicitly keeps preprocessing private and publishes simplified incomplete decision/quantity logic;33.78%drawdown and no fixed stop contract. No model/input invention,login,outreach or source performance replication. Not universalLSTM rejection."
+    },
+    {
+      "repository": "Gotodataru/binance-futures-backtest",
+      "commit": "5ed0d6e39d8a3e951bea40c66e2638c213012e1b",
+      "url": "https://github.com/Gotodataru/binance-futures-backtest/tree/5ed0d6e39d8a3e951bea40c66e2638c213012e1b",
+      "readme_git_blob_sha": "eaa8df5b767681e899b96ed26b4474ba27a459bf",
+      "read_scope": "Full README, no rawcode/data/results ledger inspected yet",
+      "status": "next_primary_original_ledger_and_fullcost_feasibility_lead_only",
+      "basis": "Publicresults_combined and three versioned rule families advertised;source claims2023-2025Binance1m/funding/metrics,fee.0004per_side,slip.0001per_side,nextopen,singleposition. These are author declarations,not verified guarantees or BTC profit. Published headline positives are XRP/DOGE,not BTC."
+    }
+  ],
+  "next_finite_step": {
+    "repository": "Gotodataru/binance-futures-backtest",
+    "commit": "5ed0d6e39d8a3e951bea40c66e2638c213012e1b",
+    "read_first": ["shared/data_loader.py", "shared/backtest_engine.py", "shared/metrics.py", "strategy_1_funding_mr/signals.py", "strategy_1_funding_mr/backtest.py", "results_combined"],
+    "action": "Inspect pinned complete public tree,locate BTC-only source closed ledger and params/input provenance before running anything. Reconcile source exit/entry timestamps,fees charged on both actual notionals,slip,funding settlements,missing data,delisted/universe selection. Compare source rules with prior aggressive-flow and independent-entry exclusions before any replay;do not repeat identical formula/data. Focus funding-MR source first;no252symbol/multifamily optimization. If BTC ledger exists,first calculate actual frequency,opportunitydays and sourcefee cash reconciliation with uncertainty on existing rows. Then assess native risk/TP1 compatibility. If missing,record source-specific obstacle promptly and choose a different primary source,without inventing original inputs or claiming a backtest.",
+    "forbidden": "No optimizer,live entrypoints,accounts/keys,orders,LLM calls,paiddata,outreach,sourcepickle execution,threshold relaxation or selecting profitable altcoins as BTC proof.",
+    "data_limit": "2023-Sep2026 already observed;2022already observed;source2023-2025 is not newly unseen. Existing archived Binance minute/funding inputs may only be reused after SHA checks and original requiredfields comparison. No artificial gap/end liquidation."
+  },
+  "completed_source_audit": "docs/lbank_cshear_source_audit_2026-10-20.md",
+  "eligible_candidates": [],
+  "forward_started": false,
+  "production_changed": false
+}

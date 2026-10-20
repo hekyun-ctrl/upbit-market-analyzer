@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "protocol_checkpoint_commit": "5d79331ddd4e0a7cc25895b5cf109c77c1d8935d",
+  "source_commit": "72f293c19a61e01507f322595e3982da00f0932d",
+  "source_recovery": "git clone https://github.com/CShear/crack-the-nut then checkout --detach 72f293c19a61e01507f322595e3982da00f0932d. Compare report source_inventory and all executed file SHAs.",
+  "data_recovery": "Official Binance ZIP/checksum URLs and ZIP+CSV SHA in report.real_price_prefix; prior persisted manifest checked. January2024alreadyobserved,not sourceHyperliquid or nativeLBank.",
+  "source_full_modules_imported": false,
+  "source_pickle_or_live_executed": false,
+  "market_profitability_backtest_performed": false,
+  "temporary_cache_required": false,
+  "continuous_collector_started": false,
+  "production_changed": false,
+  "execution_errors": "One code-orchestration JS syntax error before any tool action;retried corrected orchestration. No research rule/cost/data/probe changes after protocol checkpoint."
+}

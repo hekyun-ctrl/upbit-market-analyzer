@@ -1,0 +1,2704 @@
+{
+  "version": "cshear_72f293_source_contract_v1",
+  "started_utc": "2026-10-20T03:18:43.311534+00:00",
+  "source_inventory": {
+    "commit": "72f293c19a61e01507f322595e3982da00f0932d",
+    "tracked": [
+      {
+        "path": ".gitignore",
+        "mode": "100644",
+        "git_blob_sha": "4516851f711735444e430ce69b7bca62152b98aa",
+        "bytes": 383,
+        "sha256": "e33c67bb1622344997d5141f0fef6e7775072bfded3af826a23365a97cb59460"
+      },
+      {
+        "path": "README.md",
+        "mode": "100644",
+        "git_blob_sha": "68edd2ca9c9ba8d950dea0dea9d1b967bd1c912b",
+        "bytes": 9238,
+        "sha256": "90b192e69aea4ed1e8a322d89de83e8898c37ef2c79477fc7d5cd39d7da2dada"
+      },
+      {
+        "path": "RESEARCH-REPORT.md",
+        "mode": "100644",
+        "git_blob_sha": "cf524be09001fa9d252e97c9e94596b2134095c6",
+        "bytes": 30541,
+        "sha256": "6348d57b01b82e76a85a97f6b09e27965753f329081cf5012613fea689d27203"
+      },
+      {
+        "path": "STRATEGY-REPORT.html",
+        "mode": "100644",
+        "git_blob_sha": "50d4ca33efdb6287937d414aecc2f739fe466627",
+        "bytes": 44581,
+        "sha256": "316ac87e9b83fb7028f96f456c7dfda6cd4c8f82fca8f04ed2cccccb3fb507c4"
+      },
+      {
+        "path": "STRATEGY-REPORT.md",
+        "mode": "100644",
+        "git_blob_sha": "d50416d554f00ffddc1a37ad359340c714d02992",
+        "bytes": 29489,
+        "sha256": "2d92fc79ec6bcf82454f01ccbb9f192966a9b503a5b55b33c1a090354ce1f90e"
+      },
+      {
+        "path": "STRATEGY-REPORT.pdf",
+        "mode": "100644",
+        "git_blob_sha": "58250af9b31cc1c0435e0e68ea14d9e2ca6b530b",
+        "bytes": 321084,
+        "sha256": "b47ee179d6bbb3eda3e7d950e4aadae29f0ac6b6de5bd7d91498ab2bdf07c374"
+      },
+      {
+        "path": "agents/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "e0858b7bccc42b75e08915633d768a0ec35894bf",
+        "bytes": 100,
+        "sha256": "f65f388948ff986528690cbe6f863f10a19dc5462da67c93ede62de53e982924"
+      },
+      {
+        "path": "agents/adversarial_ensemble.py",
+        "mode": "100644",
+        "git_blob_sha": "ca0e3d67562fb8264fd02f378f00562349f52203",
+        "bytes": 8552,
+        "sha256": "f2d681a31bf788430f70195946dc7a9a5a075b356db73cf5f475ae713cd17f42"
+      },
+      {
+        "path": "agents/binary_calibration.py",
+        "mode": "100644",
+        "git_blob_sha": "596e44e3bfe1f35270df3577cc1a882da0574ea2",
+        "bytes": 6119,
+        "sha256": "d0d08ce8c25f70b7a6fecd1fbbb4ff0bcfddc4ad46346cbb27e5709aa44c323e"
+      },
+      {
+        "path": "agents/llm_analyst.py",
+        "mode": "100644",
+        "git_blob_sha": "a67e42c4cf937f61c7f5f54c421996aeeca76621",
+        "bytes": 7022,
+        "sha256": "2d4c09b34e948eab8fb673719912722258304d8a0d1737884cb2d39bb6ea5b3d"
+      },
+      {
+        "path": "analog/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "763f653dcbdd8d3fc996ffe9c958fdcbad38025a",
+        "bytes": 1789,
+        "sha256": "5c8168e79198cf32828e12ca29618cc6da638417253828e250bc5c3f0fcc63e7"
+      },
+      {
+        "path": "analog/backfill.py",
+        "mode": "100644",
+        "git_blob_sha": "c24f6d2b2305cb42e433ea0886093ad5a31804c5",
+        "bytes": 14768,
+        "sha256": "034405e8ddc41471144827ede1033e58dc942bcad9aea4b6aca70cb482ae82ee"
+      },
+      {
+        "path": "analog/beta_strategies.py",
+        "mode": "100644",
+        "git_blob_sha": "caf03eb1f0e2bbc0e7646018258b091b233c4a62",
+        "bytes": 15685,
+        "sha256": "e9d6daf0d37677e34cf3a9308ffb61f996517fa09afb8bff873e1af573f3e1f8"
+      },
+      {
+        "path": "analog/champion.py",
+        "mode": "100644",
+        "git_blob_sha": "9deeafd06069be5174f87fea5a4d870a7799e257",
+        "bytes": 9190,
+        "sha256": "478ed1c7ff9bbc065b2491cd28783285c539eb02c8243a4e5646871946f90c71"
+      },
+      {
+        "path": "analog/contrarian.py",
+        "mode": "100644",
+        "git_blob_sha": "dc2cff4222bde7fce9ab1254b0eb0a8cc259dbcb",
+        "bytes": 19266,
+        "sha256": "3d8dfc2f3f3a3d69e2a88ba8ec6c4329d2cd29554cd10dbbe18d02c86cec1a00"
+      },
+      {
+        "path": "analog/ensemble.py",
+        "mode": "100644",
+        "git_blob_sha": "fdac58a455f9a1e3f0be834649aa0bdc07ca8cbf",
+        "bytes": 20524,
+        "sha256": "bee4317bff53af5b96e3a0d3a8a64007bcf060d5b1645b95fcc8a908a5baa2e0"
+      },
+      {
+        "path": "analog/evaluators.py",
+        "mode": "100644",
+        "git_blob_sha": "51835edd327754b2d9cf2d7b9779ea91ae2f7fd5",
+        "bytes": 28216,
+        "sha256": "3dcdcff204cc89eb823b1842abf36ab36ef0f2e646358225dcd282af9dc4c628"
+      },
+      {
+        "path": "analog/example_pipeline.py",
+        "mode": "100644",
+        "git_blob_sha": "269c9a6bc70b050310bdf35ce71f3b5ce97e348f",
+        "bytes": 10068,
+        "sha256": "c9cdfc932f0c3a28cce1a47d9d4927f04d0ee71e8b5b5fbe4b20a5a05ec565a6"
+      },
+      {
+        "path": "analog/exit_analysis.py",
+        "mode": "100644",
+        "git_blob_sha": "d7892322b09ef563a6b8301e0553dfe0488a6b9c",
+        "bytes": 20308,
+        "sha256": "c261c5eb98da3ad31e16b73f366f6e12bf3df5d3e9d84aa4e84d82d8799cd516"
+      },
+      {
+        "path": "analog/finder.py",
+        "mode": "100644",
+        "git_blob_sha": "e82b9ba5736cac2b6edb4cb9fa1c852dbe40d9ed",
+        "bytes": 8646,
+        "sha256": "ef1eb30aba7ea38133a19cd62a09dff0c28f4247f2481c11d66a79774a857b56"
+      },
+      {
+        "path": "analog/fingerprint.py",
+        "mode": "100644",
+        "git_blob_sha": "c19b9c7f264d69ebdf91ec31f4dc4799d7fd734f",
+        "bytes": 11533,
+        "sha256": "450000e87e01dfdc7f999a3b8fc0ac829f534ba867ff83547f0a6b2e40da0d4f"
+      },
+      {
+        "path": "analog/lead_lag.py",
+        "mode": "100644",
+        "git_blob_sha": "8325c257f32669db903d7955594b7a3a57a28fed",
+        "bytes": 17823,
+        "sha256": "15737d47fc3e9bf4d2e75b9e3572ab8c12c26233cc941b19ad244e20b9cb9a38"
+      },
+      {
+        "path": "analog/meta.py",
+        "mode": "100644",
+        "git_blob_sha": "c60c7da8c44ab14b388ac1b6a10eed962715c55a",
+        "bytes": 10528,
+        "sha256": "eaa102c52f7e6a353212ba8ec9f0ea7de71400aeb0903da8ad3c37e8b7449de7"
+      },
+      {
+        "path": "analog/run_15m_analysis.py",
+        "mode": "100644",
+        "git_blob_sha": "024a119b095b5f6c9da8c17c93bcdde26e909824",
+        "bytes": 16952,
+        "sha256": "63f46e1aae7df3453c757bb20c1a3af9f304671876af23c878c9a4eaedafd354"
+      },
+      {
+        "path": "analog/run_analysis.py",
+        "mode": "100644",
+        "git_blob_sha": "34047fe90538ae2725ef7ac98948fad411d4eab8",
+        "bytes": 6663,
+        "sha256": "3db293789102d261fca0e43998a4e2f3dabbe8eb170485c25c7a61a791239601"
+      },
+      {
+        "path": "analog/run_multi_asset.py",
+        "mode": "100644",
+        "git_blob_sha": "45edc1d148c512fab1ed033c9da69eb4bb7f997c",
+        "bytes": 6841,
+        "sha256": "21f8ba1d5c33a1f90105740bb5c6e28f5ca6029fe28edbbd35578a479f517c36"
+      },
+      {
+        "path": "analog/run_walkforward.py",
+        "mode": "100644",
+        "git_blob_sha": "193e14a394dabee35644b047594e974c2e08b76b",
+        "bytes": 4325,
+        "sha256": "3d2fa0ce09bb90e74f97de5bcb5e3e52482928c2c8047e3813b25d764982f899"
+      },
+      {
+        "path": "analog/scorer.py",
+        "mode": "100644",
+        "git_blob_sha": "909bc2c14a09073251ca420b1a01e4b1a28670a2",
+        "bytes": 9882,
+        "sha256": "7c019d2e5a95d814a43ca54521ecef65e651c356d5c13ace9625187e12e26135"
+      },
+      {
+        "path": "analog/simulate_liquidity.py",
+        "mode": "100644",
+        "git_blob_sha": "e1b656d080af0ca4a55129a0902c283a9cf14cfe",
+        "bytes": 15033,
+        "sha256": "0cbc7a25795651fd770acc0c1da71b82b8a768a6da2b3d7ad355c46343b0e7b9"
+      },
+      {
+        "path": "analog/simulate_portfolio.py",
+        "mode": "100644",
+        "git_blob_sha": "96858edc2a9bc0197a6c727932430a608bba0201",
+        "bytes": 19833,
+        "sha256": "f4ddcc4ee8bdd64aed9c7adc5dae9c8bd8f71eaf1ac10ad8b06f9b44d897166a"
+      },
+      {
+        "path": "analog/simulate_top_n.py",
+        "mode": "100644",
+        "git_blob_sha": "22e2912ff6fd34a657cb62350ddf80673fee717a",
+        "bytes": 13620,
+        "sha256": "29eb0b90cc24da519de6a5fde6f6bbda713a3b1217a1c6b27d1c2fb6fb615ecf"
+      },
+      {
+        "path": "analog/store.py",
+        "mode": "100644",
+        "git_blob_sha": "a6a44a01270bee4671219b166906907c0f41f4ba",
+        "bytes": 5367,
+        "sha256": "2a01b8c44a94de795760254cab7f0e84e65e4949cf4004c32ca0ea10aa202661"
+      },
+      {
+        "path": "analog/strategies.py",
+        "mode": "100644",
+        "git_blob_sha": "2db11b6b32cd24909b8c3f76baa5c8a503a3be4b",
+        "bytes": 41870,
+        "sha256": "cfeab3444cb9225acab6b6c016757ea7ed8deb10137e5223e5da16f2eb5632c8"
+      },
+      {
+        "path": "analog/surface.py",
+        "mode": "100644",
+        "git_blob_sha": "7d8d9801f9dc9fe3a8c74236d78214c6dd336365",
+        "bytes": 5708,
+        "sha256": "ba73832e5b24964ffb591eba6f5267bd2fe7096ae7a3df1c1577282978dcdd7b"
+      },
+      {
+        "path": "analog/tp_trail_backtest.py",
+        "mode": "100644",
+        "git_blob_sha": "52993443d29ba488360585a39c67034b8005963b",
+        "bytes": 21988,
+        "sha256": "a422fcc09e24e6df860ac27a07a16c173b01134bba08a9df8492358c80fe0baa"
+      },
+      {
+        "path": "analog/walkforward.py",
+        "mode": "100644",
+        "git_blob_sha": "131f01241327c3a2a64ac592befd2ab6eb846a4e",
+        "bytes": 14635,
+        "sha256": "b3939226f6b8422f21fd1dfb429aac679b6c786e838ff41db6491e636c0d0ffc"
+      },
+      {
+        "path": "backtest/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "da6f090bdb6395fc05b7c131e196e4452786fa7b",
+        "bytes": 106,
+        "sha256": "b96074a33305eab7e995818d7edd3a44adf2481da5b515b94033827584fdfb73"
+      },
+      {
+        "path": "backtest/datasets/.gitkeep",
+        "mode": "100644",
+        "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "backtest/engine/.gitkeep",
+        "mode": "100644",
+        "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "backtest/engine/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "backtest/engine/runner.py",
+        "mode": "100644",
+        "git_blob_sha": "2ef7df1ccb2bd7450ed3cd6bee8d7441dc87d5f7",
+        "bytes": 6711,
+        "sha256": "e80c7a983fca7c93eecc37db35ab9ef638938b6329da3f7f6b16af79ed605aa5"
+      },
+      {
+        "path": "config/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "e94021760ec0d2f5066bc557f1892daf6590735a",
+        "bytes": 57,
+        "sha256": "6778247943d85c57920ec64743e4d1e95e15214fb9bce4f6a86e9dfd1767355c"
+      },
+      {
+        "path": "config/base.py",
+        "mode": "100644",
+        "git_blob_sha": "a1dbe6f82c297ff8249d53f357eef8b5cb9d0b48",
+        "bytes": 1590,
+        "sha256": "41e25eab0e4ffb0e68b8f541aefe0445e7f6812289d2cad1c6f77bb6aa62ea6a"
+      },
+      {
+        "path": "config/example.env",
+        "mode": "100644",
+        "git_blob_sha": "5b0f3b44c9ba266be4ac916ba22181260a23fa2e",
+        "bytes": 697,
+        "sha256": "bc8701ad1be62a9c3dddc9809d6744397296077ebbee5b0db1180f14451f68d7"
+      },
+      {
+        "path": "data/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "3b1f0d5c982cb47700c7bbc5a22f5c8be70ed833",
+        "bytes": 168,
+        "sha256": "ab4d03df692d11870b52681afecabe56285617c7690923dcfdbfa7489ffc268b"
+      },
+      {
+        "path": "data/database.py",
+        "mode": "100644",
+        "git_blob_sha": "1cb7b8aa71e784bbc095f9c3fae0d3e952f60791",
+        "bytes": 5546,
+        "sha256": "8074b2f10763660db6aeec1d3836c9f26a414c174ffc40073c1057da9081f8c7"
+      },
+      {
+        "path": "data/models.py",
+        "mode": "100644",
+        "git_blob_sha": "2e163f38651b70b5cdba9ce59111a17a9bb35718",
+        "bytes": 1875,
+        "sha256": "a26cfd7662b11d5c5a3dbc8c21c257be95d6eef85209e8ca60c76ed10d1cd925"
+      },
+      {
+        "path": "docs/15m-analysis-prompt.md",
+        "mode": "100644",
+        "git_blob_sha": "ce59be44f01c3baebae6bc341a77d102397df981",
+        "bytes": 8139,
+        "sha256": "35f10e9b9ba8f6a8f2b52dd5946959abf1cd0ff5b2e6b74600d3f6339f07789d"
+      },
+      {
+        "path": "docs/CONTRIBUTING.md",
+        "mode": "100644",
+        "git_blob_sha": "c75ec6368426aa34116e976607445f7182119c51",
+        "bytes": 1375,
+        "sha256": "e63e6bde37289d783d5a15a5bebaa975564f34c3b0636344ebd5dd731125693d"
+      },
+      {
+        "path": "docs/ai-trading-mvp.md",
+        "mode": "100644",
+        "git_blob_sha": "307bcbbef4e2cc962c0e271fa64d6c792f4a2497",
+        "bytes": 12798,
+        "sha256": "82d7afb673b9205d4ff28612d8f97cc40958759567b70683cf8af9717fbe5326"
+      },
+      {
+        "path": "docs/ai-trading-research-prompt.md",
+        "mode": "100644",
+        "git_blob_sha": "c29e9f413c9a9c3db9b300e3695af551ecde6dab",
+        "bytes": 6671,
+        "sha256": "4889bb3d9aaac57f58e972b011d8828c015732dd8f44eee987bf94392b1afdc2"
+      },
+      {
+        "path": "docs/ai-trading-thesis.md",
+        "mode": "100644",
+        "git_blob_sha": "e401b8cb1caac33fc2fd1f49fbc1038704a839be",
+        "bytes": 18639,
+        "sha256": "b70b7719300559382e7cc9457dfa489b0e7397c971767a9235b0fc0d95d4fd97"
+      },
+      {
+        "path": "docs/architecture.md",
+        "mode": "100644",
+        "git_blob_sha": "0075f93b8d1f2ac94f1b5a5af72b8333859d5a09",
+        "bytes": 5336,
+        "sha256": "d6f930831168544aaecd0ddb2f0e5e8929e7284de01100245c15bc5361195222"
+      },
+      {
+        "path": "docs/bot-performance-report.md",
+        "mode": "100644",
+        "git_blob_sha": "1d01e3ccade5229870fa5397e00347b50cf30074",
+        "bytes": 13848,
+        "sha256": "6b7c88d4e20d8ef2fc48e9d799d14ad69d23299ef07793b1066234a62bd81c43"
+      },
+      {
+        "path": "docs/exchange-notes.md",
+        "mode": "100644",
+        "git_blob_sha": "609eb521accb2b3405141d95b92fb7f2b5391c69",
+        "bytes": 4385,
+        "sha256": "402984092674270d275ebcbce29a6da7218a033389ca2e68ffade0d62cca5cba"
+      },
+      {
+        "path": "exchanges/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "exchanges/base.py",
+        "mode": "100644",
+        "git_blob_sha": "c9fc204ec69a64d899b3ce73fb475ec6a82797e3",
+        "bytes": 2501,
+        "sha256": "4115cae2a4995d3228d0a2d3b02c4366f6dd4cf900f025dd0f07fce795bbd0f8"
+      },
+      {
+        "path": "exchanges/binance/.gitkeep",
+        "mode": "100644",
+        "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "exchanges/dex/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "44f5a67cae3e8c34ffa1aba7760d084c3f21150d",
+        "bytes": 58,
+        "sha256": "404988120ace8c63246555ed0706b6a2c459661d50e13c77e3b9fd6760188c62"
+      },
+      {
+        "path": "exchanges/dex/adapter.py",
+        "mode": "100644",
+        "git_blob_sha": "1ca31f9242440e3920dc39db1ec85bff3864c58d",
+        "bytes": 5929,
+        "sha256": "03cad0a2f904ff7b0fa0ed66cc55764df7fe8374ad93cdea96711c436f0559b2"
+      },
+      {
+        "path": "exchanges/hyperliquid/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "dccf3499fe8ce5acce076a5e6e251836ba53b7e9",
+        "bytes": 74,
+        "sha256": "b1479ef5ea83d38566a944b76dab52ae2f4c79c6acac6d798b033c399867026c"
+      },
+      {
+        "path": "exchanges/hyperliquid/adapter.py",
+        "mode": "100644",
+        "git_blob_sha": "cf09766331db7d5d661c53e2d89ac2acb21f7bb9",
+        "bytes": 7388,
+        "sha256": "5f68da367f63bf7fda4cde8645319f2fb461613b6274a655f9c296b49d56dff4"
+      },
+      {
+        "path": "exchanges/polymarket/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "a8f3025c3865eef65f2b496120fd6bd50c9db6bc",
+        "bytes": 72,
+        "sha256": "80dec25f721a243d0491b9cbd872e4b5068b5bcb8ca1d35562ee82e3f199f4be"
+      },
+      {
+        "path": "exchanges/polymarket/adapter.py",
+        "mode": "100644",
+        "git_blob_sha": "0c5a2884a911c0497315489fcdecf5f8f4466a0d",
+        "bytes": 5133,
+        "sha256": "5df81470bfcf724a7828f27553372cb124f836518b2a6a46f8370d7626057bc0"
+      },
+      {
+        "path": "exchanges/polymarket/fees.py",
+        "mode": "100644",
+        "git_blob_sha": "273fc136755c85a82703acca5e4d8b0448d6d38e",
+        "bytes": 4450,
+        "sha256": "4296522b7da7304ffa5fd73042e7145880e958908da39794ed0deaa5e4e63983"
+      },
+      {
+        "path": "exchanges/polymarket/geo_guard.py",
+        "mode": "100644",
+        "git_blob_sha": "8e371f4ae9408ccc0fb59b4a561f6c3aa8659e92",
+        "bytes": 5876,
+        "sha256": "e24bc6f5185e7f30574cf88bf2a0a06b172eff12f315617d26f2dce050b01b31"
+      },
+      {
+        "path": "exchanges/polymarket/market_filter.py",
+        "mode": "100644",
+        "git_blob_sha": "49d9785f0a29982bf472a04a4b5f480bad2c714b",
+        "bytes": 6677,
+        "sha256": "127b6c239d4a6d2edd477ac8430322408a300728cc69f10d4b7890983680aa1b"
+      },
+      {
+        "path": "exchanges/polymarket/redemption.py",
+        "mode": "100644",
+        "git_blob_sha": "872d15c8e6fc9475fb085298ae674efaa4633093",
+        "bytes": 11298,
+        "sha256": "d9d62b4beb9767ca96bc057284242d1f1bacdd82f3aaf008e3c49dfd602d3ecd"
+      },
+      {
+        "path": "execution/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "16407cae6ae399de151ce5d799f2992abaef3a30",
+        "bytes": 173,
+        "sha256": "b968cfd0b76f29505c95f6ea5fe0675a49e6b59dbab9f9e8234b6962ca048db9"
+      },
+      {
+        "path": "execution/risk.py",
+        "mode": "100644",
+        "git_blob_sha": "0882fff08babbbefe5071b96e6db76dd00c06c0d",
+        "bytes": 6587,
+        "sha256": "cc81a7d36b4b95d03e997059cbe7a9e18146c11ced1498792cdc4a5b3886cc3e"
+      },
+      {
+        "path": "notify/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "43026df89661733cd5485f596bf09fe454675551",
+        "bytes": 71,
+        "sha256": "231d952f408ba8ee8a976bfaf6ba255237a5a556a0b3604b925f44e2cfca0fa2"
+      },
+      {
+        "path": "notify/telegram.py",
+        "mode": "100644",
+        "git_blob_sha": "fb0f6bdd686fc286a0ce95c362e1705d257f8c33",
+        "bytes": 4273,
+        "sha256": "46763c4eb4daa7e53c60e1ebef4f5ee9f54242d45cd487d14168a6f6876ccc9b"
+      },
+      {
+        "path": "pyproject.toml",
+        "mode": "100644",
+        "git_blob_sha": "0f81e6ccb365b10baa324256ecd07ca976bd82ce",
+        "bytes": 1161,
+        "sha256": "07be4fd1883272853d25bb579a292cf420111a32beb9f06e9e3b320154d30561"
+      },
+      {
+        "path": "scheduler/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "c43e354f7e5ef3b8808e539e60335916119a1068",
+        "bytes": 67,
+        "sha256": "a49052473314613a86692096f1671edabf4517095246ca5408f2d35af7e1b310"
+      },
+      {
+        "path": "scheduler/runner.py",
+        "mode": "100644",
+        "git_blob_sha": "7a542e8b58bc889eb93fcd30101e85ea2689148c",
+        "bytes": 3634,
+        "sha256": "a33b386cf262fa28b63d70e2de719afbba58e0ebac1bb089d28de8aedd151596"
+      },
+      {
+        "path": "scoring/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "5a668bab378b03024dae296c57ef1bdbd71eeaf6",
+        "bytes": 93,
+        "sha256": "c5376ef9a4923416a46993274e6bce8990d77a194ade1a0726299e181cf000b7"
+      },
+      {
+        "path": "scoring/confidence.py",
+        "mode": "100644",
+        "git_blob_sha": "b024eb54786faee36775345c565ff2cd0434587b",
+        "bytes": 2740,
+        "sha256": "d8e1671fcb9d4cb52a0b3bb408fd1d45fabf0b76387cb08f66353b1bb7dd823a"
+      },
+      {
+        "path": "scoring/momentum.py",
+        "mode": "100644",
+        "git_blob_sha": "a73029492017f4e57aeb5f6b62771a94a205fd24",
+        "bytes": 5490,
+        "sha256": "cc1a51b646ef595553378a566991abcca286ac3cee38f8f2f1d8ba28cc00a45f"
+      },
+      {
+        "path": "strategies/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "strategies/base.py",
+        "mode": "100644",
+        "git_blob_sha": "90bf106d16f2066536e95344b41c108e64c243ba",
+        "bytes": 2551,
+        "sha256": "c0102ce585c663b320d0fb35d501b29736d4162e4307e4b979a2482d4c54bbd0"
+      },
+      {
+        "path": "strategies/examples/__init__.py",
+        "mode": "100644",
+        "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "strategies/examples/funding_arb.py",
+        "mode": "100644",
+        "git_blob_sha": "8e92a4f81dcdfc9f54248fdd1890ae1c6d570cc6",
+        "bytes": 2827,
+        "sha256": "c1019fb99e3ac90ee1f59e8b1f4cfd8365ed16d3c7bc807ae3a172103b529511"
+      },
+      {
+        "path": "strategies/examples/multi_factor_signal.py",
+        "mode": "100644",
+        "git_blob_sha": "84ccbb640296196929e3880e0c16130c2e881b4d",
+        "bytes": 4754,
+        "sha256": "adefa66b68aaac203a3c32fa033adf23941a93b31e380750f7c94725d8167d81"
+      },
+      {
+        "path": "strategies/examples/whale_copy.py",
+        "mode": "100644",
+        "git_blob_sha": "611c3286250a17b7b993b88b215be16b4aa36e52",
+        "bytes": 4531,
+        "sha256": "4ae81636828f3679279fad313737efee69334bb454c2ebaad07fe341f095f034"
+      }
+    ],
+    "tracked_count": 84,
+    "public_data_or_ledger_paths": []
+  },
+  "fixtures": {
+    "selected_definitions": [
+      {
+        "file": "analog/backfill.py",
+        "name": "CandleData",
+        "source_file_sha256": "034405e8ddc41471144827ede1033e58dc942bcad9aea4b6aca70cb482ae82ee",
+        "definition_sha256": "687338f0202dfa9b58d5e72c7497168c3ca0dc912f6969bef332c17ba858057b"
+      },
+      {
+        "file": "analog/backfill.py",
+        "name": "FundingSnapshot",
+        "source_file_sha256": "034405e8ddc41471144827ede1033e58dc942bcad9aea4b6aca70cb482ae82ee",
+        "definition_sha256": "2db091db63949616bed767437337bae707092b00f64613abf180d2e99bb7b6d7"
+      },
+      {
+        "file": "analog/evaluators.py",
+        "name": "HistoricalData",
+        "source_file_sha256": "3dcdcff204cc89eb823b1842abf36ab36ef0f2e646358225dcd282af9dc4c628",
+        "definition_sha256": "5603e8cf4aed7b4915fab7b4b623f7309aa8faa55ac44f72203b5425c8eafe98"
+      },
+      {
+        "file": "analog/evaluators.py",
+        "name": "_make_funding_arb",
+        "source_file_sha256": "3dcdcff204cc89eb823b1842abf36ab36ef0f2e646358225dcd282af9dc4c628",
+        "definition_sha256": "e3c238fd05a61f2577737a7646e10994460b08571a1604b094e2230adce382b4"
+      },
+      {
+        "file": "analog/exit_analysis.py",
+        "name": "infer_direction",
+        "source_file_sha256": "c261c5eb98da3ad31e16b73f366f6e12bf3df5d3e9d84aa4e84d82d8799cd516",
+        "definition_sha256": "244ed11504a026a304e07eefc4704dde2ef285c9fa7bc1c59a202f34af35740e"
+      },
+      {
+        "file": "analog/tp_trail_backtest.py",
+        "name": "simulate_exit_tp_to_trail",
+        "source_file_sha256": "a422fcc09e24e6df860ac27a07a16c173b01134bba08a9df8492358c80fe0baa",
+        "definition_sha256": "4cae9b4c6d98f080f74af9ad786960140116439c77f69b043859110d5511a301"
+      },
+      {
+        "file": "analog/tp_trail_backtest.py",
+        "name": "infer_direction",
+        "source_file_sha256": "a422fcc09e24e6df860ac27a07a16c173b01134bba08a9df8492358c80fe0baa",
+        "definition_sha256": "050ba1a562de77fd4f36ec78cea3c17925d2359a8429964e701cae433e342085"
+      },
+      {
+        "file": "analog/strategies.py",
+        "name": "make_rsi_regime_reversion",
+        "source_file_sha256": "cfeab3444cb9225acab6b6c016757ea7ed8deb10137e5223e5da16f2eb5632c8",
+        "definition_sha256": "797db0e647eb1db3bd5f06e2dc530daa61799d0f39431eb9c4b249603924fe0e"
+      }
+    ],
+    "nearest_lookup": {
+      "query": 10800,
+      "prefix_label": 0.0,
+      "full_label": 14400.0,
+      "prefix_close": 100.0,
+      "full_close": 120.0,
+      "future_label_selected": true
+    },
+    "tie_lookup": {
+      "at_label": 0.0,
+      "index_label": 14400.0
+    },
+    "funding_future_append": {
+      "query": 3600,
+      "prefix": 0.0001,
+      "full": 0.0005
+    },
+    "funding_input_order": {
+      "chronological": 0.000525,
+      "reversed": 0.00032500000000000004,
+      "arithmetic_mean": 0.00039999999999999996
+    },
+    "funding_direction_recovery": [
+      {
+        "future_close": 100.02,
+        "source_expected_side": -1,
+        "evaluator_pnl": -0.0003999999999999602,
+        "inferred_side_exit": 1.0,
+        "inferred_side_tp": 1.0
+      },
+      {
+        "future_close": 100.1,
+        "source_expected_side": -1,
+        "evaluator_pnl": -0.0011999999999999433,
+        "inferred_side_exit": -1.0,
+        "inferred_side_tp": -1.0
+      }
+    ],
+    "small_return_direction_recovery": [
+      {
+        "future_close": 100.005,
+        "explicit_unit_long_pnl": -0.0005500000000000455,
+        "inferred": -1.0,
+        "expected_for_unit_long": 1
+      },
+      {
+        "future_close": 100.02,
+        "explicit_unit_long_pnl": -0.00040000000000003976,
+        "inferred": 1.0,
+        "expected_for_unit_long": 1
+      }
+    ],
+    "sample_end_source_exit": [
+      0.19940000000000002,
+      4.0,
+      "time_exit"
+    ],
+    "gap_time_compression": {
+      "requested_forward_hours": 4,
+      "actual_timestamp_span_hours": 8,
+      "source_forward_return": 0.2,
+      "source_exit": [
+        0.19940000000000002,
+        4.0,
+        "time_exit"
+      ]
+    },
+    "stop_gap_source_exit": [
+      -0.0206,
+      4.0,
+      "stop_loss"
+    ],
+    "both_touch_stop_first_control": [
+      -0.0206,
+      4.0,
+      "stop_loss"
+    ],
+    "tp_trail_same_OHLC_paths": {
+      "source": [
+        0.0944,
+        4.0,
+        "tp_trail"
+      ],
+      "high_then_low": [
+        0.0944,
+        "tp_trail"
+      ],
+      "low_then_high": [
+        0.09739999999999997,
+        "time_exit_post_tp"
+      ],
+      "exact_intrabar_order_known": false,
+      "systematic_profit_bias_estimated": false
+    },
+    "source_rsi24_uptrend_fixture_pnl": 0.0094,
+    "interpretation": "Bounded source-contract counterexamples/controls, not measured market frequencies or an estimate of headline profit impact."
+  },
+  "real_price_prefix": {
+    "source_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-01.zip",
+    "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-01.zip.CHECKSUM",
+    "zip_sha256": "21eeac04a76a7a35b10467e5e752fb2f8cff77cdeb57df6b50a23ce8d69bb190",
+    "csv_sha256": "ab25f0fee86faa93df62f800adf92b742abdc60982e023159d0ca9faf3a4ba14",
+    "minute_rows": 44640,
+    "missing_or_duplicate_minutes": 0,
+    "bars_4h": 186,
+    "queries": 185,
+    "queries_using_later_timestamp": 185,
+    "past_query_price_changes": 185,
+    "exact_label_control_changes": 0,
+    "rows": [
+      {
+        "query": 1704078000.0,
+        "prefix_selected_label": 1704067200.0,
+        "full_selected_label": 1704081600.0,
+        "prefix_close": 42369.8,
+        "full_close": 42527.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704092400.0,
+        "prefix_selected_label": 1704081600.0,
+        "full_selected_label": 1704096000.0,
+        "prefix_close": 42527.0,
+        "full_close": 42727.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704106800.0,
+        "prefix_selected_label": 1704096000.0,
+        "full_selected_label": 1704110400.0,
+        "prefix_close": 42727.6,
+        "full_close": 42818.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704121200.0,
+        "prefix_selected_label": 1704110400.0,
+        "full_selected_label": 1704124800.0,
+        "prefix_close": 42818.0,
+        "full_close": 43556.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704135600.0,
+        "prefix_selected_label": 1704124800.0,
+        "full_selected_label": 1704139200.0,
+        "prefix_close": 43556.2,
+        "full_close": 44230.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704150000.0,
+        "prefix_selected_label": 1704139200.0,
+        "full_selected_label": 1704153600.0,
+        "prefix_close": 44230.2,
+        "full_close": 45435.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704164400.0,
+        "prefix_selected_label": 1704153600.0,
+        "full_selected_label": 1704168000.0,
+        "prefix_close": 45435.0,
+        "full_close": 45495.5,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704178800.0,
+        "prefix_selected_label": 1704168000.0,
+        "full_selected_label": 1704182400.0,
+        "prefix_close": 45495.5,
+        "full_close": 45486.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704193200.0,
+        "prefix_selected_label": 1704182400.0,
+        "full_selected_label": 1704196800.0,
+        "prefix_close": 45486.8,
+        "full_close": 45215.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704207600.0,
+        "prefix_selected_label": 1704196800.0,
+        "full_selected_label": 1704211200.0,
+        "prefix_close": 45215.0,
+        "full_close": 45073.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704222000.0,
+        "prefix_selected_label": 1704211200.0,
+        "full_selected_label": 1704225600.0,
+        "prefix_close": 45073.2,
+        "full_close": 44979.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704236400.0,
+        "prefix_selected_label": 1704225600.0,
+        "full_selected_label": 1704240000.0,
+        "prefix_close": 44979.8,
+        "full_close": 45297.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704250800.0,
+        "prefix_selected_label": 1704240000.0,
+        "full_selected_label": 1704254400.0,
+        "prefix_close": 45297.8,
+        "full_close": 45030.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704265200.0,
+        "prefix_selected_label": 1704254400.0,
+        "full_selected_label": 1704268800.0,
+        "prefix_close": 45030.4,
+        "full_close": 43728.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704279600.0,
+        "prefix_selected_label": 1704268800.0,
+        "full_selected_label": 1704283200.0,
+        "prefix_close": 43728.9,
+        "full_close": 43014.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704294000.0,
+        "prefix_selected_label": 1704283200.0,
+        "full_selected_label": 1704297600.0,
+        "prefix_close": 43014.0,
+        "full_close": 42600.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704308400.0,
+        "prefix_selected_label": 1704297600.0,
+        "full_selected_label": 1704312000.0,
+        "prefix_close": 42600.4,
+        "full_close": 42849.5,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704322800.0,
+        "prefix_selected_label": 1704312000.0,
+        "full_selected_label": 1704326400.0,
+        "prefix_close": 42849.5,
+        "full_close": 43119.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704337200.0,
+        "prefix_selected_label": 1704326400.0,
+        "full_selected_label": 1704340800.0,
+        "prefix_close": 43119.6,
+        "full_close": 42775.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704351600.0,
+        "prefix_selected_label": 1704340800.0,
+        "full_selected_label": 1704355200.0,
+        "prefix_close": 42775.0,
+        "full_close": 43188.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704366000.0,
+        "prefix_selected_label": 1704355200.0,
+        "full_selected_label": 1704369600.0,
+        "prefix_close": 43188.2,
+        "full_close": 44050.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704380400.0,
+        "prefix_selected_label": 1704369600.0,
+        "full_selected_label": 1704384000.0,
+        "prefix_close": 44050.4,
+        "full_close": 43950.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704394800.0,
+        "prefix_selected_label": 1704384000.0,
+        "full_selected_label": 1704398400.0,
+        "prefix_close": 43950.0,
+        "full_close": 44143.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704409200.0,
+        "prefix_selected_label": 1704398400.0,
+        "full_selected_label": 1704412800.0,
+        "prefix_close": 44143.8,
+        "full_close": 43469.1,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704423600.0,
+        "prefix_selected_label": 1704412800.0,
+        "full_selected_label": 1704427200.0,
+        "prefix_close": 43469.1,
+        "full_close": 43769.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704438000.0,
+        "prefix_selected_label": 1704427200.0,
+        "full_selected_label": 1704441600.0,
+        "prefix_close": 43769.6,
+        "full_close": 43769.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704452400.0,
+        "prefix_selected_label": 1704441600.0,
+        "full_selected_label": 1704456000.0,
+        "prefix_close": 43769.9,
+        "full_close": 43495.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704466800.0,
+        "prefix_selected_label": 1704456000.0,
+        "full_selected_label": 1704470400.0,
+        "prefix_close": 43495.2,
+        "full_close": 43599.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704481200.0,
+        "prefix_selected_label": 1704470400.0,
+        "full_selected_label": 1704484800.0,
+        "prefix_close": 43599.0,
+        "full_close": 44145.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704495600.0,
+        "prefix_selected_label": 1704484800.0,
+        "full_selected_label": 1704499200.0,
+        "prefix_close": 44145.4,
+        "full_close": 43925.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704510000.0,
+        "prefix_selected_label": 1704499200.0,
+        "full_selected_label": 1704513600.0,
+        "prefix_close": 43925.8,
+        "full_close": 43645.3,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704524400.0,
+        "prefix_selected_label": 1704513600.0,
+        "full_selected_label": 1704528000.0,
+        "prefix_close": 43645.3,
+        "full_close": 43669.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704538800.0,
+        "prefix_selected_label": 1704528000.0,
+        "full_selected_label": 1704542400.0,
+        "prefix_close": 43669.2,
+        "full_close": 43863.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704553200.0,
+        "prefix_selected_label": 1704542400.0,
+        "full_selected_label": 1704556800.0,
+        "prefix_close": 43863.6,
+        "full_close": 43903.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704567600.0,
+        "prefix_selected_label": 1704556800.0,
+        "full_selected_label": 1704571200.0,
+        "prefix_close": 43903.6,
+        "full_close": 43956.7,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704582000.0,
+        "prefix_selected_label": 1704571200.0,
+        "full_selected_label": 1704585600.0,
+        "prefix_close": 43956.7,
+        "full_close": 43937.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704596400.0,
+        "prefix_selected_label": 1704585600.0,
+        "full_selected_label": 1704600000.0,
+        "prefix_close": 43937.2,
+        "full_close": 44071.5,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704610800.0,
+        "prefix_selected_label": 1704600000.0,
+        "full_selected_label": 1704614400.0,
+        "prefix_close": 44071.5,
+        "full_close": 44054.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704625200.0,
+        "prefix_selected_label": 1704614400.0,
+        "full_selected_label": 1704628800.0,
+        "prefix_close": 44054.0,
+        "full_close": 44035.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704639600.0,
+        "prefix_selected_label": 1704628800.0,
+        "full_selected_label": 1704643200.0,
+        "prefix_close": 44035.0,
+        "full_close": 44238.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704654000.0,
+        "prefix_selected_label": 1704643200.0,
+        "full_selected_label": 1704657600.0,
+        "prefix_close": 44238.8,
+        "full_close": 43916.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704668400.0,
+        "prefix_selected_label": 1704657600.0,
+        "full_selected_label": 1704672000.0,
+        "prefix_close": 43916.9,
+        "full_close": 43501.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704682800.0,
+        "prefix_selected_label": 1704672000.0,
+        "full_selected_label": 1704686400.0,
+        "prefix_close": 43501.9,
+        "full_close": 43970.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704697200.0,
+        "prefix_selected_label": 1704686400.0,
+        "full_selected_label": 1704700800.0,
+        "prefix_close": 43970.0,
+        "full_close": 44637.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704711600.0,
+        "prefix_selected_label": 1704700800.0,
+        "full_selected_label": 1704715200.0,
+        "prefix_close": 44637.2,
+        "full_close": 44969.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704726000.0,
+        "prefix_selected_label": 1704715200.0,
+        "full_selected_label": 1704729600.0,
+        "prefix_close": 44969.6,
+        "full_close": 47006.7,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704740400.0,
+        "prefix_selected_label": 1704729600.0,
+        "full_selected_label": 1704744000.0,
+        "prefix_close": 47006.7,
+        "full_close": 46972.7,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704754800.0,
+        "prefix_selected_label": 1704744000.0,
+        "full_selected_label": 1704758400.0,
+        "prefix_close": 46972.7,
+        "full_close": 46932.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704769200.0,
+        "prefix_selected_label": 1704758400.0,
+        "full_selected_label": 1704772800.0,
+        "prefix_close": 46932.8,
+        "full_close": 46841.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704783600.0,
+        "prefix_selected_label": 1704772800.0,
+        "full_selected_label": 1704787200.0,
+        "prefix_close": 46841.0,
+        "full_close": 46624.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704798000.0,
+        "prefix_selected_label": 1704787200.0,
+        "full_selected_label": 1704801600.0,
+        "prefix_close": 46624.4,
+        "full_close": 46868.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704812400.0,
+        "prefix_selected_label": 1704801600.0,
+        "full_selected_label": 1704816000.0,
+        "prefix_close": 46868.8,
+        "full_close": 46873.5,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704826800.0,
+        "prefix_selected_label": 1704816000.0,
+        "full_selected_label": 1704830400.0,
+        "prefix_close": 46873.5,
+        "full_close": 46114.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704841200.0,
+        "prefix_selected_label": 1704830400.0,
+        "full_selected_label": 1704844800.0,
+        "prefix_close": 46114.0,
+        "full_close": 46133.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704855600.0,
+        "prefix_selected_label": 1704844800.0,
+        "full_selected_label": 1704859200.0,
+        "prefix_close": 46133.6,
+        "full_close": 45766.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704870000.0,
+        "prefix_selected_label": 1704859200.0,
+        "full_selected_label": 1704873600.0,
+        "prefix_close": 45766.4,
+        "full_close": 45530.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704884400.0,
+        "prefix_selected_label": 1704873600.0,
+        "full_selected_label": 1704888000.0,
+        "prefix_close": 45530.2,
+        "full_close": 45569.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704898800.0,
+        "prefix_selected_label": 1704888000.0,
+        "full_selected_label": 1704902400.0,
+        "prefix_close": 45569.0,
+        "full_close": 46498.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704913200.0,
+        "prefix_selected_label": 1704902400.0,
+        "full_selected_label": 1704916800.0,
+        "prefix_close": 46498.9,
+        "full_close": 46662.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704927600.0,
+        "prefix_selected_label": 1704916800.0,
+        "full_selected_label": 1704931200.0,
+        "prefix_close": 46662.9,
+        "full_close": 46502.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704942000.0,
+        "prefix_selected_label": 1704931200.0,
+        "full_selected_label": 1704945600.0,
+        "prefix_close": 46502.4,
+        "full_close": 46096.1,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704956400.0,
+        "prefix_selected_label": 1704945600.0,
+        "full_selected_label": 1704960000.0,
+        "prefix_close": 46096.1,
+        "full_close": 47068.5,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704970800.0,
+        "prefix_selected_label": 1704960000.0,
+        "full_selected_label": 1704974400.0,
+        "prefix_close": 47068.5,
+        "full_close": 46813.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704985200.0,
+        "prefix_selected_label": 1704974400.0,
+        "full_selected_label": 1704988800.0,
+        "prefix_close": 46813.4,
+        "full_close": 46698.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1704999600.0,
+        "prefix_selected_label": 1704988800.0,
+        "full_selected_label": 1705003200.0,
+        "prefix_close": 46698.4,
+        "full_close": 46337.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705014000.0,
+        "prefix_selected_label": 1705003200.0,
+        "full_selected_label": 1705017600.0,
+        "prefix_close": 46337.8,
+        "full_close": 45997.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705028400.0,
+        "prefix_selected_label": 1705017600.0,
+        "full_selected_label": 1705032000.0,
+        "prefix_close": 45997.0,
+        "full_close": 46002.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705042800.0,
+        "prefix_selected_label": 1705032000.0,
+        "full_selected_label": 1705046400.0,
+        "prefix_close": 46002.6,
+        "full_close": 45958.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705057200.0,
+        "prefix_selected_label": 1705046400.0,
+        "full_selected_label": 1705060800.0,
+        "prefix_close": 45958.0,
+        "full_close": 44495.1,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705071600.0,
+        "prefix_selected_label": 1705060800.0,
+        "full_selected_label": 1705075200.0,
+        "prefix_close": 44495.1,
+        "full_close": 43497.5,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705086000.0,
+        "prefix_selected_label": 1705075200.0,
+        "full_selected_label": 1705089600.0,
+        "prefix_close": 43497.5,
+        "full_close": 42788.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705100400.0,
+        "prefix_selected_label": 1705089600.0,
+        "full_selected_label": 1705104000.0,
+        "prefix_close": 42788.9,
+        "full_close": 42625.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705114800.0,
+        "prefix_selected_label": 1705104000.0,
+        "full_selected_label": 1705118400.0,
+        "prefix_close": 42625.6,
+        "full_close": 43102.1,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705129200.0,
+        "prefix_selected_label": 1705118400.0,
+        "full_selected_label": 1705132800.0,
+        "prefix_close": 43102.1,
+        "full_close": 42631.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705143600.0,
+        "prefix_selected_label": 1705132800.0,
+        "full_selected_label": 1705147200.0,
+        "prefix_close": 42631.9,
+        "full_close": 43159.7,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705158000.0,
+        "prefix_selected_label": 1705147200.0,
+        "full_selected_label": 1705161600.0,
+        "prefix_close": 43159.7,
+        "full_close": 42791.1,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705172400.0,
+        "prefix_selected_label": 1705161600.0,
+        "full_selected_label": 1705176000.0,
+        "prefix_close": 42791.1,
+        "full_close": 42846.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705186800.0,
+        "prefix_selected_label": 1705176000.0,
+        "full_selected_label": 1705190400.0,
+        "prefix_close": 42846.4,
+        "full_close": 42691.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705201200.0,
+        "prefix_selected_label": 1705190400.0,
+        "full_selected_label": 1705204800.0,
+        "prefix_close": 42691.2,
+        "full_close": 43012.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705215600.0,
+        "prefix_selected_label": 1705204800.0,
+        "full_selected_label": 1705219200.0,
+        "prefix_close": 43012.8,
+        "full_close": 42836.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705230000.0,
+        "prefix_selected_label": 1705219200.0,
+        "full_selected_label": 1705233600.0,
+        "prefix_close": 42836.8,
+        "full_close": 42908.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705244400.0,
+        "prefix_selected_label": 1705233600.0,
+        "full_selected_label": 1705248000.0,
+        "prefix_close": 42908.4,
+        "full_close": 42665.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705258800.0,
+        "prefix_selected_label": 1705248000.0,
+        "full_selected_label": 1705262400.0,
+        "prefix_close": 42665.8,
+        "full_close": 41734.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705273200.0,
+        "prefix_selected_label": 1705262400.0,
+        "full_selected_label": 1705276800.0,
+        "prefix_close": 41734.9,
+        "full_close": 42571.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705287600.0,
+        "prefix_selected_label": 1705276800.0,
+        "full_selected_label": 1705291200.0,
+        "prefix_close": 42571.8,
+        "full_close": 42713.1,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705302000.0,
+        "prefix_selected_label": 1705291200.0,
+        "full_selected_label": 1705305600.0,
+        "prefix_close": 42713.1,
+        "full_close": 42699.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705316400.0,
+        "prefix_selected_label": 1705305600.0,
+        "full_selected_label": 1705320000.0,
+        "prefix_close": 42699.9,
+        "full_close": 42278.7,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705330800.0,
+        "prefix_selected_label": 1705320000.0,
+        "full_selected_label": 1705334400.0,
+        "prefix_close": 42278.7,
+        "full_close": 42989.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705345200.0,
+        "prefix_selected_label": 1705334400.0,
+        "full_selected_label": 1705348800.0,
+        "prefix_close": 42989.6,
+        "full_close": 42515.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705359600.0,
+        "prefix_selected_label": 1705348800.0,
+        "full_selected_label": 1705363200.0,
+        "prefix_close": 42515.0,
+        "full_close": 42919.5,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705374000.0,
+        "prefix_selected_label": 1705363200.0,
+        "full_selected_label": 1705377600.0,
+        "prefix_close": 42919.5,
+        "full_close": 42788.1,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705388400.0,
+        "prefix_selected_label": 1705377600.0,
+        "full_selected_label": 1705392000.0,
+        "prefix_close": 42788.1,
+        "full_close": 42894.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705402800.0,
+        "prefix_selected_label": 1705392000.0,
+        "full_selected_label": 1705406400.0,
+        "prefix_close": 42894.9,
+        "full_close": 43251.7,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705417200.0,
+        "prefix_selected_label": 1705406400.0,
+        "full_selected_label": 1705420800.0,
+        "prefix_close": 43251.7,
+        "full_close": 43164.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705431600.0,
+        "prefix_selected_label": 1705420800.0,
+        "full_selected_label": 1705435200.0,
+        "prefix_close": 43164.8,
+        "full_close": 43133.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705446000.0,
+        "prefix_selected_label": 1705435200.0,
+        "full_selected_label": 1705449600.0,
+        "prefix_close": 43133.0,
+        "full_close": 42842.1,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705460400.0,
+        "prefix_selected_label": 1705449600.0,
+        "full_selected_label": 1705464000.0,
+        "prefix_close": 42842.1,
+        "full_close": 42654.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705474800.0,
+        "prefix_selected_label": 1705464000.0,
+        "full_selected_label": 1705478400.0,
+        "prefix_close": 42654.0,
+        "full_close": 42681.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705489200.0,
+        "prefix_selected_label": 1705478400.0,
+        "full_selected_label": 1705492800.0,
+        "prefix_close": 42681.0,
+        "full_close": 42478.3,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705503600.0,
+        "prefix_selected_label": 1705492800.0,
+        "full_selected_label": 1705507200.0,
+        "prefix_close": 42478.3,
+        "full_close": 42617.5,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705518000.0,
+        "prefix_selected_label": 1705507200.0,
+        "full_selected_label": 1705521600.0,
+        "prefix_close": 42617.5,
+        "full_close": 42783.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705532400.0,
+        "prefix_selected_label": 1705521600.0,
+        "full_selected_label": 1705536000.0,
+        "prefix_close": 42783.4,
+        "full_close": 42594.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705546800.0,
+        "prefix_selected_label": 1705536000.0,
+        "full_selected_label": 1705550400.0,
+        "prefix_close": 42594.0,
+        "full_close": 42918.3,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705561200.0,
+        "prefix_selected_label": 1705550400.0,
+        "full_selected_label": 1705564800.0,
+        "prefix_close": 42918.3,
+        "full_close": 42540.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705575600.0,
+        "prefix_selected_label": 1705564800.0,
+        "full_selected_label": 1705579200.0,
+        "prefix_close": 42540.0,
+        "full_close": 42618.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705590000.0,
+        "prefix_selected_label": 1705579200.0,
+        "full_selected_label": 1705593600.0,
+        "prefix_close": 42618.9,
+        "full_close": 41014.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705604400.0,
+        "prefix_selected_label": 1705593600.0,
+        "full_selected_label": 1705608000.0,
+        "prefix_close": 41014.2,
+        "full_close": 41323.1,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705618800.0,
+        "prefix_selected_label": 1705608000.0,
+        "full_selected_label": 1705622400.0,
+        "prefix_close": 41323.1,
+        "full_close": 41049.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705633200.0,
+        "prefix_selected_label": 1705622400.0,
+        "full_selected_label": 1705636800.0,
+        "prefix_close": 41049.8,
+        "full_close": 41282.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705647600.0,
+        "prefix_selected_label": 1705636800.0,
+        "full_selected_label": 1705651200.0,
+        "prefix_close": 41282.0,
+        "full_close": 41471.7,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705662000.0,
+        "prefix_selected_label": 1705651200.0,
+        "full_selected_label": 1705665600.0,
+        "prefix_close": 41471.7,
+        "full_close": 40897.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705676400.0,
+        "prefix_selected_label": 1705665600.0,
+        "full_selected_label": 1705680000.0,
+        "prefix_close": 40897.0,
+        "full_close": 41818.5,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705690800.0,
+        "prefix_selected_label": 1705680000.0,
+        "full_selected_label": 1705694400.0,
+        "prefix_close": 41818.5,
+        "full_close": 41662.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705705200.0,
+        "prefix_selected_label": 1705694400.0,
+        "full_selected_label": 1705708800.0,
+        "prefix_close": 41662.2,
+        "full_close": 41638.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705719600.0,
+        "prefix_selected_label": 1705708800.0,
+        "full_selected_label": 1705723200.0,
+        "prefix_close": 41638.0,
+        "full_close": 41652.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705734000.0,
+        "prefix_selected_label": 1705723200.0,
+        "full_selected_label": 1705737600.0,
+        "prefix_close": 41652.4,
+        "full_close": 41583.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705748400.0,
+        "prefix_selected_label": 1705737600.0,
+        "full_selected_label": 1705752000.0,
+        "prefix_close": 41583.6,
+        "full_close": 41570.3,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705762800.0,
+        "prefix_selected_label": 1705752000.0,
+        "full_selected_label": 1705766400.0,
+        "prefix_close": 41570.3,
+        "full_close": 41638.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705777200.0,
+        "prefix_selected_label": 1705766400.0,
+        "full_selected_label": 1705780800.0,
+        "prefix_close": 41638.4,
+        "full_close": 41691.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705791600.0,
+        "prefix_selected_label": 1705780800.0,
+        "full_selected_label": 1705795200.0,
+        "prefix_close": 41691.8,
+        "full_close": 41677.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705806000.0,
+        "prefix_selected_label": 1705795200.0,
+        "full_selected_label": 1705809600.0,
+        "prefix_close": 41677.4,
+        "full_close": 41648.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705820400.0,
+        "prefix_selected_label": 1705809600.0,
+        "full_selected_label": 1705824000.0,
+        "prefix_close": 41648.6,
+        "full_close": 41720.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705834800.0,
+        "prefix_selected_label": 1705824000.0,
+        "full_selected_label": 1705838400.0,
+        "prefix_close": 41720.9,
+        "full_close": 41652.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705849200.0,
+        "prefix_selected_label": 1705838400.0,
+        "full_selected_label": 1705852800.0,
+        "prefix_close": 41652.8,
+        "full_close": 41721.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705863600.0,
+        "prefix_selected_label": 1705852800.0,
+        "full_selected_label": 1705867200.0,
+        "prefix_close": 41721.2,
+        "full_close": 41580.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705878000.0,
+        "prefix_selected_label": 1705867200.0,
+        "full_selected_label": 1705881600.0,
+        "prefix_close": 41580.0,
+        "full_close": 41199.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705892400.0,
+        "prefix_selected_label": 1705881600.0,
+        "full_selected_label": 1705896000.0,
+        "prefix_close": 41199.6,
+        "full_close": 41042.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705906800.0,
+        "prefix_selected_label": 1705896000.0,
+        "full_selected_label": 1705910400.0,
+        "prefix_close": 41042.6,
+        "full_close": 40809.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705921200.0,
+        "prefix_selected_label": 1705910400.0,
+        "full_selected_label": 1705924800.0,
+        "prefix_close": 40809.4,
+        "full_close": 40774.7,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705935600.0,
+        "prefix_selected_label": 1705924800.0,
+        "full_selected_label": 1705939200.0,
+        "prefix_close": 40774.7,
+        "full_close": 39812.5,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705950000.0,
+        "prefix_selected_label": 1705939200.0,
+        "full_selected_label": 1705953600.0,
+        "prefix_close": 39812.5,
+        "full_close": 39567.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705964400.0,
+        "prefix_selected_label": 1705953600.0,
+        "full_selected_label": 1705968000.0,
+        "prefix_close": 39567.0,
+        "full_close": 40000.1,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705978800.0,
+        "prefix_selected_label": 1705968000.0,
+        "full_selected_label": 1705982400.0,
+        "prefix_close": 40000.1,
+        "full_close": 39773.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1705993200.0,
+        "prefix_selected_label": 1705982400.0,
+        "full_selected_label": 1705996800.0,
+        "prefix_close": 39773.9,
+        "full_close": 38850.1,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706007600.0,
+        "prefix_selected_label": 1705996800.0,
+        "full_selected_label": 1706011200.0,
+        "prefix_close": 38850.1,
+        "full_close": 39197.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706022000.0,
+        "prefix_selected_label": 1706011200.0,
+        "full_selected_label": 1706025600.0,
+        "prefix_close": 39197.4,
+        "full_close": 39140.1,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706036400.0,
+        "prefix_selected_label": 1706025600.0,
+        "full_selected_label": 1706040000.0,
+        "prefix_close": 39140.1,
+        "full_close": 39890.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706050800.0,
+        "prefix_selected_label": 1706040000.0,
+        "full_selected_label": 1706054400.0,
+        "prefix_close": 39890.0,
+        "full_close": 39611.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706065200.0,
+        "prefix_selected_label": 1706054400.0,
+        "full_selected_label": 1706068800.0,
+        "prefix_close": 39611.2,
+        "full_close": 39979.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706079600.0,
+        "prefix_selected_label": 1706068800.0,
+        "full_selected_label": 1706083200.0,
+        "prefix_close": 39979.4,
+        "full_close": 40195.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706094000.0,
+        "prefix_selected_label": 1706083200.0,
+        "full_selected_label": 1706097600.0,
+        "prefix_close": 40195.2,
+        "full_close": 40046.7,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706108400.0,
+        "prefix_selected_label": 1706097600.0,
+        "full_selected_label": 1706112000.0,
+        "prefix_close": 40046.7,
+        "full_close": 39797.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706122800.0,
+        "prefix_selected_label": 1706112000.0,
+        "full_selected_label": 1706126400.0,
+        "prefix_close": 39797.4,
+        "full_close": 40078.7,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706137200.0,
+        "prefix_selected_label": 1706126400.0,
+        "full_selected_label": 1706140800.0,
+        "prefix_close": 40078.7,
+        "full_close": 40002.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706151600.0,
+        "prefix_selected_label": 1706140800.0,
+        "full_selected_label": 1706155200.0,
+        "prefix_close": 40002.8,
+        "full_close": 40119.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706166000.0,
+        "prefix_selected_label": 1706155200.0,
+        "full_selected_label": 1706169600.0,
+        "prefix_close": 40119.6,
+        "full_close": 40165.5,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706180400.0,
+        "prefix_selected_label": 1706169600.0,
+        "full_selected_label": 1706184000.0,
+        "prefix_close": 40165.5,
+        "full_close": 39793.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706194800.0,
+        "prefix_selected_label": 1706184000.0,
+        "full_selected_label": 1706198400.0,
+        "prefix_close": 39793.6,
+        "full_close": 39982.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706209200.0,
+        "prefix_selected_label": 1706198400.0,
+        "full_selected_label": 1706212800.0,
+        "prefix_close": 39982.9,
+        "full_close": 39953.3,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706223600.0,
+        "prefix_selected_label": 1706212800.0,
+        "full_selected_label": 1706227200.0,
+        "prefix_close": 39953.3,
+        "full_close": 40057.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706238000.0,
+        "prefix_selected_label": 1706227200.0,
+        "full_selected_label": 1706241600.0,
+        "prefix_close": 40057.0,
+        "full_close": 39956.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706252400.0,
+        "prefix_selected_label": 1706241600.0,
+        "full_selected_label": 1706256000.0,
+        "prefix_close": 39956.0,
+        "full_close": 41272.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706266800.0,
+        "prefix_selected_label": 1706256000.0,
+        "full_selected_label": 1706270400.0,
+        "prefix_close": 41272.0,
+        "full_close": 41399.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706281200.0,
+        "prefix_selected_label": 1706270400.0,
+        "full_selected_label": 1706284800.0,
+        "prefix_close": 41399.8,
+        "full_close": 42046.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706295600.0,
+        "prefix_selected_label": 1706284800.0,
+        "full_selected_label": 1706299200.0,
+        "prefix_close": 42046.0,
+        "full_close": 41806.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706310000.0,
+        "prefix_selected_label": 1706299200.0,
+        "full_selected_label": 1706313600.0,
+        "prefix_close": 41806.4,
+        "full_close": 41805.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706324400.0,
+        "prefix_selected_label": 1706313600.0,
+        "full_selected_label": 1706328000.0,
+        "prefix_close": 41805.2,
+        "full_close": 41699.1,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706338800.0,
+        "prefix_selected_label": 1706328000.0,
+        "full_selected_label": 1706342400.0,
+        "prefix_close": 41699.1,
+        "full_close": 41744.7,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706353200.0,
+        "prefix_selected_label": 1706342400.0,
+        "full_selected_label": 1706356800.0,
+        "prefix_close": 41744.7,
+        "full_close": 41797.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706367600.0,
+        "prefix_selected_label": 1706356800.0,
+        "full_selected_label": 1706371200.0,
+        "prefix_close": 41797.4,
+        "full_close": 41896.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706382000.0,
+        "prefix_selected_label": 1706371200.0,
+        "full_selected_label": 1706385600.0,
+        "prefix_close": 41896.4,
+        "full_close": 42102.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706396400.0,
+        "prefix_selected_label": 1706385600.0,
+        "full_selected_label": 1706400000.0,
+        "prefix_close": 42102.2,
+        "full_close": 42210.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706410800.0,
+        "prefix_selected_label": 1706400000.0,
+        "full_selected_label": 1706414400.0,
+        "prefix_close": 42210.0,
+        "full_close": 42369.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706425200.0,
+        "prefix_selected_label": 1706414400.0,
+        "full_selected_label": 1706428800.0,
+        "prefix_close": 42369.9,
+        "full_close": 42456.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706439600.0,
+        "prefix_selected_label": 1706428800.0,
+        "full_selected_label": 1706443200.0,
+        "prefix_close": 42456.6,
+        "full_close": 42244.5,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706454000.0,
+        "prefix_selected_label": 1706443200.0,
+        "full_selected_label": 1706457600.0,
+        "prefix_close": 42244.5,
+        "full_close": 41770.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706468400.0,
+        "prefix_selected_label": 1706457600.0,
+        "full_selected_label": 1706472000.0,
+        "prefix_close": 41770.6,
+        "full_close": 42021.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706482800.0,
+        "prefix_selected_label": 1706472000.0,
+        "full_selected_label": 1706486400.0,
+        "prefix_close": 42021.2,
+        "full_close": 42306.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706497200.0,
+        "prefix_selected_label": 1706486400.0,
+        "full_selected_label": 1706500800.0,
+        "prefix_close": 42306.4,
+        "full_close": 42040.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706511600.0,
+        "prefix_selected_label": 1706500800.0,
+        "full_selected_label": 1706515200.0,
+        "prefix_close": 42040.0,
+        "full_close": 42233.3,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706526000.0,
+        "prefix_selected_label": 1706515200.0,
+        "full_selected_label": 1706529600.0,
+        "prefix_close": 42233.3,
+        "full_close": 42623.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706540400.0,
+        "prefix_selected_label": 1706529600.0,
+        "full_selected_label": 1706544000.0,
+        "prefix_close": 42623.2,
+        "full_close": 42986.7,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706554800.0,
+        "prefix_selected_label": 1706544000.0,
+        "full_selected_label": 1706558400.0,
+        "prefix_close": 42986.7,
+        "full_close": 43287.7,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706569200.0,
+        "prefix_selected_label": 1706558400.0,
+        "full_selected_label": 1706572800.0,
+        "prefix_close": 43287.7,
+        "full_close": 43502.9,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706583600.0,
+        "prefix_selected_label": 1706572800.0,
+        "full_selected_label": 1706587200.0,
+        "prefix_close": 43502.9,
+        "full_close": 43346.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706598000.0,
+        "prefix_selected_label": 1706587200.0,
+        "full_selected_label": 1706601600.0,
+        "prefix_close": 43346.6,
+        "full_close": 43513.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706612400.0,
+        "prefix_selected_label": 1706601600.0,
+        "full_selected_label": 1706616000.0,
+        "prefix_close": 43513.4,
+        "full_close": 43355.5,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706626800.0,
+        "prefix_selected_label": 1706616000.0,
+        "full_selected_label": 1706630400.0,
+        "prefix_close": 43355.5,
+        "full_close": 43525.1,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706641200.0,
+        "prefix_selected_label": 1706630400.0,
+        "full_selected_label": 1706644800.0,
+        "prefix_close": 43525.1,
+        "full_close": 42918.3,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706655600.0,
+        "prefix_selected_label": 1706644800.0,
+        "full_selected_label": 1706659200.0,
+        "prefix_close": 42918.3,
+        "full_close": 42918.0,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706670000.0,
+        "prefix_selected_label": 1706659200.0,
+        "full_selected_label": 1706673600.0,
+        "prefix_close": 42918.0,
+        "full_close": 43031.6,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706684400.0,
+        "prefix_selected_label": 1706673600.0,
+        "full_selected_label": 1706688000.0,
+        "prefix_close": 43031.6,
+        "full_close": 42630.2,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706698800.0,
+        "prefix_selected_label": 1706688000.0,
+        "full_selected_label": 1706702400.0,
+        "prefix_close": 42630.2,
+        "full_close": 43341.8,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706713200.0,
+        "prefix_selected_label": 1706702400.0,
+        "full_selected_label": 1706716800.0,
+        "prefix_close": 43341.8,
+        "full_close": 43316.4,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      },
+      {
+        "query": 1706727600.0,
+        "prefix_selected_label": 1706716800.0,
+        "full_selected_label": 1706731200.0,
+        "prefix_close": 43316.4,
+        "full_close": 42560.5,
+        "later_label_selected": true,
+        "past_price_changed": true,
+        "exact_label_control_unchanged": true
+      }
+    ],
+    "reused_observed_prices": true,
+    "native_LBank": false,
+    "profitability_backtest_performed": false,
+    "scope": "Lookup contract at frozen non-grid queries. Not market occurrence rates; no claim that every original on-grid strategy return is contaminated. Candle-label availability is not inferred from price."
+  },
+  "hypothetical_unit_costs": {
+    "rows": [
+      {
+        "side": 1,
+        "cost_multiple": 1,
+        "price_move_fraction": "0.05",
+        "net_cash": "4.8260006000",
+        "fee_cash": "0.1229994000",
+        "funding_reserve_cash": "0.0100"
+      },
+      {
+        "side": 1,
+        "cost_multiple": 1,
+        "price_move_fraction": "-0.02",
+        "net_cash": "-2.1684002400",
+        "fee_cash": "0.1188002400",
+        "funding_reserve_cash": "0.0100"
+      },
+      {
+        "side": 1,
+        "cost_multiple": 2,
+        "price_move_fraction": "0.05",
+        "net_cash": "4.6520024000",
+        "fee_cash": "0.2459976000",
+        "funding_reserve_cash": "0.0200"
+      },
+      {
+        "side": 1,
+        "cost_multiple": 2,
+        "price_move_fraction": "-0.02",
+        "net_cash": "-2.3368009600",
+        "fee_cash": "0.2376009600",
+        "funding_reserve_cash": "0.0200"
+      },
+      {
+        "side": -1,
+        "cost_multiple": 1,
+        "price_move_fraction": "0.05",
+        "net_cash": "4.8340006000",
+        "fee_cash": "0.1169994000",
+        "funding_reserve_cash": "0.0100"
+      },
+      {
+        "side": -1,
+        "cost_multiple": 1,
+        "price_move_fraction": "-0.02",
+        "net_cash": "-2.1716002400",
+        "fee_cash": "0.1212002400",
+        "funding_reserve_cash": "0.0100"
+      },
+      {
+        "side": -1,
+        "cost_multiple": 2,
+        "price_move_fraction": "0.05",
+        "net_cash": "4.6680024000",
+        "fee_cash": "0.2339976000",
+        "funding_reserve_cash": "0.0200"
+      },
+      {
+        "side": -1,
+        "cost_multiple": 2,
+        "price_move_fraction": "-0.02",
+        "net_cash": "-2.3432009600",
+        "fee_cash": "0.2424009600",
+        "funding_reserve_cash": "0.0200"
+      }
+    ],
+    "actual_native_cost_or_funding_verified": false,
+    "market_PnL_calculated": false,
+    "interpretation": "Hypothetical same-reference cash checks only. Source flat0.0006 return charge is not full fees+slippage+funding."
+  },
+  "implementation_sha256": "fd2e8bb2946f55507f5f01289b14097d987ff159bd761e0815d3f91b54fbe2c0",
+  "protocol_sha256": "83d3e5c7512581f52382ef75df4f604a7497c22a6767a825061c05710ed5229f",
+  "source_market_profitability_backtest_performed": false,
+  "source_headline_profit_impact_measured": false,
+  "source_original_data_or_closed_ledger_recovered": false,
+  "market_PF": null,
+  "net_expectancy_lower": null,
+  "TP1_Wilson_lower": null,
+  "actual_urgent_warning_rate": null,
+  "native_manual_fill_verified": false,
+  "actual_max_drawdown_R": null,
+  "full_historical_cost_stress": null,
+  "eligible": false,
+  "forward_started": false,
+  "production_changed": false,
+  "decision": "exclude_this_release_as_replacement_evidence_missing_BTC_ledger_fullcost_and_execution_contract",
+  "completed_utc": "2026-10-20T03:18:44.264423+00:00"
+}

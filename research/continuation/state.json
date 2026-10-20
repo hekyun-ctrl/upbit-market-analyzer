@@ -31,7 +31,8 @@
     "native_LBank_public_depth_bounded12attempts_v1_raw_hash_and_decimal_quality_audit",
     "djienne_lightgbm_1274e_pure_kernel_contract_forensic_v1",
     "rlxbt_public_combo_contract_v1_147synthetic_predicates_92public_objects",
-    "rlxbt_pinbar_transfer_v1_fixed_rules_actual2024_2026_two_latency_fullcost"
+    "rlxbt_pinbar_transfer_v1_fixed_rules_actual2024_2026_two_latency_fullcost",
+    "cshear_72f293_source_contract_v1_8pure_definitions_185real_query_prefix_checks"
   ],
   "read_before_work": [
     "docs/lbank_strategy_rebuild_2026-10-20.md",
@@ -40,19 +41,38 @@
     "docs/lbank_published_strategy_search_2026-10-20.md",
     "research/long_history/results",
     "docs/lbank_pinbar_transfer_validation_2026-10-20.md",
-    "research/continuation/source_screening_20261020_1132.json"
+    "research/continuation/source_screening_20261020_1132.json",
+    "docs/lbank_cshear_source_audit_2026-10-20.md",
+    "research/continuation/source_screening_20261020_1224.json"
   ],
   "next_work": {
-    "stage": "fixed_cshear_source_contract_real_price_probe_in_progress",
-    "instruction": "Continue active_run: code/protocol and13synthetic fixture tests fixed before retained actual January2024 prefix lookup audit. Do not rerun known rejected pinbar or other excluded candidates. Run audit_cshear_source.py with pinned source and SHA-verified complete month, preserve actual outputs/inventory/independent arithmetic and exact costs unknown fields. This is source-contract diagnostics,not market profitability. No candidate/forwardclock/deploy. Then record source-specific decision and move to different primary source if unqualified. Existing operational followup still pending;query latest scoped native readiness,don't restart/relax for docs.",
+    "stage": "next_original_BTC_ledger_and_fullcost_feasibility_funding_MR_source",
+    "instruction": "CShear84object/8definition13fixture/185real-query audit completed;read doc and saved report,do not repeat source replay. Next finite step from source_screening_20261020_1224.json: read pinned Gotodataru public tree,shared loader/engine/metrics,strategy1funding_MR signals/backtest and results_combined. Locate BTC-only original closedledger/params/rawinputs/checksums;first actual frequency,opportunity days and fee/funding cash reconciliation if rows exist. Compare prior flow/entry exclusions before any replay. Author lookahead claims and XRP/DOGE positives not BTC proof. No252symbol sweep,optimizer,orders,privateinputs,threshold relaxation or sourcepickle. If incompatible/missing,record source-specific obstacle promptly and continue different primary source. No eligible/forward candidate;all promotion gates intact. Keep latest operational validation check before research.",
     "sources_to_screen": [
+      {
+        "repository": "Gotodataru/binance-futures-backtest",
+        "commit": "5ed0d6e39d8a3e951bea40c66e2638c213012e1b",
+        "url": "https://github.com/Gotodataru/binance-futures-backtest/tree/5ed0d6e39d8a3e951bea40c66e2638c213012e1b",
+        "readme_git_blob_sha": "eaa8df5b767681e899b96ed26b4474ba27a459bf",
+        "status": "primary_source_feasibility_lead_only_NOT_qualified_no_forward",
+        "read_first": [
+          "shared/data_loader.py",
+          "shared/backtest_engine.py",
+          "shared/metrics.py",
+          "strategy_1_funding_mr/signals.py",
+          "strategy_1_funding_mr/backtest.py",
+          "results_combined"
+        ],
+        "screening": "research/continuation/source_screening_20261020_1224.json",
+        "market_backtest_performed": false
+      },
       {
         "repository": "CShear/crack-the-nut",
         "commit": "72f293c19a61e01507f322595e3982da00f0932d",
         "url": "https://github.com/CShear/crack-the-nut/tree/72f293c19a61e01507f322595e3982da00f0932d",
         "readme_git_blob_sha": "68edd2ca9c9ba8d950dea0dea9d1b967bd1c912b",
         "read_scope_now": "Public full README and pinned README first35lines; no strategy code,rawdataset or closed ledger inspected yet",
-        "status": "source_availability_lead_only_NOT_qualified_no_forward",
+        "status": "completed_excluded_this_publicrelease_contract_causality_fullcost_and_BTCledger_evidence;no_repeat",
         "read_first": [
           "RESEARCH-REPORT.md",
           "STRATEGY-REPORT.md",
@@ -60,7 +80,8 @@
           "analog/strategies.py"
         ],
         "instruction": "Read pinned complete tree and four files;first locate BTC-only original closedledger/rawdata/checksums and full fees/slippage/funding. Separate exact source rule from selected multiasset headline and after-the-fact20exit optimization. Check causal historical lookup/entry/exit timestamps,gaps,bar-before-entry protection and TP1/manualrisk contract with bounded pure probes if feasible. No63strategy/13asset optimization,no live scripts,private account access,LLM calls,paid data or automatic orders. Do not unpickle untrusted data. If source lacks compatible BTC evidence,record finite source-specific obstacle and continue different published source;do not turn alternateasset portfolio gains into BTC evidence.",
-        "caveats": "Authorpositive figure is selected portfolio across13assets;README explicitly says BTC combos may break even and alts carry edge. No BTC profit claim adopted. No data or sourcecode execution performed in this preflight."
+        "caveats": "Authorpositive figure is selected portfolio across13assets;README explicitly says BTC combos may break even and alts carry edge. No BTC profit claim adopted. No data or sourcecode execution performed in this preflight.",
+        "report": "research/continuation/results/cshear_source_20261020/report.json"
       },
       {
         "title": "Original ultra-sharp pinbar fixed-rule transfer screen",
@@ -147,10 +168,11 @@
         "research/continuation/source_screening_20261020_0740.json",
         "research/continuation/source_screening_20261020_0840.json",
         "research/continuation/source_screening_20261020_1007.json",
-        "research/continuation/source_screening_20261020_1132.json"
+        "research/continuation/source_screening_20261020_1132.json",
+        "research/continuation/source_screening_20261020_1224.json"
       ]
     },
-    "operational_check_before_research": "Before the next finite source-research step, query the latest production head/deployment and bounded live logs. Verify current source/hash/policies and NATIVE_ENTRY_STATUS reason=native_ready/entry_source_switched=true with >=65 contiguous closed1m and >=20 closed5m, plus actual ENTRY_SETUP_EVALUATED new_completed_bar or periodic_and_new_bar. If still warming up, record exact counts/gaps, do not alter thresholds or restart; continue the existing independent source research step, without duplicate unchanged notifications. When readiness is actually restored, persist evidence and send one concise update; do NOT disable the alternative-strategy research automation because this hotfix is not a certified replacement."
+    "operational_check_before_research": "Entry pipeline restored2026-10-20T03:25:05Z on existing deployed862339d source. Before next research step,check latest production/deployment and bounded logs for continuity/regressions;do not repeat unchanged readiness announcement. No valid new setup or confirmation/alert observed in this bounded window;no native publication timestamp or end-to-end latency measured. Continue alternative-strategy research;do not disable task because hotfix readiness is not certified replacement."
   },
   "known_limitations": [
     "2023 through Sep2026 reused and exploratory; 2022 observed for Turtle; none may be relabeled untouched.",
@@ -171,7 +193,9 @@
     "Djienne15mML1274e public artifact absent;12sourcefiles/19purefunction diagnostics and16tests reproduce fee/closed-count omission on entrybarstop,monthendentry,NaNexit/level-stoplock differences. Loss remains inaggregatePnL. Synthetic counterexamples,not measuredmarketfrequency or historicalprofitimpact;positiveprefixcontrols preserved. No unchanged repetition/training/salvagetuning.",
     "Seven additional original preflights not independentbacktests. RLXBT4leg counts/fee-onlyheadline remain author claims;public rawJSONresearchManifest null,local-onlyCSV,feature/formula/SLTPunits unavailable inreviewedarticle. Source feasibility lead only,no adoptedcandidate or forwardclock.",
     "RLXBT combo:92pinned public Git objects/5CSVheaders lack named custom features;147syntheticcases include5opposed/6entryexit/5duplicate,not market rates. Publicprobe fraction units support1.5%/2% but article runtimebinary unknown. No marketbacktest. Pinbar originalwinner selectedafter12hypotheses,spotvolume vs futures different,cost/engineunspecified;new fixed transfer screen not exactreplication/unseen validation.",
-    "Pinbarfixedsource transfer screen:1445760futures1m/3012funding,all2024-Sep2026reused,66ZIPhashes. Zero-delay6737closedPF.4705/TP1.2382/netmean-.4604R,60sec6327PF.4939/TP1.2398/netmean-.4270R. Everyyearbothfullcostlevelsnegative. No originalspot/proprietaryengine replication/nativeurgentrate/fills. 5minstop andwholebarMAE proxies not realwarnings.20implementationtests combine8sourcecontract+12pinbar;26128separateDecimalcashchecks. No optimization,eligiblecandidate,forwardclock or production replacement."
+    "Pinbarfixedsource transfer screen:1445760futures1m/3012funding,all2024-Sep2026reused,66ZIPhashes. Zero-delay6737closedPF.4705/TP1.2382/netmean-.4604R,60sec6327PF.4939/TP1.2398/netmean-.4270R. Everyyearbothfullcostlevelsnegative. No originalspot/proprietaryengine replication/nativeurgentrate/fills. 5minstop andwholebarMAE proxies not realwarnings.20implementationtests combine8sourcecontract+12pinbar;26128separateDecimalcashchecks. No optimization,eligiblecandidate,forwardclock or production replacement.",
+    "CShear72f293 original selected-kernel diagnostics: fixed fundingSHORT recoversLONG/SHORT when only futureclosechanges;non-grid185realqueries all selectlaterlabel andchangepastprice,185exactlabelcontrols0changes. Sourceend48hwith4hdata returns fictionalearlypositiveexit,gap8hlabelled4h;13tests/8separateDecimalcashchecks. Publictree84objects no rawBTCledger. These are bounded forensic probes,not measuredmarketfrequency or headlineprofitimpact/not allon-gridreturnsinvalid. No marketPF/TP1/urgent/native qualification.",
+    "New primary source preflights are not marketbacktests: Pavdot103selectedtrades+CPCVclaims not qualified;Liam2021positive uses private preprocessing/incomplete logic and1289orders not matchedclosedtrades. GotodataruREADME fee/slip/causality and altcoin positives are authorclaims only. BTCclosedledger/sourcefullcost not yet inspected."
   ],
   "iterations": [
     {
@@ -502,17 +526,57 @@
       "reused_all_periods": true,
       "production_changed": false,
       "forward_started": false
+    },
+    {
+      "id": "cshear_source_contract_20261020_1210",
+      "stage_completed": "pinned84Gitobjects_8revieweddefinitions_13fixtures_actual44640minute185query_causality_and_separate_Decimal_checks",
+      "protocol_checkpoint_commit": "5d79331ddd4e0a7cc25895b5cf109c77c1d8935d",
+      "evaluation_started_utc": "2026-10-20T03:18:43.311534+00:00",
+      "evaluation_completed_utc": "2026-10-20T03:18:44.264423+00:00",
+      "completed_utc": "2026-10-20 03:25:41 UTC",
+      "implementation_tests_passed": 13,
+      "tracked_source_objects": 84,
+      "public_raw_data_or_ledger_paths": 0,
+      "actual_minute_rows": 44640,
+      "complete_4h_bars": 186,
+      "fixed_real_queries": 185,
+      "past_query_prices_changed": 185,
+      "exact_label_positive_control_changes": 0,
+      "separate_cash_checks": 8,
+      "independent_audit_passed": true,
+      "result": "exclude_this_public_release_as_replacement_evidence_missing_BTC_ledger_fullcost_and_execution_contract",
+      "market_profitability_backtest_performed": false,
+      "source_headline_profit_impact_measured": false,
+      "report": "research/continuation/results/cshear_source_20261020/report.json",
+      "audit": "research/continuation/results/cshear_source_20261020/independent_audit.json",
+      "documentation": "docs/lbank_cshear_source_audit_2026-10-20.md",
+      "source_screening": "research/continuation/source_screening_20261020_1224.json",
+      "production_changed": false,
+      "forward_started": false
+    },
+    {
+      "id": "entry_timing_hotfix_readiness_20261020_1225",
+      "category": "operational_followup_not_replacement_strategy",
+      "production_changed": false,
+      "production_commit": "862339db2c4f69facc9ba6626e2826d475504174",
+      "deployment_id": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
+      "deployment_status": "SUCCESS",
+      "native_ready": true,
+      "closed_1m": 103,
+      "closed_5m": 20,
+      "new_completed_bar_scan_observed": true,
+      "candidates": 0,
+      "reason": "market_no_setup",
+      "full_hotfix_entry_pipeline_validation_completed": true,
+      "live_new_candidate_confirmation_observed": false,
+      "replacement_certified": false,
+      "forward_started": false,
+      "report": "research/continuation/results/operational_readiness_20261020_1225.json"
     }
   ],
-  "active_run": {
-    "id": "cshear_source_contract_20261020_1210",
-    "stage": "reviewed_8pure_definitions_13fixture_tests_protocol_fixed_before_retained_real_price_probe",
-    "source_commit": "72f293c19a61e01507f322595e3982da00f0932d",
-    "protocol": "research/continuation/cshear_source_protocol_20261020.json",
-    "started_utc": "2026-10-20 03:18:06 UTC"
-  },
+  "active_run": null,
   "blockers": [],
-  "updated_kst": "2026-10-20T11:34:38.459258+09:00",
+  "updated_kst": "2026-10-20T12:25:48+09:00",
   "maintained_research_candidates": [
     {
       "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
@@ -553,6 +617,11 @@
       "candidate_id": "rlxbt_pinbar_transfer_v1",
       "status": "rejected_fixed_futures_transfer_costed_all3calendarperiod_losses_PFbelow0.5_TP1near24percent",
       "next": "Preserve all original positive authorclaims plus our negative reused-futures translation. No cost/stop/target/latency threshold search or unchanged repeat. Not universal pinbar rejection."
+    },
+    {
+      "candidate_id": "cshear_72f293_source_contract_v1",
+      "status": "excluded_publicrelease_as_replacement_evidence_contract_causality_cost_BTCledger_unverified",
+      "next": "No repair/63strategy/13asset/20exit optimization. Preserve both correct controls and bounded counterexamples;not allRSI/meanreversion failure. No measured headlineprofitimpact or native marketbacktest."
     }
   ],
   "source_reconciliation": {
@@ -582,13 +651,13 @@
   },
   "pending_operational_validation": {
     "version": 1,
-    "observed_utc": "2026-10-20T03:10:57.372394910Z",
+    "observed_utc": "2026-10-20T03:25:45.556264255Z",
     "scope": {
       "projectId": "e7d240ac-2468-45c9-8411-33f5e24f425b",
       "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
       "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34"
     },
-    "status": "code_deployed_runtime_verified_entry_readiness_pending",
+    "status": "code_deployed_runtime_verified_entry_pipeline_resumed",
     "production_commit": "862339db2c4f69facc9ba6626e2826d475504174",
     "production_tree": "cbf343b437ba1379dc2304f706db30b0f8746814",
     "deployment_id": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
@@ -613,18 +682,20 @@
       "profitability_verified": false
     },
     "native_readiness": {
-      "ready": false,
-      "reason": "native_history_missing_stale_or_gapped",
-      "last_observed_utc": "2026-10-20T03:10:57.372394910Z",
-      "consecutive_closed_1m": 88,
-      "consecutive_closed_5m_at_that_time": 17,
+      "ready": true,
+      "reason": "native_ready",
+      "last_observed_utc": "2026-10-20T03:25:45.556264255Z",
+      "consecutive_closed_1m": 103,
+      "consecutive_closed_5m_at_that_time": 20,
       "required_closed_1m": 65,
       "required_closed_5m": 20,
       "rsi_history_mature": false,
       "rsi_warmup_target": 250,
-      "note": "A restart crossed a candle boundary; older 5m tail count can reset at the next 5m boundary. Do not infer readiness from 130 cached 5m bars. No interpolation or quality relabeling. Entry resumes only after the existing full contiguous feed contract."
+      "note": "Existing65closed1m/20closed5m readiness contract actually passed;20native5m now usable. RSIcomputed but250warmup maturitytarget not yet met. No history interpolation or threshold changes.",
+      "rsi14_wilder": 57.19135827331703,
+      "entry_source_switched": true
     },
-    "full_rollout_complete": false,
+    "full_rollout_complete": true,
     "replacement_certified": false,
     "replacement_deployed": false,
     "forward_candidate_started": false,
@@ -641,9 +712,31 @@
     "source_documentation": "https://github.com/hekyun-ctrl/upbit-market-analyzer/blob/862339db2c4f69facc9ba6626e2826d475504174/docs/lbank_entry_timing_2026-10-20.md",
     "original_replay": "https://github.com/hekyun-ctrl/upbit-market-analyzer/blob/862339db2c4f69facc9ba6626e2826d475504174/research/lbank_signal13_replay_result_20261020.json",
     "changed_replay": "https://github.com/hekyun-ctrl/upbit-market-analyzer/blob/862339db2c4f69facc9ba6626e2826d475504174/research/lbank_signal13_changed_confirmation_20261020.json",
-    "next_check": "Before the next finite source-research step, query the latest production head/deployment and bounded live logs. Verify current source/hash/policies and NATIVE_ENTRY_STATUS reason=native_ready/entry_source_switched=true with >=65 contiguous closed1m and >=20 closed5m, plus actual ENTRY_SETUP_EVALUATED new_completed_bar or periodic_and_new_bar. If still warming up, record exact counts/gaps, do not alter thresholds or restart; continue the existing independent source research step, without duplicate unchanged notifications. When readiness is actually restored, persist evidence and send one concise update; do NOT disable the alternative-strategy research automation because this hotfix is not a certified replacement.",
+    "next_check": "Entry pipeline restored2026-10-20T03:25:05Z on existing deployed862339d source. Before next research step,check latest production/deployment and bounded logs for continuity/regressions;do not repeat unchanged readiness announcement. No valid new setup or confirmation/alert observed in this bounded window;no native publication timestamp or end-to-end latency measured. Continue alternative-strategy research;do not disable task because hotfix readiness is not certified replacement.",
     "followup_via_existing_enabled_research_task": true,
     "evidence_path": "research/continuation/results/entry_timing_hotfix_20261020_deployment.json",
-    "latest_bounded_observation": "research/continuation/results/operational_readiness_20261020_1210.json"
+    "latest_bounded_observation": "research/continuation/results/operational_readiness_20261020_1225.json",
+    "hotfix_entry_pipeline_validated_utc": "2026-10-20T03:25:05.441094944Z",
+    "live_new_candidate_confirmation_observed": false,
+    "last_completed_bar_evaluation": {
+      "timestamp": "2026-10-20T03:25:05.441094944Z",
+      "reason": "market_no_setup",
+      "candidate_count": 0,
+      "entry_timing": {
+        "candidate_evaluated_at": 1792466705.2863274,
+        "evaluation_after_first_ready_observation_seconds": 0.006357431411743164,
+        "evaluation_after_nominal_close_seconds": 5.286327362060547,
+        "first_ready_observed_at": 1792466705.27997,
+        "last_closed_1m_start": 1792466640,
+        "last_closed_5m_start": 1792466400,
+        "nominal_1m_close_at": 1792466700,
+        "policy": "native_completed_bar_schedule_v1",
+        "publication_note": "nominal_close_is_not_actual_publication_time",
+        "quote_observed_at": 1792466705.27997,
+        "source_publication_at": null,
+        "trigger": "new_completed_bar"
+      }
+    },
+    "readiness_resumption_reported_in_run": "cshear_source_contract_20261020_1210"
   }
 }

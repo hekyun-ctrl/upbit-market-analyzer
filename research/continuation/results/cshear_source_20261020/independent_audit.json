@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "checks": [
+    "all8executeddefinitionfilehashes_match_pinned_Git_objects",
+    "original_funding_short_cash_and_both_recovered_direction_functions",
+    "sample_end_and_stop_gap_independent_cash",
+    "8longshort_base_double_full_unit_cashflows",
+    "185real_queries_prices_labels_and185exactlabel_positivecontrols"
+  ],
+  "executed_source_definitions": 8,
+  "unit_cost_checks": 8,
+  "real_queries": 185,
+  "exact_label_controls": 185,
+  "unit_cash_max_abs_error": "0",
+  "headline_profit_impact_measured": false,
+  "market_profitability_backtest_performed": false
+}
