@@ -90,14 +90,18 @@ class LiveNonInterferenceTests(unittest.TestCase):
         fixture.setUp()
         self.addCleanup(fixture.doCleanups)
         state,_ = fixture.snapshot()
-        state["rsi5"]["rsi"] = [84.,85.]
+        # Annotation invariance is tested on a complete higher-priority context;
+        # a lost trigger with missing priority is now intentionally rejected.
+        state["rsi5"]["rsi"] = [83.,84.,85.]
         untouched = copy.deepcopy(state)
         annotated = m.classify(state["prices"],native_state=state)
         from test_lbank_entry_quality import future_confirmation_state
         future = future_confirmation_state(state, annotated)
+        future['quote'] = annotated['price'] + 25.  # preserve the existing extension cap
         with patch.object(m,"annotate_rsi_context",side_effect=lambda p,s:p):
             baseline = m.classify(state["prices"],native_state=state)
             confirm_base = m.confirm_watch(future["prices"],baseline,180,native_state=future)
+        self.assertIsNotNone(confirm_base)
         self.assertIsNotNone(baseline)
         self.assertEqual({k:v for k,v in annotated.items() if k!="rsi_context"},baseline)
         confirm_new = m.confirm_watch(future["prices"],annotated,180,native_state=future)

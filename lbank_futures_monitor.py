@@ -45,6 +45,9 @@ from lbank_public_techniques import TechniqueStudy, annotate as annotate_public_
 from lbank_entry_timing import (completed_key, setup_evidence, confirmation_evidence,
                                POLICY as ENTRY_TIMING_POLICY)
 from lbank_entry_replay_audit import audit_recent as audit_recent_entry
+from lbank_breakout_freshness import (evidence as breakout_evidence,
+    confirmation_allowed as breakout_confirmation_allowed, POLICY as BREAKOUT_CONFIRMATION_POLICY,
+    REJECT_REASON as BREAKOUT_CONFIRMATION_REJECT)
 
 LOG = logging.getLogger("lbank_monitor")
 TELEGRAM_DELIVERY = TelegramTransport()
@@ -524,23 +527,14 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
     else:
         first = detect_structure(prices, ema, rsi)
         setups = ([first] if first is not None else []) + detect_structures(prices, ema, rsi)
-    curr = prices[-1]
-    m5, m15 = (curr / prices[-6] - 1) * 100, (curr / prices[-16] - 1) * 100
-    macd_arr = [a - b for a, b in zip(ema(prices, 12), ema(prices, 26))]
-    macd, sig = macd_arr[-1], ema(macd_arr, 9)[-1]
-    prior_high = (max(b["high"] for b in native_state["minute_bars"][-16:-1])
-                  if native_state is not None else max(prices[-16:-1]))
-    prior_low = (min(b["low"] for b in native_state["minute_bars"][-16:-1])
-                 if native_state is not None else min(prices[-16:-1]))
+    fresh = breakout_evidence(prices, native_state, ema)
     if native_state is not None and diagnostics is not None:
         diagnostics["market"].update(
-            momentum5_pct=m5, momentum15_pct=m15,
-            breakout_long=curr>prior_high and macd>sig and m5>=.14 and m15>=.20,
-            breakout_short=curr<prior_low and macd<sig and m5<=-.14 and m15<=-.20)
-    if curr > prior_high and macd > sig and m5 >= .14 and m15 >= .20:
-        setups.append({"direction": 1, "strategy": "breakout", "level": prior_high})
-    if curr < prior_low and macd < sig and m5 <= -.14 and m15 <= -.20:
-        setups.append({"direction": -1, "strategy": "breakout", "level": prior_low})
+            **{k:fresh[k] for k in ('momentum5_pct','momentum15_pct','breakout_long','breakout_short')})
+    if fresh['breakout_long']:
+        setups.append({"direction": 1, "strategy": "breakout", "level": fresh['prior_high']})
+    if fresh['breakout_short']:
+        setups.append({"direction": -1, "strategy": "breakout", "level": fresh['prior_low']})
     seen, decisions, qualified = set(), [], []
     for setup in setups:
         key = setup["strategy"], setup["direction"]
@@ -728,6 +722,10 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
                 native_state,direction,current,plan['target1'],
                 native_state['minute_bars'][-1]['start']+60)
             plan['entry_quality']['ranked_entry'] = plan['entry_decision_priority']
+            if watch.get('strategy','breakout') == 'breakout' and not breakout_confirmation_allowed(
+                    plan, breakout_evidence(prices,native_state,ema)):
+                mark(BREAKOUT_CONFIRMATION_REJECT)
+                return None
         plan["sampled_rsi5"] = sampled_rsi5  # Legacy schema alias; see data_source.
         plan["sampled_context"] = context
         plan["rsi_direction_status"] = reason if native_state is not None or observations is not None else None
@@ -933,7 +931,10 @@ def run():
              RISK_POLL, POLL, RISK_POLL)
     LOG.info("ENTRY_TIMING_POLICY policy=%s setup_on_new_completed_native_bar=true "
              "periodic_setup_fallback_seconds=%d minute_sample_cadence_unchanged=true "
-             "minimum_confirmation_seconds=30 strategy_gates_unchanged=true", ENTRY_TIMING_POLICY, POLL)
+             "minimum_confirmation_seconds=30 existing_risk_gates_unchanged=true", ENTRY_TIMING_POLICY, POLL)
+    LOG.info("BREAKOUT_CONFIRMATION_POLICY policy=%s original_trigger_or_existing_higher_priority=true "
+             "lost_both_cancel_watch=true extra_wait_seconds=0 profitability_validated=false",
+             BREAKOUT_CONFIRMATION_POLICY)
     try:
         with open(__file__, "rb") as source:
             monitor_sha = hashlib.sha256(source.read()).hexdigest()
@@ -1237,6 +1238,10 @@ def run():
                             LOG.info("ALERT_CONFIRM_REJECT reason=%s age_seconds=%.1f strategy=%s",
                                      confirm_diag.get("reason", "other"), age,
                                      watch["plan"].get("strategy"))
+                            if confirm_diag.get('reason') == BREAKOUT_CONFIRMATION_REJECT:
+                                count_event('quality_reject')
+                                LOG.info("WATCH_CANCELLED reason=%s no_additional_wait=true", BREAKOUT_CONFIRMATION_REJECT)
+                                watch = None
                         if plan is not None:
                             plan["entry_timing"] = confirmation_evidence(
                                 watch, plan, native_state, now, time.time())

@@ -1,0 +1,358 @@
+{
+  "source": "Railway runtime logs",
+  "deployment": "5c424883-8829-4610-91db-42bccf7b9ebf",
+  "production_commit": "6c3e22e6ca5c580807de83bf68e871d4c9362761",
+  "start": "2026-10-20T00:50:00Z",
+  "end": "2026-10-20T01:15:00Z",
+  "note": "Log timestamps are not necessarily quote or candidate internal timestamps.",
+  "records": [
+    {
+      "timestamp": "2026-10-20T00:50:05.223465478Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLE_CLOSED {\"period\": 300, \"start\": 1792457100, \"open\": 81660.0, \"high\": 81660.0, \"low\": 81557.1, \"close\": 81593.1, \"volume\": 5.4916, \"turnover\": 448124.7858, \"updated\": 1792457399, \"quality\": \"stream_closed\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:50:05.374411937Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 120, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:50:45.784391027Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 120, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 97.29059856634262, \"min_range_fraction\": 0.006383971079417567, \"minimum_target_fraction\": 0.006233971079417567, \"stop_floor_fraction\": 0.0017883709466661513}, \"entry_source_switched\": true, \"last5_start\": 1792457100, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 32.82426275176746, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:50:45.784409162Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81602.7 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T00:50:45.784413448Z",
+      "message": "INFO:lbank_monitor:NATIVE_SETUP_DIAGNOSTICS {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"market\": {\"atr5\": 97.29059856634262, \"breakout_long\": false, \"breakout_short\": false, \"ema_direction\": -1, \"long_pullback_pct\": 0.1965852504684761, \"minimum_stop_pct\": 0.17883709466661513, \"minimum_target_pct\": 0.6233971079417566, \"momentum15_pct\": -0.006862854432720944, \"momentum5_pct\": -0.08192505510653536, \"pullback_min_pct\": 0.15, \"range60_pct\": 0.6826979989632589, \"range_balanced\": false, \"range_required_pct\": 0.6383971079417566, \"range_width_ok\": true, \"range_width_pct\": 0.7601132938937203, \"short_pullback_pct\": 0.3312780124789821}, \"reason\": \"market_no_setup\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:51:05.786374224Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 120, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:51:55.977319453Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 120, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 97.29059856634262, \"min_range_fraction\": 0.0063827522751260905, \"minimum_target_fraction\": 0.006232752275126091, \"stop_floor_fraction\": 0.0017875582479319392}, \"entry_source_switched\": true, \"last5_start\": 1792457100, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 32.82426275176746, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:51:55.977323119Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81639.8 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T00:52:05.928664430Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 120, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:52:56.402238449Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81644.5 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T00:52:56.402304494Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 120, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 97.29059856634262, \"min_range_fraction\": 0.006382597950398798, \"minimum_target_fraction\": 0.006232597950398798, \"stop_floor_fraction\": 0.0017874553441997187}, \"entry_source_switched\": true, \"last5_start\": 1792457100, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 32.82426275176746, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:53:06.180027702Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 120, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:53:57.055320125Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81586.5 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T00:53:57.055327728Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 120, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 97.29059856634262, \"min_range_fraction\": 0.006384503627358037, \"minimum_target_fraction\": 0.006234503627358037, \"stop_floor_fraction\": 0.0017887260496468648}, \"entry_source_switched\": true, \"last5_start\": 1792457100, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 32.82426275176746, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:54:06.340236356Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 120, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:55:06.578320409Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 120, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 97.29059856634262, \"min_range_fraction\": 0.006384151859021701, \"minimum_target_fraction\": 0.006234151859021701, \"stop_floor_fraction\": 0.0017884914905108747}, \"entry_source_switched\": true, \"last5_start\": 1792457100, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 32.82426275176746, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:55:06.578324506Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81597.2 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T00:55:06.578337261Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLE_CLOSED {\"period\": 300, \"start\": 1792457400, \"open\": 81593.1, \"high\": 81651.2, \"low\": 81568.9, \"close\": 81590.1, \"volume\": 5.358, \"turnover\": 437269.60162, \"updated\": 1792457699, \"quality\": \"stream_closed\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:55:06.578343451Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 121, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:56:06.659188077Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 121, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 96.21984152588979, \"min_range_fraction\": 0.0063545379261668615, \"minimum_target_fraction\": 0.0062045379261668615, \"stop_floor_fraction\": 0.0017687449192934157}, \"entry_source_switched\": true, \"last5_start\": 1792457400, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 32.67646720150205, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:56:06.659201064Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81600.1 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T00:56:06.659926900Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 121, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:57:04.405292851Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 121, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 96.21984152588979, \"min_range_fraction\": 0.006353563070045554, \"minimum_target_fraction\": 0.006203563070045554, \"stop_floor_fraction\": 0.0017680948852057594}, \"entry_source_switched\": true, \"last5_start\": 1792457400, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 32.67646720150205, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:57:04.417717399Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81630.1 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T00:57:07.161654085Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 121, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:58:07.637459470Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 121, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 96.21984152588979, \"min_range_fraction\": 0.00635438840170212, \"minimum_target_fraction\": 0.00620438840170212, \"stop_floor_fraction\": 0.0017686452163764425}, \"entry_source_switched\": true, \"last5_start\": 1792457400, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 32.67646720150205, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:58:07.637470191Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81604.7 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T00:58:07.637489985Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 121, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:59:07.424460079Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 121, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:59:10.084391763Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 121, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 96.21984152588979, \"min_range_fraction\": 0.006351625236553639, \"minimum_target_fraction\": 0.006201625236553639, \"stop_floor_fraction\": 0.0017668027377816407}, \"entry_source_switched\": true, \"last5_start\": 1792457400, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 32.67646720150205, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T00:59:10.084394798Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81689.8 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T01:00:00.940520325Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLE_CLOSED {\"period\": 300, \"start\": 1792457700, \"open\": 81590.1, \"high\": 81714.0, \"low\": 81590.0, \"close\": 81699.4, \"volume\": 5.5148, \"turnover\": 450220.49012, \"updated\": 1792457999, \"quality\": \"stream_closed\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:00:08.194370193Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 122, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:00:13.087510919Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 122, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 98.20413855975481, \"min_range_fraction\": 0.006405907439095439, \"minimum_target_fraction\": 0.006255907439095439, \"stop_floor_fraction\": 0.0018029981118843806}, \"entry_source_switched\": true, \"last5_start\": 1792457700, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 42.784441136005256, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:00:13.087557585Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81700.7 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T01:01:12.900039791Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 122, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:01:15.912608581Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 122, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 98.20413855975481, \"min_range_fraction\": 0.006405993491112388, \"minimum_target_fraction\": 0.006255993491112388, \"stop_floor_fraction\": 0.0018030554913716745}, \"entry_source_switched\": true, \"last5_start\": 1792457700, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 42.784441136005256, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:01:15.912611937Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81698.1 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T01:01:15.912616169Z",
+      "message": "INFO:lbank_monitor:NATIVE_SETUP_DIAGNOSTICS {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"market\": {\"atr5\": 98.20413855975481, \"breakout_long\": false, \"breakout_short\": false, \"ema_direction\": -1, \"long_pullback_pct\": 0.1560988748637961, \"minimum_stop_pct\": 0.18030554913716745, \"minimum_target_pct\": 0.6255993491112388, \"momentum15_pct\": 0.06603360975974137, \"momentum5_pct\": 0.09681372549019684, \"pullback_min_pct\": 0.15, \"range60_pct\": 0.6033188042316703, \"range_balanced\": true, \"range_required_pct\": 0.6405993491112388, \"range_width_ok\": true, \"range_width_pct\": 0.6820602602872112, \"short_pullback_pct\": 0.1963785061031528}, \"reason\": \"market_no_setup\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:02:08.396485437Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 122, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:02:28.330327331Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 122, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 98.20413855975481, \"min_range_fraction\": 0.006407762079397045, \"minimum_target_fraction\": 0.006257762079397045, \"stop_floor_fraction\": 0.0018042347860869378}, \"entry_source_switched\": true, \"last5_start\": 1792457700, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 42.784441136005256, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:02:28.330333683Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81644.7 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T01:03:09.159770541Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 122, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:03:29.049603843Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 122, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 98.20413855975481, \"min_range_fraction\": 0.006408517911945924, \"minimum_target_fraction\": 0.006258517911945924, \"stop_floor_fraction\": 0.0018047387752506646}, \"entry_source_switched\": true, \"last5_start\": 1792457700, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 42.784441136005256, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:03:29.049609660Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81621.9 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T01:04:09.461341962Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 122, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:04:29.566988270Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 122, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 98.20413855975481, \"min_range_fraction\": 0.006410897560743356, \"minimum_target_fraction\": 0.006260897560743356, \"stop_floor_fraction\": 0.0018063255251321542}, \"entry_source_switched\": true, \"last5_start\": 1792457700, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 42.784441136005256, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:04:29.566997252Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81550.2 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T01:05:01.223380127Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLE_CLOSED {\"period\": 300, \"start\": 1792458000, \"open\": 81699.4, \"high\": 81702.9, \"low\": 81529.3, \"close\": 81529.4, \"volume\": 6.7276, \"turnover\": 549183.07086, \"updated\": 1792458299, \"quality\": \"stream_closed\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:05:10.500233808Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 123, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:05:30.359952376Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 123, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 103.58955723405742, \"min_range_fraction\": 0.006559460532761355, \"minimum_target_fraction\": 0.006409460532761355, \"stop_floor_fraction\": 0.0019053873188361265}, \"entry_source_switched\": true, \"last5_start\": 1792458000, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 34.186961409571, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:05:30.359970314Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81550.0 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T01:06:10.513466821Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 123, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:06:31.583015228Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 123, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 103.58955723405742, \"min_range_fraction\": 0.006559134698219914, \"minimum_target_fraction\": 0.006409134698219914, \"stop_floor_fraction\": 0.0019051700523556004}, \"entry_source_switched\": true, \"last5_start\": 1792458000, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 34.186961409571, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:06:31.583018324Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81559.3 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T01:07:10.343704710Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 123, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:07:40.637860795Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 123, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 103.58955723405742, \"min_range_fraction\": 0.006560333294439575, \"minimum_target_fraction\": 0.006410333294439575, \"stop_floor_fraction\": 0.0019059692763466235}, \"entry_source_switched\": true, \"last5_start\": 1792458000, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 34.186961409571, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:07:40.637864573Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81525.1 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T01:08:10.616230979Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 123, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:08:40.404598254Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 123, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 103.58955723405742, \"min_range_fraction\": 0.00656296180635296, \"minimum_target_fraction\": 0.00641296180635296, \"stop_floor_fraction\": 0.0019077219681607428}, \"entry_source_switched\": true, \"last5_start\": 1792458000, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 34.186961409571, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:08:40.404601645Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81450.2 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T01:09:21.081643644Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 123, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:09:41.000617068Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 123, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 103.58955723405742, \"min_range_fraction\": 0.006566725220357399, \"minimum_target_fraction\": 0.006416725220357399, \"stop_floor_fraction\": 0.0019102314127190242}, \"entry_source_switched\": true, \"last5_start\": 1792458000, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 34.186961409571, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:09:41.000620939Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81343.2 count=360 watch=none confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T01:10:00.987414586Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLE_CLOSED {\"period\": 300, \"start\": 1792458300, \"open\": 81529.4, \"high\": 81585.8, \"low\": 81208.1, \"close\": 81267.6, \"volume\": 83.8994, \"turnover\": 6820798.93756, \"updated\": 1792458599, \"quality\": \"stream_closed\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:10:21.117249958Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 124, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:10:50.689440810Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 124, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 123.16887457448169, \"min_range_fraction\": 0.00710917650231369, \"minimum_target_fraction\": 0.00695917650231369, \"stop_floor_fraction\": 0.0022719379419958823}, \"entry_source_switched\": true, \"last5_start\": 1792458300, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 25.64152049633779, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:10:50.689459894Z",
+      "message": "INFO:lbank_monitor:PREWATCH candidate strategy=breakout direction=SHORT price=81319.7 rsi1=22.7"
+    },
+    {
+      "timestamp": "2026-10-20T01:10:50.689463479Z",
+      "message": "INFO:lbank_monitor:watch created 숏 strategy=breakout at 81319.7 context={'range5_pct': 0.5313310593643572, 'trend5_pct': -0.39526854361007224, 'trend15_pct': -0.06544110361834665, 'three_step_recovery': False, 'reversal_confirmed': False, 'reversal_10m_pct': 0.528522853288993, 'reversal_last5_pct': 0.32111115744748453, 'context_type': 'lbank_native_1m_aggregated_5m'}"
+    },
+    {
+      "timestamp": "2026-10-20T01:10:50.689466920Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81319.7 count=360 watch=숏 confirmed_total=0 tracked_references=0"
+    },
+    {
+      "timestamp": "2026-10-20T01:11:20.531941897Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 124, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:11:20.531950178Z",
+      "message": "WARNING:lbank_monitor:ENTRY_EVIDENCE_AUDIT strategy=breakout side=숏 stage2_signed_progress_pct=-0.06161 native_1m_to_quote_move5_pct=-0.2005 native_1m_to_quote_move15_pct=-0.2821 native_15m_45m_signed_pct=0.0654 confirmed_reversal=False read_only_no_quality_gate_change=true"
+    },
+    {
+      "timestamp": "2026-10-20T01:11:20.531953782Z",
+      "message": "INFO:lbank_monitor:ENTRY_QUALITY_SENT reference=13 evidence={\"confirmation_quote\": 81369.8, \"confirmed_1m_closes\": [], \"confirmed_1m_starts\": [], \"frozen_breakout_level\": 81443.0, \"minute_followthrough\": false, \"policy\": \"native_structure_priority_v2\", \"priority\": {\"bar_start\": 1792458300, \"dominant_intact\": false, \"ema_aligned\": true, \"observed_barrier\": null, \"order\": [\"hard_risk\", \"higher_structure\", \"target_room\", \"minute_reaction\"], \"policy\": \"native_structure_priority_v2\", \"ready\": true, \"support\": 81714.0, \"support_intact\": true, \"swing_structure\": true, \"target_room\": \"unknown\", \"trend15_aligned\": false}, \"ranked_entry\": {\"atr5\": 123.16887457448169, \"atr_target_exception\": false, \"bar_start\": 1792458300, \"barrier_groups\": [], \"ema9\": 81563.91379221278, \"extension_atr\": 1.5759971249505809, \"higher_direction_intact\": false, \"location_ok\": true, \"max_extension_atr\": 2.5, \"max_trend_target_atr\": 6.0, \"may_override_minor_reaction\": false, \"may_override_single_pivots\": false, \"overrides\": [], \"policy\": \"native_ranked_entry_v1\", \"ready\": true, \"repeated_barrier\": false, \"target_distance_atr\": 5.93234734953037, \"upper_evidence\": {\"bar_start\": 1792458300, \"dominant_intact\": false, \"ema_aligned\": true, \"observed_barrier\": null, \"order\": [\"hard_risk\", \"higher_structure\", \"target_room\", \"minute_reaction\"], \"policy\": \"native_structure_priority_v2\", \"ready\": true, \"support\": 81714.0, \"support_intact\": true, \"swing_structure\": true, \"target_room\": \"unknown\", \"trend15_aligned\": false}}, \"requires_two_minute_wait\": false, \"signed_progress_pct\": -0.06160868768576577, \"watch_last_closed_1m\": 1792458540, \"watch_price\": 81319.7}"
+    },
+    {
+      "timestamp": "2026-10-20T01:11:20.533210798Z",
+      "message": "INFO:lbank_monitor:ENTRY_PRIORITY_SENT reference=13 evidence={\"atr5\": 123.16887457448169, \"atr_target_exception\": false, \"bar_start\": 1792458300, \"barrier_groups\": [], \"ema9\": 81563.91379221278, \"extension_atr\": 1.5759971249505809, \"higher_direction_intact\": false, \"location_ok\": true, \"max_extension_atr\": 2.5, \"max_trend_target_atr\": 6.0, \"may_override_minor_reaction\": false, \"may_override_single_pivots\": false, \"overrides\": [], \"policy\": \"native_ranked_entry_v1\", \"ready\": true, \"repeated_barrier\": false, \"target_distance_atr\": 5.93234734953037, \"upper_evidence\": {\"bar_start\": 1792458300, \"dominant_intact\": false, \"ema_aligned\": true, \"observed_barrier\": null, \"order\": [\"hard_risk\", \"higher_structure\", \"target_room\", \"minute_reaction\"], \"policy\": \"native_structure_priority_v2\", \"ready\": true, \"support\": 81714.0, \"support_intact\": true, \"swing_structure\": true, \"target_room\": \"unknown\", \"trend15_aligned\": false}}"
+    },
+    {
+      "timestamp": "2026-10-20T01:11:20.533216456Z",
+      "message": "INFO:lbank_monitor:ENTRY_THESIS_SENT reference=13 evidence={\"anchor\": null, \"anchor_source\": \"hard_stop_and_confirmed_reversal\", \"entry\": 81369.8, \"entry_bar_start\": 1792458300, \"frozen_at\": 1792458674.574107, \"initial_stop\": 81664.39197, \"policy\": \"native_frozen_thesis_v3\", \"review_seconds\": 21600, \"tracking_seconds\": 86400}"
+    },
+    {
+      "timestamp": "2026-10-20T01:11:20.533220493Z",
+      "message": "INFO:lbank_monitor:ENTRY REVIEW SENT strategy=breakout side=숏 entry=81369.8 stop=81664.4 t1=80639.1 t2=80222.5 net_rr=1.50 reverse_exception=False"
+    },
+    {
+      "timestamp": "2026-10-20T01:11:40.385154283Z",
+      "message": "INFO:lbank_signal_risk:SIGNAL_THESIS reference=13 evidence={\"anchor\": null, \"bar_start\": 1792458300, \"evaluated_at\": 1792458699.978619, \"invalidated\": false, \"last_close\": 81267.6, \"opposite15\": true, \"opposite_ema\": false, \"opposite_swings\": false, \"policy\": \"native_frozen_thesis_v3\", \"reason\": \"mixed_evidence_not_reversal\", \"reversal_since\": 1792455300, \"status\": \"weakened\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:12:00.513468424Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 124, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 123.16887457448169, \"min_range_fraction\": 0.007111612582722981, \"minimum_target_fraction\": 0.006961612582722981, \"stop_floor_fraction\": 0.0022735623204775996}, \"entry_source_switched\": true, \"last5_start\": 1792458300, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 25.64152049633779, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:12:00.513471941Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81261.6 count=360 watch=none confirmed_total=1 tracked_references=1"
+    },
+    {
+      "timestamp": "2026-10-20T01:12:00.513475820Z",
+      "message": "INFO:lbank_monitor:NATIVE_SETUP_DIAGNOSTICS {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"reason\": \"price_deviation\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:12:11.764273751Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 124, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:13:11.922459976Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 124, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 123.16887457448169, \"min_range_fraction\": 0.00711208678618946, \"minimum_target_fraction\": 0.00696208678618946, \"stop_floor_fraction\": 0.0022738785193620516}, \"entry_source_switched\": true, \"last5_start\": 1792458300, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 25.64152049633779, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:13:11.922467001Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81250.3 count=360 watch=none confirmed_total=1 tracked_references=1"
+    },
+    {
+      "timestamp": "2026-10-20T01:13:11.922478989Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 124, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:14:05.462479016Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 124, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 123.16887457448169, \"min_range_fraction\": 0.0071132707721286706, \"minimum_target_fraction\": 0.006963270772128671, \"stop_floor_fraction\": 0.002274668001217926}, \"entry_source_switched\": true, \"last5_start\": 1792458300, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 25.64152049633779, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T01:14:05.462481884Z",
+      "message": "INFO:lbank_monitor:contract=BTCUSDT price=81222.1 count=360 watch=none confirmed_total=1 tracked_references=1"
+    },
+    {
+      "timestamp": "2026-10-20T01:14:12.383515288Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 124, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    }
+  ]
+}

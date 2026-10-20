@@ -56,6 +56,8 @@ def confirmation_evidence(watch, plan, state, quote_at, evaluated_at):
                     dominant_intact=priority.get("dominant_intact"),
                     extension_atr=ranked.get("extension_atr"),
                     target_distance_atr=ranked.get("target_distance_atr"),
-                    strategy_gate_changed=False, orderbook_verified=False,
+                    strategy_gate_changed=bool(quality.get('breakout_confirmation')),
+                    breakout_confirmation=quality.get('breakout_confirmation'),
+                    existing_risk_gates_changed=False, orderbook_verified=False,
                     profitability_verified=False)
     return evidence

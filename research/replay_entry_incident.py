@@ -5,6 +5,8 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+import subprocess
+import types
 import zlib
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
@@ -43,24 +45,38 @@ def main():
     source=parser.add_mutually_exclusive_group(required=True)
     source.add_argument('--railway-log');source.add_argument('--bundle')
     parser.add_argument('--save-bundle');parser.add_argument('--output')
+    parser.add_argument('--source-ref',help='Default: archived runtime commit; WORKTREE explicitly uses changed code')
+    parser.add_argument('--allow-policy-change',action='store_true')
     args=parser.parse_args()
     if args.railway_log:
         bundle,sha=decode_archive(json.loads(Path(args.railway_log).read_text()))
     else:
         bundle=json.loads(Path(args.bundle).read_text())
         sha=hashlib.sha256(json.dumps(bundle,sort_keys=True,ensure_ascii=False,allow_nan=False).encode()).hexdigest()
+    source_ref=args.source_ref or bundle.get('runtime_source_commit')
+    gates=monitor
+    source_sha=hashlib.sha256(Path(monitor.__file__).read_bytes()).hexdigest()
+    if source_ref and source_ref!='WORKTREE':
+        source=subprocess.check_output(['git','show',source_ref+':lbank_futures_monitor.py'],
+                                       cwd=Path(__file__).resolve().parents[1])
+        source_sha=hashlib.sha256(source).hexdigest()
+        gates=types.ModuleType('pinned_incident_monitor')
+        gates.__file__=monitor.__file__
+        exec(compile(source,'<pinned-incident-monitor>','exec'),gates.__dict__)
     mapping=dict(fee='TAKER_FEE',slippage='STOP_SLIPPAGE',funding_buffer='FUNDING_BUFFER',
         reference_balance='REF_BALANCE',risk_fraction='RISK_FRACTION',leverage='LEVERAGE',
         max_margin_fraction='MAX_MARGIN_FRACTION')
     for key,field in mapping.items():
-        if key in bundle.get('model_config',{}):setattr(monitor,field,bundle['model_config'][key])
-    result=replay(bundle,monitor.classify,monitor.confirm_watch)
-    output=dict(archive_sha256=sha,result=result,matches_archived_result=result==bundle.get('result'))
+        if key in bundle.get('model_config',{}):setattr(gates,field,bundle['model_config'][key])
+    result=replay(bundle,gates.classify,gates.confirm_watch)
+    output=dict(archive_sha256=sha,gate_source=source_ref,gate_source_sha256=source_sha,result=result,
+                matches_archived_result=result==bundle.get('result'),policy_comparison=args.allow_policy_change)
     if args.save_bundle:Path(args.save_bundle).write_text(json.dumps(bundle,sort_keys=True,ensure_ascii=False,indent=2)+'\n')
     rendered=json.dumps(output,sort_keys=True,ensure_ascii=False,indent=2)+'\n'
     if args.output:Path(args.output).write_text(rendered)
     print(rendered)
-    if result!=bundle.get('result'):raise SystemExit('replay differs from archived result')
+    if result!=bundle.get('result') and not args.allow_policy_change:
+        raise SystemExit('replay differs from archived result')
 
 
 if __name__=='__main__':main()

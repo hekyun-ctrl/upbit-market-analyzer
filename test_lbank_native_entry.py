@@ -113,7 +113,9 @@ class NativeEntryTests(unittest.TestCase):
         state, _ = self.snapshot()
         # Isolate directional alignment while retaining real native context,
         # price structure and fee/risk/target calculation on both stages.
-        state["rsi5"]["rsi"] = [84., 85.]
+        # Include the third RSI sample required by the existing higher-priority
+        # policy when the future fixture pauses rather than makes a fresh break.
+        state["rsi5"]["rsi"] = [83., 84., 85.]
         with patch("lbank_futures_monitor.sampled_context_gate", side_effect=AssertionError("ticker fallback")), \
              patch("lbank_futures_monitor.sampled_five_minute_rsi", side_effect=AssertionError("ticker RSI fallback")):
             diag = {}
@@ -124,6 +126,9 @@ class NativeEntryTests(unittest.TestCase):
             self.assertEqual(plan["rsi5"], 85.)  # No overbought LONG veto.
             self.assertIsNotNone(monitor.confirm_watch(state["prices"], plan, 60, native_state=state))
             future = future_confirmation_state(state, plan)
+            # A modest pullback remains inside the existing 2.5 ATR cap; the
+            # original +85 quote is beyond that cap once priority is fully ready.
+            future['quote'] = plan['price'] + 25.
             confirmed = monitor.confirm_watch(future["prices"], plan, 180, native_state=future)
             self.assertIsNotNone(confirmed)
             self.assertEqual(confirmed["data_source"], SOURCE)

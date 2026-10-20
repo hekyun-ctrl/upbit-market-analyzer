@@ -14,7 +14,7 @@ class StopLoop(BaseException):
 
 
 def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
-              ready_at=None,qualify_at=None,stop_at=9075.):
+              ready_at=None,qualify_at=None,stop_at=9075.,cancel_at=None):
     clock=SimpleNamespace(now=9000.);order=[];saved=[];sent=[];confirmed=[]
     state=structural_state();state['rsi5']['closes']=[b['close'] for b in state['five_bars']]
     p=state['quote'];plan=dict(direction=1,side='롱',strategy='breakout',price=p,
@@ -28,6 +28,9 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
         return (None if now==missing_at or ready_at is not None and now<ready_at else fresh),{}
     def confirm(prices,watch,age,**kwargs):
         order.append((clock.now,'confirm'));confirmed.append((clock.now,age,kwargs['native_state']['quote']))
+        if clock.now==cancel_at:
+            kwargs['diagnostics']['reason']=monitor.BREAKOUT_CONFIRMATION_REJECT
+            return None
         return None if clock.now==reject_at else copy.deepcopy(plan)
     def sample(now,*args,**kwargs):
         if now==journal_fails_at:raise OSError('journal unavailable')
@@ -136,6 +139,11 @@ class ConfirmationCadenceTests(unittest.TestCase):
     def test_closed_bar_detection_does_not_override_rejected_candidate(self):
         r=run_clock(ready_at=9015.,qualify_at=9200.,stop_at=9120.)
         self.assertEqual(r['sent'],[]);self.assertEqual(r['confirmed'],[])
+
+    def test_lost_trigger_cancels_candidate_instead_of_waiting_to_send_late(self):
+        r=run_clock(cancel_at=9030.)
+        self.assertEqual([t for t,_,_ in r['confirmed']],[9030.])
+        self.assertEqual(r['sent'],[])
 
 
 if __name__=='__main__':unittest.main()
