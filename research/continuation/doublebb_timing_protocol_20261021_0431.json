@@ -1,0 +1,15 @@
+{
+  "version": "doubleBB_availability_timing_only_v1",
+  "frozen_before_calculation": true,
+  "source": "25388b431c9c9d38df6a434670586c65f382d604",
+  "entry_window": "2025Jan8-15exclusive",
+  "followup": "Jan16exclusive",
+  "seen_development": true,
+  "intervention": "Only existing doubleBB closed1m reaction and 30s watch bypass; original context RSI price risk target overlap management cost same",
+  "data_sha": "b69ca5b2c2d1ae00d68d2790d09138cb2a44085ff19e0da5dc98b569ea7e489e",
+  "funding_sha": "df725010d55458866eb5a47e9ee708c6796c9d7e77b14c38342cea11f381815e",
+  "original_replica": false,
+  "source_video": "https://www.youtube.com/watch?v=eGaaM0Pz2Lk",
+  "transcript": "Unavailable provider insufficient credits; no retry",
+  "promotion": false
+}
