@@ -1,0 +1,1768 @@
+[
+  {
+    "name": "entrybar_stop_touch",
+    "synthetic": true,
+    "commission_rate": 0.0006,
+    "initial_cash": 1000.0,
+    "bars": [
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        90,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ]
+    ],
+    "orders": [
+      {
+        "bar": 1,
+        "status": "Submitted",
+        "ref": 1,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Accepted",
+        "ref": 1,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Completed",
+        "ref": 1,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 100.0,
+        "size": 1.0,
+        "commission": 0.06
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 2,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 3,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 2,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 3,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      }
+    ],
+    "states": [
+      {
+        "bar": 0,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": true,
+        "entry_refs": 1,
+        "cash": 1000.0,
+        "value": 1000.0
+      },
+      {
+        "bar": 1,
+        "position": 1.0,
+        "stop": 98.0,
+        "take": 104.0,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 899.94,
+        "value": 999.94
+      },
+      {
+        "bar": 2,
+        "position": 1.0,
+        "stop": 98.0,
+        "take": 104.0,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 899.94,
+        "value": 999.94
+      },
+      {
+        "bar": 3,
+        "position": 1.0,
+        "stop": 98.0,
+        "take": 104.0,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 899.94,
+        "value": 999.94
+      }
+    ],
+    "closed": [],
+    "original_analyzer": [],
+    "final_cash": 899.94,
+    "final_value": 999.94,
+    "final_position": 1.0
+  },
+  {
+    "name": "long_dual",
+    "synthetic": true,
+    "commission_rate": 0.0006,
+    "initial_cash": 1000.0,
+    "bars": [
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        105,
+        95,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ]
+    ],
+    "orders": [
+      {
+        "bar": 1,
+        "status": "Submitted",
+        "ref": 4,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Accepted",
+        "ref": 4,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Completed",
+        "ref": 4,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 100.0,
+        "size": 1.0,
+        "commission": 0.06
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 5,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 6,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 5,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 6,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Completed",
+        "ref": 5,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 104.0,
+        "size": -1.0,
+        "commission": 0.0624
+      },
+      {
+        "bar": 2,
+        "status": "Completed",
+        "ref": 6,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 98.0,
+        "size": -1.0,
+        "commission": 0.0588
+      }
+    ],
+    "states": [
+      {
+        "bar": 0,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": true,
+        "entry_refs": 1,
+        "cash": 1000.0,
+        "value": 1000.0
+      },
+      {
+        "bar": 1,
+        "position": 1.0,
+        "stop": 98.0,
+        "take": 104.0,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 899.94,
+        "value": 999.94
+      },
+      {
+        "bar": 2,
+        "position": -1.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 1101.8188,
+        "value": 1001.8188
+      },
+      {
+        "bar": 3,
+        "position": -1.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 1101.8188,
+        "value": 1001.8188
+      }
+    ],
+    "closed": [
+      {
+        "gross": 4.0,
+        "net": 3.8776,
+        "bar": 2
+      }
+    ],
+    "original_analyzer": [
+      {
+        "entry_bar": 2,
+        "exit_bar": 3,
+        "entry_price": 100.0,
+        "exit_price": 100.0,
+        "size": 0.0,
+        "pnl_gross": 4.0,
+        "pnl_net": 3.8776,
+        "commission": 0.1224,
+        "duration_bars": 1
+      }
+    ],
+    "final_cash": 1101.8188,
+    "final_value": 1001.8188,
+    "final_position": -1.0
+  },
+  {
+    "name": "stop_only",
+    "synthetic": true,
+    "commission_rate": 0.0006,
+    "initial_cash": 1000.0,
+    "bars": [
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        97,
+        99,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ]
+    ],
+    "orders": [
+      {
+        "bar": 1,
+        "status": "Submitted",
+        "ref": 7,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Accepted",
+        "ref": 7,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Completed",
+        "ref": 7,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 100.0,
+        "size": 1.0,
+        "commission": 0.06
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 8,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 9,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 8,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 9,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Completed",
+        "ref": 9,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 98.0,
+        "size": -1.0,
+        "commission": 0.0588
+      },
+      {
+        "bar": 3,
+        "status": "Canceled",
+        "ref": 8,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      }
+    ],
+    "states": [
+      {
+        "bar": 0,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": true,
+        "entry_refs": 1,
+        "cash": 1000.0,
+        "value": 1000.0
+      },
+      {
+        "bar": 1,
+        "position": 1.0,
+        "stop": 98.0,
+        "take": 104.0,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 899.94,
+        "value": 999.94
+      },
+      {
+        "bar": 2,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 997.8812,
+        "value": 997.8812
+      },
+      {
+        "bar": 3,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 997.8812,
+        "value": 997.8812
+      }
+    ],
+    "closed": [
+      {
+        "gross": -2.0,
+        "net": -2.1188,
+        "bar": 2
+      }
+    ],
+    "original_analyzer": [
+      {
+        "entry_bar": 2,
+        "exit_bar": 3,
+        "entry_price": 100.0,
+        "exit_price": 100.0,
+        "size": 0.0,
+        "pnl_gross": -2.0,
+        "pnl_net": -2.1188,
+        "commission": 0.1188,
+        "duration_bars": 1
+      }
+    ],
+    "final_cash": 997.8812,
+    "final_value": 997.8812,
+    "final_position": 0.0
+  },
+  {
+    "name": "target_only",
+    "synthetic": true,
+    "commission_rate": 0.0006,
+    "initial_cash": 1000.0,
+    "bars": [
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        105,
+        99,
+        103,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ]
+    ],
+    "orders": [
+      {
+        "bar": 1,
+        "status": "Submitted",
+        "ref": 10,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Accepted",
+        "ref": 10,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Completed",
+        "ref": 10,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 100.0,
+        "size": 1.0,
+        "commission": 0.06
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 11,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 12,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 11,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 12,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Completed",
+        "ref": 11,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 104.0,
+        "size": -1.0,
+        "commission": 0.0624
+      },
+      {
+        "bar": 3,
+        "status": "Canceled",
+        "ref": 12,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      }
+    ],
+    "states": [
+      {
+        "bar": 0,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": true,
+        "entry_refs": 1,
+        "cash": 1000.0,
+        "value": 1000.0
+      },
+      {
+        "bar": 1,
+        "position": 1.0,
+        "stop": 98.0,
+        "take": 104.0,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 899.94,
+        "value": 999.94
+      },
+      {
+        "bar": 2,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 1003.8776,
+        "value": 1003.8776
+      },
+      {
+        "bar": 3,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 1003.8776,
+        "value": 1003.8776
+      }
+    ],
+    "closed": [
+      {
+        "gross": 4.0,
+        "net": 3.8776,
+        "bar": 2
+      }
+    ],
+    "original_analyzer": [
+      {
+        "entry_bar": 2,
+        "exit_bar": 3,
+        "entry_price": 100.0,
+        "exit_price": 100.0,
+        "size": 0.0,
+        "pnl_gross": 4.0,
+        "pnl_net": 3.8776,
+        "commission": 0.1224,
+        "duration_bars": 1
+      }
+    ],
+    "final_cash": 1003.8776,
+    "final_value": 1003.8776,
+    "final_position": 0.0
+  },
+  {
+    "name": "stop_gap",
+    "synthetic": true,
+    "commission_rate": 0.0006,
+    "initial_cash": 1000.0,
+    "bars": [
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        95,
+        96,
+        94,
+        95,
+        1
+      ],
+      [
+        95,
+        96,
+        94,
+        95,
+        1
+      ]
+    ],
+    "orders": [
+      {
+        "bar": 1,
+        "status": "Submitted",
+        "ref": 13,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Accepted",
+        "ref": 13,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Completed",
+        "ref": 13,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 100.0,
+        "size": 1.0,
+        "commission": 0.06
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 14,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 15,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 14,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 15,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Completed",
+        "ref": 15,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 95.0,
+        "size": -1.0,
+        "commission": 0.056999999999999995
+      },
+      {
+        "bar": 3,
+        "status": "Canceled",
+        "ref": 14,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      }
+    ],
+    "states": [
+      {
+        "bar": 0,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": true,
+        "entry_refs": 1,
+        "cash": 1000.0,
+        "value": 1000.0
+      },
+      {
+        "bar": 1,
+        "position": 1.0,
+        "stop": 98.0,
+        "take": 104.0,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 899.94,
+        "value": 999.94
+      },
+      {
+        "bar": 2,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 994.883,
+        "value": 994.883
+      },
+      {
+        "bar": 3,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 994.883,
+        "value": 994.883
+      }
+    ],
+    "closed": [
+      {
+        "gross": -5.0,
+        "net": -5.117,
+        "bar": 2
+      }
+    ],
+    "original_analyzer": [
+      {
+        "entry_bar": 2,
+        "exit_bar": 3,
+        "entry_price": 100.0,
+        "exit_price": 100.0,
+        "size": 0.0,
+        "pnl_gross": -5.0,
+        "pnl_net": -5.117,
+        "commission": 0.117,
+        "duration_bars": 1
+      }
+    ],
+    "final_cash": 994.883,
+    "final_value": 994.883,
+    "final_position": 0.0
+  },
+  {
+    "name": "short_dual",
+    "synthetic": true,
+    "commission_rate": 0.0006,
+    "initial_cash": 1000.0,
+    "bars": [
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        105,
+        95,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ]
+    ],
+    "orders": [
+      {
+        "bar": 1,
+        "status": "Submitted",
+        "ref": 16,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Accepted",
+        "ref": 16,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Completed",
+        "ref": 16,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 100.0,
+        "size": -1.0,
+        "commission": 0.06
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 17,
+        "is_entry": false,
+        "created_price": 96.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 18,
+        "is_entry": false,
+        "created_price": 102.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 17,
+        "is_entry": false,
+        "created_price": 96.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 18,
+        "is_entry": false,
+        "created_price": 102.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Completed",
+        "ref": 17,
+        "is_entry": false,
+        "created_price": 96.0,
+        "price": 96.0,
+        "size": 1.0,
+        "commission": 0.0576
+      },
+      {
+        "bar": 2,
+        "status": "Completed",
+        "ref": 18,
+        "is_entry": false,
+        "created_price": 102.0,
+        "price": 102.0,
+        "size": 1.0,
+        "commission": 0.0612
+      }
+    ],
+    "states": [
+      {
+        "bar": 0,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": true,
+        "entry_refs": 1,
+        "cash": 1000.0,
+        "value": 1000.0
+      },
+      {
+        "bar": 1,
+        "position": -1.0,
+        "stop": 102.0,
+        "take": 96.0,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 1099.94,
+        "value": 999.94
+      },
+      {
+        "bar": 2,
+        "position": 1.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 901.8212000000001,
+        "value": 1001.8212000000001
+      },
+      {
+        "bar": 3,
+        "position": 1.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 901.8212000000001,
+        "value": 1001.8212000000001
+      }
+    ],
+    "closed": [
+      {
+        "gross": 4.0,
+        "net": 3.8824,
+        "bar": 2
+      }
+    ],
+    "original_analyzer": [
+      {
+        "entry_bar": 2,
+        "exit_bar": 3,
+        "entry_price": 100.0,
+        "exit_price": 100.0,
+        "size": 0.0,
+        "pnl_gross": 4.0,
+        "pnl_net": 3.8824,
+        "commission": 0.1176,
+        "duration_bars": 1
+      }
+    ],
+    "final_cash": 901.8212000000001,
+    "final_value": 1001.8212000000001,
+    "final_position": 1.0
+  },
+  {
+    "name": "margin",
+    "synthetic": true,
+    "commission_rate": 0.0006,
+    "initial_cash": 50,
+    "bars": [
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ]
+    ],
+    "orders": [
+      {
+        "bar": 1,
+        "status": "Submitted",
+        "ref": 19,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Margin",
+        "ref": 19,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      }
+    ],
+    "states": [
+      {
+        "bar": 0,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": true,
+        "entry_refs": 1,
+        "cash": 50.0,
+        "value": 50.0
+      },
+      {
+        "bar": 1,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": true,
+        "entry_refs": 1,
+        "cash": 50.0,
+        "value": 50.0
+      },
+      {
+        "bar": 2,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": true,
+        "entry_refs": 1,
+        "cash": 50.0,
+        "value": 50.0
+      },
+      {
+        "bar": 3,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": true,
+        "entry_refs": 1,
+        "cash": 50.0,
+        "value": 50.0
+      }
+    ],
+    "closed": [],
+    "original_analyzer": [],
+    "final_cash": 50.0,
+    "final_value": 50.0,
+    "final_position": 0.0
+  },
+  {
+    "name": "entry_gap",
+    "synthetic": true,
+    "commission_rate": 0.0006,
+    "initial_cash": 1000.0,
+    "bars": [
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        110,
+        111,
+        109,
+        110,
+        1
+      ],
+      [
+        110,
+        111,
+        109,
+        110,
+        1
+      ],
+      [
+        110,
+        111,
+        109,
+        110,
+        1
+      ]
+    ],
+    "orders": [
+      {
+        "bar": 1,
+        "status": "Submitted",
+        "ref": 20,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Accepted",
+        "ref": 20,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Completed",
+        "ref": 20,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 110.0,
+        "size": 1.0,
+        "commission": 0.06599999999999999
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 21,
+        "is_entry": false,
+        "created_price": 114.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 22,
+        "is_entry": false,
+        "created_price": 108.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 21,
+        "is_entry": false,
+        "created_price": 114.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 22,
+        "is_entry": false,
+        "created_price": 108.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      }
+    ],
+    "states": [
+      {
+        "bar": 0,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": true,
+        "entry_refs": 1,
+        "cash": 1000.0,
+        "value": 1000.0
+      },
+      {
+        "bar": 1,
+        "position": 1.0,
+        "stop": 108.0,
+        "take": 114.0,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 889.934,
+        "value": 999.934
+      },
+      {
+        "bar": 2,
+        "position": 1.0,
+        "stop": 108.0,
+        "take": 114.0,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 889.934,
+        "value": 999.934
+      },
+      {
+        "bar": 3,
+        "position": 1.0,
+        "stop": 108.0,
+        "take": 114.0,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 889.934,
+        "value": 999.934
+      }
+    ],
+    "closed": [],
+    "original_analyzer": [],
+    "final_cash": 889.934,
+    "final_value": 999.934,
+    "final_position": 1.0
+  },
+  {
+    "name": "stop_only_double_commission",
+    "synthetic": true,
+    "commission_rate": 0.0012,
+    "initial_cash": 1000.0,
+    "bars": [
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        97,
+        99,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ]
+    ],
+    "orders": [
+      {
+        "bar": 1,
+        "status": "Submitted",
+        "ref": 23,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Accepted",
+        "ref": 23,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Completed",
+        "ref": 23,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 100.0,
+        "size": 1.0,
+        "commission": 0.12
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 24,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 25,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 24,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 25,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Completed",
+        "ref": 25,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 98.0,
+        "size": -1.0,
+        "commission": 0.1176
+      },
+      {
+        "bar": 3,
+        "status": "Canceled",
+        "ref": 24,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      }
+    ],
+    "states": [
+      {
+        "bar": 0,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": true,
+        "entry_refs": 1,
+        "cash": 1000.0,
+        "value": 1000.0
+      },
+      {
+        "bar": 1,
+        "position": 1.0,
+        "stop": 98.0,
+        "take": 104.0,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 899.88,
+        "value": 999.88
+      },
+      {
+        "bar": 2,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 997.7624,
+        "value": 997.7624
+      },
+      {
+        "bar": 3,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 997.7624,
+        "value": 997.7624
+      }
+    ],
+    "closed": [
+      {
+        "gross": -2.0,
+        "net": -2.2376,
+        "bar": 2
+      }
+    ],
+    "original_analyzer": [
+      {
+        "entry_bar": 2,
+        "exit_bar": 3,
+        "entry_price": 100.0,
+        "exit_price": 100.0,
+        "size": 0.0,
+        "pnl_gross": -2.0,
+        "pnl_net": -2.2376,
+        "commission": 0.2376,
+        "duration_bars": 1
+      }
+    ],
+    "final_cash": 997.7624,
+    "final_value": 997.7624,
+    "final_position": 0.0
+  },
+  {
+    "name": "target_only_double_commission",
+    "synthetic": true,
+    "commission_rate": 0.0012,
+    "initial_cash": 1000.0,
+    "bars": [
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ],
+      [
+        100,
+        105,
+        99,
+        103,
+        1
+      ],
+      [
+        100,
+        101,
+        99,
+        100,
+        1
+      ]
+    ],
+    "orders": [
+      {
+        "bar": 1,
+        "status": "Submitted",
+        "ref": 26,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Accepted",
+        "ref": 26,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 1,
+        "status": "Completed",
+        "ref": 26,
+        "is_entry": true,
+        "created_price": 100.0,
+        "price": 100.0,
+        "size": 1.0,
+        "commission": 0.12
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 27,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Submitted",
+        "ref": 28,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 27,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Accepted",
+        "ref": 28,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      },
+      {
+        "bar": 2,
+        "status": "Completed",
+        "ref": 27,
+        "is_entry": false,
+        "created_price": 104.0,
+        "price": 104.0,
+        "size": -1.0,
+        "commission": 0.1248
+      },
+      {
+        "bar": 3,
+        "status": "Canceled",
+        "ref": 28,
+        "is_entry": false,
+        "created_price": 98.0,
+        "price": 0.0,
+        "size": 0.0,
+        "commission": 0.0
+      }
+    ],
+    "states": [
+      {
+        "bar": 0,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": true,
+        "entry_refs": 1,
+        "cash": 1000.0,
+        "value": 1000.0
+      },
+      {
+        "bar": 1,
+        "position": 1.0,
+        "stop": 98.0,
+        "take": 104.0,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 899.88,
+        "value": 999.88
+      },
+      {
+        "bar": 2,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 1003.7552,
+        "value": 1003.7552
+      },
+      {
+        "bar": 3,
+        "position": 0.0,
+        "stop": null,
+        "take": null,
+        "pending_entry": false,
+        "entry_refs": 0,
+        "cash": 1003.7552,
+        "value": 1003.7552
+      }
+    ],
+    "closed": [
+      {
+        "gross": 4.0,
+        "net": 3.7552,
+        "bar": 2
+      }
+    ],
+    "original_analyzer": [
+      {
+        "entry_bar": 2,
+        "exit_bar": 3,
+        "entry_price": 100.0,
+        "exit_price": 100.0,
+        "size": 0.0,
+        "pnl_gross": 4.0,
+        "pnl_net": 3.7552,
+        "commission": 0.2448,
+        "duration_bars": 1
+      }
+    ],
+    "final_cash": 1003.7552,
+    "final_value": 1003.7552,
+    "final_position": 0.0
+  }
+]

@@ -1,0 +1,70 @@
+{
+  "recorded_utc": "2026-10-20T07:19:00Z",
+  "completed_source": {
+    "repository": "Silentbilly/trend-pullback",
+    "commit": "22271525f93d04188c2791d48e1029a6101d39c3",
+    "url": "https://github.com/Silentbilly/trend-pullback/tree/22271525f93d04188c2791d48e1029a6101d39c3",
+    "readme_git_blob_sha": "c399f8d93842e5d94dc0920c91d0db148cfe1b6b",
+    "signal_git_blob_sha": "8de3e2cfc4f5118fc5ebab631a90c018b7a3530c",
+    "risk_git_blob_sha": "8f0b52b3559aafdfd5cd7f14d82e015836d0fa94",
+    "strategy_git_blob_sha": "b1c1a79dd125c6b377296aee491a474af77c084f",
+    "status": "completed_excluded_publicversion_execution_protection_ledger_contract",
+    "read_scope": "22ASTdefs10reviewedfiles,actualBacktrader1.9.78.123 tenfixturecases,15regressiontests44784separatechecks;actual44640BTCminutes->2976bars,84480prefixcellsnochange.",
+    "read_first": [
+      "src/trend_pullback/signal_engine.py",
+      "src/trend_pullback/risk.py",
+      "src/trend_pullback/strategy.py",
+      "src/trend_pullback/datafeed.py",
+      "src/trend_pullback/reporting.py",
+      "configs/sample_backtest.yaml",
+      "src/trend_pullback/config.py",
+      "scripts/run_backtest.py"
+    ],
+    "instruction": "Do notrepeatunchangedcontractprobes,repair-to-salvageoroptimizeETHsettingsforBTC. Sourcepriceprofitabilitynotcomputed;excludeonlycurrentpublicrelease,notallEMA/pullback. Continue newpublicBTCledger/data finitearithmetic.",
+    "documentation": "docs/lbank_pullback_contract_audit_2026-10-20.md",
+    "report": "research/continuation/results/pullback_contract_20261020/report.json",
+    "audit": "research/continuation/results/pullback_contract_20261020/independent_verification.json"
+  },
+  "next_finite_source": {
+    "repository": "shivanshu1177/funding_harvester",
+    "commit": "776003eb85f3c1e6e92683ee39d6ebf7cade78a0",
+    "url": "https://github.com/shivanshu1177/funding_harvester/tree/776003eb85f3c1e6e92683ee39d6ebf7cade78a0",
+    "readme_git_blob_sha": "c5e863d74388486e89d3780c0562fbf600773507",
+    "code_git_blob_sha": "7e876964aa91b21981adc98b3d5926d28f09a7d5",
+    "strategy_git_blob_sha": "019fae1dc089ff8740e6d1917ece39ae03e942ec",
+    "data_loader_git_blob_sha": "7f971dc79a8108bc481562a51e36d1eee57b18c7",
+    "test_summary_git_blob_sha": "2b776df72a7abd5d1b04cc64581504bb33432b2e",
+    "test_trades_git_blob_sha": "bbb493fe80026e3c4f8da377cd31bd329c4b6377",
+    "test_pnl_git_blob_sha": "8d0ffc3da4cfefaf4c8bdd43538a5101ed0eedaf",
+    "status": "new_publicBTCversioned_input_and_trade_PnL_artifact_lead_not_qualified",
+    "read_scope": "FullREADMEand297fileGittree;actualtest_defaultsummaryJSON read. Raw CSV/Parquet andresulttrade/PnLobjects versioned butnotdecoded/codefullreviewed. No originalmarketbacktestorledgerreconciliationyet.",
+    "read_first": [
+      "python/src/backtester.py",
+      "python/src/strategies/funding_arb.py",
+      "python/src/data_loader.py",
+      "python/src/quant_stats.py",
+      "results/test_default/summary.json",
+      "results/test_default/trades.parquet",
+      "results/test_default/pnl.parquet",
+      "results/test_default/position.parquet",
+      "results/test_default/equity.parquet",
+      "results/train_default/summary.json",
+      "results/train_default/trades.parquet",
+      "data/raw/btcusdt_1h.csv",
+      "data/raw/btcusdt_funding.csv",
+      "results/registry.parquet"
+    ],
+    "basis": "OriginalBybitBTCUSDTcode/raw/clean/resultobjectspresent. Authortest_default5089hourlybars2025Oct1-2026May1,n_trades58,return+0.110796%,fees174.0424/slip29.0071/funding1.3106;ISREADME-9.3%. Units,sourcepriceprovenance/ledgerclosed-vs-eventsandfundingsignsnotindependentlyverified. Lowreportedfrequencyalreadyconcern;do notretuneforfrequency.",
+    "instruction": "Next finite step: source-owned default IS/OOS artifact cashflow/date/closedcampaign/entryfrequency reconciliation with actual public Parquet+CSV after hash manifest/frozen plan;compare exactcode lag/forwardfill/funding mark timing and allfee/slip/funding cashsigns. Preserve ISnegativeandOOSsmallpositive;do notrun81grid,WFoptimizer,Kelly,sizing/leverage increases orprivateAPI. Determine economicclosedcampaignvsorder-event count before gate;compute actual opportunitydays,netcash/PF/uncertainty and doubled ALL modelcost on fixedpublicledger only if exactaccounting permits;otherwise null notinvented. If frequency/manualSLTP1/fullcost fails,finishfinitearithmeticrecordandmove different PRIMARYBTCsource withoutsalvage tuning. No sourceheadlineadoptedasnativeLBankprofit/forwardstart."
+  },
+  "other_preflight": {
+    "repository": "buffettlaw/BTC-ETH-Trend-following-and-Lead-lag-Trading-Strategies",
+    "commit": "45dda879fbfb3bc6e8dbac46bd8605f01ca28c20",
+    "readme_git_blob_sha": "3f7930f2f70a342109b6543f3afe7a84ee4bae32",
+    "status": "preflight_parked_unqualified_portfolio_or_ETHonly_notBTCmanualcontract",
+    "basis": "FullREADMEand29filetree;leadlag tradesETHonly,trendtradesBTC+ETH portfolio with10x/exposure100k;rawparquet andCSVtablespresentbutnotread. Do nottransfertargetassetprofit orrisktoLBank. Notnewprofitbacktest."
+  },
+  "no_candidate_qualified": true,
+  "no_forward_started": true,
+  "no_production_changes": true
+}

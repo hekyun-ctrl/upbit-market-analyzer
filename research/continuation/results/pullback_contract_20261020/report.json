@@ -1,0 +1,445 @@
+{
+  "version": "silentbilly_2227152_execution_contract_v1",
+  "started_utc": "2026-10-20T07:13:22.094547+00:00",
+  "completed_utc": "2026-10-20T07:13:22.339036+00:00",
+  "source_commit": "22271525f93d04188c2791d48e1029a6101d39c3",
+  "source_tree": [
+    {
+      "path": ".env.example",
+      "git_blob_sha": "e6618943e0f90d4aee15e8b6d1c0d170a11ba157"
+    },
+    {
+      "path": ".gitignore",
+      "git_blob_sha": "1454f531d72d39bd01e65d0db3e8ff6de908352e"
+    },
+    {
+      "path": "Dockerfile",
+      "git_blob_sha": "1cd86a0611e520e06c15c8e49f84f7da66975a44"
+    },
+    {
+      "path": "README.md",
+      "git_blob_sha": "c399f8d93842e5d94dc0920c91d0db148cfe1b6b"
+    },
+    {
+      "path": "configs/live_demo.yaml",
+      "git_blob_sha": "de495d7bd812551107d592b02ccbd4942f5ee71d"
+    },
+    {
+      "path": "configs/live_mainnet.yaml",
+      "git_blob_sha": "e8fd27ce7c7251b4216eee89ddbb112e7d010cda"
+    },
+    {
+      "path": "configs/live_testnet.yaml",
+      "git_blob_sha": "f485d068973ceb01a172e2d913ebaf82261efed9"
+    },
+    {
+      "path": "configs/sample_backtest.yaml",
+      "git_blob_sha": "bc7ac73c846fb6c24313e4066bcb2551eacaa9c2"
+    },
+    {
+      "path": "data/processed/.gitkeep",
+      "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "data/raw/.gitkeep",
+      "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "docker-compose.yml",
+      "git_blob_sha": "42f47562322cd9085be1bcda425645ac24798fee"
+    },
+    {
+      "path": "pyproject.toml",
+      "git_blob_sha": "38fb387d71296302d2f92aa49b5817f201badad8"
+    },
+    {
+      "path": "scripts/fetch_data.py",
+      "git_blob_sha": "7944d88d7a5ea623b1822144fb6b1452f690e9a5"
+    },
+    {
+      "path": "scripts/run_backtest.py",
+      "git_blob_sha": "a7662648470c324096bc4acbaa54716fb6b5c169"
+    },
+    {
+      "path": "scripts/run_live.py",
+      "git_blob_sha": "509856ebd96ca9cc063b0ebb18185682cb2a603e"
+    },
+    {
+      "path": "scripts/run_parameter_sweep.py",
+      "git_blob_sha": "d9230560aeb9bfa9925a6fc69905cbe26d9dc227"
+    },
+    {
+      "path": "scripts/run_walk_forward.py",
+      "git_blob_sha": "68174ee50c4a6a4977a9a35ef3bfb15a8450bf97"
+    },
+    {
+      "path": "src/trend_pullback/__init__.py",
+      "git_blob_sha": "e92316f6b2810b2ec67b1d7e560f669777745d65"
+    },
+    {
+      "path": "src/trend_pullback/analyzers.py",
+      "git_blob_sha": "ab631b015c9d5bd5116439e14d0f32365510db3e"
+    },
+    {
+      "path": "src/trend_pullback/broker.py",
+      "git_blob_sha": "dffd1cd7410b9021be3e47e2f29f00a349a831bb"
+    },
+    {
+      "path": "src/trend_pullback/config.py",
+      "git_blob_sha": "0001991d95693b2b41398d4c75e3d30bd7fbbc67"
+    },
+    {
+      "path": "src/trend_pullback/datafeed.py",
+      "git_blob_sha": "23a78b338d9681b399a06c09dbf0069fd5d3ff31"
+    },
+    {
+      "path": "src/trend_pullback/indicators.py",
+      "git_blob_sha": "b8b8335b50741efb429d113dbe511df569ec52e3"
+    },
+    {
+      "path": "src/trend_pullback/notifier.py",
+      "git_blob_sha": "d894f58e650c2217110ccd93fc3006f1f1bacbbc"
+    },
+    {
+      "path": "src/trend_pullback/reporting.py",
+      "git_blob_sha": "8b6ef69397ebeca8cb2bf4ab343d48e3f7acb7a0"
+    },
+    {
+      "path": "src/trend_pullback/risk.py",
+      "git_blob_sha": "8f0b52b3559aafdfd5cd7f14d82e015836d0fa94"
+    },
+    {
+      "path": "src/trend_pullback/signal_engine.py",
+      "git_blob_sha": "8de3e2cfc4f5118fc5ebab631a90c018b7a3530c"
+    },
+    {
+      "path": "src/trend_pullback/state.py",
+      "git_blob_sha": "edeb7766ff813bdba074ec7c06f0dc5d6243d24c"
+    },
+    {
+      "path": "src/trend_pullback/strategy.py",
+      "git_blob_sha": "b1c1a79dd125c6b377296aee491a474af77c084f"
+    },
+    {
+      "path": "src/trend_pullback/utils.py",
+      "git_blob_sha": "315bcd4ba249e2aef88523a3ff3d4ed7a828b47a"
+    },
+    {
+      "path": "tests/__init__.py",
+      "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391"
+    },
+    {
+      "path": "tests/conftest.py",
+      "git_blob_sha": "73cb9bcbe705171d7c0e50312607bd688c02a4ca"
+    },
+    {
+      "path": "tests/test_config.py",
+      "git_blob_sha": "ad1b86e2353894c08072a0925e08866f65c73112"
+    },
+    {
+      "path": "tests/test_indicators.py",
+      "git_blob_sha": "218afdbb6846045bb321530dd5d755553f783927"
+    },
+    {
+      "path": "tests/test_risk.py",
+      "git_blob_sha": "ba5654462e144b50183debbb7135a6baced8ecc5"
+    },
+    {
+      "path": "tests/test_signal_engine.py",
+      "git_blob_sha": "69a4ee04893e8b107c25f5f59f41756030f1713d"
+    }
+  ],
+  "reviewed_definitions": [
+    {
+      "path": "src/trend_pullback/indicators.py",
+      "name": "ema",
+      "line": 22,
+      "ast_sha256": "63f574a50b472cc94fdfa40b0de10916888e9adecc08b7291aef224fca428117"
+    },
+    {
+      "path": "src/trend_pullback/indicators.py",
+      "name": "_rma",
+      "line": 40,
+      "ast_sha256": "a753ae28f0dba3cac0370af37f49b023992977b94d7d9c5c53138f08d1346b76"
+    },
+    {
+      "path": "src/trend_pullback/indicators.py",
+      "name": "rsi",
+      "line": 58,
+      "ast_sha256": "4f4552e2bb0fb7d6b3ba49bcccc96a338e68b974dbe6c9d3d88293cc907ce9ca"
+    },
+    {
+      "path": "src/trend_pullback/indicators.py",
+      "name": "atr",
+      "line": 88,
+      "ast_sha256": "46ba4f8eadbb267ba917b54dde1672252a1e2de8008baba709ed374fbe35078d"
+    },
+    {
+      "path": "src/trend_pullback/signal_engine.py",
+      "name": "compute_signals",
+      "line": 21,
+      "ast_sha256": "3f2f363ead68f76420d8baf3c881b7df61b65d472e11722b5b4805b0164c25ea"
+    },
+    {
+      "path": "src/trend_pullback/signal_engine.py",
+      "name": "_true_range",
+      "line": 191,
+      "ast_sha256": "076bab3d74769b2a2132f30d6bda4b1565b568cc59610efab87db89f54f25587"
+    },
+    {
+      "path": "src/trend_pullback/signal_engine.py",
+      "name": "_rma",
+      "line": 204,
+      "ast_sha256": "84f678511db11d9084da6d46cfc8791f840d92d6e56d2f985519ff85ef54d21b"
+    },
+    {
+      "path": "src/trend_pullback/signal_engine.py",
+      "name": "_dmi_adx",
+      "line": 209,
+      "ast_sha256": "af4e07a6461bcf031c16120cdfe7a5138392580d57e6a0f00c3745c5f426ee14"
+    },
+    {
+      "path": "src/trend_pullback/signal_engine.py",
+      "name": "_compute_pb_count",
+      "line": 250,
+      "ast_sha256": "41c030496e7e993c88be67e898d743b6cdc4df32ca17aacb599c32156a0c4c29"
+    },
+    {
+      "path": "src/trend_pullback/signal_engine.py",
+      "name": "_apply_block_repeats",
+      "line": 263,
+      "ast_sha256": "b214ba22e8c443f5d69e03a1c40448067183f7b2881cd0f1a9b34a460322112c"
+    },
+    {
+      "path": "src/trend_pullback/risk.py",
+      "name": "LevelResult",
+      "line": 25,
+      "ast_sha256": "271ea0f69ad20c7d103802724cd64ac2a6e1ceb5705dd0a294003b75b2c03d77"
+    },
+    {
+      "path": "src/trend_pullback/risk.py",
+      "name": "calc_long_levels",
+      "line": 31,
+      "ast_sha256": "2dfc37bb6683ad3b1909b91b69b29718bb0db2a817c0ebc11240c5e4c37bcc1f"
+    },
+    {
+      "path": "src/trend_pullback/risk.py",
+      "name": "calc_short_levels",
+      "line": 45,
+      "ast_sha256": "e311935661ada3eb955c70c689c74f0072a29bff06b0153081f73bdc35a20b4d"
+    },
+    {
+      "path": "src/trend_pullback/risk.py",
+      "name": "validate_risk",
+      "line": 59,
+      "ast_sha256": "594893935e1fbca3ba02cc258bac333871664c10aaaf077037da9015b2b2785b"
+    },
+    {
+      "path": "src/trend_pullback/strategy.py",
+      "name": "TrendPullbackStrategy",
+      "line": 14,
+      "ast_sha256": "0812e91dead0ee9da4ddfdaa93a175b3ec4bcb52df12ab65092c74769a54ceed"
+    },
+    {
+      "path": "src/trend_pullback/datafeed.py",
+      "name": "load_ohlcv",
+      "line": 27,
+      "ast_sha256": "2eee485a7e5e2c1fb0f9188314043ab8a9ca26c009ca31571f84a8b540596ad8"
+    },
+    {
+      "path": "src/trend_pullback/datafeed.py",
+      "name": "_find_datetime_column",
+      "line": 96,
+      "ast_sha256": "e76857a10bcd3220cb3feaeceb26481e1e650a4e41d34a9fe93092e4451f4962"
+    },
+    {
+      "path": "src/trend_pullback/datafeed.py",
+      "name": "_validate_ohlcv",
+      "line": 107,
+      "ast_sha256": "4225d81e356c54ef47a8d068a4582a60404e6c8be065d1e326f3338894929e4a"
+    },
+    {
+      "path": "src/trend_pullback/reporting.py",
+      "name": "compute_summary",
+      "line": 62,
+      "ast_sha256": "0a1004afbff98732f2039c0fd69601d6ca149bd3d93397e2e64f64fc82f5d734"
+    },
+    {
+      "path": "src/trend_pullback/reporting.py",
+      "name": "_compute_max_drawdown",
+      "line": 113,
+      "ast_sha256": "4ff43f99deac5bdd1cb276babf29d69ce5c1b0baf36e3f820552f5f3099a287e"
+    },
+    {
+      "path": "src/trend_pullback/analyzers.py",
+      "name": "TradeListAnalyzer",
+      "line": 16,
+      "ast_sha256": "6016f2065113f4b0bdd73da769eeb3f2c1196932318f4ad78b1e23bb895695f8"
+    },
+    {
+      "path": "src/trend_pullback/analyzers.py",
+      "name": "EquityCurveAnalyzer",
+      "line": 62,
+      "ast_sha256": "e4204129d2f944ddedec705ca4af55e6806c7c51295522612b62ba8495b5597a"
+    }
+  ],
+  "reviewed_source_files": [
+    {
+      "path": "src/trend_pullback/indicators.py",
+      "sha256": "8adb2933ff721ff3a7d16648f53ae0dd53aa6ecb4bedb1fa879c3e799df8a3c1",
+      "git_blob_sha": "b8b8335b50741efb429d113dbe511df569ec52e3"
+    },
+    {
+      "path": "src/trend_pullback/signal_engine.py",
+      "sha256": "0684c7a3369f8f0ae0ec9990f66cdfdbd5444500640ad1ecfa01a6906a12854e",
+      "git_blob_sha": "8de3e2cfc4f5118fc5ebab631a90c018b7a3530c"
+    },
+    {
+      "path": "src/trend_pullback/risk.py",
+      "sha256": "4d30de7658aac97a5519f8576c6475f34497626813241d820996a1b110e9f776",
+      "git_blob_sha": "8f0b52b3559aafdfd5cd7f14d82e015836d0fa94"
+    },
+    {
+      "path": "src/trend_pullback/strategy.py",
+      "sha256": "2ab2aeec1565bbc0e14f48a1cb261733a3125a41d986e1a2108498fd39d21126",
+      "git_blob_sha": "b1c1a79dd125c6b377296aee491a474af77c084f"
+    },
+    {
+      "path": "src/trend_pullback/datafeed.py",
+      "sha256": "dad1d72b60879353f3ed0e28b2da1e5034cae3fdc2c1bef48f75f2e4b9f6322b",
+      "git_blob_sha": "23a78b338d9681b399a06c09dbf0069fd5d3ff31"
+    },
+    {
+      "path": "src/trend_pullback/reporting.py",
+      "sha256": "4dc1d1f4bec3e5ce8238dfede8c3883de2cd94885895bdb3b01be29df87e0091",
+      "git_blob_sha": "8b6ef69397ebeca8cb2bf4ab343d48e3f7acb7a0"
+    },
+    {
+      "path": "src/trend_pullback/analyzers.py",
+      "sha256": "1bdbe71af3686b631867ee10d8021ccfe7149914066358352b1a9e60bc18f294",
+      "git_blob_sha": "ab631b015c9d5bd5116439e14d0f32365510db3e"
+    },
+    {
+      "path": "src/trend_pullback/config.py",
+      "sha256": "3624b2b508b4ba66625357844d9b71555f96257fa53a23474db3e0927013482d",
+      "git_blob_sha": "0001991d95693b2b41398d4c75e3d30bd7fbbc67"
+    },
+    {
+      "path": "configs/sample_backtest.yaml",
+      "sha256": "62a380321d185cad15cd12dd5785049ba32f27d39e475be50a60cf361043001a",
+      "git_blob_sha": "bc7ac73c846fb6c24313e4066bcb2551eacaa9c2"
+    },
+    {
+      "path": "scripts/run_backtest.py",
+      "sha256": "809ee671227adcbde3bfb2fd9a5d096d1a56f7cf87f014be8b776889f440daad",
+      "git_blob_sha": "a7662648470c324096bc4acbaa54716fb6b5c169"
+    }
+  ],
+  "actual_engine": {
+    "version": "1.9.78.123",
+    "kernel_sha256": {
+      "__init__.py": "763f463ccb8f0d68145c19ebb790f1b9342542c507c02b4917763354a80d9431",
+      "cerebro.py": "246f4e2d801f3cbfbbb2526e17f5e4493fd99e7fc51eafcc0d773a094283e696",
+      "strategy.py": "8a56ebc1d7a597c41f20bd35d83b07fde90da60df50be46b3fc3bab85ab21d18",
+      "order.py": "b1a8827de9c40d25e932bc64455279a09b8b6389b681a019310dee68e64fff5d",
+      "brokers/bbroker.py": "0fd397a72814f0de31fcd318b4a1da2030412ae9bea426c0d5dcdd001a52965e"
+    },
+    "installed_package": "backtrader==1.9.78.123"
+  },
+  "original_sample_backtest": {
+    "symbol": "ETHUSDT",
+    "timeframe": "15m",
+    "data_path": "data/raw/bybit_spot_ETHUSDT_15m_40000.csv",
+    "initial_capital": 50000,
+    "commission_pct": 0.06,
+    "stake": 5,
+    "leverage": 1
+  },
+  "loader_fixture": {
+    "unix_seconds_input": [
+      1704067200,
+      1704068100
+    ],
+    "parsed": [
+      "1970-01-01T00:00:01.704067200",
+      "1970-01-01T00:00:01.704068100"
+    ],
+    "actual_separation_seconds": 0.0
+  },
+  "zero_closed_nonflat_equity_summary": {
+    "total_trades": 0,
+    "win_rate_pct": 0.0,
+    "net_profit": 0.0,
+    "net_profit_pct": 0.0,
+    "avg_trade_net": 0.0,
+    "max_drawdown_pct": 0.0
+  },
+  "actual_price_prefix": {
+    "source": {
+      "month": "2024-01",
+      "kind": "klines",
+      "interval": "1m",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-01.zip",
+      "checksum_url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-01.zip.CHECKSUM",
+      "sha256": "21eeac04a76a7a35b10467e5e752fb2f8cff77cdeb57df6b50a23ce8d69bb190",
+      "zip_bytes": 1898532,
+      "csv_rows": 44640,
+      "csv_sha256": "ab25f0fee86faa93df62f800adf92b742abdc60982e023159d0ca9faf3a4ba14"
+    },
+    "manifest_sha256": "c6468c70aa4aa45f4f6315a6477450e2119c76bda826a1db4ee1b144ec6e5569",
+    "raw_minutes": 44640,
+    "complete15m": 2976,
+    "prefix15m": 1920,
+    "compared_columns": 44,
+    "past_cell_changes": 0,
+    "raw_long_signals": 16,
+    "raw_short_signals": 11,
+    "signal_days": 17,
+    "market_days": 31,
+    "sample_asset": "ETHUSDT15mspot;thisisreusedBTCfuturescausality-only",
+    "source_strategy_settings": {
+      "fast_len": 34,
+      "slow_len": 200,
+      "pull_len": 13,
+      "use_slope": true,
+      "slope_lb": 5,
+      "min_pb": 1,
+      "max_pb": 3,
+      "use_rsi": true,
+      "rsi_len": 14,
+      "rsi_long_min": 45,
+      "rsi_short_max": 55,
+      "block_repeats": true,
+      "use_adx": true,
+      "adx_di_len": 14,
+      "adx_smth": 14,
+      "adx_min": 22.0,
+      "use_chop": false,
+      "chop_len": 14,
+      "chop_max": 50.0,
+      "break_atr_buf": 0.08,
+      "atr_len": 14,
+      "atr_mul": 2.4,
+      "rr": 2
+    },
+    "actual_market_entries_calculated": false,
+    "market_costed_returns_computed": false,
+    "prefix_csv_sha256": "44299102c14aed56dc382ce0d10de8ac7177a5cc29288cb79d988b6dd424a94e",
+    "signals_csv_sha256": "b6f36b3b4ee228efe8b842b6b3f4e0e409040e4d6439ced350394a40e280938c"
+  },
+  "script_sha256": "cccc491124689a739c4c709785274552270d80022fa85cda066a875b42f18825",
+  "protocol_sha256": "171d726c5bb644ff4ef76e2050b2cf784056b3c3e524d11679eb0f9e8a56e923",
+  "valid_market_profitability_backtest": false,
+  "published_original_BTC_ledger_recovered": false,
+  "fullcost_double_result": null,
+  "expectancy_95_lower": null,
+  "PF": null,
+  "drawdown_R": null,
+  "tp1_wilson_lower": null,
+  "urgent_5min_rate": null,
+  "native_manual_execution": null,
+  "forward_started": false,
+  "eligible": false,
+  "production_changed": false,
+  "decision": "exclude_thispublicrelease_asreplacement_evidence;executionandledgercontractnotqualified_notallpullbackstrategies"
+}

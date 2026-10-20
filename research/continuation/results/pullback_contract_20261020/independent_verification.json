@@ -1,0 +1,54 @@
+{
+  "checks_passed": 44784,
+  "maximum_cash_absolute_error": "1E-13",
+  "synthetic_cases": 10,
+  "separate_campaign_and_account_totals": [
+    {
+      "name": "long_dual",
+      "closed_campaign_net": "3.8776",
+      "account_marked_delta": "1.8188",
+      "same_account_result": false
+    },
+    {
+      "name": "stop_only",
+      "closed_campaign_net": "-2.1188",
+      "account_marked_delta": "-2.1188",
+      "same_account_result": true
+    },
+    {
+      "name": "target_only",
+      "closed_campaign_net": "3.8776",
+      "account_marked_delta": "3.8776",
+      "same_account_result": true
+    },
+    {
+      "name": "stop_gap",
+      "closed_campaign_net": "-5.116999999999999995",
+      "account_marked_delta": "-5.117",
+      "same_account_result": true
+    },
+    {
+      "name": "short_dual",
+      "closed_campaign_net": "3.8824",
+      "account_marked_delta": "1.8212000000001",
+      "same_account_result": false
+    },
+    {
+      "name": "stop_only_double_commission",
+      "closed_campaign_net": "-2.2376",
+      "account_marked_delta": "-2.2376",
+      "same_account_result": true
+    },
+    {
+      "name": "target_only_double_commission",
+      "closed_campaign_net": "3.7552",
+      "account_marked_delta": "3.7552",
+      "same_account_result": true
+    }
+  ],
+  "actual_minute_continuity_steps": 44639,
+  "actual_output_cells_compared_by_source_audit": 84480,
+  "all_prefix_changes": 0,
+  "market_profitability_verified": false,
+  "verifier_sha256": "1ad972cbd6dc5f49a2f91d15901a3bd8412ad9e0adf2c56e635f55b42256fed0"
+}
