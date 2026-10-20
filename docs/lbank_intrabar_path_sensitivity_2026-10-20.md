@@ -1,3 +1,5 @@
+> **INVALIDATED for active native management inference (2026-10-20 22:32 KST):** input omitted quality=stream_closed, so native valid_state rejected bars. Preserved below for audit only. Use [corrected replay and attribution](lbank_fixed22_entry_attribution_2026-10-20.md); do not use these runner results for strategy decisions.
+
 # Fixed22 intraminute path sensitivity — 2026-10-20
 Research only; no operating change or promotion.
 
