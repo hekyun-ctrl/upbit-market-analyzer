@@ -167,3 +167,7 @@ OOS PF1.014094, 진입29/213일·기회28/213일, 고정장부에서 수수료/�
 다음유한단계는같은22진입의명시적O-H-L-C/O-L-H-C15초가정민감도다. 기존분표본주기는유지하고합성15초를원래5분표본으로잘못세지않는다.가정경로를실제tick/수동체결/전체가능손익상하한으로표현하지않고원래검열은별도보존한다. 새출구숫자맞추기·낙관체결로승격·반복최초사건계산은없다. 유의한우위가없으면원래진입방향/위치의구체적공백으로돌아간다.
 
 운영5c977a7/23799b11SUCCESS읽기확인.20:00~20:28:30KST연구로그60행후보/진입/종료0,20:00/20:15progress API성공2건은0거래다.원본360/116준비·시간봉연구미준비/RSI250미성숙유지.이번실행은운영변경/재배포/위험확대없고합격후보/채택전향시작없다. 상세중간결과는GitHub에만저장한다.
+
+
+## 2026-10-20 22:19 KST — fixed22 hypothetical intraminute sensitivity
+Completed pre-frozen two-path15second replay using unchanged source5c977a7, fixed22plans, original minute sample cadence and verified official Jan2025 archives;13golden cases,92160completed-bar prefix assertions and264Decimal cash comparisons passed. Both paths runner-6.062594R/PF.678123/doublecost-12.962485R; levels/warning-5.129937R. Hypothetical paths only, same22paired entries, not44independenttrades; original13unknowns preserved, true native all22return remains unknown. No promotion/operational change. Scratch cleared and fully restored via32sourceblob manifest; result remote blob verified. Source HEAD fresh, runtime not freshly verified this run. Details: [path sensitivity](lbank_intrabar_path_sensitivity_2026-10-20.md). Next actual task: fixed22 known-at-entry direction/location/target-room acceptance inventory, reuse crossed-pivot attribution and freeze only a justified source-grounded correction, no further exit variants.
