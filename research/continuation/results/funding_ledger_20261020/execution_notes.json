@@ -1,0 +1,13 @@
+{
+  "protocol_checkpoint": "d91f212ec24ce8ebc3686cc23311be5fc4aa07b9",
+  "implementation_tests_passed": 12,
+  "independent_cash_checks_passed": 1278,
+  "source_input_SHA256_verified": 25,
+  "published_campaigns": 146,
+  "actual_strategy_price_backtest": false,
+  "published_ledger_arithmetic": true,
+  "conditional_all_model_cost_stress": true,
+  "native_costs_validated": false,
+  "forward_started": false,
+  "production_changed": false
+}

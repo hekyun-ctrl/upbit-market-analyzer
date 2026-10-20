@@ -1,0 +1,64 @@
+{
+  "recorded_utc": "2026-10-20T07:57:21Z",
+  "completed_original_cash_audit": "docs/lbank_funding_ledger_audit_2026-10-20.md",
+  "next_finite_source": {
+    "title": "The Recurrent Reinforcement Learning Crypto Agent",
+    "doi": "10.1109/ACCESS.2022.3166599",
+    "url": "https://discovery.ucl.ac.uk/id/eprint/10147117/",
+    "arxiv": "https://arxiv.org/abs/2201.04699",
+    "status": "new_primary_paper_provenance_and_manualcontract_lead_only_NOTcandidate",
+    "read_scope": "PrimaryUCLbibliographicrecord/abstract and arXivsearchmetadata only;fulltextnotread/code/data/closedledgernotobtained. arxivv4directopenDisabledError,noruleversionorrawSHAfrozen.",
+    "basis": "AuthorreportsBitMEXXBTUSDintradaynet350%overroughly5years,71%fundingprofit,IR1.46;preservedasauthorclaimnotadopted.NativeinverseBTCmarginvslinearLBankBTCUSDTandmanualprotectiondifferenceunreviewed.",
+    "read_first": [
+      "Institutional primary full published article and data/code availability statement",
+      "Exact execution, transaction-cost, funding schedule and position/stop/target contracts",
+      "Public author repository and fixed original inputs/closed ledger if actually linked"
+    ],
+    "instruction": "Finite nextstep: obtain/read fullPRIMARYpaperthroughpermittedaccess,freezeactualpublication/versionSHA,locatepublic originalcode/data/ledger and exact cost/funding/manualrisk contract beforetrainingorreplication. Do not callabstractreturns alpha proof or inventunreleasedfeatures/data/TP1. No request-code/privateoutreach/accounts/inverse-margin orriskexpansion. Iforiginaldata/codeunavailableorunsupportedmanualBTCUSDTcontract,recordprecisefinitepreflight andcontinueanotherdistinctPRIMARYpublicBTCsourcewithcode+aftercostledger;notendlessarticle browsing. Do not retry/bypassMACD403. Preservecurrentfundingpositiveandnegativeevidence;no unchangedledgercalc/tuning."
+  },
+  "new_preflights": [
+    {
+      "repository": "Pavdot/btcusdt-strategy-optimizer",
+      "commit": "12f27c0b5fd6e095e683b13beb1fb58a4827f6aa",
+      "status": "duplicate_existing1224preflight_recoveredREADME_no_newalpha_orledgercalculation",
+      "previous": "research/continuation/source_screening_20261020_1224.json"
+    },
+    {
+      "repository": "octopus444/technical-trading-rules-based-strategies-btc",
+      "status": "duplicate0505preflight_no_newtest_ortraining",
+      "previous": "research/continuation/source_screening_20261020_0505.json"
+    },
+    {
+      "repository": "quantsarahz/btcusdt-regime-multistrategy-trading",
+      "commit": "0d216c8d8fffeeb4ecd181f15c70b62f9e12efe3",
+      "readme_git_blob_sha": "571ac62b32a0914451a4046286a54336071aba58",
+      "status": "preflight_notshortlisted_defaultlongonlyspot_min42h_no_publicrawledger",
+      "basis": "FullREADME57filetree;data/results onlygitkeep. Authorpositive68.8%/OOS31.75%areunverifiedhistory,longonlyspot/min168x15mholdinganddrawdown~29%;notourmanualfrequentboundedriskcontract. No codekernel/backtest."
+    },
+    {
+      "repository": "jsinn003/btc_macd_trading_strategy",
+      "commit": "08e5f1af36d66b6e071d64b98882f771397a63a4",
+      "readme_git_blob_sha": "696b7f652c14c8e9b40f4194158785977e54625d",
+      "status": "targeted_read_stopped_CONNECT403_no_bypass_or_retry",
+      "basis": "12fileGittreerecovered;rawdata/resultsabsentintree. READMEpromisorblobcouldnotfetchdueCONNECTtunnel403. NotfullREADMEreview/no performanceclaim or calculation."
+    }
+  ],
+  "targeted_access_errors": [
+    {
+      "scope": "single_new_source_README_NOT_whole_research",
+      "source": "jsinn003/btc_macd_trading_strategy@08e5f1af",
+      "error": "CONNECT tunnel403whilepromisorblobfetch",
+      "action": "Stoppedtargetedaccess,noalternatebypass;do_notretrywithoutpermission. ExistingfundingmathandGitHubresearchcheckpointunblocked."
+    },
+    {
+      "scope": "single_primary_paper_tool_fetch",
+      "source": "arxiv2201.04699v4",
+      "error": "webDisabledError",
+      "action": "Fulltextnotread;nextfeasibilitymustusepermittedpublicprimaryaccessorrecordunavailable,notinventedrules/returns."
+    }
+  ],
+  "whole_task_fully_blocked": false,
+  "replacement_eligible": false,
+  "forward_started": false,
+  "production_changed": false
+}

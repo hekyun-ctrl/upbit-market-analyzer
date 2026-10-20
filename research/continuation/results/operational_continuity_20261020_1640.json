@@ -1,0 +1,131 @@
+{
+  "scope": {
+    "projectId": "e7d240ac-2468-45c9-8411-33f5e24f425b",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34"
+  },
+  "deploy": [
+    {
+      "id": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
+      "status": "SUCCESS",
+      "meta": {
+        "reason": "deploy",
+        "commitMessage": "Cancel stale breakout reviews unless existing higher-direction priority supports them\n\nReuse the unchanged initial breakout predicate at discovery and confirmation. All previous risk/target gates still run first. Existing stronger direction may support minor reactions; cancel rather than add waiting when both original trigger and higher priority are absent. Public native incident13 inputs and checksum are archived; original quote/stop/TP1 reproduce and this development case is rejected under the consistency guard. 343 LBank tests pass. Not independent profitability validation or replacement-strategy promotion. Tested tree cbf343b437ba1379dc2304f706db30b0f8746814.",
+        "commitHash": "862339db2c4f69facc9ba6626e2826d475504174",
+        "branch": "feature/lbank-futures-monitor"
+      }
+    }
+  ],
+  "logs": {
+    "scope": "service",
+    "deploymentId": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "status": "SUCCESS",
+    "deploy": [
+      {
+        "timestamp": "2026-10-20T07:40:55.756965108Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 358, \"closed_5m\": 71, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 80.19182726557612, \"min_range_fraction\": 0.005913249728239047, \"minimum_target_fraction\": 0.005763249728239047, \"stop_floor_fraction\": 0.0014744939371451498}, \"entry_source_switched\": true, \"last5_start\": 1792481700, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 29.304481822179653, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T07:40:55.756970376Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:RSI5_NATIVE completed_bucket=5974939 close=81539.5 rsi=29.30 source=lbank_native_1m_aggregated_5m",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T07:40:55.756993022Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:RSI5_STUDY completed_bucket=5974939 {\"close\": 81539.5, \"neutral_stall_long\": false, \"neutral_stall_short\": false, \"orderbook\": \"unverified\", \"rsi\": 29.3, \"source\": \"lbank_native_1m_aggregated_5m\", \"zones\": {\"long\": {\"first_turn\": false, \"prior_rsi\": 32.04, \"two_closed_turns\": false, \"zone\": \"near_miss\"}, \"short\": null}}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T07:40:55.756996778Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:ENTRY_SETUP_EVALUATED {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"entry_timing\": {\"candidate_evaluated_at\": 1792482053.314485, \"evaluation_after_first_ready_observation_seconds\": 47.685293197631836, \"evaluation_after_nominal_close_seconds\": 53.3144850730896, \"first_ready_observed_at\": 1792482005.6291919, \"last_closed_1m_start\": 1792481940, \"last_closed_5m_start\": 1792481700, \"nominal_1m_close_at\": 1792482000, \"policy\": \"native_completed_bar_schedule_v1\", \"publication_note\": \"nominal_close_is_not_actual_publication_time\", \"quote_observed_at\": 1792482053.2931504, \"source_publication_at\": null, \"trigger\": \"periodic\"}, \"market\": {\"atr5\": 80.19182726557612, \"breakout_long\": false, \"breakout_short\": false, \"ema_direction\": -1, \"long_pullback_pct\": 0.34584465197848896, \"minimum_stop_pct\": 0.147449393714515, \"minimum_target_pct\": 0.5763249728239047, \"momentum15_pct\": -0.1283616859964587, \"momentum5_pct\": 0.010548148002786917, \"pullback_min_pct\": 0.15, \"range60_pct\": 0.4816190441167386, \"range_balanced\": false, \"range_required_pct\": 0.5913249728239047, \"range_width_ok\": false, \"range_width_pct\": 0.4818523537671855, \"short_pullback_pct\": 0.15354521428264473}, \"reason\": \"market_no_setup\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T07:40:55.758475480Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:contract=BTCUSDT price=81579.0 count=358 watch=none confirmed_total=0 tracked_references=0",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T07:40:55.758478563Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T07:40:55.758481280Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [{\"id\": \"public_techniques_v1:box_retest_5m:-1:1792481700\", \"reason\": \"await_closed_minute_reaction\", \"strategy\": \"box_retest_5m\"}], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 1, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T07:41:15.587533314Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:ENTRY_SETUP_EVALUATED {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"entry_timing\": {\"candidate_evaluated_at\": 1792482069.1322265, \"evaluation_after_first_ready_observation_seconds\": 0.0070247650146484375, \"evaluation_after_nominal_close_seconds\": 9.132226467132568, \"first_ready_observed_at\": 1792482069.1252017, \"last_closed_1m_start\": 1792482000, \"last_closed_5m_start\": 1792481700, \"nominal_1m_close_at\": 1792482060, \"policy\": \"native_completed_bar_schedule_v1\", \"publication_note\": \"nominal_close_is_not_actual_publication_time\", \"quote_observed_at\": 1792482069.1252017, \"source_publication_at\": null, \"trigger\": \"new_completed_bar\"}, \"market\": {\"atr5\": 80.19182726557612, \"breakout_long\": false, \"breakout_short\": false, \"ema_direction\": -1, \"long_pullback_pct\": 0.33296595925703704, \"minimum_stop_pct\": 0.14742662344942883, \"minimum_target_pct\": 0.576290824257344, \"momentum15_pct\": -0.02671840395530589, \"momentum5_pct\": -0.010174286757980155, \"pullback_min_pct\": 0.15, \"range60_pct\": 0.48154466881393937, \"range_balanced\": false, \"range_required_pct\": 0.591290824257344, \"range_width_ok\": false, \"range_width_pct\": 0.4816727739031116, \"short_pullback_pct\": 0.1534879900551516}, \"reason\": \"market_no_setup\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T07:41:16.486582104Z",
+        "severity": "error",
+        "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 71, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      }
+    ]
+  },
+  "production_changed": false,
+  "source_publication_at": null,
+  "live_new_candidate_or_delivery_observed": false,
+  "note": "Read-onlycontinuity;unverifiedstudybox_retestdecisionisnotnewlivecandidateorindependentprofit."
+}

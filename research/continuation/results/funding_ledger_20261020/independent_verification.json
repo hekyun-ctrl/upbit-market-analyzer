@@ -1,0 +1,25 @@
+{
+  "checks_passed": 1278,
+  "maximum_cash_absolute_error": "1.6978853414043E-11",
+  "periods": [
+    {
+      "period": "train_default",
+      "orders": 234,
+      "campaigns": 117,
+      "cash_base_USD": "-1085.796970181989272737241372",
+      "cash_double_USD": "-1921.639464942514178853414046"
+    },
+    {
+      "period": "test_default",
+      "orders": 58,
+      "campaigns": 29,
+      "cash_base_USD": "11.07963748503717977361840",
+      "cash_double_USD": "-193.888375080565017170272145"
+    }
+  ],
+  "source_inputs_hash_verified": 25,
+  "independent_method": "Decimal direct cashflows and campaign matching from originalParquets,not audit functions",
+  "bootstrap_not_independently_reimplemented": true,
+  "market_native_profitability_certified": false,
+  "verifier_sha256": "bcc246e063dafddbd0484e60807f4f018d15f9b278ab579db6822f3f4d7ab847"
+}

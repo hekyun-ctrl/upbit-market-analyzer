@@ -36,7 +36,8 @@
     "gotodataru_5ed0d6e_original_BTC_summary_and_execution_contract_v1_51files14definitions11tests75checks",
     "public_ledger_source2_bottradepm_contract_v1_21definitions_10tests_125checks_131040realminute_prefix",
     "daynight_5693993_original_BTC_all900costrows_525overlap_300conditionalcells_3307Decimalchecks_v1",
-    "silentbilly_2227152_original22defs_actualBacktrader10fixtures_44640realminute_prefix_contract_v1"
+    "silentbilly_2227152_original22defs_actualBacktrader10fixtures_44640realminute_prefix_contract_v1",
+    "funding_harvester_776003e_originalIS_OOS_146campaign_25SHA_cash_doublecost_frequency_blockuncertainty_v1"
   ],
   "read_before_work": [
     "docs/lbank_strategy_rebuild_2026-10-20.md",
@@ -53,12 +54,28 @@
     "docs/lbank_public_ledger_sources_audit_2026-10-20.md",
     "research/continuation/source_screening_20261020_1423.json",
     "docs/lbank_daynight_cost_audit_2026-10-20.md",
-    "docs/lbank_pullback_contract_audit_2026-10-20.md"
+    "docs/lbank_pullback_contract_audit_2026-10-20.md",
+    "docs/lbank_funding_ledger_audit_2026-10-20.md"
   ],
   "next_work": {
-    "stage": "public_BTC_original_ledger_PnL_cost_frequency_reconciliation",
-    "instruction": "Next finite step: source-owned default IS/OOS artifact cashflow/date/closedcampaign/entryfrequency reconciliation with actual public Parquet+CSV after hash manifest/frozen plan;compare exactcode lag/forwardfill/funding mark timing and allfee/slip/funding cashsigns. Preserve ISnegativeandOOSsmallpositive;do notrun81grid,WFoptimizer,Kelly,sizing/leverage increases orprivateAPI. Determine economicclosedcampaignvsorder-event count before gate;compute actual opportunitydays,netcash/PF/uncertainty and doubled ALL modelcost on fixedpublicledger only if exactaccounting permits;otherwise null notinvented. If frequency/manualSLTP1/fullcost fails,finishfinitearithmeticrecordandmove different PRIMARYBTCsource withoutsalvage tuning. No sourceheadlineadoptedasnativeLBankprofit/forwardstart.",
+    "stage": "distinct_primary_paper_original_data_code_and_manualrisk_feasibility",
+    "instruction": "Finite nextstep: obtain/read fullPRIMARYpaperthroughpermittedaccess,freezeactualpublication/versionSHA,locatepublic originalcode/data/ledger and exact cost/funding/manualrisk contract beforetrainingorreplication. Do not callabstractreturns alpha proof or inventunreleasedfeatures/data/TP1. No request-code/privateoutreach/accounts/inverse-margin orriskexpansion. Iforiginaldata/codeunavailableorunsupportedmanualBTCUSDTcontract,recordprecisefinitepreflight andcontinueanotherdistinctPRIMARYpublicBTCsourcewithcode+aftercostledger;notendlessarticle browsing. Do not retry/bypassMACD403. Preservecurrentfundingpositiveandnegativeevidence;no unchangedledgercalc/tuning.",
     "sources_to_screen": [
+      {
+        "title": "The Recurrent Reinforcement Learning Crypto Agent",
+        "doi": "10.1109/ACCESS.2022.3166599",
+        "url": "https://discovery.ucl.ac.uk/id/eprint/10147117/",
+        "arxiv": "https://arxiv.org/abs/2201.04699",
+        "status": "new_primary_paper_provenance_and_manualcontract_lead_only_NOTcandidate",
+        "read_scope": "PrimaryUCLbibliographicrecord/abstract and arXivsearchmetadata only;fulltextnotread/code/data/closedledgernotobtained. arxivv4directopenDisabledError,noruleversionorrawSHAfrozen.",
+        "basis": "AuthorreportsBitMEXXBTUSDintradaynet350%overroughly5years,71%fundingprofit,IR1.46;preservedasauthorclaimnotadopted.NativeinverseBTCmarginvslinearLBankBTCUSDTandmanualprotectiondifferenceunreviewed.",
+        "read_first": [
+          "Institutional primary full published article and data/code availability statement",
+          "Exact execution, transaction-cost, funding schedule and position/stop/target contracts",
+          "Public author repository and fixed original inputs/closed ledger if actually linked"
+        ],
+        "instruction": "Finite nextstep: obtain/read fullPRIMARYpaperthroughpermittedaccess,freezeactualpublication/versionSHA,locatepublic originalcode/data/ledger and exact cost/funding/manualrisk contract beforetrainingorreplication. Do not callabstractreturns alpha proof or inventunreleasedfeatures/data/TP1. No request-code/privateoutreach/accounts/inverse-margin orriskexpansion. Iforiginaldata/codeunavailableorunsupportedmanualBTCUSDTcontract,recordprecisefinitepreflight andcontinueanotherdistinctPRIMARYpublicBTCsourcewithcode+aftercostledger;notendlessarticle browsing. Do not retry/bypassMACD403. Preservecurrentfundingpositiveandnegativeevidence;no unchangedledgercalc/tuning."
+      },
       {
         "repository": "shivanshu1177/funding_harvester",
         "commit": "776003eb85f3c1e6e92683ee39d6ebf7cade78a0",
@@ -70,8 +87,8 @@
         "test_summary_git_blob_sha": "2b776df72a7abd5d1b04cc64581504bb33432b2e",
         "test_trades_git_blob_sha": "bbb493fe80026e3c4f8da377cd31bd329c4b6377",
         "test_pnl_git_blob_sha": "8d0ffc3da4cfefaf4c8bdd43538a5101ed0eedaf",
-        "status": "new_publicBTCversioned_input_and_trade_PnL_artifact_lead_not_qualified",
-        "read_scope": "FullREADMEand297fileGittree;actualtest_defaultsummaryJSON read. Raw CSV/Parquet andresulttrade/PnLobjects versioned butnotdecoded/codefullreviewed. No originalmarketbacktestorledgerreconciliationyet.",
+        "status": "completed_notpromoted_originaldefault_ledger_lowfrequency_PF_uncertainty_doublecost_noTP1native",
+        "read_scope": "Full backtester/strategy/data_loader contracts,registry and puretrade-return accounting reviewed;25wholeSHA inputs,2originalIS/OOSledgers,146campaigns292executions,12tests1278Decimalchecks,5000x7/30dayblockUSDuncertainty. Notnewsource-signalbacktest.",
         "read_first": [
           "python/src/backtester.py",
           "python/src/strategies/funding_arb.py",
@@ -89,7 +106,10 @@
           "results/registry.parquet"
         ],
         "basis": "OriginalBybitBTCUSDTcode/raw/clean/resultobjectspresent. Authortest_default5089hourlybars2025Oct1-2026May1,n_trades58,return+0.110796%,fees174.0424/slip29.0071/funding1.3106;ISREADME-9.3%. Units,sourcepriceprovenance/ledgerclosed-vs-eventsandfundingsignsnotindependentlyverified. Lowreportedfrequencyalreadyconcern;do notretuneforfrequency.",
-        "instruction": "Next finite step: source-owned default IS/OOS artifact cashflow/date/closedcampaign/entryfrequency reconciliation with actual public Parquet+CSV after hash manifest/frozen plan;compare exactcode lag/forwardfill/funding mark timing and allfee/slip/funding cashsigns. Preserve ISnegativeandOOSsmallpositive;do notrun81grid,WFoptimizer,Kelly,sizing/leverage increases orprivateAPI. Determine economicclosedcampaignvsorder-event count before gate;compute actual opportunitydays,netcash/PF/uncertainty and doubled ALL modelcost on fixedpublicledger only if exactaccounting permits;otherwise null notinvented. If frequency/manualSLTP1/fullcost fails,finishfinitearithmeticrecordandmove different PRIMARYBTCsource withoutsalvage tuning. No sourceheadlineadoptedasnativeLBankprofit/forwardstart."
+        "instruction": "No unchangedIS/OOSledgerrecalculation,81grid,WFoptimization,Kelly,riskincrease,feehalvingorTP1invention. OOS+11.0796 preservedbutPF1.014,29campaigns/213days,opportunity28days,doublecost-193.8884andUSDlower<0. IS-1085.797. Continue separate primarypaper/code/data feasibility.",
+        "documentation": "docs/lbank_funding_ledger_audit_2026-10-20.md",
+        "report": "research/continuation/results/funding_ledger_20261020/report.json",
+        "audit": "research/continuation/results/funding_ledger_20261020/independent_verification.json"
       },
       {
         "repository": "Silentbilly/trend-pullback",
@@ -302,9 +322,35 @@
         "readme_git_blob_sha": "3f7930f2f70a342109b6543f3afe7a84ee4bae32",
         "status": "preflight_parked_unqualified_portfolio_or_ETHonly_notBTCmanualcontract",
         "basis": "FullREADMEand29filetree;leadlag tradesETHonly,trendtradesBTC+ETH portfolio with10x/exposure100k;rawparquet andCSVtablespresentbutnotread. Do nottransfertargetassetprofit orrisktoLBank. Notnewprofitbacktest."
+      },
+      {
+        "repository": "Pavdot/btcusdt-strategy-optimizer",
+        "commit": "12f27c0b5fd6e095e683b13beb1fb58a4827f6aa",
+        "status": "duplicate_existing1224preflight_recoveredREADME_no_newalpha_orledgercalculation",
+        "previous": "research/continuation/source_screening_20261020_1224.json"
+      },
+      {
+        "repository": "octopus444/technical-trading-rules-based-strategies-btc",
+        "status": "duplicate0505preflight_no_newtest_ortraining",
+        "previous": "research/continuation/source_screening_20261020_0505.json"
+      },
+      {
+        "repository": "quantsarahz/btcusdt-regime-multistrategy-trading",
+        "commit": "0d216c8d8fffeeb4ecd181f15c70b62f9e12efe3",
+        "readme_git_blob_sha": "571ac62b32a0914451a4046286a54336071aba58",
+        "status": "preflight_notshortlisted_defaultlongonlyspot_min42h_no_publicrawledger",
+        "basis": "FullREADME57filetree;data/results onlygitkeep. Authorpositive68.8%/OOS31.75%areunverifiedhistory,longonlyspot/min168x15mholdinganddrawdown~29%;notourmanualfrequentboundedriskcontract. No codekernel/backtest."
+      },
+      {
+        "repository": "jsinn003/btc_macd_trading_strategy",
+        "commit": "08e5f1af36d66b6e071d64b98882f771397a63a4",
+        "readme_git_blob_sha": "696b7f652c14c8e9b40f4194158785977e54625d",
+        "status": "targeted_read_stopped_CONNECT403_no_bypass_or_retry",
+        "basis": "12fileGittreerecovered;rawdata/resultsabsentintree. READMEpromisorblobcouldnotfetchdueCONNECTtunnel403. NotfullREADMEreview/no performanceclaim or calculation."
       }
     ],
-    "completed_pullback_contract": "docs/lbank_pullback_contract_audit_2026-10-20.md"
+    "completed_pullback_contract": "docs/lbank_pullback_contract_audit_2026-10-20.md",
+    "completed_funding_ledger": "docs/lbank_funding_ledger_audit_2026-10-20.md"
   },
   "known_limitations": [
     "2023 through Sep2026 reused and exploratory; 2022 observed for Turtle; none may be relabeled untouched.",
@@ -331,7 +377,8 @@
     "Gotodataru5ed0d6e51files no rawBTCledger/windowparams;authorBTC139/318/368trades PF.6183/.3322/.7111 negative. Sharedengine percentageunits100factor,fundingcashabsent,costoverrideignored,tail/gap/stop/TPprobes;11tests75separatechecks. Syntheticcontractnotmarketprofitbias;completedbarprefix49signals0change,SLfirst/nextopencontrolsretained. No source profit replay/fullcostCI/TP1/nativegate or allfundingstrategyfailure. Newprimarypreflights pgup/maxs retainauthorpositivebutincompatiblefrequency/missingledger;GTtargetsnotmeasurements. Do not repeatunchanged.",
     "Bhanu15391f25filepublictree:nooriginalBTCrawledger,README45tradesExampleOutput. Embeddedthirdpartycredentialsnotused/copied;noauthclient/mainexecution. Bottradepmdcd1ac339files21defs10tests125checks:actual2024Q1reused131040minutes26/420pastglobalquantileflagschange,31intradaydailyEMAproxy/24ADXchangeBUT31dailybull/bearflags0change,causalpricecontrolsunchanged. Sourcepartialeventwin50%withlosingcampaign;entryfeeextra.040008lowersPnL,shortslipfavorable,tailcurveunupdated,fundingabsent. No measuredheadlineprofitimpact/fullcostprofit/nativegates. OriginalOOSpositive1entry1forcedcloseandPFNaNretainedasauthoronly,notlabelledsyntheticwithoutprovenance.",
     "Daynight5693993:all900BTCpublishedcostrowsreconciledwith3.34e-13relativeerror,525overlapexact;originalpreferred8bpsconditionalwealth237.22from100but16bps0.5866. 16bpspositive12cellsallcontinuouslongwithonechange,not12newedges. RawKrakenpriceSHA/closedcampaign/SLTP1/fullcost/nativeforwardmissing;published9BHrelativeCIcross0notabsoluteRexpectancy.",
-    "Silentbilly2227152 actualBacktrader probes show entrybarstopmiss,dualTP/SLcreatesunprotectedoppositeposition,Marginpendingnotcleared,closedanalyzerqty0. RealBTC2024Jancausality84480cellsunchanged;27rawsignals17/31daysNOTexecutedalerts/trades. ETHsample sourceunqualified;no validmarketPF/fullcost/nativeforward."
+    "Silentbilly2227152 actualBacktrader probes show entrybarstopmiss,dualTP/SLcreatesunprotectedoppositeposition,Marginpendingnotcleared,closedanalyzerqty0. RealBTC2024Jancausality84480cellsunchanged;27rawsignals17/31daysNOTexecutedalerts/trades. ETHsample sourceunqualified;no validmarketPF/fullcost/nativeforward.",
+    "FundingHarvester776003e original25inputSHA/292events->146campaigns:rootIS117net-1085.797/OOS29net+11.0796;OOSPF1.014,29/213days,28opportunitydays,conditionalallmodelcostdouble-193.8884,7/30dayUSD95lowernegative. Originalpertradeextractdoublechargesembeddedslip/omitsfunding;cashpositivepreserved. RegistryMD5coversfirst100rows/len,runwasgitdirty;notfullpolicysignalreproduction/nativeprofit/Rgate."
   ],
   "iterations": [
     {
@@ -829,11 +876,63 @@
       "source_screening": "research/continuation/source_screening_20261020_1619.json",
       "production_changed": false,
       "forward_started": false
+    },
+    {
+      "id": "funding_ledger_20261020_1640",
+      "stage_completed": "fixed_original_two_publicdefault_ledgers_25inputSHA_cash_cost_frequency_and_blockuncertainty_calculation",
+      "protocol_checkpoint_commit": "d91f212ec24ce8ebc3686cc23311be5fc4aa07b9",
+      "source_commit": "776003eb85f3c1e6e92683ee39d6ebf7cade78a0",
+      "execution_started_utc": "2026-10-20T07:48:48.360456+00:00",
+      "execution_completed_utc": "2026-10-20T07:48:49.481059+00:00",
+      "original_inputs_wholeSHA": 25,
+      "published_order_events": 292,
+      "economic_closed_campaigns": 146,
+      "IS_campaigns": 117,
+      "OOS_campaigns": 29,
+      "forced_end_or_gap_campaigns": 0,
+      "implementation_tests_passed": 12,
+      "separate_Decimal_checks_passed": 1278,
+      "max_cash_absolute_error": 1.6978853414043e-11,
+      "IS_net_USD": -1085.7969701819832,
+      "OOS_net_USD": 11.079637485035661,
+      "OOS_PF": 1.0140942351858613,
+      "OOS_doublecost_USD": -193.88837508056102,
+      "OOS_calendar_days": 213,
+      "OOS_entry_days": 28,
+      "OOS_entries_per_day": 0.13615023474178403,
+      "OOS_95lower_USD_by_7_30day": [
+        -21.323348289346928,
+        -20.259913955449463
+      ],
+      "new_market_strategy_backtest": false,
+      "published_cash_ledger_reconstructed": true,
+      "native_market_returns_verified": false,
+      "source_pure_definitions_executed": 3,
+      "decision": "not_promoted_aftercostpositivepreserved_butPFfrequency_uncertainty_doublecostfail_noTP1nativeforward",
+      "documentation": "docs/lbank_funding_ledger_audit_2026-10-20.md",
+      "report": "research/continuation/results/funding_ledger_20261020/report.json",
+      "audit": "research/continuation/results/funding_ledger_20261020/independent_verification.json",
+      "source_screening": "research/continuation/source_screening_20261020_1657.json",
+      "production_changed": false,
+      "forward_started": false
     }
   ],
   "active_run": null,
-  "blockers": [],
-  "updated_kst": "2026-10-20T16:19:00+09:00",
+  "blockers": [
+    {
+      "scope": "single_new_source_README_NOT_whole_research",
+      "source": "jsinn003/btc_macd_trading_strategy@08e5f1af",
+      "error": "CONNECT tunnel403whilepromisorblobfetch",
+      "action": "Stoppedtargetedaccess,noalternatebypass;do_notretrywithoutpermission. ExistingfundingmathandGitHubresearchcheckpointunblocked."
+    },
+    {
+      "scope": "single_primary_paper_tool_fetch",
+      "source": "arxiv2201.04699v4",
+      "error": "webDisabledError",
+      "action": "Fulltextnotread;nextfeasibilitymustusepermittedpublicprimaryaccessorrecordunavailable,notinventedrules/returns."
+    }
+  ],
+  "updated_kst": "2026-10-20T16:57:21+09:00",
   "maintained_research_candidates": [
     {
       "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
@@ -899,6 +998,11 @@
       "candidate_id": "silentbilly_2227152_execution_contract_v1",
       "status": "excluded_currentpublicrelease_protection_ledger_notallpullback",
       "next": "Do notrepeatunchangedcontractprobes,repair-to-salvageoroptimizeETHsettingsforBTC. Sourcepriceprofitabilitynotcomputed;excludeonlycurrentpublicrelease,notallEMA/pullback. Continue newpublicBTCledger/data finitearithmetic."
+    },
+    {
+      "candidate_id": "funding_harvester_776003e_default_publicledger_v1",
+      "status": "notpromoted_PFfrequencyuncertainty_doublecost_manualcontract_notallfunding",
+      "next": "No unchangedIS/OOSledgerrecalculation,81grid,WFoptimization,Kelly,riskincrease,feehalvingorTP1invention. OOS+11.0796 preservedbutPF1.014,29campaigns/213days,opportunity28days,doublecost-193.8884andUSDlower<0. IS-1085.797. Continue separate primarypaper/code/data feasibility."
     }
   ],
   "source_reconciliation": {
@@ -961,15 +1065,15 @@
     "native_readiness": {
       "ready": true,
       "reason": "native_ready",
-      "last_observed_utc": "2026-10-20T07:08:15.610117695Z",
+      "last_observed_utc": "2026-10-20T07:40:55.756965108Z",
       "required_closed_1m": 65,
       "required_closed_5m": 20,
       "rsi_warmup_target": 250,
       "note": "Existing65closed1m/20closed5m readiness contract actually passed;20native5m now usable. RSIcomputed but250warmup maturitytarget not yet met. No history interpolation or threshold changes.",
-      "rsi14_wilder": 47.58330537363405,
+      "rsi14_wilder": 29.304481822179653,
       "entry_source_switched": true,
-      "closed_1m": 326,
-      "closed_5m": 64,
+      "closed_1m": 358,
+      "closed_5m": 71,
       "rsi_history_mature": false
     },
     "full_rollout_complete": true,
@@ -992,24 +1096,24 @@
     "next_check": "Entry pipeline restored2026-10-20T03:25:05Z on existing deployed862339d source. Before next research step,check latest production/deployment and bounded logs for continuity/regressions;do not repeat unchanged readiness announcement. No valid new setup or confirmation/alert observed in this bounded window;no native publication timestamp or end-to-end latency measured. Continue alternative-strategy research;do not disable task because hotfix readiness is not certified replacement.",
     "followup_via_existing_enabled_research_task": true,
     "evidence_path": "research/continuation/results/entry_timing_hotfix_20261020_deployment.json",
-    "latest_bounded_observation": "research/continuation/results/operational_continuity_20261020_1607.json",
+    "latest_bounded_observation": "research/continuation/results/operational_continuity_20261020_1640.json",
     "hotfix_entry_pipeline_validated_utc": "2026-10-20T03:25:05.441094944Z",
     "live_new_candidate_confirmation_observed": false,
     "last_completed_bar_evaluation": {
-      "timestamp": "2026-10-20T07:09:05.686555739Z",
+      "timestamp": "2026-10-20T07:41:15.587533314Z",
       "reason": "market_no_setup",
       "candidate_count": 0,
       "entry_timing": {
-        "candidate_evaluated_at": 1792480142.703189,
-        "evaluation_after_first_ready_observation_seconds": 0.006601810455322266,
-        "evaluation_after_nominal_close_seconds": 2.703188896179199,
-        "first_ready_observed_at": 1792480142.696587,
-        "last_closed_1m_start": 1792480080,
-        "last_closed_5m_start": 1792479600,
-        "nominal_1m_close_at": 1792480140,
+        "candidate_evaluated_at": 1792482069.1322265,
+        "evaluation_after_first_ready_observation_seconds": 0.0070247650146484375,
+        "evaluation_after_nominal_close_seconds": 9.132226467132568,
+        "first_ready_observed_at": 1792482069.1252017,
+        "last_closed_1m_start": 1792482000,
+        "last_closed_5m_start": 1792481700,
+        "nominal_1m_close_at": 1792482060,
         "policy": "native_completed_bar_schedule_v1",
         "publication_note": "nominal_close_is_not_actual_publication_time",
-        "quote_observed_at": 1792480142.696587,
+        "quote_observed_at": 1792482069.1252017,
         "source_publication_at": null,
         "trigger": "new_completed_bar"
       }

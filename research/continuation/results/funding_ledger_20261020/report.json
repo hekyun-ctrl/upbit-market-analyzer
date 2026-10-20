@@ -1,0 +1,606 @@
+{
+  "version": "funding_harvester_776003e_published_default_ledger_v1",
+  "source_commit": "776003eb85f3c1e6e92683ee39d6ebf7cade78a0",
+  "started_utc": "2026-10-20T07:48:48.360456+00:00",
+  "completed_utc": "2026-10-20T07:48:49.481059+00:00",
+  "library_versions": {
+    "numpy": "2.3.5",
+    "pandas": "2.2.3"
+  },
+  "source_inputs": [
+    {
+      "path": "python/src/backtester.py",
+      "sha256": "c282d9acdbc8cead69f3984163c0d0c8a0e749f2de7299a0ac31a5ccd8858767",
+      "bytes": 11484,
+      "git_blob_sha": "7e876964aa91b21981adc98b3d5926d28f09a7d5"
+    },
+    {
+      "path": "python/src/strategies/funding_arb.py",
+      "sha256": "0f369051ca2f689deffb345832f39fae1c2b0848550a1bf911dede78136f16c0",
+      "bytes": 10450,
+      "git_blob_sha": "019fae1dc089ff8740e6d1917ece39ae03e942ec"
+    },
+    {
+      "path": "python/src/data_loader.py",
+      "sha256": "e679dd35585720c06b7ade2d6922a6aa2965f6cc402eb67f1a73890be3dfbda7",
+      "bytes": 10883,
+      "git_blob_sha": "7f971dc79a8108bc481562a51e36d1eee57b18c7"
+    },
+    {
+      "path": "python/src/quant_stats.py",
+      "sha256": "6b035cb6b43fffd9ca8ab6e0d48f223ff031a887870014b8794785261833bec2",
+      "bytes": 15250,
+      "git_blob_sha": "b38fd49dd8d4d8f1e2795943af9026acdc822521"
+    },
+    {
+      "path": "python/src/registry.py",
+      "sha256": "740c800da93e79dbfa699c8208ceb6ef6bfea25d4443eadac52e1a784bd4c6e2",
+      "bytes": 4489,
+      "git_blob_sha": "309684cee60380badec0da239ccc4de51b15fec9"
+    },
+    {
+      "path": "results/registry.parquet",
+      "sha256": "47c6e4b3f22af7002c529cc40ec7a106b5b2ac9eb1c7331a80e606d37c7d8e50",
+      "bytes": 9554,
+      "git_blob_sha": "ba5ec31260528d3d45bc31cff788f358f8695db0"
+    },
+    {
+      "path": "data/raw/btcusdt_1h.csv",
+      "sha256": "e82898124169856a756a0cdb9db942d7778283909d63b45eea019fd1d72ac14f",
+      "bytes": 676744,
+      "git_blob_sha": "ed3227bd700832f6a5be5366a3d553ee6c542ac5"
+    },
+    {
+      "path": "data/raw/btcusdt_funding.csv",
+      "sha256": "5541d914051e58cf1a92264b0b25283934d5353ad128409baa5e973735218ba3",
+      "bytes": 27604,
+      "git_blob_sha": "b9aea96dd3750148eb98179c7167b6b25709fc5f"
+    },
+    {
+      "path": "data/clean/btcusdt_1h.parquet",
+      "sha256": "164cb1073300d7064ee74081b17fe3c6d577b632fc316c4fcf6a69cd9413c438",
+      "bytes": 358613,
+      "git_blob_sha": "a35c6ce8679a180ef72d90200b2ee6bdd2095abe"
+    },
+    {
+      "path": "data/raw/btcusdt_1h_2yr.csv",
+      "sha256": "b653c018b390f9676cee392b3720f2109a255e4e01876f98fb788b560b054c7e",
+      "bytes": 1480179,
+      "git_blob_sha": "f377c4b874cc56f72ea34689de5c7cc78bd03bc2"
+    },
+    {
+      "path": "data/raw/btcusdt_funding_2yr.csv",
+      "sha256": "714ad6c04bfe4029954122198ad2ae70612e4d5f222cd35259bcd1d2a95b3eda",
+      "bytes": 59845,
+      "git_blob_sha": "3b6cda998dfad98fd1891433efe88fa374569492"
+    },
+    {
+      "path": "data/clean/btcusdt_1h_2yr.parquet",
+      "sha256": "a83263e7a2b6ccb7ce3253840edf6e15684c82412b715dde2513a5f754e89566",
+      "bytes": 773942,
+      "git_blob_sha": "698fcaef4938f59fab7c0d567fa35cf0d448ea62"
+    },
+    {
+      "path": "data/raw/btcusdt_1h_full.csv",
+      "sha256": "12d2b883e92b7174f7ff6110d100375edc356f540b07cde4231207bd8191c278",
+      "bytes": 1402765,
+      "git_blob_sha": "7bee924a1b3a365eb56d8a819099aae92bc5bd2c"
+    },
+    {
+      "path": "data/raw/btcusdt_funding_full.csv",
+      "sha256": "677580935632cbdd32266c6bb413519f0115e835cea2977af3f2a438590455e9",
+      "bytes": 59161,
+      "git_blob_sha": "2551cc6abb26d9fdc94fe1529c3edb12ff29a044"
+    },
+    {
+      "path": "data/clean/btcusdt_1h_full.parquet",
+      "sha256": "478f87ec3aab710ba3b00bf0d3f2f2943c4ff742faca9d3104fd61d64c0d7b06",
+      "bytes": 831233,
+      "git_blob_sha": "f94f0d9d8e0405774f748605342f1853a120f5dc"
+    },
+    {
+      "path": "results/train_default/summary.json",
+      "sha256": "493de5487bd3d8c93acedda2ef3199bc12641e0cecbdef8f8fe4e780ec9ff8dd",
+      "bytes": 819,
+      "git_blob_sha": "44871d243ad303e0e3e85b6c20d2f07f2185cf98"
+    },
+    {
+      "path": "results/train_default/trades.parquet",
+      "sha256": "52a27530937dcd2c2a1d2e840881127be7767744ad276a884b71113fca8a37cf",
+      "bytes": 13724,
+      "git_blob_sha": "ca221a64ac7ee2e8a21ba4c593c844a78bd707f0"
+    },
+    {
+      "path": "results/train_default/equity.parquet",
+      "sha256": "11e87a7a3e3c95bd5cd52e12cb8eb184b09bb27c714afe54614fff4dcfcbd063",
+      "bytes": 120051,
+      "git_blob_sha": "12e1a0635d1444584ca7ffe46a56912bf1e1c2c3"
+    },
+    {
+      "path": "results/train_default/pnl.parquet",
+      "sha256": "47879e6a335cbbb9d4f0b13928cdcedbb4d61f1ec79c20a71827f827aba79de1",
+      "bytes": 132343,
+      "git_blob_sha": "89ef91e1557d151f6e8a17f1c5e7157290ed4774"
+    },
+    {
+      "path": "results/train_default/position.parquet",
+      "sha256": "9efc16d9ca9f3a8fcd50e5099e51bd681f4e1729ce8751e1454b2d3fc3939384",
+      "bytes": 113945,
+      "git_blob_sha": "33753b0a7ab66b06f9557899226f88c770f78449"
+    },
+    {
+      "path": "results/test_default/summary.json",
+      "sha256": "978b40732b558610f9c087a49eebdbff41bf4baba0b10ca846b4b3284e01f8d6",
+      "bytes": 1090,
+      "git_blob_sha": "2b776df72a7abd5d1b04cc64581504bb33432b2e"
+    },
+    {
+      "path": "results/test_default/trades.parquet",
+      "sha256": "76f5af15bc2b7c676701c76e1413864a8eecc9f4856c47881b7eaf8395fefec0",
+      "bytes": 7209,
+      "git_blob_sha": "bbb493fe80026e3c4f8da377cd31bd329c4b6377"
+    },
+    {
+      "path": "results/test_default/equity.parquet",
+      "sha256": "f6466bfc6150980a9a745ece28917d235cce27ad518355eb727a4a33a3b728b9",
+      "bytes": 43682,
+      "git_blob_sha": "eced78e477cf12d117910e5de4fd78a1eeee3450"
+    },
+    {
+      "path": "results/test_default/pnl.parquet",
+      "sha256": "7dffca1c0950e48edc65d905e2d52c6a9010a4ea26e6593712acbce3dca446e7",
+      "bytes": 48824,
+      "git_blob_sha": "8d0ffc3da4cfefaf4c8bdd43538a5101ed0eedaf"
+    },
+    {
+      "path": "results/test_default/position.parquet",
+      "sha256": "1feb8ce9500506b6f6377dd5ce3863b6fc5e61d2aa055959cb3fd69631458fba",
+      "bytes": 42246,
+      "git_blob_sha": "19e849a45ee95015699769e7dd9cce36609bf4a5"
+    }
+  ],
+  "reviewed_executed_pure_definitions": [
+    {
+      "path": "python/src/registry.py",
+      "name": "_md5",
+      "line": 75,
+      "ast_sha256": "c7c5abdd6abdb47ebd2b4de05b6e864cfd65d750eb52b626375cfd75de92fd24"
+    },
+    {
+      "path": "python/src/registry.py",
+      "name": "data_hash",
+      "line": 84,
+      "ast_sha256": "4743f22c571f516964461a66f7e0ca8110d36d9e86ac8f3618eb80e8a8e21f21"
+    },
+    {
+      "path": "python/src/quant_stats.py",
+      "name": "extract_trade_returns",
+      "line": 56,
+      "ast_sha256": "db40b9c120ee7b24523da1275c0ca531963e9f0fc85a5a14441cf61ff314730f"
+    }
+  ],
+  "data_quality": [
+    {
+      "raw": "data/raw/btcusdt_1h.csv",
+      "clean": "data/clean/btcusdt_1h.parquet",
+      "rows": 8761,
+      "first": "2024-05-01T00:00:00+00:00",
+      "last": "2025-05-01T00:00:00+00:00",
+      "duplicates": 0,
+      "gap_steps": 0,
+      "finite": true,
+      "positive_prices": true,
+      "bad_OHLC": 0,
+      "clean_rows": 8761,
+      "clean_common_prices": 8761,
+      "maximum_raw_clean_price_error": 0.0,
+      "funding_rows": 1096,
+      "funding_duplicates": 0,
+      "clean_registry_prefix_MD5": "92afa31e327f619822a2dfbd49ceb60a",
+      "registry_hash_warning": "Original hash covers first100index/closeandlen,notwholedata;ourfullSHA256isrecorded."
+    },
+    {
+      "raw": "data/raw/btcusdt_1h_2yr.csv",
+      "clean": "data/clean/btcusdt_1h_2yr.parquet",
+      "rows": 18985,
+      "first": "2024-03-01T00:00:00+00:00",
+      "last": "2026-05-01T00:00:00+00:00",
+      "duplicates": 0,
+      "gap_steps": 0,
+      "finite": true,
+      "positive_prices": true,
+      "bad_OHLC": 0,
+      "clean_rows": 18985,
+      "clean_common_prices": 18985,
+      "maximum_raw_clean_price_error": 0.0,
+      "funding_rows": 2374,
+      "funding_duplicates": 0,
+      "clean_registry_prefix_MD5": "b4a600a619a923ffb344c54a3b93ed55",
+      "registry_hash_warning": "Original hash covers first100index/closeandlen,notwholedata;ourfullSHA256isrecorded."
+    },
+    {
+      "raw": "data/raw/btcusdt_1h_full.csv",
+      "clean": "data/clean/btcusdt_1h_full.parquet",
+      "rows": 20425,
+      "first": "2024-01-01T00:00:00+00:00",
+      "last": "2026-05-01T00:00:00+00:00",
+      "duplicates": 0,
+      "gap_steps": 0,
+      "finite": true,
+      "positive_prices": true,
+      "bad_OHLC": 0,
+      "clean_rows": 20425,
+      "clean_common_prices": 20425,
+      "maximum_raw_clean_price_error": 0.0,
+      "funding_rows": 2554,
+      "funding_duplicates": 0,
+      "clean_registry_prefix_MD5": "b36c84e69f3081339beaee0ed680e581",
+      "registry_hash_warning": "Original hash covers first100index/closeandlen,notwholedata;ourfullSHA256isrecorded."
+    }
+  ],
+  "selected_root_run_input": {
+    "raw": "data/raw/btcusdt_1h_2yr.csv",
+    "clean": "data/clean/btcusdt_1h_2yr.parquet",
+    "rows": 18985,
+    "first": "2024-03-01T00:00:00+00:00",
+    "last": "2026-05-01T00:00:00+00:00",
+    "duplicates": 0,
+    "gap_steps": 0,
+    "finite": true,
+    "positive_prices": true,
+    "bad_OHLC": 0,
+    "clean_rows": 18985,
+    "clean_common_prices": 18985,
+    "maximum_raw_clean_price_error": 0.0,
+    "funding_rows": 2374,
+    "funding_duplicates": 0,
+    "clean_registry_prefix_MD5": "b4a600a619a923ffb344c54a3b93ed55",
+    "registry_hash_warning": "Original hash covers first100index/closeandlen,notwholedata;ourfullSHA256isrecorded."
+  },
+  "registry_rows": [
+    {
+      "git_sha": "7cc804f9549f92b0a657384751f9edd5be3a52a9",
+      "git_dirty": true,
+      "data_hash": "b4a600a619a923ffb344c54a3b93ed55",
+      "config_hash": "6c9ed25e9194d8b7888dfdd87751e3fe",
+      "output_dir": "results",
+      "n_trades": 58,
+      "oos_start": "2025-10-01"
+    },
+    {
+      "git_sha": "7cc804f9549f92b0a657384751f9edd5be3a52a9",
+      "git_dirty": true,
+      "data_hash": "b36c84e69f3081339beaee0ed680e581",
+      "config_hash": "6c9ed25e9194d8b7888dfdd87751e3fe",
+      "output_dir": "results/run_jan24_may26",
+      "n_trades": 58,
+      "oos_start": "2025-10-01"
+    }
+  ],
+  "registry_full_SHA256": false,
+  "source_venue": "AuthorlabelBybit;originalversionedfilesonly_notindependentlyexchangeverified",
+  "periods": [
+    {
+      "name": "train_default",
+      "source_summary": {
+        "total_return_pct": -10.857969701819925,
+        "sharpe_ratio": -1.4707004966300703,
+        "max_drawdown_pct": -14.367036531438155,
+        "n_trades": 234,
+        "total_fees_usd": 702.2334996815966,
+        "total_slippage_usd": 117.03891661359943,
+        "total_funding_usd": 3.8440002507156006,
+        "name": "train_default",
+        "label": "IN-SAMPLE",
+        "n_bars": 13896,
+        "start": "2024-03-01 00:00:00+00:00",
+        "end": "2025-09-30 23:00:00+00:00",
+        "strategy_config": {
+          "name": "default",
+          "warmup_bars": 720,
+          "z_window": 60,
+          "z_threshold": 2.0,
+          "momentum_window": 5,
+          "vol_window": 24,
+          "vol_pct_lookback": 720,
+          "vol_filter_pct": 0.9,
+          "max_hold_bars": 10,
+          "entry_min_bars_before_snapshot": 1,
+          "stop_loss_pct": 0.015,
+          "notional_per_trade_usd": 5000
+        },
+        "fee_taker_bps": 6.0,
+        "slippage_bps": 1.0
+      },
+      "bar_rows": 13896,
+      "first": "2024-03-01T00:00:00+00:00",
+      "last": "2025-09-30T23:00:00+00:00",
+      "source_order_events": 234,
+      "economic_closed_campaigns": 117,
+      "known_closed_campaigns": 117,
+      "forced_end_campaigns": 0,
+      "raw_gap_campaigns": 0,
+      "calendar_days": 579,
+      "full_days_by_hours": 578.9583333333334,
+      "entry_days": 104,
+      "entries_per_calendar_day": 0.20207253886010362,
+      "opportunity_day_fraction": 0.17962003454231434,
+      "known_base": {
+        "closed": 117,
+        "sum_USD": -1085.7969701819832,
+        "mean_USD": -9.280315984461394,
+        "PF": 0.6251537775621564,
+        "net_wins": 43,
+        "max_closed_drawdown_USD": 1453.0067185158555
+      },
+      "known_double_cost": {
+        "closed": 117,
+        "sum_USD": -1921.6394649424972,
+        "mean_USD": -16.424268931132456,
+        "PF": 0.44399672767399223,
+        "net_wins": 36,
+        "max_closed_drawdown_USD": 2181.6283697989024
+      },
+      "yearly": [
+        {
+          "year": 2024,
+          "base": {
+            "closed": 53,
+            "sum_USD": -437.80110657269415,
+            "mean_USD": -8.260398237220645,
+            "PF": 0.6736051335814958,
+            "net_wins": 21,
+            "max_closed_drawdown_USD": 793.6920993662759
+          },
+          "double": {
+            "closed": 53,
+            "sum_USD": -815.4234205280115,
+            "mean_USD": -15.385347557132294,
+            "PF": 0.4858651378891698,
+            "net_wins": 17,
+            "max_closed_drawdown_USD": 1075.4123253844177
+          }
+        },
+        {
+          "year": 2025,
+          "base": {
+            "closed": 64,
+            "sum_USD": -647.995863609289,
+            "mean_USD": -10.124935368895141,
+            "PF": 0.5833689225131332,
+            "net_wins": 22,
+            "max_closed_drawdown_USD": 659.3146191495797
+          },
+          "double": {
+            "closed": 64,
+            "sum_USD": -1106.2160444144856,
+            "mean_USD": -17.284625693976338,
+            "PF": 0.4084896444960289,
+            "net_wins": 19,
+            "max_closed_drawdown_USD": 1106.2160444144856
+          }
+        }
+      ],
+      "block_uncertainty_USD": {
+        "net_USD": [
+          {
+            "block_days": 7,
+            "valid_samples": 5000,
+            "lo_USD": -18.45234321089999,
+            "hi_USD": 0.34742978464126345
+          },
+          {
+            "block_days": 30,
+            "valid_samples": 5000,
+            "lo_USD": -17.475036719299034,
+            "hi_USD": -0.17776980175222584
+          }
+        ],
+        "double_cost_net_USD": [
+          {
+            "block_days": 7,
+            "valid_samples": 5000,
+            "lo_USD": -25.570205330055966,
+            "hi_USD": -6.8061450372352565
+          },
+          {
+            "block_days": 30,
+            "valid_samples": 5000,
+            "lo_USD": -24.611306349464073,
+            "hi_USD": -7.332721791357751
+          }
+        ]
+      },
+      "source_published_terminal_change_USD": -1085.796970181993,
+      "cash_replayed_terminal_change_USD": -1085.7969701819711,
+      "conditional_double_cost_terminal_change_USD": -1921.639464942502,
+      "source_funding_USD": 3.8440002507156006,
+      "unallocated_funding_USD": 3.552713678800501e-15,
+      "source_pnl_decomposition_sum_USD": -1085.796972885683,
+      "source_fee_sum_USD": 702.2334996815966,
+      "source_slippage_column_sum_USD": 117.03891661359941,
+      "maximum_fee_model_abs_error": 4.440892098500626e-16,
+      "maximum_fee_booking_abs_error": 0.0,
+      "maximum_source_equity_replay_abs_error": 2.1827872842550278e-11,
+      "source_vs_economic_timestamp_equity_max_abs_difference": 3.602640739374692,
+      "source_drawdown_pct": -14.36703653143816,
+      "economic_recorded_timestamp_drawdown_pct": -14.352912440826582,
+      "nextopen_exec_price_raw_open_max_abs_error": 0.0,
+      "ordinary_events_booked_one_hour_early": 234,
+      "source_extract_trade_net_sum_USD": -1206.679887046299,
+      "source_extract_minus_correct_cash_sum_USD": -120.88291686431515,
+      "source_extract_expected_difference_USD": -120.88291686431504,
+      "raw_price_path": "data/raw/btcusdt_1h_2yr.csv"
+    },
+    {
+      "name": "test_default",
+      "source_summary": {
+        "total_return_pct": 0.11079637485043037,
+        "sharpe_ratio": 0.06438603083758834,
+        "max_drawdown_pct": -3.9301289746078285,
+        "n_trades": 58,
+        "total_fees_usd": 174.04243201222252,
+        "total_slippage_usd": 29.007072002037088,
+        "total_funding_usd": 1.3105754234691618,
+        "name": "test_default",
+        "label": "OUT-OF-SAMPLE",
+        "n_bars": 5089,
+        "start": "2025-10-01 00:00:00+00:00",
+        "end": "2026-05-01 00:00:00+00:00",
+        "strategy_config": {
+          "name": "default",
+          "warmup_bars": 720,
+          "z_window": 60,
+          "z_threshold": 2.0,
+          "momentum_window": 5,
+          "vol_window": 24,
+          "vol_pct_lookback": 720,
+          "vol_filter_pct": 0.9,
+          "max_hold_bars": 10,
+          "entry_min_bars_before_snapshot": 1,
+          "stop_loss_pct": 0.015,
+          "notional_per_trade_usd": 5000
+        },
+        "fee_taker_bps": 6.0,
+        "slippage_bps": 1.0,
+        "capacity": {
+          "avg_hourly_vol_usd": 290939097,
+          "capacity_1pct_vol_usd": 2909391,
+          "capacity_note": "At $2,909,391 notional per trade (<1% avg hourly vol), slippage assumption of 1.0 bps remains valid. Above this level, use a non-linear impact model."
+        }
+      },
+      "bar_rows": 5089,
+      "first": "2025-10-01T00:00:00+00:00",
+      "last": "2026-05-01T00:00:00+00:00",
+      "source_order_events": 58,
+      "economic_closed_campaigns": 29,
+      "known_closed_campaigns": 29,
+      "forced_end_campaigns": 0,
+      "raw_gap_campaigns": 0,
+      "calendar_days": 213,
+      "full_days_by_hours": 212.0,
+      "entry_days": 28,
+      "entries_per_calendar_day": 0.13615023474178403,
+      "opportunity_day_fraction": 0.13145539906103287,
+      "known_base": {
+        "closed": 29,
+        "sum_USD": 11.079637485035661,
+        "mean_USD": 0.3820564650012297,
+        "PF": 1.0140942351858613,
+        "net_wins": 13,
+        "max_closed_drawdown_USD": 402.08178985923786
+      },
+      "known_double_cost": {
+        "closed": 29,
+        "sum_USD": -193.88837508056102,
+        "mean_USD": -6.685806037260725,
+        "PF": 0.7843786119857834,
+        "net_wins": 12,
+        "max_closed_drawdown_USD": 451.1155066200438
+      },
+      "yearly": [
+        {
+          "year": 2025,
+          "base": {
+            "closed": 7,
+            "sum_USD": 14.832750897318355,
+            "mean_USD": 2.118964413902622,
+            "PF": 1.1351779314331083,
+            "net_wins": 4,
+            "max_closed_drawdown_USD": 103.38203249542039
+          },
+          "double": {
+            "closed": 7,
+            "sum_USD": -34.84771004913525,
+            "mean_USD": -4.978244292733607,
+            "PF": 0.7355916034801158,
+            "net_wins": 3,
+            "max_closed_drawdown_USD": 131.79502053564545
+          }
+        },
+        {
+          "year": 2026,
+          "base": {
+            "closed": 22,
+            "sum_USD": -3.7531134122826444,
+            "mean_USD": -0.17059606419466566,
+            "PF": 0.9944512065075509,
+            "net_wins": 9,
+            "max_closed_drawdown_USD": 402.08178985923786
+          },
+          "double": {
+            "closed": 22,
+            "sum_USD": -159.04066503142582,
+            "mean_USD": -7.229121137792083,
+            "PF": 0.7927572671860443,
+            "net_wins": 9,
+            "max_closed_drawdown_USD": 451.1155066200438
+          }
+        }
+      ],
+      "block_uncertainty_USD": {
+        "net_USD": [
+          {
+            "block_days": 7,
+            "valid_samples": 5000,
+            "lo_USD": -21.323348289346928,
+            "hi_USD": 20.367339266519682
+          },
+          {
+            "block_days": 30,
+            "valid_samples": 5000,
+            "lo_USD": -20.259913955449463,
+            "hi_USD": 20.354079896456344
+          }
+        ],
+        "double_cost_net_USD": [
+          {
+            "block_days": 7,
+            "valid_samples": 5000,
+            "lo_USD": -28.381684752531708,
+            "hi_USD": 13.279526077534841
+          },
+          {
+            "block_days": 30,
+            "valid_samples": 5000,
+            "lo_USD": -27.326798515421785,
+            "hi_USD": 13.286551588304164
+          }
+        ]
+      },
+      "source_published_terminal_change_USD": 11.07963748504335,
+      "cash_replayed_terminal_change_USD": 11.079637485039711,
+      "conditional_double_cost_terminal_change_USD": -193.88837508056713,
+      "source_funding_USD": 1.3105754234691618,
+      "unallocated_funding_USD": 0.0,
+      "source_pnl_decomposition_sum_USD": 11.079639613219449,
+      "source_fee_sum_USD": 174.04243201222255,
+      "source_slippage_column_sum_USD": 29.007072002037088,
+      "maximum_fee_model_abs_error": 4.440892098500626e-16,
+      "maximum_fee_booking_abs_error": 0.0,
+      "maximum_source_equity_replay_abs_error": 3.637978807091713e-12,
+      "source_vs_economic_timestamp_equity_max_abs_difference": 3.5977820132884517,
+      "source_drawdown_pct": -3.930128974607827,
+      "economic_recorded_timestamp_drawdown_pct": -3.9294610986871703,
+      "nextopen_exec_price_raw_open_max_abs_error": 0.0,
+      "ordinary_events_booked_one_hour_early": 58,
+      "source_extract_trade_net_sum_USD": -19.23800994047062,
+      "source_extract_minus_correct_cash_sum_USD": -30.317647425506248,
+      "source_extract_expected_difference_USD": -30.31764742550625,
+      "raw_price_path": "data/raw/btcusdt_1h_2yr.csv"
+    }
+  ],
+  "script_sha256": "e65bc82a37470b668a5a1cda0233115a2c46d44bd5600acc19b8c92fb1840874",
+  "protocol_sha256": "636fc3241c570f0a5f7d368ec1933b448efd5979a44bea90e1b092e1c8dca1d2",
+  "new_market_backtest_performed": false,
+  "published_ledger_cash_reconstructed": true,
+  "forward_started": false,
+  "eligible": false,
+  "production_changed": false,
+  "R_expectancy_95_lower": null,
+  "drawdown_R": null,
+  "TP1_Wilson_lower": null,
+  "urgent_5min_rate": null,
+  "native_manual_fill": null,
+  "decision": "not_promoted;originaldefaultonly_conditionalledger_math_notnativeprofit_noTP1_intrabarprotect_forwardgate"
+}
