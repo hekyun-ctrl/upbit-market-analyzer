@@ -1,0 +1,165 @@
+{
+  "study_logs": {
+    "scope": "deployment",
+    "deploymentId": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "status": "SUCCESS",
+    "deploy": [
+      {
+        "timestamp": "2026-10-20T21:50:17.720847193Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T21:51:20.704998552Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T21:52:23.321299832Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T21:53:34.586202592Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T21:54:35.302981573Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T21:55:34.560387018Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T21:56:44.999117482Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T21:57:46.315536249Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T21:58:46.199890200Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T21:59:56.469501348Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T22:00:55.976331878Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T22:01:56.111775566Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T22:03:07.087535413Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      }
+    ]
+  },
+  "outcome_search": {
+    "scope": "deployment",
+    "deploymentId": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "status": "SUCCESS",
+    "deploy": []
+  },
+  "scope": "Bounded latest logs do not prove all-window continuity or absence of earlier missing events; no observed close for prior native paper episode, exact active ledger inaccessible via current tools",
+  "new_trade_count": 0,
+  "closed_unknown": true
+}
