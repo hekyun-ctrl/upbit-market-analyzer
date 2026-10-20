@@ -1,0 +1,54 @@
+{
+  "version": "unchanged_public4_minute_open_transfer_2024_v1",
+  "prior_protocol": "research/continuation/public4_replay_protocol_20261021_0109.json",
+  "source": "25388b431c9c9d38df6a434670586c65f382d604",
+  "entry_start": "2024-01-08T00:00:00Z",
+  "entry_end_exclusive": "2024-01-15T00:00:00Z",
+  "followup_end_exclusive": "2024-01-16T00:00:00Z",
+  "changes_from_2025": [
+    {
+      "from": "b69ca5b2c2d1ae00d68d2790d09138cb2a44085ff19e0da5dc98b569ea7e489e",
+      "to": "21eeac04a76a7a35b10467e5e752fb2f8cff77cdeb57df6b50a23ce8d69bb190"
+    },
+    {
+      "from": "df725010d55458866eb5a47e9ee708c6796c9d7e77b14c38342cea11f381815e",
+      "to": "3e0d30870672aa8f0f937881056e3cfd55913ae5c780cd50b33f2763aa0ba58e"
+    },
+    {
+      "from": "start=1736294400;end=1736899200;followup=1736985600",
+      "to": "start=1704672000;end=1705276800;followup=1705363200"
+    },
+    {
+      "from": "unchanged_public4_minute_open_transfer_v1",
+      "to": "unchanged_public4_minute_open_transfer_2024_v1"
+    },
+    {
+      "from": "Binance official UM BTCUSDT Jan2025",
+      "to": "Binance official UM BTCUSDT Jan2024"
+    }
+  ],
+  "all_other_code_exact_string_unchanged": true,
+  "expected_data_sources": [
+    {
+      "kind": "klines",
+      "sha256": "21eeac04a76a7a35b10467e5e752fb2f8cff77cdeb57df6b50a23ce8d69bb190",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-01.zip"
+    },
+    {
+      "kind": "fundingRate",
+      "sha256": "3e0d30870672aa8f0f937881056e3cfd55913ae5c780cd50b33f2763aa0ba58e",
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2024-01.zip"
+    }
+  ],
+  "hash_provenance": "Previously calculated full archive hashes in research/continuation/results/current_native_offline_20261020/report.json; not independently re-downloaded this run",
+  "archive_byte_hash_recheck_required": true,
+  "protocol_frozen_before_2024_public4_outcomes": true,
+  "rule_changes": false,
+  "already_seen_development": true,
+  "new_independent_OOS": false,
+  "execution_status": "not_run_environment_unavailable",
+  "source_checksum_urls_accessible_via_search": false,
+  "actual_backtest_completed": false,
+  "outputs": null,
+  "promotion": false
+}
