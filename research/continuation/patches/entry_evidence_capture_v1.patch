@@ -1,0 +1,334 @@
+diff --git a/lbank_entry_evidence.py b/lbank_entry_evidence.py
+new file mode 100644
+index 0000000..c4b5a30
+--- /dev/null
++++ b/lbank_entry_evidence.py
+@@ -0,0 +1,188 @@
++"""Bounded, opt-in public input capture. Never an entry or warning gate.
++
++Deep-freeze the snapshot actually used by the caller. No later DB query,
++interpolation, account data, Telegram call, or strategy inference is involved.
++Disk compression and archive logging run on a bounded daemon queue.
++"""
++import base64
++import hashlib
++import json
++import logging
++import math
++import os
++import queue
++import threading
++import zlib
++from datetime import datetime, timezone
++from pathlib import Path
++
++LOG = logging.getLogger("lbank_entry_evidence")
++POLICY = "native_event_input_capture_v1"
++BAR_KEYS = ("period", "start", "open", "high", "low", "close", "volume",
++            "turnover", "updated", "quality")
++PLAN_KEYS = ("direction", "strategy", "price", "stop", "target1", "target2",
++             "level", "structure_anchor", "barrier", "native_watch_1m_start",
++             "native_5m_start", "native_5m_count", "data_source")
++MODEL_KEYS = ("fee", "slippage", "funding_buffer", "reference_balance", "risk_fraction",
++              "leverage", "max_margin_fraction", "min_net_rr")
++MAX_RAW = 256 * 1024
++MAX_DAILY_BYTES = 128 * 1024 * 1024
++
++
++def scalar(value):
++    if value is None or isinstance(value, (str, bool, int)):
++        return value
++    if isinstance(value, float) and math.isfinite(value):
++        return value
++    raise ValueError("non-public scalar")
++
++
++def plan_fields(plan):
++    return {k: scalar(plan[k]) for k in PLAN_KEYS if k in (plan or {})}
++
++
++def freeze_event(phase, at, state, decision=None, plan=None, watch=None,
++                 source_commit=None, model_config=None):
++    if phase not in ("setup", "confirmation", "delivered"):
++        raise ValueError("invalid phase")
++    if not math.isfinite(at) or at <= 0:
++        raise ValueError("invalid time")
++    state = state or {}
++    native = {}
++    for key, limit in (("minute_bars", 360), ("five_bars", 250)):
++        bars = state.get(key, [])
++        if len(bars) > limit:
++            raise ValueError("snapshot exceeds original window")
++        native[key] = [{k: scalar(b[k]) for k in BAR_KEYS if k in b} for b in bars]
++    for key, limit in (("prices", 360), ("closes15", 5)):
++        values = state.get(key, [])
++        if len(values) > limit:
++            raise ValueError("snapshot exceeds original window")
++        native[key] = [scalar(v) for v in values]
++    for key in ("source", "quote", "last5_start"):
++        if key in state:
++            native[key] = scalar(state[key])
++    rsi = state.get("rsi5", {})
++    native["rsi5"] = {k: [scalar(v) for v in rsi.get(k, [])]
++                      for k in ("closes", "rsi")}
++    if any(len(v) > 250 for v in native["rsi5"].values()):
++        raise ValueError("rsi window exceeds bound")
++    decision = decision or {}
++    candidates = decision.get("candidates", [])
++    if len(candidates) > 8:
++        raise ValueError("candidate bound")
++    public_decision = dict(reason=scalar(decision.get("reason")), candidates=[
++        {k: scalar(c[k]) for k in ("strategy", "direction", "reason") if k in c}
++        for c in candidates])
++    event = dict(policy=POLICY, phase=phase, event_at=at,
++                 source_commit=source_commit, native_state=native,
++                 decision=public_decision, plan=plan_fields(plan),
++                 model_config={k:scalar(model_config[k]) for k in MODEL_KEYS if k in (model_config or {})},
++                 watch=plan_fields((watch or {}).get("plan")),
++                 watch_at=scalar((watch or {}).get("time")),
++                 actual_account_data=False, source_publication_at=None,
++                 publication_note="caller snapshot; no exchange publication timestamp",
++                 independent_strategy_forward_validation=False)
++    raw = json.dumps(event, sort_keys=True, separators=(",", ":"),
++                     ensure_ascii=False, allow_nan=False).encode()
++    if len(raw) > MAX_RAW:
++        raise ValueError("snapshot byte bound")
++    return raw
++
++
++def unpack_archive(envelope):
++    packed = base64.b64decode(envelope["payload"], validate=True)
++    decoder = zlib.decompressobj()
++    raw = decoder.decompress(packed, MAX_RAW + 1)
++    if len(raw) > MAX_RAW or decoder.unconsumed_tail or decoder.unused_data or not decoder.eof:
++        raise ValueError("invalid or oversized archive")
++    if hashlib.sha256(raw).hexdigest() != envelope["sha256"]:
++        raise ValueError("archive hash mismatch")
++    return json.loads(raw)
++
++
++class EntryEvidenceRecorder:
++    def __init__(self, directory, source_commit=None, queue_size=8, model_config=None):
++        self.directory = Path(directory)
++        self.source_commit = source_commit
++        self.model_config = {k:scalar(model_config[k]) for k in MODEL_KEYS if k in (model_config or {})}
++        self.pending = queue.Queue(maxsize=queue_size)
++        self.dropped = self.failed = self.written = 0
++        self.thread = threading.Thread(target=self._run,
++                                       name="lbank-entry-evidence", daemon=True)
++        self.thread.start()
++
++    @classmethod
++    def from_environment(cls, model_config=None):
++        if os.getenv("LBANK_ENTRY_EVIDENCE_ENABLED", "false").lower() != "true":
++            return None
++        try:
++            return cls(os.getenv("LBANK_ENTRY_EVIDENCE_DIR", "/data/lbank_entry_evidence"),
++                       os.getenv("RAILWAY_GIT_COMMIT_SHA"), model_config=model_config)
++        except Exception as exc:
++            LOG.warning("ENTRY_EVIDENCE_DISABLED exception=%s gates_unchanged=true",
++                        type(exc).__name__)
++            return None
++
++    def submit(self, phase, at, state, decision=None, plan=None, watch=None):
++        try:
++            raw = freeze_event(phase, at, state, decision, plan, watch, self.source_commit,
++                               model_config=self.model_config)
++            interesting = bool(plan or (decision or {}).get("candidates") or watch)
++            self.pending.put_nowait((raw, interesting))
++            return True
++        except Exception as exc:
++            self.dropped += 1
++            LOG.warning("ENTRY_EVIDENCE_DROPPED count=%d exception=%s gates_unchanged=true",
++                        self.dropped, type(exc).__name__)
++            return False
++
++    def _write(self, raw, interesting):
++        event = json.loads(raw)
++        envelope = dict(codec="zlib+base64", sha256=hashlib.sha256(raw).hexdigest(),
++                        payload=base64.b64encode(zlib.compress(raw)).decode())
++        line = json.dumps(envelope, separators=(",", ":")) + "\n"
++        day = datetime.fromtimestamp(event["event_at"], timezone.utc).strftime("%Y-%m-%d")
++        self.directory.mkdir(parents=True, exist_ok=True)
++        path = self.directory / (day + ".jsonl")
++        if (path.stat().st_size if path.exists() else 0) + len(line.encode()) > MAX_DAILY_BYTES:
++            raise ValueError("daily evidence byte cap")
++        with path.open("a", encoding="utf-8") as stream:
++            stream.write(line)
++        self.written += 1
++        LOG.info("ENTRY_EVIDENCE_STORED phase=%s at=%.6f sha256=%s",
++                 event["phase"], event["event_at"], envelope["sha256"])
++        # Interesting candidates are retrievable with the existing logs connector.
++        # Non-candidate inputs are retained on disk, not mislabeled as no coverage.
++        if interesting:
++            chunks = [envelope["payload"][i:i+2400]
++                      for i in range(0, len(envelope["payload"]), 2400)]
++            for index, payload in enumerate(chunks):
++                LOG.info("ENTRY_EVIDENCE_ARCHIVE %s", json.dumps(dict(
++                    sha256=envelope["sha256"], codec=envelope["codec"],
++                    phase=event["phase"], event_at=event["event_at"],
++                    index=index, chunks=len(chunks), payload=payload), sort_keys=True))
++
++    def _run(self):
++        while True:
++            item = self.pending.get()
++            try:
++                if item is None:
++                    return
++                self._write(*item)
++            except Exception as exc:
++                self.failed += 1
++                LOG.warning("ENTRY_EVIDENCE_WRITE_FAILED count=%d exception=%s gates_unchanged=true",
++                            self.failed, type(exc).__name__)
++            finally:
++                self.pending.task_done()
++
++
++def capture_safely(recorder, *args, **kwargs):
++    """A faulty/injected recorder must never alter the caller's decision path."""
++    if recorder is not None:
++        try:
++            recorder.submit(*args, **kwargs)
++        except Exception as exc:
++            LOG.warning("ENTRY_EVIDENCE_FAILED exception=%s gates_unchanged=true",
++                        type(exc).__name__)
+diff --git a/lbank_futures_monitor.py b/lbank_futures_monitor.py
+index d00c125..0181b25 100644
+--- a/lbank_futures_monitor.py
++++ b/lbank_futures_monitor.py
+@@ -45,6 +45,7 @@ from lbank_public_techniques import TechniqueStudy, annotate as annotate_public_
+ from lbank_entry_timing import (completed_key, setup_evidence, confirmation_evidence,
+                                POLICY as ENTRY_TIMING_POLICY)
+ from lbank_entry_replay_audit import audit_recent as audit_recent_entry
++from lbank_entry_evidence import EntryEvidenceRecorder, capture_safely
+ from lbank_breakout_freshness import (evidence as breakout_evidence,
+     confirmation_allowed as breakout_confirmation_allowed, POLICY as BREAKOUT_CONFIRMATION_POLICY,
+     REJECT_REASON as BREAKOUT_CONFIRMATION_REJECT)
+@@ -823,6 +824,10 @@ def record_alert(now, side, state, plan=None):
+ 
+ 
+ def run():
++    entry_evidence = EntryEvidenceRecorder.from_environment(model_config=dict(
++        fee=TAKER_FEE, slippage=STOP_SLIPPAGE, funding_buffer=FUNDING_BUFFER,
++        reference_balance=REF_BALANCE, risk_fraction=RISK_FRACTION,
++        leverage=LEVERAGE, max_margin_fraction=MAX_MARGIN_FRACTION, min_net_rr=MIN_NET_RR))
+     exchange = ccxt.lbank({"enableRateLimit": True, "timeout": 12000,
+                            "options": {"defaultType": "swap"}})
+     exchange.load_markets()
+@@ -1225,6 +1230,9 @@ def run():
+                         plan = confirm_watch(prices, watch["plan"], age,
+                                              native_state=native_state,
+                                              diagnostics=confirm_diag)
++                        if age >= 30:
++                            capture_safely(entry_evidence, "confirmation", now, native_state,
++                                           decision=confirm_diag, plan=plan, watch=watch)
+                         if plan is None:
+                             count_event("confirm_reject")
+                             if confirm_diag.get("reason") == "await_two_post_watch_closed_minutes":
+@@ -1295,6 +1303,8 @@ def run():
+                                     save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
+                                                    observations, alert_state)
+                                     sent_signal = risk_tracker.add_sent_signal(plan, now)
++                                    capture_safely(entry_evidence, "delivered", now, native_state,
++                                                   plan=plan, watch=watch)
+                                     LOG.info("ENTRY_QUALITY_SENT reference=%d evidence=%s",
+                                              sent_signal.number, json.dumps(plan["entry_quality"], sort_keys=True))
+                                     LOG.info("ENTRY_PRIORITY_SENT reference=%d evidence=%s",
+@@ -1344,6 +1354,8 @@ def run():
+                         proposal["entry_timing"] = timing
+                     rejection["entry_timing"] = timing
+                     rejection["data_source"] = NATIVE_SOURCE
++                    capture_safely(entry_evidence, "setup", now, native_state,
++                                   decision=rejection, plan=proposal)
+                     last_entry_diagnostics = rejection
+                     performance.sample(now, price, decision=rejection)
+                     LOG.info("ENTRY_SETUP_EVALUATED %s", json.dumps(rejection, sort_keys=True))
+diff --git a/test_lbank_entry_evidence.py b/test_lbank_entry_evidence.py
+new file mode 100644
+index 0000000..a0de714
+--- /dev/null
++++ b/test_lbank_entry_evidence.py
+@@ -0,0 +1,83 @@
++import copy
++import json
++import tempfile
++import threading
++import unittest
++from pathlib import Path
++from unittest.mock import Mock, patch
++
++import lbank_entry_evidence as evidence
++from test_lbank_entry_quality import structural_state
++from test_lbank_confirmation_cadence import run_clock
++import lbank_futures_monitor as monitor
++
++
++class EntryEvidenceTests(unittest.TestCase):
++    def test_public_whitelist_and_freeze_never_copy_account_fields(self):
++        state=structural_state()
++        state['prices']=[b['close'] for b in state['minute_bars']]
++        state['rsi5']={'closes':[],'rsi':[]}
++        state['account_token']='must-not-copy'
++        state['minute_bars'][-1]['private']='must-not-copy'
++        plan={'direction':1,'price':state['quote'],'account':'must-not-copy'}
++        raw=evidence.freeze_event('setup',9000.,state,plan=plan,
++                                  model_config={'fee':.0006,'account':'must-not-copy'})
++        self.assertEqual(json.loads(raw)['model_config'],{'fee':.0006})
++        old=json.loads(raw)['native_state']['minute_bars'][-1]['close']
++        state['minute_bars'][-1]['close']=1
++        self.assertEqual(json.loads(raw)['native_state']['minute_bars'][-1]['close'],old)
++        self.assertNotIn('must-not-copy',raw.decode())
++
++    def test_real_snapshot_archive_roundtrip_and_corruption_is_rejected(self):
++        with tempfile.TemporaryDirectory() as directory:
++            rec=evidence.EntryEvidenceRecorder(directory,source_commit='test')
++            self.assertTrue(rec.submit('setup',9000.,structural_state(),plan={'price':80000.}))
++            rec.pending.join()
++            rec.pending.put(None);rec.thread.join(2)
++            envelope=json.loads(next(Path(directory).glob('*.jsonl')).read_text())
++            event=evidence.unpack_archive(envelope)
++            self.assertEqual(event['phase'],'setup')
++            self.assertFalse(event['actual_account_data'])
++            envelope['sha256']='0'*64
++            with self.assertRaises(ValueError):evidence.unpack_archive(envelope)
++
++    def test_bad_filesystem_does_not_block_producer(self):
++        with tempfile.TemporaryDirectory() as directory:
++            p=Path(directory)/'file';p.write_text('not a directory')
++            rec=evidence.EntryEvidenceRecorder(p)
++            self.assertTrue(rec.submit('setup',9000.,structural_state()))
++            rec.pending.join();self.assertEqual(rec.failed,1)
++            rec.pending.put(None);rec.thread.join(2)
++
++    def test_bounded_queue_reports_loss_instead_of_blocking(self):
++        entered=threading.Event();release=threading.Event()
++        with tempfile.TemporaryDirectory() as directory:
++            with patch.object(evidence.EntryEvidenceRecorder,'_write',side_effect=lambda *a:(entered.set(),release.wait(2))):
++                rec=evidence.EntryEvidenceRecorder(directory,queue_size=1)
++                rec.submit('setup',9000.,structural_state());self.assertTrue(entered.wait(1))
++                self.assertTrue(rec.submit('setup',9001.,structural_state()))
++                self.assertFalse(rec.submit('setup',9002.,structural_state()))
++                self.assertEqual(rec.dropped,1)
++                release.set();rec.pending.join()
++                rec.pending.put(None);rec.thread.join(2)
++
++    def test_capture_failure_does_not_change_real_loop_send_risk_or_save_schedule(self):
++        with patch.object(monitor.EntryEvidenceRecorder,'from_environment',return_value=None):
++            baseline=run_clock()
++        rec=Mock();rec.submit.side_effect=OSError('diagnostic only')
++        with patch.object(monitor.EntryEvidenceRecorder,'from_environment',return_value=rec):
++            after=run_clock()
++        for key in ('sent','saved','confirmed','order'):
++            self.assertEqual(baseline[key],after[key],key)
++        self.assertTrue(rec.submit.called)
++        phases=[c.args[0] for c in rec.submit.call_args_list]
++        self.assertIn('setup',phases);self.assertIn('confirmation',phases);self.assertIn('delivered',phases)
++
++    def test_opt_in_is_explicit_and_bad_window_does_not_get_truncated(self):
++        with patch.dict('os.environ',{'LBANK_ENTRY_EVIDENCE_ENABLED':'false'}):
++            self.assertIsNone(evidence.EntryEvidenceRecorder.from_environment())
++        state=structural_state();state['minute_bars']=state['minute_bars']*100
++        with self.assertRaises(ValueError):evidence.freeze_event('setup',9000.,state)
++
++
++if __name__=='__main__':unittest.main()
