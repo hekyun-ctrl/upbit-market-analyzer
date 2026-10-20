@@ -1,0 +1,234 @@
+{
+  "schema": "entry_attribution_v1_development_only",
+  "input_sha256": "0bfb41439cc29017fd74e198f6cb97f6b08813d439011ba2446d1c32846ff1ca",
+  "source_blob": "488d61985ae5bf54d139689fc4664cd933d2da2d",
+  "all_retained_cases": [
+    {
+      "reference": 8,
+      "entry_at": "2026-10-18T22:23:37.372053472Z",
+      "followup_at": "2026-10-18T22:28:13.994250187Z",
+      "followup_reason": "early_invalidation",
+      "first_target_before_followup": false,
+      "possible_target_touch_bars": 0,
+      "complete_5m_coverage": true,
+      "target_distance_pct": 0.6676890438241934,
+      "actual_fill_verified": false,
+      "audit_type": "reuse_prior_preserved_outcome_no_rerun",
+      "policy_version_comparable_to_current": false,
+      "frozen_entry_direction_evidence": null,
+      "original_first_qualification": null,
+      "entry_message": "INFO:lbank_monitor:ENTRY REVIEW SENT strategy=trend_retest side=롱 entry=81639.8 stop=81469.7 t1=82184.9 t2=82477.5 net_rr=1.50 reverse_exception=False"
+    },
+    {
+      "reference": 9,
+      "entry_at": "2026-10-18T23:29:56.381792438Z",
+      "followup_at": "2026-10-19T05:29:55.396605767Z",
+      "followup_reason": "time_exit",
+      "first_target_before_followup": null,
+      "possible_target_touch_bars": 0,
+      "complete_5m_coverage": false,
+      "target_distance_pct": 0.9617457848247524,
+      "actual_fill_verified": false,
+      "audit_type": "reuse_prior_preserved_outcome_no_rerun",
+      "policy_version_comparable_to_current": false,
+      "frozen_entry_direction_evidence": null,
+      "original_first_qualification": null,
+      "entry_message": "INFO:lbank_monitor:ENTRY REVIEW SENT strategy=breakout side=롱 entry=82090.3 stop=81758.3 t1=82879.8 t2=83335.0 net_rr=1.50 reverse_exception=False"
+    },
+    {
+      "reference": 10,
+      "entry_at": "2026-10-19T01:09:46.017128150Z",
+      "followup_at": "2026-10-19T02:26:39.172591922Z",
+      "followup_reason": "early_invalidation",
+      "first_target_before_followup": false,
+      "possible_target_touch_bars": 0,
+      "complete_5m_coverage": true,
+      "target_distance_pct": 0.7593147009000933,
+      "actual_fill_verified": false,
+      "audit_type": "reuse_prior_preserved_outcome_no_rerun",
+      "policy_version_comparable_to_current": false,
+      "frozen_entry_direction_evidence": null,
+      "original_first_qualification": null,
+      "entry_message": "INFO:lbank_monitor:ENTRY REVIEW SENT strategy=trend_retest side=롱 entry=82469.1 stop=82246.9 t1=83095.3 t2=83441.2 net_rr=1.50 reverse_exception=False"
+    },
+    {
+      "reference": 11,
+      "entry_at": "2026-10-19T08:10:58.113212318Z",
+      "followup_at": "2026-10-19T08:17:55.570454681Z",
+      "followup_reason": "stop_breached",
+      "first_target_before_followup": false,
+      "possible_target_touch_bars": 0,
+      "complete_5m_coverage": true,
+      "target_distance_pct": 0.7002704434279194,
+      "actual_fill_verified": false,
+      "audit_type": "reuse_prior_preserved_outcome_no_rerun",
+      "policy_version_comparable_to_current": false,
+      "frozen_entry_direction_evidence": null,
+      "original_first_qualification": null,
+      "entry_message": "INFO:lbank_monitor:ENTRY REVIEW SENT strategy=breakout side=숏 entry=82568.1 stop=82758.2 t1=81989.9 t2=81676.0 net_rr=1.50 reverse_exception=False"
+    },
+    {
+      "reference": 12,
+      "entry_at": "2026-10-19T10:23:34.085248184Z",
+      "followup_at": "2026-10-19T12:40:22.980245823Z",
+      "followup_reason": "early_invalidation",
+      "first_target_before_followup": false,
+      "possible_target_touch_bars": 0,
+      "complete_5m_coverage": true,
+      "target_distance_pct": 0.7803168559354368,
+      "actual_fill_verified": false,
+      "audit_type": "reuse_prior_preserved_outcome_no_rerun",
+      "policy_version_comparable_to_current": false,
+      "frozen_entry_direction_evidence": null,
+      "original_first_qualification": null,
+      "entry_message": "INFO:lbank_monitor:ENTRY REVIEW SENT strategy=breakout side=숏 entry=82466.5 stop=82700.4 t1=81823.0 t2=81465.4 net_rr=1.50 reverse_exception=False"
+    },
+    {
+      "reference": 13,
+      "entry_at": "2026-10-20T01:11:20.531953782Z",
+      "entry": 81369.8,
+      "higher_direction_intact": false,
+      "target_distance_atr": 5.93234734953037,
+      "overrides": [],
+      "first_target_before_followup": null,
+      "actual_fill_verified": false,
+      "policy_version_comparable_to_current": false,
+      "followup_events": [
+        {
+          "time": "2026-10-20T01:35:19.808240898Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=13 side=SHORT reason=risk_caution price=81589.7"
+        },
+        {
+          "time": "2026-10-20T01:46:00.890955754Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=13 side=SHORT reason=stop_breached price=81671.0"
+        }
+      ],
+      "entry_basis_complete_replay_available": false,
+      "original_first_qualification": null,
+      "band_position": {
+        "id": 13,
+        "status": "computed",
+        "entry": 81369.8,
+        "middle": 81729.79500000001,
+        "lower": 81328.03584092582,
+        "upper": 82131.5541590742,
+        "percent_b": 0.05197661102540219,
+        "z": -1.792093555898412,
+        "closed_last": 1792458300
+      }
+    },
+    {
+      "reference": 14,
+      "entry_at": "2026-10-20T03:37:49.164052996Z",
+      "entry": 82014,
+      "higher_direction_intact": false,
+      "target_distance_atr": 5.261731078483683,
+      "overrides": [],
+      "first_target_before_followup": null,
+      "actual_fill_verified": false,
+      "policy_version_comparable_to_current": true,
+      "followup_events": [
+        {
+          "time": "2026-10-20T05:38:08.742119410Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=14 side=LONG reason=risk_caution price=81816.3"
+        },
+        {
+          "time": "2026-10-20T05:40:15.759298762Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=14 side=LONG reason=early_invalidation price=81848.2"
+        }
+      ],
+      "entry_basis_complete_replay_available": false,
+      "original_first_qualification": null,
+      "band_position": {
+        "id": 14,
+        "status": "computed",
+        "entry": 82014,
+        "middle": 81737.56500000002,
+        "lower": 81482.11270875955,
+        "upper": 81993.01729124048,
+        "percent_b": 1.0410697211945672,
+        "z": 2.164278884778289,
+        "closed_last": 1792467000
+      }
+    },
+    {
+      "reference": 15,
+      "entry_at": "2026-10-20T07:45:45.502509585Z",
+      "entry": 81536,
+      "higher_direction_intact": true,
+      "target_distance_atr": 5.806945270652743,
+      "overrides": [
+        "single_pivots_under_aligned_15m_5m"
+      ],
+      "first_target_before_followup": null,
+      "actual_fill_verified": false,
+      "policy_version_comparable_to_current": true,
+      "followup_events": [],
+      "entry_basis_complete_replay_available": false,
+      "original_first_qualification": null,
+      "band_position": {
+        "id": 15,
+        "status": "computed",
+        "entry": 81536,
+        "middle": 81698.74,
+        "lower": 81509.80426065988,
+        "upper": 81887.67573934013,
+        "percent_b": 0.06932446828645215,
+        "z": -1.7227021268542095,
+        "closed_last": 1792482000
+      }
+    }
+  ],
+  "reference14_fixed_bars_price_only_probe": [
+    {
+      "quote": 81971.0,
+      "target": 82627.4,
+      "policy": "confirmed_native_pivot_room_v1",
+      "target_room": "conflict",
+      "observed_barrier": 81987
+    },
+    {
+      "quote": 82011.8,
+      "target": 82627.4,
+      "policy": "confirmed_native_pivot_room_v1",
+      "target_room": "unknown",
+      "observed_barrier": null
+    },
+    {
+      "quote": 82014.0,
+      "target": 82627.4,
+      "policy": "confirmed_native_pivot_room_v1",
+      "target_room": "unknown",
+      "observed_barrier": null
+    }
+  ],
+  "control_target_before_barrier": {
+    "policy": "confirmed_native_pivot_room_v1",
+    "target_room": "clear",
+    "observed_barrier": 81987
+  },
+  "last_completed_5m_close": 81974.1,
+  "old_resistance": 81987.0,
+  "completed_close_above_old_resistance": false,
+  "what_is_reproduced": "Original target-room function changes conflict to unknown when quote crosses a known pivot while completed 5m inputs and target remain fixed. Actual logs show blocked 12:35 and qualified/sent 12:37 under same last5 start; 1m inputs and other plan fields also changed, so the complete accepted-path causal contribution is NOT identified.",
+  "full_classifier_replay": false,
+  "missing_replay_inputs": [
+    "Original 65-360 closed 1m bars at each #14 observation",
+    "Full original 5m snapshot at each observation rather than only last20 used in this component probe",
+    "All contemporaneous quotes and publication times for a true first possible qualification"
+  ],
+  "testable_correction_hypothesis": "Track earlier known resistance/support and distinguish quote crossing, retest and confirmed structural acceptance rather than silently dropping a crossed pivot from candidate attribution. Determine the strategy-specific entry contract and compare opportunities and outcomes before selecting any live veto.",
+  "new_live_veto_implemented": false,
+  "production_code_changed": false,
+  "replacement_certified": false,
+  "new_backtest_or_independent_profit_evidence": false,
+  "next_step": "Capture/recover complete snapshots if retained; otherwise instrument non-gating frozen candidate evidence capture on the approved source, then fixed-test one explicit correction including missed-opportunity effects. No invented missing minute bars or proof of counterfactual profits.",
+  "limits": [
+    "8 cases were already observed and policies differ; no single failure-rate/alpha estimate.",
+    "#8 later target after earlier invalidation is not reclassified as valid-alert TP1 success.",
+    "#9 missing coverage remains unknown. #13-15 TP1 outcomes not newly measured here.",
+    "#15 urgent is user-reported but not matched to retrieved delivery logs; not marked successful.",
+    "Unknown target room is not labeled clear; current eligibility may still allow the plan.",
+    "A candle-close confirmation requirement or all-higher-direction veto is not deployed or proved profitable."
+  ]
+}
