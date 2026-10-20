@@ -1,0 +1,102 @@
+{
+  "deployment_id": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
+  "source": "25388b431c9c9d38df6a434670586c65f382d604",
+  "terminal": "SUCCESS",
+  "runtime": {
+    "scope": "deployment",
+    "deploymentId": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "status": "SUCCESS",
+    "deploy": [
+      {
+        "timestamp": "2026-10-20T15:23:35.700376867Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:ENTRY_TIMING_RUNTIME commit=25388b431c9c9d38df6a434670586c65f382d604 monitor_sha256=c8c7afd9cdcf45c3a90af5fa68ec94aa399b587c4c94a86f079c6c718b5c1b53 timing_sha256=8de5b4747d9dd39b6de1392a438697fc3d7f12ec0ac15261460b0755014435f5",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      }
+    ]
+  },
+  "native": {
+    "scope": "deployment",
+    "deploymentId": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "status": "SUCCESS",
+    "deploy": [
+      {
+        "timestamp": "2026-10-20T15:23:35.156966751Z",
+        "severity": "error",
+        "message": "INFO:lbank_native_candles:NATIVE_CANDLES_CONNECTED entry_readiness=see_NATIVE_ENTRY_STATUS",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T15:23:35.336362756Z",
+        "severity": "error",
+        "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 163, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T15:23:36.931916078Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 163, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 279.1787933127581, \"min_range_fraction\": 0.011320564235544318, \"minimum_target_fraction\": 0.011170564235544318, \"stop_floor_fraction\": 0.005080091394840151}, \"entry_source_switched\": true, \"last5_start\": 1792509300, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 51.07472338043757, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      }
+    ]
+  },
+  "observation": {
+    "scope": "deployment",
+    "deploymentId": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "status": "SUCCESS",
+    "deploy": [
+      {
+        "timestamp": "2026-10-20T15:23:36.905984286Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:RESISTANCE_PRESSURE_OBSERVATION {\"at\": 1792509816.8811548, \"atr5\": 279.1787933127581, \"direction\": 1, \"entry_override\": false, \"last5_start\": 1792509300, \"live_gate\": false, \"nearby_confirmed_levels\": [{\"closed5_crossed\": true, \"confirmed_pivot_touches\": 1, \"distance_atr\": -0.6974025415386003, \"median_rejection_atr\": 0.6751945510016852, \"price\": 82238.5, \"quote_crossed\": true, \"start\": 1792470000}, {\"closed5_crossed\": true, \"confirmed_pivot_touches\": 2, \"distance_atr\": -0.9979268005785868, \"median_rejection_atr\": 0.332940761356019, \"price\": 82154.6, \"quote_crossed\": true, \"start\": 1792468800}, {\"closed5_crossed\": true, \"confirmed_pivot_touches\": 2, \"distance_atr\": -1.0512976165463905, \"median_rejection_atr\": 0.332940761356019, \"price\": 82139.7, \"quote_crossed\": true, \"start\": 1792470900}, {\"closed5_crossed\": true, \"confirmed_pivot_touches\": 3, \"distance_atr\": -1.5982589318671088, \"median_rejection_atr\": 0.5612890511509927, \"price\": 81987.0, \"quote_crossed\": true, \"start\": 1792465800}, {\"closed5_crossed\": true, \"confirmed_pivot_touches\": 3, \"distance_atr\": -1.6136612478846644, \"median_rejection_atr\": 0.5612890511509927, \"price\": 81982.7, \"quote_crossed\": true, \"start\": 1792475100}], \"policy\": \"native_resistance_pressure_observation_v1\", \"quote\": 82433.2, \"ready\": true, \"reason\": \"observed_not_a_validated_predictor\", \"signed_close_path_efficiency\": -0.5335276967930278, \"signed_three_bar_progress_atr\": -1.5076360027406643, \"strength_comparison\": null, \"three_bar_volume_to_prior20_median\": 1.4097112691010132, \"total_volume_is_not_aggressor_buy_sell_flow\": true}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T15:23:36.905991302Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:RESISTANCE_PRESSURE_OBSERVATION {\"at\": 1792509816.8811548, \"atr5\": 279.1787933127581, \"direction\": -1, \"entry_override\": false, \"last5_start\": 1792509300, \"live_gate\": false, \"nearby_confirmed_levels\": [{\"closed5_crossed\": true, \"confirmed_pivot_touches\": 1, \"distance_atr\": -1.313853375636181, \"median_rejection_atr\": 0.6952533811640904, \"price\": 82800.0, \"quote_crossed\": true, \"start\": 1792506000}, {\"closed5_crossed\": false, \"confirmed_pivot_touches\": 3, \"distance_atr\": 1.4345645500062332, \"median_rejection_atr\": 0.162261608277869, \"price\": 82032.7, \"quote_crossed\": false, \"start\": 1792470600}, {\"closed5_crossed\": false, \"confirmed_pivot_touches\": 3, \"distance_atr\": 1.4943828470976188, \"median_rejection_atr\": 0.162261608277869, \"price\": 82016.0, \"quote_crossed\": false, \"start\": 1792471800}, {\"closed5_crossed\": false, \"confirmed_pivot_touches\": 3, \"distance_atr\": 1.4947410404933965, \"median_rejection_atr\": 0.162261608277869, \"price\": 82015.9, \"quote_crossed\": false, \"start\": 1792469100}, {\"closed5_crossed\": true, \"confirmed_pivot_touches\": 1, \"distance_atr\": -1.864396624914468, \"median_rejection_atr\": 1.0348207203416062, \"price\": 82953.7, \"quote_crossed\": true, \"start\": 1792507800}], \"policy\": \"native_resistance_pressure_observation_v1\", \"quote\": 82433.2, \"ready\": true, \"reason\": \"observed_not_a_validated_predictor\", \"signed_close_path_efficiency\": 0.5335276967930278, \"signed_three_bar_progress_atr\": 1.5076360027406643, \"strength_comparison\": null, \"three_bar_volume_to_prior20_median\": 1.4097112691010132, \"total_volume_is_not_aggressor_buy_sell_flow\": true}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      }
+    ]
+  },
+  "tests": 355,
+  "full_replacement": false,
+  "real_entry_policy_modified": false,
+  "rollback_deployment": "23799b11-6f14-4e93-aacf-78ce691f9393"
+}
