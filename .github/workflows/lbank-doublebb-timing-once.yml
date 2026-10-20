@@ -1,0 +1,45 @@
+name: Frozen doubleBB timing paired computation
+on:
+  push:
+    branches: [research/lbank-long-history-20261020]
+    paths: [.github/workflows/lbank-doublebb-timing-once.yml]
+permissions:
+  contents: read
+jobs:
+  frozen-replay:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact production policy source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: 25388b431c9c9d38df6a434670586c65f382d604
+          path: policy
+          persist-credentials: false
+      - name: Checkout frozen research input
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          path: research-input
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install only calculation dependency
+        run: python -m pip install ccxt==4.5.89
+      - name: Prepare exact research programs and public original archives
+        working-directory: policy
+        run: |
+          cp ../research-input/research/continuation/replay_full_management_20261020_2028.py prior.py
+          cp ../research-input/research/continuation/replay_public4_20261021_0109.py baseline_replay.py
+          cp ../research-input/research/continuation/doublebb_timing_20261021_0431.py paired.py
+          mkdir -p data
+          curl --fail --location --retry 2 --max-time 90 https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-01.zip --output data/bars.zip
+          curl --fail --location --retry 2 --max-time 90 https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2025-01.zip --output data/funding.zip
+          echo 'b69ca5b2c2d1ae00d68d2790d09138cb2a44085ff19e0da5dc98b569ea7e489e  data/bars.zip' | sha256sum --check
+          echo 'df725010d55458866eb5a47e9ee708c6796c9d7e77b14c38342cea11f381815e  data/funding.zip' | sha256sum --check
+          sha256sum lbank_futures_monitor.py lbank_public_techniques.py lbank_performance.py lbank_native_entry.py baseline_replay.py paired.py prior.py
+      - name: Validate original study fixtures and execute frozen episode replay
+        working-directory: policy
+        run: |
+          python -m unittest test_lbank_public_techniques -v
+          python paired.py
