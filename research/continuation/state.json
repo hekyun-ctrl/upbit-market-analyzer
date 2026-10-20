@@ -61,8 +61,8 @@
     "research/continuation/incident_band_location_20261020_1738.json"
   ],
   "next_work": {
-    "stage": "distinct_primary_paper_original_data_code_and_manualrisk_feasibility",
-    "instruction": "Finite nextstep: obtain/read fullPRIMARYpaperthroughpermittedaccess,freezeactualpublication/versionSHA,locatepublic originalcode/data/ledger and exact cost/funding/manualrisk contract beforetrainingorreplication. Do not callabstractreturns alpha proof or inventunreleasedfeatures/data/TP1. No request-code/privateoutreach/accounts/inverse-margin orriskexpansion. Iforiginaldata/codeunavailableorunsupportedmanualBTCUSDTcontract,recordprecisefinitepreflight andcontinueanotherdistinctPRIMARYpublicBTCsourcewithcode+aftercostledger;notendlessarticle browsing. Do not retry/bypassMACD403. Preservecurrentfundingpositiveandnegativeevidence;no unchangedledgercalc/tuning.",
+    "stage": "existing_alert_direction_and_location_attribution_before_further_source_search",
+    "instruction": "User priority reset 2026-10-20 17:58 KST. Complete one bounded local-system step first: inventory retained #8-15 and map, per original policy/version and known-at-time data, the candidate family, direction inputs/timeframe, structural anchor, entry-location allowance, target-room overrides, first qualification/confirmation/send, TP1-before-original-invalidation, earliest caution/urgent and data gaps. Reuse archived computed evidence; do not rerun unchanged trials. Start with #14 trend_retest whose weaker higher-direction support and band-upper entry are recorded, then cover all retained rows without deleting ambiguous/missing cases. Freeze and save the interpretation/attribution schema before any new performance selection. If full causal replay inputs are absent, identify the exact missing inputs; do not fabricate a first possible entry, counterfactual profit or universally profitable fix. Produce a source-and-data-linked decision table and at least one reproducible actual accepted-path explanation; document how it changes the next hypothesis. External source screening resumes only to fill a named missing entry contract, prioritizing fully specified, public code/data/after-cost BTC evidence compatible with manual execution, initial protection and useful opportunity frequency. No merely illustrative education-as-alpha, unrelated lowfrequency/portfolio/inverse-margin code audit as the default deliverable. Preserve all existing rejection results and unchanged promotion gates. No unvalidated live entry modifications or forced strategy adoption.",
     "sources_to_screen": [
       {
         "title": "The Recurrent Reinforcement Learning Crypto Agent",
@@ -354,7 +354,22 @@
     ],
     "completed_pullback_contract": "docs/lbank_pullback_contract_audit_2026-10-20.md",
     "completed_funding_ledger": "docs/lbank_funding_ledger_audit_2026-10-20.md",
-    "entry_design_priority": "Build source-versioned entry contract cards with exact original timeframe/universe, context, direction, location, trigger, known-at-time price, invalidation/initial stop, TP1/exit, full-cost/public-data and manual-execution coverage. Keep missing fields null; do not invent a complete formula by mixing principles. Audit all retained #8-15 as development-only diagnostics, then fixed-test one genuinely new complete BTC candidate rather than tuning on these outcomes."
+    "entry_design_priority": "Build source-versioned entry contract cards with exact original timeframe/universe, context, direction, location, trigger, known-at-time price, invalidation/initial stop, TP1/exit, full-cost/public-data and manual-execution coverage. Keep missing fields null; do not invent a complete formula by mixing principles. Audit all retained #8-15 as development-only diagnostics, then fixed-test one genuinely new complete BTC candidate rather than tuning on these outcomes.",
+    "source_search_resume": {
+      "stage": "distinct_primary_paper_original_data_code_and_manualrisk_feasibility",
+      "instruction": "Finite nextstep: obtain/read fullPRIMARYpaperthroughpermittedaccess,freezeactualpublication/versionSHA,locatepublic originalcode/data/ledger and exact cost/funding/manualrisk contract beforetrainingorreplication. Do not callabstractreturns alpha proof or inventunreleasedfeatures/data/TP1. No request-code/privateoutreach/accounts/inverse-margin orriskexpansion. Iforiginaldata/codeunavailableorunsupportedmanualBTCUSDTcontract,recordprecisefinitepreflight andcontinueanotherdistinctPRIMARYpublicBTCsourcewithcode+aftercostledger;notendlessarticle browsing. Do not retry/bypassMACD403. Preservecurrentfundingpositiveandnegativeevidence;no unchangedledgercalc/tuning."
+    },
+    "expected_outputs": [
+      "docs/lbank_entry_direction_location_audit_2026-10-20.md",
+      "research/continuation/results/entry_direction_location_attribution_20261020/report.json"
+    ],
+    "research_success_definition": "A reproducible explanation of existing accepted entry paths plus a fixed testable correction hypothesis and its evidence gaps; source count, implementation test count or a new document alone is not signal-performance improvement.",
+    "read_first": [
+      "docs/lbank_entry_principles_2026-10-20.md",
+      "docs/lbank_strategy_rebuild_2026-10-20.md",
+      "research/continuation/incident_three_alerts_20261020_1734.json",
+      "research/continuation/incident_band_location_20261020_1738.json"
+    ]
   },
   "known_limitations": [
     "2023 through Sep2026 reused and exploratory; 2022 observed for Turtle; none may be relabeled untouched.",
@@ -1135,5 +1150,13 @@
     "new_eligible_candidates": 0,
     "operations_changed": false,
     "next_finite_step": "Build source-versioned entry contract cards with exact original timeframe/universe, context, direction, location, trigger, known-at-time price, invalidation/initial stop, TP1/exit, full-cost/public-data and manual-execution coverage. Keep missing fields null; do not invent a complete formula by mixing principles. Audit all retained #8-15 as development-only diagnostics, then fixed-test one genuinely new complete BTC candidate rather than tuning on these outcomes."
+  },
+  "research_direction_correction": {
+    "requested_at_kst": "2026-10-20T17:58:15+09:00",
+    "status": "work_queue_and_deliverables_changed_not_performance_solved",
+    "problem": "External-source forensic checks accumulated without sufficient closed-loop attribution to this manual alert system's direction and entry-location defects.",
+    "priority": "Current-system causal attribution, fixed entry contracts and comparable performance first; source audits targeted to named gaps.",
+    "operations_changed": false,
+    "promotion_criteria_relaxed": false
   }
 }
