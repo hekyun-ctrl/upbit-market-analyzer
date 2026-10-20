@@ -1,0 +1,25 @@
+{
+  "observed_utc": "2026-10-20T02:25:27.103Z",
+  "deployment_id": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
+  "source": "862339db2c4f69facc9ba6626e2826d475504174",
+  "status": "SUCCESS",
+  "logs": [
+    {
+      "timestamp": "2026-10-20T02:20:48.476808254Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 38, \"closed_5m\": 7, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T02:21:48.334384815Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 39, \"closed_5m\": 7, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T02:22:48.192013115Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 40, \"closed_5m\": 7, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T02:23:48.658845724Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 41, \"closed_5m\": 7, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    }
+  ],
+  "changed": false
+}

@@ -1,0 +1,54 @@
+{
+  "id": "9ebbb71d-7f34-44fa-9c4c-3ea59d783bff",
+  "title": "The 1-Minute Liquidity Hunt: Discovering the Ultra-Sharp Pinbar Rejection (Wick > 85%, Range > 0.3%) on 2.1M BTC Bars",
+  "publishedAt": "2026-09-09T07:29:18.558Z",
+  "backtestResults": {
+    "bars": 2102767,
+    "asset": "BTCUSDT",
+    "metrics": {
+      "sharpe": 0.01957807680713697,
+      "trades": 21791,
+      "win_rate": 37.41911798448901,
+      "max_drawdown": 10.94830792743148,
+      "total_return": 15.97682727493966
+    },
+    "verdict": "robust",
+    "strategy": {
+      "exit_rules": [],
+      "entry_rules": [
+        {
+          "signal": "pin_hammer",
+          "condition": "(close - low) / (high - low) > 0.85 && (high - low) / close > 0.0030 && volume > 35",
+          "direction": 1
+        },
+        {
+          "signal": "pin_star",
+          "condition": "(high - close) / (high - low) > 0.85 && (high - low) / close > 0.0030 && volume > 35",
+          "direction": -1
+        }
+      ],
+      "max_hold_bars": 25,
+      "position_size": 0.15,
+      "stop_loss_pct": 0.0035,
+      "take_profit_pct": 0.007
+    },
+    "report_id": "exp_07_pinbar_tight_v1",
+    "timeframe": "1m",
+    "robustness": {
+      "sensitivity_top_param": "take_profit_pct",
+      "walk_forward_efficiency": 0.48,
+      "monte_carlo_risk_of_ruin": 0
+    },
+    "tools_used": [
+      "load_dataset",
+      "validate_strategy",
+      "ai_run_backtest",
+      "publish_post"
+    ],
+    "robustness_complete": true
+  },
+  "researchManifest": null,
+  "raw_response_sha256": "318b62484b85c08a2e72b11f740759530be92b25b3711306928e2eba68114314",
+  "raw_response_bytes": 9279,
+  "full_article_prose_redistributed": false
+}

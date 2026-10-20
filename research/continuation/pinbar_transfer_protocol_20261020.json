@@ -1,0 +1,47 @@
+{
+  "version": "rlxbt_pinbar_transfer_v1",
+  "scope": "One fixed original-rule transfer screen. NOT exact proprietary-engine/spot replication, independent unseen validation or LBank manual execution evidence.",
+  "source": "https://rlxbt.com/articles/the-1-minute-liquidity-hunt-discovering-the-ultra-sharp-pinbar-rejection-wick-85-range-03-on-21m-btc-bars",
+  "source_extract": "research/continuation/pinbar_source_extract_20261020.json",
+  "original_rules": {
+    "long": "(close-low)/(high-low)>0.85 && (high-low)/close>0.0030 && volume>35",
+    "short": "(high-close)/(high-low)>0.85 && (high-low)/close>0.0030 && volume>35",
+    "stop_fraction": 0.0035,
+    "target_fraction": 0.007,
+    "max_hold_bars": 25,
+    "source_position_fraction": 0.15,
+    "zero_range": "No signal; undefined ratios never filled with invented values.",
+    "interpretation": "Use exact published close-location formula; it is not body-adjusted wick length. Do not repair it. Spot and futures BTC-volume distributions differ."
+  },
+  "selection": "Original winner selected after twelve source hypotheses; author performance not independently reproduced and source fees unspecified. This is one candidate in a previously searched catalogue, not confirmatory proof.",
+  "data": {
+    "venue": "Binance USD-M BTCUSDT perpetual, not original spot or LBank",
+    "start_utc": "2024-01-01T00:00:00Z",
+    "end_exclusive_utc": "2026-10-01T00:00:00Z",
+    "previously_observed": true,
+    "manifest": "research/long_history/results/source_manifest_2024_2026_1m.json",
+    "funding_manifest_recovery": "research/long_history/results/source_manifest_2024_2026_5m.json",
+    "funding_manifest_local": "manifest-5m.json",
+    "quality": "research/long_history/integrity_final_2024_2026.json",
+    "sha": "Every consumed ZIP checked against prior verified manifest; retain CSV SHA, URLs and original checksum URLs. Verify finite OHLCV, positive prices, nonnegative BTC volume, alignment, ordering, duplicates, time gaps and funding coverage."
+  },
+  "execution_translation": {
+    "signal": "Completed minute only. One position at a time. No pyramiding or opposite-entry reversal.",
+    "entry_scenarios": ["next minute open, ideal zero response delay", "one further minute open, fixed 60-second response sensitivity"],
+    "entry_scenarios_are_robustness_checks_not_optimized_independent_strategies": true,
+    "entry_reference_and_protection": "Set source fractional SL/TP from next available reference open at specified latency. Hold those reference levels and same selected trades fixed when doubling all costs. Fill with adverse slippage; initial R is 0.0035*entry_reference. No leverage/account allocation applied.",
+    "intrabar": "Stop first if both touched; stop gap uses worse open; favorable target gap capped at target. Evaluate entry bar. Exit at close of 25th holding bar if neither level touched. Bound timestamps to minute close, not fabricated exact hit times.",
+    "gaps": "Do not interpolate or force-close. A missing/quarantined minute encountered before closure produces unknown outcome; suppress overlap to planned 25-minute horizon. Completed outcomes before gap retained. End-open outcomes unknown. Do not describe known-trade totals as complete calendar account return.",
+    "costs": "Assumed fee 0.0006 each side and adverse slip 0.0002 each side; NOT verified account fee. Funding: archived Binance settlement rate times latest observed minute-open price proxy, debit only, favorable receipts ignored. Entry-time settlement excluded; exit-boundary settlement included conservatively. No native mark-price claim. Reject missing funding coverage, do not substitute zero.",
+    "stress": "Multiply fees, adverse slippage and funding debits by two on fixed references/trade path. No source threshold tuning."
+  },
+  "statistics": {
+    "output": "All closed/unknown rows; all-period and each-year gross/base/double R, PF, closed-trade drawdown R, target-first Wilson lower, stop-within-five-minute bar proxy, whole-bar MAE/MFE proxy, raw signal/accepted alarm frequency and opportunity days.",
+    "uncertainty": "Fixed seed 20261020; 2000 circular daily block samples each with 7-day and 30-day blocks; ratio of resampled net R / closed count, 2.5th percentile. Conditional on known outcomes and reused data, no selection correction or native guarantee.",
+    "warning_limit": "Stop-within-five-minute proxy is NOT actual urgent-warning rate. Whole exit-bar extrema may occur after exit and overstate pre-exit MAE/MFE. Manual fill, latency, exact intraminute order, TP1 actionable timing, native price/quotes remain unverified.",
+    "promotion": "Fixed docs/lbank_strategy_rebuild_2026-10-20.md unchanged. Even positive exploratory screen cannot authorize deployment or start an already elapsed forward clock."
+  },
+  "fitting_or_parameter_search": false,
+  "orders_accounts_or_production_access": false,
+  "next_if_not_qualified": "Preserve all years and costs, no threshold search. Continue a different primary source with closed-ledger, full-cost and execution provenance; do not repeat unchanged results."
+}

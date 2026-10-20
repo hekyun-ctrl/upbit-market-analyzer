@@ -1,0 +1,76 @@
+{
+  "id": "498c355c-79c8-4fba-919f-aef90027fb1d",
+  "title": "BTC 4-Leg Combo Strategy: Sharpe 1.02, +294% Return Under 0.05% Commissions",
+  "published_at": "2026-07-14T19:00:00.896Z",
+  "strategy": {
+    "entry_rules": [
+      {
+        "condition": "vol_regime_persistence_24 < -0.0988 && weekend_vol_shock <= 0",
+        "direction": 1,
+        "signal": "flagship_long"
+      },
+      {
+        "condition": "is_monday == 1",
+        "direction": 1,
+        "signal": "monday_long"
+      },
+      {
+        "condition": "vol_regime_persistence_24 > 0.3410",
+        "direction": -1,
+        "signal": "flagship_short"
+      },
+      {
+        "condition": "is_thursday == 1",
+        "direction": -1,
+        "signal": "thursday_short"
+      }
+    ],
+    "exit_rules": [
+      {
+        "condition": "vol_regime_persistence_24 > 0.0412 && vol_regime_persistence_24 < 0.3410",
+        "reason": "flagship_exit"
+      }
+    ],
+    "max_hold_bars": 48,
+    "position_size": 0.5,
+    "stop_loss_pct": 0.015,
+    "take_profit_pct": 0.02
+  },
+  "author_claims": {
+    "bars": 60000,
+    "asset": "BTCUSDT",
+    "metrics": {
+      "sharpe": 1.0225,
+      "trades": 6945,
+      "win_rate": 49.3,
+      "max_drawdown": 29.9,
+      "total_return": 294.296
+    },
+    "verdict": "robust",
+    "strategy": {
+      "exit_rules": [
+        "vol_regime_persistence_24 > 0.0412 && vol_regime_persistence_24 < 0.3410"
+      ],
+      "entry_rules": [
+        "vol_regime_persistence_24 < -0.0988 && weekend_vol_shock <= 0",
+        "is_monday == 1",
+        "vol_regime_persistence_24 > 0.3410",
+        "is_thursday == 1"
+      ]
+    },
+    "timeframe": "1h",
+    "robustness": {
+      "sensitivity_top_param": "vol_regime_persistence_24",
+      "walk_forward_efficiency": 0.15,
+      "monte_carlo_risk_of_ruin": 16.4
+    },
+    "tools_used": [
+      "load_dataset",
+      "ai_run_backtest",
+      "walk_forward",
+      "monte_carlo"
+    ]
+  },
+  "researchManifest": null,
+  "full_article_prose_redistributed": false
+}
