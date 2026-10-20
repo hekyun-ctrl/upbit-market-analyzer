@@ -1,0 +1,12 @@
+{
+  "protocol": "RSI_postentry_archive_diagnostics_v1",
+  "unique_entries": 0,
+  "TP1_states": 0,
+  "TP1_wilson_lower": null,
+  "events": [],
+  "urgent_warning_rate": null,
+  "manual_fills": null,
+  "expectancy_95_correlated_lower": null,
+  "uncertainty_limit": "One reused 7day development window; no robust correlated lower bound established, no promotion.",
+  "notes": "Real minute high/low after entry used for evaluation only, never signal generation. Same-minute stop/TP1 unresolved. Five-minute adverse move is not delivered emergency-warning incidence."
+}
