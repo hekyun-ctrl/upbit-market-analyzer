@@ -37,6 +37,7 @@ from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
 from lbank_entry_quality import (confirmation_quality, direction_priority,
                                  observed_target_room, POLICY as ENTRY_QUALITY_POLICY)
 from lbank_entry_priority import ranked_entry_evidence, POLICY as ENTRY_PRIORITY_POLICY
+from lbank_resistance_pressure import PressureObserver
 from lbank_signal_thesis import attach_thesis, POLICY as FOLLOWUP_POLICY
 from lbank_profit_protection import new_policy, format_notice as format_profit_notice, POLICY as PROFIT_POLICY
 from lbank_rsi_divergence import annotate as annotate_rsi_context, DivergenceStudy
@@ -987,6 +988,7 @@ def run():
     last_5m_audit = None
     last_entry_diagnostics = {}
     last_setup_key = None
+    pressure_observer = PressureObserver()
     observed_ready_key = None
     first_ready_observed_at = None
     while True:
@@ -997,6 +999,11 @@ def run():
             now = time.time()
             native_state, native_diag = native_feed.snapshot(now, price)
             native_key = completed_key(native_state)
+            try:
+                for pressure in pressure_observer.step(native_state, now):
+                    LOG.info("RESISTANCE_PRESSURE_OBSERVATION %s", json.dumps(pressure,sort_keys=True))
+            except Exception:
+                LOG.exception("RESISTANCE_PRESSURE_OBSERVATION failed; live gates unchanged")
             if native_key is not None and native_key != observed_ready_key:
                 observed_ready_key, first_ready_observed_at = native_key, now
             audit_ready = performance is not None
