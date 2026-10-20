@@ -1,0 +1,58 @@
+{
+  "outcome_logs": {
+    "scope": "deployment",
+    "deploymentId": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "status": "SUCCESS",
+    "deploy": [
+      {
+        "timestamp": "2026-10-20T23:10:45.984519279Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [{\"id\": \"public_techniques_v1:grouped_decline_5m:1:1792537500\", \"reason\": \"await_closed_minute_reaction\", \"strategy\": \"grouped_decline_5m\"}], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [{\"actual_pnl\": false, \"id\": \"1792530611298:public_techniques_v1:box_retest_5m:1:1792530000\", \"net_usdt_model\": -3.430318932598397, \"policy\": \"levels\", \"status\": \"time_exit\"}, {\"actual_pnl\": false, \"id\": \"1792530611298:public_techniques_v1:box_retest_5m:1:1792530000\", \"net_usdt_model\": -3.430318932598397, \"policy\": \"warning_exit\", \"status\": \"time_exit\"}], \"ready\": true, \"setups\": 1, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      }
+    ]
+  },
+  "notification_logs": {
+    "scope": "deployment",
+    "deploymentId": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "status": "SUCCESS",
+    "deploy": [
+      {
+        "timestamp": "2026-10-20T23:10:45.984524088Z",
+        "severity": "error",
+        "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=closed orders=false live_gate=false",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      }
+    ]
+  },
+  "source": "25388b431c9c9d38df6a434670586c65f382d604",
+  "candidate_id": "public_techniques_v1:box_retest_5m:1:1792530000",
+  "signal_id": "1792530611298:public_techniques_v1:box_retest_5m:1:1792530000",
+  "unique_episodes": 1,
+  "closed_levels": 1,
+  "levels_status": "time_exit",
+  "levels_net_usdt_model": -3.430318932598397,
+  "warning_exit_same_episode": true,
+  "runner_outcome": null,
+  "actual_account_pnl": false,
+  "actual_funding_verified": false,
+  "device_receipt_verified": false,
+  "TP1_first_touch": null,
+  "urgent_followup_rate": null,
+  "observation_full_continuity_verified": false,
+  "promotion": false
+}
