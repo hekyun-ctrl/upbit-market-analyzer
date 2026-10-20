@@ -1,0 +1,154 @@
+{
+  "scope": "Read-only incident diagnosis of user-reported three alerts on 2026-10-20 KST; no performance certification or new deployment",
+  "production": {
+    "source": "862339db2c4f69facc9ba6626e2826d475504174",
+    "deployment": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
+    "status": "SUCCESS"
+  },
+  "entries": [
+    {
+      "time": "2026-10-20T01:11:20.531953782Z",
+      "reference": 13,
+      "entry": 81369.8,
+      "upper": false,
+      "target_atr": 5.93234734953037,
+      "overrides": []
+    },
+    {
+      "time": "2026-10-20T03:37:49.164052996Z",
+      "reference": 14,
+      "entry": 82014,
+      "upper": false,
+      "target_atr": 5.261731078483683,
+      "overrides": []
+    },
+    {
+      "time": "2026-10-20T07:45:45.502509585Z",
+      "reference": 15,
+      "entry": 81536,
+      "upper": true,
+      "target_atr": 5.806945270652743,
+      "overrides": [
+        "single_pivots_under_aligned_15m_5m"
+      ]
+    }
+  ],
+  "delivery_events": [
+    {
+      "time": "2026-10-20T01:11:20.533220493Z",
+      "message": "INFO:lbank_monitor:ENTRY REVIEW SENT strategy=breakout side=숏 entry=81369.8 stop=81664.4 t1=80639.1 t2=80222.5 net_rr=1.50 reverse_exception=False"
+    },
+    {
+      "time": "2026-10-20T01:35:19.808240898Z",
+      "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=13 side=SHORT reason=risk_caution price=81589.7"
+    },
+    {
+      "time": "2026-10-20T01:46:00.890955754Z",
+      "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=13 side=SHORT reason=stop_breached price=81671.0"
+    },
+    {
+      "time": "2026-10-20T03:37:49.164527891Z",
+      "message": "INFO:lbank_monitor:ENTRY REVIEW SENT strategy=trend_retest side=롱 entry=82014.0 stop=81799.2 t1=82627.4 t2=82965.3 net_rr=1.50 reverse_exception=False"
+    },
+    {
+      "time": "2026-10-20T05:38:08.742119410Z",
+      "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=14 side=LONG reason=risk_caution price=81816.3"
+    },
+    {
+      "time": "2026-10-20T05:40:15.759298762Z",
+      "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=14 side=LONG reason=early_invalidation price=81848.2"
+    },
+    {
+      "time": "2026-10-20T07:45:45.506576687Z",
+      "message": "INFO:lbank_monitor:ENTRY REVIEW SENT strategy=trend_retest side=숏 entry=81536.0 stop=81658.0 t1=81063.6 t2=80819.4 net_rr=1.50 reverse_exception=False"
+    }
+  ],
+  "timing": [
+    {
+      "time": "2026-10-20T03:37:49.164524335Z",
+      "evidence": {
+        "breakout_confirmation": null,
+        "candidate_evaluated_at": 1792467427.565423,
+        "confirmation_evaluated_at": 1792467459.4735117,
+        "confirmation_quote": 82014,
+        "confirmation_quote_at": 1792467459.4672449,
+        "dominant_intact": false,
+        "entry_quote_improved_for_side": false,
+        "evaluation_after_first_ready_observation_seconds": 0.017119646072387695,
+        "evaluation_after_nominal_close_seconds": 7.565423011779785,
+        "existing_risk_gates_changed": false,
+        "extension_atr": 1.4011130264853138,
+        "first_ready_observed_at": 1792467427.5483034,
+        "higher_direction_intact": false,
+        "last_closed_1m_start": 1792467360,
+        "last_closed_5m_start": 1792467000,
+        "minute_followthrough": false,
+        "nominal_1m_close_at": 1792467420,
+        "orderbook_verified": false,
+        "policy": "native_completed_bar_schedule_v1",
+        "profitability_verified": false,
+        "publication_note": "nominal_close_is_not_actual_publication_time",
+        "quote_age_when_send_started_seconds": 0.0068051815032958984,
+        "quote_observed_at": 1792467427.5483034,
+        "recipient_receipt_verified": false,
+        "send_started_at": 1792467459.47405,
+        "side_adjusted_quote_change_pct": 0.0026825408051101007,
+        "source_publication_at": null,
+        "strategy_gate_changed": false,
+        "target_distance_atr": 5.261731078483683,
+        "telegram_acknowledged_at": 1792467460.1009386,
+        "telegram_elapsed_seconds": 0.6268885135650635,
+        "trigger": "periodic_and_new_bar",
+        "watch_age_at_confirmation_seconds": 31.918941497802734,
+        "watch_quote": 82011.8,
+        "watch_quote_at": 1792467427.5483034
+      }
+    },
+    {
+      "time": "2026-10-20T07:45:45.505771772Z",
+      "evidence": {
+        "breakout_confirmation": null,
+        "candidate_evaluated_at": 1792482305.9907665,
+        "confirmation_evaluated_at": 1792482337.4246988,
+        "confirmation_quote": 81536,
+        "confirmation_quote_at": 1792482337.369213,
+        "dominant_intact": false,
+        "entry_quote_improved_for_side": true,
+        "evaluation_after_first_ready_observation_seconds": 0.021936416625976562,
+        "evaluation_after_nominal_close_seconds": 5.990766525268555,
+        "existing_risk_gates_changed": false,
+        "extension_atr": 1.0069110973307784,
+        "first_ready_observed_at": 1792482305.96883,
+        "higher_direction_intact": true,
+        "last_closed_1m_start": 1792482240,
+        "last_closed_5m_start": 1792482000,
+        "minute_followthrough": false,
+        "nominal_1m_close_at": 1792482300,
+        "orderbook_verified": false,
+        "policy": "native_completed_bar_schedule_v1",
+        "profitability_verified": false,
+        "publication_note": "nominal_close_is_not_actual_publication_time",
+        "quote_age_when_send_started_seconds": 0.05705666542053223,
+        "quote_observed_at": 1792482305.96883,
+        "recipient_receipt_verified": false,
+        "send_started_at": 1792482337.4262698,
+        "side_adjusted_quote_change_pct": -0.021835614623477717,
+        "source_publication_at": null,
+        "strategy_gate_changed": false,
+        "target_distance_atr": 5.806945270652743,
+        "telegram_acknowledged_at": 1792482338.0478966,
+        "telegram_elapsed_seconds": 0.6216268539428711,
+        "trigger": "periodic_and_new_bar",
+        "watch_age_at_confirmation_seconds": 31.40038299560547,
+        "watch_quote": 81518.2,
+        "watch_quote_at": 1792482305.96883
+      }
+    }
+  ],
+  "limits": [
+    "User reports urgent warnings for all three; retrieved logs positively match urgent outcomes for #13 and #14 only. No #15 urgent delivery in logs retrieved through approximately 17:36 KST. Do not label #15 successful or invent its warning.",
+    "No account/order/actual PnL access. No full tick or causal manual fill replay. Logged 5m bars contain gaps at deployment warmup; no artificial gap liquidation or independent strategy inference.",
+    "Targets expressed in ATR are requirements from the cost/risk plan, not predicted price reachability. Observation of weaker higher-direction support is not proof that a new universal veto produces positive expectancy.",
+    "#13 predates latest guard; #14 and #15 follow guard. Guard's new original-trigger consistency rejection applies specifically to breakout, not a universal trend_retest higher-direction requirement."
+  ]
+}
