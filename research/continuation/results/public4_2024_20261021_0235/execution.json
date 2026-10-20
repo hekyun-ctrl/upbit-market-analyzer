@@ -1,0 +1,125 @@
+{
+  "workflow_run_id": 39467632950,
+  "job_id": 118783074202,
+  "url": "https://github.com/hekyun-ctrl/upbit-market-analyzer/actions/runs/39467632950",
+  "status": "completed",
+  "conclusion": "success",
+  "workflow_commit": "a13418a77195f04caf84703a2a3bf3da5f79c688",
+  "production_policy_checkout": "25388b431c9c9d38df6a434670586c65f382d604",
+  "permissions": "contents:read; no trading credentials or writes from runner",
+  "trigger": "single path-filtered research push, no schedule or recurring task",
+  "execution_location": "GitHub-hosted isolated ubuntu-latest job; local environment unavailable",
+  "timeout_minutes": 15,
+  "logs_evidence": [
+    "2026-10-20T17:37:20.6397971Z data/bars.zip: OK",
+    "2026-10-20T17:37:20.6412409Z data/funding.zip: OK",
+    "2026-10-20T17:37:20.6425839Z c8c7afd9cdcf45c3a90af5fa68ec94aa399b587c4c94a86f079c6c718b5c1b53  lbank_futures_monitor.py",
+    "2026-10-20T17:37:20.6426410Z c9ff5a3f2bd6a72651b878b372385796c094300544b56ce4b3740bc108928b61  lbank_public_techniques.py",
+    "2026-10-20T17:37:20.6426942Z 39ce555def76ece101c28bb31ea22d70091b0fbf5febb65fc4de95ac86ace04c  lbank_performance.py",
+    "2026-10-20T17:37:20.6428200Z c4ae4075d8dd3a05679e36771a2fee3d74b6f6912e83d2e7a89e5054636c8d91  lbank_native_entry.py",
+    "2026-10-20T17:37:20.6428946Z 561ce0ea3002f906c9625960521173490ca585bdf3224df4bc6085be7f61621e  public4_replay.py",
+    "2026-10-20T17:37:20.6429740Z add7a01a16291d9bca070bbaa494cd2af69b769295ae18fc45fb82a6b8d48eb6  prior.py",
+    "2026-10-20T17:37:23.0721363Z Ran 11 tests in 0.054s",
+    "2026-10-20T17:37:23.0721634Z OK"
+  ],
+  "jobs": {
+    "jobs": [
+      {
+        "id": 118783074202,
+        "name": "frozen-replay",
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 39467632950,
+        "logs_url": null,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1
+          },
+          {
+            "name": "Checkout exact production policy source",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2
+          },
+          {
+            "name": "Checkout frozen research input",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3
+          },
+          {
+            "name": "Run actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4
+          },
+          {
+            "name": "Install only calculation dependency",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5
+          },
+          {
+            "name": "Prepare exact research programs and public original archives",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6
+          },
+          {
+            "name": "Validate original study fixtures and execute frozen episode replay",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7
+          },
+          {
+            "name": "Preserve complete result in job logs",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8
+          },
+          {
+            "name": "Post Run actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 14
+          },
+          {
+            "name": "Post Checkout frozen research input",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 15
+          },
+          {
+            "name": "Post Checkout exact production policy source",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 16
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 17
+          }
+        ]
+      }
+    ]
+  },
+  "verify": {
+    "complete_policy_rows": 0,
+    "decimal_checks": 0,
+    "not_native_fill_test": true,
+    "promotion": false,
+    "raw_setup_ids": 101,
+    "report_git_blob": "38306f433bee33278b9627dadc2c42dc428c3e65",
+    "report_sha256": "103e9a8843894bee2b37e0a77a91fa7dc759fbcc320ef70aee261702148ec5ae",
+    "source": "25388b431c9c9d38df6a434670586c65f382d604",
+    "unique_entry_ids": 0
+  },
+  "new_independent_OOS": false,
+  "native_LBank_execution": false,
+  "production_changed": false
+}
