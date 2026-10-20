@@ -1570,5 +1570,11 @@
     "original_runner_unknown_removed": 6,
     "promotion": false,
     "production_changed": false
+  },
+  "user_missed_rally_case": {
+    "evidence": "research/continuation/results/user_chart_no_alert_20261021_0009/evidence.json",
+    "status": "actual_sequential_rejections_identified_not_full_stop_target_replay",
+    "priority": "Reproduce earliest13:40UTC81708 candidate original inputs/stop/target before general public4 replay if preserved raw snapshots obtainable; target82674.4 outside470.2range then13:50barrier81919.8 and14:00barrier82139.7 followed14:02EMAextension3.188>2.5. Later successful price move alone not proof accepted trade would profit. Preserve prior finite public4 task; do not relax gates or deploy based only on image.",
+    "operations_changed": false
   }
 }
