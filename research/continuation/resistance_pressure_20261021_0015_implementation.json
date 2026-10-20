@@ -1,0 +1,31 @@
+{
+  "requested_change": "Resistance strength versus directional pressure; urgent correction/deployment request",
+  "implemented_scope": "Descriptive native closed5m observation, not an entry classifier or profitable replacement",
+  "source": "25388b431c9c9d38df6a434670586c65f382d604",
+  "module_git_blob": "2f3d7abacd1dfd4e72671aa780ab8fdc665789b6",
+  "monitor_git_blob": "7492ab62e992b7a9672d0123bb88014e657845dc",
+  "module_sha256": "a8b2eb2a99e058d9e75d6fc65e8e179e7653bca4267340fe8fa612a8374d36a6",
+  "monitor_sha256": "c8c7afd9cdcf45c3a90af5fa68ec94aa399b587c4c94a86f079c6c718b5c1b53",
+  "tests": 355,
+  "non_run_definitions_exactly_unchanged": 24,
+  "metrics": [
+    "nearest confirmed pivots including crossed levels",
+    "pivot cluster touches within existing .25ATR",
+    "median completed2bar rejection/ATR",
+    "signed3bar price progress/ATR",
+    "signed close-path efficiency",
+    "last3bar mean totalvolume / prior20median"
+  ],
+  "not_measured": [
+    "aggressor buy/sell flow",
+    "real absorption",
+    "validated resistance-vs-pressure probability"
+  ],
+  "strength_comparison": null,
+  "live_gate": false,
+  "entry_override": false,
+  "source_unchanged_live_gates": true,
+  "rollback_source": "5c977a7f51cea67048f95791d1dcc4230634939a",
+  "rollback_deployment": "23799b11-6f14-4e93-aacf-78ce691f9393",
+  "replacement_complete": false
+}
