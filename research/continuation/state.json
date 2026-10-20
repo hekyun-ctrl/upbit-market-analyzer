@@ -371,7 +371,8 @@
       "research/continuation/current_native_offline_clarification_20261020.json",
       "research/continuation/results/current_native_offline_20261020/report.json"
     ],
-    "previous_stage": "complete_direction_location_replay_inputs_and_fixed_barrier_transition_hypothesis"
+    "previous_stage": "complete_direction_location_replay_inputs_and_fixed_barrier_transition_hypothesis",
+    "paper_priority": "First verify deployment3b42b081 correct80dcd65 source terminalSUCCESS, native readiness and PAPER_NOTIFICATIONS_STARTED plus actual Telegram API delivery result. If failed,fix finite fault before claiming paper stream started. This is paper notification telemetry only, not replacement strategy promotion. Once verified, inspect new candidate/open/TP1/closed counts and gap exclusions; no artificial trades, duplicate count inflation or existing gate loosening. Continue already-frozen offline/fullmanagement research next, without waiting for user requests."
   },
   "known_limitations": [
     "2023 through Sep2026 reused and exploratory; 2022 observed for Turtle; none may be relabeled untouched.",
@@ -1236,5 +1237,31 @@
     "full_exit_replay": false
   },
   "updated_utc": "2026-10-20 09:56:16 UTC",
-  "updated_kst": "2026-10-20T18:56:16.000+09:00"
+  "updated_kst": "2026-10-20T18:56:16.000+09:00",
+  "paper_notifications": {
+    "policy": "native_paper_notifications_v1",
+    "source_commit": "80dcd65701fb08df4c0e738705d69b84f6274b54",
+    "deployment_id": "3b42b081-4f79-4767-aee9-b97694d8c2fa",
+    "deployment_state": "INITIALIZING",
+    "runtime_verified": false,
+    "telegram_api_ack_verified": false,
+    "actual_new_paper_entry_observed": false,
+    "source": "existing native public-techniques4 and RSI study DB; no new candidate rules",
+    "max_batch_frequency_seconds": 60,
+    "progress_seconds": 900,
+    "paper_only": true,
+    "orders": false,
+    "implementation_tests": 350,
+    "documentation": "docs/lbank_paper_notifications_2026-10-20.md",
+    "rollback_commit": "862339db2c4f69facc9ba6626e2826d475504174",
+    "rollback_deployment": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
+    "full_replacement_deployed": false
+  },
+  "user_autonomous_followthrough": {
+    "requested": true,
+    "existing_task_id": "6ad658e93c208191bd473ceb228e15b8",
+    "enabled_verified": true,
+    "continues_until": "validated replacement implementation/deployment/runtime verification; preserve existing criteria",
+    "AI_continuous_between_runs": false
+  }
 }
