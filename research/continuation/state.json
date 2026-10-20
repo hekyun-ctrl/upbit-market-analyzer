@@ -37,7 +37,8 @@
     "public_ledger_source2_bottradepm_contract_v1_21definitions_10tests_125checks_131040realminute_prefix",
     "daynight_5693993_original_BTC_all900costrows_525overlap_300conditionalcells_3307Decimalchecks_v1",
     "silentbilly_2227152_original22defs_actualBacktrader10fixtures_44640realminute_prefix_contract_v1",
-    "funding_harvester_776003e_originalIS_OOS_146campaign_25SHA_cash_doublecost_frequency_blockuncertainty_v1"
+    "funding_harvester_776003e_originalIS_OOS_146campaign_25SHA_cash_doublecost_frequency_blockuncertainty_v1",
+    "current_native_entry_first_event_2024Jan8_15_baseline_vs_higher_retest_fixed_v1_no_send"
   ],
   "read_before_work": [
     "docs/lbank_strategy_rebuild_2026-10-20.md",
@@ -58,11 +59,12 @@
     "docs/lbank_funding_ledger_audit_2026-10-20.md",
     "docs/lbank_entry_principles_2026-10-20.md",
     "research/continuation/incident_three_alerts_20261020_1734.json",
-    "research/continuation/incident_band_location_20261020_1738.json"
+    "research/continuation/incident_band_location_20261020_1738.json",
+    "docs/lbank_offline_entry_comparison_2026-10-20.md"
   ],
   "next_work": {
-    "stage": "complete_direction_location_replay_inputs_and_fixed_barrier_transition_hypothesis",
-    "instruction": "Read the newly executed eight-case attribution report first. Do not repeat the same20bar target-room probe or old TP1 audits. The full original #14 minute snapshots and full5m window remain missing; original capture module can export recent public-model DB data but no SSH/CLI existed in this run. First determine one authorized non-mutating access route for retained snapshots without restart or account credentials. If no route exists, record it once and prepare/test minimal NON-GATING event-time capture of original candidate/confirmation public snapshots on latest production source; it must not change entry, risk, warning, target or frequency gates. This is a diagnostic prerequisite, not completion of profitable alerts, and must not displace strategy work indefinitely. Freeze one strategy-specific barrier-crossing/retest/acceptance hypothesis with original source contract and full opportunity/cost comparison before results. Keep user priorities: larger evidence precedence, valid entry position, no arbitrary extra wait or universal all-indicators agreement. Use existing public minute datasets only as already-seen development if original live snapshots are missing; never fabricate original input or first possible live entry. No live price-prediction gate change or profitable replacement promotion without full unchanged evidence. Detailed records only; follow verified short reporting policy.",
+    "stage": "offline_entry_comparison_full_management_and_prefixed_regime_extension",
+    "instruction": "Read docs/lbank_offline_entry_comparison_2026-10-20.md and exact v1 code/report first. Actual first-event price replay is completed, not a literature/status-only step. Do not repeat unchanged seven-day calculation or retune on its losses. Next finite experiment: pre-register unchanged rules on remaining Jan2024 and a different year/regime interval from already-used archives, then execute matched baseline/higher_retest comparisons with full opportunity and same cost models. Preserve both positive and negative intervals; these remain development not independent/forward. Before describing any result as current operating PnL, port actual existing pre-TP protection and partial-runner management using production pure functions, freeze execution/order/funding/time ambiguity contract before outcomes, and verify against deterministic cases. Choose one reproducible step per run. Native #14 original full input access route was checked once and unavailable (no SSH/CLI); do not let retries or diagnostics displace price testing. Opt-in capture patch is prepared, tested349, NOT deployed/enabled/collecting; no original missing input has been recreated. Later test one source-grounded barrier acceptance/retest hypothesis only after complete original rule/cost contract fixed; no invented universal filter, additional waiting, risk expansion or warning suppression. Promotion gates unchanged; offline screening can be fast but is not substitute for native fills/new forward evidence. No unvalidated strategy deployment.",
     "sources_to_screen": [
       {
         "title": "The Recurrent Reinforcement Learning Crypto Agent",
@@ -360,17 +362,16 @@
       "instruction": "Finite nextstep: obtain/read fullPRIMARYpaperthroughpermittedaccess,freezeactualpublication/versionSHA,locatepublic originalcode/data/ledger and exact cost/funding/manualrisk contract beforetrainingorreplication. Do not callabstractreturns alpha proof or inventunreleasedfeatures/data/TP1. No request-code/privateoutreach/accounts/inverse-margin orriskexpansion. Iforiginaldata/codeunavailableorunsupportedmanualBTCUSDTcontract,recordprecisefinitepreflight andcontinueanotherdistinctPRIMARYpublicBTCsourcewithcode+aftercostledger;notendlessarticle browsing. Do not retry/bypassMACD403. Preservecurrentfundingpositiveandnegativeevidence;no unchangedledgercalc/tuning."
     },
     "expected_outputs": [
-      "recovered original snapshots or an exact one-time access obstacle record",
-      "tested non-gating original evidence capture patch if snapshots inaccessible",
-      "pre-outcome fixed entry correction contract and executable comparable evaluation, not a fitted universal veto"
+      "One pre-registered and executed additional regime comparison OR exact full existing exit-management replay with deterministic checks; code/raw SHA/results/limitations saved, no retuning or repeated identical seven-day test."
     ],
     "research_success_definition": "A reproducible explanation of existing accepted entry paths plus a fixed testable correction hypothesis and its evidence gaps; source count, implementation test count or a new document alone is not signal-performance improvement.",
     "read_first": [
-      "docs/lbank_entry_principles_2026-10-20.md",
-      "docs/lbank_strategy_rebuild_2026-10-20.md",
-      "research/continuation/incident_three_alerts_20261020_1734.json",
-      "research/continuation/incident_band_location_20261020_1738.json"
-    ]
+      "docs/lbank_offline_entry_comparison_2026-10-20.md",
+      "research/continuation/current_native_offline_protocol_20261020.json",
+      "research/continuation/current_native_offline_clarification_20261020.json",
+      "research/continuation/results/current_native_offline_20261020/report.json"
+    ],
+    "previous_stage": "complete_direction_location_replay_inputs_and_fixed_barrier_transition_hypothesis"
   },
   "known_limitations": [
     "2023 through Sep2026 reused and exploratory; 2022 observed for Turtle; none may be relabeled untouched.",
@@ -935,6 +936,47 @@
       "source_screening": "research/continuation/source_screening_20261020_1657.json",
       "production_changed": false,
       "forward_started": false
+    },
+    {
+      "id": "native_offline_entry_20261020_1837",
+      "stage_completed": "actual_no_send_7day_price_replay_and_decimal_prefix_checks_plus_optin_capture_patch_prepared",
+      "protocol_commits": [
+        "6cc4483e263a3e83b13cd486fe9f235d0d024a52",
+        "63f2720f5cb0ae5cd754d45b61f4afed4984016b",
+        "bc62690814fb10a6c12421f89e8c52247a052f68"
+      ],
+      "source_commit": "862339db2c4f69facc9ba6626e2826d475504174",
+      "documentation": "docs/lbank_offline_entry_comparison_2026-10-20.md",
+      "report": "research/continuation/results/current_native_offline_20261020/report.json",
+      "verifier": "research/continuation/verify_offline_current_entry_compare_20261020.py",
+      "baseline_signals_closed_censored": [
+        17,
+        16,
+        1
+      ],
+      "higher_retest_signals_closed_censored": [
+        16,
+        15,
+        1
+      ],
+      "baseline_net_R": -2.689383447690272,
+      "higher_retest_net_R": -4.14567436557995,
+      "baseline_doublecost_R": -7.596598562955365,
+      "higher_retest_doublecost_R": -8.819323274421896,
+      "actual_LBank_performance": false,
+      "independent_history": false,
+      "actual_alerts_sent": 0,
+      "orders": 0,
+      "full_current_production_exit_management_reproduced": false,
+      "decimal_checks": 62,
+      "prefix_signal_times": 16,
+      "implementation_tests_passed": 349,
+      "capture_patch": "research/continuation/patches/entry_evidence_capture_v1.patch",
+      "capture_deployed": false,
+      "capture_enabled": false,
+      "production_changed": false,
+      "forward_started": false,
+      "decision": "no improvement evidence for compulsory higher-direction filter in first week; do not deploy or generalize to all regimes"
     }
   ],
   "active_run": null,
@@ -952,7 +994,6 @@
       "action": "Fulltextnotread;nextfeasibilitymustusepermittedpublicprimaryaccessorrecordunavailable,notinventedrules/returns."
     }
   ],
-  "updated_kst": "2026-10-20T16:57:21+09:00",
   "maintained_research_candidates": [
     {
       "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
@@ -1185,5 +1226,14 @@
     ],
     "maximum_user_facing_sentences": 4,
     "no_hourly_rejection_or_research_repetition": true
-  }
+  },
+  "offline_entry_validation": {
+    "documentation": "docs/lbank_offline_entry_comparison_2026-10-20.md",
+    "last_result": "first_event_diagnostic_both_costed_negative_not_promoted",
+    "forward_candidate": null,
+    "capture_patch_prepared": true,
+    "capture_deployed": false,
+    "full_exit_replay": false
+  },
+  "updated_utc": "2026-10-20 09:56:16 UTC"
 }
