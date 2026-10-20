@@ -1,0 +1,14 @@
+{
+  "actual_decimal_leg_checks": 12,
+  "unique_setup_ids": 108,
+  "unique_entry_ids": 2,
+  "policy_rows": 6,
+  "all_closed_fractions_one": true,
+  "source_fixture_tests_passed": 11,
+  "source_fixtures_completed_this_run": true,
+  "rule_source_unchanged": true,
+  "full_cost_positive": false,
+  "statistical_edge_established": false,
+  "emergency_five_minute_rate": null,
+  "native_manual_fill_test": false
+}
