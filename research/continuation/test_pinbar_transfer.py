@@ -1,4 +1,5 @@
 import unittest
+import json
 from decimal import Decimal
 import numpy as np
 from evaluate_pinbar_transfer import signals,follow,replay,cash
@@ -61,6 +62,12 @@ class PinbarTests(unittest.TestCase):
         short,_=replay(a[:45],np.ones(45,bool),[])
         full,_=replay(a,np.ones(90,bool),[])
         self.assertEqual(short,full)
+
+    def test_full_replay_ledger_serializes_native_indices(self):
+        a=bars();a[0,2:5]=[100.4,99.9,100.39]
+        rows,_=replay(a,np.ones(len(a),bool),[])
+        self.assertTrue(rows)
+        self.assertEqual(json.loads(json.dumps(rows)),rows)
 
     def test_short_stop_direction(self):
         a=bars();a[1,2]=101

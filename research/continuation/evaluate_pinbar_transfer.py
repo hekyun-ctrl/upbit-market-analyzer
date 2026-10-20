@@ -95,7 +95,7 @@ def replay(a,valid,funding,delay_minutes=0):
     for i in np.flatnonzero(s):
         if not valid[i]:skipped_invalid+=1;continue
         if int(a[i,0])+60<=busy:continue
-        entry=i+1+delay_minutes
+        entry=int(i)+1+delay_minutes
         if entry>=len(a):continue
         if int(a[entry,0])<=busy:continue
         if a[entry,0]!=a[i,0]+60*(1+delay_minutes) or not valid[i:entry+1].all():
