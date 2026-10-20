@@ -93,7 +93,7 @@ def load_minutes(folder,manifest):
         if digest(path)!=m['sha256']:raise ValueError('official manifest SHA mismatch')
         with zipfile.ZipFile(path) as z:
             name=z.namelist()[0];raw=z.read(name)
-            f=pd.read_csv(path,header=None,names=['start','open','high','low','close','volume','close_time','quote','trades','buy_volume','buy_quote','ignore'])
+            f=pd.read_csv(path,header=0 if raw.startswith(b'open_time,') else None,names=['start','open','high','low','close','volume','close_time','quote','trades','buy_volume','buy_quote','ignore'])
         if len(f)!=m['csv_rows']:raise ValueError('row count mismatch')
         parts.append(f);sources.append(dict(month=month,url=m['url'],checksum_url=m['checksum_url'],
             zip_sha256=digest(path),csv_sha256=hashlib.sha256(raw).hexdigest(),rows=len(f)))
