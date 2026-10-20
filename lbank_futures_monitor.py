@@ -6,6 +6,7 @@ to SPOT. Live entries use native closed 1m candle closes with a separate current
 Ticker observations remain for fast risk monitoring and hypothetical accounting.
 """
 import json
+import hashlib
 import logging
 import math
 import os
@@ -41,6 +42,9 @@ from lbank_profit_protection import new_policy, format_notice as format_profit_n
 from lbank_rsi_divergence import annotate as annotate_rsi_context, DivergenceStudy
 from lbank_market_context import MarketContextThread, annotate as annotate_market_context
 from lbank_public_techniques import TechniqueStudy, annotate as annotate_public_techniques
+from lbank_entry_timing import (completed_key, setup_evidence, confirmation_evidence,
+                               POLICY as ENTRY_TIMING_POLICY)
+from lbank_entry_replay_audit import audit_recent as audit_recent_entry
 
 LOG = logging.getLogger("lbank_monitor")
 TELEGRAM_DELIVERY = TelegramTransport()
@@ -894,6 +898,13 @@ def run():
         LOG.error("PERFORMANCE_V2 unavailable exception=%s; new_entries_paused=true",
                   type(exc).__name__)
     LOG.info("position_report_tracking=enabled; recorded_position_present=%s", bool(position_ledger.position))
+    # Read-only reconstruction of the latest public signal in a separate thread.
+    # No account state, Telegram calls, source DB changes or live strategy gates.
+    threading.Thread(target=audit_recent_entry, args=(classify, confirm_watch, dict(
+        fee=TAKER_FEE, slippage=STOP_SLIPPAGE, funding_buffer=FUNDING_BUFFER,
+        reference_balance=REF_BALANCE, risk_fraction=RISK_FRACTION,
+        leverage=LEVERAGE, max_margin_fraction=MAX_MARGIN_FRACTION)),
+        name="lbank-entry-replay-audit", daemon=True).start()
     # Official macro feeds are polled in an independent daemon thread.
     # No macro network call can block ticker sampling, stop-risk warning,
     # RSI validation or any other market-monitor action.
@@ -920,6 +931,18 @@ def run():
     LOG.info("risk_snapshot_poll=%ds setup_review_poll=%ds watch_confirmation_poll=%ds "
              "min_watch_age=30 source=native_candles quote_risk_polling=true",
              RISK_POLL, POLL, RISK_POLL)
+    LOG.info("ENTRY_TIMING_POLICY policy=%s setup_on_new_completed_native_bar=true "
+             "periodic_setup_fallback_seconds=%d minute_sample_cadence_unchanged=true "
+             "minimum_confirmation_seconds=30 strategy_gates_unchanged=true", ENTRY_TIMING_POLICY, POLL)
+    try:
+        with open(__file__, "rb") as source:
+            monitor_sha = hashlib.sha256(source.read()).hexdigest()
+        with open(os.path.join(os.path.dirname(__file__), "lbank_entry_timing.py"), "rb") as source:
+            timing_sha = hashlib.sha256(source.read()).hexdigest()
+        LOG.info("ENTRY_TIMING_RUNTIME commit=%s monitor_sha256=%s timing_sha256=%s",
+                 os.getenv("RAILWAY_GIT_COMMIT_SHA", "unknown"), monitor_sha, timing_sha)
+    except OSError as exc:
+        LOG.warning("ENTRY_TIMING_RUNTIME source_hash_unavailable exception=%s", type(exc).__name__)
     LOG.info("ENTRY_QUALITY policy=%s universal_minute_wait=false "
              "priority=hard_risk,higher_structure,target_room,minute_reaction "
              "stop_warnings=always_on early_caution=structure_aware", ENTRY_QUALITY_POLICY)
@@ -954,6 +977,9 @@ def run():
     next_diag_summary = time.time() + 600
     last_5m_audit = None
     last_entry_diagnostics = {}
+    last_setup_key = None
+    observed_ready_key = None
+    first_ready_observed_at = None
     while True:
         try:
             # Inbound updates use the same authorized existing Telegram chat.
@@ -961,6 +987,9 @@ def run():
             price, change24 = get_perpetual_snapshot(exchange)
             now = time.time()
             native_state, native_diag = native_feed.snapshot(now, price)
+            native_key = completed_key(native_state)
+            if native_key is not None and native_key != observed_ready_key:
+                observed_ready_key, first_ready_observed_at = native_key, now
             audit_ready = performance is not None
             if performance is not None:
                 try:
@@ -1082,10 +1111,12 @@ def run():
                 else:
                     LOG.error("SIGNAL FOLLOWUP SEND FAILED reference=%d reason=%s",
                               tracked.number, reason)
-            # A completed setup is discovered on the existing minute cadence.
-            # Its fresh-price confirmation must not wait for that cadence again.
+            # Newly completed native bars must not wait for the unrelated price
+            # sample timer. Never promote a forming candle or append a quote.
             sample_due = now - last_sample >= POLL
             confirm_due = watch is not None and now - watch["time"] >= 30
+            new_setup_bar = native_key is not None and native_key != last_setup_key
+            setup_due = sample_due or (watch is None and new_setup_bar)
             if sample_due:
                 last_sample = now
                 observations.append((now, price))
@@ -1157,7 +1188,7 @@ def run():
                                     LOG.warning("MANUAL POSITION NEUTRAL STALL REVIEW SENT side=%s",side_text)
                                 else:
                                     LOG.error("MANUAL POSITION NEUTRAL STALL REVIEW SEND FAILED")
-            if sample_due or confirm_due:
+            if sample_due or confirm_due or setup_due:
                 # Preserve minute-indexed strategy timing with native 1m closes.
                 # The live quote is used separately for entry/confirmation prices.
                 prices = native_state["prices"] if native_state else []
@@ -1207,6 +1238,8 @@ def run():
                                      confirm_diag.get("reason", "other"), age,
                                      watch["plan"].get("strategy"))
                         if plan is not None:
+                            plan["entry_timing"] = confirmation_evidence(
+                                watch, plan, native_state, now, time.time())
                             side = plan["side"]
                             gate_reason = alert_gate(now, side, alert_state, plan=plan)
                             if gate_reason == "ok":
@@ -1243,7 +1276,14 @@ def run():
                                 message = format_entry_alert(
                                     plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat(),
                                     reference_number=risk_tracker.next_number)
+                                send_started_at = time.time()
                                 if telegram(message):
+                                    acknowledged_at = time.time()
+                                    plan["entry_timing"].update(send_started_at=send_started_at,
+                                        telegram_acknowledged_at=acknowledged_at,
+                                        quote_age_when_send_started_seconds=send_started_at-now,
+                                        telegram_elapsed_seconds=acknowledged_at-send_started_at,
+                                        recipient_receipt_verified=False)
                                     reverse_exception = verified_reversal_exception(
                                         now, side, alert_state, plan)
                                     record_alert(now, side, alert_state, plan=plan)
@@ -1256,6 +1296,8 @@ def run():
                                              sent_signal.number,json.dumps(plan.get('entry_decision_priority'),sort_keys=True))
                                     LOG.info("ENTRY_THESIS_SENT reference=%d evidence=%s",
                                              sent_signal.number,json.dumps(plan.get("followup_thesis"),sort_keys=True))
+                                    LOG.info("ENTRY_TIMING_SENT reference=%d evidence=%s",
+                                             sent_signal.number, json.dumps(plan["entry_timing"], sort_keys=True))
                                     try:
                                         performance.add(sent_signal.number, plan, now,
                                                         fee=TAKER_FEE, slippage=STOP_SLIPPAGE,
@@ -1284,13 +1326,22 @@ def run():
                                          side, gate_reason, plan.get("strategy", "breakout"),
                                          plan["price"])
                             watch = None
-                if sample_due and continuous and audit_ready and watch is None:
+                if setup_due and continuous and audit_ready and watch is None:
+                    last_setup_key = native_key
                     rejection = {}
                     proposal = classify(prices, native_state=native_state,
                                         diagnostics=rejection)
+                    timing = setup_evidence(native_state, now, time.time(),
+                                            first_ready_observed_at,
+                                            "periodic_and_new_bar" if sample_due and new_setup_bar
+                                            else "periodic" if sample_due else "new_completed_bar")
+                    if proposal is not None:
+                        proposal["entry_timing"] = timing
+                    rejection["entry_timing"] = timing
                     rejection["data_source"] = NATIVE_SOURCE
                     last_entry_diagnostics = rejection
                     performance.sample(now, price, decision=rejection)
+                    LOG.info("ENTRY_SETUP_EVALUATED %s", json.dumps(rejection, sort_keys=True))
                     if proposal is not None:
                         side = proposal["side"]
                         gate_reason = alert_gate(now, side, alert_state, plan=proposal)

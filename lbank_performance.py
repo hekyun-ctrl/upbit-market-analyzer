@@ -102,6 +102,7 @@ class PerformanceBook:
                  runner_enabled=bool(plan.get("runner_enabled")),
                  profit_policy=plan.get("profit_policy"),
                  entry_quality=plan.get("entry_quality"),
+                 entry_timing=plan.get("entry_timing"),
                  followup_thesis=plan.get("followup_thesis"),stop_active_since=ts,
                  runner_last_bar=-1, barrier=plan.get("barrier"),
                  policy_version=POLICY_VERSION if plan.get("runner_enabled") else "fixed_levels_v2",

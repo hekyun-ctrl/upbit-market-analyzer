@@ -13,7 +13,8 @@ class StopLoop(BaseException):
     pass
 
 
-def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None):
+def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
+              ready_at=None,qualify_at=None,stop_at=9075.):
     clock=SimpleNamespace(now=9000.);order=[];saved=[];sent=[];confirmed=[]
     state=structural_state();state['rsi5']['closes']=[b['close'] for b in state['five_bars']]
     p=state['quote'];plan=dict(direction=1,side='롱',strategy='breakout',price=p,
@@ -21,10 +22,10 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None):
         entry_quality={'priority':{}})
     def sleep(_):
         clock.now+=15
-        if clock.now>=9075:raise StopLoop()
+        if clock.now>=stop_at:raise StopLoop()
     def snapshot(now,quote):
         fresh=copy.deepcopy(state);fresh['quote']=quote
-        return (None if now==missing_at else fresh),{}
+        return (None if now==missing_at or ready_at is not None and now<ready_at else fresh),{}
     def confirm(prices,watch,age,**kwargs):
         order.append((clock.now,'confirm'));confirmed.append((clock.now,age,kwargs['native_state']['quote']))
         return None if clock.now==reject_at else copy.deepcopy(plan)
@@ -40,7 +41,12 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None):
     research=MagicMock();research.observe.return_value=({},[])
     neutral=MagicMock();neutral.observe.return_value=[]
     exchange=MagicMock();exchange.market.return_value={'swap':True}
-    classifier=MagicMock(side_effect=[copy.deepcopy(plan),None])
+    calls=[]
+    def classify(*args,**kwargs):
+        calls.append(clock.now);order.append((clock.now,'classify'))
+        if qualify_at is not None:return copy.deepcopy(plan) if clock.now>=qualify_at else None
+        return copy.deepcopy(plan) if len(calls)==1 else None
+    classifier=MagicMock(side_effect=classify)
     log=MagicMock()
     with ExitStack() as stack:
         for name,value in dict(POLL=60,RISK_POLL=15,STARTUP_TEST_ENABLED=False).items():stack.enter_context(patch.object(monitor,name,value))
@@ -71,7 +77,8 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None):
         except StopLoop:pass
     errors=[a for a in log.error.call_args_list if a.args and a.args[0].startswith('LBank market error')]
     if errors:raise AssertionError(errors)
-    return dict(confirmed=confirmed,sent=sent,saved=saved,book=book,risk=risk,order=order,classifier=classifier)
+    return dict(confirmed=confirmed,sent=sent,saved=saved,book=book,risk=risk,order=order,
+                classifier=classifier,classify_times=calls)
 
 
 class ConfirmationCadenceTests(unittest.TestCase):
@@ -112,6 +119,23 @@ class ConfirmationCadenceTests(unittest.TestCase):
     def test_fast_confirmation_fails_closed_on_journal_failure(self):
         r=run_clock(journal_fails_at=9030.)
         self.assertEqual(r['confirmed'],[]);self.assertEqual(r['sent'],[])
+
+    def test_new_ready_native_bar_does_not_wait_for_price_sample_timer(self):
+        r=run_clock(ready_at=9015.,qualify_at=9015.,stop_at=9120.)
+        self.assertEqual([t for t,_ in r['sent']],[9045.])
+        self.assertEqual(r['confirmed'][0][1],30.)
+        self.assertEqual(sorted({t for _,rows in r['saved'] for t,_ in rows}),[9000.,9060.])
+        self.assertEqual(r['classifier'].call_count,2)  # first-ready + periodic; not every quote
+        self.assertLess(r['order'].index((9015.,'risk')),r['order'].index((9015.,'classify')))
+
+    def test_new_ready_scan_requires_journal_and_does_not_create_an_early_watch(self):
+        r=run_clock(ready_at=9015.,qualify_at=9015.,journal_fails_at=9015.,stop_at=9075.)
+        self.assertNotIn(9015.,r['classify_times'])
+        self.assertEqual([t for t,_ in r['sent']],[9060.])  # retry at 30, confirm at 60
+
+    def test_closed_bar_detection_does_not_override_rejected_candidate(self):
+        r=run_clock(ready_at=9015.,qualify_at=9200.,stop_at=9120.)
+        self.assertEqual(r['sent'],[]);self.assertEqual(r['confirmed'],[])
 
 
 if __name__=='__main__':unittest.main()
