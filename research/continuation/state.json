@@ -32,7 +32,8 @@
     "djienne_lightgbm_1274e_pure_kernel_contract_forensic_v1",
     "rlxbt_public_combo_contract_v1_147synthetic_predicates_92public_objects",
     "rlxbt_pinbar_transfer_v1_fixed_rules_actual2024_2026_two_latency_fullcost",
-    "cshear_72f293_source_contract_v1_8pure_definitions_185real_query_prefix_checks"
+    "cshear_72f293_source_contract_v1_8pure_definitions_185real_query_prefix_checks",
+    "gotodataru_5ed0d6e_original_BTC_summary_and_execution_contract_v1_51files14definitions11tests75checks"
   ],
   "read_before_work": [
     "docs/lbank_strategy_rebuild_2026-10-20.md",
@@ -43,18 +44,40 @@
     "docs/lbank_pinbar_transfer_validation_2026-10-20.md",
     "research/continuation/source_screening_20261020_1132.json",
     "docs/lbank_cshear_source_audit_2026-10-20.md",
-    "research/continuation/source_screening_20261020_1224.json"
+    "research/continuation/source_screening_20261020_1224.json",
+    "docs/lbank_gotodataru_source_audit_2026-10-20.md",
+    "research/continuation/source_screening_20261020_1240.json"
   ],
   "next_work": {
-    "stage": "next_original_BTC_ledger_and_fullcost_feasibility_funding_MR_source",
-    "instruction": "CShear84object/8definition13fixture/185real-query audit completed;read doc and saved report,do not repeat source replay. Next finite step from source_screening_20261020_1224.json: read pinned Gotodataru public tree,shared loader/engine/metrics,strategy1funding_MR signals/backtest and results_combined. Locate BTC-only original closedledger/params/rawinputs/checksums;first actual frequency,opportunity days and fee/funding cash reconciliation if rows exist. Compare prior flow/entry exclusions before any replay. Author lookahead claims and XRP/DOGE positives not BTC proof. No252symbol sweep,optimizer,orders,privateinputs,threshold relaxation or sourcepickle. If incompatible/missing,record source-specific obstacle promptly and continue different primary source. No eligible/forward candidate;all promotion gates intact. Keep latest operational validation check before research.",
+    "stage": "new_pinned_original_BTC_ledger_first_feasibility",
+    "instruction": "Gotodataru51file/14definition11fixture/75separateaudit complete;read saved report/docs,do notrepeat or optimize. Next finite step: new pinned bhanu-pratap-rana source availability first;actualpublicBTCclosedledger/rawdata/params/costs,not illustrative example. Compare exclusion catalogs including new1240screen. If ledger exists execute calendar frequency/opportunity and fee/funding reconciliation before expensive replay. If exactrules+publicdata but noledger,freeze one source-owned fixed replication plus allcost/gap/manual-riskcontract before outcomes;no inventedfeatures/TP1/riskexpansion. If unavailable recordquickly and move secondarypymammadov availability;no optimizer/live/LLM/keys/orders. Do not rerun pgup/maxs/GT preflights unchanged. No eligiblecandidate/forwardclock. All fixedpromotiongates unchanged.",
     "sources_to_screen": [
+      {
+        "repository": "bhanu-pratap-rana/Trading-strategy-backtest",
+        "commit": "15391f936e8fa24985392dac7770405f81c5300e",
+        "url": "https://github.com/bhanu-pratap-rana/Trading-strategy-backtest/tree/15391f936e8fa24985392dac7770405f81c5300e",
+        "status": "unread_primary_code_and_data_lead_only_NOT_qualified",
+        "discovery": "Search index mentions45trade/30day15m example output; not established as measured run,not a positive evidence claim. HEAD resolved anonymously,README/code/data not yet read.",
+        "read_first": [
+          "README.md",
+          "Git tree data/results artifacts",
+          "src/main_backtest.py and exact called strategy/execution modules located from actual tree"
+        ],
+        "instruction": "First determine if claimed output is illustrative or actual BTC closedledger with rawinputs/params/costs. Do not count example output as performance. If no actual ledger,only continue if exact source rules and public rawdata permit bounded fixed replication without inventing features;freeze before outcomes. No paper/live main scripts,keys/orders/LLM or optimizer."
+      },
+      {
+        "repository": "pymammadov/bottradepm",
+        "commit": "dcd1ac3e2a32204c2943bff000644b6f95486aa5",
+        "url": "https://github.com/pymammadov/bottradepm/tree/dcd1ac3e2a32204c2943bff000644b6f95486aa5",
+        "status": "secondary_unread_availability_lead_NOT_qualified",
+        "discovery": "Index advertises outputs/trades.csv and stress/OOS commands,not retrieved actual artifacts. HEAD only resolved; no adoption."
+      },
       {
         "repository": "Gotodataru/binance-futures-backtest",
         "commit": "5ed0d6e39d8a3e951bea40c66e2638c213012e1b",
         "url": "https://github.com/Gotodataru/binance-futures-backtest/tree/5ed0d6e39d8a3e951bea40c66e2638c213012e1b",
         "readme_git_blob_sha": "eaa8df5b767681e899b96ed26b4474ba27a459bf",
-        "status": "primary_source_feasibility_lead_only_NOT_qualified_no_forward",
+        "status": "completed_excluded_publicrelease_missing_BTCledger_fullcost_and_contract",
         "read_first": [
           "shared/data_loader.py",
           "shared/backtest_engine.py",
@@ -64,7 +87,8 @@
           "results_combined"
         ],
         "screening": "research/continuation/source_screening_20261020_1224.json",
-        "market_backtest_performed": false
+        "market_backtest_performed": false,
+        "report": "research/continuation/results/gotodataru_source_20261020/report.json"
       },
       {
         "repository": "CShear/crack-the-nut",
@@ -195,7 +219,8 @@
     "RLXBT combo:92pinned public Git objects/5CSVheaders lack named custom features;147syntheticcases include5opposed/6entryexit/5duplicate,not market rates. Publicprobe fraction units support1.5%/2% but article runtimebinary unknown. No marketbacktest. Pinbar originalwinner selectedafter12hypotheses,spotvolume vs futures different,cost/engineunspecified;new fixed transfer screen not exactreplication/unseen validation.",
     "Pinbarfixedsource transfer screen:1445760futures1m/3012funding,all2024-Sep2026reused,66ZIPhashes. Zero-delay6737closedPF.4705/TP1.2382/netmean-.4604R,60sec6327PF.4939/TP1.2398/netmean-.4270R. Everyyearbothfullcostlevelsnegative. No originalspot/proprietaryengine replication/nativeurgentrate/fills. 5minstop andwholebarMAE proxies not realwarnings.20implementationtests combine8sourcecontract+12pinbar;26128separateDecimalcashchecks. No optimization,eligiblecandidate,forwardclock or production replacement.",
     "CShear72f293 original selected-kernel diagnostics: fixed fundingSHORT recoversLONG/SHORT when only futureclosechanges;non-grid185realqueries all selectlaterlabel andchangepastprice,185exactlabelcontrols0changes. Sourceend48hwith4hdata returns fictionalearlypositiveexit,gap8hlabelled4h;13tests/8separateDecimalcashchecks. Publictree84objects no rawBTCledger. These are bounded forensic probes,not measuredmarketfrequency or headlineprofitimpact/not allon-gridreturnsinvalid. No marketPF/TP1/urgent/native qualification.",
-    "New primary source preflights are not marketbacktests: Pavdot103selectedtrades+CPCVclaims not qualified;Liam2021positive uses private preprocessing/incomplete logic and1289orders not matchedclosedtrades. GotodataruREADME fee/slip/causality and altcoin positives are authorclaims only. BTCclosedledger/sourcefullcost not yet inspected."
+    "New primary source preflights are not marketbacktests: Pavdot103selectedtrades+CPCVclaims not qualified;Liam2021positive uses private preprocessing/incomplete logic and1289orders not matchedclosedtrades. GotodataruREADME fee/slip/causality and altcoin positives are authorclaims only. BTCclosedledger/sourcefullcost not yet inspected.",
+    "Gotodataru5ed0d6e51files no rawBTCledger/windowparams;authorBTC139/318/368trades PF.6183/.3322/.7111 negative. Sharedengine percentageunits100factor,fundingcashabsent,costoverrideignored,tail/gap/stop/TPprobes;11tests75separatechecks. Syntheticcontractnotmarketprofitbias;completedbarprefix49signals0change,SLfirst/nextopencontrolsretained. No source profit replay/fullcostCI/TP1/nativegate or allfundingstrategyfailure. Newprimarypreflights pgup/maxs retainauthorpositivebutincompatiblefrequency/missingledger;GTtargetsnotmeasurements. Do not repeatunchanged."
   ],
   "iterations": [
     {
@@ -572,11 +597,35 @@
       "replacement_certified": false,
       "forward_started": false,
       "report": "research/continuation/results/operational_readiness_20261020_1225.json"
+    },
+    {
+      "id": "gotodataru_source_contract_20261020_1230",
+      "stage_completed": "pinned_source_BTC_summary_arithmetic_execution_contract_and_ledger_availability",
+      "source_commit": "5ed0d6e39d8a3e951bea40c66e2638c213012e1b",
+      "source_files": 51,
+      "reviewed_definitions": 14,
+      "implementation_tests_passed": 11,
+      "separate_checks_passed": 75,
+      "public_summary_csvs": 3,
+      "public_trade_ledgers": 0,
+      "actual_new_market_backtests": 0,
+      "result": "exclude_thisrelease_not_all_funding_flow_strategies",
+      "source_BTC_PFs": [
+        0.6183,
+        0.3322,
+        0.7111
+      ],
+      "report": "research/continuation/results/gotodataru_source_20261020/report.json",
+      "documentation": "docs/lbank_gotodataru_source_audit_2026-10-20.md",
+      "source_screening": "research/continuation/source_screening_20261020_1240.json",
+      "forward_started": false,
+      "production_changed": false,
+      "initial_execution_error": "pandas mixedtimestampfixtureformat;fixed parsing only;11tests and75checks thenpass"
     }
   ],
   "active_run": null,
   "blockers": [],
-  "updated_kst": "2026-10-20T12:25:48+09:00",
+  "updated_kst": "2026-10-20T12:39:35+09:00",
   "maintained_research_candidates": [
     {
       "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
@@ -622,6 +671,11 @@
       "candidate_id": "cshear_72f293_source_contract_v1",
       "status": "excluded_publicrelease_as_replacement_evidence_contract_causality_cost_BTCledger_unverified",
       "next": "No repair/63strategy/13asset/20exit optimization. Preserve both correct controls and bounded counterexamples;not allRSI/meanreversion failure. No measured headlineprofitimpact or native marketbacktest."
+    },
+    {
+      "candidate_id": "gotodataru_5ed0d6e_source_contract_v1",
+      "status": "excluded_this_public_release_as_replacement_evidence",
+      "next": "No81parameter252symbol optimizer or repair-to-salvage;no sameauditrepeat,sourceBTCsummarylossandmissingledger/fullcostrecorded."
     }
   ],
   "source_reconciliation": {
@@ -684,15 +738,15 @@
     "native_readiness": {
       "ready": true,
       "reason": "native_ready",
-      "last_observed_utc": "2026-10-20T03:25:45.556264255Z",
-      "consecutive_closed_1m": 103,
-      "consecutive_closed_5m_at_that_time": 20,
+      "last_observed_utc": "2026-10-20T03:31:58.223250499Z",
+      "consecutive_closed_1m": 109,
+      "consecutive_closed_5m_at_that_time": 21,
       "required_closed_1m": 65,
       "required_closed_5m": 20,
       "rsi_history_mature": false,
       "rsi_warmup_target": 250,
       "note": "Existing65closed1m/20closed5m readiness contract actually passed;20native5m now usable. RSIcomputed but250warmup maturitytarget not yet met. No history interpolation or threshold changes.",
-      "rsi14_wilder": 57.19135827331703,
+      "rsi14_wilder": 55.67716519444773,
       "entry_source_switched": true
     },
     "full_rollout_complete": true,
@@ -715,24 +769,24 @@
     "next_check": "Entry pipeline restored2026-10-20T03:25:05Z on existing deployed862339d source. Before next research step,check latest production/deployment and bounded logs for continuity/regressions;do not repeat unchanged readiness announcement. No valid new setup or confirmation/alert observed in this bounded window;no native publication timestamp or end-to-end latency measured. Continue alternative-strategy research;do not disable task because hotfix readiness is not certified replacement.",
     "followup_via_existing_enabled_research_task": true,
     "evidence_path": "research/continuation/results/entry_timing_hotfix_20261020_deployment.json",
-    "latest_bounded_observation": "research/continuation/results/operational_readiness_20261020_1225.json",
+    "latest_bounded_observation": "research/continuation/results/operational_continuity_20261020_1230.json",
     "hotfix_entry_pipeline_validated_utc": "2026-10-20T03:25:05.441094944Z",
     "live_new_candidate_confirmation_observed": false,
     "last_completed_bar_evaluation": {
-      "timestamp": "2026-10-20T03:25:05.441094944Z",
+      "timestamp": "2026-10-20T03:31:13.839650255Z",
       "reason": "market_no_setup",
       "candidate_count": 0,
       "entry_timing": {
-        "candidate_evaluated_at": 1792466705.2863274,
-        "evaluation_after_first_ready_observation_seconds": 0.006357431411743164,
-        "evaluation_after_nominal_close_seconds": 5.286327362060547,
-        "first_ready_observed_at": 1792466705.27997,
-        "last_closed_1m_start": 1792466640,
-        "last_closed_5m_start": 1792466400,
-        "nominal_1m_close_at": 1792466700,
+        "candidate_evaluated_at": 1792467066.6134925,
+        "evaluation_after_first_ready_observation_seconds": 0.005862236022949219,
+        "evaluation_after_nominal_close_seconds": 6.613492488861084,
+        "first_ready_observed_at": 1792467066.6076303,
+        "last_closed_1m_start": 1792467000,
+        "last_closed_5m_start": 1792466700,
+        "nominal_1m_close_at": 1792467060,
         "policy": "native_completed_bar_schedule_v1",
         "publication_note": "nominal_close_is_not_actual_publication_time",
-        "quote_observed_at": 1792466705.27997,
+        "quote_observed_at": 1792467066.6076303,
         "source_publication_at": null,
         "trigger": "new_completed_bar"
       }

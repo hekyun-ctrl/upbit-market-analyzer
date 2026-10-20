@@ -1,0 +1,2 @@
+symbol,total_return_pct,annual_return_pct,sharpe,sortino,max_drawdown_pct,calmar,n_trades,win_rate,avg_trade_pct,avg_win_pct,avg_loss_pct,profit_factor,n_longs,n_shorts,sl_hits,tp_hits,avg_hold_bars,oos_windows
+BTCUSDT,-0.2269,-0.0625,-1.0062,-0.0504,-0.275,-0.2273,139,0.4245,-0.001633,0.00623,-0.007431,0.6183,60,79,0,0,14.1,15

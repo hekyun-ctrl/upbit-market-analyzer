@@ -1,0 +1,307 @@
+{
+  "passed": true,
+  "checks_passed": 75,
+  "checks": [
+    {
+      "name": "source_blob:.gitignore",
+      "passed": true
+    },
+    {
+      "name": "source_blob:README.md",
+      "passed": true
+    },
+    {
+      "name": "source_blob:compare_all.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:results_combined/strategies_comparison.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:shared/__init__.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:shared/backtest_engine.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:shared/data_loader.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:shared/metrics.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_1_funding_mr/__init__.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_1_funding_mr/backtest.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_1_funding_mr/optimize.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_1_funding_mr/results/BTCUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_1_funding_mr/results/metrics_per_symbol.csv",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_1_funding_mr/results/portfolio_comparison.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_1_funding_mr/results/portfolio_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_1_funding_mr/run_full_universe.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_1_funding_mr/signals.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/__init__.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/backtest.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/optimize.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/results/ADAUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/results/BNBUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/results/BTCUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/results/DOGEUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/results/ETHUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/results/SOLUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/results/SUIUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/results/TRUMPUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/results/TRXUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/results/XRPUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/results/metrics_per_symbol.csv",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/results/portfolio_comparison.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/results/portfolio_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_2_taker_momentum/signals.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/__init__.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/backtest.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/optimize.py",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/results/ADAUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/results/BNBUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/results/BTCUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/results/DOGEUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/results/ETHUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/results/SOLUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/results/SUIUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/results/TRUMPUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/results/TRXUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/results/XRPUSDT_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/results/metrics_per_symbol.csv",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/results/portfolio_comparison.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/results/portfolio_equity.png",
+      "passed": true
+    },
+    {
+      "name": "source_blob:strategy_3_oi_divergence/signals.py",
+      "passed": true
+    },
+    {
+      "name": "original_summary_bytes:1",
+      "passed": true
+    },
+    {
+      "name": "summary_rounding_net:1",
+      "passed": true
+    },
+    {
+      "name": "summary_rounding_pf:1",
+      "passed": true
+    },
+    {
+      "name": "BTC_negative_PFbelow1:1",
+      "passed": true
+    },
+    {
+      "name": "summary_not_ledger:1",
+      "passed": true
+    },
+    {
+      "name": "original_summary_bytes:2",
+      "passed": true
+    },
+    {
+      "name": "summary_rounding_net:2",
+      "passed": true
+    },
+    {
+      "name": "summary_rounding_pf:2",
+      "passed": true
+    },
+    {
+      "name": "BTC_negative_PFbelow1:2",
+      "passed": true
+    },
+    {
+      "name": "summary_not_ledger:2",
+      "passed": true
+    },
+    {
+      "name": "original_summary_bytes:3",
+      "passed": true
+    },
+    {
+      "name": "summary_rounding_net:3",
+      "passed": true
+    },
+    {
+      "name": "summary_rounding_pf:3",
+      "passed": true
+    },
+    {
+      "name": "BTC_negative_PFbelow1:3",
+      "passed": true
+    },
+    {
+      "name": "summary_not_ledger:3",
+      "passed": true
+    },
+    {
+      "name": "separate_actual_notionals_cash",
+      "passed": true
+    },
+    {
+      "name": "separate_target_cash",
+      "passed": true
+    },
+    {
+      "name": "separate_stop_price",
+      "passed": true
+    },
+    {
+      "name": "separate_tail_pnl",
+      "passed": true
+    },
+    {
+      "name": "settlement_inside_probe_holding",
+      "passed": true
+    },
+    {
+      "name": "inventory_only3summaryCSV",
+      "passed": true
+    },
+    {
+      "name": "no_raw_or_tradeledger",
+      "passed": true
+    },
+    {
+      "name": "no_invented_market_metrics",
+      "passed": true
+    },
+    {
+      "name": "no_promotion_or_production",
+      "passed": true
+    }
+  ],
+  "market_result_validated": false
+}

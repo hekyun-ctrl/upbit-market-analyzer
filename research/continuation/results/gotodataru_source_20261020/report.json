@@ -1,0 +1,601 @@
+{
+  "protocol": "gotodataru_source_contract_v1",
+  "source_repository": "Gotodataru/binance-futures-backtest",
+  "source_commit": "5ed0d6e39d8a3e951bea40c66e2638c213012e1b",
+  "started_utc": "2026-10-20T03:36:32.977623+00:00",
+  "completed_utc": "2026-10-20T03:36:33.046000+00:00",
+  "script_sha256": "30014766afe47c76f3c503f55c85eae912cc3ba0de25de74a49852c6c519f70c",
+  "protocol_sha256": "ab7224c3d2e823ffecb13d022179019934478e237129d1a61062d6281f41b2d1",
+  "source_tree": [
+    {
+      "path": ".gitignore",
+      "git_blob_sha": "5f60df4ae43b8709ad0a4c372ec6074d2bf6c72c",
+      "sha256": "29b78b21bee198d01ec21c91b3a395bc34a428f0836063aec8ca561ee1c8cb83",
+      "size": 525
+    },
+    {
+      "path": "README.md",
+      "git_blob_sha": "eaa8df5b767681e899b96ed26b4474ba27a459bf",
+      "sha256": "04a0dd83889f808f00b255877fe597135858093dd50e5a7f79c186d81a5c99e2",
+      "size": 5422
+    },
+    {
+      "path": "compare_all.py",
+      "git_blob_sha": "6c948a892257be5a3d2a0064b5e4c7b310c47e17",
+      "sha256": "52fb5bf3a66b618a466faa7a05cd0ca0bec1f764ad2941b4a11eb5024b8e31c7",
+      "size": 6068
+    },
+    {
+      "path": "results_combined/strategies_comparison.png",
+      "git_blob_sha": "943c8ef1cab7649f0a420848aab002fe3cfb5df9",
+      "sha256": "8941a16aabfee0adc29adad516f9c8d4989d7952c3fec39fbbb2ab49a298b314",
+      "size": 255635
+    },
+    {
+      "path": "shared/__init__.py",
+      "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "shared/backtest_engine.py",
+      "git_blob_sha": "1b4b37ec9bec257defbb8222a3d340ac8afc4585",
+      "sha256": "20b36c01e26e14a391f7f720a7c3d309d1462d2fc89a3c7c26f076fa3ea2fb17",
+      "size": 22116
+    },
+    {
+      "path": "shared/data_loader.py",
+      "git_blob_sha": "9178ce4ca23bc94d7ea9ff01bacaec7e7ad96e54",
+      "sha256": "cd70f9b130966b6229d4da133d99230aba52d44620b32b9d7ff4507b15fb726f",
+      "size": 9140
+    },
+    {
+      "path": "shared/metrics.py",
+      "git_blob_sha": "3a009d32d78f1fb9d9a0eb0abab72482d8e2671f",
+      "sha256": "947a213db4fdd44a791bb62fceabd864e62364434ff2a3d25934343655146c78",
+      "size": 11789
+    },
+    {
+      "path": "strategy_1_funding_mr/__init__.py",
+      "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "strategy_1_funding_mr/backtest.py",
+      "git_blob_sha": "2b3d7e4e7b5ddaf78df4af7706fa30b72ea934a3",
+      "sha256": "a40a5d8de8d771383818a420fb8df6dec04aa3c877e14563c71669ebfc71faad",
+      "size": 7264
+    },
+    {
+      "path": "strategy_1_funding_mr/optimize.py",
+      "git_blob_sha": "de66940aa047139c95178d017b4b9c51d21d16d0",
+      "sha256": "19128e138019f92d65f0bc6a48b9c91cd55de76fd398f3e7313d2e590a524fff",
+      "size": 5668
+    },
+    {
+      "path": "strategy_1_funding_mr/results/BTCUSDT_equity.png",
+      "git_blob_sha": "3c45b474dcd2903020ad8ac270d8cd54157f9914",
+      "sha256": "0343483b791689573469b33398000bf42a6349f66d316865311ad429ca6877d2",
+      "size": 119902
+    },
+    {
+      "path": "strategy_1_funding_mr/results/metrics_per_symbol.csv",
+      "git_blob_sha": "8e89dbb6f713ed23923e8546b719459b99440358",
+      "sha256": "46c18b4cd7e86ff68a6ee282c824236b54ee25e4a4b114fee0422fceb60505e3",
+      "size": 330
+    },
+    {
+      "path": "strategy_1_funding_mr/results/portfolio_comparison.png",
+      "git_blob_sha": "15b677a2ab40b899a4c653106b2efe53d79c3d67",
+      "sha256": "8e2f82c9d335812b060b705f7f81bd0775ce744bdef0db496f7c331b347b393e",
+      "size": 65158
+    },
+    {
+      "path": "strategy_1_funding_mr/results/portfolio_equity.png",
+      "git_blob_sha": "75bd3f8066d210fe3d7a8ac4547e2002736874eb",
+      "sha256": "5bfbb2926220cbda9a658afd6ab4bd1e17adf358f0eeb6aaddd1ff450f89f55d",
+      "size": 86673
+    },
+    {
+      "path": "strategy_1_funding_mr/run_full_universe.py",
+      "git_blob_sha": "f4c8d693055bc3a6ffa177fc42be062212a1fa15",
+      "sha256": "1119993ecfd27208d929104ca09f058ca14a7d2473871ab8a03b19578508e969",
+      "size": 8357
+    },
+    {
+      "path": "strategy_1_funding_mr/signals.py",
+      "git_blob_sha": "7528f737eddd459b8505972c01fef60d263715e1",
+      "sha256": "bee2b5995d4a2ca212d0155da1b0c2ed971312842c2943644cd317eaa39da057",
+      "size": 3541
+    },
+    {
+      "path": "strategy_2_taker_momentum/__init__.py",
+      "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "strategy_2_taker_momentum/backtest.py",
+      "git_blob_sha": "1c0366b55c09d6d9bb55e982108f0bab6159648a",
+      "sha256": "cc2cc2520333146843322dbf8e844dcbbae1ab401af2e34aae6a57458ba9e0b1",
+      "size": 7488
+    },
+    {
+      "path": "strategy_2_taker_momentum/optimize.py",
+      "git_blob_sha": "75a5d13050b70bab2f865c2a176d3cb6449db609",
+      "sha256": "655d790806010e65ccf961474ef041663c46d32113100e212cacc1ae4e887c34",
+      "size": 5170
+    },
+    {
+      "path": "strategy_2_taker_momentum/results/ADAUSDT_equity.png",
+      "git_blob_sha": "1ce211d5c39b95e76cdf8a35a8125335579761b5",
+      "sha256": "3c703e73fca5475b48bb0eadf04abf89cf50bdcca6048bb059bf48aa88f1f5a8",
+      "size": 134384
+    },
+    {
+      "path": "strategy_2_taker_momentum/results/BNBUSDT_equity.png",
+      "git_blob_sha": "de494ae897d9db70265b73dffc26194064417ed9",
+      "sha256": "048bef1872064f80c9c5a4f83eb2595d5c5f68f77545dc5ef4e94760dfde2abe",
+      "size": 130788
+    },
+    {
+      "path": "strategy_2_taker_momentum/results/BTCUSDT_equity.png",
+      "git_blob_sha": "d39d2b46854676a3b4f105f5b247b20bc2da9643",
+      "sha256": "f63a72a6868d06f3ce2ac422d999d9963754b6e5f3b9aadb8d3e8db47e5af493",
+      "size": 122046
+    },
+    {
+      "path": "strategy_2_taker_momentum/results/DOGEUSDT_equity.png",
+      "git_blob_sha": "65163f68b5b7b5695fbca1a0e31dd4dbd670677f",
+      "sha256": "8506d3b5913bfdfb1aa461e72623c7cd0659df664373580929f85fcf28536289",
+      "size": 126632
+    },
+    {
+      "path": "strategy_2_taker_momentum/results/ETHUSDT_equity.png",
+      "git_blob_sha": "a346400444ad4e2016f228b06d3e21f57aac26df",
+      "sha256": "4e6590a8794db02aabfd8d8664c5e5af66656110d49792f60bf32067e0fbb038",
+      "size": 129499
+    },
+    {
+      "path": "strategy_2_taker_momentum/results/SOLUSDT_equity.png",
+      "git_blob_sha": "bc958f41a320d661b24435ea6be10fc3c04c93c5",
+      "sha256": "164ddc4a74187125f3e05c3091443c6a600bd58f1588dff72f7f31b95c0953e5",
+      "size": 152551
+    },
+    {
+      "path": "strategy_2_taker_momentum/results/SUIUSDT_equity.png",
+      "git_blob_sha": "2069ef9f996099ce6c57f9a2f087604ed2614eaa",
+      "sha256": "8b4e760623fef79993996c297ca34b5217666240713faa9ebb8823c3dc72b9e3",
+      "size": 145754
+    },
+    {
+      "path": "strategy_2_taker_momentum/results/TRUMPUSDT_equity.png",
+      "git_blob_sha": "b653e10730e55bd56f696f32e77323a4bdf0129e",
+      "sha256": "6fdb003105cc65c31e7df944363cd7558105d4c1049ee2e148bcc15d65c30fc6",
+      "size": 96521
+    },
+    {
+      "path": "strategy_2_taker_momentum/results/TRXUSDT_equity.png",
+      "git_blob_sha": "74cb98b2e5013fcbf77a419f9bad3d7f2978c6a2",
+      "sha256": "9902c7faa21928e13a79b928791adb6ee259ec03b8e799f825b587a9317051f6",
+      "size": 152254
+    },
+    {
+      "path": "strategy_2_taker_momentum/results/XRPUSDT_equity.png",
+      "git_blob_sha": "be217e16348797223ef94393caaa4a523d631714",
+      "sha256": "a4a2a18632a8f448e8cc7ede8a6ac49a82741108c76af24012328552393b382a",
+      "size": 105042
+    },
+    {
+      "path": "strategy_2_taker_momentum/results/metrics_per_symbol.csv",
+      "git_blob_sha": "6ded98a074c64504c501e93332022d5eeab0abe1",
+      "sha256": "47d2ca75e7fd2c6b1a4d670239ed76b8b873a8ba555a314a8fe88a65b6aab326",
+      "size": 1511
+    },
+    {
+      "path": "strategy_2_taker_momentum/results/portfolio_comparison.png",
+      "git_blob_sha": "3bca0eb858306ce2a4c9e8dad1c9703304d5d8f1",
+      "sha256": "6ef22de61fdbdb1aa8be68969dcd2d4f6d5f4d798df2cb56392984d0364c297e",
+      "size": 168213
+    },
+    {
+      "path": "strategy_2_taker_momentum/results/portfolio_equity.png",
+      "git_blob_sha": "0b2d1a0db181b859d41beef0e00561222d7c9815",
+      "sha256": "4f4257221420672cb777d2badaf315a8ad9cc0c7ebbbeda9b0c987682fe07d66",
+      "size": 106810
+    },
+    {
+      "path": "strategy_2_taker_momentum/signals.py",
+      "git_blob_sha": "b8a2840618c4fb02a2d90120deed5771b34bdbd6",
+      "sha256": "4bdac6240af94e63e88abf3e32f903855a261b900aeabde5633fae71666e29df",
+      "size": 4377
+    },
+    {
+      "path": "strategy_3_oi_divergence/__init__.py",
+      "git_blob_sha": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "size": 0
+    },
+    {
+      "path": "strategy_3_oi_divergence/backtest.py",
+      "git_blob_sha": "89963a739a99144e7abbbae37e03ba982b9f6a58",
+      "sha256": "be4ef556412f48f1ddfe5036daa53c871b64041449423b23f1a1a4236fefa6e5",
+      "size": 5629
+    },
+    {
+      "path": "strategy_3_oi_divergence/optimize.py",
+      "git_blob_sha": "04f48325e4ba4eedb94280afccf9fe09027eb81b",
+      "sha256": "b4e56e64e9bde0b5abadde91fb1a07a881b3a9962d7109bd622347e6584cc826",
+      "size": 3978
+    },
+    {
+      "path": "strategy_3_oi_divergence/results/ADAUSDT_equity.png",
+      "git_blob_sha": "7dbc6f98720aec831685f45d3ea799e2dadbf895",
+      "sha256": "378b431843b7a7d6c2b564e16ea13588679c193436cbb714e17b6a66fcd422ab",
+      "size": 168978
+    },
+    {
+      "path": "strategy_3_oi_divergence/results/BNBUSDT_equity.png",
+      "git_blob_sha": "992d41c68d7c66b9068fb558012ed4534674e3cb",
+      "sha256": "ec91143f835e7862f1ac250348fc4103a149c66ffafbac5bb4a59d1a999e1ce3",
+      "size": 156840
+    },
+    {
+      "path": "strategy_3_oi_divergence/results/BTCUSDT_equity.png",
+      "git_blob_sha": "9e39338fa03b138320c7fe42b89f163056f0df84",
+      "sha256": "b3007f6630a6b4ade160bcee399dfa94529f0a05499f3c8219db264422c09631",
+      "size": 135357
+    },
+    {
+      "path": "strategy_3_oi_divergence/results/DOGEUSDT_equity.png",
+      "git_blob_sha": "0fe6a06d92abeb86183dcc4f5af71386ef96ef99",
+      "sha256": "fbf68b4add8da895300a0ea05f543b43dc79fac8984f1b92b20a30e71de342e8",
+      "size": 190197
+    },
+    {
+      "path": "strategy_3_oi_divergence/results/ETHUSDT_equity.png",
+      "git_blob_sha": "68276cbefd7f0122892ba8a7097399ab5b43bb18",
+      "sha256": "635cc8951db46ea3c84758ec0a88053ec552be156971740a66c1863b694f30dc",
+      "size": 166077
+    },
+    {
+      "path": "strategy_3_oi_divergence/results/SOLUSDT_equity.png",
+      "git_blob_sha": "322f8b14d4c7cfa618c37002f9e8c3971a6fe538",
+      "sha256": "1422c8e500ac2308cd011b64770bc924644571f075ea462dd2cb37845432c2d9",
+      "size": 188000
+    },
+    {
+      "path": "strategy_3_oi_divergence/results/SUIUSDT_equity.png",
+      "git_blob_sha": "1ce90681bfa01299f5acaf6f7d12aa248ddfe767",
+      "sha256": "1257493e6e4909657a357a2d464442594572a8fddbaedafdac530c34ed85f814",
+      "size": 176160
+    },
+    {
+      "path": "strategy_3_oi_divergence/results/TRUMPUSDT_equity.png",
+      "git_blob_sha": "abe44e242c27b11df14453e9e3d67b2d42a367fe",
+      "sha256": "f6f3171844c769f185f74cd5236fe3e88ea0b37817cd66c6b0af26bd69bc2ca3",
+      "size": 124358
+    },
+    {
+      "path": "strategy_3_oi_divergence/results/TRXUSDT_equity.png",
+      "git_blob_sha": "93e1096f1d6a32b445c0cdcd2941f7c6694a1b08",
+      "sha256": "0179e19db3339aad3369b38cc81534d4b22106076593778796099d1c1a148895",
+      "size": 136248
+    },
+    {
+      "path": "strategy_3_oi_divergence/results/XRPUSDT_equity.png",
+      "git_blob_sha": "53851682a422bdf84e924e88a1e8bc390ccdbc75",
+      "sha256": "6b3f69b5a06fd696e674b8fe153cf121cab2f76b861856e6cdfb699fd497083c",
+      "size": 129515
+    },
+    {
+      "path": "strategy_3_oi_divergence/results/metrics_per_symbol.csv",
+      "git_blob_sha": "64b64d68cfef16a80d46a990c318956fa768d159",
+      "sha256": "b07b848c63783b3c7f92662e6350f99ece1bb383018b07699ecc8eeaef2d6dfe",
+      "size": 1375
+    },
+    {
+      "path": "strategy_3_oi_divergence/results/portfolio_comparison.png",
+      "git_blob_sha": "8bdea5ef95a88223c60dbd6693c62b2ca8bda631",
+      "sha256": "c3f49b2e335bc713330fc450f862887068978d99a84386fe5864fb6ddb4423f1",
+      "size": 175548
+    },
+    {
+      "path": "strategy_3_oi_divergence/results/portfolio_equity.png",
+      "git_blob_sha": "ca97bdb0d05971e72ddea3565c258cef55342e18",
+      "sha256": "4479bcefebe308c4f1fa3fe47a6b38dd7f6f3dfee5c3d6a45ba423d1df1df784",
+      "size": 174436
+    },
+    {
+      "path": "strategy_3_oi_divergence/signals.py",
+      "git_blob_sha": "be177d2b24a740bc3ac46115326780c48582ec3e",
+      "sha256": "3c34909a1c92ab5ee62733b464431b5d733dd6b32c051d00605ec23125ceffe3",
+      "size": 3970
+    }
+  ],
+  "reviewed_definitions": [
+    {
+      "path": "shared/backtest_engine.py",
+      "name": "BacktestResult",
+      "line": 36,
+      "ast_sha256": "ddb0b1d465499e049785bc838f6633892ab6e22040f33ddc4ec6134d076fac9f"
+    },
+    {
+      "path": "shared/backtest_engine.py",
+      "name": "WalkForwardResult",
+      "line": 48,
+      "ast_sha256": "cc265598db9ce0941cc113c640ab76a8ce9b0c34a1e8c406606cda06ba877bb0"
+    },
+    {
+      "path": "shared/backtest_engine.py",
+      "name": "_entry_price",
+      "line": 60,
+      "ast_sha256": "5a46d3d285dd33448f82abf72c3bbe2bcf05a7dfd20aba5564fb0eafa8b9d0c6"
+    },
+    {
+      "path": "shared/backtest_engine.py",
+      "name": "_exit_price",
+      "line": 68,
+      "ast_sha256": "d49d3aaa708c3ad370ba065b7d51b9ebb374fa661a9844733facf1aecb096622"
+    },
+    {
+      "path": "shared/backtest_engine.py",
+      "name": "_trade_pnl",
+      "line": 76,
+      "ast_sha256": "9a4be197f2b2be85ab2c62d67d8c8010a8fa31ad18ca95a3b26e0baa6d4bc14d"
+    },
+    {
+      "path": "shared/backtest_engine.py",
+      "name": "_make_param_grid",
+      "line": 85,
+      "ast_sha256": "21f18ac90338f30d0ab698398ba5e435619cfd38f389bbd62e98f1e96bc65ffe"
+    },
+    {
+      "path": "shared/backtest_engine.py",
+      "name": "_calc_sharpe",
+      "line": 92,
+      "ast_sha256": "e4d289571467533568aad55c4b32048c25b6c45e3a06d3dbf729c98feef355b4"
+    },
+    {
+      "path": "shared/backtest_engine.py",
+      "name": "_calc_sharpe_for_freq",
+      "line": 99,
+      "ast_sha256": "c141e7869f4af26dc7c42f6f5f51fd057e52f4258b913c42d355642c3ea8af32"
+    },
+    {
+      "path": "shared/backtest_engine.py",
+      "name": "run_trades",
+      "line": 115,
+      "ast_sha256": "5015fe9168abacf48974d5e88ea5b8e560c47ed8564ec23a474e92747d107372"
+    },
+    {
+      "path": "shared/backtest_engine.py",
+      "name": "trades_to_equity",
+      "line": 234,
+      "ast_sha256": "81643a1e4a634d95c4e6ea22ca6d982fbe2a537d0676216c4f943b69e64c8bcc"
+    },
+    {
+      "path": "shared/backtest_engine.py",
+      "name": "WalkForwardEngine",
+      "line": 257,
+      "ast_sha256": "e46c9f5d70a6fcbe6bb5e6d087663e1b3b9259048b1c6decc4baac1cb486da09"
+    },
+    {
+      "path": "shared/metrics.py",
+      "name": "calc_metrics",
+      "line": 35,
+      "ast_sha256": "2c3afd12c7daac33bca12fe123210369ad5396d2d6cd6f0fa2ec8d8675dfa5a8"
+    },
+    {
+      "path": "shared/metrics.py",
+      "name": "_empty_metrics",
+      "line": 124,
+      "ast_sha256": "de70705a6876d514701c956b63302e8ae192b0feed89a59117311be9995b2c29"
+    },
+    {
+      "path": "strategy_1_funding_mr/signals.py",
+      "name": "generate_signals",
+      "line": 19,
+      "ast_sha256": "e34eaf9924bb9d2f08252237b4cb3e6bed0e2472a2d441d8d35170342fe17f90"
+    }
+  ],
+  "fixtures": {
+    "funding_rate_sign_changed_pnl": {
+      "positive": -0.0009999800019999023,
+      "negative": -0.0009999800019999023,
+      "entry": "2024-01-01 00:15:00+00:00",
+      "exit": "2024-01-01 08:15:00+00:00",
+      "synthetic_settlement": "2024-01-01T08:00:00Z",
+      "equal": true,
+      "note": "synthetic fixed signals cross08:00 settlement; no funding cashflow used"
+    },
+    "end_truncation": {
+      "requested_bars": 16,
+      "returned_bars": 2,
+      "reason": "hold",
+      "pnl_fraction": 0.19896002399760018
+    },
+    "gap_index_time": {
+      "returned_bars": 1,
+      "elapsed_seconds": 171900.0,
+      "nominal_bar_seconds": 900,
+      "reason": "hold"
+    },
+    "stop_gap": {
+      "open_at_gap": 90.0,
+      "stop_fill": 98.0098,
+      "reason": "sl"
+    },
+    "target_exit_slippage": {
+      "source_exit": 102.01020000000001,
+      "source_target": 102.01020000000001,
+      "corrected_adverse_exit": "101.99999898",
+      "source_net_fraction": 0.019200000000000068,
+      "actual_notionals_fee_and_slip_net": "0.0190900408"
+    },
+    "fee_notionals": {
+      "source_net_fraction": 0.09920000000000001,
+      "actual_notionals_net": "0.09916"
+    },
+    "cost_override": {
+      "default_pnls": [
+        -0.0009999800019999023
+      ],
+      "changed_pnls": [
+        -0.0009999800019999023
+      ],
+      "identical": true
+    },
+    "percent_units": {
+      "source_total_return_pct_label": 0.0992,
+      "economic_noncompounded_percent": 9.920000000000002
+    },
+    "both_touch": {
+      "exit_reason": "sl"
+    },
+    "safe_controls": {
+      "next_open_entry_time": "2024-01-01 00:15:00+00:00",
+      "expected": "2024-01-01 00:15:00+00:00",
+      "funding_mr_past_signals_changed": 0,
+      "past_signal_count": 49,
+      "note": "signals are considered available only after current bar close; publication latency not established"
+    }
+  },
+  "public_raw_parquet_paths": [],
+  "public_csv_paths": [
+    "strategy_1_funding_mr/results/metrics_per_symbol.csv",
+    "strategy_2_taker_momentum/results/metrics_per_symbol.csv",
+    "strategy_3_oi_divergence/results/metrics_per_symbol.csv"
+  ],
+  "public_trade_ledger_paths": [],
+  "public_original_equity_csv_paths": [],
+  "btc_source_summary_arithmetic": [
+    {
+      "family": 1,
+      "path": "strategy_1_funding_mr/results/metrics_per_symbol.csv",
+      "source_row": {
+        "symbol": "BTCUSDT",
+        "total_return_pct": "-0.2269",
+        "annual_return_pct": "-0.0625",
+        "sharpe": "-1.0062",
+        "sortino": "-0.0504",
+        "max_drawdown_pct": "-0.275",
+        "calmar": "-0.2273",
+        "n_trades": "139",
+        "win_rate": "0.4245",
+        "avg_trade_pct": "-0.001633",
+        "avg_win_pct": "0.00623",
+        "avg_loss_pct": "-0.007431",
+        "profit_factor": "0.6183",
+        "n_longs": "60",
+        "n_shorts": "79",
+        "sl_hits": "0",
+        "tp_hits": "0",
+        "avg_hold_bars": "14.1",
+        "oos_windows": "15"
+      },
+      "source_csv_rows": 1,
+      "closed_trades_claimed": 139,
+      "rounded_summary_implied_wins": 59,
+      "rounded_summary_net_fraction": "-0.226910",
+      "rounded_summary_pf": "0.6183050733414076167406809312",
+      "reported_total_raw_fraction": "-0.2269",
+      "unit_consistent_noncompounded_percent": "-22.6900",
+      "actual_trade_ledger_reconciled": false,
+      "actual_frequency_per_day": null
+    },
+    {
+      "family": 2,
+      "path": "strategy_2_taker_momentum/results/metrics_per_symbol.csv",
+      "source_row": {
+        "symbol": "BTCUSDT",
+        "total_return_pct": "-0.4515",
+        "annual_return_pct": "-0.1245",
+        "sharpe": "-3.2547",
+        "sortino": "-0.1667",
+        "max_drawdown_pct": "-0.4515",
+        "calmar": "-0.2758",
+        "n_trades": "318",
+        "win_rate": "0.2704",
+        "avg_trade_pct": "-0.00142",
+        "avg_win_pct": "0.002612",
+        "avg_loss_pct": "-0.002914",
+        "profit_factor": "0.3322",
+        "n_longs": "40",
+        "n_shorts": "278",
+        "sl_hits": "1",
+        "tp_hits": "0",
+        "avg_hold_bars": "15.9",
+        "best_sl_pct": "0.02",
+        "best_tp_pct": "0.035"
+      },
+      "source_csv_rows": 10,
+      "closed_trades_claimed": 318,
+      "rounded_summary_implied_wins": 86,
+      "rounded_summary_net_fraction": "-0.451416",
+      "rounded_summary_pf": "0.3322722646912645255958156817",
+      "reported_total_raw_fraction": "-0.4515",
+      "unit_consistent_noncompounded_percent": "-45.1500",
+      "actual_trade_ledger_reconciled": false,
+      "actual_frequency_per_day": null
+    },
+    {
+      "family": 3,
+      "path": "strategy_3_oi_divergence/results/metrics_per_symbol.csv",
+      "source_row": {
+        "symbol": "BTCUSDT",
+        "total_return_pct": "-0.6623",
+        "annual_return_pct": "-0.1828",
+        "sharpe": "-1.2544",
+        "sortino": "-0.1148",
+        "max_drawdown_pct": "-0.6631",
+        "calmar": "-0.2757",
+        "n_trades": "368",
+        "win_rate": "0.4511",
+        "avg_trade_pct": "-0.0018",
+        "avg_win_pct": "0.009819",
+        "avg_loss_pct": "-0.011348",
+        "profit_factor": "0.7111",
+        "n_longs": "219",
+        "n_shorts": "149",
+        "sl_hits": "0",
+        "tp_hits": "0",
+        "avg_hold_bars": "21.2"
+      },
+      "source_csv_rows": 10,
+      "closed_trades_claimed": 368,
+      "rounded_summary_implied_wins": 166,
+      "rounded_summary_net_fraction": "-0.662342",
+      "rounded_summary_pf": "0.7110573852591462882629468446",
+      "reported_total_raw_fraction": "-0.6623",
+      "unit_consistent_noncompounded_percent": "-66.2300",
+      "actual_trade_ledger_reconciled": false,
+      "actual_frequency_per_day": null
+    }
+  ],
+  "decision": "exclude_this_release_as_replacement_evidence_not_all_funding_or_flow_strategies",
+  "market_profitability_backtest_performed": false,
+  "source_claims_reproduced": false,
+  "measured_source_profit_bias": null,
+  "market_trades_executed": 0,
+  "net_expectancy_95_lower": null,
+  "fullcost_double_profit": null,
+  "drawdown_R": null,
+  "tp1_wilson_lower": null,
+  "urgent_warning_rate": null,
+  "opportunity_days": null,
+  "native_execution_validated": false,
+  "rule_frozen_forward_start": null,
+  "replacement_certified": false,
+  "production_changed": false,
+  "limitations": [
+    "Summary rows are author outputs, not original closed trades.",
+    "Unit correction is conditional on shown source path; no matching data/params/hash establish provenance.",
+    "Positive and negative funding must both be accounted; omission bias is not universally favorable.",
+    "Synthetic probes demonstrate contracts only, not market frequency or profitability.",
+    "No future-data dependence found in this bounded fixed-parameter completed-bar signal control.",
+    "SL/TP diagnostics target shared engine; funding MR default has neither SL nor TP.",
+    "Reported PF is scale invariant, not fixed by percentage-label correction."
+  ]
+}

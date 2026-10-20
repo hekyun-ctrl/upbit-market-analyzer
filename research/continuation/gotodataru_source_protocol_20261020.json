@@ -1,0 +1,16 @@
+{
+  "version": "gotodataru_source_contract_v1",
+  "fixed_utc": "2026-10-20T03:35:24Z",
+  "fixation_note": "Clock recorded after protocol write and a fixture timestamp-format failure, before the first successful full probe. Local fixation only, no pre-result remote preregistration; all author summary outcomes already read.",
+  "source_commit": "5ed0d6e39d8a3e951bea40c66e2638c213012e1b",
+  "source_url": "https://github.com/Gotodataru/binance-futures-backtest/tree/5ed0d6e39d8a3e951bea40c66e2638c213012e1b",
+  "scope": "Public BTC ledger/inputs/parameter availability and fixed synthetic execution probes; not a market profitability test or independent forward evaluation.",
+  "author_summaries_already_seen_before_protocol": true,
+  "rule": "Original funding MR:15m, close<prior EMA and prior funding<-threshold_low and prior buy_ratio>0.45 LONG; mirror funding>threshold_high,close>prior EMA,buy_ratio<0.55 SHORT. Defaults EMA50,high0.0005,low0.0001,hold16. Source walk-forward uses81 configurations with6month train/2month test/2month step; no fitted-window parameters released. Do not pick defaults or reoptimize to claim source reproduction.",
+  "synthetic_probes": ["funding sign ignored at fixed entry signal","tail truncated hold","timestamp gap","stop gap","TP exit adverse slip","fees actual notionals","constructor cost stress ignored","return percent units","SL-first positive control","next-open positive control","fixed-parameter signal prefix positive control"],
+  "safety": "Reviewed AST definitions only. No original package import,data loader,optimizer,full-universe,network,keys,orders or pickle execution.",
+  "dedup": "Previous aggressive-flow gradient-boosting meta/structure shock reclaim use volume imbalance but not this funding-extreme MR rule. No prior-market replay repeated. S2 taker momentum is not promoted as new alpha merely because a second source publishes flow.",
+  "missing_data": "No author raw parquet/closedledger/windowparams; do not synthesize these, censor rather than count unknown data-end or gaps in any future economic backtest.",
+  "cost_model": "Probe original0.0004fee/0.0001slip separately from exact-notional cash arithmetic. Correct source engine ignores funding; all real fullcost/performance/uncertainty/native metrics remain null without ledger. Cost override probe is implementation behavior, not a completed2x-cost strategy test.",
+  "promotion_unchanged": "All docs/lbank_strategy_rebuild_2026-10-20.md criteria; no qualified candidate/forward clock/deployment."
+}

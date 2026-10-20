@@ -1,0 +1,98 @@
+{
+  "recorded_utc": "2026-10-20T03:37:46Z",
+  "check_time_note": "bounded response captured near run start; event timestamps authoritative; no continuous polling claim",
+  "production_commit": "862339db2c4f69facc9ba6626e2826d475504174",
+  "deployment_id": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
+  "status": "SUCCESS",
+  "production_changed": false,
+  "continuous_collection_assumed": false,
+  "new_candidate_seen": false,
+  "source_publication_at": null,
+  "events": [
+    {
+      "timestamp": "2026-10-20T03:25:05.441094944Z",
+      "message": "INFO:lbank_monitor:ENTRY_SETUP_EVALUATED {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"entry_timing\": {\"candidate_evaluated_at\": 1792466705.2863274, \"evaluation_after_first_ready_observation_seconds\": 0.006357431411743164, \"evaluation_after_nominal_close_seconds\": 5.286327362060547, \"first_ready_observed_at\": 1792466705.27997, \"last_closed_1m_start\": 1792466640, \"last_closed_5m_start\": 1792466400, \"nominal_1m_close_at\": 1792466700, \"policy\": \"native_completed_bar_schedule_v1\", \"publication_note\": \"nominal_close_is_not_actual_publication_time\", \"quote_observed_at\": 1792466705.27997, \"source_publication_at\": null, \"trigger\": \"new_completed_bar\"}, \"market\": {\"atr5\": 115.79144103966073, \"breakout_long\": false, \"breakout_short\": false, \"ema_direction\": 1, \"long_pullback_pct\": 0.19495368017825046, \"minimum_stop_pct\": 0.2121714569322297, \"minimum_target_pct\": 0.6733886510315079, \"momentum15_pct\": -0.0990886770441235, \"momentum5_pct\": 0.01576001769032498, \"pullback_min_pct\": 0.15, \"range60_pct\": 0.5582586239963255, \"range_balanced\": false, \"range_required_pct\": 0.6883886510315079, \"range_width_ok\": false, \"range_width_pct\": 0.5582320290818121, \"short_pullback_pct\": 0.2039928859007935}, \"reason\": \"market_no_setup\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:25:45.556264255Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 103, \"closed_5m\": 20, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 115.79144103966073, \"min_range_fraction\": 0.006883179239993543, \"minimum_target_fraction\": 0.006733179239993543, \"stop_floor_fraction\": 0.0021212429614531902}, \"entry_source_switched\": true, \"last5_start\": 1792466400, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 57.19135827331703, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:25:51.557844134Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 20, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:26:11.260968316Z",
+      "message": "INFO:lbank_monitor:ENTRY_SETUP_EVALUATED {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"entry_timing\": {\"candidate_evaluated_at\": 1792466767.9797568, \"evaluation_after_first_ready_observation_seconds\": 0.0201871395111084, \"evaluation_after_nominal_close_seconds\": 7.979756832122803, \"first_ready_observed_at\": 1792466767.9595697, \"last_closed_1m_start\": 1792466700, \"last_closed_5m_start\": 1792466400, \"nominal_1m_close_at\": 1792466760, \"policy\": \"native_completed_bar_schedule_v1\", \"publication_note\": \"nominal_close_is_not_actual_publication_time\", \"quote_observed_at\": 1792466767.9595697, \"source_publication_at\": null, \"trigger\": \"new_completed_bar\"}, \"market\": {\"atr5\": 115.79144103966073, \"breakout_long\": false, \"breakout_short\": false, \"ema_direction\": 1, \"long_pullback_pct\": 0.19495010816311537, \"minimum_stop_pct\": 0.2122017856560673, \"minimum_target_pct\": 0.6734341350186535, \"momentum15_pct\": -0.11968493946210579, \"momentum5_pct\": 0.04289275589013375, \"pullback_min_pct\": 0.15, \"range60_pct\": 0.5583384239462431, \"range_balanced\": false, \"range_required_pct\": 0.6884341350186535, \"range_width_ok\": false, \"range_width_pct\": 0.558221800943236, \"short_pullback_pct\": 0.203989148265909}, \"reason\": \"market_no_setup\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:26:48.534499412Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 104, \"closed_5m\": 20, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 115.79144103966073, \"min_range_fraction\": 0.00688465242666844, \"minimum_target_fraction\": 0.00673465242666844, \"stop_floor_fraction\": 0.002122225282367135}, \"entry_source_switched\": true, \"last5_start\": 1792466400, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 57.19135827331703, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:26:51.619348793Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 20, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:27:11.670479322Z",
+      "message": "INFO:lbank_monitor:ENTRY_SETUP_EVALUATED {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"entry_timing\": {\"candidate_evaluated_at\": 1792466831.2499635, \"evaluation_after_first_ready_observation_seconds\": 0.005975008010864258, \"evaluation_after_nominal_close_seconds\": 11.249963521957397, \"first_ready_observed_at\": 1792466831.2439885, \"last_closed_1m_start\": 1792466760, \"last_closed_5m_start\": 1792466400, \"nominal_1m_close_at\": 1792466820, \"policy\": \"native_completed_bar_schedule_v1\", \"publication_note\": \"nominal_close_is_not_actual_publication_time\", \"quote_observed_at\": 1792466831.2439885, \"source_publication_at\": null, \"trigger\": \"new_completed_bar\"}, \"market\": {\"atr5\": 115.79144103966073, \"breakout_long\": false, \"breakout_short\": false, \"ema_direction\": 1, \"long_pullback_pct\": 0.1950492205974981, \"minimum_stop_pct\": 0.2122998300491749, \"minimum_target_pct\": 0.6735811721949942, \"momentum15_pct\": -0.14278304908930117, \"momentum5_pct\": -0.037138434737138404, \"pullback_min_pct\": 0.15, \"range60_pct\": 0.5585963951586683, \"range_balanced\": false, \"range_required_pct\": 0.6885811721949942, \"range_width_ok\": false, \"range_width_pct\": 0.5585056003324147, \"short_pullback_pct\": 0.20409285613897868}, \"reason\": \"market_no_setup\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:27:52.226913183Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 105, \"closed_5m\": 20, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 115.79144103966073, \"min_range_fraction\": 0.006885025798731877, \"minimum_target_fraction\": 0.006735025798731877, \"stop_floor_fraction\": 0.0021224742468691016}, \"entry_source_switched\": true, \"last5_start\": 1792466400, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 57.19135827331703, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:27:52.227917561Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 20, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:28:23.050560592Z",
+      "message": "INFO:lbank_monitor:ENTRY_SETUP_EVALUATED {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"entry_timing\": {\"candidate_evaluated_at\": 1792466894.0087767, \"evaluation_after_first_ready_observation_seconds\": 0.005682706832885742, \"evaluation_after_nominal_close_seconds\": 14.008776664733887, \"first_ready_observed_at\": 1792466894.003094, \"last_closed_1m_start\": 1792466820, \"last_closed_5m_start\": 1792466400, \"nominal_1m_close_at\": 1792466880, \"policy\": \"native_completed_bar_schedule_v1\", \"publication_note\": \"nominal_close_is_not_actual_publication_time\", \"quote_observed_at\": 1792466894.003094, \"source_publication_at\": null, \"trigger\": \"new_completed_bar\"}, \"market\": {\"atr5\": 115.79144103966073, \"breakout_long\": false, \"breakout_short\": false, \"ema_direction\": 1, \"long_pullback_pct\": 0.19733915942071484, \"minimum_stop_pct\": 0.2122017856560673, \"minimum_target_pct\": 0.6734341350186535, \"momentum15_pct\": -0.17783827694469734, \"momentum5_pct\": -0.0681363606391705, \"pullback_min_pct\": 0.15, \"range60_pct\": 0.5583384239462431, \"range_balanced\": false, \"range_required_pct\": 0.6884341350186535, \"range_width_ok\": false, \"range_width_pct\": 0.5584148350171312, \"short_pullback_pct\": 0.20405968806971753}, \"reason\": \"market_no_setup\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:28:53.290558083Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 106, \"closed_5m\": 20, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 115.79144103966073, \"min_range_fraction\": 0.006884096420252705, \"minimum_target_fraction\": 0.006734096420252705, \"stop_floor_fraction\": 0.0021218545372743585}, \"entry_source_switched\": true, \"last5_start\": 1792466400, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 57.19135827331703, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:28:53.291439951Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 20, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:29:23.293433597Z",
+      "message": "INFO:lbank_monitor:ENTRY_SETUP_EVALUATED {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"entry_timing\": {\"candidate_evaluated_at\": 1792466956.806908, \"evaluation_after_first_ready_observation_seconds\": 0.004945278167724609, \"evaluation_after_nominal_close_seconds\": 16.806907892227173, \"first_ready_observed_at\": 1792466956.8019626, \"last_closed_1m_start\": 1792466880, \"last_closed_5m_start\": 1792466400, \"nominal_1m_close_at\": 1792466940, \"policy\": \"native_completed_bar_schedule_v1\", \"publication_note\": \"nominal_close_is_not_actual_publication_time\", \"quote_observed_at\": 1792466956.8019626, \"source_publication_at\": null, \"trigger\": \"new_completed_bar\"}, \"market\": {\"atr5\": 115.79144103966073, \"breakout_long\": false, \"breakout_short\": false, \"ema_direction\": 1, \"long_pullback_pct\": 0.21366712152881842, \"minimum_stop_pct\": 0.21218571294476296, \"minimum_target_pct\": 0.673410030773542, \"momentum15_pct\": -0.09532015856587028, \"momentum5_pct\": -0.0629975863133958, \"pullback_min_pct\": 0.15, \"range60_pct\": 0.5582961339519793, \"range_balanced\": false, \"range_required_pct\": 0.688410030773542, \"range_width_ok\": false, \"range_width_pct\": 0.5582954519077945, \"short_pullback_pct\": 0.2040160622945332}, \"reason\": \"market_no_setup\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:29:53.540407678Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 107, \"closed_5m\": 20, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 115.79144103966073, \"min_range_fraction\": 0.006884726316270087, \"minimum_target_fraction\": 0.006734726316270087, \"stop_floor_fraction\": 0.0021222745519554726}, \"entry_source_switched\": true, \"last5_start\": 1792466400, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 57.19135827331703, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:29:53.546983221Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 20, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:30:04.127972185Z",
+      "message": "INFO:lbank_monitor:ENTRY_SETUP_EVALUATED {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"entry_timing\": {\"candidate_evaluated_at\": 1792467003.8266153, \"evaluation_after_first_ready_observation_seconds\": 0.005742311477661133, \"evaluation_after_nominal_close_seconds\": 3.826615333557129, \"first_ready_observed_at\": 1792467003.820873, \"last_closed_1m_start\": 1792466940, \"last_closed_5m_start\": 1792466700, \"nominal_1m_close_at\": 1792467000, \"policy\": \"native_completed_bar_schedule_v1\", \"publication_note\": \"nominal_close_is_not_actual_publication_time\", \"quote_observed_at\": 1792467003.820873, \"source_publication_at\": null, \"trigger\": \"new_completed_bar\"}, \"market\": {\"atr5\": 112.37062382254169, \"breakout_long\": false, \"breakout_short\": false, \"ema_direction\": 1, \"long_pullback_pct\": 0.2136989715813286, \"minimum_stop_pct\": 0.20594731909385458, \"minimum_target_pct\": 0.6640543115153045, \"momentum15_pct\": -0.0359090548223695, \"momentum5_pct\": -0.026262557166867317, \"pullback_min_pct\": 0.15, \"range60_pct\": 0.5583779913543049, \"range_balanced\": false, \"range_required_pct\": 0.6790543115153045, \"range_width_ok\": false, \"range_width_pct\": 0.558378673600174, \"short_pullback_pct\": 0.20404647372260187}, \"reason\": \"market_no_setup\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:30:54.070952771Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 108, \"closed_5m\": 21, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 112.37062382254169, \"min_range_fraction\": 0.0067912640688227435, \"minimum_target_fraction\": 0.0066412640688227435, \"stop_floor_fraction\": 0.0020599539228648976}, \"entry_source_switched\": true, \"last5_start\": 1792466700, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 55.67716519444773, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:30:54.071369041Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 21, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:31:13.839650255Z",
+      "message": "INFO:lbank_monitor:ENTRY_SETUP_EVALUATED {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"entry_timing\": {\"candidate_evaluated_at\": 1792467066.6134925, \"evaluation_after_first_ready_observation_seconds\": 0.005862236022949219, \"evaluation_after_nominal_close_seconds\": 6.613492488861084, \"first_ready_observed_at\": 1792467066.6076303, \"last_closed_1m_start\": 1792467000, \"last_closed_5m_start\": 1792466700, \"nominal_1m_close_at\": 1792467060, \"policy\": \"native_completed_bar_schedule_v1\", \"publication_note\": \"nominal_close_is_not_actual_publication_time\", \"quote_observed_at\": 1792467066.6076303, \"source_publication_at\": null, \"trigger\": \"new_completed_bar\"}, \"market\": {\"atr5\": 112.37062382254169, \"breakout_long\": false, \"breakout_short\": false, \"ema_direction\": 1, \"long_pullback_pct\": 0.2137488542621377, \"minimum_stop_pct\": 0.20599564403765663, \"minimum_target_pct\": 0.6641267844335453, \"momentum15_pct\": -0.07473786791912795, \"momentum5_pct\": -0.05142480923351345, \"pullback_min_pct\": 0.15, \"range60_pct\": 0.5585090131377941, \"range_balanced\": false, \"range_required_pct\": 0.6791267844335453, \"range_width_ok\": false, \"range_width_pct\": 0.5585090131377941, \"short_pullback_pct\": 0.16987473266116712}, \"reason\": \"market_no_setup\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:31:58.223247225Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 21, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:31:58.223250499Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 109, \"closed_5m\": 21, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 112.37062382254169, \"min_range_fraction\": 0.006790120513470093, \"minimum_target_fraction\": 0.006640120513470093, \"stop_floor_fraction\": 0.002059191400125252}, \"entry_source_switched\": true, \"last5_start\": 1792466700, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 55.67716519444773, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    }
+  ],
+  "note": "Previously reported readiness unchanged; no repeat readiness notification, no native fullfill gate."
+}

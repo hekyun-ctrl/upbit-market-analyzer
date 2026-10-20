@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "recorded_utc": "2026-10-20T03:39:35Z",
+  "scope": "Primary source preflights,not additional market backtests; only Gotodataru audit executed separately.",
+  "sources": [
+    {
+      "repository": "pgup-ai/strategy-lab",
+      "commit": "debf9ed3f81effadaa9a9d2f68062d3d9a6b7149",
+      "url": "https://github.com/pgup-ai/strategy-lab/tree/debf9ed3f81effadaa9a9d2f68062d3d9a6b7149",
+      "readme_git_blob_sha": "bb5de4c821088faf7f44380bd0daf742179114e8",
+      "strategies_git_blob_sha": "d2fca05e71459c41a6317d4a889a0bff87045ea7",
+      "scope_read": "Actual224file Git tree,STRATEGIES sections lines1-240 and245-685,README web funding/results sections only,tests/test_state_machine_gate first105lines,scripts/r9/step0_control complete. No source execution/DB/results restored.",
+      "positive_claim": "R5BTC4h +15.45%73trades in6048bars,2xexecution +10.93%,3x+6.41%; author claims retained,not reproduced. Selected54configurations and denominator/warmup changes explicitly disclosed.",
+      "decision": "not_priority_for_fixed_manual_alert_policy_low_frequency_missing_publicledger",
+      "basis": "73/(6048*4/24)=0.07242 claimedtrades/day,even all unique trade days<=7.25%days;not actual ledger-derived rate. Git reports/data onlygitkeep;no CSV/parquet/jsonl/xlsx. No SL/TP1 in canonicalmachine,source stress does not scalefunding. Do not reinterpret author gate as ourgate or invent exits. Laterenergy variants negative do not erase originalBTCpositive."
+    },
+    {
+      "repository": "maxs231/lsob-backtest",
+      "commit": "710eef5926f9f37f43581b8609c56c8e08f49403",
+      "url": "https://github.com/maxs231/lsob-backtest/tree/710eef5926f9f37f43581b8609c56c8e08f49403",
+      "readme_git_blob_sha": "76956b49095edb552847a1dfbd2519579554c7ab",
+      "scope_read": "README1-590 throughData;remainingfile glossary not read. CompleteGit tree17files,no CSV/marketrawledger. No strategycode execution.",
+      "positive_claim": "Author196trades/~730days,PF1.35,+0.269R;secondyear88tradesPF1.31positive. Fee/slipsensitivity disclosed.",
+      "decision": "not_priority_for_fixed_gate_frequency_TP1_and_native_scope",
+      "basis": "Author196/730=.2685/day,win46.4% not WilsonTP1>50;do not infer exactTP1first fromprofitwins. SpotBinanceproxyforHyperliquidperps,2%risk/10xcap/avg6.4xnotional,stops0.14-2.95%;not approveduserpolicy. Actualledger/rawmissing. Do not implement leverage/risk expansion or run192sweep;not universal orderblock rejection."
+    },
+    {
+      "repository": "GT-2005/btc-regime-gate",
+      "commit": "92e63c737878cf00b1af21ae8feaa1a5ee7c6920",
+      "url": "https://github.com/GT-2005/btc-regime-gate/tree/92e63c737878cf00b1af21ae8feaa1a5ee7c6920",
+      "readme_git_blob_sha": "42c33a776d01d3f82dd155812dd2e2eeb8a93c58",
+      "scope_read": "Full240lineREADME and actual25file tree;no sourcemodel/PDF execution.",
+      "decision": "not_profit_evidence_design_targets_and_synthetic_only",
+      "basis": "Author explicitly says real-results table empty,only syntheticendtoend tested. Design targets+20%,58-65%wins/PF>1.5 not measurements;data/outputgitkeep. No sourceclaim accepted as profitable.No modeltraining fromscratch."
+    },
+    {
+      "url": "https://simplemarkets.io/strategies/research-log/opening-range-breakout-costs",
+      "scope_read": "Primaryresearchlog fee correction and reproduction sections web",
+      "decision": "not_costed_positive_evidence",
+      "basis": "AuthorgrossBTC/ETHopeningrange positive but reportsretailcosts exceededge;funding lefton. Notnewmarketbacktest or netpositive candidate."
+    }
+  ],
+  "duplicates": [
+    {
+      "url": "https://arxiv.org/html/2606.00060v1",
+      "previous": "source_screening_20261020_0505.json and1132.json",
+      "action": "Reopened during search beforecataloguededup caught it. No new outcome calculation/modeltraining or adoption;do not revisit unchanged."
+    }
+  ],
+  "search_engine_note": "Broad engine1queriesreturned irrelevantintradayitems;not evidence of noavailable profitable strategy. Engine2foundnewprimarylinks;verifydirectsources.",
+  "next_sources": [
+    {
+      "repository": "bhanu-pratap-rana/Trading-strategy-backtest",
+      "commit": "15391f936e8fa24985392dac7770405f81c5300e",
+      "url": "https://github.com/bhanu-pratap-rana/Trading-strategy-backtest/tree/15391f936e8fa24985392dac7770405f81c5300e",
+      "status": "unread_primary_code_and_data_lead_only_NOT_qualified",
+      "discovery": "Search index mentions45trade/30day15m example output; not established as measured run,not a positive evidence claim. HEAD resolved anonymously,README/code/data not yet read.",
+      "read_first": [
+        "README.md",
+        "Git tree data/results artifacts",
+        "src/main_backtest.py and exact called strategy/execution modules located from actual tree"
+      ],
+      "instruction": "First determine if claimed output is illustrative or actual BTC closedledger with rawinputs/params/costs. Do not count example output as performance. If no actual ledger,only continue if exact source rules and public rawdata permit bounded fixed replication without inventing features;freeze before outcomes. No paper/live main scripts,keys/orders/LLM or optimizer."
+    },
+    {
+      "repository": "pymammadov/bottradepm",
+      "commit": "dcd1ac3e2a32204c2943bff000644b6f95486aa5",
+      "url": "https://github.com/pymammadov/bottradepm/tree/dcd1ac3e2a32204c2943bff000644b6f95486aa5",
+      "status": "secondary_unread_availability_lead_NOT_qualified",
+      "discovery": "Index advertises outputs/trades.csv and stress/OOS commands,not retrieved actual artifacts. HEAD only resolved; no adoption."
+    }
+  ],
+  "qualified_candidates": [],
+  "forward_started": false,
+  "production_changed": false
+}
