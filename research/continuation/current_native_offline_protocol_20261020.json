@@ -1,0 +1,38 @@
+{
+  "version": "current_native_rule_offline_first_event_v1",
+  "status": "frozen_before_this_comparison_outcomes",
+  "source_commit": "862339db2c4f69facc9ba6626e2826d475504174",
+  "source_tree": "cbf343b437ba1379dc2304f706db30b0f8746814",
+  "source_rules": "existing production classify/confirm_watch/alert_gate and attach_thesis/SignalRiskTracker, unchanged numeric parameters",
+  "data": "Binance USD-M BTCUSDT perpetual official archive already used in earlier research; transfer/development only, NOT LBank or untouched OOS",
+  "start_utc": "2024-01-08T00:00:00Z",
+  "end_exclusive_utc": "2024-01-15T00:00:00Z",
+  "choice": "First complete Monday-Sunday UTC week after 7 warmup days of first retained2024 month, fixed without this run's signal/outcome inspection.",
+  "variants": [
+    "baseline_current_rules",
+    "existing_higher_direction_required_for_trend_retest_only"
+  ],
+  "change_contract": "One exploratory modification uses only existing higher_direction_intact boolean for trend_retest at proposal and confirmation, no numerical tuning/new indicators/new waiting. Other candidate families and risk gates unchanged. This is NOT an original published strategy or validated live fix.",
+  "clock": "Only completed1m/5m bars at each minute boundary. Current quote is next minute open, not its future close. Watch confirmation first checked at next available1m event (60s), so actual30s/15s cadence is not reconstructed; same assumption both variants. Exact closed5m window max250 and minute360; complete aligned15m from known5m closes.",
+  "outcome": "Diagnostic first-event contract: exit full at first TP1 or initial stop; original confirmed urgent warning exits at current minute-open quote. Same-minute TP1/stop ambiguity resolved stop first. Not existing partial-profit/runner full-account performance. risk_caution counted but is not exit.",
+  "costs": "Frozen entry/exit events: adverse entry/exit slippage2bp each and taker fees6bp each, actual Binance funding debits/credits using1m open mark proxy at settlement. Double-cost keeps events fixed, doubles fees/slippage/funding debits and does not amplify funding receipts. NormalizeR by baseline theoretical initial stop cost including source funding reserve, no risk/leverage increase.",
+  "ending": "Open end/gap outcomes censored, no artificial profitable liquidation. Overlapping original signals kept and overlap reported; realized closed-trade R drawdown is not account MTM drawdown.",
+  "metrics": [
+    "signals/closed/censored by strategy",
+    "TP1-before-stop-or-urgent and Wilson95lower",
+    "gross and net R, PF, closed-R drawdown",
+    "first5m adverse movement and confirmed urgent within5m",
+    "signals/day/opportunity days",
+    "double-cost outcome",
+    "day-block conditional uncertainty,7days small and no selection correction"
+  ],
+  "promotion": false,
+  "parameter_search": false,
+  "remaining_limits": [
+    "Already observed historical data",
+    "Different venue",
+    "Minute event/fill model",
+    "No native orderbook/manual-fill verification",
+    "Seven-day sample cannot meet existing30forwardday/100closed gate"
+  ]
+}
