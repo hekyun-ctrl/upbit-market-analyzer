@@ -1,0 +1,59 @@
+{
+  "source_commit": "5c977a7f51cea67048f95791d1dcc4230634939a",
+  "source_hashes_verified": {
+    "lbank_futures_monitor.py": {
+      "blob": "0ce552ec07cecd72bd3fee4a3caaccc8b4abf778",
+      "sha256": "4f8928f2bd7b4e52d2358594b5dad592be444218d92862825b46e1d52eab0d5e"
+    },
+    "lbank_performance.py": {
+      "blob": "f39362b456489fe43e33a46dc0028db6d32f3de3",
+      "sha256": "39ce555def76ece101c28bb31ea22d70091b0fbf5febb65fc4de95ac86ace04c"
+    },
+    "lbank_signal_risk.py": {
+      "blob": "059e0b28740da81e08eebcc1fd58b4731b58a8f6",
+      "sha256": "363232c6b40cba6c34443641f11b9b0fc129f09164b0a3199c46ff1d3c0da821"
+    },
+    "lbank_profit_protection.py": {
+      "blob": "46fc0a9bf31ea6130415d38ee06ce5c005907cc1",
+      "sha256": "4eb1bb18e7baa4e58eb65d5c5d5c7a2a81612d479ebedbf926db2fe5137e455d"
+    },
+    "lbank_signal_thesis.py": {
+      "blob": "19505b40f5571ac7b4a538b77c97dca66e728794",
+      "sha256": "161400bdd4bc4fbd00be62deaed37c6abaa2577e1d0e1653d0c1859067352cde"
+    },
+    "lbank_trend_runner.py": {
+      "blob": "54efdb8a24d3e9493580f9aed43fef97fe02f1d4",
+      "sha256": "82b9836f12b91db07d53933cfb19f91d4982395ee3dff76d5d30965e0f0a6c5a"
+    }
+  },
+  "deployment": "23799b11-6f14-4e93-aacf-78ce691f9393",
+  "status": "SUCCESS",
+  "paper_window": [
+    "2026-10-20T11:00:00Z",
+    "2026-10-20T11:28:30Z"
+  ],
+  "study_rows": 54,
+  "study_decision_and_outcome_rows": 0,
+  "progress_messages_not_trades": [
+    {
+      "at": "2026-10-20T11:00:04.596143795Z",
+      "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=progress orders=false live_gate=false"
+    },
+    {
+      "at": "2026-10-20T11:15:05.486944849Z",
+      "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=progress orders=false live_gate=false"
+    }
+  ],
+  "native_last": [
+    {
+      "at": "2026-10-20T11:28:27.157275478Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 116, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 86.63261471393629, \"min_range_fraction\": 0.00609333509928813, \"minimum_target_fraction\": 0.00594333509928813, \"stop_floor_fraction\": 0.0015945748673639472}, \"entry_source_switched\": true, \"last5_start\": 1792495200, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 48.98518752404027, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    }
+  ],
+  "fixture_revision": {
+    "first_golden_run_stopped_before_market": true,
+    "cause": "Runner synthetic fixture omitted290seconds observations; existing source correctly censored gap. Added explicit intermediate minute quotes to no-gap runner fixture, kept dedicated gap cases; no source strategy changes.",
+    "original_code_commit": "8fc912698320c1b4e683165e7283b03b483aca2c",
+    "corrected_before_market_commit": "d78443f91e2455dc90a2d15aa06c50facad8cd8e"
+  }
+}
