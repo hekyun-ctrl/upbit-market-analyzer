@@ -1,0 +1,200 @@
+{
+  "descriptive_after_outcomes": true,
+  "selection_bias_corrected": false,
+  "new_strategy_rule": false,
+  "rows": [
+    {
+      "start": "2024-01-15T00:00:00Z",
+      "end": "2024-02-01T00:00:00Z",
+      "variant": "baseline",
+      "groups": {
+        "trend_retest long": {
+          "closed": 25,
+          "TP1": 7,
+          "gross_R": 1.189452091619883,
+          "net_R": -7.377344264167429,
+          "reasons": {
+            "target1": 7,
+            "initial_stop": 12,
+            "early_invalidation": 6
+          }
+        },
+        "trend_retest short": {
+          "closed": 22,
+          "TP1": 5,
+          "gross_R": -2.0178763555864516,
+          "net_R": -9.074088774893008,
+          "reasons": {
+            "initial_stop": 11,
+            "early_invalidation": 6,
+            "target1": 5
+          }
+        },
+        "breakout short": {
+          "closed": 9,
+          "TP1": 2,
+          "gross_R": -1.072156771170527,
+          "net_R": -3.7866690003094896,
+          "reasons": {
+            "target1": 2,
+            "initial_stop": 6,
+            "early_invalidation": 1
+          }
+        },
+        "breakout long": {
+          "closed": 3,
+          "TP1": 1,
+          "gross_R": 0.4554490214170598,
+          "net_R": -0.6332688765776231,
+          "reasons": {
+            "initial_stop": 2,
+            "target1": 1
+          }
+        }
+      }
+    },
+    {
+      "start": "2024-01-15T00:00:00Z",
+      "end": "2024-02-01T00:00:00Z",
+      "variant": "higher_retest",
+      "groups": {
+        "trend_retest long": {
+          "closed": 24,
+          "TP1": 7,
+          "gross_R": 1.9606013854882667,
+          "net_R": -6.362026845836075,
+          "reasons": {
+            "target1": 7,
+            "initial_stop": 11,
+            "early_invalidation": 6
+          }
+        },
+        "trend_retest short": {
+          "closed": 21,
+          "TP1": 5,
+          "gross_R": -1.3501793275966505,
+          "net_R": -8.023125783607421,
+          "reasons": {
+            "initial_stop": 10,
+            "early_invalidation": 6,
+            "target1": 5
+          }
+        },
+        "breakout short": {
+          "closed": 9,
+          "TP1": 2,
+          "gross_R": -1.072156771170527,
+          "net_R": -3.7866690003094896,
+          "reasons": {
+            "target1": 2,
+            "initial_stop": 6,
+            "early_invalidation": 1
+          }
+        },
+        "breakout long": {
+          "closed": 3,
+          "TP1": 1,
+          "gross_R": 0.4554490214170598,
+          "net_R": -0.6332688765776231,
+          "reasons": {
+            "initial_stop": 2,
+            "target1": 1
+          }
+        }
+      }
+    },
+    {
+      "start": "2025-01-08T00:00:00Z",
+      "end": "2025-01-15T00:00:00Z",
+      "variant": "baseline",
+      "groups": {
+        "breakout short": {
+          "closed": 4,
+          "TP1": 0,
+          "gross_R": -2.674955356671948,
+          "net_R": -4.088080745061614,
+          "reasons": {
+            "initial_stop": 4
+          }
+        },
+        "trend_retest short": {
+          "closed": 13,
+          "TP1": 7,
+          "gross_R": 8.2861410202091,
+          "net_R": 4.478129916108035,
+          "reasons": {
+            "target1": 7,
+            "early_invalidation": 2,
+            "initial_stop": 4
+          }
+        },
+        "breakout long": {
+          "closed": 2,
+          "TP1": 0,
+          "gross_R": -1.0094539677660803,
+          "net_R": -1.7612630008543937,
+          "reasons": {
+            "initial_stop": 1,
+            "early_invalidation": 1
+          }
+        },
+        "trend_retest long": {
+          "closed": 3,
+          "TP1": 1,
+          "gross_R": 0.5152600674512584,
+          "net_R": -0.3868165003447359,
+          "reasons": {
+            "early_invalidation": 2,
+            "target1": 1
+          }
+        }
+      }
+    },
+    {
+      "start": "2025-01-08T00:00:00Z",
+      "end": "2025-01-15T00:00:00Z",
+      "variant": "higher_retest",
+      "groups": {
+        "breakout short": {
+          "closed": 5,
+          "TP1": 0,
+          "gross_R": -3.3800950308835733,
+          "net_R": -5.107675375762937,
+          "reasons": {
+            "initial_stop": 5
+          }
+        },
+        "trend_retest short": {
+          "closed": 12,
+          "TP1": 6,
+          "gross_R": 6.586367114343587,
+          "net_R": 3.027038533944957,
+          "reasons": {
+            "target1": 6,
+            "early_invalidation": 2,
+            "initial_stop": 4
+          }
+        },
+        "breakout long": {
+          "closed": 2,
+          "TP1": 0,
+          "gross_R": -1.0094539677660803,
+          "net_R": -1.7612630008543937,
+          "reasons": {
+            "initial_stop": 1,
+            "early_invalidation": 1
+          }
+        },
+        "trend_retest long": {
+          "closed": 2,
+          "TP1": 0,
+          "gross_R": -1.277579872613837,
+          "net_R": -1.819127939166552,
+          "reasons": {
+            "early_invalidation": 2
+          }
+        }
+      }
+    }
+  ]
+}
