@@ -1,0 +1,38 @@
+{
+  "recorded_utc": "2026-10-20T05:56:10Z",
+  "completed": "docs/lbank_daynight_cost_audit_2026-10-20.md",
+  "next_finite_source": {
+    "repository": "Silentbilly/trend-pullback",
+    "commit": "22271525f93d04188c2791d48e1029a6101d39c3",
+    "url": "https://github.com/Silentbilly/trend-pullback/tree/22271525f93d04188c2791d48e1029a6101d39c3",
+    "readme_git_blob_sha": "c399f8d93842e5d94dc0920c91d0db148cfe1b6b",
+    "signal_git_blob_sha": "8de3e2cfc4f5118fc5ebab631a90c018b7a3530c",
+    "risk_git_blob_sha": "8f0b52b3559aafdfd5cd7f14d82e015836d0fa94",
+    "strategy_git_blob_sha": "b1c1a79dd125c6b377296aee491a474af77c084f",
+    "status": "new_original_source_lead_not_profitqualified_no_publicledger_found",
+    "read_scope": "PrimaryREADMEandfull36fileGittree;data/rawandprocessedonlygitkeep,noactualoutput/trades.csv in tree. No purekernel orpricebacktestexecuted.",
+    "read_first": [
+      "src/trend_pullback/signal_engine.py",
+      "src/trend_pullback/risk.py",
+      "src/trend_pullback/strategy.py",
+      "src/trend_pullback/datafeed.py",
+      "src/trend_pullback/reporting.py",
+      "configs/sample_backtest.yaml",
+      "src/trend_pullback/config.py",
+      "scripts/run_backtest.py"
+    ],
+    "instruction": "Finite nextstep: staticreadandreviewpurefunctions forcausalbarclose->nextopen entry,riskanchoringandSLTPactivation,samebar/gap/costnotional/size/funding andsampleoriginalsettings. No live/broker/notifier/credentialconfigs/.env reads/execution,install scripts,parameter sweep orwalkforwardoptimizer. If exactdefaultsingleconfig has compatible manualboundedriskcontract,freezeoriginalrules+onefinitealreadyobservedBTCperiod before returns,thenexecuteactualprice/fullcostsinglemodelandretainclosed/unknownledgers;not untouchedforward. If unfaithfulorincompatible,recordpreciseobstacleandmove tonewPRIMARY BTCledger/data source,not endlesssyntheticprobes. Do not inventnewexitsorrepair-to-pass. No profitclaimedfromREADME emptydata/outputnames."
+  },
+  "other_source": [
+    {
+      "repository": "mantasbil/Thesis-Algo-Trading",
+      "commit": "90c85f694db3b04ac34d1e15420c4e5d3f5a4802",
+      "readme_git_blob_sha": "e80e1474de3b22d9f1c5811deeb20ce66d53840f",
+      "status": "excluded_for_BTC_evidence_asset_XAUUSD_Gold",
+      "basis": "FullREADMEand90filetree showgold15mLSTM study;noBTC dataledger. Do not loadpt/pkl or runMT5/training/transfergoldgains."
+    }
+  ],
+  "originals_only_no_new_price_backtests": true,
+  "forward_started": false,
+  "production_changed": false
+}

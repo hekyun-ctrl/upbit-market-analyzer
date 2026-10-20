@@ -34,7 +34,8 @@
     "rlxbt_pinbar_transfer_v1_fixed_rules_actual2024_2026_two_latency_fullcost",
     "cshear_72f293_source_contract_v1_8pure_definitions_185real_query_prefix_checks",
     "gotodataru_5ed0d6e_original_BTC_summary_and_execution_contract_v1_51files14definitions11tests75checks",
-    "public_ledger_source2_bottradepm_contract_v1_21definitions_10tests_125checks_131040realminute_prefix"
+    "public_ledger_source2_bottradepm_contract_v1_21definitions_10tests_125checks_131040realminute_prefix",
+    "daynight_5693993_original_BTC_all900costrows_525overlap_300conditionalcells_3307Decimalchecks_v1"
   ],
   "read_before_work": [
     "docs/lbank_strategy_rebuild_2026-10-20.md",
@@ -49,12 +50,35 @@
     "docs/lbank_gotodataru_source_audit_2026-10-20.md",
     "research/continuation/source_screening_20261020_1240.json",
     "docs/lbank_public_ledger_sources_audit_2026-10-20.md",
-    "research/continuation/source_screening_20261020_1423.json"
+    "research/continuation/source_screening_20261020_1423.json",
+    "docs/lbank_daynight_cost_audit_2026-10-20.md"
   ],
   "next_work": {
-    "stage": "published_session_paper_original_cost_and_rawprovenance_contract",
-    "instruction": "Completedbhanu25filepreflight andbottradepm39file21definition10test125check131040realminute audit;no repeat/repair/optimizer. Readsavednewdoc/reportthen nextpinnedpublisheddaynightpaperoriginalfunctions+ALLBTCcosttable/provenancefiniteaudit. RawKrakenmissing;verifyofficialsource/units/no-tradehoursandavailability,do notrelabelanotherexchange. First reconcile sessionpositions/costs/tradecount/multipleselection withoriginaltables;no artificialnewTP1, no costlowering to pass. Check fullfixedgate/riskmanualcompatibilitybeforehistoricalreplication. If unavailable/incompatible recordpreciseobstacleandcontinueotherprimarysource. No candidate/forwardclock;allpromotioncriteria unchanged.",
+    "stage": "pinned_manual_entry_risk_contract_then_single_configuration_replication",
+    "instruction": "Finite nextstep: staticreadandreviewpurefunctions forcausalbarclose->nextopen entry,riskanchoringandSLTPactivation,samebar/gap/costnotional/size/funding andsampleoriginalsettings. No live/broker/notifier/credentialconfigs/.env reads/execution,install scripts,parameter sweep orwalkforwardoptimizer. If exactdefaultsingleconfig has compatible manualboundedriskcontract,freezeoriginalrules+onefinitealreadyobservedBTCperiod before returns,thenexecuteactualprice/fullcostsinglemodelandretainclosed/unknownledgers;not untouchedforward. If unfaithfulorincompatible,recordpreciseobstacleandmove tonewPRIMARY BTCledger/data source,not endlesssyntheticprobes. Do not inventnewexitsorrepair-to-pass. No profitclaimedfromREADME emptydata/outputnames.",
     "sources_to_screen": [
+      {
+        "repository": "Silentbilly/trend-pullback",
+        "commit": "22271525f93d04188c2791d48e1029a6101d39c3",
+        "url": "https://github.com/Silentbilly/trend-pullback/tree/22271525f93d04188c2791d48e1029a6101d39c3",
+        "readme_git_blob_sha": "c399f8d93842e5d94dc0920c91d0db148cfe1b6b",
+        "signal_git_blob_sha": "8de3e2cfc4f5118fc5ebab631a90c018b7a3530c",
+        "risk_git_blob_sha": "8f0b52b3559aafdfd5cd7f14d82e015836d0fa94",
+        "strategy_git_blob_sha": "b1c1a79dd125c6b377296aee491a474af77c084f",
+        "status": "new_original_source_lead_not_profitqualified_no_publicledger_found",
+        "read_scope": "PrimaryREADMEandfull36fileGittree;data/rawandprocessedonlygitkeep,noactualoutput/trades.csv in tree. No purekernel orpricebacktestexecuted.",
+        "read_first": [
+          "src/trend_pullback/signal_engine.py",
+          "src/trend_pullback/risk.py",
+          "src/trend_pullback/strategy.py",
+          "src/trend_pullback/datafeed.py",
+          "src/trend_pullback/reporting.py",
+          "configs/sample_backtest.yaml",
+          "src/trend_pullback/config.py",
+          "scripts/run_backtest.py"
+        ],
+        "instruction": "Finite nextstep: staticreadandreviewpurefunctions forcausalbarclose->nextopen entry,riskanchoringandSLTPactivation,samebar/gap/costnotional/size/funding andsampleoriginalsettings. No live/broker/notifier/credentialconfigs/.env reads/execution,install scripts,parameter sweep orwalkforwardoptimizer. If exactdefaultsingleconfig has compatible manualboundedriskcontract,freezeoriginalrules+onefinitealreadyobservedBTCperiod before returns,thenexecuteactualprice/fullcostsinglemodelandretainclosed/unknownledgers;not untouchedforward. If unfaithfulorincompatible,recordpreciseobstacleandmove tonewPRIMARY BTCledger/data source,not endlesssyntheticprobes. Do not inventnewexitsorrepair-to-pass. No profitclaimedfromREADME emptydata/outputnames."
+      },
       {
         "repository": "wzf01195010-png/Crypto-day-night-effects",
         "commit": "5693993e108f2b3668bd21b1dd36ae31f79d8fcd",
@@ -63,8 +87,8 @@
         "code_git_blob_sha": "82b79f2be4332858de55de46341bd3fc81fa0c38",
         "core_table_git_blob_sha": "4e7c7c9fd5d4e465fd58b9a5955b612549086044",
         "full_table_git_blob_sha": "e6e3b5a7e899337ace77092e1291792e706b92d4",
-        "status": "primary_published_code_tables_provenance_lead_ONLY_notqualified",
-        "read_scope": "FullREADME,paper_outputsREADME,completeGit tree;actualCSVheaders/linecounts1050and1800rows;onlyfunctionindex ofmaincode. No rule/costfullreview,sourcekernel,pricebacktest or rawinput acquired.",
+        "status": "completed_parked_unqualified_missingoriginalprices_manualriskcontract_fullcostnativeforward",
+        "read_scope": "Completedoriginalsession/cost/position/QAandstatisticalcodeaudit;all900BTCcostrows/525coreoverlap,300cells8/16bpsconditionalalgebra,4puredefs12syntheticcashcases,9unittests3307independentchecks. Notpricebacktest.",
         "basis": "Originalcodeandversionedpaperoutputs available;rawKrakenBTC/ETHnotcommitted,READMErequiresindependentprovenance/no-tradehourandrightschecks. MissinginputnotreplaceablebyrelabelledBitstamp/Binance. 25orderedstrategies12UTCcutoffs0/1/2bps index notacceptednetLBankedge. ClosedBTCledger/stopTP1/nativefillnotestablished.",
         "read_first": [
           "btc_eth_backtest.py",
@@ -74,7 +98,10 @@
           "paper_outputs/tables/cutoff_strategy_full_results.csv",
           "paper_outputs/tables/preferred_vs_buyhold_tests.csv"
         ],
-        "instruction": "Next finite stage: audit entire originalcost/position/session/timestamp/data-qualityfunctions againstALLBTCtable rows,retainothercutoff/negativecells andmultiple-testing/selectionscope. VerifyrawKrakenofficialarchiveavailability andexactbar-time/gaphandlingwithoutdownloadinghugearchivesblindly. If publishedroundtrip/turnoverallowsindependentfeecashreconciliationperformit;otherwise unknownsnull. No tableheadline adoptedasLBankprofit, no top-levelmoduleexecutionwithmissingdata, no arbitrarySLTP/riskexpansion or25x12optimizer. If originaldata/methodincompatible,recordpreciseobstacleandmovetodistinctsource."
+        "instruction": "No unchanged300cellrepriceorfullsourceauditrepeat,12hTP1invention,costloweringoroptimizer. OriginalrawSHA/ledgerandmanualriskcontractmissing. Revisitonlymaterialnewverifiedsourceevidence;keepconditionalpositive8bps andnegative16bps,all9sourceinferenceperiods. Continue distinctsource.",
+        "documentation": "docs/lbank_daynight_cost_audit_2026-10-20.md",
+        "report": "research/continuation/results/daynight_cost_20261020/report.json",
+        "audit": "research/continuation/results/daynight_cost_20261020/independent_verification.json"
       },
       {
         "repository": "bhanu-pratap-rana/Trading-strategy-backtest",
@@ -222,7 +249,17 @@
         "research/continuation/source_screening_20261020_1224.json"
       ]
     },
-    "operational_check_before_research": "Entry pipeline restored2026-10-20T03:25:05Z on existing deployed862339d source. Before next research step,check latest production/deployment and bounded logs for continuity/regressions;do not repeat unchanged readiness announcement. No valid new setup or confirmation/alert observed in this bounded window;no native publication timestamp or end-to-end latency measured. Continue alternative-strategy research;do not disable task because hotfix readiness is not certified replacement."
+    "operational_check_before_research": "Entry pipeline restored2026-10-20T03:25:05Z on existing deployed862339d source. Before next research step,check latest production/deployment and bounded logs for continuity/regressions;do not repeat unchanged readiness announcement. No valid new setup or confirmation/alert observed in this bounded window;no native publication timestamp or end-to-end latency measured. Continue alternative-strategy research;do not disable task because hotfix readiness is not certified replacement.",
+    "completed_daynight_audit": "docs/lbank_daynight_cost_audit_2026-10-20.md",
+    "other_source_dedup": [
+      {
+        "repository": "mantasbil/Thesis-Algo-Trading",
+        "commit": "90c85f694db3b04ac34d1e15420c4e5d3f5a4802",
+        "readme_git_blob_sha": "e80e1474de3b22d9f1c5811deeb20ce66d53840f",
+        "status": "excluded_for_BTC_evidence_asset_XAUUSD_Gold",
+        "basis": "FullREADMEand90filetree showgold15mLSTM study;noBTC dataledger. Do not loadpt/pkl or runMT5/training/transfergoldgains."
+      }
+    ]
   },
   "known_limitations": [
     "2023 through Sep2026 reused and exploratory; 2022 observed for Turtle; none may be relabeled untouched.",
@@ -247,7 +284,8 @@
     "CShear72f293 original selected-kernel diagnostics: fixed fundingSHORT recoversLONG/SHORT when only futureclosechanges;non-grid185realqueries all selectlaterlabel andchangepastprice,185exactlabelcontrols0changes. Sourceend48hwith4hdata returns fictionalearlypositiveexit,gap8hlabelled4h;13tests/8separateDecimalcashchecks. Publictree84objects no rawBTCledger. These are bounded forensic probes,not measuredmarketfrequency or headlineprofitimpact/not allon-gridreturnsinvalid. No marketPF/TP1/urgent/native qualification.",
     "New primary source preflights are not marketbacktests: Pavdot103selectedtrades+CPCVclaims not qualified;Liam2021positive uses private preprocessing/incomplete logic and1289orders not matchedclosedtrades. GotodataruREADME fee/slip/causality and altcoin positives are authorclaims only. BTCclosedledger/sourcefullcost not yet inspected.",
     "Gotodataru5ed0d6e51files no rawBTCledger/windowparams;authorBTC139/318/368trades PF.6183/.3322/.7111 negative. Sharedengine percentageunits100factor,fundingcashabsent,costoverrideignored,tail/gap/stop/TPprobes;11tests75separatechecks. Syntheticcontractnotmarketprofitbias;completedbarprefix49signals0change,SLfirst/nextopencontrolsretained. No source profit replay/fullcostCI/TP1/nativegate or allfundingstrategyfailure. Newprimarypreflights pgup/maxs retainauthorpositivebutincompatiblefrequency/missingledger;GTtargetsnotmeasurements. Do not repeatunchanged.",
-    "Bhanu15391f25filepublictree:nooriginalBTCrawledger,README45tradesExampleOutput. Embeddedthirdpartycredentialsnotused/copied;noauthclient/mainexecution. Bottradepmdcd1ac339files21defs10tests125checks:actual2024Q1reused131040minutes26/420pastglobalquantileflagschange,31intradaydailyEMAproxy/24ADXchangeBUT31dailybull/bearflags0change,causalpricecontrolsunchanged. Sourcepartialeventwin50%withlosingcampaign;entryfeeextra.040008lowersPnL,shortslipfavorable,tailcurveunupdated,fundingabsent. No measuredheadlineprofitimpact/fullcostprofit/nativegates. OriginalOOSpositive1entry1forcedcloseandPFNaNretainedasauthoronly,notlabelledsyntheticwithoutprovenance."
+    "Bhanu15391f25filepublictree:nooriginalBTCrawledger,README45tradesExampleOutput. Embeddedthirdpartycredentialsnotused/copied;noauthclient/mainexecution. Bottradepmdcd1ac339files21defs10tests125checks:actual2024Q1reused131040minutes26/420pastglobalquantileflagschange,31intradaydailyEMAproxy/24ADXchangeBUT31dailybull/bearflags0change,causalpricecontrolsunchanged. Sourcepartialeventwin50%withlosingcampaign;entryfeeextra.040008lowersPnL,shortslipfavorable,tailcurveunupdated,fundingabsent. No measuredheadlineprofitimpact/fullcostprofit/nativegates. OriginalOOSpositive1entry1forcedcloseandPFNaNretainedasauthoronly,notlabelledsyntheticwithoutprovenance.",
+    "Daynight5693993:all900BTCpublishedcostrowsreconciledwith3.34e-13relativeerror,525overlapexact;originalpreferred8bpsconditionalwealth237.22from100but16bps0.5866. 16bpspositive12cellsallcontinuouslongwithonechange,not12newedges. RawKrakenpriceSHA/closedcampaign/SLTP1/fullcost/nativeforwardmissing;published9BHrelativeCIcross0notabsoluteRexpectancy."
   ],
   "iterations": [
     {
@@ -678,11 +716,44 @@
       "source_screening": "research/continuation/source_screening_20261020_1423.json",
       "production_changed": false,
       "forward_started": false
+    },
+    {
+      "id": "daynight_original_cost_20261020_1445",
+      "stage_completed": "pinned_originalpaper_allBTCtable_cost_reconciliation_and_conditional_friction_diagnostic",
+      "protocol_checkpoint_commit": "defd03877b9f1fb14f39486d6683da911d27fe61",
+      "source_commit": "5693993e108f2b3668bd21b1dd36ae31f79d8fcd",
+      "execution_started_utc": "2026-10-20T05:51:59.239994+00:00",
+      "execution_completed_utc": "2026-10-20T05:51:59.613827+00:00",
+      "original_source_files": 24,
+      "reviewed_AST_definitions": 4,
+      "implementation_tests_passed": 9,
+      "synthetic_cash_cases": 12,
+      "BTC_original_cost_rows": 900,
+      "BTC_core_overlap": 525,
+      "unique_correlated_cells": 300,
+      "independent_Decimal_cells": 1500,
+      "separate_checks_passed": 3307,
+      "max_cost_relative_error": 3.337245930228905e-13,
+      "core_overlap_error": 0,
+      "preferred_conditional_wealth_8bps": 237.22277822024876,
+      "preferred_conditional_wealth_16bps": 0.5866033539556672,
+      "positive_16bps_cells": 12,
+      "all16positive_cells_continuous_long_one_change": true,
+      "first_attempt": "Stoppedonunused0exponentlogdomain;onlyconditionalnumericlogevaluationfixed,no changeofrules/costs/selectors. Originalcheckpointandtracebackdisclosedindoc.",
+      "decision": "not_promoted_missingrawprices_boundedmanualrisk_fullcostnativeforward;conditionalpositivepreserved",
+      "real_market_profitability_backtest_performed": false,
+      "published_table_arithmetic_executed": true,
+      "documentation": "docs/lbank_daynight_cost_audit_2026-10-20.md",
+      "report": "research/continuation/results/daynight_cost_20261020/report.json",
+      "audit": "research/continuation/results/daynight_cost_20261020/independent_verification.json",
+      "source_screening": "research/continuation/source_screening_20261020_1456.json",
+      "production_changed": false,
+      "forward_started": false
     }
   ],
   "active_run": null,
   "blockers": [],
-  "updated_kst": "2026-10-20T14:23:43+09:00",
+  "updated_kst": "2026-10-20T14:56:10+09:00",
   "maintained_research_candidates": [
     {
       "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
@@ -738,6 +809,11 @@
       "candidate_id": "bottradepm_dcd1ac3_contract_realprefix_v1",
       "status": "excluded_currentpublicrelease_nooriginalledger_fullcostcausalcontract",
       "next": "No sameauditrepeat,repairtotuneheadline,60grid,sourceprivateinputsorusercapitalriskchanges;notallregimestrategiesinvalid."
+    },
+    {
+      "candidate_id": "daynight_5693993_original_cost_v1",
+      "status": "parked_unqualified_currentpublicrelease_notnewforwardcandidate",
+      "next": "No unchanged300cellrepriceorfullsourceauditrepeat,12hTP1invention,costloweringoroptimizer. OriginalrawSHA/ledgerandmanualriskcontractmissing. Revisitonlymaterialnewverifiedsourceevidence;keepconditionalpositive8bps andnegative16bps,all9sourceinferenceperiods. Continue distinctsource."
     }
   ],
   "source_reconciliation": {
@@ -800,13 +876,16 @@
     "native_readiness": {
       "ready": true,
       "reason": "native_ready",
-      "last_observed_utc": "2026-10-20T05:14:23.800905498Z",
+      "last_observed_utc": "2026-10-20T05:45:19.892947963Z",
       "required_closed_1m": 65,
       "required_closed_5m": 20,
       "rsi_warmup_target": 250,
       "note": "Existing65closed1m/20closed5m readiness contract actually passed;20native5m now usable. RSIcomputed but250warmup maturitytarget not yet met. No history interpolation or threshold changes.",
-      "rsi14_wilder": null,
-      "entry_source_switched": true
+      "rsi14_wilder": 44.49635549703576,
+      "entry_source_switched": true,
+      "closed_1m": 243,
+      "closed_5m": 48,
+      "rsi_history_mature": false
     },
     "full_rollout_complete": true,
     "replacement_certified": false,
@@ -828,26 +907,26 @@
     "next_check": "Entry pipeline restored2026-10-20T03:25:05Z on existing deployed862339d source. Before next research step,check latest production/deployment and bounded logs for continuity/regressions;do not repeat unchanged readiness announcement. No valid new setup or confirmation/alert observed in this bounded window;no native publication timestamp or end-to-end latency measured. Continue alternative-strategy research;do not disable task because hotfix readiness is not certified replacement.",
     "followup_via_existing_enabled_research_task": true,
     "evidence_path": "research/continuation/results/entry_timing_hotfix_20261020_deployment.json",
-    "latest_bounded_observation": "research/continuation/results/operational_continuity_20261020_1413.json",
+    "latest_bounded_observation": "research/continuation/results/operational_continuity_20261020_1445.json",
     "hotfix_entry_pipeline_validated_utc": "2026-10-20T03:25:05.441094944Z",
     "live_new_candidate_confirmation_observed": false,
     "last_completed_bar_evaluation": {
-      "timestamp": "2026-10-20T05:14:23.800898647Z",
+      "timestamp": "2026-10-20T05:45:19.892966006Z",
       "reason": "market_no_setup",
       "candidate_count": 0,
       "entry_timing": {
-        "candidate_evaluated_at": 1792473253.7443998,
-        "evaluation_after_first_ready_observation_seconds": 0.014712095260620117,
-        "evaluation_after_nominal_close_seconds": 13.744399785995483,
-        "first_ready_observed_at": 1792473253.7296877,
-        "last_closed_1m_start": 1792473180,
-        "last_closed_5m_start": 1792472700,
-        "nominal_1m_close_at": 1792473240,
+        "candidate_evaluated_at": 1792475115.0696166,
+        "evaluation_after_first_ready_observation_seconds": 0.0295257568359375,
+        "evaluation_after_nominal_close_seconds": 15.069616556167603,
+        "first_ready_observed_at": 1792475115.0400908,
+        "last_closed_1m_start": 1792475040,
+        "last_closed_5m_start": 1792474800,
+        "nominal_1m_close_at": 1792475100,
         "policy": "native_completed_bar_schedule_v1",
         "publication_note": "nominal_close_is_not_actual_publication_time",
-        "quote_observed_at": 1792473253.7296877,
+        "quote_observed_at": 1792475115.0400908,
         "source_publication_at": null,
-        "trigger": "new_completed_bar"
+        "trigger": "periodic_and_new_bar"
       }
     },
     "readiness_resumption_reported_in_run": "cshear_source_contract_20261020_1210"

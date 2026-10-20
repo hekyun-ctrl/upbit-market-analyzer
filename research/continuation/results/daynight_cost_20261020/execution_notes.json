@@ -1,0 +1,8 @@
+{
+  "protocol_checkpoint": "defd03877b9f1fb14f39486d6683da911d27fe61",
+  "fix": "Unusedzero-exponentlogdomainonly,9regressiontests pass;noalpha/query/costchange.",
+  "implementation_tests_passed": 9,
+  "independent_checks_passed": 3307,
+  "market_price_backtest_performed": false,
+  "published_arithmetic_computed": true
+}

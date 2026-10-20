@@ -35,7 +35,8 @@ def unit_counts(change_events,turnover):
 def reprice(gross_wealth,n1,n2,bps):
     c=bps/10000.
     if (n1 and c>=1) or (n2 and c>=.5):raise ValueError('nonpositive cost factor')
-    return float(gross_wealth*math.exp(n1*math.log1p(-c)+n2*math.log1p(-2*c)))
+    # A zero exponent contributes zero; do not evaluate its unused log domain.
+    return float(gross_wealth*math.exp((n1*math.log1p(-c) if n1 else 0.)+(n2*math.log1p(-2*c) if n2 else 0.)))
 
 def breakeven(gross,n1,n2):
     if gross<=100 or not n1+n2:return None

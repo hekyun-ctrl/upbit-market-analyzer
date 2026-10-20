@@ -1,0 +1,1829 @@
+{
+  "checks_passed": 3307,
+  "maximum_relative_error": "3.3384694899555638608291660039204954617271450734594E-13",
+  "BTC_published_cost_rows": 900,
+  "independent_Decimal_repriced_cells": 1500,
+  "core_overlap_rows": 525,
+  "synthetic_cash_cases": 12,
+  "positive_cell_identities": {
+    "0": [
+      {
+        "cutoff": 0,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3676
+      },
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "short",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "trend",
+        "change_events": 3631
+      },
+      {
+        "cutoff": 0,
+        "night": "reversal",
+        "day": "cash",
+        "change_events": 7302
+      },
+      {
+        "cutoff": 0,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 4013
+      },
+      {
+        "cutoff": 0,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3791
+      },
+      {
+        "cutoff": 1,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 1,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7299
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3654
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "short",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "trend",
+        "change_events": 3655
+      },
+      {
+        "cutoff": 2,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 2,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3696
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "short",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "trend",
+        "change_events": 3611
+      },
+      {
+        "cutoff": 2,
+        "night": "reversal",
+        "day": "cash",
+        "change_events": 7302
+      },
+      {
+        "cutoff": 2,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3923
+      },
+      {
+        "cutoff": 2,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3665
+      },
+      {
+        "cutoff": 3,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 3,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 3,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 3,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 3,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3730
+      },
+      {
+        "cutoff": 3,
+        "night": "long",
+        "day": "short",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 3,
+        "night": "long",
+        "day": "trend",
+        "change_events": 3577
+      },
+      {
+        "cutoff": 3,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3307
+      },
+      {
+        "cutoff": 4,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 4,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 4,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 4,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 4,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3770
+      },
+      {
+        "cutoff": 4,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3921
+      },
+      {
+        "cutoff": 4,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3687
+      },
+      {
+        "cutoff": 4,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3383
+      },
+      {
+        "cutoff": 4,
+        "night": "trend",
+        "day": "reversal",
+        "change_events": 3616
+      },
+      {
+        "cutoff": 5,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 5,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 5,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 5,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 5,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3760
+      },
+      {
+        "cutoff": 5,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3887
+      },
+      {
+        "cutoff": 5,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3689
+      },
+      {
+        "cutoff": 5,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3417
+      },
+      {
+        "cutoff": 5,
+        "night": "trend",
+        "day": "reversal",
+        "change_events": 3614
+      },
+      {
+        "cutoff": 6,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 6,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 6,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 6,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 6,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3860
+      },
+      {
+        "cutoff": 6,
+        "night": "reversal",
+        "day": "cash",
+        "change_events": 7302
+      },
+      {
+        "cutoff": 6,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3853
+      },
+      {
+        "cutoff": 6,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3719
+      },
+      {
+        "cutoff": 6,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3451
+      },
+      {
+        "cutoff": 6,
+        "night": "trend",
+        "day": "reversal",
+        "change_events": 3584
+      },
+      {
+        "cutoff": 7,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 7,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 7,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 7,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 7,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3794
+      },
+      {
+        "cutoff": 7,
+        "night": "reversal",
+        "day": "cash",
+        "change_events": 7302
+      },
+      {
+        "cutoff": 7,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3873
+      },
+      {
+        "cutoff": 7,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3727
+      },
+      {
+        "cutoff": 8,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 8,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 8,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 8,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 8,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3838
+      },
+      {
+        "cutoff": 8,
+        "night": "reversal",
+        "day": "cash",
+        "change_events": 7302
+      },
+      {
+        "cutoff": 8,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3789
+      },
+      {
+        "cutoff": 8,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3743
+      },
+      {
+        "cutoff": 9,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 9,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 9,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 9,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 9,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3874
+      },
+      {
+        "cutoff": 9,
+        "night": "reversal",
+        "day": "cash",
+        "change_events": 7302
+      },
+      {
+        "cutoff": 9,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3791
+      },
+      {
+        "cutoff": 9,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3743
+      },
+      {
+        "cutoff": 10,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 10,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7299
+      },
+      {
+        "cutoff": 10,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 10,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 10,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3996
+      },
+      {
+        "cutoff": 10,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3701
+      },
+      {
+        "cutoff": 10,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3755
+      },
+      {
+        "cutoff": 10,
+        "night": "short",
+        "day": "long",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 10,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3603
+      },
+      {
+        "cutoff": 10,
+        "night": "trend",
+        "day": "reversal",
+        "change_events": 3550
+      },
+      {
+        "cutoff": 11,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 11,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 11,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 11,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 4032
+      },
+      {
+        "cutoff": 11,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3677
+      },
+      {
+        "cutoff": 11,
+        "night": "short",
+        "day": "long",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 11,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3627
+      },
+      {
+        "cutoff": 11,
+        "night": "trend",
+        "day": "reversal",
+        "change_events": 3556
+      }
+    ],
+    "1": [
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3676
+      },
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "short",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "trend",
+        "change_events": 3631
+      },
+      {
+        "cutoff": 0,
+        "night": "reversal",
+        "day": "cash",
+        "change_events": 7302
+      },
+      {
+        "cutoff": 0,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 4013
+      },
+      {
+        "cutoff": 0,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3791
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3654
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "short",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "trend",
+        "change_events": 3655
+      },
+      {
+        "cutoff": 2,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3696
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "trend",
+        "change_events": 3611
+      },
+      {
+        "cutoff": 2,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3923
+      },
+      {
+        "cutoff": 2,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3665
+      },
+      {
+        "cutoff": 3,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 3,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 3,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 3,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 3,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3730
+      },
+      {
+        "cutoff": 3,
+        "night": "long",
+        "day": "trend",
+        "change_events": 3577
+      },
+      {
+        "cutoff": 4,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 4,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 4,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 4,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 4,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3770
+      },
+      {
+        "cutoff": 4,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3921
+      },
+      {
+        "cutoff": 4,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3687
+      },
+      {
+        "cutoff": 4,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3383
+      },
+      {
+        "cutoff": 4,
+        "night": "trend",
+        "day": "reversal",
+        "change_events": 3616
+      },
+      {
+        "cutoff": 5,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 5,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 5,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 5,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 5,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3760
+      },
+      {
+        "cutoff": 5,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3887
+      },
+      {
+        "cutoff": 5,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3689
+      },
+      {
+        "cutoff": 5,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3417
+      },
+      {
+        "cutoff": 5,
+        "night": "trend",
+        "day": "reversal",
+        "change_events": 3614
+      },
+      {
+        "cutoff": 6,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 6,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 6,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 6,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 6,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3860
+      },
+      {
+        "cutoff": 6,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3853
+      },
+      {
+        "cutoff": 6,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3719
+      },
+      {
+        "cutoff": 6,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3451
+      },
+      {
+        "cutoff": 6,
+        "night": "trend",
+        "day": "reversal",
+        "change_events": 3584
+      },
+      {
+        "cutoff": 7,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 7,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 7,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 7,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 7,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3794
+      },
+      {
+        "cutoff": 7,
+        "night": "reversal",
+        "day": "cash",
+        "change_events": 7302
+      },
+      {
+        "cutoff": 7,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3873
+      },
+      {
+        "cutoff": 7,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3727
+      },
+      {
+        "cutoff": 8,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 8,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 8,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 8,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 8,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3838
+      },
+      {
+        "cutoff": 8,
+        "night": "reversal",
+        "day": "cash",
+        "change_events": 7302
+      },
+      {
+        "cutoff": 8,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3789
+      },
+      {
+        "cutoff": 8,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3743
+      },
+      {
+        "cutoff": 9,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 9,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 9,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 9,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 9,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3874
+      },
+      {
+        "cutoff": 9,
+        "night": "reversal",
+        "day": "cash",
+        "change_events": 7302
+      },
+      {
+        "cutoff": 9,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3791
+      },
+      {
+        "cutoff": 9,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3743
+      },
+      {
+        "cutoff": 10,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 10,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7299
+      },
+      {
+        "cutoff": 10,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 10,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 10,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3996
+      },
+      {
+        "cutoff": 10,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3701
+      },
+      {
+        "cutoff": 10,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3755
+      },
+      {
+        "cutoff": 10,
+        "night": "short",
+        "day": "long",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 10,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3603
+      },
+      {
+        "cutoff": 10,
+        "night": "trend",
+        "day": "reversal",
+        "change_events": 3550
+      },
+      {
+        "cutoff": 11,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 11,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 11,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 11,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 4032
+      },
+      {
+        "cutoff": 11,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3677
+      },
+      {
+        "cutoff": 11,
+        "night": "short",
+        "day": "long",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 11,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3627
+      },
+      {
+        "cutoff": 11,
+        "night": "trend",
+        "day": "reversal",
+        "change_events": 3556
+      }
+    ],
+    "2": [
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3676
+      },
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "trend",
+        "change_events": 3631
+      },
+      {
+        "cutoff": 0,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 4013
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3654
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "trend",
+        "change_events": 3655
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3696
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "trend",
+        "change_events": 3611
+      },
+      {
+        "cutoff": 3,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 3,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 3,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3730
+      },
+      {
+        "cutoff": 4,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 4,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 4,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 4,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 4,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3770
+      },
+      {
+        "cutoff": 4,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3687
+      },
+      {
+        "cutoff": 4,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3383
+      },
+      {
+        "cutoff": 4,
+        "night": "trend",
+        "day": "reversal",
+        "change_events": 3616
+      },
+      {
+        "cutoff": 5,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 5,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 5,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 5,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 5,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3760
+      },
+      {
+        "cutoff": 5,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3887
+      },
+      {
+        "cutoff": 5,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3689
+      },
+      {
+        "cutoff": 5,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3417
+      },
+      {
+        "cutoff": 5,
+        "night": "trend",
+        "day": "reversal",
+        "change_events": 3614
+      },
+      {
+        "cutoff": 6,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 6,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 6,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 6,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 6,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3860
+      },
+      {
+        "cutoff": 6,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3853
+      },
+      {
+        "cutoff": 6,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3719
+      },
+      {
+        "cutoff": 7,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 7,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 7,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 7,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 7,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3794
+      },
+      {
+        "cutoff": 7,
+        "night": "reversal",
+        "day": "cash",
+        "change_events": 7302
+      },
+      {
+        "cutoff": 7,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3873
+      },
+      {
+        "cutoff": 7,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3727
+      },
+      {
+        "cutoff": 8,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 8,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 8,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 8,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 8,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3838
+      },
+      {
+        "cutoff": 8,
+        "night": "reversal",
+        "day": "cash",
+        "change_events": 7302
+      },
+      {
+        "cutoff": 8,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3789
+      },
+      {
+        "cutoff": 8,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3743
+      },
+      {
+        "cutoff": 9,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 9,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7301
+      },
+      {
+        "cutoff": 9,
+        "night": "long",
+        "day": "cash",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 9,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 9,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3874
+      },
+      {
+        "cutoff": 9,
+        "night": "reversal",
+        "day": "cash",
+        "change_events": 7302
+      },
+      {
+        "cutoff": 9,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3791
+      },
+      {
+        "cutoff": 9,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3743
+      },
+      {
+        "cutoff": 10,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 10,
+        "night": "cash",
+        "day": "reversal",
+        "change_events": 7299
+      },
+      {
+        "cutoff": 10,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 10,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3996
+      },
+      {
+        "cutoff": 10,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3701
+      },
+      {
+        "cutoff": 10,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3603
+      },
+      {
+        "cutoff": 10,
+        "night": "trend",
+        "day": "reversal",
+        "change_events": 3550
+      },
+      {
+        "cutoff": 11,
+        "night": "cash",
+        "day": "long",
+        "change_events": 7303
+      },
+      {
+        "cutoff": 11,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 11,
+        "night": "reversal",
+        "day": "long",
+        "change_events": 3677
+      },
+      {
+        "cutoff": 11,
+        "night": "short",
+        "day": "long",
+        "change_events": 7304
+      },
+      {
+        "cutoff": 11,
+        "night": "trend",
+        "day": "long",
+        "change_events": 3627
+      }
+    ],
+    "8": [
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 3,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 4,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 5,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 5,
+        "night": "long",
+        "day": "reversal",
+        "change_events": 3760
+      },
+      {
+        "cutoff": 6,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 7,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 8,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 8,
+        "night": "reversal",
+        "day": "reversal",
+        "change_events": 3743
+      },
+      {
+        "cutoff": 9,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 10,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 11,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      }
+    ],
+    "16": [
+      {
+        "cutoff": 0,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 1,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 2,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 3,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 4,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 5,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 6,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 7,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 8,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 9,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 10,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      },
+      {
+        "cutoff": 11,
+        "night": "long",
+        "day": "long",
+        "change_events": 1
+      }
+    ]
+  },
+  "market_price_replayed": false,
+  "source_tables_are_conditional_inputs": true,
+  "verifier_sha256": "fb5b902caef96c7783ca06641220660e61a88506a3a84fe64bca003c9744b032"
+}

@@ -1,0 +1,407 @@
+{
+  "version": "daynight_original_BTC_cost_algebra_v1",
+  "source_commit": "5693993e108f2b3668bd21b1dd36ae31f79d8fcd",
+  "source_url": "https://github.com/wzf01195010-png/Crypto-day-night-effects/tree/5693993e108f2b3668bd21b1dd36ae31f79d8fcd",
+  "started_utc": "2026-10-20T05:51:59.239994+00:00",
+  "completed_utc": "2026-10-20T05:51:59.613827+00:00",
+  "script_sha256": "705921ad6584989115fd7fd4eb32b8fbc40469ea3d6d6ced12020ae45ce83f98",
+  "protocol_sha256": "6157c492689e19d2ca060d20d6f3007c86c805ec984d176bbfe586da039c072b",
+  "source_tree": [
+    {
+      "path": ".gitignore",
+      "git_blob_sha": "9f293d359c9c7f5920155fad3cc54d6132691718",
+      "sha256": "9c50a4bda72ca028118fd2ca2a877584daad216408bd16fb37d3bfc566794f5a"
+    },
+    {
+      "path": "LICENSE",
+      "git_blob_sha": "5049982706f73cb77f7aebfbf331b14ac7e0915b",
+      "sha256": "f16fdf7cbf23233d96956ca990d3aa4d77628a51e14547e25204ef1edfea2009"
+    },
+    {
+      "path": "README.md",
+      "git_blob_sha": "984275db354d71bb2aa60aec56b108c130732816",
+      "sha256": "67259785bce7995173121a0a37ad5481b501219ee247a72d8f326798276ddf3e"
+    },
+    {
+      "path": "btc_eth_backtest.py",
+      "git_blob_sha": "82b79f2be4332858de55de46341bd3fc81fa0c38",
+      "sha256": "70a2d1b4432d6a7e8e2e06bd6bf104d5b2b2ee4b57b240274f4cc1f56e89b219"
+    },
+    {
+      "path": "cutoff_strategy_analysis.py",
+      "git_blob_sha": "194e400e80324643b0bb0de6499161d695301890",
+      "sha256": "34916ac57bdd7f05a6f2efe7f37181bd6d3a6584e616a2aba33f05256775e7af"
+    },
+    {
+      "path": "etf_2025_analysis.py",
+      "git_blob_sha": "b926fcb4e0fb96861e12d4df641ef6709448ff21",
+      "sha256": "0546b56d667ccf8adc02e938a13585a7499202dcec76bda4066697f1d88802ab"
+    },
+    {
+      "path": "figure_annual_sharpe_mdd.py",
+      "git_blob_sha": "88037673f82753d0af1319f98016d9cf2b4b4061",
+      "sha256": "478e1eada61c096178ff735c55afe05329f86d9fe8b206cfe74e208a6ae254b0"
+    },
+    {
+      "path": "figure_annual_volatility.py",
+      "git_blob_sha": "3704365c55f6972d745cb90da094af1ced0c3c5c",
+      "sha256": "820ca5bef2244fdbd82ab8d35e78caa4decc6d2b0fe37fff8f846bf4b3894b1e"
+    },
+    {
+      "path": "paper_outputs/README.md",
+      "git_blob_sha": "e8343e5cacfe2f5ed3165b353cae4eb5c707c6f0",
+      "sha256": "21ccd28bc1ca1857d7c14de55d7cd41f005443cb84870e7326412de05dde8e08"
+    },
+    {
+      "path": "paper_outputs/figures/Annualized_volatility_year.png",
+      "git_blob_sha": "15b27b67348785b5d5224dbdad6a858e9b947047",
+      "sha256": "d55e3ba4a419cfd5afe03e998b5bfbd0889d31aa23792bef094f53913465e414"
+    },
+    {
+      "path": "paper_outputs/figures/BTC_cutoff_best_strategy_barchart.png",
+      "git_blob_sha": "8a8bf9ddbb98f62cb19a1cf53262c9002f6f4a80",
+      "sha256": "c9bb4506d05725c5921c484a141c66a9a53436f0bdf65305691156caf68c1d41"
+    },
+    {
+      "path": "paper_outputs/figures/ETH_cutoff_best_strategy_barchart.png",
+      "git_blob_sha": "aab4b8af47291b8e834ba5761255f0d4f6e125d5",
+      "sha256": "d0277e87f973ece6fefba893434714aeab7cd3d591acd1377e017100f15d1ff8"
+    },
+    {
+      "path": "paper_outputs/figures/annualized_sharpe_ratio_by_year.png",
+      "git_blob_sha": "33dac08cebb0970bea1263c3d77f7d3aa9fac8d0",
+      "sha256": "77a0a2f92209d1ae3615f3af113c9ba94536a9073dbfd8ddb84713904c0f18f4"
+    },
+    {
+      "path": "paper_outputs/figures/maximum_drawdown_by_year.png",
+      "git_blob_sha": "66bde4f1f1519c18e1ffb6446d15ed8226ef635d",
+      "sha256": "207e4378d96274a7a24d23f649bf5110bd76b504bb31dc056475b06e6b4b6949"
+    },
+    {
+      "path": "paper_outputs/tables/annual_sharpe_mdd_data.csv",
+      "git_blob_sha": "6b3bfc7d833f135fd82c69bc54f2c8e3bb8c30a2",
+      "sha256": "09a3bb2f29e1312ed1973ce69ee33e0f8d022ae32e85a5313934216267d4ad28"
+    },
+    {
+      "path": "paper_outputs/tables/annualized_volatility_by_year.csv",
+      "git_blob_sha": "6d9fede69e6442efc0cae1c5e401d688a3d2acae",
+      "sha256": "513be60fa68eca771becd0c949e29dc75802adb49abfc29d34a725f40c1ee343"
+    },
+    {
+      "path": "paper_outputs/tables/btc_eth_all_metrics.csv",
+      "git_blob_sha": "4e7c7c9fd5d4e465fd58b9a5955b612549086044",
+      "sha256": "ac79eebace8fb952fcb0705b083ffa4fc18b3d96862f9b640ba68f2675034f92"
+    },
+    {
+      "path": "paper_outputs/tables/conditional_predictability_tests.csv",
+      "git_blob_sha": "f4464bb23d3e263a2aeb3031dabfbd6132a16fb2",
+      "sha256": "18e7b151e5d6f484ddb84867a3e1e2cca50fb6b298ae673495d9c5a7464f5e58"
+    },
+    {
+      "path": "paper_outputs/tables/cutoff_strategy_best_by_cutoff.csv",
+      "git_blob_sha": "be623a252fd8ab9d38ecde5d571997edc7c44c74",
+      "sha256": "04c7fe8362288c02d06911fabf63d8f39d40e7e3848a3e04cbf26adf35c0361b"
+    },
+    {
+      "path": "paper_outputs/tables/cutoff_strategy_full_results.csv",
+      "git_blob_sha": "e6e3b5a7e899337ace77092e1291792e706b92d4",
+      "sha256": "907932cb694641c15a04275a17727ec7351a4714f183259fb5f703af03bb5059"
+    },
+    {
+      "path": "paper_outputs/tables/etf_2025_metrics.csv",
+      "git_blob_sha": "1ee26e825af267d6adb7b77627403dc05ea92a3b",
+      "sha256": "d9fc3ecddf784c5cbe872fdf913aed25e4b10f315d8285efd3cab813cff7f945"
+    },
+    {
+      "path": "paper_outputs/tables/preferred_vs_buyhold_tests.csv",
+      "git_blob_sha": "007dfd82c1837a9541d0d24204843df776e63cde",
+      "sha256": "97599daf3ab4a855b0a93565110e64d607c7635ababddd1e6e60687e14e0a305"
+    },
+    {
+      "path": "requirements.txt",
+      "git_blob_sha": "cee47abddb260ede1441e8eb933290ab881b62ba",
+      "sha256": "da5b36591324c47ce74cc866d100728a28a6ce8080f3e9ca8ac17d4cdb93d58c"
+    },
+    {
+      "path": "statistical_tests.py",
+      "git_blob_sha": "2ba03a709412fe05094b296ad5a7662dcdb4c7a7",
+      "sha256": "1fa1d727257f7e933a758753a063212803fa6f933d7e15f0af0834297c3b6089"
+    }
+  ],
+  "reviewed_definitions": [
+    {
+      "name": "build_day_night_sessions",
+      "line": 158,
+      "ast_sha256": "57405477fe811317e3d7665064cf2aa6ef38aa5e99ae3234ca244b6027fa6853"
+    },
+    {
+      "name": "position_array",
+      "line": 259,
+      "ast_sha256": "7f168961d31880e519ae02181a1bcf1315894f479694e1845c7e1df810760e0d"
+    },
+    {
+      "name": "max_drawdown_from_returns",
+      "line": 277,
+      "ast_sha256": "0d4e920c83f38b69752fcb449916df91132215ecfa0cebddbf80aab7330335cf"
+    },
+    {
+      "name": "backtest_combo",
+      "line": 284,
+      "ast_sha256": "7a57d1e252c2840a8ead8b8a66f55921f305736573bc28e4d72148270e32f622"
+    }
+  ],
+  "fixtures": {
+    "cash_cases": [
+      {
+        "night": "long",
+        "day": "long",
+        "bps": 1,
+        "n1": 1,
+        "n2": 0,
+        "original": 103.86422940737614,
+        "repriced": 103.86422940737614,
+        "Decimal": "103.8642294073761336960000000000000000000",
+        "change_events": 1,
+        "initial_nonzero": 8,
+        "terminal_marked_position": 1.0
+      },
+      {
+        "night": "long",
+        "day": "long",
+        "bps": 2,
+        "n1": 1,
+        "n2": 0,
+        "original": 103.85384194568925,
+        "repriced": 103.85384194568924,
+        "Decimal": "103.8538419456892273920000000000000000000",
+        "change_events": 1,
+        "initial_nonzero": 8,
+        "terminal_marked_position": 1.0
+      },
+      {
+        "night": "long",
+        "day": "long",
+        "bps": 8,
+        "n1": 1,
+        "n2": 0,
+        "original": 103.7915171755678,
+        "repriced": 103.79151717556779,
+        "Decimal": "103.7915171755677895680000000000000000000",
+        "change_events": 1,
+        "initial_nonzero": 8,
+        "terminal_marked_position": 1.0
+      },
+      {
+        "night": "long",
+        "day": "long",
+        "bps": 16,
+        "n1": 1,
+        "n2": 0,
+        "original": 103.70841748207252,
+        "repriced": 103.70841748207255,
+        "Decimal": "103.7084174820725391360000000000000000000",
+        "change_events": 1,
+        "initial_nonzero": 8,
+        "terminal_marked_position": 1.0
+      },
+      {
+        "night": "cash",
+        "day": "long",
+        "bps": 1,
+        "n1": 7,
+        "n2": 0,
+        "original": 104.92450745710211,
+        "repriced": 104.92450745710208,
+        "Decimal": "104.9245074571020780308951583353882016000",
+        "change_events": 7,
+        "initial_nonzero": 4,
+        "terminal_marked_position": 1.0
+      },
+      {
+        "night": "cash",
+        "day": "long",
+        "bps": 2,
+        "n1": 7,
+        "n2": 0,
+        "original": 104.85107499131303,
+        "repriced": 104.851074991313,
+        "Decimal": "104.8510749913130036615645852728578048000",
+        "change_events": 7,
+        "initial_nonzero": 4,
+        "terminal_marked_position": 1.0
+      },
+      {
+        "night": "cash",
+        "day": "long",
+        "bps": 8,
+        "n1": 7,
+        "n2": 0,
+        "original": 104.41140458244564,
+        "repriced": 104.41140458244563,
+        "Decimal": "104.4114045824456154907467814306578432000",
+        "change_events": 7,
+        "initial_nonzero": 4,
+        "terminal_marked_position": 1.0
+      },
+      {
+        "night": "cash",
+        "day": "long",
+        "bps": 16,
+        "n1": 7,
+        "n2": 0,
+        "original": 103.8276362423697,
+        "repriced": 103.82763624236976,
+        "Decimal": "103.8276362423697630093076171163959296000",
+        "change_events": 7,
+        "initial_nonzero": 4,
+        "terminal_marked_position": 1.0
+      },
+      {
+        "night": "reversal",
+        "day": "reversal",
+        "bps": 1,
+        "n1": 1,
+        "n2": 2,
+        "original": 107.01291962754489,
+        "repriced": 107.01291962754489,
+        "Decimal": "107.0129196275448770068608000000000000000",
+        "change_events": 3,
+        "initial_nonzero": 6,
+        "terminal_marked_position": -1.0
+      },
+      {
+        "night": "reversal",
+        "day": "reversal",
+        "bps": 2,
+        "n1": 1,
+        "n2": 2,
+        "original": 106.95941209835127,
+        "repriced": 106.95941209835125,
+        "Decimal": "106.9594120983512449188864000000000000000",
+        "change_events": 3,
+        "initial_nonzero": 6,
+        "terminal_marked_position": -1.0
+      },
+      {
+        "night": "reversal",
+        "day": "reversal",
+        "bps": 8,
+        "n1": 1,
+        "n2": 2,
+        "original": 106.63872646858346,
+        "repriced": 106.63872646858347,
+        "Decimal": "106.6387264685834602807296000000000000000",
+        "change_events": 3,
+        "initial_nonzero": 6,
+        "terminal_marked_position": -1.0
+      },
+      {
+        "night": "reversal",
+        "day": "reversal",
+        "bps": 16,
+        "n1": 1,
+        "n2": 2,
+        "original": 106.21210369712392,
+        "repriced": 106.21210369712395,
+        "Decimal": "106.2121036971239295418368000000000000000",
+        "change_events": 3,
+        "initial_nonzero": 6,
+        "terminal_marked_position": -1.0
+      }
+    ],
+    "past_position_changes": 0,
+    "lagged_positions": [
+      -0.0,
+      -1.0,
+      1.0,
+      -1.0
+    ],
+    "source_model": "1+net=(1+p*r)*(1-c*abs(p-prevp));not native account cash"
+  },
+  "table_rows": {
+    "full_all_assets": 1800,
+    "core_all_assets": 1050,
+    "full_BTC": 900,
+    "core_BTC": 525,
+    "unique_BTC_cells": 300
+  },
+  "maximum_cost_relative_error": 3.337245930228905e-13,
+  "maximum_core_full_overlap_relative_error": 0.0,
+  "unique_active_BTC_cells_wealth_above100_by_bps": {
+    "0": {
+      "total": 288,
+      "positive": 104,
+      "negative": 184,
+      "flat": 0
+    },
+    "1": {
+      "total": 288,
+      "positive": 95,
+      "negative": 193,
+      "flat": 0
+    },
+    "2": {
+      "total": 288,
+      "positive": 76,
+      "negative": 212,
+      "flat": 0
+    },
+    "8": {
+      "total": 288,
+      "positive": 14,
+      "negative": 274,
+      "flat": 0
+    },
+    "16": {
+      "total": 288,
+      "positive": 12,
+      "negative": 276,
+      "flat": 0
+    }
+  },
+  "author_selected_preferred_BTC": {
+    "cutoff": 8,
+    "night": "reversal",
+    "day": "reversal",
+    "source_gross_wealth": 95015.45936450094,
+    "source_change_events": 3743,
+    "source_turnover": 7485.0,
+    "n1": 1,
+    "n2": 3742,
+    "source_dates": 3652,
+    "change_events_per_day": 1.0249178532311063,
+    "economic_closed_campaigns": null,
+    "opportunity_days": null,
+    "break_even_bps": 9.152101472342462,
+    "conditional_wealth_0bps": 95015.45936450094,
+    "conditional_wealth_1bps": 44946.13413433543,
+    "conditional_wealth_2bps": 21258.145693195438,
+    "conditional_wealth_8bps": 237.22277822024876,
+    "conditional_wealth_16bps": 0.5866033539556672
+  },
+  "known_author_positive_outcome_seen_before_fixation": "preferredBTC0/1bps alreadyseen;other300cell outcomes notinspectedbeforerun",
+  "original_raw_price_SHA": null,
+  "original_price_replayed": false,
+  "original_closed_ledger_recovered": false,
+  "economic_fullcost_double_result": null,
+  "net_expectancy_95_lower": null,
+  "profit_factor": null,
+  "drawdown_R": null,
+  "tp1_wilson_lower": null,
+  "urgent_5min_rate": null,
+  "native_manual_execution_validated": false,
+  "forward_started": false,
+  "eligible": false,
+  "production_changed": false,
+  "decision": "not_promoted;conditional_summaryalgebra_only_missingrawprice_and_manualboundedriskcontract",
+  "limitations": [
+    "8/16bpsdiagnosticextendsoriginalturnoverformula;notactual0.06%fee/0.02%fills orfunding,notfullcostgate.",
+    "All300cells multiple-selectedcorrelatedhistoricalviews,not300independentforwardtests.",
+    "Originaltrade_count ispositionchangeevents,notclosedcampaigns/entryalerts oropportunitydays.",
+    "Originalterminalwealth marks openpositionwithoutendliquidationcost;notrealizedcashledger.",
+    "PublishedbootstrapCIvsbuyhold notourabsoluteexpectedRlowerbound;selectionamong25x12notcuredbylimitedHolmgroup.",
+    "Source1xshortsimpleperiodreturn/2xturnovercost has nofunding,borrow,SLTP1,urgentwarn,book/manualdelay.",
+    "AuthorKrakenrawnotpublished;officialarchiveexistencedoesnotconfirmexactauthorfile orcontinuousno-tradehourtreatment.",
+    "No new alpha rules/stop/TP/optimizer orriskincrease;no profitcertification or deadline."
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "scope": {
+    "projectId": "e7d240ac-2468-45c9-8411-33f5e24f425b",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34"
+  },
+  "production_commit": "862339db2c4f69facc9ba6626e2826d475504174",
+  "deployment_id": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
+  "status": "SUCCESS",
+  "bounded_logs": [
+    {
+      "timestamp": "2026-10-20T05:43:32.335677114Z",
+      "severity": "error",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 47, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-20T05:44:12.795124994Z",
+      "severity": "error",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 242, \"closed_5m\": 47, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 76.24536363169035, \"min_range_fraction\": 0.005796259244586177, \"minimum_target_fraction\": 0.005646259244586177, \"stop_floor_fraction\": 0.0013964846795251056}, \"entry_source_switched\": true, \"last5_start\": 1792474500, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 35.49948316674471, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-20T05:44:12.795128486Z",
+      "severity": "error",
+      "message": "INFO:lbank_monitor:ENTRY_SETUP_EVALUATED {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"entry_timing\": {\"candidate_evaluated_at\": 1792475052.0344489, \"evaluation_after_first_ready_observation_seconds\": 0.4197990894317627, \"evaluation_after_nominal_close_seconds\": 12.034448862075806, \"first_ready_observed_at\": 1792475051.6146498, \"last_closed_1m_start\": 1792474980, \"last_closed_5m_start\": 1792474500, \"nominal_1m_close_at\": 1792475040, \"policy\": \"native_completed_bar_schedule_v1\", \"publication_note\": \"nominal_close_is_not_actual_publication_time\", \"quote_observed_at\": 1792475051.6146498, \"source_publication_at\": null, \"trigger\": \"periodic_and_new_bar\"}, \"market\": {\"atr5\": 76.24536363169035, \"breakout_long\": false, \"breakout_short\": false, \"ema_direction\": -1, \"long_pullback_pct\": 0.24965390278025332, \"minimum_stop_pct\": 0.13964846795251057, \"minimum_target_pct\": 0.5646259244586177, \"momentum15_pct\": -0.05673506190222444, \"momentum5_pct\": 0.10228560046046109, \"pullback_min_pct\": 0.15, \"range60_pct\": 0.34689873023587625, \"range_balanced\": false, \"range_required_pct\": 0.5796259244586177, \"range_width_ok\": false, \"range_width_pct\": 0.4003008054848276, \"short_pullback_pct\": 0.1316023996073938}, \"reason\": \"market_no_setup\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-20T05:44:32.511403152Z",
+      "severity": "error",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 47, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-20T05:45:19.892947963Z",
+      "severity": "error",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 243, \"closed_5m\": 48, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 77.42069480085512, \"min_range_fraction\": 0.005827463584119545, \"minimum_target_fraction\": 0.005677463584119545, \"stop_floor_fraction\": 0.0014172917339582234}, \"entry_source_switched\": true, \"last5_start\": 1792474800, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 44.49635549703576, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-20T05:45:19.892966006Z",
+      "severity": "error",
+      "message": "INFO:lbank_monitor:ENTRY_SETUP_EVALUATED {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"entry_timing\": {\"candidate_evaluated_at\": 1792475115.0696166, \"evaluation_after_first_ready_observation_seconds\": 0.0295257568359375, \"evaluation_after_nominal_close_seconds\": 15.069616556167603, \"first_ready_observed_at\": 1792475115.0400908, \"last_closed_1m_start\": 1792475040, \"last_closed_5m_start\": 1792474800, \"nominal_1m_close_at\": 1792475100, \"policy\": \"native_completed_bar_schedule_v1\", \"publication_note\": \"nominal_close_is_not_actual_publication_time\", \"quote_observed_at\": 1792475115.0400908, \"source_publication_at\": null, \"trigger\": \"periodic_and_new_bar\"}, \"market\": {\"atr5\": 77.42069480085512, \"breakout_long\": false, \"breakout_short\": false, \"ema_direction\": -1, \"long_pullback_pct\": 0.22378957675323555, \"minimum_stop_pct\": 0.14172917339582233, \"minimum_target_pct\": 0.5677463584119545, \"momentum15_pct\": -0.052226903933005886, \"momentum5_pct\": 0.09752222663530485, \"pullback_min_pct\": 0.15, \"range60_pct\": 0.34672261092744433, \"range_balanced\": false, \"range_required_pct\": 0.5827463584119545, \"range_width_ok\": false, \"range_width_pct\": 0.34685553058153035, \"short_pullback_pct\": 0.14565246321146333}, \"reason\": \"market_no_setup\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-20T05:45:39.861763726Z",
+      "severity": "error",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 48, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    }
+  ],
+  "live_setup_or_delivery_observed": false,
+  "actual_publication_time_known": false,
+  "production_changed": false,
+  "note": "Read-onlycontinuity,notreplacementcertification;no restartedcollector orassumedbackgroundAI."
+}
