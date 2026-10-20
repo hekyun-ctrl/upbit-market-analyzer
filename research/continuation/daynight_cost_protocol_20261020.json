@@ -1,0 +1,14 @@
+{
+  "version": "daynight_original_BTC_cost_algebra_v1",
+  "fixed_clock_utc": "2026-10-20T05:46:56Z",
+  "fixation": "Design clock aftersourceformula review,prior300cellcostmatrixexecution; remotecheckpoint is fixationevidence. PreferredBTC0/1bps outcomes alreadyseen,notblindalpha validation.",
+  "source_commit": "5693993e108f2b3668bd21b1dd36ae31f79d8fcd",
+  "rule_owned_by_source": "12hDay/Night,eachcash/long/short/signprevioussame-sessionreturn/ornegative sign;25orderedpairs,12UTCcutoffs. No newrule or cut-offselection.",
+  "finite_step": "Reconcileall900BTCsourcecostrows and525coreoverlapusingoriginalpos-change-costalgebra;retainall300grosscells,then8/16bpsconditionalturnoverdiagnostic. Do notrun300newpricebacktests orchoosewinningcell.",
+  "algebra": "positions[-1,0,+1],N=count_nonzero(abs(dp)),T=sum(abs(dp));n2=T-N,n1=2N-T. W(c)=W(0)*(1-c)^n1*(1-2c)^n2 exactunderpublishednetformula. Comparepublished0/1/2bps BEFORE using8/16,stopiffails.",
+  "diagnostic_costs_bps": [0,1,2,8,16],
+  "diagnostic_rationale": "Original0/1/2retained;8=existingresearch6bpsfee+2bpsslipbudget,16doubled. Notnativeactualfills/fee-notional/funding/fullcostgate;no costloweringtopass.",
+  "source_data": "Originalversioned1050/1800metricCSV and allpublishedinferenceperiods(countactualatread),notrawprices/closedledger. RetainpinnedfullsourceGitURLs,blobSHA,SHA256 andderivedBTCtables. ExactoriginalKrakenpriceSHA unavailable;officialarchive/no-tradehourscheckseparate.",
+  "tests": "Reviewed4pureASTfunctions only;syntheticpos/costDecimal/prefix/terminalmarked controls,notmarkettrades. IndependentDecimalreconcileallBTCrowsandcoreoverlap;unknownperformancegatesnull.",
+  "boundaries": "No top-levelpaperimports,bootstraprerun,optimizer,privateoutreach,orders,leverage/margin/lossincrease,artificialTP1ornewexits. No nativeprofitclaim orforwardclock."
+}
