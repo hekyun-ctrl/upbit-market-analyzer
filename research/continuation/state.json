@@ -8,8 +8,8 @@
   "research_branch": "research/lbank-long-history-20261020",
   "production_branch": "feature/lbank-futures-monitor",
   "baseline_research_commit": "709bc7e295c44afad117f5b4f53aecf699e02561",
-  "last_observed_production_commit": "862339db2c4f69facc9ba6626e2826d475504174",
-  "last_observed_deployment": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
+  "last_observed_production_commit": "5c977a7f51cea67048f95791d1dcc4230634939a",
+  "last_observed_deployment": "23799b11-6f14-4e93-aacf-78ce691f9393",
   "eligible_candidates": [],
   "forward_candidate": null,
   "completed_experiments": [
@@ -372,7 +372,7 @@
       "research/continuation/results/current_native_offline_20261020/report.json"
     ],
     "previous_stage": "complete_direction_location_replay_inputs_and_fixed_barrier_transition_hypothesis",
-    "paper_priority": "First verify deployment23799b11 correct5c977a7 source terminalSUCCESS, native readiness and PAPER_NOTIFICATIONS_STARTED plus actual Telegram API delivery result. If failed,fix finite fault before claiming paper stream started. This is paper notification telemetry only, not replacement strategy promotion. Once verified, inspect new candidate/open/TP1/closed counts and gap exclusions; no artificial trades, duplicate count inflation or existing gate loosening. Continue already-frozen offline/fullmanagement research next, without waiting for user requests."
+    "paper_priority": "Paper notification telemetry SUCCESS/source/native readiness and first progress Telegram API acknowledgment verified at2026-10-20T10:23Z. Do not repeat unchanged deployment/status announcement. No candidate/entry/closure yet in this bounded window; hourly study notready and RSI250 maturityfalse are retained, not bypassed. Next inspect actual distinct watch/open/TP1/closed outcomes from existing study logs and missed/stale delivery records, excluding progress/candidate messages from trade counts; do not count overlapping strategies as independent. Continue existing offline/fullmanagement next_work without requiring user re-requests, and do not replace numerical performance research with paper-status notifications. New code source5c977a7 has unchanged entry/strategy/risk gates; profitable replacement remains unqualified. No unnecessary restart for documents."
   },
   "known_limitations": [
     "2023 through Sep2026 reused and exploratory; 2022 observed for Turtle; none may be relabeled untouched.",
@@ -978,6 +978,19 @@
       "production_changed": false,
       "forward_started": false,
       "decision": "no improvement evidence for compulsory higher-direction filter in first week; do not deploy or generalize to all regimes"
+    },
+    {
+      "id": "native_paper_notifications_20261020_1911",
+      "stage_completed": "existing_native_study_event_notification_implemented_tested350_deployed_runtime_and_progress_API_ack_verified",
+      "production_commit": "5c977a7f51cea67048f95791d1dcc4230634939a",
+      "deployment_id": "23799b11-6f14-4e93-aacf-78ce691f9393",
+      "terminal_status": "SUCCESS",
+      "proof": "research/continuation/results/paper_notifications_20261020/runtime.json",
+      "profitability_improved": false,
+      "replacement_promoted": false,
+      "forward_candidate_started": false,
+      "actual_new_paper_entry_observed": false,
+      "autonomous_followthrough_enabled_verified": true
     }
   ],
   "active_run": null,
@@ -1236,15 +1249,15 @@
     "capture_deployed": false,
     "full_exit_replay": false
   },
-  "updated_utc": "2026-10-20 09:56:16 UTC",
-  "updated_kst": "2026-10-20T18:56:16.000+09:00",
+  "updated_utc": "2026-10-20T10:23:07Z",
+  "updated_kst": "2026-10-20T19:23:07+09:00",
   "paper_notifications": {
     "policy": "native_paper_notifications_v1",
     "source_commit": "5c977a7f51cea67048f95791d1dcc4230634939a",
     "deployment_id": "23799b11-6f14-4e93-aacf-78ce691f9393",
-    "deployment_state": "BUILDING",
-    "runtime_verified": false,
-    "telegram_api_ack_verified": false,
+    "deployment_state": "SUCCESS",
+    "runtime_verified": true,
+    "telegram_api_ack_verified": true,
     "actual_new_paper_entry_observed": false,
     "source": "existing native public-techniques4 and RSI study DB; no new candidate rules",
     "max_batch_frequency_seconds": 60,
@@ -1273,7 +1286,16 @@
       "cause": "version-dependent ast.dump shape in newly added invariance test; actual complete source blobs matched local tested files",
       "fix": "Compare exact original function text and unchanged study file hashes instead of AST schema fields; no runtime monitor changes",
       "runtime_activated": false
-    }
+    },
+    "device_receipt_verified": false,
+    "native_ready_verified_at": "2026-10-20T10:23:07.806077908Z",
+    "native_1m": 360,
+    "native_5m": 103,
+    "rsi_history_mature": false,
+    "hourly_study_ready": false,
+    "observed_new_candidate_count": 0,
+    "observed_new_paper_entry_count": 0,
+    "runtime_evidence": "research/continuation/results/paper_notifications_20261020/runtime.json"
   },
   "user_autonomous_followthrough": {
     "requested": true,
