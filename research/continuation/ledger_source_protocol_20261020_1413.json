@@ -1,0 +1,15 @@
+{
+  "version": "bottradepm_contract_and_realprefix_v1",
+  "frozen_utc": "2026-10-20T05:18:23Z",
+  "fixation_scope": "Audit design,not alpha hypothesis;author result summaries alreadyseen. Sourcecode readbeforeprotocol;no actualrealprefix outputs yet. Remote checkpoint precedes marketfeatureevaluation.",
+  "source_commit": "dcd1ac3e2a32204c2943bff000644b6f95486aa5",
+  "source_rule": "OriginalStrategyConfig/defaultadd_features,4hpriceEMA/ATR/RSI,laggeddailybullregime,unlaggeddailydiagnostics,fullsamplevolatilityquantile0.6. No selection/optimizer/training. Syntheticforcedentry isolatescost/partialevent/terminal contracts,not alpha.",
+  "sample": "Already-observed2024Q1 BTCUSDT BinanceUSD-M1m3officialmonthlyZIPs;hour/4h/dayexactcompleteaggregation. Not authorinput or nativeLBank.",
+  "queries_fixed_before_output": {
+    "fullsample_vs_prefix": "2024-01-01 through2024-03-31 full vs prefixending2024-03-11T00:00Z;compareallpast highvolflags,laggeddailybullcontrol,andfourcausalpriceindicators",
+    "intraday_queries": "Days60through90after2024-01-01,first4hbarcompleted(eachday04:00UTC). Compare sourcefeaturesbuiltfromknownhourprefix againstfull-quarter samebar. Keep31queriesincluding0changecontrols;do notcherry-pickdates."
+  },
+  "checks": ["SHA against persistedofficialmanifests", "strictminutecontinuity and OHLCV", "fullsamplequantilepastchanges", "same-daydailyfeaturesfutureappend", "laggedbullandpriceindicatorcontrols", "partialevents vscompletecampaigns", "actualnotionalfeeDecimalreconciliation", "shortslippageorientation", "terminalforceclose vsmark"],
+  "safety": "AST revieweddefinitionsonly;no sourcepackage/downloader/client/optimizer/institutional entrypoint/order. bhanu publiccredentialbearingdocuments must not be copied,used,or echoed;hash-onlyinventory allowed. RawauthorJSON NaN preserved as .txt andnormalized unknownsnull.",
+  "gate": "All originalpromotioncriteria unchanged. No forwardcandidate orclock;missingfullcostexpectancy/PF/DD_R/TP1/urgent/native fieldsnull. Contract/provenance failure excludescurrentrelease only,not everyregime/EMAstrategy."
+}
