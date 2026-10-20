@@ -1,0 +1,156 @@
+{
+  "production": {
+    "deployments": [
+      {
+        "id": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
+        "status": "SUCCESS",
+        "createdAt": "2026-10-20T15:21:53.430Z",
+        "updatedAt": "2026-10-20T15:23:36.102Z",
+        "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+        "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+        "url": null,
+        "snapshotId": "f2852ee8-d513-4663-991e-655ed9ab4e0b",
+        "creator": {
+          "id": "e37ee446-2d9d-4f82-b9db-4bfbc2c98607",
+          "name": "자유3",
+          "email": "hekyun@hanmail.net"
+        },
+        "canRollback": true,
+        "canRedeploy": true,
+        "regions": [
+          "sfo"
+        ],
+        "meta": {
+          "reason": "deploy",
+          "commitMessage": "Observe resistance reaction and directional pressure per closed5m; keep all live entry gates unchanged",
+          "commitHash": "25388b431c9c9d38df6a434670586c65f382d604",
+          "branch": "feature/lbank-futures-monitor"
+        }
+      }
+    ]
+  },
+  "window": {
+    "scope": "deployment",
+    "deploymentId": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "status": "SUCCESS",
+    "deploy": [
+      {
+        "timestamp": "2026-10-20T20:15:07.719488773Z",
+        "severity": "error",
+        "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=progress orders=false live_gate=false",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T20:30:08.695249729Z",
+        "severity": "error",
+        "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=progress orders=false live_gate=false",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T20:45:09.455257155Z",
+        "severity": "error",
+        "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=progress orders=false live_gate=false",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T21:00:10.327095948Z",
+        "severity": "error",
+        "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=progress orders=false live_gate=false",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T21:08:04.984239838Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [{\"id\": \"public_techniques_v1:box_retest_5m:1:1792530000\", \"reason\": \"paper_watch\", \"strategy\": \"box_retest_5m\"}], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 1, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T21:08:10.827002535Z",
+        "severity": "error",
+        "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=candidate orders=false live_gate=false",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T21:10:11.639018831Z",
+        "severity": "error",
+        "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [{\"id\": \"public_techniques_v1:box_retest_5m:1:1792530000\", \"reason\": \"paper_opened\", \"strategy\": \"box_retest_5m\"}], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 1, \"version\": \"public_techniques_v1\"}",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      }
+    ]
+  },
+  "new_event_ack": {
+    "scope": "deployment",
+    "deploymentId": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "status": "SUCCESS",
+    "deploy": [
+      {
+        "timestamp": "2026-10-20T21:08:10.827002535Z",
+        "severity": "error",
+        "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=candidate orders=false live_gate=false",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T21:10:41.320178725Z",
+        "severity": "error",
+        "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=opened orders=false live_gate=false",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      }
+    ]
+  },
+  "device_receipt_verified": false,
+  "observed_candidate_count": 1,
+  "observed_open_count": 1,
+  "observed_closed_count": 0,
+  "scope": "bounded observed window only, not lifetime ledger; INFO mirrored as error severity by log transport",
+  "performance_proven": false,
+  "source_restarted": false
+}
