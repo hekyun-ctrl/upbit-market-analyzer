@@ -1,0 +1,43 @@
+{
+  "version": "cshear_72f293_source_contract_v1",
+  "scope": "Bounded original-code execution/data/cost feasibility audit. Not a market profitability backtest, optimization, replication of selected author portfolio, or native LBank validation.",
+  "source": {
+    "repository": "CShear/crack-the-nut",
+    "commit": "72f293c19a61e01507f322595e3982da00f0932d",
+    "url": "https://github.com/CShear/crack-the-nut/tree/72f293c19a61e01507f322595e3982da00f0932d",
+    "read": ["README.md", "RESEARCH-REPORT.md", "STRATEGY-REPORT.md", "analog/evaluators.py", "analog/strategies.py", "analog/backfill.py", "analog/exit_analysis.py", "analog/tp_trail_backtest.py", "analog/simulate_portfolio.py"],
+    "original_rsi_code": "RSI14<=25 plus close>SMA120 LONG; RSI14>=75 plus close<=SMA120 SHORT. Source code rule, not older research report20/80+vol1.3 description. No new rule invented or adopted. Four-hour source interval and default flat0.0006 round-trip return charge.",
+    "execution_safety": "Read pinned Git objects. AST-execute only reviewed CandleData/FundingSnapshot/HistoricalData and five function definitions (eight total definitions). Omit original imports, module entrypoints, network clients, live code and pickle loading. Retain every original definition/file SHA. No credentials or orders."
+  },
+  "fixed_probes": [
+    "Candle history prefix vs future append at query+3h and exact label control; nearest-index/candle tie behavior.",
+    "Future funding appended within4h bucket at earlier query; three-record arrival order vs true mean.",
+    "Positive-funding factory's fixed short under two different future closes; apply both original infer_direction functions.",
+    "Explicit long price-only return below/above original1bp direction fallback threshold.",
+    "48h requested hold with only4h available; gap of8h returned as4h; stop gaps and stop-first both-touch control.",
+    "Same OHLC two monotonic intrabar paths for TP-to-trail; cannot infer market prevalence or direction of aggregate bias.",
+    "RSI24/uptrend fixture checks current source parameters vs differing historical descriptions.",
+    "Long/short hypothetical target5% and stop2%, full assumed costs1x/2x at fixed price reference100. Fee0.0006/side, adverse slip0.0002/side and funding reserve0.0001 notional; these are not actual source/native historical costs."
+  ],
+  "real_price_causality_probe": {
+    "venue": "Binance USD-M BTCUSDT, not source Hyperliquid or LBank",
+    "month": "2024-01",
+    "zip_sha256": "21eeac04a76a7a35b10467e5e752fb2f8cff77cdeb57df6b50a23ce8d69bb190",
+    "source_manifest": "research/long_history/results/source_manifest_2024_2026_1m.json",
+    "expected_minutes": 44640,
+    "missing_duplicates_badOHLC_policy": "Abort. Frozen January has no existing quarantined windows; do not release any other month quarantine.",
+    "aggregation": "186complete4h bars from original contiguous1m. Each bucket240minutes; UTC epoch anchored.",
+    "queries": "For each of first185bar labels use label+3hours. Compare prefix with candles through this label vs full month. No price-dependent timestamp selection. Check exact-label query as positive control.",
+    "interpretation": "Later-labeled candle selection proves accessor is not past-only at these non-grid queries. These counts are not market frequency and do not prove every original on-grid strategy decision leaks. Input candle labels do not establish actual exchange publication/availability timestamps.",
+    "previously_observed": true,
+    "independent_forward_evidence": false
+  },
+  "statistics_and_promotion": {
+    "source_tree": "Record complete public tree/object identifiers and SHA. Locate public raw BTC data and closed ledger; do not count markdown aggregate tables as ledgers.",
+    "PF_expectancy_CI_drawdown_R_TP1_urgent_manual_fills": "Unavailable without valid closed-market ledger/causal execution. Leave null; do not assign synthetic fixture profits to performance.",
+    "selection": "Author searched63strategies/13assets plus20exit variants and multiple portfolios. Preserve this selection context and all disclosed negative BTC evidence; no new sweep or best-period selection.",
+    "gate": "docs/lbank_strategy_rebuild_2026-10-20.md unchanged. No candidate/forward clock/deploy based on contract probes."
+  },
+  "preregistration_limit": "Hypotheses arise from reading source. Freeze code/protocol before retained real-price query run, but do not present forensic counterexamples as blind confirmatory alpha research.",
+  "next": "If this public release lacks valid BTC-only fullcost provenance or fails causal execution contract, exclude this release, preserve facts, and perform different primary-source discovery. Do not repair/tune this source to salvage its headline."
+}

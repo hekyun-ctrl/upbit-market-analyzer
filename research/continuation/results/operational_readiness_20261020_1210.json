@@ -1,0 +1,55 @@
+{
+  "source": "862339db2c4f69facc9ba6626e2826d475504174",
+  "deployment": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
+  "deployment_status": "SUCCESS",
+  "observation_end_utc": "2026-10-20T03:10:57.372394910Z",
+  "logs": [
+    {
+      "timestamp": "2026-10-20T03:00:28.530339573Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 78, \"closed_5m\": 15, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:01:38.824889368Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 79, \"closed_5m\": 15, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:02:34.246534129Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 80, \"closed_5m\": 15, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:03:44.930655377Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 81, \"closed_5m\": 15, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:04:48.842596959Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 82, \"closed_5m\": 15, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:05:49.329386909Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 83, \"closed_5m\": 16, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:06:49.490893018Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 84, \"closed_5m\": 16, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:07:49.556392313Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 85, \"closed_5m\": 16, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:08:52.802821204Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 86, \"closed_5m\": 16, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:09:54.651508650Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 87, \"closed_5m\": 16, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T03:10:57.372394910Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 88, \"closed_5m\": 17, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    }
+  ],
+  "operations_changed": false,
+  "entry_readiness_verified": false,
+  "metadata_severity_note": "Railway marks stderr as error while underlying messages are INFO;do not infer application exception solely from wrapper severity."
+}
