@@ -55,7 +55,10 @@
     "research/continuation/source_screening_20261020_1423.json",
     "docs/lbank_daynight_cost_audit_2026-10-20.md",
     "docs/lbank_pullback_contract_audit_2026-10-20.md",
-    "docs/lbank_funding_ledger_audit_2026-10-20.md"
+    "docs/lbank_funding_ledger_audit_2026-10-20.md",
+    "docs/lbank_entry_principles_2026-10-20.md",
+    "research/continuation/incident_three_alerts_20261020_1734.json",
+    "research/continuation/incident_band_location_20261020_1738.json"
   ],
   "next_work": {
     "stage": "distinct_primary_paper_original_data_code_and_manualrisk_feasibility",
@@ -350,7 +353,8 @@
       }
     ],
     "completed_pullback_contract": "docs/lbank_pullback_contract_audit_2026-10-20.md",
-    "completed_funding_ledger": "docs/lbank_funding_ledger_audit_2026-10-20.md"
+    "completed_funding_ledger": "docs/lbank_funding_ledger_audit_2026-10-20.md",
+    "entry_design_priority": "Build source-versioned entry contract cards with exact original timeframe/universe, context, direction, location, trigger, known-at-time price, invalidation/initial stop, TP1/exit, full-cost/public-data and manual-execution coverage. Keep missing fields null; do not invent a complete formula by mixing principles. Audit all retained #8-15 as development-only diagnostics, then fixed-test one genuinely new complete BTC candidate rather than tuning on these outcomes."
   },
   "known_limitations": [
     "2023 through Sep2026 reused and exploratory; 2022 observed for Turtle; none may be relabeled untouched.",
@@ -1119,5 +1123,17 @@
       }
     },
     "readiness_resumption_reported_in_run": "cshear_source_contract_20261020_1210"
+  },
+  "entry_design_workstream": {
+    "status": "source_comparison_and_design_principles_fixed_not_profitable_formula",
+    "version": "entry_design_principles_v1",
+    "documentation": "docs/lbank_entry_principles_2026-10-20.md",
+    "documentation_commit": "b6a8c2b14b2bc484f38695ae406e4d9b9f524b04",
+    "user_priority": "Direction rationale and entry location first; Bollinger Bands are only one descriptive component. Do not substitute latency improvements for signal selection quality.",
+    "reviewed_public_sources": 4,
+    "new_profitability_backtests": 0,
+    "new_eligible_candidates": 0,
+    "operations_changed": false,
+    "next_finite_step": "Build source-versioned entry contract cards with exact original timeframe/universe, context, direction, location, trigger, known-at-time price, invalidation/initial stop, TP1/exit, full-cost/public-data and manual-execution coverage. Keep missing fields null; do not invent a complete formula by mixing principles. Audit all retained #8-15 as development-only diagnostics, then fixed-test one genuinely new complete BTC candidate rather than tuning on these outcomes."
   }
 }
