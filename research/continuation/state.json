@@ -372,7 +372,7 @@
       "research/continuation/results/current_native_offline_20261020/report.json"
     ],
     "previous_stage": "complete_direction_location_replay_inputs_and_fixed_barrier_transition_hypothesis",
-    "paper_priority": "First verify deployment2231dfa8 correct336cd3f source terminalSUCCESS, native readiness and PAPER_NOTIFICATIONS_STARTED plus actual Telegram API delivery result. If failed,fix finite fault before claiming paper stream started. This is paper notification telemetry only, not replacement strategy promotion. Once verified, inspect new candidate/open/TP1/closed counts and gap exclusions; no artificial trades, duplicate count inflation or existing gate loosening. Continue already-frozen offline/fullmanagement research next, without waiting for user requests."
+    "paper_priority": "First verify deployment23799b11 correct5c977a7 source terminalSUCCESS, native readiness and PAPER_NOTIFICATIONS_STARTED plus actual Telegram API delivery result. If failed,fix finite fault before claiming paper stream started. This is paper notification telemetry only, not replacement strategy promotion. Once verified, inspect new candidate/open/TP1/closed counts and gap exclusions; no artificial trades, duplicate count inflation or existing gate loosening. Continue already-frozen offline/fullmanagement research next, without waiting for user requests."
   },
   "known_limitations": [
     "2023 through Sep2026 reused and exploratory; 2022 observed for Turtle; none may be relabeled untouched.",
@@ -1240,8 +1240,8 @@
   "updated_kst": "2026-10-20T18:56:16.000+09:00",
   "paper_notifications": {
     "policy": "native_paper_notifications_v1",
-    "source_commit": "336cd3fb3a5d91cafcd613a2456c75b756e41d2f",
-    "deployment_id": "2231dfa8-bcbd-4dba-b0d0-a8ea35039cbc",
+    "source_commit": "5c977a7f51cea67048f95791d1dcc4230634939a",
+    "deployment_id": "23799b11-6f14-4e93-aacf-78ce691f9393",
     "deployment_state": "BUILDING",
     "runtime_verified": false,
     "telegram_api_ack_verified": false,
@@ -1263,6 +1263,16 @@
       "runtime_activated": false,
       "corrected_source_remote_blob_hashes_verified": true,
       "old_live_readback": "2026-10-20T10:18:54Z 862339d deployment181eb91b native360/102 ready"
+    },
+    "remote_blob_hashes_verified": true,
+    "second_failed_predeploy": {
+      "commit": "336cd3fb3a5d91cafcd613a2456c75b756e41d2f",
+      "deployment": "2231dfa8-bcbd-4dba-b0d0-a8ea35039cbc",
+      "server_tests": 350,
+      "failures": 1,
+      "cause": "version-dependent ast.dump shape in newly added invariance test; actual complete source blobs matched local tested files",
+      "fix": "Compare exact original function text and unchanged study file hashes instead of AST schema fields; no runtime monitor changes",
+      "runtime_activated": false
     }
   },
   "user_autonomous_followthrough": {
