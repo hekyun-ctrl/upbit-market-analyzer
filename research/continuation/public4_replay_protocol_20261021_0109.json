@@ -1,0 +1,19 @@
+{
+  "version": "unchanged_public4_minute_open_transfer_v1",
+  "frozen_before_market_result": true,
+  "source": "25388b431c9c9d38df6a434670586c65f382d604",
+  "entry_window": [
+    "2025-01-08",
+    "2025-01-15"
+  ],
+  "followup_end_exclusive": "2025-01-16",
+  "cadence": "once/minute at archived actual1m open; watch must age>=30 per original rules, earliest laterpoll60s; native15snotreproduced",
+  "state": "360closed1m,250closed5m,300research5m; exact originalsource quality checked; hourlyaggregation original; no formingdata",
+  "rules": "unchanged TechniqueStudy confirmation/context/RSI/plan/risk/dedup/overlap; no conflictveto/no newtechnique",
+  "costs": "6bp fee+2bp slip eachside, archivedfunding; double charges and costs, not receipts; original stop cashloss R",
+  "censors": "source intrabar/gap/endpoint unknowns excluded, all rows saved",
+  "warning": "Study original PerformanceBook only; no SignalRiskTracker emergency validation",
+  "development": true,
+  "not_native_execution": true,
+  "promotion": false
+}
