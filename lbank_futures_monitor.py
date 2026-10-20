@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 21517)
-Total output lines: 1474
-
 """LBank BTCUSDT perpetual-only public price observation monitor.
 
 Never creates orders or reads private LBank accounts. CCXT routes fetch_ohlcv
@@ -630,7 +627,402 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
     """Separate second-stage ENTRY REVIEW with fresh price confirmation.
 
     Used for user-side manual checking only, not a guaranteed market entry.
-    …5517 tokens truncated…reason, observed_price = registered_risk
+    Native mode verifies candle continuity; orderbook depth remains unverified.
+    """
+    def mark(reason):
+        if diagnostics is not None:
+            diagnostics["reason"] = reason
+
+    if watch is None or age_seconds < 30 or age_seconds > ENTRY_CONFIRM_MAX_AGE_SECONDS:
+        mark("invalid_watch_age")
+        return None
+    if len(prices) < MIN_SAMPLES:
+        mark("insufficient_samples")
+        return None
+    direction = watch["direction"]
+    current = native_state["quote"] if native_state is not None else prices[-1]
+    initial = watch["price"]
+    relative = direction * (current / initial - 1)
+    # Do not chase >0.10% in the favorable direction or accept >0.10% failed breakout.
+    if relative < -ENTRY_MAX_CHASE_PCT or relative > ENTRY_MAX_CHASE_PCT:
+        mark("price_deviation")
+        return None
+    entry_quality = None
+    ranked_confirmation = None
+    if native_state is not None:
+        quality_ok, quality_reason, entry_quality = confirmation_quality(native_state, watch)
+        if not quality_ok:
+            mark(quality_reason)
+            return None
+        ranked_confirmation = ranked_entry_evidence(native_state,direction,current,watch.get('target1'))
+    m5 = (current / prices[-6] - 1) * 100
+    m15 = (current / prices[-16] - 1) * 100
+    macd_line = [a - b for a, b in zip(ema(prices, 12), ema(prices, 26))]
+    macd, sig = macd_line[-1], ema(macd_line, 9)[-1]
+    strength = rsi(prices)
+    if direction == 1:
+        valid = macd > sig and m5 >= .04 and m15 >= .10
+    else:
+        valid = macd < sig and m5 <= -.04 and m15 <= -.10
+    if watch.get("strategy", "breakout") != "breakout":
+        valid = (confirm_structure(prices, watch, ema, rsi, current_price=current)
+                 if native_state is not None else confirm_structure(prices, watch, ema, rsi))
+    if not valid:
+        if entry_quality and (entry_quality['priority'].get('dominant_intact')
+                or ranked_confirmation['may_override_minor_reaction']):
+            valid = True
+    if not valid:
+        mark("structure_or_momentum")
+        return None
+    if watch.get("strategy") == "trend_retest":
+        momentum_ok, momentum_reason, directional5, directional15 = (
+            trend_retest_momentum_gate(prices, direction))
+        if not momentum_ok and entry_quality and (entry_quality['priority'].get('dominant_intact')
+                or ranked_confirmation['may_override_minor_reaction']):
+            momentum_ok=True
+        if not momentum_ok:
+            LOG.info("RETEST MOMENTUM CONFIRM BLOCKED side=%s reason=%s directed5m=%.3f%% directed15m=%.3f%%",
+                     "LONG" if direction == 1 else "SHORT",
+                     momentum_reason, directional5, directional15)
+            mark("retest_momentum")
+            return None
+    context = None
+    if native_state is not None or observations is not None:
+        context_ok, context_reason, context = (
+            native_context_gate(native_state, direction, watch.get("strategy", "breakout"))
+            if native_state is not None else sampled_context_gate(
+                observations, direction, watch.get("strategy", "breakout")))
+        if not context_ok:
+            LOG.info("CLOSED-BUCKET confirm BLOCKED side=%s reason=%s context=%s",
+                     "LONG" if direction == 1 else "SHORT", context_reason, context)
+            mark("sampled_context")
+            return None
+        allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(
+            observations, direction, setup=watch, native_state=native_state)
+        if not allowed:
+            LOG.info("5m RSI confirm direction BLOCKED side=%s reason=%s rsi=%s",
+                     "LONG" if direction == 1 else "SHORT", reason, sampled_rsi5)
+            mark("rsi_direction")
+            return None
+    else:
+        sampled_rsi5 = None
+    plan = calculate_plan(prices, direction, setup=watch, native_state=native_state)
+    if plan is None:
+        mark("risk_or_target")
+        LOG.info("CONFIRM candidate cost/risk/target rejected strategy=%s direction=%s",
+                 watch.get("strategy", "breakout"), direction)
+    if plan is not None:
+        mark("qualified")
+        if native_state is not None:
+            plan["data_source"] = native_state["source"]
+            plan["native_5m_start"] = native_state["last5_start"]
+            plan["native_5m_count"] = len(native_state["five_bars"])
+            plan["rsi5"] = sampled_rsi5
+            plan["entry_quality"] = entry_quality
+            plan['entry_quality']['priority']=direction_priority(
+                native_state,direction,current,plan['target1'],
+                native_state['minute_bars'][-1]['start']+60)
+            plan['entry_quality']['ranked_entry'] = plan['entry_decision_priority']
+            if watch.get('strategy','breakout') == 'breakout' and not breakout_confirmation_allowed(
+                    plan, breakout_evidence(prices,native_state,ema)):
+                mark(BREAKOUT_CONFIRMATION_REJECT)
+                return None
+        plan["sampled_rsi5"] = sampled_rsi5  # Legacy schema alias; see data_source.
+        plan["sampled_context"] = context
+        plan["rsi_direction_status"] = reason if native_state is not None or observations is not None else None
+        plan = annotate_rsi_context(plan, native_state)
+    return plan
+
+
+def format_entry_alert(plan, observed_at_utc, reference_number=None):
+    """Send only the actionable 9-line, USDT-first, KST observation summary.
+
+    Full market diagnostics and filter decisions remain in Railway logs.
+    Manual entries must verify live venue price, contract size and fees.
+    """
+    return format_compact_entry_alert(
+        plan, observed_at_utc, reference_number=reference_number,
+        reference_balance=REF_BALANCE, leverage=LEVERAGE,
+        max_margin_fraction=MAX_MARGIN_FRACTION,
+    )
+
+
+def verified_reversal_exception(now, side, state, plan=None):
+    """Permit early opposite-side review ONLY on a strict closed-bucket reversal.
+
+    The global 45m cooldown, daily cap, two-stage confirmation, no-chase and
+    net cost/risk checks are NOT waived. Directional RSI is secondary evidence.
+    """
+    previous_at = state.get("last_time")
+    if previous_at is None or state.get("last_side") == side:
+        return False
+    elapsed = now - previous_at
+    if not (COOLDOWN <= elapsed < REVERSAL_COOLDOWN):
+        return False
+    if not isinstance(plan, dict):
+        return False
+    if plan.get("side") != side or plan.get("strategy") not in ("breakout", "trend_retest"):
+        return False
+    context = plan.get("sampled_context") or {}
+    try:
+        direction = 1 if side == "롱" else -1
+        entry, stop, target = (float(plan[key]) for key in
+                               ("price", "stop", "target1"))
+        rr, loss = float(plan["rr1"]), float(plan["net_loss"])
+        risk_valid = (entry > 0 and stop > 0 and target > 0 and
+                      direction * (entry - stop) > 0 and
+                      direction * (target - entry) > 0 and
+                      0 < loss <= REF_BALANCE * RISK_FRACTION + 1e-7 and
+                      rr >= MIN_NET_RR - 1e-7)
+    except (KeyError, TypeError, ValueError, OverflowError):
+        return False
+    return (risk_valid and context.get("reversal_confirmed") is True and
+            plan.get("rsi_direction_status") == "5m_rsi_direction_aligned")
+
+
+def format_reversal_pre_watch(plan, at_kst):
+    """Information-only verified reversal watch, never an entry permission."""
+    context = plan.get("sampled_context") or {}
+    return (
+        f"[LBank BTCUSDT | {plan['side']} 전환 사전포착 - 진입 미확정]\n"
+        f"한국시간: {at_kst}\n"
+        f"현재 참고가격: {plan['price']:,.1f} USDT\n"
+        f"완료된 5분 가격표본 2구간 회복: {context.get('reversal_10m_pct', 0):+.2f}%\n"
+        f"완료된 최신 5분 구간 움직임: {context.get('reversal_last5_pct', 0):+.2f}%\n"
+        "기존 반대 방향 알람의 90분 제한 중 검증된 전환 후보를 포착했습니다.\n"
+        "※ 2단계 재확인 전이므로 진입 추천이나 확정 알람이 아닙니다.\n"
+        "※ 수수료 포함 위험·손절·목표의 추가 검증 및 거래소 실제 5분봉/호가 확인 필요.\n"
+        "※ 거래소 원본 OHLCV/거래량이 아닌 1분 선물 가격표본 기반입니다. 자동주문 없음."
+    )
+
+
+def alert_gate(now, side, state, plan=None):
+    day = datetime.fromtimestamp(now, tz=timezone(timedelta(hours=9))).date().isoformat()
+    if day != state["day"]:
+        state["day"], state["count"] = day, 0
+    # Quiet hours apply only to discretionary entry and reversal pre-watch.
+    # Sent-signal/actual-position risk and target notices bypass this gate.
+    if is_quiet_new_entry_time(now):
+        return "sleep_hours"
+    if state["count"] >= MAX_DAILY_ALERTS:
+        return "daily_cap"
+    if state["last_time"] is not None:
+        elapsed = now - state["last_time"]
+        if elapsed < COOLDOWN:
+            return "global_cooldown"
+        if side != state["last_side"] and elapsed < REVERSAL_COOLDOWN:
+            if not verified_reversal_exception(now, side, state, plan):
+                return "reverse_cooldown"
+    return "ok"
+
+
+def record_alert(now, side, state, plan=None):
+    if alert_gate(now, side, state, plan=plan) != "ok":
+        raise ValueError("alert gate disallowed sending")
+    state["last_time"], state["last_side"] = now, side
+    state["count"] += 1
+
+
+def run():
+    exchange = ccxt.lbank({"enableRateLimit": True, "timeout": 12000,
+                           "options": {"defaultType": "swap"}})
+    exchange.load_markets()
+    if not exchange.market(SYMBOL).get("swap"):
+        raise RuntimeError("Refuse to monitor spot instrument")
+    LOG.info("LBank BTCUSDT: TWO-STAGE fee-aware entry-review monitor started. REF_BALANCE=%.4f risk_pct=%.2f leverage=%.0fx max_margin_pct=%.1f; NO orders",
+             REF_BALANCE, 100 * RISK_FRACTION, LEVERAGE, MAX_MARGIN_FRACTION * 100)
+    LOG.info("ENTRY_NOTIFICATION_SCHEDULE timezone=KST quiet_hours_enabled=%s "
+             "entry_hours=%s risk_notifications=always_on",
+             quiet_hours_enabled(),
+             "quiet=Wed-Sat 23:00-to-next-day-06:00" if quiet_hours_enabled() else "24h")
+    # Runs in a daemon so health checks cannot hold up market or stop warnings.
+    threading.Thread(target=TELEGRAM_DELIVERY.startup_probe_once,
+                     name="lbank-telegram-one-time-diagnostic",
+                     daemon=True).start()
+    cached_observations, cached_alert_state = load_snapshots(
+        SAMPLE_STORE_PATH, SYMBOL, POLL)
+    observations = deque(cached_observations, maxlen=360)
+    LOG.info("price_sample_cache_restored=%d", len(observations))
+    # Only the writer thread owns a writable native DB connection. The entry
+    # reader fails closed on missing, stale or discontinuous native history.
+    if os.getenv("LBANK_NATIVE_CANDLES_ENABLED", "true").lower() == "true":
+        NativeCandleThread().start()
+        LOG.info("NATIVE_CANDLES collection enabled; entry_source=native readiness_required=true")
+    native_feed = NativeEntryFeed()
+    market_context = None
+    try:
+        market_context = MarketContextThread()
+        market_context.start()
+        LOG.info("MARKET_CONTEXT enabled source=CoinGecko poll_seconds=300 "
+                 "btc_d=true usdt_d=true usdt_usd=true supply=true live_gate=false")
+    except Exception as exc:
+        LOG.warning("MARKET_CONTEXT_INIT_FAILED exception=%s existing_alerts_unchanged=true",type(exc).__name__)
+    risk_tracker = SignalRiskTracker(path=os.getenv(
+        "LBANK_SIGNAL_FOLLOWUP_STATE_PATH", "/data/lbank_signal_followups.json"))
+    rsi_research = ResearchTracker()  # Shadow stats only; not an entry gate
+    neutral_exit_study = NeutralExitStudy(path=os.getenv(
+        "LBANK_NATIVE_NEUTRAL_EXIT_RESEARCH_STATE_PATH", "/data/lbank_native_neutral_exit_study.json"))
+    LOG.info("neutral_exit_shadow_study=enabled; logging hypotheses only, no new Telegram exit alerts")
+    position_ledger = PositionState()
+    position_bot = TelegramBot(position_ledger)
+    performance = None
+    divergence_study = None
+    technique_study = None
+    try:
+        technique_study = TechniqueStudy(os.getenv(
+            "LBANK_PUBLIC_TECHNIQUE_STUDY_DB", "/data/lbank_public_technique_study.sqlite3"),
+            REF_BALANCE, fee=TAKER_FEE, slippage=STOP_SLIPPAGE, funding=FUNDING_BUFFER)
+        LOG.info("PUBLIC_TECHNIQUES enabled paper_strategies=4 live_gate=false live_entry_added=false "
+                 "original_rsi_window=250 study_only_hourly_history=300")
+    except Exception as exc:
+        LOG.error("PUBLIC_TECHNIQUES unavailable exception=%s existing_entries_unchanged=true",type(exc).__name__)
+    try:
+        divergence_study = DivergenceStudy(os.getenv(
+            "LBANK_RSI_DIVERGENCE_STUDY_DB", "/data/lbank_rsi_divergence_study.sqlite3"), REF_BALANCE)
+        LOG.info("RSI_DIVERGENCE enabled annotation_only=true independent_paper=true live_gate=false "
+                 "pivot_right_bars=2 rsi50_required_for_existing=false")
+    except Exception as exc:
+        LOG.error("RSI_DIVERGENCE study_unavailable exception=%s existing_entries_unchanged=true", type(exc).__name__)
+    # Separate reader/sender: existing study rules and safety loop are untouched.
+    if os.getenv("LBANK_PAPER_NOTIFICATIONS_ENABLED", "true").lower() == "true":
+        try:
+            threading.Thread(target=PaperNotificationThread().run,
+                             name="lbank-paper-notification-worker",daemon=True).start()
+        except Exception as exc:
+            LOG.error("PAPER_NOTIFICATION_START_FAILED type=%s", type(exc).__name__)
+    pending_journal = []
+    try:
+        performance = PerformanceBook(
+            os.getenv("LBANK_PERFORMANCE_DB", "/data/lbank_performance.sqlite3"),
+            REF_BALANCE, goal_pct=DAILY_GOAL_PCT)
+        LOG.info("PERFORMANCE_V3 ready daily_goal_pct=7 report_kst=22:50 "
+                 "partial_exit=50pct source=ticker_samples actual_account_pnl=false")
+        LOG.info("TREND_RUNNER enabled=%s policy=%s atr=14 trail_atr=2 "
+                 "ema=9/21 max_tracking_hours=6 goal_is_exit_cap=false validated_profit=false",
+                 RUNNER_ENABLED, POLICY_VERSION)
+    except Exception as exc:
+        LOG.error("PERFORMANCE_V2 unavailable exception=%s; new_entries_paused=true",
+                  type(exc).__name__)
+    LOG.info("position_report_tracking=enabled; recorded_position_present=%s", bool(position_ledger.position))
+    # Read-only reconstruction of the latest public signal in a separate thread.
+    # No account state, Telegram calls, source DB changes or live strategy gates.
+    threading.Thread(target=audit_recent_entry, args=(classify, confirm_watch, dict(
+        fee=TAKER_FEE, slippage=STOP_SLIPPAGE, funding_buffer=FUNDING_BUFFER,
+        reference_balance=REF_BALANCE, risk_fraction=RISK_FRACTION,
+        leverage=LEVERAGE, max_margin_fraction=MAX_MARGIN_FRACTION)),
+        name="lbank-entry-replay-audit", daemon=True).start()
+    # Official macro feeds are polled in an independent daemon thread.
+    # No macro network call can block ticker sampling, stop-risk warning,
+    # RSI validation or any other market-monitor action.
+    try:
+        MacroMonitor(
+            sender=telegram,
+            state_path=os.getenv("LBANK_MACRO_STATE_PATH", "/data/lbank_macro_state.json"),
+        ).start()
+        LOG.info("MACRO integration enabled official BLS/Fed news + BLS/BEA schedule; informative only")
+    except Exception as exc:
+        LOG.error("MACRO integration failed to start exception=%s", type(exc).__name__)
+    # Independent read-only LBank futures order-book data collection.
+    # Non-fatal in case this public API is inaccessible in this deployment.
+    # It NEVER affects the existing entry/safety rules or live Telegram sends.
+    if os.getenv("LBANK_ORDERBOOK_SHADOW_ENABLED", "true").lower() == "true":
+        try:
+            OrderBookShadowThread(
+                interval_seconds=int(os.getenv(
+                    "LBANK_ORDERBOOK_SHADOW_INTERVAL_SECONDS", "30"))).start()
+            LOG.info("ORDERBOOK_SHADOW integration started independent daemon")
+        except Exception as exc:
+            LOG.error("ORDERBOOK_SHADOW_INIT_FAILED exception=%s details=%s",
+                      type(exc).__name__, str(exc)[:150])
+    LOG.info("risk_snapshot_poll=%ds setup_review_poll=%ds watch_confirmation_poll=%ds "
+             "min_watch_age=30 source=native_candles quote_risk_polling=true",
+             RISK_POLL, POLL, RISK_POLL)
+    LOG.info("ENTRY_TIMING_POLICY policy=%s setup_on_new_completed_native_bar=true "
+             "periodic_setup_fallback_seconds=%d minute_sample_cadence_unchanged=true "
+             "minimum_confirmation_seconds=30 existing_risk_gates_unchanged=true", ENTRY_TIMING_POLICY, POLL)
+    LOG.info("BREAKOUT_CONFIRMATION_POLICY policy=%s original_trigger_or_existing_higher_priority=true "
+             "lost_both_cancel_watch=true extra_wait_seconds=0 profitability_validated=false",
+             BREAKOUT_CONFIRMATION_POLICY)
+    try:
+        with open(__file__, "rb") as source:
+            monitor_sha = hashlib.sha256(source.read()).hexdigest()
+        with open(os.path.join(os.path.dirname(__file__), "lbank_entry_timing.py"), "rb") as source:
+            timing_sha = hashlib.sha256(source.read()).hexdigest()
+        LOG.info("ENTRY_TIMING_RUNTIME commit=%s monitor_sha256=%s timing_sha256=%s",
+                 os.getenv("RAILWAY_GIT_COMMIT_SHA", "unknown"), monitor_sha, timing_sha)
+    except OSError as exc:
+        LOG.warning("ENTRY_TIMING_RUNTIME source_hash_unavailable exception=%s", type(exc).__name__)
+    LOG.info("ENTRY_QUALITY policy=%s universal_minute_wait=false "
+             "priority=hard_risk,higher_structure,target_room,minute_reaction "
+             "stop_warnings=always_on early_caution=structure_aware", ENTRY_QUALITY_POLICY)
+    LOG.info("PROFIT_PROTECTION_POLICY policy=%s pre_tp1=true profitable_reversal=true legacy_policy_unchanged=true",PROFIT_POLICY)
+    LOG.info("SIGNAL_THESIS_POLICY policy=%s frozen_followup_policy_unchanged=true missing_evidence_is_reversal=false "
+             "review_hours=6 tracking_hours=24 time_alone_is_exit=false", FOLLOWUP_POLICY)
+    LOG.info("NATIVE_TARGET_ROOM policy=%s "
+             "single_pivot=ranked repeated_barrier=block stages=watch,confirm additional_wait=false "
+             "direction=15m_and_5m_ema max_extension_atr=2.5 historical_range_exception_cap_atr=6", ENTRY_PRIORITY_POLICY)
+    LOG.info("NATIVE_ENTRY_GEOMETRY stop_floor=max(0.05pct,1.5ATR5) "
+             "structural_stop_preserved=true range_floor=cost_solved_TP1 "
+             "net_rr1=1.5 risk_limit_unchanged=true")
+    watch = None
+    alert_state = cached_alert_state
+    last_sample = observations[-1][0] if observations else 0
+    startup_done = False
+    next_startup_test = 0
+    counter_template = {"watched": 0, "confirmed": 0, "expired": 0, "blocked": 0,
+                        "suppressed": 0, "range_watch": 0, "trend_watch": 0,
+                        "breakout_watch": 0, "range_confirmed": 0,
+                        "trend_confirmed": 0, "breakout_confirmed": 0,
+                        "data_gap": 0, "no_setup": 0, "retest_momentum": 0,
+                        "sampled_context": 0, "rsi_direction": 0,
+                        "risk_or_target": 0, "other_reject": 0,
+                        "confirm_reject": 0, "quality_wait": 0, "quality_reject": 0}
+    counters = dict(counter_template)
+    diag_counters = dict(counter_template)
+    def count_event(label):
+        counters[label] += 1
+        diag_counters[label] += 1
+    next_log_summary = time.time() + 3600
+    next_diag_summary = time.time() + 600
+    last_5m_audit = None
+    last_entry_diagnostics = {}
+    last_setup_key = None
+    observed_ready_key = None
+    first_ready_observed_at = None
+    while True:
+        try:
+            # Inbound updates use the same authorized existing Telegram chat.
+            position_bot.poll()
+            price, change24 = get_perpetual_snapshot(exchange)
+            now = time.time()
+            native_state, native_diag = native_feed.snapshot(now, price)
+            native_key = completed_key(native_state)
+            if native_key is not None and native_key != observed_ready_key:
+                observed_ready_key, first_ready_observed_at = native_key, now
+            audit_ready = performance is not None
+            if performance is not None:
+                try:
+                    # Retry an acknowledged notification's failed write before
+                    # advancing the model or allowing another entry. A process
+                    # crash in the delivery/write interval remains unauditable.
+                    while pending_journal:
+                        method, args, kwargs = pending_journal[0]
+                        getattr(performance, method)(*args, **kwargs)
+                        pending_journal.pop(0)
+                    for outcome in performance.observe(now, price, native_state=native_state):
+                        LOG.info("SIGNAL_MODEL_OUTCOME %s", json.dumps(outcome))
+                except Exception as exc:
+                    audit_ready = False
+                    LOG.error("PERFORMANCE_V2 observe_failed exception=%s", type(exc).__name__)
+            if STARTUP_TEST_ENABLED and not startup_done and now >= next_startup_test:
+                startup_done = telegram("[LBank BTCUSDT] 2단계 감시 재시작. 시험 알림이며 진입 신호 아님.")
+                LOG.info("Telegram startup test %s", "SENT" if startup_done else "FAILED")
+                next_startup_test = now + STARTUP_RETRY
+            # Self-reported *executed* position has priority over hypothetical alerts.
+            observed_prices = [v for _, v in observations][-5:] + [price]
+            registered_risk = position_ledger.risk(observed_prices)
+            if registered_risk is not None:
+                reason, observed_price = registered_risk
                 p = position_ledger.position
                 side = "롱" if p["side"] == "LONG" else "숏"
                 kst_at = datetime.fromtimestamp(
