@@ -56,9 +56,9 @@ def load_verified(source_dir):
 
 def load_kernels(source_dir):
     manifest, protocol, trees, source = load_verified(source_dir)
-    safe_names = ("abs", "bool", "dict", "enumerate", "float", "int", "isinstance",
+    safe_names = ("abs", "bool", "dict", "enumerate", "float", "hasattr", "int", "isinstance",
                   "len", "list", "max", "min", "print", "range", "set", "str",
-                  "tuple", "zip", "ValueError")
+                  "sorted", "tuple", "zip", "ValueError")
     namespace = {"np": np, "pd": pd, "__builtins__": {
         name: getattr(builtins, name) for name in safe_names}}
     spans = []

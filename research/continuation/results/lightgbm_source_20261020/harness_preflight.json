@@ -1,0 +1,10 @@
+{
+  "first_checkpoint_commit": "063cbc79e96fb7b4a763f0917d91d09148c4f62e",
+  "first_test_exit_code": 5,
+  "tests_completed": 0,
+  "failure": "Isolated harness omitted pure builtin hasattr needed by original compute_signal_returns;setUpClass NameError before a complete diagnostic report.",
+  "classification": "research_harness_error_not_external_strategy_failure",
+  "fix": "Allow reviewed pure hasattr and sorted builtins;no source body,probe inputs,policy or expected outcomes changed.",
+  "frozen_protocol_changed": false,
+  "original_source_modified": false
+}
