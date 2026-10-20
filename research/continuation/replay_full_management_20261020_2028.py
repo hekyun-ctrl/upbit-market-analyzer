@@ -87,6 +87,7 @@ def golden_cases():
         state,p=fixture(d);p=profit_plan(p);e=Engine();sig=e.add(p,9000)
         assert 'target1_reached' in e.step(9015,p['target1'],state)
         old_stop=sig.stop;old_target=sig.target2
+        for at in (9075,9135,9195,9255):e.step(at,p['target1']+d*50,None)
         append_bar(state,9000,p['price']+d*1000)
         state['five_bars'][-1]['volume']=2*sum(b['volume'] for b in state['five_bars'][-21:-1])/20
         reasons=e.step(9305,p['target2']+d*10,state)
