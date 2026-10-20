@@ -39,7 +39,8 @@
     "silentbilly_2227152_original22defs_actualBacktrader10fixtures_44640realminute_prefix_contract_v1",
     "funding_harvester_776003e_originalIS_OOS_146campaign_25SHA_cash_doublecost_frequency_blockuncertainty_v1",
     "current_native_entry_first_event_2024Jan8_15_baseline_vs_higher_retest_fixed_v1_no_send",
-    "current_native_first_event_regime_extension_2024Jan15_Feb1_and2025Jan8_15_v1"
+    "current_native_first_event_regime_extension_2024Jan15_Feb1_and2025Jan8_15_v1",
+    "frozen22_existing_management_fullfunctions_2025Jan8_15_plus24h_followup_v1"
   ],
   "read_before_work": [
     "docs/lbank_strategy_rebuild_2026-10-20.md",
@@ -62,11 +63,12 @@
     "research/continuation/incident_three_alerts_20261020_1734.json",
     "research/continuation/incident_band_location_20261020_1738.json",
     "docs/lbank_offline_entry_comparison_2026-10-20.md",
-    "docs/lbank_entry_regime_extension_2026-10-20.md"
+    "docs/lbank_entry_regime_extension_2026-10-20.md",
+    "docs/lbank_full_management_replay_2026-10-20.md"
   ],
   "next_work": {
-    "stage": "full_existing_exit_management_replay_contract",
-    "instruction": "Read docs/lbank_entry_regime_extension_2026-10-20.md, completed first-event extension code and all positive/negative attribution first. Completed: Jan2024remaining17days and Jan2025same7daydates, both costed variants negative, no mandatory higher-direction filter deployment. Do not repeat unchanged first-event runs, optimize these intervals or disable a strategy based on selected positive/negative cells. Next ONE finite executable step: freeze actual source5c977a7 monitor call ordering for pre-TP profit protection/partialTP1/runner/urgent exits and gap censoring, using unchanged pure existing functions and fixed costs. Build deterministic golden price/closed-bar cases for TP1-before-stop, small pullback, profitable reversal, gap/censor, ambiguous touch and warning acknowledgment; then run one predeclared bounded historical interval with those full management policies against identical frozen entry events. Preserve old first-event diagnostic as a different endpoint rather than overwrite it or call it actual operating PnL. Source-ledger venue/manual fill/15s-30s timing limits remain. No new waiting, universal indicator alignment, risk increase, warning hiding or promotion-gate relaxation. After identifying a specific entry-location/direction gap, only screen an exact complete external rule that addresses that gap; do not resume broad source-error audits. No valid replacement or qualified forward candidate yet. Save actual code, contract, command, raw SHA, results and precise next step, not only status.",
+    "stage": "frozen22_intrabar_path_sensitivity_before_entry_contract_revision",
+    "instruction": "Read docs/lbank_full_management_replay_2026-10-20.md and full source-hash/fixture-revision evidence first. Completed actual existing management function path: same22 entries reconstructed and matched;13golden cases,132Decimalcost+53sourcecash+22one-stepcausal checks. Current runner9complete/13censored (4stopwick,9guardwick), so all22 expectancy remainsNULL, not -8.566R for22; legacy policies22complete remain negative. No new source fix/deployment or promotion justified. Next ONE finite executable step: pre-freeze two intrabar price-order sensitivity scenarios for these same22 entries and Jan8-15+Jan16 followup (O-H-L-C vs O-L-H-C at0/15/30/45sec) with only completed native bars known at each simulated step, actual existing functions/costs/censor rules unchanged. These are hypothetical trajectories, not actual native ticks/manual fills, not exhaustive mathematical PnL bounds. IMPORTANT retain original1minute sample cadence for last5 sample history while risk/accounting polls15s; do not reinterpret5x15sec samples as original5minutes. Keep same frozen entries, no new signals, source fee/margin/risk/stop limits or guard coefficients unchanged. Verify deterministic cases/source prefix causality/Decimal leg cash and distinguish assumed path effects from alpha evidence. Retain original13unknown outcomes separately; never relabel them observed wins after assuming a favorable path. If no robust edge, return to a concrete original entry-context/location gap with a source-grounded complete rule, not repeated exit retuning or broad source-error audits. No unchanged first-event reruns or recalc just to generate progress; no candidate yet qualifies for new forward study.",
     "sources_to_screen": [
       {
         "title": "The Recurrent Reinforcement Learning Crypto Agent",
@@ -364,21 +366,19 @@
       "instruction": "Finite nextstep: obtain/read fullPRIMARYpaperthroughpermittedaccess,freezeactualpublication/versionSHA,locatepublic originalcode/data/ledger and exact cost/funding/manualrisk contract beforetrainingorreplication. Do not callabstractreturns alpha proof or inventunreleasedfeatures/data/TP1. No request-code/privateoutreach/accounts/inverse-margin orriskexpansion. Iforiginaldata/codeunavailableorunsupportedmanualBTCUSDTcontract,recordprecisefinitepreflight andcontinueanotherdistinctPRIMARYpublicBTCsourcewithcode+aftercostledger;notendlessarticle browsing. Do not retry/bypassMACD403. Preservecurrentfundingpositiveandnegativeevidence;no unchangedledgercalc/tuning."
     },
     "expected_outputs": [
-      "A frozen full-management call/order and cost contract, deterministic true function cases, and one actual paired-entry management replay OR explicit finite checkpoint if original execution assumptions unresolved. No retuning or unchanged first-event repetition."
+      "One pre-registered two-order15second synthetic-path sensitivity calculation on fixed22 entries with original minute-sample cadence, source unchanged, exact accounting and causal checks; label scenario dependence and unknown true native fills. Preserve all negative/positive/censored evidence and concrete entry-gap next step."
     ],
     "research_success_definition": "A reproducible explanation of existing accepted entry paths plus a fixed testable correction hypothesis and its evidence gaps; source count, implementation test count or a new document alone is not signal-performance improvement.",
     "read_first": [
-      "docs/lbank_entry_regime_extension_2026-10-20.md",
-      "research/continuation/entry_regime_extension_protocol_20261020_1945.json",
-      "research/continuation/results/entry_regime_extension_20261020_1945/attribution.json",
-      "lbank_futures_monitor.py at production5c977a7",
-      "lbank_performance.py",
-      "lbank_profit_protection.py",
-      "lbank_signal_risk.py",
-      "lbank_signal_thesis.py"
+      "docs/lbank_full_management_replay_2026-10-20.md",
+      "research/continuation/full_management_protocol_20261020_2028.json",
+      "research/continuation/replay_full_management_20261020_2028.py",
+      "research/continuation/verify_full_management_20261020_2028.py",
+      "research/continuation/results/full_management_20261020_2028/report.json",
+      "research/continuation/results/full_management_20261020_2028/source_and_runtime.json"
     ],
-    "previous_stage": "offline_entry_comparison_full_management_and_prefixed_regime_extension",
-    "paper_priority": "Observe existing paper events alongside numerical replay, not instead of it. Window2026-10-20T10:23:08Z-10:45:30Z read in two non-capped pages97/115 rows: no candidate/open/closed; progress API successes at10:30/10:45 count as0trades. Source5c977a7 deployment23799b11 remainsSUCCESS/native3601m1085m; hourlystudyunready, RSI250immature preserved. Do not reannounce unchanged readiness, restart for docs, assume DB totals/missed-delivery audits from logs, or fabricate frequent entries. Existing notification sender runs independently; actual user device receipt unknown."
+    "previous_stage": "full_existing_exit_management_replay_contract",
+    "paper_priority": "Bounded20:00-20:28:30KST original study logs60rows have no new decisions/outcomes; progress2 API acknowledgments at20:00/20:15 are0trades. Deployment23799b11/source5c977a7 remainsSUCCESS/native360/116 ready, hourlystudyunready, RSI250immature. Do not send unchanged readiness/negative interim notifications, inflate sample counts, restart for docs or infer all-time ledger/delivery coverage from bounded logs. Observe actual distinct future paper episodes alongside executable numerical research."
   },
   "known_limitations": [
     "2023 through Sep2026 reused and exploratory; 2022 observed for Turtle; none may be relabeled untouched.",
@@ -1051,6 +1051,127 @@
       ],
       "production_changed": false,
       "forward_started": false
+    },
+    {
+      "id": "full_management_20261020_2028",
+      "stage_completed": "existing_management_contract13golden_cases_frozen22entry_reconstruction_actual_paired_policy_replay_and_independent_cash_verification",
+      "protocol_commit": "d51dc7b0a9fd6848226414ddbc084ec93ae5bbb9",
+      "initial_code_commit": "8fc912698320c1b4e683165e7283b03b483aca2c",
+      "corrected_fixture_before_market_commit": "d78443f91e2455dc90a2d15aa06c50facad8cd8e",
+      "production_source": "5c977a7f51cea67048f95791d1dcc4230634939a",
+      "six_source_blobs_verified": true,
+      "golden_cases": 13,
+      "reconstructed_entry_matches": 22,
+      "compared_policy_rows": 66,
+      "rows_are_overlapping": true,
+      "management_summaries": {
+        "levels": {
+          "signals": 22,
+          "complete": 22,
+          "censored": 0,
+          "open_end": 0,
+          "statuses": {
+            "stop": 13,
+            "target2": 4,
+            "time_exit": 4,
+            "entry_stop": 1
+          },
+          "TP1_states": 6,
+          "TP1_Wilson_lower": 0.13150582015814438,
+          "conditional_complete_sum_R": -8.505670208423576,
+          "conditional_complete_mean_R": -0.38662137311016254,
+          "conditional_complete_PF": 0.5376972817551338,
+          "conditional_complete_doublecost_R": -15.409661424090455,
+          "conditional_closed_R_DD": 9.435299474148632,
+          "conditional_complete_2day_block95_mean_R": [
+            -0.8477935217401636,
+            -0.06087888260460038
+          ],
+          "unconditional_all22_net_R": -8.505670208423576,
+          "censor_coverage_complete_fraction": 1,
+          "TP1_Wilson_interpretation": "observed model TP1 states / all22 including unknown censors; conservative known-hit fraction, not empirical actual hit-rate CI"
+        },
+        "warning_exit": {
+          "signals": 22,
+          "complete": 22,
+          "censored": 0,
+          "open_end": 0,
+          "statuses": {
+            "stop": 9,
+            "target2": 4,
+            "early_warning": 4,
+            "time_exit": 4,
+            "entry_stop": 1
+          },
+          "TP1_states": 6,
+          "TP1_Wilson_lower": 0.13150582015814438,
+          "conditional_complete_sum_R": -7.508459901909289,
+          "conditional_complete_mean_R": -0.3412936319049677,
+          "conditional_complete_PF": 0.568510957296047,
+          "conditional_complete_doublecost_R": -14.412388646982883,
+          "conditional_closed_R_DD": 8.438089167634345,
+          "conditional_complete_2day_block95_mean_R": [
+            -0.8149080174234843,
+            0.006855365503295425
+          ],
+          "unconditional_all22_net_R": -7.508459901909289,
+          "censor_coverage_complete_fraction": 1,
+          "TP1_Wilson_interpretation": "observed model TP1 states / all22 including unknown censors; conservative known-hit fraction, not empirical actual hit-rate CI"
+        },
+        "trend_runner": {
+          "signals": 22,
+          "complete": 9,
+          "censored": 13,
+          "open_end": 0,
+          "statuses": {
+            "censored_intrabar_stop": 4,
+            "structure_exit": 4,
+            "censored_intrabar_profit_guard": 9,
+            "stop": 4,
+            "trailing_stop": 1
+          },
+          "TP1_states": 3,
+          "TP1_Wilson_lower": 0.04748917264236267,
+          "conditional_complete_sum_R": -8.565962384805752,
+          "conditional_complete_mean_R": -0.9517735983117502,
+          "conditional_complete_PF": 0.10379238343925701,
+          "conditional_complete_doublecost_R": -11.33450816028281,
+          "conditional_closed_R_DD": 8.565962384805754,
+          "conditional_complete_2day_block95_mean_R": [
+            -1.6237658731265237,
+            -0.6138785679705678
+          ],
+          "unconditional_all22_net_R": null,
+          "censor_coverage_complete_fraction": 0.4090909090909091,
+          "TP1_Wilson_interpretation": "observed model TP1 states / all22 including unknown censors; conservative known-hit fraction, not empirical actual hit-rate CI"
+        }
+      },
+      "verification": {
+        "decimal_policy_cost_checks": 132,
+        "source_model_cash_checks": 53,
+        "max_R_error": 1.176836406102666e-13,
+        "max_source_USDT_error": 1.6564527527407336e-13,
+        "one_step_future_HLC_prefix_checks": 22,
+        "full_simulation_future_append_replay": false,
+        "original_reconstruction_matches": 22,
+        "golden_case_count": 13,
+        "code_sha256": "add7a01a16291d9bca070bbaa494cd2af69b769295ae18fc45fb82a6b8d48eb6",
+        "verifier_sha256": "08cd0b7f2d786955ac296f354109107273494b9c5a998b54bc2e226df2bc982a",
+        "uncertainty": "conditional on uncensored cases, UTC2day circular blocks5000, no selection correction; censoring prevents full22 runner expectation",
+        "source_model_funding_reserve_not_same_as_actual_archived_funding": true
+      },
+      "report": "research/continuation/results/full_management_20261020_2028/report.json",
+      "documentation": "docs/lbank_full_management_replay_2026-10-20.md",
+      "current_runner_complete": 9,
+      "current_runner_censored": 13,
+      "current_runner_all22_expected_net_R": null,
+      "decision": "No replacement or profitability claim; source current management full22 return remains unknown due4intrabarstop+9intrabarprofitguard censors; legacy policy comparisons negative; preserve conditional subset and all source censors.",
+      "native_LBank_performance": false,
+      "new_independent_data": false,
+      "orders": 0,
+      "messages_sent": 0,
+      "production_changed": false,
+      "forward_started": false
     }
   ],
   "active_run": null,
@@ -1303,16 +1424,16 @@
   },
   "offline_entry_validation": {
     "documentation": "docs/lbank_offline_entry_comparison_2026-10-20.md",
-    "last_result": "fixed_additional24day_extension_both_variants_costed_negative_filter_not_promoted",
+    "last_result": "existing_full_management_path_replayed_with13censored_true_full22return_unknown",
     "forward_candidate": null,
     "capture_patch_prepared": true,
     "capture_deployed": false,
-    "full_exit_replay": false,
-    "last_documentation": "docs/lbank_entry_regime_extension_2026-10-20.md",
+    "full_exit_replay": "existing functions in minute-observation transfer model only; real15s/manual fills unverified",
+    "last_documentation": "docs/lbank_full_management_replay_2026-10-20.md",
     "last_closed_variant_rows": 159
   },
-  "updated_utc": "2026-10-20T10:55:31Z",
-  "updated_kst": "2026-10-20T19:55:31.000+09:00",
+  "updated_utc": "2026-10-20T11:43:39Z",
+  "updated_kst": "2026-10-20T20:43:39.000+09:00",
   "paper_notifications": {
     "policy": "native_paper_notifications_v1",
     "source_commit": "5c977a7f51cea67048f95791d1dcc4230634939a",
@@ -1352,14 +1473,14 @@
     "device_receipt_verified": false,
     "native_ready_verified_at": "2026-10-20T10:23:07.806077908Z",
     "native_1m": 360,
-    "native_5m": 108,
+    "native_5m": 116,
     "rsi_history_mature": false,
     "hourly_study_ready": false,
     "observed_new_candidate_count": 0,
     "observed_new_paper_entry_count": 0,
     "runtime_evidence": "research/continuation/results/paper_notifications_20261020/runtime.json",
-    "last_bounded_observation": "research/continuation/results/entry_regime_extension_20261020_1945/paper_observation.json",
-    "last_observed_at": "2026-10-20T10:45:12.762028662Z"
+    "last_bounded_observation": "research/continuation/results/full_management_20261020_2028/source_and_runtime.json",
+    "last_observed_at": "2026-10-20T11:28:27.157275478Z"
   },
   "user_autonomous_followthrough": {
     "requested": true,
@@ -1367,5 +1488,18 @@
     "enabled_verified": true,
     "continues_until": "validated replacement implementation/deployment/runtime verification; preserve existing criteria",
     "AI_continuous_between_runs": false
+  },
+  "full_management_validation": {
+    "version": "frozen_entries_existing_management_v1",
+    "report": "research/continuation/results/full_management_20261020_2028/report.json",
+    "source_evidence": "research/continuation/results/full_management_20261020_2028/source_and_runtime.json",
+    "golden13_passed": true,
+    "actual_existing_functions_replayed": true,
+    "frozen_entries22_matched": true,
+    "native_fills_verified": false,
+    "full_real15s30s_timing_replayed": false,
+    "current_runner_all22_R": null,
+    "censor_count": 13,
+    "not_promoted": true
   }
 }
