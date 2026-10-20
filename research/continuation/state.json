@@ -61,8 +61,8 @@
     "research/continuation/incident_band_location_20261020_1738.json"
   ],
   "next_work": {
-    "stage": "existing_alert_direction_and_location_attribution_before_further_source_search",
-    "instruction": "User priority reset 2026-10-20 17:58 KST. Complete one bounded local-system step first: inventory retained #8-15 and map, per original policy/version and known-at-time data, the candidate family, direction inputs/timeframe, structural anchor, entry-location allowance, target-room overrides, first qualification/confirmation/send, TP1-before-original-invalidation, earliest caution/urgent and data gaps. Reuse archived computed evidence; do not rerun unchanged trials. Start with #14 trend_retest whose weaker higher-direction support and band-upper entry are recorded, then cover all retained rows without deleting ambiguous/missing cases. Freeze and save the interpretation/attribution schema before any new performance selection. If full causal replay inputs are absent, identify the exact missing inputs; do not fabricate a first possible entry, counterfactual profit or universally profitable fix. Produce a source-and-data-linked decision table and at least one reproducible actual accepted-path explanation; document how it changes the next hypothesis. External source screening resumes only to fill a named missing entry contract, prioritizing fully specified, public code/data/after-cost BTC evidence compatible with manual execution, initial protection and useful opportunity frequency. No merely illustrative education-as-alpha, unrelated lowfrequency/portfolio/inverse-margin code audit as the default deliverable. Preserve all existing rejection results and unchanged promotion gates. No unvalidated live entry modifications or forced strategy adoption.",
+    "stage": "complete_direction_location_replay_inputs_and_fixed_barrier_transition_hypothesis",
+    "instruction": "Read the newly executed eight-case attribution report first. Do not repeat the same20bar target-room probe or old TP1 audits. The full original #14 minute snapshots and full5m window remain missing; original capture module can export recent public-model DB data but no SSH/CLI existed in this run. First determine one authorized non-mutating access route for retained snapshots without restart or account credentials. If no route exists, record it once and prepare/test minimal NON-GATING event-time capture of original candidate/confirmation public snapshots on latest production source; it must not change entry, risk, warning, target or frequency gates. This is a diagnostic prerequisite, not completion of profitable alerts, and must not displace strategy work indefinitely. Freeze one strategy-specific barrier-crossing/retest/acceptance hypothesis with original source contract and full opportunity/cost comparison before results. Keep user priorities: larger evidence precedence, valid entry position, no arbitrary extra wait or universal all-indicators agreement. Use existing public minute datasets only as already-seen development if original live snapshots are missing; never fabricate original input or first possible live entry. No live price-prediction gate change or profitable replacement promotion without full unchanged evidence. Detailed records only; follow verified short reporting policy.",
     "sources_to_screen": [
       {
         "title": "The Recurrent Reinforcement Learning Crypto Agent",
@@ -360,8 +360,9 @@
       "instruction": "Finite nextstep: obtain/read fullPRIMARYpaperthroughpermittedaccess,freezeactualpublication/versionSHA,locatepublic originalcode/data/ledger and exact cost/funding/manualrisk contract beforetrainingorreplication. Do not callabstractreturns alpha proof or inventunreleasedfeatures/data/TP1. No request-code/privateoutreach/accounts/inverse-margin orriskexpansion. Iforiginaldata/codeunavailableorunsupportedmanualBTCUSDTcontract,recordprecisefinitepreflight andcontinueanotherdistinctPRIMARYpublicBTCsourcewithcode+aftercostledger;notendlessarticle browsing. Do not retry/bypassMACD403. Preservecurrentfundingpositiveandnegativeevidence;no unchangedledgercalc/tuning."
     },
     "expected_outputs": [
-      "docs/lbank_entry_direction_location_audit_2026-10-20.md",
-      "research/continuation/results/entry_direction_location_attribution_20261020/report.json"
+      "recovered original snapshots or an exact one-time access obstacle record",
+      "tested non-gating original evidence capture patch if snapshots inaccessible",
+      "pre-outcome fixed entry correction contract and executable comparable evaluation, not a fitted universal veto"
     ],
     "research_success_definition": "A reproducible explanation of existing accepted entry paths plus a fixed testable correction hypothesis and its evidence gaps; source count, implementation test count or a new document alone is not signal-performance improvement.",
     "read_first": [
@@ -1158,5 +1159,31 @@
     "priority": "Current-system causal attribution, fixed entry contracts and comparable performance first; source audits targeted to named gaps.",
     "operations_changed": false,
     "promotion_criteria_relaxed": false
+  },
+  "entry_location_attribution": {
+    "status": "eight_case_inventory_and_actual_target_room_component_probe_completed_full_classifier_replay_missing_inputs",
+    "documentation": "docs/lbank_entry_direction_location_audit_2026-10-20.md",
+    "commit": "7673f5505e351f5cc1f744c64ec86b580097a1a1",
+    "report": "research/continuation/results/entry_direction_location_attribution_20261020/report.json",
+    "input": "research/continuation/results/entry_direction_location_attribution_20261020/input.json",
+    "code": "research/continuation/entry_direction_location_attribution_20261020.py",
+    "actual_executed": true,
+    "retained_case_count": 8,
+    "source_blob": "488d61985ae5bf54d139689fc4664cd933d2da2d",
+    "finding": "Same completed20x5m bars and target, quote81971->82011.8/82014 changes original target_room conflict->unknown by dropping crossed81987 pivot; original logs show12:35 blocked12:37qualified. Not sole-cause/full-classifier replay proof.",
+    "production_changed": false,
+    "performance_improved": false
+  },
+  "user_reporting_policy": {
+    "automation_id": "6ad658e93c208191bd473ceb228e15b8",
+    "actual_prompt_updated_and_readback_verified": true,
+    "detail_destination": "GitHub only",
+    "notify_on": [
+      "verified operational modification/deployment/runtime",
+      "material performance validation phase change",
+      "critical obstacle requiring user action"
+    ],
+    "maximum_user_facing_sentences": 4,
+    "no_hourly_rejection_or_research_repetition": true
   }
 }
