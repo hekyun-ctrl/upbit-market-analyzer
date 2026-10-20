@@ -1,0 +1,144 @@
+{
+  "version": "nassi_grouped_decline_source_contract_v1_20261021",
+  "implementation_source": {
+    "repository": "hekyun-ctrl/upbit-market-analyzer",
+    "commit": "25388b431c9c9d38df6a434670586c65f382d604",
+    "path": "lbank_public_techniques.py",
+    "blob": "1c6ca9de1c42a49feb154a554fba3f9d78f3c7b8",
+    "hypothesis": "grouped_decline_5m"
+  },
+  "primary_evidence": {
+    "type": "published direct author interview, not independent return audit",
+    "url": "https://weekly.donga.com/economy/article/all/11/2913751/1",
+    "published": "2021-09-11",
+    "scope": "author answers on setup/timeframe/entry and discretionary risk management; retrieved text lines127-150",
+    "full_original_bytes_downloaded": false,
+    "full_content_sha256": null
+  },
+  "video_sources": [
+    {
+      "url": "https://www.youtube.com/watch?v=rxRaZowvSBA",
+      "title_from_prior_repo": "하락장 패닉셀 5분봉 3틱룰",
+      "duration_from_prior_repo": "13:14",
+      "retrieved_transcript_this_run": false,
+      "timestamps": null,
+      "web_error": "Failed to fetch",
+      "transcript_tool_error": "INVALID_ARGUMENT",
+      "retry_permitted_by_tool_message": false
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=JqMbhhwKnWE",
+      "title_from_prior_repo": "5분봉 3틱룰 실전 강의",
+      "duration_from_prior_repo": "9:27",
+      "retrieved_transcript_this_run": false,
+      "timestamps": null,
+      "web_error": "Failed to fetch",
+      "transcript_tool_error": "INVALID_ARGUMENT",
+      "retry_permitted_by_tool_message": false
+    }
+  ],
+  "legacy_source_review": {
+    "path": "docs/lbank_four_traders_review_2026-10-19.md",
+    "commit": "25388b431c9c9d38df6a434670586c65f382d604",
+    "status": "prior report attests full captions reviewed; not raw captions or timestamp evidence recovered this run"
+  },
+  "contract": {
+    "market_context": {
+      "verified_qualitative": "countertrend rebound after substantial decline; not blanket entry during sideways conditions",
+      "numeric_volatility_or_decline_cutoff": null
+    },
+    "timeframe": {
+      "verified": "5minute in volatile conditions;15/30minute alternatives discussed",
+      "exact_switch_rule": null
+    },
+    "direction": {
+      "verified": "long rebound setup discussed",
+      "short_mirror_rule": null
+    },
+    "grouping": {
+      "verified_qualitative": "third substantial declining step; precise grouping equality/materiality rule not specified in accessible primary text",
+      "numeric_step": null,
+      "recent_window": null,
+      "reset_threshold": null
+    },
+    "trigger": {
+      "verified_beginner_option": "third5minute bar closes",
+      "verified_advanced_option": "intrabar low judged with1minute view",
+      "advance_low_causal_rule": null,
+      "extra_three_minute_high_breakout": null
+    },
+    "invalidation": {
+      "initial_fixed_stop": null
+    },
+    "exit": {
+      "TP1": null,
+      "TP2": null,
+      "partial_fraction": null,
+      "timeout": null
+    },
+    "sizing": {
+      "compatible_fixed_risk_contract": null,
+      "discretionary_averaging_down": "discussed in original; excluded from authorized implementation"
+    },
+    "execution": {
+      "fee": null,
+      "slippage": null,
+      "funding": null,
+      "closed_BTCUSDT_trade_ledger": null
+    }
+  },
+  "code_added_assumptions": [
+    {
+      "field": "material_step",
+      "actual": "max(.5 * prior20median true range, .0001 * last close)",
+      "primary_verified": false
+    },
+    {
+      "field": "group_window",
+      "actual": "last10completed5minute bars",
+      "primary_verified": false
+    },
+    {
+      "field": "group_completion",
+      "actual": "count==3 AND latest bar makes newmaterial step AND close<open",
+      "primary_verified": false
+    },
+    {
+      "field": "recovery_reset",
+      "actual": "close>=laststep+step resets count",
+      "primary_verified": false
+    },
+    {
+      "field": "expiry",
+      "actual": "900seconds after setup availability",
+      "primary_verified": false
+    },
+    {
+      "field": "confirmation",
+      "actual": "completed1minute directional candle breaks previous3minute extreme and setup level",
+      "primary_verified": false
+    },
+    {
+      "field": "context_rsi_plan",
+      "actual": "existing context, RSI slope, price deviation, cost/target/stop gates",
+      "primary_verified": false
+    },
+    {
+      "field": "entry_watch",
+      "actual": "30to240second repeated confirmation",
+      "primary_verified": false
+    },
+    {
+      "field": "protection",
+      "actual": "existing fixed-risk boundedstop/Rtargets/partialmanagement, averagingdown removed",
+      "primary_verified": false
+    }
+  ],
+  "finding": "Current public4 replay evaluates a composite adapted hypothesis, not original creator strategy profitability.5minute timeframe itself is primary-supported; materiality/grouping/extra confirmation and risk/exit contract are not equivalent by default.",
+  "original_strategy_reproduced": false,
+  "complete_testable_original_contract": false,
+  "profitable_candidate": false,
+  "promotion": false,
+  "operations_changed": false,
+  "next": "One existing Kim Jikseon doubleBB source eGaaM0Pz2Lk contract reconciliation; numericbandsettings already documented, recover actual original trigger/stop/exit before claiming executable original strategy. No parameter optimization or more calendar sweeps."
+}
