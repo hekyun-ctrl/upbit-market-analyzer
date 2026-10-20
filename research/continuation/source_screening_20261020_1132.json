@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "reviewed_date_utc": "2026-10-20",
+  "scope": "Primary-source preflight and catalogue deduplication, NOT newly executed market backtests or qualified candidates.",
+  "new_preflights": [
+    {
+      "repository": "Ares-Infenus/rsi-backtesting-engine",
+      "url": "https://github.com/Ares-Infenus/rsi-backtesting-engine",
+      "review_scope": "README default rules/execution/project structure, not code or stored ledger replay",
+      "decision": "not_priority_for_fixed_intraday_manual_alert_contract",
+      "basis": "Default BTC-USD daily2020-2024,RSI14<30entry/>70exit,all-in long-only,no original fixed SL/TP1. Published costs do not establish compatible native aftercost performance. Do not invent protective exits,change timeframe or deploy full-capital allocation to fit policy. No universal RSI rejection."
+    },
+    {
+      "repository": "ayhanarashtasin/Trading_Backtest",
+      "commit": "ecbae6de6d58185a507baa49af5179d899bbba10",
+      "url": "https://github.com/ayhanarashtasin/Trading_Backtest/tree/ecbae6de6d58185a507baa49af5179d899bbba10",
+      "readme_git_blob_sha": "e8c42cff28d8aea0d390059bd165732e24cf5fac",
+      "results_log_git_blob_sha": "0ea820e89eb532d908462593cd15151dd01e7282",
+      "review_scope": "Full README; results_log initial baseline and final V5 architecture/matrix/scorecard/5year summary. Middle185874character log not exhaustively audited; archives not opened.",
+      "decision": "preserve_positive_source_claims_but_not_priority_frequency_and_sample_contract",
+      "basis": "SelectedV5TP sourceclaimsNET+6.74%PF2.380butonly11trades/year,not >=1/day or100closed forward.5year134trade summary explicitlyGROSS. Earlier baseline source reportsPF<1 beforecost. These are author claims,not independently reconciled ledgers. README acceptance thresholds are not achieved results. No new strategy replay or originalparams salvage."
+    },
+    {
+      "url": "https://jesse.trade/strategies/trendwaveriderv2",
+      "review_scope": "Public defaultBTC2024performance page",
+      "decision": "not_priority_public_reproducibility_and_frequency_policy",
+      "basis": "Premium source access;public author67trades/366days(~0.183/day),fees shown but no publicly retrieved rules/closedledger or complete execution model. Positive headline retained as authorclaim;no purchase/login,ruleinvention or marketreplay."
+    },
+    {
+      "repository": "wiktorj137/btc-strategy-lab",
+      "url": "https://github.com/wiktorj137/btc-strategy-lab",
+      "review_scope": "Search discovery and anonymous git ls-remote only",
+      "decision": "source_access_not_recovered_do_not_adopt_indexed_claims",
+      "basis": "Search index exists,but anonymous remote HEAD could not be read and requested unavailable credentials. Cause(private/deleted/endpoint issue)not established. Did not authenticate,look up credentials or execute;no claim about strategy performance."
+    }
+  ],
+  "catalogue_duplicates_skipped": [
+    {
+      "source": "juriok/chart-pattern-backtester",
+      "previous": "research/continuation/source_screening_20261020_1007.json",
+      "action": "Deduplicated against existing documented43symbol/closedDD/flatfunding/gapfill preflight. No new market replay or use as next candidate."
+    },
+    {
+      "source": "https://arxiv.org/html/2606.00060v1",
+      "previous": "research/continuation/source_screening_20261020_0505.json and docs/lbank_published_strategy_search_2026-10-20.md",
+      "action": "Deduplicated. Original code availability section states upon request;no outreach or model training. Do not repeatedly screen its annualized headline."
+    }
+  ],
+  "next_finite_source_audit": {
+    "repository": "CShear/crack-the-nut",
+    "commit": "72f293c19a61e01507f322595e3982da00f0932d",
+    "url": "https://github.com/CShear/crack-the-nut/tree/72f293c19a61e01507f322595e3982da00f0932d",
+    "readme_git_blob_sha": "68edd2ca9c9ba8d950dea0dea9d1b967bd1c912b",
+    "read_scope_now": "Public full README and pinned README first35lines; no strategy code,rawdataset or closed ledger inspected yet",
+    "status": "source_availability_lead_only_NOT_qualified_no_forward",
+    "read_first": ["RESEARCH-REPORT.md", "STRATEGY-REPORT.md", "analog/evaluators.py", "analog/strategies.py"],
+    "instruction": "Read pinned complete tree and four files;first locate BTC-only original closedledger/rawdata/checksums and full fees/slippage/funding. Separate exact source rule from selected multiasset headline and after-the-fact20exit optimization. Check causal historical lookup/entry/exit timestamps,gaps,bar-before-entry protection and TP1/manualrisk contract with bounded pure probes if feasible. No63strategy/13asset optimization,no live scripts,private account access,LLM calls,paid data or automatic orders. Do not unpickle untrusted data. If source lacks compatible BTC evidence,record finite source-specific obstacle and continue different published source;do not turn alternateasset portfolio gains into BTC evidence.",
+    "caveats": "Authorpositive figure is selected portfolio across13assets;README explicitly says BTC combos may break even and alts carry edge. No BTC profit claim adopted. No data or sourcecode execution performed in this preflight."
+  },
+  "eligible_candidates": [],
+  "forward_started": false,
+  "production_changed": false
+}

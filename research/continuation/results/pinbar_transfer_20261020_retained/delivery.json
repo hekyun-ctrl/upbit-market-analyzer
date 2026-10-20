@@ -1,0 +1,31 @@
+{
+  "protocol_checkpoint_commit": "378586d9d5bf07859e2b3fb999fed9a86aec4987",
+  "execution_checkpoint_commit": "eb74e769b9b3fdb93539a2e6bc669d92ff549164",
+  "before_calculation_protocol_fixed": true,
+  "serialization_fix": "Initial frozen run reached JSON serialization and failed on numpy int64 index. No market metrics were printed. Cast index to native int, add round-trip test, store new execution checkpoint before retained run. No rule/cost/data/latency changes.",
+  "files": [
+    {
+      "file": "delay_0m_ledger.jsonl.gz",
+      "compression": "gzip mtime=0",
+      "gzip_sha256": "49ab36f3c6c0563427349eb736e9354b59270bc91072ddc1d6447cedd33b6c95",
+      "gzip_bytes": 883596,
+      "recovered_file": "delay_0m_ledger.jsonl",
+      "recovered_sha256": "28a4d7125144898799cc755288d51dd8a9c8fd0d67f5d0b2ac679a140c44e82a",
+      "rows": 6737,
+      "recovery": "python -m gzip -d delay_0m_ledger.jsonl.gz"
+    },
+    {
+      "file": "delay_1m_ledger.jsonl.gz",
+      "compression": "gzip mtime=0",
+      "gzip_sha256": "f2546d2cda5634cffecbb7ac628d158e84cd1eeacf409624f62c6cb01aa174e1",
+      "gzip_bytes": 833507,
+      "recovered_file": "delay_1m_ledger.jsonl",
+      "recovered_sha256": "a7bd3a733f9ce48cba0a1f9c82d41f5856998cb6e1e3dd87595a38a5ad7c1fc2",
+      "rows": 6327,
+      "recovery": "python -m gzip -d delay_1m_ledger.jsonl.gz"
+    }
+  ],
+  "raw_archives": "66 consumed ZIPs and CSV SHA in sources.json; recover official public URLs and compare prior persisted manifests; temporary cache not required.",
+  "collector_running_between_runs": false,
+  "production_changed": false
+}

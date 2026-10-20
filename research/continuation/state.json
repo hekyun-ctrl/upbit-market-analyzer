@@ -30,25 +30,45 @@
     "mroziewicz_slepaczuk_2026_two_released_BTC_ledger_cost_frequency_audit_v1",
     "native_LBank_public_depth_bounded12attempts_v1_raw_hash_and_decimal_quality_audit",
     "djienne_lightgbm_1274e_pure_kernel_contract_forensic_v1",
-    "rlxbt_public_combo_contract_v1_147synthetic_predicates_92public_objects"
+    "rlxbt_public_combo_contract_v1_147synthetic_predicates_92public_objects",
+    "rlxbt_pinbar_transfer_v1_fixed_rules_actual2024_2026_two_latency_fullcost"
   ],
   "read_before_work": [
     "docs/lbank_strategy_rebuild_2026-10-20.md",
     "docs/lbank_long_history_validation_2026-10-20.md",
     "docs/lbank_rebuild_followthrough_2026-10-20.md",
     "docs/lbank_published_strategy_search_2026-10-20.md",
-    "research/long_history/results"
+    "research/long_history/results",
+    "docs/lbank_pinbar_transfer_validation_2026-10-20.md",
+    "research/continuation/source_screening_20261020_1132.json"
   ],
   "next_work": {
-    "stage": "frozen_pinbar_transfer_actual_reused2024_2026_costed_screen",
-    "instruction": "Read pinbar_transfer_protocol_20261020.json and source extract. Code and 11 fixtures frozen before market outcomes. Run evaluate_pinbar_transfer.py on SHA-verified 2024-Jan through 2026-Sep Binance futures minute/funding archives; explicitly original spot vs futures transfer, all data reused, no parameter fitting. Preserve both zero/60sec latency cases and base/double full costs, every year, closed/unknown ledger, whole-bar adverse proxy not actual urgent warnings, native/forward gates remain unmet. Separate arithmetic audit before interpretation. No production change for research. If interrupted recover source archives from persisted manifests, not temporary files. Completed combo release excluded; no repeated source lookup or fabricated features. Keep existing operational readiness check and gates unchanged.",
+    "stage": "new_pinned_primary_BTC_ledger_rule_and_fullcost_feasibility_audit",
+    "instruction": "Read pinned complete tree and four files;first locate BTC-only original closedledger/rawdata/checksums and full fees/slippage/funding. Separate exact source rule from selected multiasset headline and after-the-fact20exit optimization. Check causal historical lookup/entry/exit timestamps,gaps,bar-before-entry protection and TP1/manualrisk contract with bounded pure probes if feasible. No63strategy/13asset optimization,no live scripts,private account access,LLM calls,paid data or automatic orders. Do not unpickle untrusted data. If source lacks compatible BTC evidence,record finite source-specific obstacle and continue different published source;do not turn alternateasset portfolio gains into BTC evidence. Start with source_screening_20261020_1132.json and prior catalogue exclusions BEFORE more web/clone activity. Pinbar actual fixed screen now completed/rejected;read its report/doc instead of rerun. No eligible/forward candidate. Preserve all promotion gates and native operational followup. If no compatible publicledger/rule evidence,move source promptly;never fabricate missing alpha features or call report headings proof.",
     "sources_to_screen": [
+      {
+        "repository": "CShear/crack-the-nut",
+        "commit": "72f293c19a61e01507f322595e3982da00f0932d",
+        "url": "https://github.com/CShear/crack-the-nut/tree/72f293c19a61e01507f322595e3982da00f0932d",
+        "readme_git_blob_sha": "68edd2ca9c9ba8d950dea0dea9d1b967bd1c912b",
+        "read_scope_now": "Public full README and pinned README first35lines; no strategy code,rawdataset or closed ledger inspected yet",
+        "status": "source_availability_lead_only_NOT_qualified_no_forward",
+        "read_first": [
+          "RESEARCH-REPORT.md",
+          "STRATEGY-REPORT.md",
+          "analog/evaluators.py",
+          "analog/strategies.py"
+        ],
+        "instruction": "Read pinned complete tree and four files;first locate BTC-only original closedledger/rawdata/checksums and full fees/slippage/funding. Separate exact source rule from selected multiasset headline and after-the-fact20exit optimization. Check causal historical lookup/entry/exit timestamps,gaps,bar-before-entry protection and TP1/manualrisk contract with bounded pure probes if feasible. No63strategy/13asset optimization,no live scripts,private account access,LLM calls,paid data or automatic orders. Do not unpickle untrusted data. If source lacks compatible BTC evidence,record finite source-specific obstacle and continue different published source;do not turn alternateasset portfolio gains into BTC evidence.",
+        "caveats": "Authorpositive figure is selected portfolio across13assets;README explicitly says BTC combos may break even and alts carry edge. No BTC profit claim adopted. No data or sourcecode execution performed in this preflight."
+      },
       {
         "title": "Original ultra-sharp pinbar fixed-rule transfer screen",
         "url": "https://rlxbt.com/articles/the-1-minute-liquidity-hunt-discovering-the-ultra-sharp-pinbar-rejection-wick-85-range-03-on-21m-btc-bars",
         "protocol": "research/continuation/pinbar_transfer_protocol_20261020.json",
-        "status": "protocol_and_code_fixed_before_market_calculation_not_qualified",
-        "candidate_rules_frozen": true
+        "status": "completed_rejected_fixed_futures_transfer_allperiods_costed_losses;no_unchanged_repeat",
+        "candidate_rules_frozen": true,
+        "report": "research/continuation/results/pinbar_transfer_20261020_retained/report.json"
       },
       {
         "title": "BTC 4-Leg Combo: public feature/unit/data feasibility,not qualified",
@@ -126,7 +146,8 @@
         "research/continuation/source_screening_20261020_0558.json",
         "research/continuation/source_screening_20261020_0740.json",
         "research/continuation/source_screening_20261020_0840.json",
-        "research/continuation/source_screening_20261020_1007.json"
+        "research/continuation/source_screening_20261020_1007.json",
+        "research/continuation/source_screening_20261020_1132.json"
       ]
     },
     "operational_check_before_research": "Before the next finite source-research step, query the latest production head/deployment and bounded live logs. Verify current source/hash/policies and NATIVE_ENTRY_STATUS reason=native_ready/entry_source_switched=true with >=65 contiguous closed1m and >=20 closed5m, plus actual ENTRY_SETUP_EVALUATED new_completed_bar or periodic_and_new_bar. If still warming up, record exact counts/gaps, do not alter thresholds or restart; continue the existing independent source research step, without duplicate unchanged notifications. When readiness is actually restored, persist evidence and send one concise update; do NOT disable the alternative-strategy research automation because this hotfix is not a certified replacement."
@@ -149,7 +170,8 @@
     "NativePUBLICdepth12attempts completed08:35:32-08:36:27KST:7valid5timeouts at5sec inresearchhost. No bookeventtime in7validresponses;HTTPDate not eventtime,RTTnotoneway. No productiondelaycause/exchangeuptime/fill inference;no collector between runs. Full nativegate still missing.",
     "Djienne15mML1274e public artifact absent;12sourcefiles/19purefunction diagnostics and16tests reproduce fee/closed-count omission on entrybarstop,monthendentry,NaNexit/level-stoplock differences. Loss remains inaggregatePnL. Synthetic counterexamples,not measuredmarketfrequency or historicalprofitimpact;positiveprefixcontrols preserved. No unchanged repetition/training/salvagetuning.",
     "Seven additional original preflights not independentbacktests. RLXBT4leg counts/fee-onlyheadline remain author claims;public rawJSONresearchManifest null,local-onlyCSV,feature/formula/SLTPunits unavailable inreviewedarticle. Source feasibility lead only,no adoptedcandidate or forwardclock.",
-    "RLXBT combo:92pinned public Git objects/5CSVheaders lack named custom features;147syntheticcases include5opposed/6entryexit/5duplicate,not market rates. Publicprobe fraction units support1.5%/2% but article runtimebinary unknown. No marketbacktest. Pinbar originalwinner selectedafter12hypotheses,spotvolume vs futures different,cost/engineunspecified;new fixed transfer screen not exactreplication/unseen validation."
+    "RLXBT combo:92pinned public Git objects/5CSVheaders lack named custom features;147syntheticcases include5opposed/6entryexit/5duplicate,not market rates. Publicprobe fraction units support1.5%/2% but article runtimebinary unknown. No marketbacktest. Pinbar originalwinner selectedafter12hypotheses,spotvolume vs futures different,cost/engineunspecified;new fixed transfer screen not exactreplication/unseen validation.",
+    "Pinbarfixedsource transfer screen:1445760futures1m/3012funding,all2024-Sep2026reused,66ZIPhashes. Zero-delay6737closedPF.4705/TP1.2382/netmean-.4604R,60sec6327PF.4939/TP1.2398/netmean-.4270R. Everyyearbothfullcostlevelsnegative. No originalspot/proprietaryengine replication/nativeurgentrate/fills. 5minstop andwholebarMAE proxies not realwarnings.20implementationtests combine8sourcecontract+12pinbar;26128separateDecimalcashchecks. No optimization,eligiblecandidate,forwardclock or production replacement."
   ],
   "iterations": [
     {
@@ -444,15 +466,47 @@
       "real_market_profitability_backtest_performed": false,
       "production_changed": false,
       "forward_started": false
+    },
+    {
+      "id": "pinbar_transfer_20261020_1127",
+      "stage_completed": "frozen_original_rule_actual1445760minutes_3012funding_2latency_cost_stress_and_Decimal_prefix_audit",
+      "started_utc": "2026-10-20T02:27:03.660952+00:00",
+      "evaluation_completed_utc": "2026-10-20T02:27:46.103925+00:00",
+      "completed_utc": "2026-10-20T02:34:38.458973+00:00",
+      "protocol_checkpoint_commit": "378586d9d5bf07859e2b3fb999fed9a86aec4987",
+      "execution_checkpoint_commit": "eb74e769b9b3fdb93539a2e6bc669d92ff549164",
+      "implementation_tests_passed": 12,
+      "original_rule_model_count": 1,
+      "latency_scenarios": 2,
+      "overlapping_scenarios_not_independent": true,
+      "closed_rows_by_latency": [
+        6737,
+        6327
+      ],
+      "unknown_rows_by_latency": [
+        0,
+        0
+      ],
+      "source_archives_SHA_reconciled": 66,
+      "independent_Decimal_cash_checks": 26128,
+      "future_append_closed_prefix_changes": 0,
+      "result": "reject_this_futures_transfer_version_all_years_costed_loss_PFbelow0.5_TP1near24percent",
+      "report": "research/continuation/results/pinbar_transfer_20261020_retained/report.json",
+      "audit": "research/continuation/results/pinbar_transfer_20261020_retained/independent_audit.json",
+      "delivery": "research/continuation/results/pinbar_transfer_20261020_retained/delivery.json",
+      "documentation": "docs/lbank_pinbar_transfer_validation_2026-10-20.md",
+      "source_screening": "research/continuation/source_screening_20261020_1132.json",
+      "market_price_backtest_performed": true,
+      "original_spot_engine_replication": false,
+      "native_LBank": false,
+      "reused_all_periods": true,
+      "production_changed": false,
+      "forward_started": false
     }
   ],
-  "active_run": {
-    "stage": "pinbar_rules_code_tests_fixed_before_market_outcomes",
-    "protocol": "research/continuation/pinbar_transfer_protocol_20261020.json",
-    "started_utc": "2026-10-20T02:25:28.375758+00:00"
-  },
+  "active_run": null,
   "blockers": [],
-  "updated_kst": "2026-10-20T11:25:28.375778+09:00",
+  "updated_kst": "2026-10-20T11:34:38.459258+09:00",
   "maintained_research_candidates": [
     {
       "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
@@ -488,6 +542,11 @@
       "candidate_id": "rlxbt_public_combo_contract_v1",
       "status": "excluded_public_release_missing_features_data_ledger_execution_contract",
       "next": "No invented feature formulas or private recovery. Source public-probe unit clarified; original article binary version unknown. No unchanged repeat."
+    },
+    {
+      "candidate_id": "rlxbt_pinbar_transfer_v1",
+      "status": "rejected_fixed_futures_transfer_costed_all3calendarperiod_losses_PFbelow0.5_TP1near24percent",
+      "next": "Preserve all original positive authorclaims plus our negative reused-futures translation. No cost/stop/target/latency threshold search or unchanged repeat. Not universal pinbar rejection."
     }
   ],
   "source_reconciliation": {
@@ -517,7 +576,7 @@
   },
   "pending_operational_validation": {
     "version": 1,
-    "observed_utc": "2026-10-20T02:24:08.542800925Z",
+    "observed_utc": "2026-10-20T02:31:44Z",
     "scope": {
       "projectId": "e7d240ac-2468-45c9-8411-33f5e24f425b",
       "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
@@ -550,9 +609,9 @@
     "native_readiness": {
       "ready": false,
       "reason": "native_history_missing_stale_or_gapped",
-      "last_observed_utc": "2026-10-20T02:23:48.658845724Z",
-      "consecutive_closed_1m": 41,
-      "consecutive_closed_5m_at_that_time": 7,
+      "last_observed_utc": "2026-10-20T02:30:06.028073423Z",
+      "consecutive_closed_1m": 48,
+      "consecutive_closed_5m_at_that_time": 9,
       "required_closed_1m": 65,
       "required_closed_5m": 20,
       "rsi_history_mature": false,
@@ -579,6 +638,6 @@
     "next_check": "Before the next finite source-research step, query the latest production head/deployment and bounded live logs. Verify current source/hash/policies and NATIVE_ENTRY_STATUS reason=native_ready/entry_source_switched=true with >=65 contiguous closed1m and >=20 closed5m, plus actual ENTRY_SETUP_EVALUATED new_completed_bar or periodic_and_new_bar. If still warming up, record exact counts/gaps, do not alter thresholds or restart; continue the existing independent source research step, without duplicate unchanged notifications. When readiness is actually restored, persist evidence and send one concise update; do NOT disable the alternative-strategy research automation because this hotfix is not a certified replacement.",
     "followup_via_existing_enabled_research_task": true,
     "evidence_path": "research/continuation/results/entry_timing_hotfix_20261020_deployment.json",
-    "latest_bounded_observation": "research/continuation/results/operational_readiness_20261020_1124.json"
+    "latest_bounded_observation": "research/continuation/results/operational_readiness_20261020_1131.json"
   }
 }

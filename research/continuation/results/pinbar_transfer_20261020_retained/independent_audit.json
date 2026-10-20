@@ -1,0 +1,26 @@
+{
+  "archive_SHA_reconciled_to_persisted_manifests": 66,
+  "scenarios": {
+    "delay_0m": {
+      "rows": 6737,
+      "closed": 6737,
+      "independent_Decimal_cash_checks": 13474,
+      "max_abs_net_R_error": 1.2301271112846734e-13,
+      "funding_event_rows": 130,
+      "actual_January_closed_prefix_rows": 308,
+      "future_append_closed_prefix_changes": 0,
+      "unknown_rows_excluded_from_cash_not_zero_profit": true
+    },
+    "delay_1m": {
+      "rows": 6327,
+      "closed": 6327,
+      "independent_Decimal_cash_checks": 12654,
+      "max_abs_net_R_error": 1.1790568521519162e-13,
+      "funding_event_rows": 149,
+      "actual_January_closed_prefix_rows": 281,
+      "future_append_closed_prefix_changes": 0,
+      "unknown_rows_excluded_from_cash_not_zero_profit": true
+    }
+  },
+  "passed": true
+}

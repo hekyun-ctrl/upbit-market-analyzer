@@ -1,0 +1,21 @@
+{
+  "observed_utc": "2026-10-20T02:31:44Z",
+  "deployment_id": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
+  "source": "862339db2c4f69facc9ba6626e2826d475504174",
+  "status": "SUCCESS",
+  "logs": [
+    {
+      "timestamp": "2026-10-20T02:28:00.327518144Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 46, \"closed_5m\": 8, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T02:29:03.081815609Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 47, \"closed_5m\": 8, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "timestamp": "2026-10-20T02:30:06.028073423Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 48, \"closed_5m\": 9, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    }
+  ],
+  "changed": false
+}
