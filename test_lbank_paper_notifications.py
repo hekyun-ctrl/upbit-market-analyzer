@@ -70,10 +70,11 @@ class PaperNotificationsTests(unittest.TestCase):
         self.assertNotIn('모의 진입 ·',self.messages[-1])
 
     def test_live_gates_and_study_rules_unchanged(self):
-        # Frozen from production 862339d; no Git executable/repository required.
-        expected={'calculate_plan': 'bd2d5e5cdbc34717bab65c394bcbc1cd684300cd82e42c65ff54fb7571f4fc17', 'classify': 'd1af4071927aa226098bf82fc0ab6e8c2e60b068db67f35a4e76b5d605e98d16', 'assess_candidate': '02cd62e5a1cfbc751066671cc1da430ea9282d98bdb2df461caa36ba358977f2', 'confirm_watch': 'b11c415f319488fa79a8dbce8d0c144851fcb636f2653603a0737e33ecbab6e1', 'alert_gate': 'bb7b1f66fdb0017d21897fad9aa14e1a92e1aa45e458f194c733b7220ef53179', 'record_alert': '7d4e99c77c486c5b798fe17daa0961c47758ac0c9d5df487ca903020770f6bb0'}
-        current={n.name:hashlib.sha256(ast.dump(n,include_attributes=False).encode()).hexdigest()
-                 for n in ast.parse(Path('lbank_futures_monitor.py').read_text()).body
+        # Frozen source text from production 862339d; independent of Python AST schema.
+        expected={'calculate_plan': '39a580a2cde5fbfe4cf54caeb02f27ae22034ad4201c9ccd1a826ac397d7ecec', 'classify': 'd4da5506ae4d587dec4f73c79bb2550b64a84cc1a09673bc0ce4b70f0dc5af9f', 'assess_candidate': 'b91c60a36a148544cedd4612469f97ca2089b6670c367bc0a4e23d60857f2c14', 'confirm_watch': '4966fd56dc71bea02445395dd7c1cd2507b70611e90e86264bc9db74131649e5', 'alert_gate': 'e047eeeb07dd40558cd745dea5e3731c2c177cde127a7137c37fd14a3213ffab', 'record_alert': '89147d99872cc78f1b8f8b4e6d86660806736030e335bf732f2975de24f3e04b'}
+        src=Path('lbank_futures_monitor.py').read_text()
+        current={n.name:hashlib.sha256(ast.get_source_segment(src,n).encode()).hexdigest()
+                 for n in ast.parse(src).body
                  if isinstance(n,ast.FunctionDef) and n.name in expected}
         self.assertEqual(expected,current)
         files={'lbank_public_techniques.py': 'c9ff5a3f2bd6a72651b878b372385796c094300544b56ce4b3740bc108928b61', 'lbank_rsi_divergence.py': '602a4faae7cff60ecb33cc0fd21ae20953e69e4b89acc2bba62979c49737f269', 'lbank_performance.py': '39ce555def76ece101c28bb31ea22d70091b0fbf5febb65fc4de95ac86ace04c'}
