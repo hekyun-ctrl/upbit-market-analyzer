@@ -1,0 +1,64 @@
+{
+  "deployment": {
+    "deployments": [
+      {
+        "id": "23799b11-6f14-4e93-aacf-78ce691f9393",
+        "status": "SUCCESS",
+        "createdAt": "2026-10-20T10:21:16.751Z",
+        "updatedAt": "2026-10-20T10:22:13.699Z",
+        "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+        "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+        "url": null,
+        "snapshotId": "2ee800c4-8cb9-4adf-8730-dae5e687c770",
+        "creator": {
+          "id": "e37ee446-2d9d-4f82-b9db-4bfbc2c98607",
+          "name": "자유3",
+          "email": "hekyun@hanmail.net"
+        },
+        "canRollback": true,
+        "canRedeploy": true,
+        "regions": [
+          "sfo"
+        ],
+        "meta": {
+          "reason": "deploy",
+          "commitMessage": "Make unchanged-gate verification portable across Python AST schema versions\n\nCompare exact frozen function source instead of version-dependent ast.dump fields. No monitor/runtime changes. Local 350 tests pass.",
+          "commitHash": "5c977a7f51cea67048f95791d1dcc4230634939a",
+          "branch": "feature/lbank-futures-monitor"
+        }
+      }
+    ]
+  },
+  "paper_notification_logs": {
+    "scope": "service",
+    "deploymentId": "23799b11-6f14-4e93-aacf-78ce691f9393",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "status": "SUCCESS",
+    "deploy": [
+      {
+        "timestamp": "2026-10-20T14:15:01.726122515Z",
+        "severity": "error",
+        "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=progress orders=false live_gate=false",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      },
+      {
+        "timestamp": "2026-10-20T14:30:02.498626113Z",
+        "severity": "error",
+        "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=progress orders=false live_gate=false",
+        "attributes": [
+          {
+            "key": "level",
+            "value": "\"error\""
+          }
+        ]
+      }
+    ]
+  },
+  "full_study_ledger_checked": false
+}
