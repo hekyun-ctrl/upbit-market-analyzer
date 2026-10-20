@@ -1,0 +1,14 @@
+{
+  "status": "fresh_public_download_recovered_all12exact_sources_and_same_diagnostic_outputs",
+  "recovered_source_bytes_checked_against_manifest": true,
+  "temporary_prior_source_reused": false,
+  "recovery_started_utc": "2026-10-20T01:04:34.477215+00:00",
+  "recovery_completed_utc": "2026-10-20T01:04:34.623094+00:00",
+  "time_scope": "Times above are diagnostic recomputation after download,not download-start/end timing.",
+  "original_report_sha256": "c456980aeb567d3df6d2740249d43aa191a81d67ebf201b3fdda3de0f84d7320",
+  "recovered_report_sha256": "18929c0d4654a6def20c53f3983badf96e005ae4aca9f4e726614a7a809e6db7",
+  "comparison": "Remove only started_utc and completed_utc from both parsed reports;all remaining fields exactly equal.",
+  "canonical_diagnostic_sha256": "a6bec504a6f9cc420520a36a29926e08b52e68820b273163c471fc1fa318654d",
+  "source_files": 12,
+  "model_or_market_backtest_performed": false
+}

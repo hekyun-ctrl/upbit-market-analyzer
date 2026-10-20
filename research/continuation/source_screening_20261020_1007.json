@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "reviewed_utc": "2026-10-20T01:09:49Z",
+  "scope": "Additional primary-source preflights,NOT newly executed market backtests. Author figures and labels are not our validation.",
+  "sources": [
+    {
+      "repository": "Dnayaka/btc-rsi-momentum",
+      "commit": "3216d14f111d705bd48b3b1746bd7cbaa2832653",
+      "file": "README.md",
+      "git_blob_sha": "5484117689a455118817d40bee585acc43bbcbd9",
+      "review_scope": "Full README",
+      "decision": "exclude_current_family_from_priority_manual_policy;no market replay",
+      "basis": "Author~550-560trades/6.8years (~0.22/day) below>=1/day;macro stop widening/closed-onlyDD/selection need review. Does not invalidate RSI generally."
+    },
+    {
+      "repository": "YASARAMA/BTC-bot-auto-trading",
+      "commit": "737fecbd56694e0804141152bd40cfa7f95179a1",
+      "file": "README.md",
+      "git_blob_sha": "2cf12baece3df372e7b299ad89175431026a8118",
+      "review_scope": "Introduction,research,strategies/filter tables,backtest results;not all UI/config sections",
+      "decision": "not_priority_positive_BTC_aftercost_evidence_for_defaults;not sourcecode replay",
+      "basis": "Author default EMA reference:PF1.04bullsample/PF0.65bearsample;71/225trades across multi-month/year windows. Positive breakout/filter tables are retrospective two-sample selections,not sealed validation;holes acknowledged."
+    },
+    {
+      "repository": "juriok/chart-pattern-backtester",
+      "commit": "2972c880144997ec305dc3dac23d78ee5a831176",
+      "file": "README.md",
+      "git_blob_sha": "03d5db3a2bbc8b6122139bef59fd3209cae05f7a",
+      "review_scope": "Strategy/results and limitations",
+      "decision": "not_priority_BTC_single_position_native_aftercost_evidence;no replay",
+      "basis": "Positive headline is43symbol sharedpool,30slots/2xnotional,not BTC-only. Author admits closed-trade-onlyDD,constantfunding and stop-level fills even through gaps;5m source version negative. Do not increase user risk or transfer portfolio result to BTC manual fills."
+    },
+    {
+      "repository": "farrellh1/crypto-funding-rate-strategy",
+      "commit": "ac3557f567bbd487f8ab8fa203bfa666027add8d",
+      "file": "README.md",
+      "git_blob_sha": "9c2b67c640f30cd012a101c01cedd83c612b7fd7",
+      "review_scope": "Full README",
+      "decision": "not_priority_positive_costed_source;no source execution",
+      "basis": "Performance metrics explicitly TBD;instant candle-close fills and actual funding cashflows omitted. Framework capacity is not profit evidence."
+    },
+    {
+      "repository": "CILSON/Quant-Trading-Strategy-Backtest",
+      "commit": "b82376d7b4e739d52f8d42df36c3634be413f05b",
+      "file": "README.md",
+      "git_blob_sha": "4373eb2edecdeeb655171ac730a0a1602fe76b81",
+      "review_scope": "Full README",
+      "decision": "not_priority_BTC_validated_replacement_source;no marketreplay",
+      "basis": "58trade recorded example does not identify BTC sample/date provenance;ETH-named file,SL/timeexit withnoTP1,walkforward/OOS/slippage listed futurework."
+    },
+    {
+      "url": "https://rlxbt.com/articles/optimized-btc-5m-oscillation-exhaustion-high-frequency-bottom-reversion-slashed-to-clear-maker-only-trading-fees",
+      "raw_JSON": "https://rlxbt.com/api/articles/optimized-btc-5m-oscillation-exhaustion-high-frequency-bottom-reversion-slashed-to-clear-maker-only-trading-fees",
+      "published_at": "2026-08-05T18:35:19.508Z",
+      "review_scope": "Full article and public rawJSON",
+      "decision": "exclude_optimized_source_from_priority_frequency_policy;not independent backtest",
+      "basis": "110reportedtrades/~79000five-minute bars implies~0.401/day. Baseline1972trade source reportsnetloss;optimization changes signals,not fixedsignal2xcoststress. researchManifest null/learnedpatterndefinition absent;do not adopt article leverage-scaling suggestion."
+    },
+    {
+      "url": "https://rlxbt.com/articles/robust-rsi-bollinger-mean-reversion-strategy-on-btcusdt-1h",
+      "published_at": "2026-07-08",
+      "review_scope": "Full article",
+      "decision": "exclude_current_hourly_source_from_priority_frequency_policy;no new backtest",
+      "basis": "525reportedtrades/30600hourlybars implies~0.412/day;author-localdata path/no checksum;cost treatment and SLpct engine units not resolved. Site robust label does not meet our policy."
+    }
+  ],
+  "next_preflight": "research/continuation/rlxbt_combo_source_preflight_20261020.json",
+  "qualified_candidates": [],
+  "forward_started": false,
+  "production_changed": false,
+  "search_limit": "One search engine returned irrelevant lexical results;ignored. Decisions rely on directly retrieved primary sources,not those results."
+}

@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "reviewed_utc": "2026-10-20T01:09:49Z",
+  "status": "public_metadata_preflight_only_NOT_qualified_or_forwardcandidate",
+  "title": "BTC 4-Leg Combo Strategy",
+  "original_article": "https://rlxbt.com/articles/btc-4-leg-combo-strategy-sharpe-102-294-return-under-005-commissions",
+  "raw_JSON": "https://rlxbt.com/api/articles/btc-4-leg-combo-strategy-sharpe-102-294-return-under-005-commissions",
+  "published_at": "2026-07-14T19:00:00.896Z",
+  "site_verdict_not_our_verdict": "robust",
+  "author_claims_not_reproduced": {
+    "asset": "BTCUSDT",
+    "timeframe": "1h",
+    "bars": 60000,
+    "trades": 6945,
+    "fee_statement": "0.05% per trade;entry/exit semantics not verified",
+    "count_per_nominal_bar_day": 2.778,
+    "walk_forward_efficiency": 0.15,
+    "reported_max_drawdown_pct": 29.9,
+    "MC_risk_of_ruin_pct": 16.4
+  },
+  "public_rule_summary": "Volatility-persistence plus Monday-long/Thursday-short sleeves;48bar timeout;stop_loss_pct0.015 and take_profit_pct0.02 fields,whose engine units are not verified.",
+  "observed_missing": [
+    "Article references author-local CSV,not public download or checksum.",
+    "researchManifest is null in public raw JSON.",
+    "Definitions/code for vol_regime_persistence_24 and weekend_vol_shock not provided in reviewed article.",
+    "Raw closed trades,unrealized equity,funding/slippage/fullfee and selected-parameter chronology not verified."
+  ],
+  "next_finite_step": {
+    "instruction": "Read only public raw metadata,linked public source/specifications and research-log repository to resolve feature definitions,entry conflict priority,SL/TP units,fee sides,execution-time causality and public data/closedledger availability. Save exact bytes/SHA/versions and feasibility decision before computing strategy performance.",
+    "stop_or_exclude": "If original features/data/contract cannot be publicly recovered,record source-specific exclusion and continue ledger-first primary discovery. Do not invent definitions or reinterpret label robust as proof. Do not rerun known excluded sources.",
+    "no_authority_expansion": "No login,paid app/container installation,service/daemon,credentials,author outreach,accounts/orders or risk changes."
+  },
+  "source_rules_frozen_for_candidate": false,
+  "full_original_code_reviewed": false,
+  "market_backtest_performed": false,
+  "eligible": false,
+  "fixed_gates_unchanged": true,
+  "all_2022_2026_and_author_published_past_outcomes_not_unseen_prospective": true
+}

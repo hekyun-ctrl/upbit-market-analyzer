@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "completed_utc": "2026-10-20T01:09:49Z",
+  "source_commit": "1274eac3f8e02ddce6be7ff3b48887a971932f35",
+  "protocol_frozen_utc": "2026-10-20T00:57:35Z",
+  "protocol_checkpoint": "063cbc79e96fb7b4a763f0917d91d09148c4f62e",
+  "tested_execution_checkpoint": "f6bdde78e3e51449c9331fa1d8401d863d30a0f1",
+  "evaluation_started_utc": "2026-10-20T01:02:21.326194+00:00",
+  "evaluation_completed_utc": "2026-10-20T01:02:21.429552+00:00",
+  "tests_passed": 16,
+  "separate_scalar_Decimal_checks_passed": 10,
+  "source_files_hash_verified": 12,
+  "source_functions_selected": 19,
+  "SHA256": {
+    "code": "f0fb8f5ecfab9f67b31c2fe29b7718ad2ef60aeb47400330c2a3228c584edfe7",
+    "tests": "d66f3c8445adcfa2b2ec5bd52105f2eb8eb65834702a38d31fcf9d40710657cd",
+    "verifier": "583a8d97a911a8957f92998ce4019c67386ee996c8dc087ec15e0df7bc80a9a2",
+    "protocol": "481f4ea3818bbe12e6e303b9b6b31222660453da4ec60f146f9e82cfeb898bcf",
+    "manifest": "8cffc2f55fb77c51d78f0b0b46382c422ab8d00b010de52c22c447c5be3ee06d",
+    "source_tree": "266986ef8677fa8e63aea79f708571d0c9712ce73ecdf8f1b009e9b68ef2fad8",
+    "report": "c456980aeb567d3df6d2740249d43aa191a81d67ebf201b3fdda3de0f84d7320",
+    "independent_audit": "b096feaa7af14750dfb097bb9a4b98199b8d3b571e73e2bfa11402c4d0939de2",
+    "recovered_report": "18929c0d4654a6def20c53f3983badf96e005ae4aca9f4e726614a7a809e6db7"
+  },
+  "commands": {
+    "actual": "python research/continuation/audit_lightgbm_source_contract.py --source-dir /workspace/scratch/ba9af914844b/ml-source-audit-qtmscx --output research/continuation/results/lightgbm_source_20261020/report.json",
+    "recovery": "python research/continuation/audit_lightgbm_source_contract.py --fetch-sources /workspace/scratch/ba9af914844b/ml-source-audit-qtmscx/fresh_recovery --output research/continuation/results/lightgbm_source_20261020/recovered_report.json",
+    "tests": "ML_AUDIT_SOURCE_DIR=<source-dir> python -m unittest discover -s research/continuation -p test_lightgbm_source_contract_audit.py -v",
+    "verify": "python research/continuation/verify_lightgbm_source_audit.py research/continuation/results/lightgbm_source_20261020/report.json"
+  },
+  "source_recovery": "Full exact public pinned files recovered afresh using manifest URLs and Gitblob/SHA checks;no reliance on survival of task scratch files. Original source code is not vendored;the public immutable source and audited body hashes identify it.",
+  "decision": "source_version_excluded;missing_artifacts_and_fee_closedledger_missingentrybarstop/monthend/unknownsignal_contract_mismatch",
+  "inference_limits": "Synthetic diagnostic counterexamples,not empirical prevalence or market return validation. Loss itself remains in aggregate PnL;cost/closed-count omission does not prove all original headline profit invalid.",
+  "production_changed": false,
+  "railway_accessed": false,
+  "account_or_order_access": false,
+  "forward_started": false,
+  "replacement_certified": false
+}

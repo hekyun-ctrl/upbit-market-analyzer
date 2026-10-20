@@ -28,7 +28,8 @@
     "unreadable_supply_demand_7d15e_source_audit_v1_real_price_causality",
     "garcia_schweitzer_2015_public_data_and_alert_contract_preflight",
     "mroziewicz_slepaczuk_2026_two_released_BTC_ledger_cost_frequency_audit_v1",
-    "native_LBank_public_depth_bounded12attempts_v1_raw_hash_and_decimal_quality_audit"
+    "native_LBank_public_depth_bounded12attempts_v1_raw_hash_and_decimal_quality_audit",
+    "djienne_lightgbm_1274e_pure_kernel_contract_forensic_v1"
   ],
   "read_before_work": [
     "docs/lbank_strategy_rebuild_2026-10-20.md",
@@ -38,15 +39,23 @@
     "research/long_history/results"
   ],
   "next_work": {
-    "stage": "pinned_15m_LightGBM_source_contract_cost_artifact_risk_preflight",
-    "instruction": "Completed actual bounded native PUBLICdepth batch under pre-request code checkpoint910e888abba4f525cab3a91cc5a58ef55c4ac526:12attempts,7valid,5researchhost5secondtimeouts,7unknownbookeventages;rawbytes/hash and separateDecimaltiming audit preserved. This is input quality,not alpha/fills/forwardvalidation or productiondelayattribution. No continuouscollector remains. Read docs/lbank_native_quote_baseline_2026-10-20.md and source_screening_20261020_0840.json. Next single finite step:read pinned djienne15mLightGBM source contract/artifact/replay/evidence at1274eac3f8e02ddce6be7ff3b48887a971932f35 WITHOUT executing externalcode. Audit modelartifact date vsstalehandwrittenperformance,signal/feature/splitcausality,feesides/funding/slippage,bar-vs-intrabarstop,frequency and current risk/TP1compatibility. Documented-20%stop is NOT approved for user;no currentTP1 inread docs. Reject incompatible originalcontract rather than relaxgates/increaserisk/salvagetune. Onlyifcompatible freeze bounded execution protocol before training/backtest;otherwise continue another primarysource with code/data/aftercostevidence. Do not run Freqtrade,accounts,orders,webhooks,SQL,unreviewedpickles or dependencies. Newsource remains unreviewedlead,NOT maintained/eligiblecandidate or forwardclock. Do not repeat prior failedcalculation/README-onlyresearch. Allpromotiongatesunchanged;2022-Sep2026alreadyobserved and publishedolderoutcomesnot prospective. No deploy.",
+    "stage": "public_combo_feature_units_source_and_data_availability_preflight_before_execution",
+    "instruction": "Completed pinned djienne15mLightGBM source audit:12sourcefiles/19reviewedpurefunctions,16regressiontests,10separateDecimal/eventchecks,exactfreshpublicsource recovery. Actual fixtureentrybarstop loss stays inaggregatePnL but0fees/0closedrows;monthendnewentry,NaNexit,andstoplockvslevelentry mismatch reproduced. Rollingrank/20featureprefixcontrols0pastchanges. Source model_info/weights/OOF/ledger missing from complete publictree. This version excluded as replacement evidence;no fullmarketbacktest or training/no repairs tosalvage. Read docs/lbank_lightgbm_source_contract_audit_2026-10-20.md and nextpreflight. Next finite step:resolve public original featuredefinitions(vol_regime_persistence_24,weekend_vol_shock),SLTPpctunits(0.015/0.02),fee sides,opposing-entrypriority,and downloadable rawdata/closedledger/source for separate RLXBT4leg source. Public rawJSONresearchManifest null and authorlocalCSVpath mean publicationlabel robust is NOT evidence of reproducibility. First locate exactpublicbytes+SHA/specification via citedoriginal/API/researchlog;no install/login/daemon/paidaccess,contacts,accountorders or inventedfeatureformulas. If unavailable/incompatible,record source-specific exclusion quickly and continue new ledger-first primarysource discovery rather than a speculative marketreplay. Do not report6945asverifiedclosedtrades or2.778/dayasnativegatepass. No eligiblecandidate/forwardclock/deploy;allpolicygatesunchanged;2022-Sep2026reused andolderpublishedoutcomesnot unseen. Additional7sourcepreflights are not newmarkettests;see source_screening_20261020_1007.json. No reuse of knownexcluded sources or risk/costthresholdrelaxation.",
     "sources_to_screen": [
+      {
+        "title": "BTC 4-Leg Combo: public feature/unit/data feasibility,not qualified",
+        "url": "https://rlxbt.com/articles/btc-4-leg-combo-strategy-sharpe-102-294-return-under-005-commissions",
+        "raw_JSON": "https://rlxbt.com/api/articles/btc-4-leg-combo-strategy-sharpe-102-294-return-under-005-commissions",
+        "preflight": "research/continuation/rlxbt_combo_source_preflight_20261020.json",
+        "status": "unqualified_publicmetadata_lead;original_feature_code_data_units_and_fee_contract_missing",
+        "candidate_rules_frozen": false
+      },
       {
         "title": "15m BTC long-only LightGBM artifact-owned contract",
         "url": "https://github.com/djienne/ML_Trading_Strategy_Crypto_BTC_LightGBM_Jansen/tree/1274eac3f8e02ddce6be7ff3b48887a971932f35",
         "source_commit": "1274eac3f8e02ddce6be7ff3b48887a971932f35",
         "screening": "research/continuation/source_screening_20261020_0840.json",
-        "status": "unreviewed_code_artifact_risk_contract_lead_only;3documentsread;no code/dataexecution",
+        "status": "completed_excluded_source_version_for_missingartifact_and_execution_cost_ledger_contract_defects;no_repeat",
         "read_first": [
           "src/strategy_contract.py",
           "freqtrade_live/shared/models/model_info.json",
@@ -56,7 +65,9 @@
         "known_caveats": [
           "Stale2026-07-04performance predates reported2026-08-13artifact.",
           "Selectionbias reusedOOF,partialcosts,barstopnotintrabar,documented-20%stopnotapproved,TP1notestablished."
-        ]
+        ],
+        "report": "research/continuation/results/lightgbm_source_20261020/report.json",
+        "documentation": "docs/lbank_lightgbm_source_contract_audit_2026-10-20.md"
       },
       {
         "title": "Native LBank PUBLIC quote baseline for manual fill feasibility",
@@ -94,7 +105,22 @@
         "status": "all10frozen_component_variants_executed_rejected_costed_losses_PFbelow1_no_forward",
         "report": "research/continuation/results/functional_curve_20261020_report.json"
       }
-    ]
+    ],
+    "fallback_discovery": {
+      "approach": "Closed BTCUSDT ledger and public rule/code/data provenance first,not positive labels or multipair headlines.",
+      "search_queries": [
+        "BTCUSDT intraday published trade ledger net fees slippage funding source code",
+        "Bitcoin strategy public data after transaction costs fixed stop takeprofit reproducible",
+        "BTCUSDT backtest hourly five minute closed trades frequency original repository"
+      ],
+      "exclusions_catalogs": [
+        "research/continuation/source_screening_20261020_0505.json",
+        "research/continuation/source_screening_20261020_0558.json",
+        "research/continuation/source_screening_20261020_0740.json",
+        "research/continuation/source_screening_20261020_0840.json",
+        "research/continuation/source_screening_20261020_1007.json"
+      ]
+    }
   },
   "known_limitations": [
     "2023 through Sep2026 reused and exploratory; 2022 observed for Turtle; none may be relabeled untouched.",
@@ -112,7 +138,8 @@
     "Additional primary screens:CacheCarti all4passedBTCcardsnegative;TSMOM sourcefeesappliedtorisknotnotional andTPfirst;Frontiers licensedrawdata/riskcontract notpubliclyreproducible. These are source screens only,not newly executed market backtests. Social-signal paper now screened:dailyinput,riskcontract unavailable,advertisedendpoint404;not qualified.",
     "New publishedWFtwoBTCsourceledgers remainpositive after sourcefee reconciliation and2xfeemodel,but source processedKaggleprices/rawimputation not reconciled,logshortapproximation,nativefunding/latency/TP1 absent. Both frequency<.45/day,opportunitydays~32%,95lowernegative. PaperclipDD~50-54% is percent,notinitialR. No promotion or universalEMAconclusion.",
     "NativePUBLICdepth12attempts completed08:35:32-08:36:27KST:7valid5timeouts at5sec inresearchhost. No bookeventtime in7validresponses;HTTPDate not eventtime,RTTnotoneway. No productiondelaycause/exchangeuptime/fill inference;no collector between runs. Full nativegate still missing.",
-    "Additional sources jsinn003/TobiasREADME preflights lack positive aftercostproof;no marketbacktest. New djienne15mMLlead3docs only,currentartifact and staleperformance dates differ,-20%stop/TP1/cost/selectionbias unresolved. Not qualified or forward-ready."
+    "Djienne15mML1274e public artifact absent;12sourcefiles/19purefunction diagnostics and16tests reproduce fee/closed-count omission on entrybarstop,monthendentry,NaNexit/level-stoplock differences. Loss remains inaggregatePnL. Synthetic counterexamples,not measuredmarketfrequency or historicalprofitimpact;positiveprefixcontrols preserved. No unchanged repetition/training/salvagetuning.",
+    "Seven additional original preflights not independentbacktests. RLXBT4leg counts/fee-onlyheadline remain author claims;public rawJSONresearchManifest null,local-onlyCSV,feature/formula/SLTPunits unavailable inreviewedarticle. Source feasibility lead only,no adoptedcandidate or forwardclock."
   ],
   "iterations": [
     {
@@ -338,19 +365,53 @@
       "background_collector_running": false,
       "production_changed": false,
       "forward_started": false
+    },
+    {
+      "id": "lightgbm_source_contract_audit_20261020_0957",
+      "protocol_frozen_utc": "2026-10-20T00:57:35Z",
+      "evaluation_started_utc": "2026-10-20T01:02:21.326194+00:00",
+      "evaluation_completed_utc": "2026-10-20T01:02:21.429552+00:00",
+      "completed_utc": "2026-10-20T01:09:49Z",
+      "stage_completed": "pinned12sourcefiles19purekernel16tests_actual_synthetic_contract_fee_ledger_probes10separatechecks_and_fresh_download_recovery",
+      "source_commit": "1274eac3f8e02ddce6be7ff3b48887a971932f35",
+      "protocol_checkpoint_commit": "063cbc79e96fb7b4a763f0917d91d09148c4f62e",
+      "tested_execution_checkpoint": "f6bdde78e3e51449c9331fa1d8401d863d30a0f1",
+      "implementation_tests_passed": 16,
+      "separate_arithmetic_checks_passed": 10,
+      "source_files_hash_verified": 12,
+      "selected_pure_functions": 19,
+      "first_bar_stop_reported_transitions": 0,
+      "first_bar_stop_closed_rows": 0,
+      "first_bar_stop_net_return": -0.2,
+      "loss_retained_in_aggregate": true,
+      "normal_round_trip_reported_transitions": 2,
+      "normal_closed_rows": 1,
+      "prefix_rows": 600,
+      "full_rows": 800,
+      "past_rolling_rank_changes": 0,
+      "past_feature_cell_changes": 0,
+      "features_tested": 20,
+      "public_required_artifacts_found": 0,
+      "public_required_artifacts_checked": 3,
+      "fresh_source_recovery_same_diagnostic_fields": true,
+      "result": "exclude_this_external_release_as_replacement_evidence_not_allML;source_defects_and_missing_artifacts",
+      "actual_market_profitability_backtest_performed": false,
+      "source_model_training_performed": false,
+      "synthetic_diagnostics_only": true,
+      "report": "research/continuation/results/lightgbm_source_20261020/report.json",
+      "audit": "research/continuation/results/lightgbm_source_20261020/independent_audit.json",
+      "recovery": "research/continuation/results/lightgbm_source_20261020/recovery_audit.json",
+      "documentation": "docs/lbank_lightgbm_source_contract_audit_2026-10-20.md",
+      "source_screening": "research/continuation/source_screening_20261020_1007.json",
+      "delivery": "research/continuation/results/lightgbm_source_20261020/delivery.json",
+      "next_preflight": "research/continuation/rlxbt_combo_source_preflight_20261020.json",
+      "production_changed": false,
+      "forward_started": false
     }
   ],
-  "active_run": {
-    "id": "lightgbm_source_contract_audit_20261020_0957",
-    "protocol_frozen_utc": "2026-10-20T00:57:35Z",
-    "stage": "reviewed_allowlist_kernel_diagnostic_code_and_protocol_fixed_before_execution",
-    "source_commit": "1274eac3f8e02ddce6be7ff3b48887a971932f35",
-    "protocol": "research/continuation/lightgbm_source_audit_protocol_20261020.json",
-    "manifest": "research/continuation/lightgbm_source_manifest_20261020.json",
-    "next_action": "Execute deterministic synthetic kernel diagnostic fixtures and controls only,no modeltraining/fullmarketbacktest/livebot. Preserve all outcomes and separate fee/ledger verification."
-  },
+  "active_run": null,
   "blockers": [],
-  "updated_kst": "2026-10-20T08:44:23+09:00",
+  "updated_kst": "2026-10-20T10:09:49+09:00",
   "maintained_research_candidates": [
     {
       "candidate_id": "deprez_frommel_2024_unfiltered_obv_intraday_component_v1",
@@ -376,6 +437,11 @@
       "candidate_id": "mroziewicz_slepaczuk_2026_released_BTC_ledger_audit_v1",
       "status": "historical_fee_only_positive_not_qualified_for_manual_alert_frequency_uncertainty_and_contract",
       "next": "Retain original positive/negative evidence,not eligiblecandidate. No repeated optimization or added arbitrary exits to pass gates;no claim of nativeaftercostprofit. Observe bounded nativeinputbaseline and continue another compatible PRIMARY source."
+    },
+    {
+      "candidate_id": "djienne_lightgbm_1274e_contract_forensic_v1",
+      "status": "excluded_release_as_replacement_evidence_missing_public_artifacts_and_execution_contract_mismatch",
+      "next": "No unchanged source replay/training or repairs/tuning to salvage headline. Loss remains inaggregatePnL;counterexample scope not universalMLfailure. Continue separate primary source availability audit."
     }
   ],
   "source_reconciliation": {

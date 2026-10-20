@@ -1,0 +1,21 @@
+{
+  "status": "saved_scalar_Decimal_and_event_checks_passed",
+  "completed_utc": "2026-10-20T01:03:20.667781+00:00",
+  "report_sha256": "c456980aeb567d3df6d2740249d43aa191a81d67ebf201b3fdda3de0f84d7320",
+  "check_count": 10,
+  "checks": [
+    "normal_round_trip_two_fee_events_0.0003",
+    "normal_round_trip_two_fee_events_0.0006",
+    "entry_bar_stop_loss_retained_but_two_fee_events_and_closed_row_missing",
+    "month_end_flat_can_open_new_trade",
+    "unknown_quantile_becomes_exit_flag",
+    "locked_model_and_persistent_entry_flag_differ_only",
+    "open_close_only_kernel_omits_low_breach",
+    "held_gap_price_leg_omitted",
+    "prefix_and_shift_controls_reconciled",
+    "missing_artifacts_and_all_unassessed_gates_are_not_passes"
+  ],
+  "independence": "Same researcher, separate stdlib scalar/Decimal implementation;not external institutional validation.",
+  "profitability_verified": false,
+  "forward_started": false
+}

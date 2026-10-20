@@ -1,0 +1,528 @@
+{
+  "id": "djienne_lightgbm_1274e_contract_forensic_v1",
+  "started_utc": "2026-10-20T01:02:21.326194+00:00",
+  "completed_utc": "2026-10-20T01:02:21.429552+00:00",
+  "protocol_frozen_utc": "2026-10-20T00:57:35Z",
+  "source_commit": "1274eac3f8e02ddce6be7ff3b48887a971932f35",
+  "code_sha256": "f0fb8f5ecfab9f67b31c2fe29b7718ad2ef60aeb47400330c2a3228c584edfe7",
+  "manifest_sha256": "8cffc2f55fb77c51d78f0b0b46382c422ab8d00b010de52c22c447c5be3ee06d",
+  "protocol_sha256": "481f4ea3818bbe12e6e303b9b6b31222660453da4ec60f146f9e82cfeb898bcf",
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "pandas": "2.2.3"
+  },
+  "source_files_hash_verified": 12,
+  "executed_functions": [
+    {
+      "file": "src/utils.py",
+      "function": "get_time_index",
+      "start": 14,
+      "end": 17,
+      "AST_body_sha256": "cd0675ddb7ecb718e149db4e2ea10ce0b8ebc843153e088977e4c1b8da13ae31"
+    },
+    {
+      "file": "src/utils.py",
+      "function": "get_symbol_key",
+      "start": 25,
+      "end": 28,
+      "AST_body_sha256": "6cded3211d61d14672835e2fab268ab7b01dc57670c86461be0455df58931ba1"
+    },
+    {
+      "file": "src/utils.py",
+      "function": "interval_to_minutes",
+      "start": 226,
+      "end": 244,
+      "AST_body_sha256": "de1dc144ce16a734384555b0344dac577c31e7c3196947f1409560aae13fcfe2"
+    },
+    {
+      "file": "src/utils.py",
+      "function": "bars_per_year",
+      "start": 220,
+      "end": 223,
+      "AST_body_sha256": "e4a9a00c62fec62af3897640fd57dd36709c6e27be2ae79940011cee427eab2c"
+    },
+    {
+      "file": "src/utils.py",
+      "function": "rolling_pct_rank",
+      "start": 137,
+      "end": 155,
+      "AST_body_sha256": "cb8e32dff2be450b29df0febf5110f54941a129a4e7d3f69e58ec81eb90bb62f"
+    },
+    {
+      "file": "src/utils.py",
+      "function": "assign_decile_rolling",
+      "start": 158,
+      "end": 170,
+      "AST_body_sha256": "4abe45dc902231244113b9351f4981568f57d155491c8dfe123167c8147b0b73"
+    },
+    {
+      "file": "src/signal_engine.py",
+      "function": "_hysteresis_signal",
+      "start": 16,
+      "end": 36,
+      "AST_body_sha256": "2650653691ff931b584c9afed1afa56641192a02ef86bded41c9861330d389bf"
+    },
+    {
+      "file": "src/signal_engine.py",
+      "function": "_hysteresis_signal_low",
+      "start": 40,
+      "end": 58,
+      "AST_body_sha256": "47f7427889dbcd459dcdd80fe21a0435cbe2d6eb98c4816ca757bd0d78adda49"
+    },
+    {
+      "file": "src/signal_engine.py",
+      "function": "quantile_window_bars",
+      "start": 61,
+      "end": 63,
+      "AST_body_sha256": "ee986f1a1a2ca806af4caec2c5fca7cfa6dd0042f30649a0212f362471b56aeb"
+    },
+    {
+      "file": "src/signal_engine.py",
+      "function": "_normalize_datetime_index",
+      "start": 66,
+      "end": 70,
+      "AST_body_sha256": "e632ff2b63cb7ae6cd5472aa7eb54583af6254167bf53161fac098459dec733a"
+    },
+    {
+      "file": "src/signal_engine.py",
+      "function": "compute_prediction_quantiles",
+      "start": 73,
+      "end": 113,
+      "AST_body_sha256": "3d73b4fafbded28d4bed4ddc56b8e699f25a0a37f6a6b95bd072d5c77a775a54"
+    },
+    {
+      "file": "src/signal_engine.py",
+      "function": "compute_desired_position",
+      "start": 116,
+      "end": 159,
+      "AST_body_sha256": "e1cdc0d837c6b6ce75adc33b046f088a8786a8454ccd315c62d301c86860382a"
+    },
+    {
+      "file": "src/signal_engine.py",
+      "function": "compute_live_level_signals",
+      "start": 162,
+      "end": 180,
+      "AST_body_sha256": "79d44972286c0ce4edd7402cb27b16012ca0c57cda812a07f39ad1581ccfff6f"
+    },
+    {
+      "file": "src/signal_engine.py",
+      "function": "shift_position_for_execution",
+      "start": 198,
+      "end": 207,
+      "AST_body_sha256": "bca410e2ff48595d304cb4bc69042f41382919b8874d167824e714c36ac323ed"
+    },
+    {
+      "file": "src/backtest.py",
+      "function": "_apply_stoploss",
+      "start": 21,
+      "end": 75,
+      "AST_body_sha256": "1518ce569d21bc962cae427b199c4fcae15d5b5e6722fee1fe8bb0195a1a44d7"
+    },
+    {
+      "file": "src/backtest.py",
+      "function": "compute_signal_returns",
+      "start": 78,
+      "end": 158,
+      "AST_body_sha256": "fb16e07a1acd35b03b2d6a507bedaf5bc0d50649cbe36b9aeeca3e41e9d960ea"
+    },
+    {
+      "file": "freqtrade_live/backtest_live_window.py",
+      "function": "build_trade_table",
+      "start": 364,
+      "end": 395,
+      "AST_body_sha256": "b7e5e908c5d8d33db1e6c4d59431b852eb3a054e8084379f1291225bf5264ecc"
+    },
+    {
+      "file": "src/features.py",
+      "function": "_resolve_group_key",
+      "start": 18,
+      "end": 21,
+      "AST_body_sha256": "2bd4918d4833c4200083f3b2ba44e8464ff1749e56180450b6edba4e648c4fce"
+    },
+    {
+      "file": "src/features.py",
+      "function": "engineer_features",
+      "start": 24,
+      "end": 232,
+      "AST_body_sha256": "59b616c70baabb735336b876d996c10e310fc73c8a40fff74b2ffbf97a8175e7"
+    }
+  ],
+  "artifacts": {
+    "freqtrade_live/shared/models/model_info.json": false,
+    "freqtrade_live/shared/models/latest_model.txt": false,
+    "freqtrade_live/shared/models/latest_predictions.feather": false
+  },
+  "code_defaults_not_deployed_artifact": {
+    "DEFAULT_DIRECTION": "high",
+    "DEFAULT_FEE_ASSUMPTION": 0.0003,
+    "DEFAULT_QUANTILE_METHOD": "rolling",
+    "DEFAULT_STOPLOSS": -0.2,
+    "DEFAULT_BINS": 100,
+    "DEFAULT_ENTRY_QUANTILE": 100,
+    "DEFAULT_EXIT_QUANTILE": 90,
+    "DEFAULT_TRAIN_MONTHS": 12,
+    "DEFAULT_INTERVAL": "15m",
+    "DEFAULT_INFERENCE_SYMBOL": "BTCUSDT"
+  },
+  "normal_round_trip_control": [
+    {
+      "fee": 0.0003,
+      "predictions": [
+        0.0,
+        1.0,
+        2.0,
+        -1.0
+      ],
+      "target_returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "quantiles": [
+        null,
+        100,
+        100,
+        50
+      ],
+      "modified_signal": [
+        1,
+        1,
+        0
+      ],
+      "gross_array": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "net_array": [
+        -0.0003,
+        0.0,
+        -0.0003
+      ],
+      "gross_return": 0.0,
+      "net_return": -0.0005999099999999258,
+      "reported_Total_Trades": 2,
+      "closed_table_rows": 1
+    },
+    {
+      "fee": 0.0006,
+      "predictions": [
+        0.0,
+        1.0,
+        2.0,
+        -1.0
+      ],
+      "target_returns": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "quantiles": [
+        null,
+        100,
+        100,
+        50
+      ],
+      "modified_signal": [
+        1,
+        1,
+        0
+      ],
+      "gross_array": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "net_array": [
+        -0.0006,
+        0.0,
+        -0.0006
+      ],
+      "gross_return": 0.0,
+      "net_return": -0.0011996400000000573,
+      "reported_Total_Trades": 2,
+      "closed_table_rows": 1
+    }
+  ],
+  "entry_bar_stop_fee_and_ledger": {
+    "cases": [
+      {
+        "fee": 0.0003,
+        "predictions": [
+          0.0,
+          1.0,
+          2.0,
+          -1.0
+        ],
+        "target_returns": [
+          0.0,
+          -0.25,
+          0.0,
+          0.0
+        ],
+        "quantiles": [
+          null,
+          100,
+          100,
+          50
+        ],
+        "modified_signal": [
+          0,
+          0,
+          0
+        ],
+        "gross_array": [
+          -0.19999999999999996,
+          0.0,
+          0.0
+        ],
+        "net_array": [
+          -0.19999999999999996,
+          0.0,
+          0.0
+        ],
+        "gross_return": -0.19999999999999996,
+        "net_return": -0.19999999999999996,
+        "reported_Total_Trades": 0,
+        "closed_table_rows": 0
+      },
+      {
+        "fee": 0.0006,
+        "predictions": [
+          0.0,
+          1.0,
+          2.0,
+          -1.0
+        ],
+        "target_returns": [
+          0.0,
+          -0.25,
+          0.0,
+          0.0
+        ],
+        "quantiles": [
+          null,
+          100,
+          100,
+          50
+        ],
+        "modified_signal": [
+          0,
+          0,
+          0
+        ],
+        "gross_array": [
+          -0.19999999999999996,
+          0.0,
+          0.0
+        ],
+        "net_array": [
+          -0.19999999999999996,
+          0.0,
+          0.0
+        ],
+        "gross_return": -0.19999999999999996,
+        "net_return": -0.19999999999999996,
+        "reported_Total_Trades": 0,
+        "closed_table_rows": 0
+      }
+    ],
+    "economic_entry_and_stop_fee_events": 2,
+    "market_prevalence_or_original_profit_impact": null
+  },
+  "month_end_new_entry": {
+    "timestamps": [
+      "2026-01-31T23:30:00",
+      "2026-01-31T23:45:00",
+      "2026-02-01T00:00:00",
+      "2026-02-01T00:15:00",
+      "2026-02-01T00:30:00",
+      "2026-02-01T00:45:00",
+      "2026-02-01T01:00:00",
+      "2026-02-01T01:15:00"
+    ],
+    "quantiles": [
+      50.0,
+      100.0,
+      95.0,
+      95.0,
+      95.0,
+      95.0,
+      50.0,
+      50.0
+    ],
+    "desired": [
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0
+    ],
+    "held_next_bar": [
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    "new_month_first_held": 1,
+    "violation": true
+  },
+  "unknown_quantile_live_exit": {
+    "quantiles": [
+      100.0,
+      null,
+      95.0,
+      50.0
+    ],
+    "valid": [
+      true,
+      false,
+      true,
+      true
+    ],
+    "desired": [
+      1,
+      0,
+      1,
+      0
+    ],
+    "entry_flags": [
+      true,
+      false,
+      true,
+      false
+    ],
+    "exit_flags": [
+      false,
+      true,
+      false,
+      true
+    ],
+    "exit_on_invalid_bar": true
+  },
+  "stop_lock_vs_live_level_flags": {
+    "desired": [
+      0,
+      1,
+      1,
+      1,
+      0
+    ],
+    "held_before_stop": [
+      0,
+      0,
+      1,
+      1,
+      1
+    ],
+    "modified_position": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "stop_flags": [
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "live_entry_flags": [
+      false,
+      true,
+      true,
+      true,
+      false
+    ],
+    "next_bar_live_entry_flag_while_model_locked": true,
+    "actual_Freqtrade_order_or_fill_tested": false
+  },
+  "intrabar_rebound_approximation": {
+    "entry_price": 100.0,
+    "nominal_stop_price": 80.0,
+    "fixture_ohlc": {
+      "open": 100.0,
+      "high": 101.0,
+      "low": 75.0,
+      "close": 100.0
+    },
+    "source_stop_flags": [
+      0,
+      0,
+      0
+    ],
+    "source_uses_low_or_high": false,
+    "low_crosses_nominal_stop": true,
+    "actual_stop_fill_assumed": false
+  },
+  "held_gap_return_omission": {
+    "opens": [
+      100.0,
+      100.0,
+      90.0,
+      90.0
+    ],
+    "closes": [
+      100.0,
+      100.0,
+      90.0,
+      90.0
+    ],
+    "positions": [
+      0,
+      1,
+      1,
+      0
+    ],
+    "source_open_close_product_return": 0.0,
+    "continuous_held_entry_to_exit_price_return": -0.09999999999999998,
+    "synthetic_adversarial_only": true
+  },
+  "causal_controls": {
+    "prediction_rows": 800,
+    "prefix_rows": 600,
+    "rolling_quantile_past_changes": 0,
+    "feature_count": 20,
+    "feature_past_cells_changed_at_1e_12_tolerance": 0,
+    "one_bar_shift": [
+      0,
+      0,
+      1,
+      1
+    ],
+    "not_full_leakage_proof": true
+  },
+  "source_review": {
+    "funding_slippage_native_latency_fully_modeled": false,
+    "public_own_artifact_or_trade_ledger_available": false,
+    "TP1_contract_verified": false,
+    "stoploss_default_not_user_account_loss_fraction": -0.2,
+    "Total_Trades_field_is_position_transitions_not_closed_trades": true,
+    "source_documents_only_parity_statistics_not_independent_ledger_validation": true
+  },
+  "decision": "exclude_this_release_as_replacement_evidence;missing_artifacts_and_execution_contract_defects;no_salvage_tuning",
+  "market_profitability_backtest_performed": false,
+  "synthetic_diagnostics_only": true,
+  "all_cost_double_profitability": null,
+  "net_expectancy_95lower": null,
+  "profit_factor": null,
+  "max_drawdown_R": null,
+  "TP1_Wilson_lower": null,
+  "urgent5minute_rate": null,
+  "alerts_per_day": null,
+  "native_LBank_fills": false,
+  "forward_started": false,
+  "production_changed": false
+}
