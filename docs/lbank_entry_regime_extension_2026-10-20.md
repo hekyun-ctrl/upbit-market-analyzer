@@ -50,7 +50,7 @@ UTC 달력일을 단위로 공백일도 유지하여2/7일 원형 블록을5000�
 | [2025-01 분봉](https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-01.zip) | b69ca5b2c2d1ae00d68d2790d09138cb2a44085ff19e0da5dc98b569ea7e489e |
 | [2025-01 펀딩](https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2025-01.zip) | df725010d55458866eb5a47e9ee708c6796c9d7e77b14c38342cea11f381815e |
 
-manifest-1m.json SHA256 b4859678358fcc945995f15b657571b9ed1c86f322bd4fd19f6d9c8982cbb7d3, manifest-5m.json 4ea68d6a854f4530ab8325d17a757254902d13b9ac8783cb93de91ac8e89e5e5。原본 출처·전체 입력 SHA는각 결과에도있다.
+manifest-1m.json SHA256 b4859678358fcc945995f15b657571b9ed1c86f322bd4fd19f6d9c8982cbb7d3, manifest-5m.json 4ea68d6a854f4530ab8325d17a757254902d13b9ac8783cb93de91ac8e89e5e5. 원본 출처·전체 입력 SHA는각 결과에도있다.
 
 기존 고정 계약과 동일하게 다음 분 시가를 알려진 호가 대용으로 사용하고 확인은 다음1분 사건(60초)에 수행했다. 실제15초/30초·수동체결은 재현하지 않았다. 편도 수수료6bp/슬립2bp, 실제 Binance펀딩률×정산 분 시가를 사용한다. 비용 두 배는 동일 사건에서 수수료/슬립/펀딩지급을 두 배, 수취는 늘리지 않는다. R분모는 원래 손절 비용 가정으로 고정했다. 같은 봉 목표/손절 동시 접촉은 손절 우선이며 불리한 갭을 반영한다.
 
