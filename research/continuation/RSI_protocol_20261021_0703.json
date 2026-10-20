@@ -1,0 +1,17 @@
+{
+  "version": "unchanged_RSI_minute_open_transfer_v1",
+  "frozen_code": "1bc60bb53dba5ccffd397a290a8cf4da21ff08eb",
+  "source": "25388b431c9c9d38df6a434670586c65f382d604",
+  "entry": "2025Jan8-15exclusive",
+  "followup": "Jan16exclusive",
+  "already_seen_development": true,
+  "changes": "No strategy changes. Adapter only normalizes missing decision strategy labels. Original DivergenceStudy observe without native_state and runner_enabled=False preserved, including followup.",
+  "bars_sha": "b69ca5b2c2d1ae00d68d2790d09138cb2a44085ff19e0da5dc98b569ea7e489e",
+  "funding_sha": "df725010d55458866eb5a47e9ee708c6796c9d7e77b14c38342cea11f381815e",
+  "cost": "6bp fee 2bp slip each leg plus archived funding; double cost stress charges not receipts",
+  "native_LBank": false,
+  "orders": false,
+  "notification": false,
+  "promotion": false,
+  "metrics": "Closed netR/PF/DD/TP1/frequency/censors, null native urgent/manual fills. Same-window comparison development only, no superiority claim from a few episodes."
+}
