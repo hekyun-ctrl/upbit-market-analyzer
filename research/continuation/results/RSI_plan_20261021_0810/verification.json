@@ -1,0 +1,18 @@
+{
+  "checks": 127,
+  "actual_calls": 20,
+  "unique_candidate_ids": 15,
+  "return_counts": {
+    "431": 9,
+    "438": 6,
+    "412": 5
+  },
+  "ahead_barrier_cases": 19,
+  "behind_barrier_cases": 1,
+  "maximum_base_plan_R": 1.0262668649647786,
+  "maximum_doublecost_plan_R": 0.6806625262605912,
+  "feasible_R_atleast_1_5": 0,
+  "result_SHA256": "6ce8f33b03561b2aeb60d79d21a3001f17a11df92e7e39726d91cb8998d12cff",
+  "scope": "Planning-model inequalities and cost feasibility, NOT closed-trade performance or native fills",
+  "verified": true
+}
