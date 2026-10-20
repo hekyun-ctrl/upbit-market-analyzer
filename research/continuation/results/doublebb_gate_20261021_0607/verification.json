@@ -1,0 +1,13 @@
+{
+  "verified": true,
+  "checks": 329,
+  "events": 6,
+  "observations": 60,
+  "rejection_line_counts": {
+    "438": 37,
+    "447": 3,
+    "431": 20
+  },
+  "result_SHA256": "aa0ab194287188114aaa73743a3ca4663770a5257a40a2f0b126fecd6feaf876",
+  "scope": "Exact prior six-event reason correspondence and Decimal rejection inequalities; no financial returns, trades or alpha test"
+}
