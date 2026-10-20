@@ -1,0 +1,3 @@
+timestamp,event_type,price,qty,realized_pnl,equity,r_multiple,size_multiplier,side
+2024-01-01 00:00:00+00:00,entry,100.02,1.0,-0.040008,9999.959992,,1.0,1.0
+2024-01-01 00:00:00+00:00,force_close,99.98,1.0,-0.11999999999999204,9999.839992,-0.022222222222217838,,

@@ -1,0 +1,24 @@
+{
+  "starting_equity": 10000.0,
+  "ending_equity": 9999.839992,
+  "total_return_pct": -0.0016000800000082194,
+  "average_monthly_return_pct": NaN,
+  "monthly_statistics": {
+    "months_count": 0,
+    "average_monthly_return_pct": NaN,
+    "min_monthly_return_pct": NaN,
+    "max_monthly_return_pct": NaN,
+    "months_meeting_target": 0,
+    "target_achievement_pct": 0.0
+  },
+  "total_trades": 1,
+  "win_rate_pct": 0.0,
+  "average_win": 0.0,
+  "average_loss": -0.11999999999999204,
+  "profit_factor": 0.0,
+  "max_drawdown_pct": 0.0,
+  "expectancy_per_trade": -0.11999999999999204,
+  "average_r_multiple": -0.022222222222217838,
+  "forced_closes": 1,
+  "data_source": "synthetic_tail_probe_NOT_market"
+}

@@ -1,0 +1,511 @@
+{
+  "passed": true,
+  "checks_passed": 125,
+  "checks": [
+    {
+      "name": "source_object:.gitignore",
+      "passed": true
+    },
+    {
+      "name": "source_object:BACKTEST_AUDIT.md",
+      "passed": true
+    },
+    {
+      "name": "source_object:MONTHLY_INCOME_FEATURE.md",
+      "passed": true
+    },
+    {
+      "name": "source_object:README.md",
+      "passed": true
+    },
+    {
+      "name": "source_object:data/.gitkeep",
+      "passed": true
+    },
+    {
+      "name": "source_object:outputs/.gitkeep",
+      "passed": true
+    },
+    {
+      "name": "source_object:outputs/best_model_report.json",
+      "passed": true
+    },
+    {
+      "name": "source_object:outputs/improvement_log.md",
+      "passed": true
+    },
+    {
+      "name": "source_object:outputs/investment_committee_report.md",
+      "passed": true
+    },
+    {
+      "name": "source_object:outputs/monthly_returns.csv",
+      "passed": true
+    },
+    {
+      "name": "source_object:outputs/oos_comparison.json",
+      "passed": true
+    },
+    {
+      "name": "source_object:outputs/optimization_results.csv",
+      "passed": true
+    },
+    {
+      "name": "source_object:outputs/optimization_summary.json",
+      "passed": true
+    },
+    {
+      "name": "source_object:outputs/regime_analysis.json",
+      "passed": true
+    },
+    {
+      "name": "source_object:outputs/report.json",
+      "passed": true
+    },
+    {
+      "name": "source_object:outputs/strategy_v2_improvement_log.md",
+      "passed": true
+    },
+    {
+      "name": "source_object:outputs/stress_test_summary.json",
+      "passed": true
+    },
+    {
+      "name": "source_object:requirements.txt",
+      "passed": true
+    },
+    {
+      "name": "source_object:scripts/download_binance_btc.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:scripts/run_backtest.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:scripts/run_institutional.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:scripts/run_optimization.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:src/__init__.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:src/backtest.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:src/cli.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:src/data_loader.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:src/indicators.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:src/institutional.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:src/optimization.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:src/optimize.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:src/performance.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:src/strategy.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:tests/conftest.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:tests/test_backtest_smoke.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:tests/test_import_style.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:tests/test_indicators.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:tests/test_institutional_pipeline.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:tests/test_position_sizing.py",
+      "passed": true
+    },
+    {
+      "name": "source_object:tests/test_trade_management.py",
+      "passed": true
+    },
+    {
+      "name": "ZIP_SHA:2024-01",
+      "passed": true
+    },
+    {
+      "name": "CSV_SHA:2024-01",
+      "passed": true
+    },
+    {
+      "name": "row_count:2024-01",
+      "passed": true
+    },
+    {
+      "name": "ZIP_SHA:2024-02",
+      "passed": true
+    },
+    {
+      "name": "CSV_SHA:2024-02",
+      "passed": true
+    },
+    {
+      "name": "row_count:2024-02",
+      "passed": true
+    },
+    {
+      "name": "ZIP_SHA:2024-03",
+      "passed": true
+    },
+    {
+      "name": "CSV_SHA:2024-03",
+      "passed": true
+    },
+    {
+      "name": "row_count:2024-03",
+      "passed": true
+    },
+    {
+      "name": "all_raw_minutes_unique_contiguous",
+      "passed": true
+    },
+    {
+      "name": "no_archived_quarantine_in_Q1",
+      "passed": true
+    },
+    {
+      "name": "all420_quantile_flags_independently_equal",
+      "passed": true
+    },
+    {
+      "name": "quantile_change_count26",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:0",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:0",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:1",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:1",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:2",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:2",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:3",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:3",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:4",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:4",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:5",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:5",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:6",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:6",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:7",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:7",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:8",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:8",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:9",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:9",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:10",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:10",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:11",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:11",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:12",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:12",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:13",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:13",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:14",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:14",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:15",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:15",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:16",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:16",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:17",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:17",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:18",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:18",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:19",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:19",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:20",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:20",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:21",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:21",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:22",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:22",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:23",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:23",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:24",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:24",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:25",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:25",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:26",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:26",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:27",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:27",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:28",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:28",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:29",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:29",
+      "passed": true
+    },
+    {
+      "name": "independent_daily_prefix_EMA:30",
+      "passed": true
+    },
+    {
+      "name": "independent_full_day_EMA:30",
+      "passed": true
+    },
+    {
+      "name": "all31queries_fixed_and_no_bearflagchange",
+      "passed": true
+    },
+    {
+      "name": "lagged_bull_control31unchanged",
+      "passed": true
+    },
+    {
+      "name": "independent_unitcash_correct",
+      "passed": true
+    },
+    {
+      "name": "independent_source_extra_entryfee",
+      "passed": true
+    },
+    {
+      "name": "independent_entry_fee",
+      "passed": true
+    },
+    {
+      "name": "source_synthetic_ledger_reconciles",
+      "passed": true
+    },
+    {
+      "name": "source_returns_loss_but_eventwin50",
+      "passed": true
+    },
+    {
+      "name": "real_markets_profitability_not_claimed",
+      "passed": true
+    },
+    {
+      "name": "no_promotion_or_production",
+      "passed": true
+    },
+    {
+      "name": "query_artifact:real_intraday_prefix.csv",
+      "passed": true
+    },
+    {
+      "name": "query_artifact:real_fullsample_quantile_prefix.csv",
+      "passed": true
+    }
+  ],
+  "raw_minutes": 131040,
+  "Decimal_correct_unitcash": "-0.3158824156800",
+  "Decimal_source_unitcash": "-0.3558904156800",
+  "original_source_executed": false,
+  "market_profitability_validated": false
+}

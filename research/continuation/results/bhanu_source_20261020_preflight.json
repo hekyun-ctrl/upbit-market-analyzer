@@ -1,0 +1,155 @@
+{
+  "version": 1,
+  "source_repository": "bhanu-pratap-rana/Trading-strategy-backtest",
+  "source_commit": "15391f936e8fa24985392dac7770405f81c5300e",
+  "source_url": "https://github.com/bhanu-pratap-rana/Trading-strategy-backtest/tree/15391f936e8fa24985392dac7770405f81c5300e",
+  "source_tree": [
+    {
+      "path": ".env.example",
+      "git_blob_sha": "8aeb3f5d745e4e9845005e25eba873705900d38b",
+      "sha256": "447be789fff9123477c96acd22397c6deb0fa374120f96f86ea04d62539aaffb"
+    },
+    {
+      "path": ".gitignore",
+      "git_blob_sha": "89c7c67d694f814042f9ba6631cefb353012889d",
+      "sha256": "29c77950918849cb65eb389985a418159dbf0aa692c992d21e87733ded8bb95e"
+    },
+    {
+      "path": "PROJECT_SUMMARY.md",
+      "git_blob_sha": "73fa9510e60e9e2c429d3bbf727aa11c990c967b",
+      "sha256": "2fe3d7998a4868d07b5efa504f137ad52124b113cbaaf29c7ca4397743a3b91b"
+    },
+    {
+      "path": "QUICKSTART.md",
+      "git_blob_sha": "389f041ee651f164fc869931721cada0569f73f7",
+      "sha256": "192e6d0f2e3bcdf4273761ec6da45634dac943cd34ec1e558cd28558e1b2e61c"
+    },
+    {
+      "path": "README.md",
+      "git_blob_sha": "445bd3c36d62a50c42e3ac04c7bf54eb9fea8d0b",
+      "sha256": "c0a5080e8e0611e6baf7eb9211fdab97831fb0c05bb2de6426a1247d77ad1ab4"
+    },
+    {
+      "path": "README_UI.md",
+      "git_blob_sha": "b067a2bb8060524a3acedcd06e553fa05ec67ee5",
+      "sha256": "bf646ab34f252e7daad6bc6fd2723dfcdb8af20a5703570cf0de606c305353fe"
+    },
+    {
+      "path": "SETUP_STATUS.md",
+      "git_blob_sha": "9acac35a2818d7e23991943dbd7ef433ea62d054",
+      "sha256": "aa3322c923408150b54e46621b2079d0d1877834c52a64ac769ee3234f5cef0e"
+    },
+    {
+      "path": "STRATEGY_EXAMPLES.md",
+      "git_blob_sha": "11072ca605dbff967721ac67f2f86dcdf8ada23c",
+      "sha256": "f0e03b2c257c7f046d381bb35d01b24628a77708c1787d80e4e51bcd4ed40588"
+    },
+    {
+      "path": "UI_GUIDE.md",
+      "git_blob_sha": "8650afeabdac5399b5e31c643892c69f2d796b39",
+      "sha256": "38d79fa2da68f2e2e7edfa080ee082e0cbbddc5786e861137da5ec0ba89a974f"
+    },
+    {
+      "path": "app.py",
+      "git_blob_sha": "5dc43c9e87ed7fd85fe04264ddae4c9443e2ab04",
+      "sha256": "28435b20faf82cbf9b0cfaa736ba9ca43b83682b369b7c553f375ead56349c27"
+    },
+    {
+      "path": "config/config.yaml",
+      "git_blob_sha": "8e9abbc0316c1d6f97716a6b3a68c95e521c14cd",
+      "sha256": "a12daa280e0d1c9c4cdb0344bd50832e0fe22d513fe09f26b9420473e84c2000"
+    },
+    {
+      "path": "install_dependencies.bat",
+      "git_blob_sha": "0eeb9b0afc5e4fa109b38869b125ec16bafc6ab0",
+      "sha256": "e92295be95bee8cb105757c7c9ee233e6b9c2a6f734fa6b1c76ec8a950ac0e17"
+    },
+    {
+      "path": "requirements.txt",
+      "git_blob_sha": "51afcc9684e4a5f05381c9a0d6c6c8691a2bfa70",
+      "sha256": "8c0afad07b4f34a829927fac6b9e5a458ffc0bcc792660e30796eb065851ddac"
+    },
+    {
+      "path": "src/__init__.py",
+      "git_blob_sha": "1f18c924d74bb0bb5fd1d4706016692462b4b49c",
+      "sha256": "fb4e296e37fb259f1d41feb8bed4dc7a500399e1bacaf3041a79384f718a8bea"
+    },
+    {
+      "path": "src/backtest.py",
+      "git_blob_sha": "57ee9927817b5859a4a6661a70c29b4f454ded48",
+      "sha256": "a3b94c76522ba8016dc273da8ae8b9f7cecf31eecea5530cbc725de9f982d1f2"
+    },
+    {
+      "path": "src/data_fetcher.py",
+      "git_blob_sha": "36856b57813713c9c976ff634780a4b601d78b1c",
+      "sha256": "f4e9f05ddaa8fca32fb8410688389534e92c24fff653223856e2dd15b7de8cd7"
+    },
+    {
+      "path": "src/delta_client.py",
+      "git_blob_sha": "4da2f03a6397bef9b57e80cb0835a97a570fe733",
+      "sha256": "7faa6f41f97724706bb50ca411442171f9d1906bd3938edcd9bbd91687defe17"
+    },
+    {
+      "path": "src/indicators.py",
+      "git_blob_sha": "06baa47956582e94f9d92847c7c78f6c3e0874dc",
+      "sha256": "9e2e63e4933ecb093b0695800a42e56892ed7df7aa9cfb997f5dc7cd69a24dd6"
+    },
+    {
+      "path": "src/logger_config.py",
+      "git_blob_sha": "a2edd2144cc08ab6bcafb6d41201646063dc860f",
+      "sha256": "69f601adf1dc71b2185bb81733468e751dc9e250eb9072a1c4d1d04938f3d7c5"
+    },
+    {
+      "path": "src/main_backtest.py",
+      "git_blob_sha": "4d0cc68baa9bf8fd0da1698d99ed729a3b3cd37b",
+      "sha256": "451b35b08675c46537826c8dc2c7c276d3c5de6fd040fd2034a873220b62f14b"
+    },
+    {
+      "path": "src/main_paper_trade.py",
+      "git_blob_sha": "979d5422ea69a2921a6beff462b06d801fa4047a",
+      "sha256": "1e38df8db495e584a958298079b551b13ee576991227f9d767b06aedc0aac2dd"
+    },
+    {
+      "path": "src/paper_trader.py",
+      "git_blob_sha": "64cfbb703ef03c2f48aaf18bf2ac3cec6290dbf2",
+      "sha256": "1a368fb85d2d60575cf8eab7d7a0c123bf6fd6758504046af85a8f907520d36f"
+    },
+    {
+      "path": "src/strategy.py",
+      "git_blob_sha": "3a1d563da9e5162ed18c5751bd009ccfdee4ec14",
+      "sha256": "b4168fa4a7248e6216d1f399142039d8d124549ff093b133290dc18727f01baa"
+    },
+    {
+      "path": "start_ui.bat",
+      "git_blob_sha": "1f5b78a2a3ff6b35d43dd74d90ad240336122c2c",
+      "sha256": "387fc78610f1c3c83db7887191d0a87e2062bb3eaafd6dc22352661837b8b978"
+    },
+    {
+      "path": "test_setup.py",
+      "git_blob_sha": "ebd7a61657d07a7d93cca61c5fc7d7b5964a7983",
+      "sha256": "6cbc01be487db2dafeed5ef4d3f5598e4eb322527782107e0264352c70189be7"
+    }
+  ],
+  "public_raw_price_and_trade_ledgers": 0,
+  "example_not_verified_performance": {
+    "README_label": "Example Output",
+    "signals": 45,
+    "winning": 28,
+    "losing": 17,
+    "profit_factor": 1.85,
+    "unverified": true
+  },
+  "scope": "Pinned25filetree;README relevantfullstrategy/backtestsection,src/backtest fullreviewedclass,src/strategy rules,src/main_backtest;no client/config/credential execution. No marketbacktest.",
+  "security_note": "Public source contains embedded thirdpartycredentials in config/documentation. Do not use,copy or echo. No credential/acct/order endpoints accessed. Inventory hashonly;credential-bearingdocs notpreserved.",
+  "contract_observations": [
+    "No publishedrawBTC input,pricechecksum orclosedledger.",
+    "Mainbacktest initializesauthenticated Delta client;notexecuted.",
+    "Backtestatcloseentry uses own2ATRstop/fixed4%TP insteadconfighelper;helperstopmax/min choosescloser despite commentwhicheverlarger.",
+    "Signals expireparameter acts minimumsuppressionbetweenaccepted signals;confidenceconfirmationfractionnot calibratedsuccessprobability.",
+    "Model ignoresfunding,timegaps andnativefilllatency;sourceendclosesremainingposition,notcensor."
+  ],
+  "decision": "exclude_as_current_profitability_evidence_example_not_originaldataset_orledger;not_allrangefilterstrategies",
+  "market_backtest_performed": false,
+  "eligible_candidate": false,
+  "production_changed": false
+}

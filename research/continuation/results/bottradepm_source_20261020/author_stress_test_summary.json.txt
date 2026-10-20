@@ -1,0 +1,67 @@
+{
+  "best_config": {
+    "risk_pct": 0.012,
+    "stop_atr_mult": 1.5,
+    "adx_threshold": 20.0,
+    "breakout_lookback": 30,
+    "pullback_rsi_min": 44.0,
+    "pullback_rsi_max": 64.0,
+    "trailing_atr_mult": 0.8,
+    "tp1_r": 1.0,
+    "tp2_r": 2.2,
+    "tp3_r": 4.2,
+    "entry_mode": "combined",
+    "breakout_volume_mult": 1.2,
+    "breakout_close_buffer_atr": 0.0,
+    "reentry_cooldown_bars": 1,
+    "tp1_size": 0.45,
+    "tp2_size": 0.25,
+    "move_stop_to_breakeven_after_tp1": false,
+    "use_monthly_controls": false,
+    "use_regime_filter": false
+  },
+  "stress_results": {
+    "base": {
+      "average_monthly_return_pct": 1.047847083063802,
+      "max_drawdown_pct": -0.13449020010240087,
+      "profit_factor": NaN,
+      "total_return_pct": 2.3826639364944002,
+      "total_trades": 1
+    },
+    "high_slippage": {
+      "average_monthly_return_pct": 1.0480215490046185,
+      "max_drawdown_pct": -0.13453745718243224,
+      "profit_factor": NaN,
+      "total_return_pct": 2.3361146630287655,
+      "total_trades": 1
+    },
+    "high_fees": {
+      "average_monthly_return_pct": 1.01550796868638,
+      "max_drawdown_pct": -0.13455320431915258,
+      "profit_factor": NaN,
+      "total_return_pct": 2.2408820616896863,
+      "total_trades": 1
+    },
+    "risk_downshift": {
+      "average_monthly_return_pct": 0.7350214432502167,
+      "max_drawdown_pct": -0.09420292780532992,
+      "profit_factor": NaN,
+      "total_return_pct": 1.667864755546078,
+      "total_trades": 1
+    },
+    "risk_upshift": {
+      "average_monthly_return_pct": 1.3075509932940377,
+      "max_drawdown_pct": -0.1680238837533905,
+      "profit_factor": NaN,
+      "total_return_pct": 2.978329920618017,
+      "total_trades": 1
+    },
+    "wider_stops": {
+      "average_monthly_return_pct": 0.9731344857454638,
+      "max_drawdown_pct": -0.11211469774608923,
+      "profit_factor": NaN,
+      "total_return_pct": 2.1854332964120093,
+      "total_trades": 1
+    }
+  }
+}

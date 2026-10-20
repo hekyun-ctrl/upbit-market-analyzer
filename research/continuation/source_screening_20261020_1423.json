@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "recorded_utc": "2026-10-20T05:23:43Z",
+  "scope": "Nextprimarysourceavailabilityscreen,not executed profitabilitytest.",
+  "completed_sources": [
+    {
+      "repository": "bhanu-pratap-rana/Trading-strategy-backtest",
+      "commit": "15391f936e8fa24985392dac7770405f81c5300e",
+      "result": "READMEExampleOutput45tradesnotmeasuredledger;25fileinventoryandofflinecontractreview;no originaldata/ledger. No credential/clientexecution.",
+      "report": "research/continuation/results/bhanu_source_20261020_preflight.json"
+    },
+    {
+      "repository": "pymammadov/bottradepm",
+      "commit": "dcd1ac3e2a32204c2943bff000644b6f95486aa5",
+      "result": "Completed21revieweddefs10tests125separatechecks,131040actualminutesfeatureprefix;no validmarketprofitabilitycertification.",
+      "report": "research/continuation/results/bottradepm_source_20261020/report.json"
+    }
+  ],
+  "next_finite_source": {
+    "repository": "wzf01195010-png/Crypto-day-night-effects",
+    "commit": "5693993e108f2b3668bd21b1dd36ae31f79d8fcd",
+    "url": "https://github.com/wzf01195010-png/Crypto-day-night-effects/tree/5693993e108f2b3668bd21b1dd36ae31f79d8fcd",
+    "readme_git_blob_sha": "984275db354d71bb2aa60aec56b108c130732816",
+    "code_git_blob_sha": "82b79f2be4332858de55de46341bd3fc81fa0c38",
+    "core_table_git_blob_sha": "4e7c7c9fd5d4e465fd58b9a5955b612549086044",
+    "full_table_git_blob_sha": "e6e3b5a7e899337ace77092e1291792e706b92d4",
+    "status": "primary_published_code_tables_provenance_lead_ONLY_notqualified",
+    "read_scope": "FullREADME,paper_outputsREADME,completeGit tree;actualCSVheaders/linecounts1050and1800rows;onlyfunctionindex ofmaincode. No rule/costfullreview,sourcekernel,pricebacktest or rawinput acquired.",
+    "basis": "Originalcodeandversionedpaperoutputs available;rawKrakenBTC/ETHnotcommitted,READMErequiresindependentprovenance/no-tradehourandrightschecks. MissinginputnotreplaceablebyrelabelledBitstamp/Binance. 25orderedstrategies12UTCcutoffs0/1/2bps index notacceptednetLBankedge. ClosedBTCledger/stopTP1/nativefillnotestablished.",
+    "read_first": [
+      "btc_eth_backtest.py",
+      "cutoff_strategy_analysis.py",
+      "statistical_tests.py",
+      "paper_outputs/tables/btc_eth_all_metrics.csv",
+      "paper_outputs/tables/cutoff_strategy_full_results.csv",
+      "paper_outputs/tables/preferred_vs_buyhold_tests.csv"
+    ],
+    "instruction": "Next finite stage: audit entire originalcost/position/session/timestamp/data-qualityfunctions againstALLBTCtable rows,retainothercutoff/negativecells andmultiple-testing/selectionscope. VerifyrawKrakenofficialarchiveavailability andexactbar-time/gaphandlingwithoutdownloadinghugearchivesblindly. If publishedroundtrip/turnoverallowsindependentfeecashreconciliationperformit;otherwise unknownsnull. No tableheadline adoptedasLBankprofit, no top-levelmoduleexecutionwithmissingdata, no arbitrarySLTP/riskexpansion or25x12optimizer. If originaldata/methodincompatible,recordpreciseobstacleandmovetodistinctsource."
+  },
+  "duplicates_skipped": [
+    "GT-2005/btc-regime-gate",
+    "maxs231/lsob-backtest",
+    "paultrassaert/btc-systematic-trading-research",
+    "Bysik2606.00060",
+    "GarciaSchweitzer1506.01513",
+    "CacheCarti/Crypto-Strategies",
+    "Bouri2021functionalcurve"
+  ],
+  "other_unreviewed_discovery_links": [
+    {
+      "repository": "Silentbilly/trend-pullback",
+      "url": "https://github.com/Silentbilly/trend-pullback",
+      "status": "searchindexonly;no claimedverifiedprofit/data/ledger"
+    },
+    {
+      "repository": "mantasbil/Thesis-Algo-Trading",
+      "url": "https://github.com/mantasbil/Thesis-Algo-Trading",
+      "status": "searchindexonly;notqualified"
+    }
+  ],
+  "no_profitable_candidate_adopted": true,
+  "forward_started": false,
+  "production_changed": false
+}

@@ -1,0 +1,20 @@
+{
+  "recorded_utc": "2026-10-20T05:21:02Z",
+  "production_commit": "862339db2c4f69facc9ba6626e2826d475504174",
+  "deployment_id": "181eb91b-065c-44b3-bcaf-c58e4cb0fa01",
+  "status": "SUCCESS",
+  "production_changed": false,
+  "continuous_collection_assumed": false,
+  "new_candidate_seen": false,
+  "events": [
+    {
+      "timestamp": "2026-10-20T05:14:23.800905498Z",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 41, \"warmup_target\": 250, \"rsi14_wilder\": null, \"native_history_ready\": false, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}"
+    },
+    {
+      "timestamp": "2026-10-20T05:14:23.800898647Z",
+      "message": "INFO:lbank_monitor:ENTRY_SETUP_EVALUATED {\"candidates\": [], \"data_source\": \"lbank_native_1m_aggregated_5m\", \"entry_timing\": {\"candidate_evaluated_at\": 1792473253.7443998, \"evaluation_after_first_ready_observation_seconds\": 0.014712095260620117, \"evaluation_after_nominal_close_seconds\": 13.744399785995483, \"first_ready_observed_at\": 1792473253.7296877, \"last_closed_1m_start\": 1792473180, \"last_closed_5m_start\": 1792472700, \"nominal_1m_close_at\": 1792473240, \"policy\": \"native_completed_bar_schedule_v1\", \"publication_note\": \"nominal_close_is_not_actual_publication_time\", \"quote_observed_at\": 1792473253.7296877, \"source_publication_at\": null, \"trigger\": \"new_completed_bar\"}, \"market\": {\"atr5\": 81.48246305124097, \"breakout_long\": false, \"breakout_short\": false, \"ema_direction\": -1, \"long_pullback_pct\": 0.14874293928240065, \"minimum_stop_pct\": 0.1490340206959362, \"minimum_target_pct\": 0.5787014379079654, \"momentum15_pct\": -0.0542251770543456, \"momentum5_pct\": 0.06417130566647167, \"pullback_min_pct\": 0.15, \"range60_pct\": 0.33593218437616595, \"range_balanced\": false, \"range_required_pct\": 0.5937014379079653, \"range_width_ok\": false, \"range_width_pct\": 0.3297947957040113, \"short_pullback_pct\": 0.08095517351108773}, \"reason\": \"market_no_setup\"}"
+    }
+  ],
+  "note": "Boundedreadonlycontinuity,notnewdeployment or wholeperioduptime/alertfrequency/nativeexecution validation."
+}
