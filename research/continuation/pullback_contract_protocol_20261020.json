@@ -1,0 +1,17 @@
+{
+  "version": "silentbilly_2227152_execution_contract_v1",
+  "designed_utc": "2026-10-20T07:11:10Z",
+  "source_commit": "22271525f93d04188c2791d48e1029a6101d39c3",
+  "source_url": "https://github.com/Silentbilly/trend-pullback/tree/22271525f93d04188c2791d48e1029a6101d39c3",
+  "scope": "One source-specific finite entry/protection/ledger contract audit, not alpha certification. Original sample is ETHUSDT15m spot, not BTC. No profitable original BTC ledger is public.",
+  "fixation": "Source code static-reviewed before probes; hypotheses entrybar unprotected, TP/SL notOCO, Margin pending state, moving stop after gap and closed-trade reporter omissions. Freeze protocol/code remote before diagnostic results. Not blind alpha research.",
+  "execution": "Compile only explicitly reviewed indicator/signal/risk/report/datafeed definitions, StrategyParams literal defaults, TrendPullbackStrategy and original analyzers. No original module top-level imports or live broker/notifier/downloader/optimizer. Use trusted backtrader1.9.78.123 local in-memory Cerebro only.",
+  "synthetic_cases": ["long entrybar stop touch", "long postentrybar both TP/SL", "long SLonly", "long TPonly", "long stop gap", "short postentrybar both", "insufficient cash Margin", "gap entry fixed planned risk"],
+  "fixture_not_alpha": "Synthetic fixed prices and forced first signal, planned risk 2 from signal100/low99/ATR0.5x2, RR2, 1unit and fixturecapital1000(or50Margin). No real orders/account sizing. Capture all order statuses/executions, cash/value/positions, original analyzer closed rows; do not count fixture winners as market performance.",
+  "market_causality": "Already observed Binance USD-M BTCUSDT2024Jan 44640minutes ->2976complete15mbars, not original ETH/spot or LBank. Original sample strategy settings unchanged (34/200/13,maxpb3,ADX22,CHOPoff,buffer0.08,ATR2.4,RR2); fullmonth vs first20days1920bars, compare every past output column, retain all actual raw signals and risk widths. No market fills/profit backtest if execution contract unsuitable.",
+  "integrity": "SHA256 ZIP and CSV against committed source manifest, header detection, 60000ms continuity, finite OHLCV, positive prices, nonnegative volume, no duplicated/missing minutes; resample exact15 counts. Do not bridge gaps or create end liquidation.",
+  "other_probes": "Original Unix-seconds datetime loader, duplicate and gap preservation; original empty closed-ledger summary vs nonflat equity. Use temp local fixtures not actual data. These are code contract evidence, not measured overall distortion.",
+  "costs": "Fixture original 0.06% each-side notional commission; compare independent Decimal on completed fixture orders and doubled commissions on fixed fixtures as accounting-only check. No funding/slippage model invented for original source. Fullcost/uncertainty/PF/TP1/urgent/native gates remain null if no valid market backtest.",
+  "decision": "If execution/manualrisk contract fails, exclude this public version as replacement evidence, no repair/parameter tuning/sweep or transposing ETH profits. Preserve correct controls; no universal EMA/pullback rejection. Continue distinct public BTC ledger/data source.",
+  "promotion": "Existing full docs/lbank_strategy_rebuild_2026-10-20.md gate unchanged; no forward candidate or production mutation authorized by probes."
+}
