@@ -1,0 +1,289 @@
+{
+  "window_start": "2026-10-20T10:23:08Z",
+  "window_end": "2026-10-20T10:45:30Z",
+  "deployment": "23799b11-6f14-4e93-aacf-78ce691f9393",
+  "status": "SUCCESS",
+  "source": "5c977a7f51cea67048f95791d1dcc4230634939a",
+  "read_in_two_bounded_pages_returned": [
+    97,
+    115
+  ],
+  "matching_records": 65,
+  "decisions": 0,
+  "watch_reason_rows": 0,
+  "opened_reason_rows": 0,
+  "outcome_rows": 0,
+  "progress_messages": [
+    {
+      "at": "2026-10-20T10:30:05.712787124Z",
+      "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=progress orders=false live_gate=false"
+    },
+    {
+      "at": "2026-10-20T10:45:03.739293461Z",
+      "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=progress orders=false live_gate=false"
+    }
+  ],
+  "records": [
+    {
+      "at": "2026-10-20T10:24:17.417258226Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 103, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 86.30399898849717, \"min_range_fraction\": 0.006082820849630782, \"minimum_target_fraction\": 0.005932820849630782, \"stop_floor_fraction\": 0.001587563965411788}, \"entry_source_switched\": true, \"last5_start\": 1792491300, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 57.75119518958328, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:24:17.417275081Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:24:17.418024489Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:25:12.032603843Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 104, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 88.43228477503247, \"min_range_fraction\": 0.006142536547221633, \"minimum_target_fraction\": 0.005992536547221633, \"stop_floor_fraction\": 0.0016273823941581455}, \"entry_source_switched\": true, \"last5_start\": 1792491600, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 53.016064119695, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:25:12.033347086Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:25:12.033350335Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:26:16.188970025Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 104, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 88.43228477503247, \"min_range_fraction\": 0.0061425455298690975, \"minimum_target_fraction\": 0.0059925455298690975, \"stop_floor_fraction\": 0.0016273883837878628}, \"entry_source_switched\": true, \"last5_start\": 1792491600, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 53.016064119695, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:26:16.202959484Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:26:16.209407006Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:27:19.178708441Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 104, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 88.43228477503247, \"min_range_fraction\": 0.006141441160091305, \"minimum_target_fraction\": 0.005991441160091305, \"stop_floor_fraction\": 0.001626651989990407}, \"entry_source_switched\": true, \"last5_start\": 1792491600, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 53.016064119695, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:27:19.191178284Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:27:19.197605714Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:28:22.259244854Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 104, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 88.43228477503247, \"min_range_fraction\": 0.006140128590407519, \"minimum_target_fraction\": 0.005990128590407519, \"stop_floor_fraction\": 0.0016257767684904265}, \"entry_source_switched\": true, \"last5_start\": 1792491600, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 53.016064119695, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:28:22.267241604Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:28:22.274390777Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:29:25.378190298Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 104, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 88.43228477503247, \"min_range_fraction\": 0.00614094466921195, \"minimum_target_fraction\": 0.00599094466921195, \"stop_floor_fraction\": 0.0016263209298589282}, \"entry_source_switched\": true, \"last5_start\": 1792491600, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 53.016064119695, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:29:25.385969701Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:29:25.387522082Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:30:05.712787124Z",
+      "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=progress orders=false live_gate=false"
+    },
+    {
+      "at": "2026-10-20T10:30:38.286920261Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 105, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 91.04426443395872, \"min_range_fraction\": 0.00621287931750494, \"minimum_target_fraction\": 0.00606287931750494, \"stop_floor_fraction\": 0.001674286955259279}, \"entry_source_switched\": true, \"last5_start\": 1792491900, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 56.78143427029105, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:30:38.288132095Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:30:38.288136554Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:31:38.132366202Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 105, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 91.04426443395872, \"min_range_fraction\": 0.006214086617396327, \"minimum_target_fraction\": 0.006064086617396327, \"stop_floor_fraction\": 0.001675091982859054}, \"entry_source_switched\": true, \"last5_start\": 1792491900, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 56.78143427029105, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:31:38.132378896Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:31:38.133750502Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:32:39.429876013Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 105, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 91.04426443395872, \"min_range_fraction\": 0.0062145982219315304, \"minimum_target_fraction\": 0.0060645982219315305, \"stop_floor_fraction\": 0.0016754331207766559}, \"entry_source_switched\": true, \"last5_start\": 1792491900, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 56.78143427029105, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:32:39.431062262Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:32:39.431065989Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:33:39.317420149Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 105, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 91.04426443395872, \"min_range_fraction\": 0.006215137789742813, \"minimum_target_fraction\": 0.006065137789742813, \"stop_floor_fraction\": 0.0016757929046077001}, \"entry_source_switched\": true, \"last5_start\": 1792491900, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 56.78143427029105, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:33:39.317429841Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:33:39.318824360Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:34:49.513361954Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 105, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 91.04426443395872, \"min_range_fraction\": 0.006215051443320725, \"minimum_target_fraction\": 0.006065051443320725, \"stop_floor_fraction\": 0.0016757353288113107}, \"entry_source_switched\": true, \"last5_start\": 1792491900, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 56.78143427029105, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:34:49.513377601Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:34:49.515225761Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:35:49.472608428Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 106, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 92.51967411724718, \"min_range_fraction\": 0.006256009177432897, \"minimum_target_fraction\": 0.006106009177432897, \"stop_floor_fraction\": 0.0017030459470096671}, \"entry_source_switched\": true, \"last5_start\": 1792492200, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 48.66455165291164, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:35:49.473737746Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:35:49.473742808Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:36:49.066727681Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 106, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 92.51967411724718, \"min_range_fraction\": 0.006254709131348652, \"minimum_target_fraction\": 0.006104709131348652, \"stop_floor_fraction\": 0.0017021790762459543}, \"entry_source_switched\": true, \"last5_start\": 1792492200, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 48.66455165291164, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:36:49.066736944Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:36:49.068100149Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:38:00.325194523Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 106, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 92.51967411724718, \"min_range_fraction\": 0.006255423209668931, \"minimum_target_fraction\": 0.006105423209668931, \"stop_floor_fraction\": 0.001702655223688937}, \"entry_source_switched\": true, \"last5_start\": 1792492200, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 48.66455165291164, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:38:00.325204090Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:38:00.325221081Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:38:57.441793281Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 106, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 92.51967411724718, \"min_range_fraction\": 0.006256429234201971, \"minimum_target_fraction\": 0.006106429234201971, \"stop_floor_fraction\": 0.001703326040874455}, \"entry_source_switched\": true, \"last5_start\": 1792492200, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 48.66455165291164, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:38:57.441805465Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:38:57.443167002Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:40:00.526406096Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 106, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 92.51967411724718, \"min_range_fraction\": 0.006256272480443155, \"minimum_target_fraction\": 0.006106272480443155, \"stop_floor_fraction\": 0.0017032215174639209}, \"entry_source_switched\": true, \"last5_start\": 1792492200, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 48.66455165291164, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:40:00.526418553Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:40:00.527157957Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:41:00.151279695Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 0, \"closed_5m\": 107, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_source_switched\": false, \"reason\": \"native_history_missing_stale_or_gapped\", \"required_5m\": 20, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:41:00.151291284Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": false, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:41:00.151295370Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": false, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:42:10.890659674Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 107, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 90.86112596601545, \"min_range_fraction\": 0.0062108736532611895, \"minimum_target_fraction\": 0.0060608736532611895, \"stop_floor_fraction\": 0.0016729495782881747}, \"entry_source_switched\": true, \"last5_start\": 1792492500, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 48.89203689525594, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:42:10.891692510Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:42:10.891695748Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:43:11.482287949Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 107, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 90.86112596601545, \"min_range_fraction\": 0.006211092327146459, \"minimum_target_fraction\": 0.006061092327146459, \"stop_floor_fraction\": 0.0016730953900406474}, \"entry_source_switched\": true, \"last5_start\": 1792492500, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 48.89203689525594, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:43:11.482649177Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:43:11.482653153Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:44:11.367645072Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 107, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 90.86112596601545, \"min_range_fraction\": 0.006210827459429881, \"minimum_target_fraction\": 0.006060827459429881, \"stop_floor_fraction\": 0.001672918776240198}, \"entry_source_switched\": true, \"last5_start\": 1792492500, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 48.89203689525594, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:44:11.367657851Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:44:11.368954614Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:45:03.739293461Z",
+      "message": "INFO:lbank_paper_notifications:PAPER_NOTIFICATION policy=native_paper_notifications_v1 delivered=True events=1 kinds=progress orders=false live_gate=false"
+    },
+    {
+      "at": "2026-10-20T10:45:12.762028662Z",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 108, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 88.5996169684427, \"min_range_fraction\": 0.006147463665811197, \"minimum_target_fraction\": 0.005997463665811197, \"stop_floor_fraction\": 0.001630667796965203}, \"entry_source_switched\": true, \"last5_start\": 1792492800, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 50.115179891473105, \"rsi_history_mature\": false, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}"
+    },
+    {
+      "at": "2026-10-20T10:45:12.763122457Z",
+      "message": "INFO:lbank_monitor:RSI_DIVERGENCE_STUDY {\"decisions\": [], \"divergences\": 0, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"rsi_context_v1\"}"
+    },
+    {
+      "at": "2026-10-20T10:45:12.763125358Z",
+      "message": "INFO:lbank_monitor:PUBLIC_TECHNIQUES_STUDY {\"decisions\": [], \"hourly_ready\": false, \"live_entry_added\": false, \"live_gate\": false, \"outcomes\": [], \"ready\": true, \"setups\": 0, \"version\": \"public_techniques_v1\"}"
+    }
+  ],
+  "limits": "Only observed bounded logs; progress is not trade; no new qualified replacement, hourly study unready/RSI250 immature preserved; no missing/stale DB export access inferred."
+}
