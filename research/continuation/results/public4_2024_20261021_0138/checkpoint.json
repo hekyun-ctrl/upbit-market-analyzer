@@ -1,0 +1,51 @@
+{
+  "run_kst": "2026-10-21T01:38:32+09:00",
+  "status": "prepared_not_executed",
+  "environment_probe": {
+    "command": "pwd",
+    "result": "No usable execution environment is available. Wait for an environment to become available before using this tool."
+  },
+  "selected_environment_reported_unavailable": true,
+  "actual_backtest_completed": false,
+  "market_output": null,
+  "preserved_work": [
+    "Recovered latest GitHub state and continuous research",
+    "Located existing full SHA2024archive provenance rather than inventing hashes",
+    "Froze exact date/archive-only code adaptation; all other text unchanged",
+    "Remote code readback exact equality"
+  ],
+  "official_checksum_retrieval_this_run": "Web tool could not access either .zip.CHECKSUM URL; no binary archives downloaded or integrity tested in this run",
+  "source_hash_provenance_path": "research/continuation/results/current_native_offline_20261020/report.json",
+  "code": "research/continuation/replay_public4_2024_20261021_0138.py",
+  "protocol": "research/continuation/public4_2024_protocol_20261021_0138.json",
+  "resume_command": "PYTHONPATH=<pinned25388b4 source with prior.py AuditBook> python research/continuation/replay_public4_2024_20261021_0138.py --data <2024Jan directory containing bars.zip and funding.zip> --output public4_2024_result.json",
+  "resume_requirements": [
+    "Obtain usable execution environment; verify Python/files/public data access",
+    "Download original2024Jan archives and verify whole byte SHA against frozen checks BEFORE execution",
+    "Restore pinned25388b4source and AuditBook dependency; verify source hashes and fixtures",
+    "Execute once, save actual results and cost/funding/unknown checks; compare against Jan2025 without tuning"
+  ],
+  "prior_2024_expected_archives": [
+    {
+      "kind": "klines",
+      "sha256": "21eeac04a76a7a35b10467e5e752fb2f8cff77cdeb57df6b50a23ce8d69bb190",
+      "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2024-01.zip"
+    },
+    {
+      "kind": "fundingRate",
+      "sha256": "3e0d30870672aa8f0f937881056e3cfd55913ae5c780cd50b33f2763aa0ba58e",
+      "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2024-01.zip"
+    }
+  ],
+  "production_observation": [
+    {
+      "id": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
+      "status": "SUCCESS",
+      "source": "25388b431c9c9d38df6a434670586c65f382d604"
+    }
+  ],
+  "production_changed": false,
+  "blocking_scope": "This run's executable calculation only; GitHub checkpoint persistence and production read tools remain available. Treat environment availability as retryable; do not claim all future runs permanently blocked.",
+  "automation_disabled": false,
+  "promotion": false
+}
