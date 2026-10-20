@@ -1,0 +1,11 @@
+{
+  "protocol": "current_native_rule_offline_first_event_v1",
+  "code_sha256": "bb0e475c598c2e9d912fa067992fffb27f84ff0a4798aba2c85568bf3e002f23",
+  "before_execution": true,
+  "clarifications": [
+    "Fixed initial-stop/TP1 diagnostic intentionally excludes pre-TP profit guard and partial runner. Urgent events are original v3 under that contract and NOT actual production warning-rate replication.",
+    "One-minute granularity is execution model; first possible native15s/30s entry or exact live-alert replay is NOT claimed.",
+    "Source200-day/education strategies are not silently introduced. Variant is an exploratory revision of existing higher-direction boolean, not already published profitable formula.",
+    "Already-seen 2024 week cannot satisfy unchanged forward gate regardless of result."
+  ]
+}
