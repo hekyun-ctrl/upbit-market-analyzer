@@ -67,8 +67,8 @@
     "docs/lbank_full_management_replay_2026-10-20.md"
   ],
   "next_work": {
-    "stage": "frozen22_intrabar_path_sensitivity_before_entry_contract_revision",
-    "instruction": "Read docs/lbank_full_management_replay_2026-10-20.md and full source-hash/fixture-revision evidence first. Completed actual existing management function path: same22 entries reconstructed and matched;13golden cases,132Decimalcost+53sourcecash+22one-stepcausal checks. Current runner9complete/13censored (4stopwick,9guardwick), so all22 expectancy remainsNULL, not -8.566R for22; legacy policies22complete remain negative. No new source fix/deployment or promotion justified. Next ONE finite executable step: pre-freeze two intrabar price-order sensitivity scenarios for these same22 entries and Jan8-15+Jan16 followup (O-H-L-C vs O-L-H-C at0/15/30/45sec) with only completed native bars known at each simulated step, actual existing functions/costs/censor rules unchanged. These are hypothetical trajectories, not actual native ticks/manual fills, not exhaustive mathematical PnL bounds. IMPORTANT retain original1minute sample cadence for last5 sample history while risk/accounting polls15s; do not reinterpret5x15sec samples as original5minutes. Keep same frozen entries, no new signals, source fee/margin/risk/stop limits or guard coefficients unchanged. Verify deterministic cases/source prefix causality/Decimal leg cash and distinguish assumed path effects from alpha evidence. Retain original13unknown outcomes separately; never relabel them observed wins after assuming a favorable path. If no robust edge, return to a concrete original entry-context/location gap with a source-grounded complete rule, not repeated exit retuning or broad source-error audits. No unchanged first-event reruns or recalc just to generate progress; no candidate yet qualifies for new forward study.",
+    "stage": "fixed22_entry_context_location_attribution_after_negative_intrabar_sensitivity",
+    "instruction": "Read intrabar sensitivity doc/report and original entry_direction_location attribution. Both pre-frozen15second O-H-L-C/O-L-H-C paths lose on same22entries (runner-6.062594R, PF.678123, doublecost-12.962485R); these are assumptions, original13observed unknowns persist. Stop further exit-path variants. NEXT one executable finite step: restore exact pinned production5c977a7 and fixed22entry plans plus same verified Jan2025 bars; inventory actual known-at-entry direction/context/location/target_room acceptance/conflict/unknown paths using completed native features and exact source functions, specifically the existing crossed-pivot target-room gap. Reuse original8case attribution, do not duplicate broad static audit. Persist per-entry original evidence, price vs pivot/support/resistance and stage reason; compare missing/conflicting versus explicit supported contexts descriptively without tuning thresholds or claiming independent OOS. Identify one complete source-grounded correction hypothesis and freeze before any subsequent comparative outcome test. Do not simply ban BB-edge entries, fabricate TP1/stop rules, repeat negative sensitivity, loosen risk/promotion or count22paired entries as44samples. Native paper distinct episodes continue separately; freshly inspect bounded runtime before asserting collection continuity. No qualified forward candidate.",
     "sources_to_screen": [
       {
         "title": "The Recurrent Reinforcement Learning Crypto Agent",
@@ -366,18 +366,18 @@
       "instruction": "Finite nextstep: obtain/read fullPRIMARYpaperthroughpermittedaccess,freezeactualpublication/versionSHA,locatepublic originalcode/data/ledger and exact cost/funding/manualrisk contract beforetrainingorreplication. Do not callabstractreturns alpha proof or inventunreleasedfeatures/data/TP1. No request-code/privateoutreach/accounts/inverse-margin orriskexpansion. Iforiginaldata/codeunavailableorunsupportedmanualBTCUSDTcontract,recordprecisefinitepreflight andcontinueanotherdistinctPRIMARYpublicBTCsourcewithcode+aftercostledger;notendlessarticle browsing. Do not retry/bypassMACD403. Preservecurrentfundingpositiveandnegativeevidence;no unchangedledgercalc/tuning."
     },
     "expected_outputs": [
-      "One pre-registered two-order15second synthetic-path sensitivity calculation on fixed22 entries with original minute-sample cadence, source unchanged, exact accounting and causal checks; label scenario dependence and unknown true native fills. Preserve all negative/positive/censored evidence and concrete entry-gap next step."
+      "Per-entry22 known-at-time actual direction/location acceptance evidence and one concrete gap; source-grounded pre-frozen correction contract if justified. No exit tuning or performance certification."
     ],
     "research_success_definition": "A reproducible explanation of existing accepted entry paths plus a fixed testable correction hypothesis and its evidence gaps; source count, implementation test count or a new document alone is not signal-performance improvement.",
     "read_first": [
-      "docs/lbank_full_management_replay_2026-10-20.md",
-      "research/continuation/full_management_protocol_20261020_2028.json",
-      "research/continuation/replay_full_management_20261020_2028.py",
-      "research/continuation/verify_full_management_20261020_2028.py",
-      "research/continuation/results/full_management_20261020_2028/report.json",
-      "research/continuation/results/full_management_20261020_2028/source_and_runtime.json"
+      "docs/lbank_intrabar_path_sensitivity_2026-10-20.md",
+      "research/continuation/results/intrabar_paths_20261020_2211/report.json",
+      "docs/lbank_entry_direction_location_audit_2026-10-20.md",
+      "research/continuation/results/entry_direction_location_attribution_20261020/report.json",
+      "research/continuation/entry_direction_location_attribution_20261020.py",
+      "research/continuation/results/full_management_20261020_2028/report.json"
     ],
-    "previous_stage": "full_existing_exit_management_replay_contract",
+    "previous_stage": "frozen22_intrabar_path_sensitivity_before_entry_contract_revision",
     "paper_priority": "Bounded20:00-20:28:30KST original study logs60rows have no new decisions/outcomes; progress2 API acknowledgments at20:00/20:15 are0trades. Deployment23799b11/source5c977a7 remainsSUCCESS/native360/116 ready, hourlystudyunready, RSI250immature. Do not send unchanged readiness/negative interim notifications, inflate sample counts, restart for docs or infer all-time ledger/delivery coverage from bounded logs. Observe actual distinct future paper episodes alongside executable numerical research."
   },
   "known_limitations": [
@@ -1432,8 +1432,8 @@
     "last_documentation": "docs/lbank_full_management_replay_2026-10-20.md",
     "last_closed_variant_rows": 159
   },
-  "updated_utc": "2026-10-20T11:43:39Z",
-  "updated_kst": "2026-10-20T20:43:39.000+09:00",
+  "updated_utc": "2026-10-20T13:19:49Z",
+  "updated_kst": "2026-10-20T22:19:49+09:00",
   "paper_notifications": {
     "policy": "native_paper_notifications_v1",
     "source_commit": "5c977a7f51cea67048f95791d1dcc4230634939a",
@@ -1501,5 +1501,25 @@
     "current_runner_all22_R": null,
     "censor_count": 13,
     "not_promoted": true
+  },
+  "intrabar_path_sensitivity": {
+    "documentation": "docs/lbank_intrabar_path_sensitivity_2026-10-20.md",
+    "code": "research/continuation/intrabar_paths_20261020_2211.py",
+    "protocol_freeze_commit": "cf417f8cf8c0d3beffa72ad93e0b6b45ef5694f0",
+    "report": "research/continuation/results/intrabar_paths_20261020_2211/report.json",
+    "report_sha256": "a97d7c39a576c181994fe4a005cc100a46cf4bcc9d81ba497ac555a846a76788",
+    "remote_blob_verified": "e6053e27e1d60ae985666b686a49e76deb58135c",
+    "fixed_entries": 22,
+    "scenario_paths": 2,
+    "independent_trades": 22,
+    "actual_native_ticks": false,
+    "original13_unknowns_preserved": true,
+    "both_paths_levels_R": -5.129937302943266,
+    "both_paths_runner_R": -6.0625941741151745,
+    "both_paths_runner_doublecost_R": -12.962484888560043,
+    "promotion": false,
+    "production_changed": false,
+    "source_head_verified": "5c977a7f51cea67048f95791d1dcc4230634939a",
+    "fresh_runtime_checked": false
   }
 }
