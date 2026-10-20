@@ -1,0 +1,16 @@
+{
+  "version": "RSI_twenty_actual_plan_calls_v1",
+  "code_freeze": "35334d22d7d8513e62a632f38f5efbde00afb365",
+  "prior_result_sha": "23df7ed066604c4ef439dcb6e36010742657b57dfc28a65bac74c05bcae1bde5",
+  "source": "25388b431c9c9d38df6a434670586c65f382d604",
+  "purpose": "Trace original20actualplan calls; require entire chronological report exact equality. UniqueIDs not20trades. No altered entry condition or hypothetical accepted trade.",
+  "cost_feasibility": "Original planning model at existing barrier, taker fees stop-slippage adverse reserve; double sensitivity. Excludes unknown actual holding/funding/fill and is not realized PnL.",
+  "null_metrics": [
+    "expectancy",
+    "PF",
+    "native urgency",
+    "manual fills",
+    "correlated CI"
+  ],
+  "promotion": false
+}
