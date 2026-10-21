@@ -1,0 +1,737 @@
+Received March 2, 2022, accepted April 7, 2022, date of publication April 11, 2022, date of current version April 15, 2022.
+Digital Object Identifier 10.1109/ACCESS.2022.3166599
+
+
+
+
+The Recurrent Reinforcement
+Learning Crypto Agent
+GABRIEL BORRAGEIRO , NICK FIROOZYE , AND PAOLO BARUCCA
+Department of Computer Science, University College London, London WC1E 6BT, U.K.
+Corresponding author: Gabriel Borrageiro (gabriel.borrageiro.20@ucl.ac.uk)
+
+
+
+
+  ABSTRACT We demonstrate a novel application of online transfer learning for a digital assets trading agent.
+  This agent uses a powerful feature space representation in the form of an echo state network, the output
+  of which is made available to a direct, recurrent reinforcement learning agent. The agent learns to trade
+  the XBTUSD (Bitcoin versus US Dollars) perpetual swap derivatives contract on BitMEX on an intraday
+  basis. By learning from the multiple sources of impact on the quadratic risk-adjusted utility that it seeks to
+  maximise, the agent avoids excessive over-trading, captures a funding profit, and can predict the market’s
+  direction. Overall, our crypto agent realises a total return of 350%, net of transaction costs, over roughly five
+  years, 71% of which is down to funding profit. The annualised information ratio that it achieves is 1.46.
+
+
+  INDEX TERMS Online learning, transfer learning, echo state networks, recurrent reinforcement learning,
+  financial time series.
+
+
+I. INTRODUCTION                                                                                   Perhaps the main benefit of this paper will be for financial
+Financial time series provide many modelling challenges for                                    industry practitioners. In the numerous papers we researched
+both researchers and practitioners. In some circumstances,                                     on machine learning applications to financial trading, the
+data availability is sparse, and the datasets are vast in other                                researchers’ emphasis tends to be on the novelty of the
+circumstances; this impacts the choice of model and the                                        machine learning model, which inevitably has a high learning
+learning style. In addition, financial time series are typically                               capacity. In practically all cases, good risk-adjusted returns
+both autocorrelated and nonstationary, requiring approaches                                    are claimed, yet when one digs into the results in more detail,
+such as integer or fractional differencing [1] to remove these                                 one invariably finds that trading costs are not fully accounted
+effects and facilitate correct feature selection; this is pre-                                 for. Such papers usually assume the execution of trades on the
+viously identified by Granger and Newbold [2] as leading                                       closing prices of sub-sampled data with certainty. However,
+to spurious regressions if not mitigated. Another approach                                     only a price taker can obtain certainty of fill by crossing the
+to coping with nonstationarity is to allow models to learn                                     bid/ask spread. The price taker then observes an immediate
+continuously.                                                                                  loss equal to the execution time half bid/ask spread. We barely
+   Against this backdrop, we extend our earlier work [3]                                       see this cost accounted for, and even when it is, such as with
+where we combine sequential learning with transfer learn-                                      the seminal work of Moody et al. [7], a fixed execution cost
+ing [4] and reinforcement learning [5]. More concretely,                                       is assumed. This fixed execution cost is never observed in
+we novelly transfer the learning of an echo state network [6]                                  reality; see, for example, figure 4 of Borrageiro et al. [3],
+to a direct, recurrent reinforcement learning agent [7] who                                    which shows that the bid/ask spread varies by time of day.
+must learn to trade digital asset futures, specifically the                                    For many assets, especially in traditional finance, the bid/ask
+XBTUSD (Bitcoin versus US Dollar) perpetual swap on the                                        spread varies by day of the week as well; Dacorogna et al. [8]
+BitMEX exchange. Our transfer learner benefits from an                                         demonstrate and discuss various examples of such stylised
+ample, dynamic reservoir feature space and can identify and                                    facts. Another approach commonly taken by academic finan-
+learn from the different sources of impact on profit and loss,                                 cial trading researchers is to use supervised learning and sub-
+including execution costs, exchange fees, funding costs and                                    sample the high-frequency data into monthly time series.
+price moves in the market.                                                                     The main reason for doing this is to ameliorate excessive
+                                                                                               trading and thus high execution cost. Inevitably, we see the
+   The associate editor coordinating the review of this manuscript and                         caveat emptor of a lack of experimental data and its impact
+approving it for publication was Chao Tong              .                                      on the generalisation performance of their chosen model.
+
+                     This work is licensed under a Creative Commons Attribution 4.0 License. For more information, see https://creativecommons.org/licenses/by/4.0/
+38590                                                                                                                                                                 VOLUME 10, 2022
+G. Borrageiro et al.: Recurrent Reinforcement Learning Crypto Agent
+
+
+
+
+Furthermore, the down-sampling of data into lower frequen-            example of the reservoir computing paradigm of understand-
+cies typically makes bearable the slow training times of many         ing and training recurrent neural networks, based on treating
+models, such as deep q-learning networks.                             the recurrent part (the reservoir) differently than the readouts
+   We complete this section with a summary of the main                from it [13]. Following Jaeger [6], the echo state property
+contributions of this paper. Our meta-model can process data          states that:
+as a stream and learn sequentially; this helps it cope with the          Definition 2 (echo state property): If a network is started
+nonstationarity of the high-frequency order book and trading          from two arbitrary states x0 , x̃0 and is run with the same input
+data. Furthermore, by using the vast high-frequency data, our         sequence in both cases, the resulting state sequences xT , x̃T
+model, which has a high learning capacity, avoids the kind            converge to each other. If this condition holds, the reservoir
+of overfitting on a lack of data points that occurs with down-        network state will asymptotically depend only on the input
+sampled data. We escape the problem of over-trading that is           history, and the network is said to be an echo state network.
+typically seen with the supervised learning model by learn-           The echo state property is guaranteed if the dynamic reservoir
+ing the sensitivity of the change in risk-adjusted returns to         weight matrix Whidden is scaled such that its spectral radius
+the model’s parameterisation. Stated another way, our model           ρ(Whidden ), that is, its largest absolute eigenvalue, satisfies
+learns from the multiple sources of impact on profit and loss         ρ(Whidden ) < 1. This ensures that Whidden is contractive.
+and targets the appropriate risk position. Finally, the scientific    The mathematically correct connection between the spectral
+experiment that we conduct is representative of the conditions        radius and the echo state property is that the latter is violated
+that would be observed in live trading; thus, we are confident        if ρ(Whidden ) > 1 in reservoirs using the tanh function as
+that the resulting performance can realistically be transferred       neuron nonlinearity and for zero input [14].
+to industry use.                                                         Murray [15] states that the criteria for plausible modelling
+                                                                      on how the brain might perform challenging time-dependent
+II. PRELIMINARIES                                                     computations are locality and causality. As the echo state
+This section provides a brief overview of the related ideas           network uses a fixed, dynamic reservoir of weights, whose
+that we use in our experimentation, namely transfer learning,         update depends on local information of inputs and activations,
+reservoir computing with echo state networks, and a form of           with fixed and random feedback, the model offers a plausible
+policy gradients reinforcement learning. Finally, we conclude         model of biological function. These biological aspects are
+the section with a literature review of recent publications that      explored by Maass and Markram [16] concerning liquid state
+apply reinforcement learning in cryptocurrency trading.               machines and more generally with spiking neural networks in
+                                                                      Samadi et al. [17].
+A. TRANSFER LEARNING                                                     Numerous articles demonstrate echo state networks
+Transfer learning refers to the machine learning paradigm in          within a reinforcement learning context. For example,
+which an algorithm extracts knowledge from one or more                Szita et al. [18] propose a novel method that uses echo state
+application scenarios to help boost the learning performance          networks as function approximators in reinforcement learn-
+in a target scenario [4]. Typically, traditional machine learn-       ing. They emphasise that echo state networks are promising
+ing requires large amounts of training data. Transfer learning        candidates for partially observable problems where informa-
+copes better with data sparsity by looking at related learning        tion about the past may improve performance, such as with
+domains where data is sufficient. Even in a big data scenario         k-order Markov processes. Since echo state networks are
+such as streaming high-frequency data, transfer learning can          effectively linear function approximators acting on the inter-
+benefit from learning immediately, where data is initially            nal state representation built from the previous observations,
+sparse, and a learner must begin providing forecasts when             Gordon’s [19] results about linear function approximators
+asked to do so. An increasing number papers focus on online           can be transferred to the echo state networks architecture.
+transfer learning [9]–[11]. Following Pan and Yang [12],              Building on this, they provide proof of convergence to a
+we define transfer learning as:                                       bounded region for echo state network training in the case
+   Definition 1 (Transfer Learning): Given a source domain            of k-order Markov decision processes.
+DS and learning task TS , a target domain DT and learning task           Shi et al. [20] seek to model the optimal energy manage-
+TT , transfer learning aims to help improve the learning of the       ment of an office. Time series inputs such as the real-time
+target predictive function fT (.) in DT using the knowledge in        electricity rate, renewable energy and energy demand are
+DS and TS , where DS 6 = DT , or TS 6 = TT .                          made available to an echo state network q-learning model,
+                                                                      which determines the optimal charging/discharging/idle
+B. ECHO STATE NETWORKS                                                strategies for the battery in the office so that the total cost
+Echo state networks are a form of recurrent neural network.           of electricity from the grid can be reduced.
+They consist of a large, fixed, recurrent reservoir network,             Chen et al. [21] develop a fault-tolerant adaptive tracking
+from which the desired output is obtained by training suitable        control method fused with an echo state network, driven by
+output connection weights. Determination of the optimal out-          reinforcement learning for Euler-Lagrange systems subject to
+put weights is solvable analytically, for example, sequentially       actuation faults. Specifically, the echo state network imple-
+with recursive least squares [6]. Echo state networks are an          ments an associative search network, a control gain network
+
+VOLUME 10, 2022                                                                                                                  38591
+                                                                                     G. Borrageiro et al.: Recurrent Reinforcement Learning Crypto Agent
+
+
+
+
+                                                                             this inner product is zero if and only if ∇E[r|w] = 0. If ηij is
+                                                                             independent of i and j, then E[1w|w] = η∇E[r|w].
+                                                                                This result relates ∇E[r|w], the gradient in weight space
+                                                                             of the performance measure E[r|w], to E[1w|w], the aver-
+                                                                             age update vector in weight space. Thus for any reinforce
+                                                                             algorithm, the average update vector in weight space lies in
+                                                                             a direction for which this performance measure is increasing
+                                                                             and the quantity (r − bij ) ln(∂πi /∂wij ) represents an unbiased
+                                                                             estimate of ∂E[r|w]/∂wij .
+
+                                                                             1) POLICY GRADIENT METHODS IN FINANCIAL TRADING
+FIGURE 1. A schematic of the echo state network (ESN), combined with         Moody et al. [7] propose to train trading systems and portfo-
+the direct, recurrent reinforcement learning agent (DRL). The ESN part is    lios by optimising objective functions that directly measure
+inspired by the schematic of Lukoševičius [22] and the DRL part is
+inspired by the McCulloch-Pitts schematic of Bishop [23].                    trading and investment performance. Their model tries to
+                                                                             target a position directly, and the model weights are adapted
+                                                                             to maximise the performance measure. The performance
+and an adaptive critic network, resulting in enhanced learning               function that they primarily consider is the differential Sharpe
+capabilities and stronger robustness against external uncer-                 ratio. The annualised Sharpe ratio [26] is
+tainties or disturbances, thus better controlling performance.                                                    µ − rf
+                                                                                                 sr = 2520.5 ×           ,
+                                                                                                                    σ
+C. POLICY GRADIENT REINFORCEMENT LEARNING                                    where µ is the strategy’s return, σ is the standard deviation
+In this section, we summarise our previous preliminary                       of returns, and rf is the risk-free rate. The differential Sharpe
+overview of the policy gradients method [3]. Williams [24]                   ratio is defined as
+introduced policy gradient methods in a reinforcement learn-                               dsrt     bt−1 1at − 0.5 at−1 1bt
+ing context. Whereas the majority of reinforcement learning                                      =                             ,
+                                                                                            dτ          (at−1 − a2t−1 )3/2
+algorithms tend to focus on action value estimation, learning
+the value of and selecting actions based on their estimated                  where the quantities at and bt are exponentially weighted
+action values, policy gradient methods learn a parameterised                 estimates of the first and second moments of rt
+policy that can select actions without the use of a value
+                                                                                      at = at−1 + τ 1at = at−1 + τ (rt − at−1 )
+function. Williams also introduced his reinforce algorithm
+                                                                                      bt = bt−1 + τ 1bt = bt−1 + τ (rt2 − bt−1 ),
+               1wij = ηij (r − bij ) ln(∂πi /∂wij ),                   (1)   with τ ∈ (0, 1]. They consider a batch gradient ascent update
+where wij     is the model weight going from the j0 th input                                                       dsrT
+                                                                                                      1θ T = η          ,
+to the i0 th output and wi is the weight vector for the i0 th                                                       dθ
+hidden processing unit in a network of such units, whose                     where
+goal it is to adapt in such a way as to maximise the scalar                             T                              
+reward r. The learning rate is ηij and the weight update                      dsrT   1 X dsrT drt dft         drt dft−1
+                                                                                   =                      +
+of equation 1 is typically applied with gradient ascent. The                   dθ    T     drt dft dθ       dft−1 dθ
+                                                                                       t=1
+reinforcement baseline bij , is conditionally independent of                            T                                       
+the model outputs yi , given the network parameters w and                            1 X bT − aT rt           drt dft    drt dft−1
+                                                                                   =                                  +              .
+inputs xi . The characteristic eligibility of wij is ln(∂πi /∂wij ),                 T
+                                                                                       t=1
+                                                                                            (bT − a2T )3/2    dft dθ    dft−1 dθ
+where πi (yi = c, wi , xi ) is the probability mass function                                                                                        (2)
+determining the value of yi as a function of the parameters
+of the unit and its input. Baseline subtraction r − bij plays an             The reward
+important role in reducing the variance of gradient estimators                                    rt = 1pt ft−1 − δt |1ft |
+and Sugiyama [25] shows that the optimal baseline is given as
+                                                                             depends on the change in reference price pt , previous position
+               Ep(r|w) rt k Tt=1 ∇ ln π (at |st , w)k2                       ft−1 and transaction costs δt which are applied only if there
+                       P                              
+        b =∗
+                                                       ,                    is a change in position |ft − ft−1 | > 0. The position function
+                Ep(r|w) k Tt=1 ∇ ln π (at |st , w)k2
+                        P
+                                                                             is typically differentiable and bounded −1 ≤ ft ≤ 1. This
+where the policy function π (at |st , w) denotes the probability             position function depends on the model inputs and parame-
+of taking action at at time t given state st , parameterised by              ters ft , f (xt ; θ t ). The right half of equation 2 shows the
+w. The main result of Williams’s paper is                                    dependency of the model parameters on the past sequence
+   Theorem 1: For any reinforce algorithm, the inner product                 of trades. To correctly compute and optimise these total
+of E[1w|w] and ∇E[r|w] is non-negative and if ηij > 0, then                  derivatives requires the use of recurrent algorithms such as
+
+38592                                                                                                                                   VOLUME 10, 2022
+G. Borrageiro et al.: Recurrent Reinforcement Learning Crypto Agent
+
+
+
+
+backpropagation through time [27], [28] or real-time recur-           on an exchange or contracts for difference in the over-the-
+rent learning [29]. An undesirable property of the Sharpe ratio       counter market attracts a funding cost similar to what brokers
+is that it penalises a model that produces returns larger than        charge for traditional financial instruments. Even if one trades
+                                     bt−1                             futures directly on an exchange without a broker, some crypto
+                             rt∗ =        ,                           derivatives contracts attract funding like traditional foreign
+                                     at−1
+                                                                      exchange instruments do. For example, trading overnight
+which is counter-intuitive relative to most investors’ notions        foreign exchange exposes one to the interest rate differen-
+of risk and reward [7]. Gold [30] extends Moody et al. [7]            tial between two currency pairs. Similarly, perpetual crypto
+work and investigates high-frequency currency trading with            swaps attract an intraday funding profit or loss, which ensures
+neural networks trained via recurrent reinforcement learning.         that the swap tracks the underlying cash instrument within
+He compares the performance of linear networks with neural            tolerance. We now proceed with the literature review.
+networks containing a single hidden layer and examines the               Jiang and Liang [31] supply a convolutional neural network
+impact of shared system hyper-parameters on performance.              with historical prices of a set of crypto assets as its input,
+In general, he concludes that the trading systems may be              outputting portfolio weights of the set of assets. The network
+effective but that the performance varies widely for different        is trained on less than a year of price data from the Poloniex
+currency markets, and simple statistics of the markets cannot         cryptocurrency exchange. The training is done in a reinforce-
+explain this variability.                                             ment learning manner, maximising the accumulated return as
+                                                                      the reward function of the network. Using 30 minutely sam-
+D. REINFORCEMENT LEARNING WITHIN                                      pled closing prices, they conduct backtests which achieve ten-
+CRYPTOCURRENCY TRADING                                                fold returns. In addition, they set exchange trading transaction
+This section provides a brief literature review of reinforce-         fees of 25 basis points (25e-4) times the notional value traded
+ment learning applied to cryptocurrency trading. Before per-          of the base cryptocurrency. However, since they use closing
+forming this review, it is helpful to describe how returns            prices to execute with a certainty of fill without applying half
+net of transaction costs are generated when trading on an             the observable bid/ask spread cost at the time of execution,
+exchange. For example, assume that a single instrument is             the empirically observed backtest results do not represent the
+traded, such as Bitcoin versus the US Dollar. This instrument         actual cost of trading and are thus more sanguine than reality.
+may be a cash or futures instrument. A gross profit (loss) is            Lee et al. [32] present a novel method to predict Bitcoin
+generated when Bitcoin is sold higher (lower) than its initial        price movement using inverse reinforcement learning [33]
+purchase price. Similar logic is applied for short positions,         and agent-based modelling. Their approach predicts the price
+albeit with directions swapped. A net profit is observed by           by reproducing synthetic yet realistic behaviours of ratio-
+deducting various costs from the gross profit. These costs            nal agents in a simulated market. Inverse reinforcement
+vary depending on the execution-style and are differentiated          learning provides a systematic way to find the behavioural
+between price makers and price takers.                                rules of each agent from Blockchain data by framing the
+   A price maker inserts quotes into an exchange limit order          trading behaviour estimation as a problem of recovering
+book and executes when a price taker removes the price                motivations from observed behaviour and generating rules
+maker’s liquidity. The price maker captures half the bid/ask          consistent with these motivations. Once the rules are recov-
+spread at the time of execution; the execution price is evalu-        ered, an agent-based model creates hypothetical interactions
+ated against the prevailing transaction mid-price (0.5×[bid +         between the recovered behavioural rules, discovering equilib-
+ask]), where bid < mid < ask. Bid/ask spreads in crypto tend          rium prices as emergent features through matching the supply
+to be as competitively priced as traditional financial instru-        and demand of Bitcoin. Their model is used to forecast the
+ments, although the exchange fees, usually a percentage of            market’s direction, and their results show that their proposed
+the notional traded, tend to be much higher. The price maker’s        method can predict short-term market prices while outlining
+fills are probabilistic, not inevitable. To compensate the mar-       overall market trends. However, their experiments do not
+ket maker for the uncertainty incurred by providing liquidity         include the impact of holding risk, transaction or funding
+and the risk of adverse selection, they capture half the bid/ask      costs.
+spread. The price taker obtains the certainty of immediate               Lucarelli and Borrotti [34] apply deep reinforcement
+fill, subject to competing with other price takers for the same       learning to trading Bitcoin. More precisely, double deep
+quoted liquidity. This certainty of fill comes at a cost, as the      q-learning [35] and duelling double deep q-learning [36] net-
+price taker must pay half the bid/ask spread and usually much         works are trained in batch mode using 80% of the four years
+higher exchange fees than price makers when trading crypto.           of data that they have available. The remaining 20% of the
+   A final cost that must be considered is funding. If one            data is used for out of sample testing. Two reward functions
+buys cash crypto without leverage, then it is plausible to            are also tested: Sharpe ratio and profit reward functions. They
+consider no funding cost, and one can consider the purchase           find that the double deep q-learning trading system based
+as self-funded. However, if one wants to sell cash crypto             on the Sharpe ratio reward function is the most profitable
+short, one needs to borrow the inventory; this attracts a fund-       approach for trading Bitcoin. We note that the authors collect
+ing cost. Furthermore, transacting in cryptocurrency futures          their data from Kaggle rather than from an actual crypto
+
+VOLUME 10, 2022                                                                                                                 38593
+                                                                           G. Borrageiro et al.: Recurrent Reinforcement Learning Crypto Agent
+
+
+
+
+exchange and that they use minutely sampled open-high-             different price due to the basis
+low-close prices rather than actual order book bids and asks.
+                                                                                     basist = futurest − indext .
+As such, accurate transaction costs cannot be used in their
+experiment. Furthermore, no indication is made in their paper      The basis means different things in different markets. For
+that they use any form of funding or exchange trading fees in      example, in the oil market, the demand for spot oil can
+their returns calculations.                                        outpace the demand for futures oil, especially if OPEC with-
+   Zhang et al. [37] note that portfolio selection is difficult    holds supply, leading to a higher spot price; this results in a
+as the nonstationarity of financial time series and their com-     futures curve in a state of backwardation. The crypto futures
+plex correlations make the learning of feature representation      normally trade in a state of contango, where the futures prices
+challenging. They propose a cost-sensitive portfolio selec-        trade at a higher rate than the spot prices. Backwardation or
+tion method with deep reinforcement learning. Specifically,        contango in crypto markets does not represent supply and
+a novel two-stream portfolio policy network is devised to          demand shortages in an economic sense but rather reflects
+extract price time series patterns and asset correlations, while   risk appetite for crypto. Similar effects happen in the equity
+a new cost-sensitive reward function is developed to max-          markets. As with the equity markets, crypto market partici-
+imise the accumulated return and constrain costs via rein-         pants can take risks in the futures market more easily. The
+forcement learning. They empirically evaluate their proposed       spot markets typically do not offer leverage, and the trader
+method on real-world datasets from the Poloniex crypto             must have inventory in the exchange to trade. In contrast,
+exchange. Promising results demonstrate the effectiveness          futures allow traders to sell assets short with leverage and
+and superiority of the proposed method in terms of profitabil-     without borrowing the underlying asset. However, what is
+ity, cost-sensitivity and representation abilities. Once more,     required is a margin or deposit to fund the position. Figure 2
+however, transaction costs are not fully accounted for in their    shows the basis in relative terms for the XBTUSD perpetual
+experiment. For example, they assume a fixed transaction cost      swap during the bear market of 2018. The mid-price of the
+of 25 basis points times the notional value traded of the base     perpetual swap is compared against the underlying index it
+cryptocurrency; however, they also use open-high-low-close         tracks, .BXBT. The relative basis is computed as
+prices, sampled every 30 minutes. The closing prices they
+                                                                                                 futurest − indext
+use assume that execution is immediate. In reality, however,                        rbasist =                      .                      (3)
+immediate execution may only be achieved by crossing the                                               indext
+spread; this additional cost must be modelled, which usually       Before this bear market, Bitcoin hit a then all-time high of
+turns a theoretically profitable strategy that executes at the     $20,000, and the 100-day exponentially weighted moving
+closing price or mid-price into a loss-making one.                 average of relative basis was very positive in late 2017.
+                                                                   For most of 2018 and 2019, the basis was largely negative,
+III. THE RESEARCH EXPERIMENT                                       reflecting the cash market sell-off from all-time highs to circa
+We begin with a discussion of the research data we use in          USD 3,000.
+our experiment, followed by an elucidation of the research
+methods and a description of the experiment results. As a          1) FUNDING
+high-level summary, our experiment aims to explore transfer        The funding rate for the perpetual swap comprises two parts:
+learning using a source model, an echo state network and           an interest rate differential component and the premium or
+a target model, a direct, recurrent, reinforcement learning        discount of the basis. We denote this funding rate as κt .
+agent. The objective of this meta-model is to learn to trade       The interest differential reflects the borrowing cost of each
+digital asset futures, specifically perpetual contracts on the     currency involved in the pair
+BitMEX crypto exchange. Finally, the dynamical reservoir of                                       quote
+                                                                                                 et− ebase
+the echo state network acts as a powerful nonlinear feature                               et =         t
+                                                                                                           .
+space; this is fed into the upstream recurrent reinforcement                                       T
+learner, who is aware of the various sources of impact on          For example, with the XBTUSD perpetual swap, the interest
+                                                                                                                       quote
+profit or loss and learns to target the desired position.          rate of borrowing in US Dollars is denoted by et          and
+                                                                   the interest rate of borrowing in Bitcoin is represented by
+A. THE BitMEX XBTUSD PERPETUAL SWAP                                ebase
+                                                                    t    . As funding occurs every 8 hours, T = 8. The basis pre-
+The data that we experiment with is from the BitMEX cryp-          mium/discount component is computed in a manner similar to
+tocurrency derivatives exchange. In 2016 they launched the         equation 3, with some subtleties applied to minimise market
+XBTUSD perpetual swap, where clients trade Bitcoin against         manipulation, such as the use of time and volume weighted
+the US Dollar. The perpetual swap is similar to a traditional      average prices. The funding rate is finally
+futures contract, except there is no expiry or settlement.
+                                                                               κt = bt + max(min[ζ et − bt ], −ζ ),                       (4)
+It mimics a margin-based spot market and trades close to
+the underlying reference index price. A funding mechanism          where ζ is a basis cap, typically 5 basis points (0.05%).
+is used to tether the contract to its underlying spot price.       When the basis is positive, traders with long positions (buy
+In contrast, a futures contract may trade at a significantly       XBT, sell USD) will pay those with short positions (sell XBT,
+
+38594                                                                                                                         VOLUME 10, 2022
+G. Borrageiro et al.: Recurrent Reinforcement Learning Crypto Agent
+
+
+
+
+                                                                      from a standard normal would suffice. Here, nhidden denotes
+                                                                      the number of hidden processing units in the internal dynam-
+                                                                      ical reservoir and ninput is the number of external inputs,
+                                                                      including a bias term. Next we initialise the hidden processing
+                                                                      units weight matrix, Whidden ∈ Rnhidden ×nhidden . The procedure
+                                                                      detailed by Yildiz et al. [38] is
+                                                                         • Initialise a random matrix Whidden , all with non-negative
+                                                                           entries.
+                                                                         • Scale       Whidden such that its spectral radius
+                                                                           ρ(W    hidden ) < 1.
+                                                                         • Change the signs of a desired number of entries of
+                                                                           Whidden to get negative connection weights as well.
+                                                                         • Sparsify Whidden with probability P(α), 0  α < 1,
+                                                                           setting those elements to zero.
+                                                                      This procedure is guaranteed to ensure the echo state property
+FIGURE 2. XBTUSD basis during the bear market of 2019.
+                                                                      for any input. Intuitively, a recurrent neural network has the
+                                                                      echo state property concerning an input signal ut , if any initial
+                                                                      network state is forgotten or washed out when the network
+buy USD). Reciprocally, shorts pay longs when the basis is
+                                                                      is driven by ut for long enough [39]. The model supports
+negative.
+                                                                      recurrent connections from either a teacher signal yt ∈ Rnback
+                                                                      or model output ŷt ∈ Rnback . These are connected to the model
+B. THE RECURRENT REINFORCEMENT
+                                                                      via the weight matrix Wback ∈ Rnhidden ×nback , whose weights
+LEARNING CRYPTO AGENT
+                                                                      are initialised at random from a standard normal. Note that
+We begin with a description of the dynamic reservoir fea-
+                                                                      Winput , Whidden and Wback , have weights that remain fixed.
+ture space, the resultant learning of which is transferred
+                                                                         Finally, initialise the output weight vector wout        0      ∈
+to the direct, recurrent reinforcement learner, which targets
+                                                                      R input +nhidden +nback . It is at this point that our procedure
+                                                                        n
+the desired risk position. It is worth highlighting where our
+                                                                      differs from the original echo state network formulation
+approach deviates from the traditional use of echo state
+                                                                      shown by Jaeger [6]. There, wout is a matrix Wout ∈
+networks within a reinforcement learning context. Figure 1
+                                                                      Rnback ×(ninput +nhidden +nback ) and the performance measure of the
+demonstrates visually that the target labels, the so-called
+                                                                      model is the quadratic loss
+teacher signal, can be fed back into the dynamic reservoir.
+                                                                                                  T
+Equally, one could apply a regression layer to the echo state                                1 X
+network and feed the resulting forecasts into the dynamic                              min      (yt − Wout zt )2 .
+                                                                                       Wout 2T
+reservoir. Both approaches make the echo state network                                           t=1
+
+recurrent then. We value this recurrent nature in a trading           The reasons will become apparent shortly when we detail
+context, as we wish to feed information about the current             the model’s direct, recurrent reinforcement learning part. But
+position back into the model. However, rather than treating           first, we must describe how we create the augmented state of
+this exercise as a value function estimation task as with Szita       the system, zt ∈ Rninput +nhidden +nback . Firstly, we initialise a
+et al. [18], we feed the augmented, dynamic reservoir features        zero-valued internal state vector x0 ∈ Rnhidden . Then at time t,
+of the echo state network to a direct recurrent reinforcement         we compute the recurrent internal state
+learner. By differentiating a quadratic utility function with
+                                                                           xt = fhidden (Winput ut + Whidden xt−1 + Wback
+                                                                                                                     t    ŷt ),
+respect to the recurrent reinforcement learner’s parameters,
+with feedback connections from the agent’s past positions fed         where fhidden (.) is typically a squashing function such as the
+back into the echo state network dynamic reservoir, the agent         hyperbolic tangent. The augmented, recurrent system state is
+learns from the various sources of impact on profit and loss          then
+and targets the appropriate position that maximises the risk-
+                                                                                             zt = [ut , xt , ŷt ].                   (5)
+adjusted reward.
+                                                                      Equation 11 defines what ŷt represents, namely the past
+1) THE DYNAMIC RESERVOIR FEATURE SPACE                                desired positions of the direct, recurrent reinforcement learn-
+Denote as ut , a vector of external inputs to the system,             ing agent.
+which is observed at time t. In the context of this experi-
+ment, such external input would include order book, trans-            2) DIRECT RECURRENT REINFORCEMENT LEARNING
+action and funding information. These features may come               The augmented, internal feature state, zt , is now fed into the
+from the instrument being traded, exogenous instruments,              upstream model, a direct, recurrent neural network, whose
+or both. Initialise the external input weight matrix Winput ∈         performance measure is a quadratic utility function of reward
+Rnhidden ×ninput , where the weights are drawn at random; a draw      and risk. For the reader’s benefit and the fact that we use the
+
+VOLUME 10, 2022                                                                                                                     38595
+                                                                               G. Borrageiro et al.: Recurrent Reinforcement Learning Crypto Agent
+
+
+
+
+same target transfer learning model, we describe the dynam-            where the weight update procedure is an extended Kalman
+ics of the direct, recurrent reinforcement learner in a manner         filter for neural networks [42], [43], albeit modified for rein-
+similar to our earlier work [3]. Sharpe [40] discusses asset           forcement learning in this context; sequential updates are
+allocation as a function of expected utility maximisation,             applied as per algorithm 1.
+where the utility function may be more complex than that
+associated with mean-variance analysis. Denote the expected             Algorithm 1: Extended Kalman Filter
+utility for a single asset portfolio as
+                                                                         Require: β, τ // β ≥ 0 is a Ridge penalty.
+                                λ                                        // 0  τ ≤ 1 is an exponential decay
+                       υt = µt − σt2 ,                           (6)
+                                2                                             factor.
+where the expected return µt and variance of returns σt2 may             Initialise: d = ninput + nhidden + nback
+be estimated in an online fashion with exponential decay                 wout = 0d , P = Id /β
+                                                                         // 0d is a zero vector in Rd .
+               µt = τ µt−1 + (1 − τ )rt ,                                // P is the precision matrix in Rd×d .
+               σt2 = τ σt−1
+                        2
+                            + (1 − τ )(rt − µt )2 .              (7)     Input: ∇υt
+                                                                         Output: woutt
+The risk appetite constant λ > 0, can be set as a function             1 q = 1 + ∇υt Pt−1 ∇υt /τ
+                                                                                       T
+of an investor’s desired risk-adjusted return, as demonstrated         2 k = Pt−1 ∇υt /(qτ )
+by Kahn [41]. Define the annualised information ratio as the           3 wt
+                                                                           out = wout + k
+                                                                                   t−1
+risk-adjusted differential reward measure, where the differ-           4 Pt = Pt−1 /τ − kk q
+                                                                                            T
+ence is taken against a benchmark or baseline strategy                 5 Pt = Pt τ // variance stabilisation
+                                       µt − bt
+                   irt = 2520.5 ×              .
+                                          σt
+                                                                          Above, Pt is an approximation to ∇ 2 υt , the inverse Hessian
+Substituting the non-annualised information ratio into the             of the utility function υt with respect to the model weights
+quadratic utility and differentiating it against the risk,             wout
+                                                                         t . We decompose the gradient of the utility function with
+we obtain a suitable value for the risk appetite parameter             respect to the recurrent reinforcement learner’s parameters as
+                                   irt                                 follows
+                            λ=         .
+                                   σt
+                                                                                                                    
+                                                                                dυt drt dft              drt dft−1
+                                                                        ∇υt =                       +
+The net returns whose expectation and variance we seek to                        drt dft dwout  t      dft−1 dwout
+                                                                                                                 t−1
+learn, are decomposed as                                                                          dυt dσt2
+                                                                                                           
+                                                                                   dυt dµt
+                                                                             =               +
+               rt = 1pt ft−1 − δt |1ft | − κt ft ,               (8)               dµt drt        dσt2 drt
+                                                                                     drt ∂ft            ∂ft ∂ft−1
+                                                                                                                  
+where 1pt is the change in reference price, typically a mid                     ×                  +
+                                                                                     dft ∂woutt       ∂ft−1 ∂wout
+                                                                                                                t−1
+price
+                                                                                                   ∂ft−1     ∂ft−1 ∂ft−2
+                                                                                                                          
+                                                                                          drt
+        1pt = 0.5 × (bidt + askt − bidt−1 − askt−1 ),                                 +                    +                  .    (12)
+                                                                                         dft−1 ∂wout  t−1    ∂ft−2 ∂wout
+                                                                                                                       t−2
+δt represents the execution cost for a price taker                        The constituent derivatives for the left half of equation 12
+                  δt = 0.5 × (askt − bidt ),                     (9)   are:
+                                                                                  dυt
+κt is the funding cost (see subsection III-A) and ft is the                            = (1 − η)[1 − λ(rt − µt )],
+                                                                                  drt
+desired position learnt by the recurrent reinforcement learner                    drt
+                                                                                       = −δt × sign(1ft ) − κt ,
+                                 t ] zt .
+                   ft = tanh [wout   T
+                                        
+                                                          (10)                     dft
+                                                                                 dft
+The model is maximally short when ft = −1 and maximally                                = zt [1 − tanh2 ([wout   T
+                                                                                                            t ] zt )]
+                                                                                dwout
+                                                                                   t
+long when ft = 1. The past positions of the model are used
+                                                                                                           2
+as the feedback connections for equation 5                                                +wout                  out T
+                                                                                              t,n [1 − tanh ([wt ] zt )]
+                                                                                             ×zt−1 [1 − tanh2 ([wout  T
+                                                                                                                 t−1 ] zt−1 )],
+                  ŷt = [ft−nback , . . . , ft−1 ].             (11)
+                                                                       where n = ninput + nhidden + nback − 1, using 0 as the starting
+  The goal of our recurrent reinforcement learner is to max-
+                                                                       index.
+imise the utility in equation 6, by targeting a position in
+equation 10. To do this, we apply an online optimisation
+                                                                       C. EXPERIMENT DESIGN
+update of the form
+                                                                       We put a recurrent reinforcement learning crypto agent
+                                                       dυt             to work by trading the XBTUSD (Bitcoin vs US Dollar)
+          wout    t−1 + ∇υt ≡ 1wt +
+               = wout                                       ,
+                                out
+           t
+                                                      dwout
+                                                        t              perpetual swap on BitMEX. We transfer the output of
+
+38596                                                                                                                             VOLUME 10, 2022
+G. Borrageiro et al.: Recurrent Reinforcement Learning Crypto Agent
+
+
+
+
+the source model, the dynamic reservoir feature space of
+subsection III-B1, to the target model, the direct recurrent
+reinforcement learner of subsection III-B2, who learns to
+target a risk position directly. Finally, we use five minutely
+sampled intraday data. The choice of this sampling rate is
+driven by the throttle imposed by the vendor on retrieving
+historical data; if we could obtain the raw, asynchronously
+delivered tick data promptly, we would do so. Nevertheless,
+we are still using 365 × 5 × 1440/5 = 525600 observations
+in our experiment. Our performance evaluation procedure
+involves the following:
+   • Construct input features from the order book and trade
+     information made available by BitMEX for XBTUSD.
+   • Feed these input features into an echo state network,
+     with nhidden = 100, nback = 10 and the percentage
+     of reservoir units Whidden that are sparsified, set to           FIGURE 3. Cumulative returns for the XBTUSD crypto agent.
+     α = 0.75.
+   • Feed the output of the echo state network (equation 5)           TABLE 1. Daily pnl statistics for the XBTUSD crypto agent.
+     into a direct, recurrent reinforcement learner
+     (subsection III-B2).
+   • Set the risk appetite constant λ = 0.00001 for quadratic
+     utility equation 6.
+   • Set the ridge penalty β = 1 and the exponential decay
+     factor τ = 0.999 for the extended Kalman filter of
+     algorithm 1.
+   • Backtest the entire history as a test set.
+   • Learn sequentially online to target the desired position.
+   • Force the agent to trade as a price taker, who incurs an
+     execution cost equal to equation 9 plus exchange fees,
+     which are set to 5 basis points (0.05%).
+   • For non-zero risk positions, apply the appropriate fund-         IV. DISCUSSION
+     ing profit or loss as per equation 4.                            The echo state network provides a robust and scalable feature
+   • Monitor equation 7, the expected net reward of the               space representation. We transfer this learning representation
+     strategy. The crypto agent can trade freely if µt ≥ 0.           to a recurrent reinforcement learning agent that learns to
+     Otherwise, close the position and wait for an opportunity        target a position directly. It is possible to use the echo state
+     to enter the market again.                                       network as a reinforcement learning agent itself, as shown
+                                                                      by Szita Yildiz et al. [18]. However, the approach may lead
+D. RESULTS                                                            to undesired behaviour in a trading context. Specifically,
+Table 1 and figure 3 show the results of the experiment.              they use an echo state network to estimate the state-action
+The crypto agent achieves a total return of just under 350%           value function of a temporal difference learning sarsa model
+over a test set that is less than five years. The associated          [5], [44]. This value function takes the form
+annualised information ratio is 1.46. Denoting the maximally
+short position as −1, no position as 0 and the maximally                                  qπ (s, a) = Eπ {rt |st , at },
+long position as 1, we see that the agent averages a position
+                                                                      where the expected return rt depends on the transition to state
+of 0.41. Thus there is a bias toward the agent maintaining a
+                                                                      st having taken action at under policy π . Sarsa estimates this
+long position, which is desirable, as Bitcoin has appreciated
+                                                                      value function sequentially as
+against the US Dollar over this period. We see visual evidence
+in figure 3 that on occasion, the crypto agent abstains from           q(st , at ) = (1 − η)q(st , at ) + η[rt+1 + γ q(st+1 , at+1 )],
+trading, or rather is forced to take no position; this will happen                                                                   (13)
+during periods when the predictive performance of the agent
+decreases relative to execution and funding costs. Our crypto         where 0 < γ ≤ 1 is a discount factor for multi-step rewards,
+agent also captures a 71% cumulative return due to earning            and η > 0 is a learning rate. Equation 13 shows that the
+funding, which is expected as the agent learns to target the          state transition reward is passed back to the starting state.
+appropriate position that maximises its quadratic utility, and        In activities such as maze traversal or board games, being
+funding is one of the drivers of this utility. The total execution    aware of the reward associated with multiple steps or deci-
+cost and exchange fees that the agent pays out is −54%.               sions and passing that reward back to the current position
+
+VOLUME 10, 2022                                                                                                                     38597
+                                                                                     G. Borrageiro et al.: Recurrent Reinforcement Learning Crypto Agent
+
+
+
+
+                                                                           θ = {nhidden = 100, nback = 10}. The information ratios
+                                                                           in this set of simulations vary from 0.219 to 1.763, with
+                                                                           total returns between 65.4% and 502.1%. Whilst this does
+                                                                           show evidence of a reasonable variability of returns, table 2
+                                                                           also shows that 95% of the mean information ratios vary
+                                                                           between 1.1 and 1.2 and 95% of the mean total returns vary
+                                                                           between 289% and 307%. Thus the overall picture remains
+                                                                           unchanged, that being that the transfer learning crypto agent
+                                                                           has successfully learnt how to trade this instrument during the
+                                                                           test period. Other than this acceptable sensitivity to weight
+                                                                           initialisation, we make no assumptions that would otherwise
+                                                                           cause our results to be violated if these assumptions were
+                                                                           not met.
+
+FIGURE 4. Monte Carlo simulation, information ratio versus total return.   VI. CONCLUSION
+                                                                           We demonstrate an application of online transfer learning
+TABLE 2. Monte Carlo simulation, information ratio versus total return.    as a digital assets trading agent. This agent uses a powerful
+                                                                           feature space representation in the form of an echo state
+                                                                           network, the output of which is made available to a direct,
+                                                                           recurrent reinforcement learning agent. The agent learns to
+                                                                           trade the XBTUSD (Bitcoin versus US Dollars) perpetual
+                                                                           swap derivatives contract on BitMEX. It learns to trade intra-
+                                                                           day on five minutely sampled data, avoids excessive over-
+                                                                           trading, captures a funding profit and is also able to predict
+                                                                           the direction of the market. Overall, our crypto agent realises
+                                                                           a total return of 350%, net of transaction costs, over roughly
+                                                                           five years, 71% of which is down to funding profit. The
+                                                                           annualised information ratio that it achieves is 1.46.
+
+                                                                           REFERENCES
+is of great value. However, in the context of trading, where                [1] R. H. Shumway, Time Series Analysis and Its Applications: With R Exam-
+the value function q(st , at ) represents the value of a position               ples (Springer Texts in Statistics), 3rd ed. Springer, 2011.
+st , with the possibility of switching or remaining in the same             [2] C. W. J. Granger and P. Newbold, ‘‘Spurious regressions in econometrics,’’
+                                                                                J. Econometrics, vol. 2, no. 2, pp. 111–120, Jul. 1974.
+position denoted by action at , we will on occasion find that
+                                                                            [3] G. Borrageiro, N. Firoozye, and P. Barucca, ‘‘Reinforcement learning for
+a larger utility is assigned to the wrong state. For example,                   systematic FX trading,’’ IEEE Access, vol. 10, pp. 5024–5036, 2022.
+imagine the current state is st = 0, that is, the model has no              [4] Q. Yang, Y. Zhang, W. Dai, and S. J. Pan, Transfer Learning. Cambridge,
+position. Now we observe a large positive price jump leading                    U.K.: Cambridge Univ. Press, 2020.
+                                                                            [5] R. S. Sutton and A. G. Barto, Reinforcement Learning: An Introduction.
+to large positive reward rt+1  0. Value function estimators                    Cambridge, MA, USA: A Bradford Book, 2018.
+such as equation 13 would pass the state transition reward                  [6] H. Jaeger, ‘‘Adaptive nonlinear system identification with echo state net-
+rt+1 to the initial state q(st = 0, at = 0). At the next iteration,             works,’’ in Proc. NIPS, 2002.
+                                                                            [7] J. Moody, L. Wu, Y. Liao, and M. Saffell, ‘‘Performance functions and
+with probability Pr(1−), st+1 = 0 as q(st+1 = 0, at+1 = 0)
+                                                                                reinforcement learning for trading systems and portfolios,’’ J. Forecasting,
+is the highest value function. However, if the position is zero,                vol. 17, nos. 5–6, pp. 441–470, Sep. 1998.
+the model cannot hope to earn a profit. Even if one excludes                [8] M. M. Dacorogna, R. Gencay, S. Altunç, O. V. Pictet, and R. Olsen,
+the zero state, then there is still the possibility of observing                An Introduction to High-Frequency Finance. New York, NY, USA: Aca-
+                                                                                demic, 2001.
+this problem for a reversal strategy with possible states s =               [9] P. Zhao, S. C. H. Hoi, J. Wang, and B. Li, ‘‘Online transfer learning,’’ Artif.
+{−1, 1}. Direct reinforcement, as we describe it, does not                      Intell., vol. 216, pp. 76–102, Nov. 2014.
+incur these problems and we have, through transfer learn-                  [10] B. K. Salvalaio and G. de Oliveira Ramos, ‘‘Self-adaptive appearance-
+                                                                                based eye-tracking with online transfer learning,’’ in Proc. 8th Brazilian
+ing, improved upon the earlier work in direct reinforcement                     Conf. Intell. Syst. (BRACIS), Oct. 2019, pp. 383–388.
+[7], [30] and extended the work of Borrageiro [3].                         [11] X. Wang, X. Wang, and Z. Zeng, ‘‘A novel weight update rule of online
+                                                                                transfer learning,’’ in Proc. 12th Int. Conf. Adv. Comput. Intell. (ICACI),
+                                                                                Aug. 2020, pp. 349–355.
+V. LIMITATIONS OF THE WORK
+                                                                           [12] S. Pan and Q. Yang, ‘‘A survey on transfer learning,’’ IEEE Trans. Knowl.
+As previously discussed in subsection III-B1, the various                       Data Eng., vol. 22, pp. 1345–1359, Nov. 2010.
+echo state network parameters are initialised at random.                   [13] M. Lukoševičius, H. Jaeger, and B. Schrauwen, ‘‘Reservoir computing
+Figure 4 and table 2 measure the impact of this randomness                      trends,’’ KI-Künstliche Intell., vol. 26, no. 4, pp. 365–371, Nov. 2012.
+                                                                           [14] M. Lukoševičius and H. Jaeger, ‘‘Reservoir computing approaches to recur-
+on test set performance. We run a Monte Carlo simulation                        rent neural network training,’’ Comput. Sci. Rev., vol. 3, no. 3, pp. 127–149,
+of 250 trials, where the network parameterisation is fixed to                   2009.
+
+38598                                                                                                                                        VOLUME 10, 2022
+G. Borrageiro et al.: Recurrent Reinforcement Learning Crypto Agent
+
+
+
+
+[15] J. M. Murray, ‘‘Local online learning in recurrent networks with random           [38] I. B. Yildiz, H. Jaeger, and S. J. Kiebel, ‘‘Re-visiting the echo state
+     feedback,’’ eLife, vol. 8, p. e43299, May 2019.                                        property,’’ Neural Netw., vol. 35, pp. 1–9, Nov. 2012.
+[16] W. Maass and H. Markram, ‘‘On the computational power of circuits of              [39] H. Jaeger, ‘‘Using conceptors to manage neural long-term memories
+     spiking neurons,’’ J. Comput. Syst. Sci., vol. 69, no. 4, pp. 593–616, 2004.           for temporal patterns,’’ J. Mach. Learn. Res., vol. 18, pp. 13:1–13:43,
+[17] A. Samadi, T. P. Lillicrap, and D. B. Tweed, ‘‘Deep learning with dynamic              Jan. 2017.
+     spiking neurons and fixed feedback weights,’’ Neural Comput., vol. 29,            [40] W. F. Sharpe, ‘‘Expected utility asset allocation,’’ Financial Analysts J.,
+     no. 3, pp. 578–602, Mar. 2017.                                                         vol. 63, no. 5, pp. 18–30, Sep. 2007.
+[18] I. Szita, V. Gyenes, and A. Lőrincz, ‘‘Reinforcement learning with                [41] R. C. Grinold and R. N. Kahn, Advances in Active Portfolio Manage-
+     echo state networks,’’ in Artificial Neural Networks—ICANN. Berlin,                    ment: New Developments in Quantitative Investing. New York, NY, USA:
+     Germany: Springer, 2006, pp. 830–839.                                                  McGraw-Hill, 2019.
+[19] G. J. Gordon, ‘‘Reinforcement learning with function approximation con-           [42] R. J. Williams, ‘‘Training recurrent networks using the extended Kalman
+     verges to a region,’’ in Proc. NIPS, 2000.                                             filter,’’ in Proc. Int. Joint Conf. Neural Netw. (IJCNN), vol. 4, 1992,
+[20] G. Shi, D. Liu, and Q. Wei, ‘‘Echo state network-based Q-learning method               pp. 241–246 vol. 4.
+     for optimal battery control of offices combined with renewable energy,’’          [43] S. Haykin, Kalman Filtering and Neural Networks. Hoboken, NJ, USA:
+     IET Control Theory Appl., vol. 11, no. 7, pp. 915–922, Apr. 2017.                      Wiley, 2001.
+[21] Q. Chen, Y. Jin, and Y. Song, ‘‘Fault-tolerant adaptive tracking control of       [44] R. S. Sutton, ‘‘Learning to predict by the methods of temporal differences,’’
+     Euler–Lagrange systems—An echo state network approach driven by rein-                  Mach. Learn., vol. 3, no. 1, pp. 9–44, 1988.
+     forcement learning,’’ Neurocomputing, vol. 484, pp. 109–116, May 2022.
+[22] M. Lukoševičius, A Practical Guide to Applying Echo State Networks.
+     Berlin, Germany: Springer, 2012, pp. 659–686.
+[23] C. M. Bishop, ‘‘Neural networks and their applications,’’ Rev. Sci. Instrum.,
+     vol. 65, no. 6, pp. 1803–1832, 1994.                                                                         GABRIEL BORRAGEIRO received the Executive
+[24] R. J. Williams, ‘‘Simple statistical gradient-following algorithms for con-                                  M.B.A. degree from the Cass Business School,
+     nectionist reinforcement learning,’’ Mach. Learn., vol. 8, pp. 229–256,                                      City, University of London, and the Diploma
+     May 1992.                                                                                                    degree in computer science from the Damelin Col-
+[25] M. Sugiyama, Statistical Reinforcement Learning, 1st ed. Boca Raton, FL,
+                                                                                                                  lege, South Africa. He is currently pursuing the
+     USA: CRC Press, 2015.
+                                                                                                                  Ph.D. degree with the Computer Science Depart-
+[26] W. F. Sharpe, ‘‘Mutual fund performance,’’ J. Bus., vol. 39, pp. 119–138,
+     Jan. 1966.                                                                                                   ment, University College London, and a part of the
+[27] D. E. Rumelhart, G. E. Hinton, and R. J. Williams, ‘‘Learning internal                                       Financial Computing Group. He is currently work-
+     representations by error propagation,’’ California Univ. San Diego La Jolla                                  ing as a Quantitative Researcher at BlueCrest Cap-
+     Inst. Cognitive Science, Tech. Rep., 1985.                                                                   ital. His research interests include online learning,
+[28] P. J. Werbos, ‘‘Backpropagation through time: What it does and how to do                                     reinforcement learning, and neural networks.
+     it,’’ Proc. IEEE, vol. 78, no. 10, pp. 1550–1560, Oct. 1990.
+[29] R. J. Williams and D. Zipser, ‘‘A learning algorithm for continually running
+     fully recurrent neural networks,’’ Neural Comput., vol. 1, pp. 270–280,
+     Jun. 1989.
+[30] C. Gold, ‘‘FX trading via recurrent reinforcement learning,’’ in Proc. IEEE                                  NICK FIROOZYE received the B.S. degree in
+     Int. Conf. Comput. Intell. Financial Eng., Mar. 2003, pp. 363–370.                                           mathematics from the Harvey Mudd College and
+[31] Z. Jiang and J. Liang, ‘‘Cryptocurrency portfolio management with deep                                       the Ph.D. and M.S. degrees in mathematics from
+     reinforcement learning,’’ in Proc. Intell. Syst. Conf. (IntelliSys), Sep. 2017,                              New York University. He is currently a Honorary
+     pp. 905–913.                                                                                                 Reader and a Computational Finance with the
+[32] K. Lee, S. Ulkuatam, P. Beling, and W. Scherer, ‘‘Generating synthetic                                       Computer Science Department, University Col-
+     bitcoin transactions and predicting market price movement via inverse                                        lege London, and also a part of the Financial Com-
+     reinforcement learning and agent-based modeling,’’ J. Artif. Soc. Social                                     puting Group. He also works for Exos Bank in the
+     Simul., vol. 21, no. 3, p. 5, 2018.                                                                          systematic rates trading business.
+[33] S. Russell, ‘‘Learning agents for uncertain environments,’’ in Proc. 11th
+     Annu. Conf. Comput. Learn. Theory (COLT). New York, NY, USA: Asso-
+     ciation for Computing Machinery, 1998, pp. 101–103.
+[34] G. Lucarelli and M. Borrotti, ‘‘A deep reinforcement learning approach for
+     automated cryptocurrency trading,’’ in Artificial Intelligence Applications
+     and Innovations. Cham, Switzerland: Springer, 2019, pp. 247–258.                                             PAOLO BARUCCA received the Ph.D. degree
+[35] V. Mnih, K. Kavukcuoglu, D. Silver, A. Graves, I. Antonoglou,                                                in theoretical and mathematical physics from the
+     D. Wierstra, and M. Riedmiller, ‘‘Playing atari with deep reinforcement
+                                                                                                                  Sapienza Universita di Roma. He is currently a
+     learning,’’ 2013, arXiv:1312.5602.
+[36] Z. Wang, T. Schaul, M. Hessel, H. Van Hasselt, M. Lanctot, and
+                                                                                                                  Lecturer with the Computer Science Department,
+     N. De Freitas, ‘‘Dueling network architectures for deep reinforcement                                        University College London, and also a part of the
+     learning,’’ in Proc. 33rd Int. Conf. Int. Conf. Mach. Learn. (ICML), vol. 48,                                Financial Computing Group. He is also the Editor-
+     2016, pp. 1995–2003.                                                                                         in-Chief of the Science Dissemination Project,
+[37] Y. Zhang, P. Zhao, Q. Wu, B. Li, J. Huang, and M. Tan, ‘‘Cost-sensitive                                      La Scienza Coatta, and a Scientific Officer of the
+     portfolio selection via deep reinforcement learning,’’ IEEE Trans. Knowl.                                    Blockchain Education Network.
+     Data Eng., vol. 34, no. 1, pp. 236–248, Jan. 2022.
+
+
+
+
+VOLUME 10, 2022                                                                                                                                                   38599
+
