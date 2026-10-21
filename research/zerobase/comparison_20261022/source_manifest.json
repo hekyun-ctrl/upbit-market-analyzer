@@ -1,0 +1,23 @@
+[
+  {
+    "file": "btc202501.zip",
+    "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/1m/BTCUSDT-1m-2025-01.zip",
+    "SHA256": "b69ca5b2c2d1ae00d68d2790d09138cb2a44085ff19e0da5dc98b569ea7e489e",
+    "publisher_checksum": "b69ca5b2c2d1ae00d68d2790d09138cb2a44085ff19e0da5dc98b569ea7e489e  BTCUSDT-1m-2025-01.zip",
+    "match": true
+  },
+  {
+    "file": "BTCUSDT-5m-2025-01.zip",
+    "url": "https://data.binance.vision/data/futures/um/monthly/klines/BTCUSDT/5m/BTCUSDT-5m-2025-01.zip",
+    "SHA256": "0c99422d64fa3cc58564cf77969fc5a96d6f44783c79ecfcf94b103753bf7570",
+    "publisher_checksum": "0c99422d64fa3cc58564cf77969fc5a96d6f44783c79ecfcf94b103753bf7570  BTCUSDT-5m-2025-01.zip",
+    "match": true
+  },
+  {
+    "file": "BTCUSDT-fundingRate-2025-01.zip",
+    "url": "https://data.binance.vision/data/futures/um/monthly/fundingRate/BTCUSDT/BTCUSDT-fundingRate-2025-01.zip",
+    "SHA256": "df725010d55458866eb5a47e9ee708c6796c9d7e77b14c38342cea11f381815e",
+    "publisher_checksum": "df725010d55458866eb5a47e9ee708c6796c9d7e77b14c38342cea11f381815e  BTCUSDT-fundingRate-2025-01.zip",
+    "match": true
+  }
+]
