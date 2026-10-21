@@ -219,16 +219,19 @@ class Position:
     last_price:D|None=None; events:list=field(default_factory=list); health:set=field(default_factory=set)
     last_minute:int|None=None; high:D|None=None; low:D|None=None
     review:set=field(default_factory=set); warned:bool=False; last_trail_sent:D|None=None
+    remaining_funding:D=ZERO;partial_skipped:bool=False
     @classmethod
     def open(cls,p,now):return cls(p,now,p.quantity,-p.quantity*p.entry*p.costs.fee_entry,p.stop,now,last_price=p.entry)
     def exit(self,price,q,now,reason):
         p=self.plan;fill=p.costs.fill(price,-p.candidate.side)
+        if q<=0 or q>self.remaining:raise ValueError('EXIT_QUANTITY')
+        self.remaining_funding*=1-q/self.remaining
         self.cash+=p.candidate.side*q*(fill-p.entry)-q*fill*p.costs.fee_exit;self.remaining-=q;self.last_price=fill
         self.events.append({'kind':reason,'time':now,'price':str(fill),'quantity':str(q)})
         if self.remaining==0:self.state='PAPER_CLOSED'
     def funding_event(self,time,rate,price):
         if self.state=='PAPER_CLOSED':return
-        paid=self.plan.candidate.side*self.remaining*price*rate;self.cash-=paid;self.funding+=paid
+        paid=self.plan.candidate.side*self.remaining*price*rate;self.cash-=paid;self.funding+=paid;self.remaining_funding+=paid
         self.events.append({'kind':'FUNDING','time':time,'paid':str(paid)})
     def mark(self,price):
         p=self.plan;fill=p.costs.fill(price,-p.candidate.side)
@@ -248,7 +251,13 @@ class Position:
             px=min(self.active_stop,b.o) if d==1 else max(self.active_stop,b.o)
             self.exit(px,self.remaining,now,'HARD_STOP');return
         if target_hit and not self.partial:
-            self.exit(p.target,p.quantity*D('.25'),now,'PARTIAL_TP1');self.partial=True;self.state='PAPER_PARTIAL'
+            q=rounding(p.quantity*D('.25'),p.costs.step)
+            fill=p.costs.fill(p.target,-d);remaining=self.remaining-q
+            if q>0 and remaining>0 and q*fill>=p.costs.minimum_notional and remaining*fill>=p.costs.minimum_notional:
+                self.exit(p.target,q,now,'PARTIAL_TP1');self.events[-1]['actual_fraction']=str(q/p.quantity)
+                self.partial=True;self.state='PAPER_PARTIAL'
+            elif not self.partial_skipped:
+                self.partial_skipped=True;self.events.append({'kind':'PARTIAL_UNEXECUTABLE','time':now,'reason':'STEP_OR_MINIMUM_ORDER','desired_fraction':'0.25','actual_fraction':'0'})
         for hours in (6,24):
             if now-self.fill_time>=hours*3600 and hours not in self.review:self.review.add(hours);self.events.append({'kind':'TIME_REVIEW','hours':hours,'time':now})
     def five(self,b,atr,state,now):
@@ -257,9 +266,15 @@ class Position:
         if d*(b.c-p.candidate.I)<0:self.exit(b.c,self.remaining,now,'STRUCTURE_INVALIDATED');return
         self.high=max(self.high or b.h,b.h);self.low=min(self.low or b.l,b.l)
         if self.partial:
-            # Allocate entry fee and already-paid funding by remaining/original qty.
-            per=p.entry*p.costs.fee_entry+self.funding/p.quantity
-            be=(p.entry+d*per)/(1-d*p.costs.fee_exit)
+            # Entry fee per BTC stays allocated; funding is only that of remaining lots.
+            per=p.entry*p.costs.fee_entry+self.remaining_funding/self.remaining
+            exit_fill_be=(p.entry+d*per)/(1-d*p.costs.fee_exit)
+            trigger=exit_fill_be/(1-d*p.costs.slip_bps/10000)
+            # Favorable tick direction is required to preserve nonnegative residual net.
+            be=rounding(trigger,p.costs.tick,up=d>0)
+            residual=lambda x:d*(p.costs.fill(x,-d)-p.entry)-p.entry*p.costs.fee_entry-p.costs.fill(x,-d)*p.costs.fee_exit-self.remaining_funding/self.remaining
+            if residual(be)<0:be+=d*p.costs.tick
+            if residual(be)<0:raise ValueError('BREAKEVEN_ROUNDING')
             trail=self.high-2*atr if d==1 else self.low+2*atr
             new=max(self.active_stop,be,trail) if d==1 else min(self.active_stop,be,trail)
             new=rounding(new,p.costs.tick,up=d<0)
