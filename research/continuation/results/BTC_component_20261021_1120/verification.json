@@ -1,0 +1,11 @@
+{
+  "verified": true,
+  "checks": 4378,
+  "source_history_rows": 2184,
+  "rebalance_segments_not_closed_trades": 324,
+  "ending_equity": "403019.1429045587845709399953",
+  "net_sum": "393019.1429045587845709399953",
+  "report_sha256": "fa3a03e3aa882491a3cc8d5cc6e89cf58807db335088add0bf402008c04955d5",
+  "row_artifact_sha256": "cda421b59a72039e2511cd1431edd92e21ff0d94df1e57d9c870e5747c09ff81",
+  "scope": "Original-history accounting and same-position-path timing sensitivity, not corrected executable strategy or native performance"
+}
