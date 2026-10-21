@@ -1,0 +1,73 @@
+{
+  "reviewed_commit": "22724922c146eeb9c927d65afa8aaad88164115d",
+  "fixtures": "SYNTHETIC; NOT MARKET PERFORMANCE",
+  "results": [
+    {
+      "id": "R1",
+      "reproduced": true,
+      "expected": "Same OHLCV received again is idempotent; preserve first-known time.",
+      "actual_error": "REVISION_REQUIRES_REPLAY_VERSION",
+      "correction_rows": 1
+    },
+    {
+      "id": "R2",
+      "reproduced": true,
+      "expected": "Keep entries blocked until missing inputs are resolved and mandatory continuity is restored.",
+      "one_minute_contiguous": false,
+      "one_minute_count": 60,
+      "health_after_matching_5m": [],
+      "missing_minute_start": 134100
+    },
+    {
+      "id": "R3",
+      "reproduced": true,
+      "expected": "Both exit quantity and remaining quantity conform to the known quantity step.",
+      "step": "0.00001",
+      "original_quantity": "0.62195",
+      "partial_quantity": "0.1554875",
+      "remaining_quantity": "0.4664625"
+    },
+    {
+      "id": "R4",
+      "reproduced": true,
+      "expected": "A BE-determined stop covers entry fees, exit fees, modeled exit slippage and allocated funding.",
+      "funding": "0",
+      "slippage_bps": "2",
+      "cases": [
+        {
+          "side": 1,
+          "entry": "100.0200",
+          "stop_trigger": "100.04",
+          "modeled_exit_fill": "100.019992",
+          "remaining_leg_net_per_btc": "-0.0200119992"
+        },
+        {
+          "side": -1,
+          "entry": "99.9800",
+          "stop_trigger": "99.97",
+          "modeled_exit_fill": "99.989994",
+          "remaining_leg_net_per_btc": "-0.0299909994"
+        }
+      ]
+    },
+    {
+      "id": "R5",
+      "reproduced": true,
+      "expected": "After the 1% daily NAV limit is reached, block new entries until the next KST day, even after recovery.",
+      "day_start_nav": "1000",
+      "halt_line": "990",
+      "nav_below_limit": "989.743785390",
+      "nav_after_recovery": "990.054729292500",
+      "new_entry_count_after_limit": 1
+    },
+    {
+      "id": "R6",
+      "reproduced": true,
+      "expected": "Process this completed minute's stop before finalizing previous-day ending NAV and next-day starting NAV.",
+      "actual_cash_nav_after_stop": "997.500009780",
+      "recorded_previous_day_end_nav": "1002.475112220",
+      "recorded_next_day_start_nav": "1002.475112220",
+      "closed_positions": 1
+    }
+  ]
+}
