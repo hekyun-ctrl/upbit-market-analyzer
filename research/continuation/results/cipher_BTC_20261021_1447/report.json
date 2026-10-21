@@ -1,0 +1,318 @@
+{
+  "source_pin": "e0b424cf4f734131d4d532513981396ea94df573",
+  "config_hash": "d57f92765ac46fc1",
+  "hashes": {
+    "trades.csv": "3bc14589e2939bed6b731a3c1ee55ba8d431a7b47b8e1c4d3f0225ffdd794838",
+    "config.snapshot.json": "75181a4052c1e2dc9a9a075f4ac632f58a2896401635c068f410153410e4fe28",
+    "metrics.json": "9f4c1b156d513e6e5620f36f780ad1e7742403fc25e680d4088e43e0a168e5ff",
+    "BTCUSDT.15m.jsonl": "f7c2cdbcd68c6707d70442ac2892f0d763e9b0f7ac05dc44bed9ee56abf39b8a",
+    "costs.ts": "9d21ec2886203ce1d9b3f369483dd909f68a2be08d626abfcd8f0f1e43d2aecc",
+    "INTEGRITY.md": "4aa39304388a33af569c3edeff96969aff6a0d87b85e27ecc2d988751d416281"
+  },
+  "all": {
+    "n": 100,
+    "net_USDT_model": "-580.722927",
+    "costs": {
+      "fees": "386.140811",
+      "slippage": "193.070416",
+      "funding": "13.342992"
+    },
+    "PF": "0.4029168526570130910642768592",
+    "conditional_extra_same_path_cost_net": "-1173.277146",
+    "exit_reasons": {
+      "stop": 58,
+      "tp2": 17,
+      "time": 25
+    },
+    "cash_checks": 100
+  },
+  "BTC": {
+    "n": 38,
+    "net_USDT_model": "-109.589478",
+    "costs": {
+      "fees": "146.691442",
+      "slippage": "73.345753",
+      "funding": "5.362926"
+    },
+    "PF": "0.6392796432499164988796631981",
+    "conditional_extra_same_path_cost_net": "-334.989599",
+    "exit_reasons": {
+      "stop": 18,
+      "time": 13,
+      "tp2": 7
+    },
+    "cash_checks": 38
+  },
+  "BTC_by_source_sample": {
+    "in-sample": {
+      "n": 23,
+      "net_USDT_model": "-92.114329",
+      "costs": {
+        "fees": "89.959879",
+        "slippage": "44.979955",
+        "funding": "3.542869"
+      },
+      "PF": "0.5306293664774106393255741740",
+      "conditional_extra_same_path_cost_net": "-230.597032",
+      "exit_reasons": {
+        "stop": 11,
+        "time": 9,
+        "tp2": 3
+      },
+      "cash_checks": 23
+    },
+    "out-of-sample": {
+      "n": 15,
+      "net_USDT_model": "-17.475149",
+      "costs": {
+        "fees": "56.731563",
+        "slippage": "28.365798",
+        "funding": "1.820057"
+      },
+      "PF": "0.8375259765623619912319258371",
+      "conditional_extra_same_path_cost_net": "-104.392567",
+      "exit_reasons": {
+        "tp2": 4,
+        "time": 4,
+        "stop": 7
+      },
+      "cash_checks": 15
+    }
+  },
+  "BTC_candles": 8788,
+  "candle_start": 1782058500000,
+  "candle_end": 1790005500000,
+  "duplicate_timestamps": 0,
+  "gaps": [
+    {
+      "after": 1782226800000,
+      "before": 1782228600000,
+      "missing": 1
+    },
+    {
+      "after": 1782407700000,
+      "before": 1782409500000,
+      "missing": 1
+    },
+    {
+      "after": 1782588600000,
+      "before": 1782590400000,
+      "missing": 1
+    },
+    {
+      "after": 1782769500000,
+      "before": 1782771300000,
+      "missing": 1
+    },
+    {
+      "after": 1782950400000,
+      "before": 1782952200000,
+      "missing": 1
+    },
+    {
+      "after": 1783131300000,
+      "before": 1783133100000,
+      "missing": 1
+    },
+    {
+      "after": 1783312200000,
+      "before": 1783314000000,
+      "missing": 1
+    },
+    {
+      "after": 1783493100000,
+      "before": 1783494900000,
+      "missing": 1
+    },
+    {
+      "after": 1783674000000,
+      "before": 1783675800000,
+      "missing": 1
+    },
+    {
+      "after": 1783854900000,
+      "before": 1783856700000,
+      "missing": 1
+    },
+    {
+      "after": 1784035800000,
+      "before": 1784037600000,
+      "missing": 1
+    },
+    {
+      "after": 1784216700000,
+      "before": 1784218500000,
+      "missing": 1
+    },
+    {
+      "after": 1784397600000,
+      "before": 1784399400000,
+      "missing": 1
+    },
+    {
+      "after": 1784578500000,
+      "before": 1784580300000,
+      "missing": 1
+    },
+    {
+      "after": 1784759400000,
+      "before": 1784761200000,
+      "missing": 1
+    },
+    {
+      "after": 1784940300000,
+      "before": 1784942100000,
+      "missing": 1
+    },
+    {
+      "after": 1785121200000,
+      "before": 1785123000000,
+      "missing": 1
+    },
+    {
+      "after": 1785302100000,
+      "before": 1785303900000,
+      "missing": 1
+    },
+    {
+      "after": 1785483000000,
+      "before": 1785484800000,
+      "missing": 1
+    },
+    {
+      "after": 1785663900000,
+      "before": 1785665700000,
+      "missing": 1
+    },
+    {
+      "after": 1785844800000,
+      "before": 1785846600000,
+      "missing": 1
+    },
+    {
+      "after": 1786025700000,
+      "before": 1786027500000,
+      "missing": 1
+    },
+    {
+      "after": 1786206600000,
+      "before": 1786208400000,
+      "missing": 1
+    },
+    {
+      "after": 1786387500000,
+      "before": 1786389300000,
+      "missing": 1
+    },
+    {
+      "after": 1786568400000,
+      "before": 1786570200000,
+      "missing": 1
+    },
+    {
+      "after": 1786749300000,
+      "before": 1786751100000,
+      "missing": 1
+    },
+    {
+      "after": 1786930200000,
+      "before": 1786932000000,
+      "missing": 1
+    },
+    {
+      "after": 1787111100000,
+      "before": 1787112900000,
+      "missing": 1
+    },
+    {
+      "after": 1787292000000,
+      "before": 1787293800000,
+      "missing": 1
+    },
+    {
+      "after": 1787472900000,
+      "before": 1787474700000,
+      "missing": 1
+    },
+    {
+      "after": 1787653800000,
+      "before": 1787655600000,
+      "missing": 1
+    },
+    {
+      "after": 1787834700000,
+      "before": 1787836500000,
+      "missing": 1
+    },
+    {
+      "after": 1788015600000,
+      "before": 1788017400000,
+      "missing": 1
+    },
+    {
+      "after": 1788196500000,
+      "before": 1788198300000,
+      "missing": 1
+    },
+    {
+      "after": 1788377400000,
+      "before": 1788379200000,
+      "missing": 1
+    },
+    {
+      "after": 1788558300000,
+      "before": 1788560100000,
+      "missing": 1
+    },
+    {
+      "after": 1788739200000,
+      "before": 1788741000000,
+      "missing": 1
+    },
+    {
+      "after": 1788920100000,
+      "before": 1788921900000,
+      "missing": 1
+    },
+    {
+      "after": 1789101000000,
+      "before": 1789102800000,
+      "missing": 1
+    },
+    {
+      "after": 1789281900000,
+      "before": 1789283700000,
+      "missing": 1
+    },
+    {
+      "after": 1789462800000,
+      "before": 1789464600000,
+      "missing": 1
+    },
+    {
+      "after": 1789643700000,
+      "before": 1789645500000,
+      "missing": 1
+    },
+    {
+      "after": 1789824600000,
+      "before": 1789826400000,
+      "missing": 1
+    }
+  ],
+  "promotion": false,
+  "full_engine_rerun": false,
+  "full_cost_double_rerun": null,
+  "TP1_first": null,
+  "actual_emergency_5min": null,
+  "native_LBank": false,
+  "limits": [
+    "Bitget SPOT proxy with model short/funding, not actual LBank futures.",
+    "Slippage already embedded in fill prices, not subtracted twice for base net.",
+    "Extra same-path fees+slip+funding is arithmetic sensitivity only; doubled-cost rerun may change prices/size/decisions.",
+    "All default BTC records retained including source eod exits; eod not profitability proof.",
+    "15m data cannot prove first5min risk/TP1 order.",
+    "Portfolio-dependent original BTC allocation, not standalone BTC rerun; source IS/OOS already viewed not new independent sample.",
+    "Rules are unofficial approximation; VMC exact formula not published."
+  ]
+}
