@@ -1,0 +1,25 @@
+{
+  "completed_source": {
+    "repo": "buffettlaw/BTC-ETH-Trend-following-and-Lead-lag-Trading-Strategies",
+    "commit": "45dda879fbfb3bc6e8dbac46bd8605f01ca28c20",
+    "document": "docs/lbank_original_BTC_attribution_2026-10-21.md"
+  },
+  "bounded_new_doc_only": {
+    "repo": "Shayawnn/metis",
+    "commit": "182aac29327fe184fe8f0dfd9d9d84bd303353c4",
+    "document_blob": "0e438ea9168442a788de12d94e81d8ff50dce197",
+    "scope": "Full docs/backtest-results.md only; no rules/data/ledger engine read or execution",
+    "status": "not_shortlisted_this_run",
+    "basis": "Author80,069aggregate chosen TP2-6%/SL1-4% multiasset1d/4hgrid, BTCaggregate+0.007R, fullcost/actualclosedBTCledger notestablished; selecteddaily72/year violatesfrequency and stopdistancecontract. No80k independentBTCclaim, no sweep/training."
+  },
+  "next_finite_discovery": {
+    "max_new_sources": 2,
+    "artifact_first": true,
+    "queries": [
+      "BTCUSDT fixed intraday strategy public raw data closed trades net fees slippage funding CSV",
+      "Bitcoin trading reproducible after transaction costs released dataset trade ledger fixed rules"
+    ],
+    "first_check": "Resolve sourcecommit + actual tree artifacts and exactBTC closed-ledger/raw-data availability before READMEreturn-ledsourceaudit. Exclude genericframeworks/optimization-only/multiasset-only/long-onlyspot/noactualresults; preserve exclusions in state.",
+    "then": "OnlyifactualfixedBTCledger/raw exists, freeze exactrules/cashmodel and perform bounded arithmetic/data-integrity comparison. No inventingstrategyfromguidelines, no repeatedcurrentfailureaudits."
+  }
+}
