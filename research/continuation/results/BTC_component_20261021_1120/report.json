@@ -1,0 +1,131 @@
+{
+  "protocol": "BTC_component_committed_history_v1",
+  "source_commit": "45dda879fbfb3bc6e8dbac46bd8605f01ca28c20",
+  "original_files": {
+    "ETH_trading_strategies.ipynb": {
+      "bytes": 720518,
+      "sha256": "84fc07ab02523c7dd88ade3974968ab68b65c075b2b581a27732cff4a1e4a72a",
+      "git_blob": "c435ce522ecfbcfe1384acd00856d9301b3d5adf"
+    },
+    "clean_data.py": {
+      "bytes": 4653,
+      "sha256": "4cd1573c9d887916265c3e6d588d151a00fa63737251ba6434a03e719ffc1639",
+      "git_blob": "ad69e6e0a53ffe15057e123ad58d096b7b60b140"
+    },
+    "download_data.py": {
+      "bytes": 5206,
+      "sha256": "e9f5361689eb99e7000ec00d79d999c2988879d620f1d2a4422738cedea96e87",
+      "git_blob": "5e2bd5024f8e529932dd923ee526c21fa27f36cc"
+    },
+    "data/raw/btcusdt_1h_raw.parquet": {
+      "bytes": 594881,
+      "sha256": "7245e7709a144ad56a42c0de41c220e79bccdd24c28b9a929f89158382973159",
+      "git_blob": "452265aad409fb648da4c576bb8d6fb9b5fa4184"
+    },
+    "data/clean/btcusdt_1h_clean.parquet": {
+      "bytes": 852544,
+      "sha256": "e3f8d39d182f102a16506eedde7f51547d6f828640d3359d00ae246a0317c7f0",
+      "git_blob": "ed8d050a456de77f46573b6d7502faff5592ab21"
+    },
+    "data/raw/ethusdt_1h_raw.parquet": {
+      "bytes": 572547,
+      "sha256": "9b99df45c27a4e1eca8498162a1a9e3356a6584ccd04941f51ef4bc32fc1bb05",
+      "git_blob": "edaba5fe7dc1c5f61bddfde2fb3849b9453c59b1"
+    },
+    "data/clean/ethusdt_1h_clean.parquet": {
+      "bytes": 829548,
+      "sha256": "babe11d6b83c6182d87a5477cbcf535504930eaaa1d87d6e689588cacf971d36",
+      "git_blob": "28ee4eb3290514ec79687f6fee212be061da89b9"
+    },
+    "output/tables/trend_following_history.csv": {
+      "bytes": 1100795,
+      "sha256": "3ca2affae966a5b44e364b35ae9e23cc6ec29892961efaefbad151cf21f54e59",
+      "git_blob": "15535b2d6dca8e9e9472b5a7b59da8442bd23efc"
+    },
+    "output/tables/trend_following_summary.csv": {
+      "bytes": 394,
+      "sha256": "e6f6b7b89ffc119952a2acc3ac6e0b20c25c4f94bbcc03e2855876ca5a7100d7",
+      "git_blob": "f975e7991961a99768edc73bfe4f8cbf7773d5fe"
+    },
+    "output/tables/trend_following_trade_pnl.csv": {
+      "bytes": 50396,
+      "sha256": "db273f0892aa6602020a4ea1e98a544b4bec50f872eda5608c88dc58b269057c",
+      "git_blob": "9bcd84588d49235bb71219761d03835701d14fc2"
+    }
+  },
+  "integrity": {
+    "btc": {
+      "rows": 6600,
+      "start": "2025-03-25 12:00:00+00:00",
+      "end": "2025-12-25 11:00:00+00:00",
+      "filled": 0,
+      "outlier": 14,
+      "clean_path_not_raw": 6398
+    },
+    "eth": {
+      "rows": 6600,
+      "start": "2025-03-25 12:00:00+00:00",
+      "end": "2025-12-25 11:00:00+00:00",
+      "filled": 0,
+      "outlier": 14,
+      "clean_path_not_raw": 6294
+    }
+  },
+  "history_rows": 2184,
+  "history_start": "2025-09-25 12:00:00+00:00",
+  "history_end": "2025-12-25 11:00:00+00:00",
+  "source_roll_rates": {
+    "btc": 0.0005,
+    "eth": 0.0005
+  },
+  "checks": 6553,
+  "components": {
+    "btc": {
+      "original_gross": "102439.6857450042891610841742",
+      "source_cost": "11601.08331334509598318711796",
+      "source_net": "90838.60243165919317789705602",
+      "same_path_lagged_gross": "2830.945059963469477127884829",
+      "turnover": "23202166.62669019196637423590",
+      "extra6bp_taker_net": "76917.30245564507799807251453",
+      "extra12bp_taker_net": "62996.00247963096281824797296",
+      "same_path_lagged_net": "-8770.138253381626506059233131"
+    },
+    "eth": {
+      "original_gross": "322607.2568135415139154052611",
+      "source_cost": "20426.71634064192053341163066",
+      "source_net": "302180.5404728995933819936311",
+      "same_path_lagged_gross": "-14550.49837286825479378385791",
+      "turnover": "40853432.68128384106682326124",
+      "extra6bp_taker_net": "277668.4808641292887418996726",
+      "extra12bp_taker_net": "253156.4212553589841018057160",
+      "same_path_lagged_net": "-34977.21471351017532719548857"
+    }
+  },
+  "portfolio_source_net": "393019.1429045587865598906871",
+  "labelled_trade_rows": 324,
+  "actual_rebalance_segments": 324,
+  "ledger_segments_not_closed_BTC_campaigns": true,
+  "ending_asset_exposure": {
+    "btc": 5.204170427930421e-18,
+    "eth": 100000.0
+  },
+  "causal_limit": "Original current close signal/variance selects Theta_t then multiplies same close-to-close return; historical decomposition not an executable forward strategy. Lagged sensitivity holds source position path fixed, not repaired strategy.",
+  "preprocessing_limit": "Entire cleaned sample quantiles define clipping and reconstruct tradable price; Roll cost estimate uses whole test window. No claim cleaned prices are actual fills.",
+  "missing": [
+    "Authenticated source-price provenance beyond committed files",
+    "Full actual funding and exchange fee inputs",
+    "Fixed initial stop/TP1 and manual fill contract",
+    "Independent future validation and native LBank book/delay"
+  ],
+  "full_cost_twice_net": null,
+  "TP1_Wilson": null,
+  "urgent_warning_rate": null,
+  "manual_fills": null,
+  "source_selection": "Source n=12 already chosen by authors from12/24/36; no reselection or notebookexecution thisrun, no claim newOOS",
+  "original_strategy_price_backtest_executed": false,
+  "optimizer_executed": false,
+  "orders": 0,
+  "messages": 0,
+  "promotion": false,
+  "production_changed": false
+}
