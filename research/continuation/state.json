@@ -67,8 +67,8 @@
     "docs/lbank_full_management_replay_2026-10-20.md"
   ],
   "next_work": {
-    "stage": "existing_committed_BTC_ETH_original_history_BTC_only_cash_attribution",
-    "instruction": "0954 LSOBfiniteoriginalcodecontract finished. Read docs/lbank_LSOB_contract_2026-10-21.md/report. Frozen21a472c beforeactual2fixtures: futureaftercutchangescreated_idx4->5; originalexecutionmissesmandatoryentrybarshortstop (O99entry100stop105H106) thenbooks+39.886 nexttarget instead sourcefee stop -20.4590945. SyntheticNOTmarketperformance. Exactraw196ledgerinputmissingCSV andmoving730days. No fundingoriginal. ExcludeTHISrelease, no repair/grid/unchangedtest or broad LSOBinvalidityclaim. NEXT reuse existingpublicbuffettlaw repo45dda879fbfb3bc6e8dbac46bd8605f01ca28c20 (previouslyREADME/treeparked) withACTUAL committedBTCraw/cleanparquet+history+PnL CSV nowverifiedpresent. Read ETH_trading_strategies.ipynb asJSONtextonly, extract reviewedpure trend functions/data cleaning and originalBTC/ETHperassetcash/costcolumns from trend_following_history.csv. First resolve labelledtrade_pnl rows:324records entry==exit firstrows, notnecessarilyclosedcampaigns; exactBTC contributionmustbeidentifiable. Leadlag tradesETHonly excluded. If derivable,freezeONE boundedBTC-only originalhistory/price/accounting reconciliation withfees/slippage/fundinglimits; usewholeperiod notgoodsegments, no12/24/36optimization or notebookshell execution. VerifyrawSHA/date/gaps beforearithmetic; do notunpicklepyc/pkl or runlivekeys/account. No10xportfolio/ETHprofittransferoroperatingriskincrease. Ifnotidentifiable recordprecisemissingBTCledger and moveon,notrewriteoriginalstrategy. Existingpromotion/native/forward/frequencycriteriaunchanged. Additionalboundedexclusionsandactualsourceblobpaths in source_screening_20261021_0954.json. Nativeboxclosedmodel-3.4303preserved, no newperformancephase/deploy;no failure-onlyusernotice. Existinglive referencealerts/riskwarningsstay.",
+    "stage": "artifact_first_new_public_BTC_closedledger_fixed_input_discovery",
+    "instruction": "1120finiteactualoriginalcashattributioncompleted. Read docs/lbank_original_BTC_attribution_2026-10-21.md/report.10filesSHA/6600contiguousrawhrs/2184sourceOOShrs, BTCoriginalgross102439.69-cost11601.08=net90838.60, ETH302180.54 sum393019.14 matchesoriginal. CurrentTheta_t fromcurrentclose multipliedsamecompletedbarreturn islookahead; samefixedpositionpath1barlagBTCnet-8770.14 (diagnosticnotrepairedstrategy). Sourcecleanprice6398BTCbarschangedfullsampleclipping, Rollcostwholetest.324PnLrows areportfolio rebalance segments NOTclosedBTCcampaigns, endingETH100kopen. No sourceoptimizer/notebookexecution/reselection;6553+4378cashchecks nottrades; reportreadbackandSHAfa3a03e3aa882491a3cc8d5cc6e89cf58807db335088add0bf402008c04955d5 preserved. ExcludeTHISpublicversionasBTCprofitabilityproof; no unchangedarithmetic/repair/optimizer/ETHportfolio gaintransfer. NEXT boundedartifact-firstdiscovery max2distinctPRIMARYpublicBTC sources: useexactqueries andexclusions in source_screening_20261021_1120.json; resolvecommit+actualGittree first, requirefixedraw+BTCclosedledger+explicitcosts beforemoretheory/codeforensics. No genericharness/aggregateTPSLgrid/unreleaseddata/multipairheadline asalpha. Ifactualmaterial exists freezeexactcash/rules andperformbounded arithmeticalcash/data integrity samefullwindow, notgoodperiodselection. Shayawnn/metis182aac29 docread only:notshortlisted selected80kaggregate1d/4h/1-4%stops/feesunknown andBTC+0.007R notedge; no moresweep/engineaudit. Allcurrent4/RSI/sourcesdedup preserve; donotaddpapertechniquesfromunprovenleads. Nativeexistingpaper distinctnewclosed/censors/deliverygaps mayreadboundedalongsideactualresearch; priorbox06:10->08:10model-3.4303sameepisodeunchangednotnewnotice. Existinglive referencealerts/riskwarnings/source25388kept; no promotion/deploy. Userpurposeaccuracy/netprofitabilityvsbaseline notmessages/testcounts, nofailure-onlyusernotice.",
     "sources_to_screen": [
       {
         "repository": "maxs231/lsob-backtest",
@@ -396,7 +396,7 @@
       "docs/lbank_public4_2024_comparison_2026-10-21.md",
       "lbank_public_techniques.py@25388b431c9c9d38df6a434670586c65f382d604"
     ],
-    "previous_stage": "distinct_pinned_LSOB_original_input_and_default_execution_preflight",
+    "previous_stage": "existing_committed_BTC_ETH_original_history_BTC_only_cash_attribution",
     "paper_priority": "Bounded20:00-20:28:30KST original study logs60rows have no new decisions/outcomes; progress2 API acknowledgments at20:00/20:15 are0trades. Deployment23799b11/source5c977a7 remainsSUCCESS/native360/116 ready, hourlystudyunready, RSI250immature. Do not send unchanged readiness/negative interim notifications, inflate sample counts, restart for docs or infer all-time ledger/delivery coverage from bounded logs. Observe actual distinct future paper episodes alongside executable numerical research.",
     "queued_public4_task": {
       "stage": "existing_public4_offline_episode_replay_protocol_then_bounded_execution",
@@ -2178,6 +2178,33 @@
     "notebook_blob": "c435ce522ecfbcfe1384acd00856d9301b3d5adf",
     "BTC_profitability_known": false,
     "closed_campaign_count": null,
-    "leadlag_ETH_excluded": true
+    "leadlag_ETH_excluded": true,
+    "status": "completed_cash_decomposition_not_adopted_original_samebar_lookahead_clean_price_contract"
+  },
+  "original_BTC_cash_attribution": {
+    "source": "45dda879fbfb3bc6e8dbac46bd8605f01ca28c20",
+    "code": "research/continuation/BTC_component_20261021_1120.py",
+    "frozen_commit": "0792ee9d22a96de8a8c35060b1093c9c51e8f81f",
+    "document": "docs/lbank_original_BTC_attribution_2026-10-21.md",
+    "report": "research/continuation/results/BTC_component_20261021_1120/report.json",
+    "verification": "research/continuation/results/BTC_component_20261021_1120/verification.json",
+    "report_SHA256": "fa3a03e3aa882491a3cc8d5cc6e89cf58807db335088add0bf402008c04955d5",
+    "verified_blob": "51c4026a03b1700d338418d93b44ac1c9f8e416c",
+    "source_files_hashed": 10,
+    "history_rows": 2184,
+    "rebalance_segments_not_closed_trades": 324,
+    "BTC_recorded_net": 90838.6024316592,
+    "BTC_same_position_path_1bar_lag_net": -8770.138253381627,
+    "BTC_clean_path_changed_bars": 6398,
+    "raw_rows": 6600,
+    "checks": 6553,
+    "independent_cash_checks": 4378,
+    "notebook_executed": false,
+    "optimizer_executed": false,
+    "closed_BTC_campaigns_known": false,
+    "causally_valid_performance": false,
+    "full_double_cost": null,
+    "promotion": false,
+    "production_changed": false
   }
 }
