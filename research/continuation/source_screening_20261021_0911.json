@@ -1,0 +1,27 @@
+{
+  "previous_RRL_fulltext_obtained": true,
+  "next_original_source": {
+    "repository": "maxs231/lsob-backtest",
+    "commit": "710eef5926f9f37f43581b8609c56c8e08f49403",
+    "readme_blob": "76956b49095edb552847a1dfbd2519579554c7ab",
+    "url": "https://github.com/maxs231/lsob-backtest/tree/710eef5926f9f37f43581b8609c56c8e08f49403",
+    "read_scope": "Complete README only; not code/data/reproducedperformance",
+    "status": "new_original_rule_code_lead_not_eligible",
+    "author_claims": {
+      "trades": 196,
+      "period": "2024Aug-2026Aug",
+      "PF": 1.35,
+      "net_R": 0.269,
+      "source": "Binance spot proxy Hyperliquid; no actual LBank evidence"
+    },
+    "constraints": "README maker1.5bp/taker4.5bp,stop5bp;2%risk/10x notauthorizedfortransfer;meanfrequency196/730<1day;rawdata/tradesCSVgitignored;192grid andOOSseen in narrative, notindependentproof; sourcefixed2R notnativeTP1;no funding proven",
+    "next": "Read pinned actual backtest_lsob.py and fetch_data_binance.py/tree. Locate exact originaldatawindow/CSV/ledger if released or reproducible original fetching contract; bound one original default replication + invariantcostrepricing only if actualrawpriceandtimestampsobtained. No192grid/MCretuning, no nativepaperaddition/riskincrease/makerfillpromise. Ifmissingexactoriginalinput freeze obstacle and move on; repoheadlinealone notalpha."
+  },
+  "excluded_search_hits_not_read": [
+    "SirCharan/Hype",
+    "jhadchiti/crypto-trading-system",
+    "Leonard-Don/rayn-strategy",
+    "poliroika/cointegration-pair-trading-backtesting-framework"
+  ],
+  "no_performance_claim": true
+}
