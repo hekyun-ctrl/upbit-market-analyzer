@@ -1,0 +1,19 @@
+{
+  "spec_version": "ZB-1.0",
+  "baseline_commit": "25388b431c9c9d38df6a434670586c65f382d604",
+  "implementation_status": "P1_INITIAL_IMPLEMENTATION_NOT_ENGINEERING_READY",
+  "P0": "BOUND_INPUT_INVENTORY_COMPLETE_EXTERNAL_METADATA_UNVERIFIED",
+  "P2": "EVIDENCE_INSUFFICIENT",
+  "sealed_trades": 0,
+  "historical_replay_completed": false,
+  "new_vs_old_net": null,
+  "new_vs_old_drawdown": null,
+  "availability": null,
+  "days_7percent": null,
+  "verified_net": null,
+  "cost_double": null,
+  "stress_120s_5bp": null,
+  "outbound": false,
+  "orders": false,
+  "next": "See HANDOFF remaining implementation steps; no autonomous research schedule resumed."
+}
