@@ -9,7 +9,7 @@
   "production_branch": "feature/lbank-futures-monitor",
   "baseline_research_commit": "709bc7e295c44afad117f5b4f53aecf699e02561",
   "last_observed_production_commit": "25388b431c9c9d38df6a434670586c65f382d604",
-  "last_observed_deployment": "23799b11-6f14-4e93-aacf-78ce691f9393",
+  "last_observed_deployment": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
   "eligible_candidates": [],
   "forward_candidate": null,
   "completed_experiments": [
@@ -67,8 +67,8 @@
     "docs/lbank_full_management_replay_2026-10-20.md"
   ],
   "next_work": {
-    "stage": "native_paper_new_closed_episode_cost_and_adverse_reconciliation",
-    "instruction": "1318 finite actual public-ledger initial-entry diagnostic complete: read docs/lbank_initial_entry_ledger_2026-10-21.md/report.563initial-open-containingorders vs238pure (325missingbylabel),278positive,median-.3795bp,mean3.4381bp;10/20bp declaredsensitivity means-6.5619/-16.5619bp notfullfundingcost.7orders span>5min, source useslastfillminute+5close vswholeorderVWAP notfirstfill5min. No transferable exactrules; end THISdiscretionarysource no reaggregation/policyreverseengineering. NEXT finite nativepaper observation: latestproduction/deployment first, bound logs after2026-10-20T23:10:45Z (knownbox08:10KSTclosure) throughcurrentUTC; group distinct4techniques/RSI candidate/open/close/ack/error byeventID; don'tcountprogressor3managementrows astrades. Fornewclosed connectoriginalentry/stopTP1/book/times and calculatemodelcost/doublecost/first5minadverse withmissingcensor/null; nofuturefill invention. Priorbox06:10->08:10 -3.4303sameepisode NOTnew. Preservewindow/loglimit/gaps and exactrawhash whereavailable. Ifnewclosednone checkpointbriefly, then max2newcomplete PRIMARY rule+raw+costedBTCledger sources; no repetitivepublicledger tables/sourceforensics/deduptrials. Existingreferencealarms/warnings kept; no newforwardcandidate/entryrelaxation. No deployment fordocs, no continuouscollectorclaim without evidence.",
+    "stage": "distinct_complete_source_fixed_BTC_ledger_reproduction",
+    "instruction": "1348 finite native reconciliation saved: docs/lbank_native_episode_reconciliation_2026-10-21_1348.md/raw/report.23progress ACK=0trades.04:30-04:49UTC40studyrows show1BBshortcandidate public_techniques_v1:double_bb_5m:-1:1792557000 with9await1m/4context,0opens/outcomes,unverifiedbook/hourlynotready. No net/TP1/adverse evidence; severityerror withINFO notfailure. Checkcandidate onlynewtimeafter04:48:45UTC ifuseful, don't repeatprogressorold08:10boxclosure. NEXT actual research: boundedmax2 distinctPRIMARY complete BTC source discovery (dedup stateallprevious) exactcommit/tree first then explicit rule+fixedraw+closedBTCledger+fee/slip/funding; ifmaterial exists freezeandexecuteonefulldefaultwindow costreconciliation. No morePaulWei238/563/687aggregation/causal makerclaim, no LSOB/RRL/codeaudit loops, no headline/multiassetgain asBTCproof. Source missing evidence finiteexclude notinvent. Keep knownseen2022-2026notOOS, no gate/riskloosening. Existingreferencealarms/warnings/source25388deploy4bbSUCCESSkept; no promotion. Native candidate alone no performanceclaim/continuouscollection guarantee.",
     "sources_to_screen": [
       {
         "repository": "maxs231/lsob-backtest",
@@ -2238,5 +2238,18 @@
     "source_analysis_ended": true,
     "promotion": false,
     "production_changed": false
+  },
+  "native_episode_1348": {
+    "document": "docs/lbank_native_episode_reconciliation_2026-10-21_1348.md",
+    "report": "research/continuation/results/native_episode_20261021_1348/report.json",
+    "raw": "research/continuation/results/native_episode_20261021_1348/raw.json",
+    "verified_blob": "908361c47e3f5e23f5dedf6ecbc3cd401d1886d8",
+    "progress_ack": 23,
+    "distinct_candidates": 1,
+    "candidate": "public_techniques_v1:double_bb_5m:-1:1792557000",
+    "new_open_or_close_observed": 0,
+    "hourly_ready": false,
+    "full_coverage_proven": false,
+    "promotion": false
   }
 }
