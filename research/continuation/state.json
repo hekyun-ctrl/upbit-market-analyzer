@@ -67,8 +67,8 @@
     "docs/lbank_full_management_replay_2026-10-20.md"
   ],
   "next_work": {
-    "stage": "distinct_complete_source_fixed_BTC_ledger_reproduction",
-    "instruction": "1348 finite native reconciliation saved: docs/lbank_native_episode_reconciliation_2026-10-21_1348.md/raw/report.23progress ACK=0trades.04:30-04:49UTC40studyrows show1BBshortcandidate public_techniques_v1:double_bb_5m:-1:1792557000 with9await1m/4context,0opens/outcomes,unverifiedbook/hourlynotready. No net/TP1/adverse evidence; severityerror withINFO notfailure. Checkcandidate onlynewtimeafter04:48:45UTC ifuseful, don't repeatprogressorold08:10boxclosure. NEXT actual research: boundedmax2 distinctPRIMARY complete BTC source discovery (dedup stateallprevious) exactcommit/tree first then explicit rule+fixedraw+closedBTCledger+fee/slip/funding; ifmaterial exists freezeandexecuteonefulldefaultwindow costreconciliation. No morePaulWei238/563/687aggregation/causal makerclaim, no LSOB/RRL/codeaudit loops, no headline/multiassetgain asBTCproof. Source missing evidence finiteexclude notinvent. Keep knownseen2022-2026notOOS, no gate/riskloosening. Existingreferencealarms/warnings/source25388deploy4bbSUCCESSkept; no promotion. Native candidate alone no performanceclaim/continuouscollection guarantee.",
+    "stage": "new_native_event_or_distinct_complete_source",
+    "instruction": "1447 actual Cipher pinnedoriginalledger cost/data arithmetic complete: docs/lbank_cipher_BTC_cost_2026-10-21.md/report. BTC38net-109.589478/PF.6393,IS23-92.1143/OOS15-17.4751 originalportfolioBTCcontribution notstandalone.6SHAs/8788BTC15m/43singlemissingbars.100cashchecks, slipalreadyinprices; extrafees/slip/funding samepathBTC-334.989599 NOTfull2xrerun. Noengine/optimizer/LLM/orders, no positive adoption. Exclude thisversion no tune/salvage/rerun/codeforensics. XGBoost-BTCa178cd130df384432eb406a650169e567086807f fullREADME10tree nofixedprice/ledger/model, no train/adopt. NEXT newnativeBB public_techniques_v1:double_bb_5m:-1:1792557000 after04:48:45UTC onlyboundedevents; newopen/close connectoriginalplan/prices/cost/censor;progressnottrades. Ifnone don'tstopatstatus: distinctPRIMARYmax2 (dedupthese+stateprevious), actualcommit/tree locateexactrule+fixedrawBTC+costedclosedledger, freezeonecandidatebeforeboundeddefaultfulldatareplication. No genericframework-only/hypotheticalprofit/multiassetheadline/financialriskexpansion. Existingreferencealarms and warnings kept, no productionchange/promotion/continuouscollectionclaim.",
     "sources_to_screen": [
       {
         "repository": "maxs231/lsob-backtest",
@@ -2250,6 +2250,19 @@
     "new_open_or_close_observed": 0,
     "hourly_ready": false,
     "full_coverage_proven": false,
+    "promotion": false
+  },
+  "cipher_BTC_1447": {
+    "document": "docs/lbank_cipher_BTC_cost_2026-10-21.md",
+    "source": "M-ax-i-codes/cipher-edge",
+    "pin": "e0b424cf4f734131d4d532513981396ea94df573",
+    "report": "research/continuation/results/cipher_BTC_20261021_1447/report.json",
+    "verified_blob": "ba4ecf36e2170e2eac0ab88caf39852f128e0343",
+    "BTC_trades": 38,
+    "BTC_net_model": -109.589478,
+    "PF": 0.6392796432499165,
+    "candle_gaps": 43,
+    "full_engine_rerun": false,
     "promotion": false
   }
 }
