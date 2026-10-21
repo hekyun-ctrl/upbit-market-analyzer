@@ -1,0 +1,68 @@
+{
+  "version": "LSOB_710eef59_bounded_execution_contract_v1",
+  "source_repo": "maxs231/lsob-backtest",
+  "commit": "710eef5926f9f37f43581b8609c56c8e08f49403",
+  "source_SHA256": "a293ced312209e251ac761663b665c845a6f12909795d3df486875ec9cd43507",
+  "future_suffix": {
+    "prefix_cut_after_index": 4,
+    "unchanged_prefix": true,
+    "original_created_idx": 4,
+    "mutated_future_created_idx": 5,
+    "finding": "build_short_setup scans future same-direction candles beyond evaluation index; main requires created_idx==current index, so unseen future changes past setup availability."
+  },
+  "entry_bar_stop": {
+    "setup_discovery_injected_only": true,
+    "original_execution_function": true,
+    "entry_bar": 8,
+    "entry_bar_OHLC": {
+      "Open": 99,
+      "High": 106.0,
+      "Low": 99.0,
+      "Close": 101
+    },
+    "source_trade": {
+      "side": "short",
+      "entry_idx": 8,
+      "entry_time": "2025-01-01 08:00:00+00:00",
+      "entry": 100,
+      "stop": 105,
+      "target": 90,
+      "exit_idx": 9,
+      "exit_time": "2025-01-01 09:00:00+00:00",
+      "exit_price": 90,
+      "outcome": "target",
+      "qty": 4.0,
+      "pnl": 39.886,
+      "r_multiple": 1.9943000000000002,
+      "fees": 0.11399999999999999,
+      "notional": 400.0,
+      "margin": 40.0,
+      "size_capped": false,
+      "liq_price": 108.74999999999999,
+      "sweep_time": "2025-01-01 04:00:00+00:00",
+      "ob_high": 108,
+      "ob_low": 100
+    },
+    "source_final_equity": 1039.886,
+    "original_booked_positive_pnl": 39.886,
+    "source_cost_model_stop_pnl_if_entry_bar_stop_applied": "-20.4590945000",
+    "finding": "Open below short entry; rally crosses entry then stop inside same candle. Original engine fills but first checks exit next candle, subsequently books target."
+  },
+  "original_raw_prices_obtained": false,
+  "original_196trade_ledger_obtained": false,
+  "original_price_backtest_performed": false,
+  "README_return_verified": false,
+  "raw_input_limit": "Git tree noCSV; fetch default start/end=time.time moving730days and includes current partial candle. Exact originaldatawindow/hash not committed.",
+  "additional_contract_limits": [
+    "No funding in run_backtest",
+    "Body-close/new-sweep invalidation inspected before resting limit touch inside samebar, unresolved event ordering",
+    "Open end trade not returned in closed ledger; equity contains mark-to-market without total exitcost",
+    "Reported total_setups sums diagnostic cap/liquidation counts too",
+    "Original frequency196/730 <1day and risk2percent not operating authorization"
+  ],
+  "orders": 0,
+  "messages": 0,
+  "production_changed": false,
+  "promotion": false,
+  "decision": "Do not adopt current public release or patch/optimize it to salvage advertised gains; positive authorclaims retained as unverified, not proof all liquidity-sweep methods fail."
+}
