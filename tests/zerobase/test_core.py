@@ -54,7 +54,7 @@ class Contract(unittest.TestCase):
   self.assertEqual(p.state,'PAPER_OPEN');self.assertTrue(p.warned)
   p.five(bar(1200,300,o='98',h='99',l='96',c='96.9'),D(2),'RANGE',1500);self.assertEqual(p.state,'PAPER_CLOSED')
  def test_partial_only_and_new_stop_not_retroactive(self):
-  p=position();p.minute(bar(660,h='107',l='99',c='106'),720);self.assertEqual(p.remaining,p.plan.quantity*D('.75'));self.assertEqual(p.active_stop,p.plan.stop)
+  p=position();p.minute(bar(660,h='107',l='99',c='106'),720);self.assertEqual(p.remaining,p.plan.quantity-rounding(p.plan.quantity*D('.25'),p.plan.costs.step));self.assertEqual(p.active_stop,p.plan.stop)
   p.five(bar(900,300,o='106',h='109',l='105',c='108'),D(2),'TREND_UP',1200)
   self.assertEqual(p.stop_since,1200);self.assertEqual(p.state,'PAPER_PARTIAL')
   p.minute(bar(1140,o='108',h='109',l='100',c='108'),1201);self.assertEqual(p.state,'PAPER_PARTIAL');self.assertIn('AMBIGUOUS_INTRABAR',p.health)
