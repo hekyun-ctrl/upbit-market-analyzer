@@ -67,8 +67,8 @@
     "docs/lbank_full_management_replay_2026-10-20.md"
   ],
   "next_work": {
-    "stage": "distinct_pinned_LSOB_original_input_and_default_execution_preflight",
-    "instruction": "0911 RRL finiteprimary stepcompleted. Read docs/lbank_RRL_primary_contract_2026-10-21.md and result. Actualpublished10pagePDFSHAe422598ceaa3830bd2f443e1bda32e7c2c57e9409dd8b88c0550ec3da062e944, tables38597/38598visual. Authornet3.498/carry.713/execution-.542 reconciled;carry20.38%ofnet not71%, execution-onlydouble2.956 notfullcoststress;seed250CI notfuturebound. No originalfeatures/rawSHA/code/closedledger/manualstopTP1/fillcontract;no training/backtest or adoption. Do notrepeatRRLsourceaudit/tablecalc or unchanged4/RSIwindows. NEXT distinctsource from source_screening_20261021_0911.json: maxs231/lsob-backtest pinned710eef5926f9f37f43581b8609c56c8e08f49403, fullREADMEreadonly. Read actualtree/backtest_lsob.py/fetch_data_binance.py once tolocate exactoriginalfixedinputtimewindow/rawdata/ledger availability and executable originaldefault. READMErawCSVgitignored, maker1.5bp/taker4.5bp/stop5bp, spotproxy, risk2%, leverage10,196trades730days,192gridselection/seenOOS, fullfrequencyalready<1/day. These are authorclaims notalpha; no operationalriskincrease/no192grid/MC/training/optimizing/newpapertechnique. Onlycontinuebounded originaldefaultreplicationandfixedsameledgerfullcostrepricing if exactpublicraw+timestamps/sourceexecution actuallypermit; otherwisefiniteprecisemissinginputrecordandmoveotherprimaryoriginalBTC source, notendlessforensics. Anypositive component cannotfullpromoteunderfrequency/native/forwardcriteria. Keep allcosts/selection/gap/causality/manualfill limits explicit. Latestproduction25388deploy4bbda6c7SUCCESS unchanged. Nativebox06:10closed08:10time_exitmodel-3.4303 plusAPIack preserved, donotcount2policyrowsas2trades;laternewnativeoutcomes/deliverygapsoverlays onlyifnew. DetailedinterimsGitHubonly; nofailure-only usernotice.",
+    "stage": "existing_committed_BTC_ETH_original_history_BTC_only_cash_attribution",
+    "instruction": "0954 LSOBfiniteoriginalcodecontract finished. Read docs/lbank_LSOB_contract_2026-10-21.md/report. Frozen21a472c beforeactual2fixtures: futureaftercutchangescreated_idx4->5; originalexecutionmissesmandatoryentrybarshortstop (O99entry100stop105H106) thenbooks+39.886 nexttarget instead sourcefee stop -20.4590945. SyntheticNOTmarketperformance. Exactraw196ledgerinputmissingCSV andmoving730days. No fundingoriginal. ExcludeTHISrelease, no repair/grid/unchangedtest or broad LSOBinvalidityclaim. NEXT reuse existingpublicbuffettlaw repo45dda879fbfb3bc6e8dbac46bd8605f01ca28c20 (previouslyREADME/treeparked) withACTUAL committedBTCraw/cleanparquet+history+PnL CSV nowverifiedpresent. Read ETH_trading_strategies.ipynb asJSONtextonly, extract reviewedpure trend functions/data cleaning and originalBTC/ETHperassetcash/costcolumns from trend_following_history.csv. First resolve labelledtrade_pnl rows:324records entry==exit firstrows, notnecessarilyclosedcampaigns; exactBTC contributionmustbeidentifiable. Leadlag tradesETHonly excluded. If derivable,freezeONE boundedBTC-only originalhistory/price/accounting reconciliation withfees/slippage/fundinglimits; usewholeperiod notgoodsegments, no12/24/36optimization or notebookshell execution. VerifyrawSHA/date/gaps beforearithmetic; do notunpicklepyc/pkl or runlivekeys/account. No10xportfolio/ETHprofittransferoroperatingriskincrease. Ifnotidentifiable recordprecisemissingBTCledger and moveon,notrewriteoriginalstrategy. Existingpromotion/native/forward/frequencycriteriaunchanged. Additionalboundedexclusionsandactualsourceblobpaths in source_screening_20261021_0954.json. Nativeboxclosedmodel-3.4303preserved, no newperformancephase/deploy;no failure-onlyusernotice. Existinglive referencealerts/riskwarningsstay.",
     "sources_to_screen": [
       {
         "repository": "maxs231/lsob-backtest",
@@ -76,7 +76,7 @@
         "readme_blob": "76956b49095edb552847a1dfbd2519579554c7ab",
         "url": "https://github.com/maxs231/lsob-backtest/tree/710eef5926f9f37f43581b8609c56c8e08f49403",
         "read_scope": "Complete README only; not code/data/reproducedperformance",
-        "status": "new_original_rule_code_lead_not_eligible",
+        "status": "completed_excluded_currentrelease_causality_execution_missingfixedinput",
         "author_claims": {
           "trades": 196,
           "period": "2024Aug-2026Aug",
@@ -85,7 +85,9 @@
           "source": "Binance spot proxy Hyperliquid; no actual LBank evidence"
         },
         "constraints": "README maker1.5bp/taker4.5bp,stop5bp;2%risk/10x notauthorizedfortransfer;meanfrequency196/730<1day;rawdata/tradesCSVgitignored;192grid andOOSseen in narrative, notindependentproof; sourcefixed2R notnativeTP1;no funding proven",
-        "next": "Read pinned actual backtest_lsob.py and fetch_data_binance.py/tree. Locate exact originaldatawindow/CSV/ledger if released or reproducible original fetching contract; bound one original default replication + invariantcostrepricing only if actualrawpriceandtimestampsobtained. No192grid/MCretuning, no nativepaperaddition/riskincrease/makerfillpromise. Ifmissingexactoriginalinput freeze obstacle and move on; repoheadlinealone notalpha."
+        "next": "Read pinned actual backtest_lsob.py and fetch_data_binance.py/tree. Locate exact originaldatawindow/CSV/ledger if released or reproducible original fetching contract; bound one original default replication + invariantcostrepricing only if actualrawpriceandtimestampsobtained. No192grid/MCretuning, no nativepaperaddition/riskincrease/makerfillpromise. Ifmissingexactoriginalinput freeze obstacle and move on; repoheadlinealone notalpha.",
+        "documentation": "docs/lbank_LSOB_contract_2026-10-21.md",
+        "instruction": "Actualsourceprefixandentrybarstopfailures reproduced, no unchangedrepeat/repair/grid. No original196tradeledger/priceSHA, no profit adoption."
       },
       {
         "title": "The Recurrent Reinforcement Learning Crypto Agent",
@@ -394,7 +396,7 @@
       "docs/lbank_public4_2024_comparison_2026-10-21.md",
       "lbank_public_techniques.py@25388b431c9c9d38df6a434670586c65f382d604"
     ],
-    "previous_stage": "targeted_original_RRL_primary_fulltext_data_execution_contract",
+    "previous_stage": "distinct_pinned_LSOB_original_input_and_default_execution_preflight",
     "paper_priority": "Bounded20:00-20:28:30KST original study logs60rows have no new decisions/outcomes; progress2 API acknowledgments at20:00/20:15 are0trades. Deployment23799b11/source5c977a7 remainsSUCCESS/native360/116 ready, hourlystudyunready, RSI250immature. Do not send unchanged readiness/negative interim notifications, inflate sample counts, restart for docs or infer all-time ledger/delivery coverage from bounded logs. Observe actual distinct future paper episodes alongside executable numerical research.",
     "queued_public4_task": {
       "stage": "existing_public4_offline_episode_replay_protocol_then_bounded_execution",
@@ -2143,5 +2145,39 @@
     "original_positive_claim_preserved": true,
     "profitability_adopted": false,
     "production_changed": false
+  },
+  "LSOB_source_contract": {
+    "document": "docs/lbank_LSOB_contract_2026-10-21.md",
+    "code": "research/continuation/LSOB_contract_20261021_0954.py",
+    "source_commit": "710eef5926f9f37f43581b8609c56c8e08f49403",
+    "report": "research/continuation/results/LSOB_source_20261021_0954/report.json",
+    "remote_verified_blob": "c3b6ebf881cf651e93472ea10479bfdb88ab6498",
+    "synthetic_prefix_future_changed_creation": [
+      4,
+      5
+    ],
+    "entry_bar_stop_missed": true,
+    "source_booked_synthetic_pnl": 39.886,
+    "source_cost_stop_comparison": -20.4590945,
+    "original_price_backtest": false,
+    "original_data_SHA": null,
+    "original_ledger_obtained": false,
+    "decision": "exclude current publicversion profitability evidence, no repair/optimize tosalvage",
+    "promotion": false,
+    "production_changed": false
+  },
+  "existing_original_BTC_attribution": {
+    "repository": "buffettlaw/BTC-ETH-Trend-following-and-Lead-lag-Trading-Strategies",
+    "commit": "45dda879fbfb3bc6e8dbac46bd8605f01ca28c20",
+    "screening": "research/continuation/source_screening_20261021_0954.json",
+    "visibility_public_verified": true,
+    "price_raw_blob": "452265aad409fb648da4c576bb8d6fb9b5fa4184",
+    "price_clean_blob": "ed8d050a456de77f46573b6d7502faff5592ab21",
+    "history_blob": "15535b2d6dca8e9e9472b5a7b59da8442bd23efc",
+    "trade_pnl_blob": "9bcd84588d49235bb71219761d03835701d14fc2",
+    "notebook_blob": "c435ce522ecfbcfe1384acd00856d9301b3d5adf",
+    "BTC_profitability_known": false,
+    "closed_campaign_count": null,
+    "leadlag_ETH_excluded": true
   }
 }
