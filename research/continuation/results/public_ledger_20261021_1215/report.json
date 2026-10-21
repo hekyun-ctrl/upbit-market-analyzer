@@ -1,0 +1,169 @@
+{
+  "version": "public_discretionary_ledger_descriptive_v1",
+  "pin": "27d2d50fc0def523d417cc84c42cc16ee3432d86",
+  "source_ledger_latest_pin": "9ff0d562cffd943d79916c9ce05adae627c8d9a2",
+  "same_underlying_trader_not_independent_sources": true,
+  "hashes": {
+    "position_episodes.csv": "07c2aac4947fae9d3e6993ab41f092a8ec7063adea8e515814df21a9b738c59c",
+    "post_fill_summary.csv": "ecca31d55fdabb51a5ba97138dfffee7b3fe53b3816890782eb49fa6bb6ed65f",
+    "tradetrace.py": "4a63ca83693908c4f10be13c0c4aa3b032d3565bf77ab51586e55adb6978e938"
+  },
+  "episodes": 688,
+  "status": {
+    "closed": 562,
+    "reversed": 125,
+    "open": 1
+  },
+  "closed_or_reversed": 687,
+  "calculated_gross_XBT": "56.60510052326405335090926726",
+  "signed_execution_fees_XBT": "15.01771288000000000000000001",
+  "calculated_after_execution_fee_XBT": "41.58738764326405335090926727",
+  "positive_episode_count_after_fee": 410,
+  "negative_episode_count_after_fee": 277,
+  "descriptive_PF_excluding_funding": "1.346074091079424826911515410",
+  "median_duration_hours": 11.78268,
+  "all_zero_ledger_pnl_field": false,
+  "summary_integer_checks": [
+    {
+      "dimension": "liquidity",
+      "segment": "maker",
+      "scope": "all",
+      "n": 10162,
+      "positive_5m_count": 5857
+    },
+    {
+      "dimension": "liquidity",
+      "segment": "mixed",
+      "scope": "all",
+      "n": 752,
+      "positive_5m_count": 347
+    },
+    {
+      "dimension": "liquidity",
+      "segment": "taker",
+      "scope": "all",
+      "n": 9391,
+      "positive_5m_count": 4686
+    },
+    {
+      "dimension": "action",
+      "segment": "add",
+      "scope": "all",
+      "n": 10897,
+      "positive_5m_count": 5990
+    },
+    {
+      "dimension": "action",
+      "segment": "close",
+      "scope": "all",
+      "n": 85,
+      "positive_5m_count": 40
+    },
+    {
+      "dimension": "action",
+      "segment": "mixed",
+      "scope": "all",
+      "n": 870,
+      "positive_5m_count": 434
+    },
+    {
+      "dimension": "action",
+      "segment": "open",
+      "scope": "all",
+      "n": 238,
+      "positive_5m_count": 127
+    },
+    {
+      "dimension": "action",
+      "segment": "reduce",
+      "scope": "all",
+      "n": 8164,
+      "positive_5m_count": 4272
+    },
+    {
+      "dimension": "action",
+      "segment": "reverse",
+      "scope": "all",
+      "n": 51,
+      "positive_5m_count": 27
+    },
+    {
+      "dimension": "liquidity",
+      "segment": "maker",
+      "scope": "all_fills_in_range",
+      "n": 7824,
+      "positive_5m_count": 4389
+    },
+    {
+      "dimension": "liquidity",
+      "segment": "mixed",
+      "scope": "all_fills_in_range",
+      "n": 338,
+      "positive_5m_count": 170
+    },
+    {
+      "dimension": "liquidity",
+      "segment": "taker",
+      "scope": "all_fills_in_range",
+      "n": 5675,
+      "positive_5m_count": 3002
+    },
+    {
+      "dimension": "action",
+      "segment": "add",
+      "scope": "all_fills_in_range",
+      "n": 7699,
+      "positive_5m_count": 4280
+    },
+    {
+      "dimension": "action",
+      "segment": "close",
+      "scope": "all_fills_in_range",
+      "n": 51,
+      "positive_5m_count": 25
+    },
+    {
+      "dimension": "action",
+      "segment": "mixed",
+      "scope": "all_fills_in_range",
+      "n": 507,
+      "positive_5m_count": 256
+    },
+    {
+      "dimension": "action",
+      "segment": "open",
+      "scope": "all_fills_in_range",
+      "n": 154,
+      "positive_5m_count": 81
+    },
+    {
+      "dimension": "action",
+      "segment": "reduce",
+      "scope": "all_fills_in_range",
+      "n": 5388,
+      "positive_5m_count": 2900
+    },
+    {
+      "dimension": "action",
+      "segment": "reverse",
+      "scope": "all_fills_in_range",
+      "n": 38,
+      "positive_5m_count": 19
+    }
+  ],
+  "full_cost_net": null,
+  "full_double_cost": null,
+  "TP1_Wilson": null,
+  "actual_5m_emergency": null,
+  "native_LBank_validation": false,
+  "rules_replicable": false,
+  "adopt": false,
+  "limits": [
+    "Derived episode table; raw execution reconciliation not performed in this run.",
+    "Calculated inverse XBT PnL less signed execution fee only; funding not allocated. Not fiat/USDT PnL.",
+    "Closed/reversed episodes include dynamic additions/reductions; not fixed alert trades.",
+    "Postfill side-return includes reductions/closes and order completion hindsight; not independent initial entries or TP1/emergency outcomes.",
+    "Same trader selected retrospectively; no causal maker alpha or transferable policy.",
+    "Latest source ledger and analysis submodule snapshots differ; do not join without exact submodule pin."
+  ]
+}
