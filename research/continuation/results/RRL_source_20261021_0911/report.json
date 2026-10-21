@@ -1,0 +1,53 @@
+{
+  "version": "RRL_published_table_arithmetic_v1",
+  "source_url": "https://discovery.ucl.ac.uk/id/eprint/10147117/1/The_Recurrent_Reinforcement_Learning_Crypto_Agent.pdf",
+  "pdf_SHA256": "e422598ceaa3830bd2f443e1bda32e7c2c57e9409dd8b88c0550ec3da062e944",
+  "bytes": 7398517,
+  "publication": "IEEEAccess10:38590-38599, published2022-04-11/current2022-04-15",
+  "table1_page": 38597,
+  "table2_page": 38598,
+  "visually_verified": true,
+  "original_price_backtest_performed": false,
+  "original_trader_ledger_obtained": false,
+  "table1": {
+    "daily_observations": 1684,
+    "position_mean": 0.405,
+    "execution_sum": "-0.542",
+    "carry_sum": "0.713",
+    "pnl_sum": "3.498",
+    "IR": "1.46",
+    "minimum_daily_pnl": "-.155"
+  },
+  "arithmetic": {
+    "carry_share_of_net": "0.2038307604345340194396798170",
+    "carry_percentage_points": "71.3",
+    "inferred_price_component": "3.327",
+    "net_excluding_carry": "2.785",
+    "conditional_same_path_execution_only_double": "2.956"
+  },
+  "interpretation": "Body/table imply carry+71.3percentagepoints, about20.38%of+349.8% net, unlike abstract/conclusion wording71%ofreturn. Preserve discrepancy; no claim which wording author intended.",
+  "double_total_cost_result": null,
+  "double_cost_limit": "Negative funding settlements not released, cannot double funding charges without doubling receipts. Same-path execution-only stress is NOT refitted strategy or full-cost validated return.",
+  "seed_table": {
+    "trials": 250,
+    "mean_return": "2.977",
+    "std": ".740",
+    "se_mean": "0.047",
+    "lower_mean": "2.886",
+    "upper_mean": "3.069",
+    "minimum_return": ".654",
+    "maximum_return": "5.021",
+    "mean_IR": "1.160",
+    "IR_lower_mean": "1.123",
+    "IR_upper_mean": "1.197"
+  },
+  "uncertainty": "Seed initialisation CI on same market history is not a new-market/serial-correlation adjusted future expectancy bound.",
+  "missing": [
+    "Exact complete orderbook/trade/funding feature list and preprocessing",
+    "Fixed original raw quote/trade/funding inputs and SHA",
+    "Original public code/weight seed and closed ledger link",
+    "Manual fixed initialstop/TP1/size/fill-delay contract",
+    "Contract payoff/margin translation to linear LBank USDT"
+  ],
+  "no_promote": true
+}
