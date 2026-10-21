@@ -1,0 +1,50 @@
+{
+  "version": "bounded_native_episode_reconciliation_v1",
+  "deployment": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
+  "source": "25388b431c9c9d38df6a434670586c65f382d604",
+  "raw_SHA256": "d604be35592e04ee90d7387d4244d32fae6d2b6896d107abb34221985412e05c",
+  "notification_window_UTC": [
+    "2026-10-20T23:10:46Z",
+    "2026-10-21T04:49:00Z"
+  ],
+  "notification_rows": 23,
+  "notification_kind_counts": {
+    "progress": 23
+  },
+  "study_window_UTC": [
+    "2026-10-21T04:30:00Z",
+    "2026-10-21T04:49:00Z"
+  ],
+  "study_rows": 40,
+  "distinct_decision_candidates": 1,
+  "events": {
+    "public_techniques_v1:double_bb_5m:-1:1792557000": {
+      "first": "2026-10-21T04:36:02.168367600Z",
+      "last": "2026-10-21T04:48:45.754814685Z",
+      "reasons": {
+        "await_closed_minute_reaction": 9,
+        "context": 4
+      },
+      "outcomes": []
+    }
+  },
+  "decision_occurrences_not_trades": {
+    "await_closed_minute_reaction": 9,
+    "context": 4
+  },
+  "new_open_or_closed_observed": 0,
+  "all_period_coverage_proven": false,
+  "native_orderbook_verified": false,
+  "net_expectancy": null,
+  "double_cost": null,
+  "TP1_first": null,
+  "five_minute_adverse": null,
+  "promotion": false,
+  "limits": [
+    "Literal filters and bounded windows only; missing logs are not proof of no activity.",
+    "23progress API acknowledgments are zero trades, device receipt unknown.",
+    "severity error wraps INFO logger on stderr, not evidence of23application failures.",
+    "No entry/exit prices for new BB decision candidate: cannot synthesize returns from later prices.",
+    "hourly_ready=false in inspected public study rows; ready=true only other readiness."
+  ]
+}
