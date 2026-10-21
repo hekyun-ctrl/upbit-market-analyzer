@@ -67,8 +67,8 @@
     "docs/lbank_full_management_replay_2026-10-20.md"
   ],
   "next_work": {
-    "stage": "public_real_ledger_initial_entry_only_cost_and_path_diagnostic",
-    "instruction": "Read docs/lbank_public_discretionary_ledger_2026-10-21.md and report. Same trader two repos NOT independent evidence. 687closed/reversed+1open censored. Derived after executionfee41.5874XBT/PF1.346 EXCLUDES funding/dynamic inventory not fixed alerts. NEXT bounded actual initial-entry diagnostic: pinned TradeTrace27d2d50 reports/tables/order_fill_summary.csv and position_actions.csv, fullSHA; action=open fullset238 reported; distinguish adds/reductions/lastfill hindsight; calculate5min signedreturn/fee sensitivity, missing/overlap and first-lastfill delay. Inspect columns first; no future-firstfill substitution/positive subset. Ledger submodulef02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6 differs latest9ff0d, do notcombine or accessaccounts. Binance proxy notnativeLBank; funding/TP1/emergency null. No repeat687sum/causal maker claim/reverseengineered rule/paperaddition/relaxation/deploy. Existingreference alerts/warnings kept. No continuouscollection newclaim. Preserve actualnegative/unknown results; finite source limitation if nontransferable rules.",
+    "stage": "native_paper_new_closed_episode_cost_and_adverse_reconciliation",
+    "instruction": "1318 finite actual public-ledger initial-entry diagnostic complete: read docs/lbank_initial_entry_ledger_2026-10-21.md/report.563initial-open-containingorders vs238pure (325missingbylabel),278positive,median-.3795bp,mean3.4381bp;10/20bp declaredsensitivity means-6.5619/-16.5619bp notfullfundingcost.7orders span>5min, source useslastfillminute+5close vswholeorderVWAP notfirstfill5min. No transferable exactrules; end THISdiscretionarysource no reaggregation/policyreverseengineering. NEXT finite nativepaper observation: latestproduction/deployment first, bound logs after2026-10-20T23:10:45Z (knownbox08:10KSTclosure) throughcurrentUTC; group distinct4techniques/RSI candidate/open/close/ack/error byeventID; don'tcountprogressor3managementrows astrades. Fornewclosed connectoriginalentry/stopTP1/book/times and calculatemodelcost/doublecost/first5minadverse withmissingcensor/null; nofuturefill invention. Priorbox06:10->08:10 -3.4303sameepisode NOTnew. Preservewindow/loglimit/gaps and exactrawhash whereavailable. Ifnewclosednone checkpointbriefly, then max2newcomplete PRIMARY rule+raw+costedBTCledger sources; no repetitivepublicledger tables/sourceforensics/deduptrials. Existingreferencealarms/warnings kept; no newforwardcandidate/entryrelaxation. No deployment fordocs, no continuouscollectorclaim without evidence.",
     "sources_to_screen": [
       {
         "repository": "maxs231/lsob-backtest",
@@ -2219,6 +2219,23 @@
     "after_execution_fee_XBT": "41.58738764326405335090926727",
     "PF_excluding_funding": "1.346074091079424826911515410",
     "full_cost_net": null,
+    "promotion": false,
+    "production_changed": false
+  },
+  "initial_entry_ledger_1318": {
+    "document": "docs/lbank_initial_entry_ledger_2026-10-21.md",
+    "code": "research/continuation/initial_entry_20261021_1318.py",
+    "frozen_commit": "c7cbdf61101b9cef4b875a79d32373dce5cae80d",
+    "report": "research/continuation/results/initial_entry_20261021_1318/report.json",
+    "SHA256": "6386e58d82dca987a19417dcd35d9f81d235fc95d48eca26d2afbad1c92aa81a",
+    "verified_blob": "76b8d508361f73299c403b18a5a041252418bef1",
+    "initial_orders": 563,
+    "pure_label_excludes": 325,
+    "positive_5m": 278,
+    "mean_gross_bp": 3.4380591758041215,
+    "conditional_10bp_mean": -6.5619408241958785,
+    "fill_span_over_5min": 7,
+    "source_analysis_ended": true,
     "promotion": false,
     "production_changed": false
   }
