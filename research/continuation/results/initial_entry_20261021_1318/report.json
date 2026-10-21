@@ -1,0 +1,4673 @@
+{
+  "version": "initial_entry_fullset_v1",
+  "source_pin": "27d2d50fc0def523d417cc84c42cc16ee3432d86",
+  "source_hashes": {
+    "order_fill_summary.csv": "e4b8e20e38b16fe0ed99badec6e6b81157162946a5170b16265c2370c46f56b5",
+    "position_actions.csv": "cf55d0e35fc446c616fd7218d4f2a0d841cae3121ce0feb4fe2b051a021e90b6"
+  },
+  "order_rows": 20305,
+  "action_rows": 98874,
+  "action_counts": {
+    "open": 563,
+    "add": 48424,
+    "reduce": 49200,
+    "close": 562,
+    "reverse": 125
+  },
+  "pure_open": {
+    "orders": 238,
+    "price_samples": 238,
+    "missing_price": 0,
+    "positive_5m": 127,
+    "median_5m_bps": 2.5272552030886075,
+    "mean_5m_bps": 12.103385806822333,
+    "last_first_seconds_median": 0.0,
+    "last_first_seconds_max": 0.0,
+    "orders_fill_span_over_5min": 0,
+    "missing_action_join": 0,
+    "signed_entry_fee_bps_median": 1.9999056625,
+    "conditional_fixed_total_roundtrip_costs_bps": {
+      "10": {
+        "positive": 93,
+        "median_net_bps": -7.4727447969113925,
+        "mean_net_bps": 2.103385806822333
+      },
+      "20": {
+        "positive": 65,
+        "median_net_bps": -17.472744796911392,
+        "mean_net_bps": -7.896614193177667
+      }
+    },
+    "note": "10/20bp are declared sensitivity only, not observed LBank fees/funding/fills; mean arithmetic directional return not inverse realized PnL."
+  },
+  "orders_containing_first_open_fill": {
+    "orders": 563,
+    "price_samples": 563,
+    "missing_price": 0,
+    "positive_5m": 278,
+    "median_5m_bps": -0.379506641366989,
+    "mean_5m_bps": 3.4380591758041215,
+    "last_first_seconds_median": 0.0,
+    "last_first_seconds_max": 1882.2019999027252,
+    "orders_fill_span_over_5min": 7,
+    "missing_action_join": 0,
+    "signed_entry_fee_bps_median": 6.161233376666667,
+    "conditional_fixed_total_roundtrip_costs_bps": {
+      "10": {
+        "positive": 189,
+        "median_net_bps": -10.379506641366989,
+        "mean_net_bps": -6.5619408241958785
+      },
+      "20": {
+        "positive": 122,
+        "median_net_bps": -20.379506641366987,
+        "mean_net_bps": -16.56194082419588
+      }
+    },
+    "note": "10/20bp are declared sensitivity only, not observed LBank fees/funding/fills; mean arithmetic directional return not inverse realized PnL."
+  },
+  "initial_orders_excluded_by_pure_label": 325,
+  "groups": {
+    "maker": {
+      "orders": 213,
+      "price_samples": 213,
+      "missing_price": 0,
+      "positive_5m": 122,
+      "median_5m_bps": 4.269901205193882,
+      "mean_5m_bps": 10.504335718410829,
+      "last_first_seconds_median": 0.0,
+      "last_first_seconds_max": 20.578999996185303,
+      "orders_fill_span_over_5min": 0,
+      "missing_action_join": 0,
+      "signed_entry_fee_bps_median": -2.2497869846984697,
+      "conditional_fixed_total_roundtrip_costs_bps": {
+        "10": {
+          "positive": 96,
+          "median_net_bps": -5.730098794806118,
+          "mean_net_bps": 0.5043357184108288
+        },
+        "20": {
+          "positive": 72,
+          "median_net_bps": -15.730098794806118,
+          "mean_net_bps": -9.495664281589171
+        }
+      },
+      "note": "10/20bp are declared sensitivity only, not observed LBank fees/funding/fills; mean arithmetic directional return not inverse realized PnL."
+    },
+    "taker": {
+      "orders": 314,
+      "price_samples": 314,
+      "missing_price": 0,
+      "positive_5m": 144,
+      "median_5m_bps": -2.6065255251694897,
+      "mean_5m_bps": -0.21437001235309033,
+      "last_first_seconds_median": 0.0,
+      "last_first_seconds_max": 0.0,
+      "orders_fill_span_over_5min": 0,
+      "missing_action_join": 0,
+      "signed_entry_fee_bps_median": 7.499473007223358,
+      "conditional_fixed_total_roundtrip_costs_bps": {
+        "10": {
+          "positive": 85,
+          "median_net_bps": -12.60652552516949,
+          "mean_net_bps": -10.21437001235309
+        },
+        "20": {
+          "positive": 48,
+          "median_net_bps": -22.606525525169488,
+          "mean_net_bps": -20.21437001235309
+        }
+      },
+      "note": "10/20bp are declared sensitivity only, not observed LBank fees/funding/fills; mean arithmetic directional return not inverse realized PnL."
+    },
+    "mixed": {
+      "orders": 36,
+      "price_samples": 36,
+      "missing_price": 0,
+      "positive_5m": 12,
+      "median_5m_bps": -3.473961322203456,
+      "mean_5m_bps": -6.51344467124766,
+      "last_first_seconds_median": 35.80849993228912,
+      "last_first_seconds_max": 1882.2019999027252,
+      "orders_fill_span_over_5min": 7,
+      "missing_action_join": 0,
+      "signed_entry_fee_bps_median": 3.2863509352075138,
+      "conditional_fixed_total_roundtrip_costs_bps": {
+        "10": {
+          "positive": 8,
+          "median_net_bps": -13.473961322203456,
+          "mean_net_bps": -16.51344467124766
+        },
+        "20": {
+          "positive": 2,
+          "median_net_bps": -23.473961322203458,
+          "mean_net_bps": -26.51344467124766
+        }
+      },
+      "note": "10/20bp are declared sensitivity only, not observed LBank fees/funding/fills; mean arithmetic directional return not inverse realized PnL."
+    }
+  },
+  "initial_order_records": [
+    {
+      "orderID": "a75e0232-d365-5fa8-ef9d-2c9ba7d006c4",
+      "label": "mixed",
+      "first": "2020-05-01T09:03:47.360Z",
+      "last": "2020-05-01T09:03:47.360Z",
+      "signed_return_5m_bps": "-2.9471775107692277",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "cd2c2344-9b17-3fae-bece-460edb95019d",
+      "label": "open",
+      "first": "2020-05-01T12:34:19.019Z",
+      "last": "2020-05-01T12:34:19.019Z",
+      "signed_return_5m_bps": "52.903518214266754",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "0219669c-8f6b-d8c1-8ebd-d159ea2d12d4",
+      "label": "mixed",
+      "first": "2020-05-01T21:30:33.177Z",
+      "last": "2020-05-01T21:30:33.177Z",
+      "signed_return_5m_bps": "6.712328767122244",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "a63a64ec-02da-f2b5-bbbc-9b4550583623",
+      "label": "mixed",
+      "first": "2020-05-02T18:08:49.639Z",
+      "last": "2020-05-02T18:08:49.650Z",
+      "signed_return_5m_bps": "38.47894975101962",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "16bd4f1b-be22-660c-4f03-3e853bac6c8d",
+      "label": "open",
+      "first": "2020-05-03T07:14:36.775Z",
+      "last": "2020-05-03T07:14:36.775Z",
+      "signed_return_5m_bps": "-7.8290238635736475",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "c08f4521-9ea0-d6d0-db8c-8a1a8d1268f8",
+      "label": "open",
+      "first": "2020-05-03T15:49:59.145Z",
+      "last": "2020-05-03T15:49:59.145Z",
+      "signed_return_5m_bps": "13.643604915793972",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "345cdfc2-c145-067d-a3ab-6315184822bc",
+      "label": "open",
+      "first": "2020-05-05T10:00:31.359Z",
+      "last": "2020-05-05T10:00:31.359Z",
+      "signed_return_5m_bps": "-84.8052599320226",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a53b8762-b6d1-cc67-415d-408ae923cdee",
+      "label": "open",
+      "first": "2020-05-10T03:10:26.812Z",
+      "last": "2020-05-10T03:10:26.812Z",
+      "signed_return_5m_bps": "2.5721968899805603",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "59171e61-8fdc-1cd3-190d-448d642afaa7",
+      "label": "open",
+      "first": "2020-05-10T08:20:27.874Z",
+      "last": "2020-05-10T08:20:27.874Z",
+      "signed_return_5m_bps": "59.38188598225813",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "6c87c507-e011-7844-32fb-9a998830c9c6",
+      "label": "open",
+      "first": "2020-05-10T09:59:49.340Z",
+      "last": "2020-05-10T09:59:49.340Z",
+      "signed_return_5m_bps": "12.80201534409775",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "d8af4f93-563d-7aeb-2cdf-228898d6c77a",
+      "label": "mixed",
+      "first": "2020-05-11T18:31:33.729Z",
+      "last": "2020-05-11T18:31:33.729Z",
+      "signed_return_5m_bps": "58.15922927964068",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "c643a8ba-d573-7321-2d83-76d1e06b445c",
+      "label": "mixed",
+      "first": "2020-05-21T12:35:54.239Z",
+      "last": "2020-05-21T12:35:54.239Z",
+      "signed_return_5m_bps": "-4.40571031385506",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "29cd5ab5-da7a-6a07-7938-c7108eddced5",
+      "label": "open",
+      "first": "2020-05-21T18:57:25.876Z",
+      "last": "2020-05-21T18:57:25.876Z",
+      "signed_return_5m_bps": "96.98104641924887",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "f72d3c6a-76f7-d465-7fa5-e13fa7b5bafc",
+      "label": "open",
+      "first": "2020-05-22T19:47:09.265Z",
+      "last": "2020-05-22T19:47:09.265Z",
+      "signed_return_5m_bps": "27.113638849394217",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "fc98335f-00fd-d5e4-043a-10e1bd7ea5d0",
+      "label": "open",
+      "first": "2020-05-30T20:47:31.426Z",
+      "last": "2020-05-30T20:47:31.426Z",
+      "signed_return_5m_bps": "18.57180780461931",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "69b17532-5257-c9a0-5ae6-e71e1bb072f7",
+      "label": "open",
+      "first": "2020-06-05T20:57:31.356Z",
+      "last": "2020-06-05T20:57:31.356Z",
+      "signed_return_5m_bps": "12.354336392699228",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "268960e3-364f-f376-8baa-eef93163b7a5",
+      "label": "open",
+      "first": "2020-06-11T16:00:49.415Z",
+      "last": "2020-06-11T16:00:49.415Z",
+      "signed_return_5m_bps": "81.1438218845617",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "609d942a-5887-cde8-b986-19e4fcd49321",
+      "label": "open",
+      "first": "2020-06-11T19:23:54.379Z",
+      "last": "2020-06-11T19:23:54.379Z",
+      "signed_return_5m_bps": "28.015522259350334",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "c5d6c174-2d20-64e5-0d97-e097e6ca46cc",
+      "label": "mixed",
+      "first": "2020-06-14T06:41:47.368Z",
+      "last": "2020-06-14T06:41:47.368Z",
+      "signed_return_5m_bps": "3.962604908105405",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4349672d-1d7d-2ecd-2f1b-7a210d7bc8ce",
+      "label": "mixed",
+      "first": "2020-06-14T13:13:12.776Z",
+      "last": "2020-06-14T13:13:12.776Z",
+      "signed_return_5m_bps": "-26.272542951659705",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4130b727-55ee-b9b8-d0c5-48ea75f2bbff",
+      "label": "mixed",
+      "first": "2020-06-14T18:17:17.443Z",
+      "last": "2020-06-14T18:17:17.443Z",
+      "signed_return_5m_bps": "-12.974531475251627",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "085d758e-8a5d-b149-ad10-f519c19d0f9f",
+      "label": "open",
+      "first": "2020-06-15T22:35:23.634Z",
+      "last": "2020-06-15T22:35:23.634Z",
+      "signed_return_5m_bps": "-29.180814940577005",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "f6d099a3-efc2-c6b3-147e-7f78ca138041",
+      "label": "open",
+      "first": "2020-06-20T11:15:45.218Z",
+      "last": "2020-06-20T11:15:45.218Z",
+      "signed_return_5m_bps": "114.46561363513075",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "1e0b553e-07cb-0967-3d5f-da75d3a88930",
+      "label": "open",
+      "first": "2020-06-25T06:45:45.804Z",
+      "last": "2020-06-25T06:45:45.804Z",
+      "signed_return_5m_bps": "13.307901907355646",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e60a8070-4054-0f95-fed6-9dd283ba7a06",
+      "label": "mixed",
+      "first": "2020-06-28T02:14:03.502Z",
+      "last": "2020-06-28T02:14:03.502Z",
+      "signed_return_5m_bps": "-7.479038569033758",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "18d8a95f-4436-f36e-9ac8-a16707db9f4f",
+      "label": "mixed",
+      "first": "2020-06-28T06:38:12.075Z",
+      "last": "2020-06-28T06:38:12.075Z",
+      "signed_return_5m_bps": "8.331016072520292",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "8494b54d-1586-153d-5acd-7309f3eca0b2",
+      "label": "mixed",
+      "first": "2020-07-02T20:16:24.348Z",
+      "last": "2020-07-02T20:16:24.348Z",
+      "signed_return_5m_bps": "-28.63148578382546",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "0734759c-4f61-f67f-fa10-2834dac4972c",
+      "label": "mixed",
+      "first": "2020-07-06T06:14:49.596Z",
+      "last": "2020-07-06T06:14:49.596Z",
+      "signed_return_5m_bps": "-6.885622165144767",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "3390138d-4e3f-7f0d-fb43-ac48d3f12996",
+      "label": "open",
+      "first": "2020-07-07T06:15:27.441Z",
+      "last": "2020-07-07T06:15:27.441Z",
+      "signed_return_5m_bps": "-0.021598272138545482",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "d2985506-0030-2295-f929-844eff4044c8",
+      "label": "open",
+      "first": "2020-07-07T20:03:17.010Z",
+      "last": "2020-07-07T20:03:17.010Z",
+      "signed_return_5m_bps": "-0.379506641366989",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "896287ae-3e86-0f12-7002-9b3adf87c343",
+      "label": "mixed",
+      "first": "2020-07-10T16:36:38.652Z",
+      "last": "2020-07-10T16:36:38.652Z",
+      "signed_return_5m_bps": "2.9191535539885294",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "cb384568-5974-febc-69c1-ff9ec4463311",
+      "label": "mixed",
+      "first": "2020-07-14T17:05:36.889Z",
+      "last": "2020-07-14T17:05:36.889Z",
+      "signed_return_5m_bps": "2.1889900303428966",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "230ad7e2-d9d8-f224-981c-38c70fbbcf4a",
+      "label": "open",
+      "first": "2020-07-15T08:22:32.866Z",
+      "last": "2020-07-15T08:22:32.866Z",
+      "signed_return_5m_bps": "-7.010689673883075",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "59f34277-6981-ff84-a669-dd3f6b8babcc",
+      "label": "mixed",
+      "first": "2020-07-16T07:11:35.663Z",
+      "last": "2020-07-16T07:11:35.663Z",
+      "signed_return_5m_bps": "35.37906137184077",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "d7e4b20d-e28c-fae1-7a11-4357d2f8f4f9",
+      "label": "open",
+      "first": "2020-07-18T16:44:20.193Z",
+      "last": "2020-07-18T16:44:20.193Z",
+      "signed_return_5m_bps": "6.958228814483158",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "c75338f0-0cc7-c085-c292-42634b1f8521",
+      "label": "open",
+      "first": "2020-07-20T19:49:26.455Z",
+      "last": "2020-07-20T19:49:26.455Z",
+      "signed_return_5m_bps": "-5.84475883541824",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4f2ce368-2097-97b9-2b06-194af2d8f2dc",
+      "label": "open",
+      "first": "2020-07-21T10:29:22.503Z",
+      "last": "2020-07-21T10:29:22.503Z",
+      "signed_return_5m_bps": "-10.409638554216283",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "94417790-b227-4634-a325-3422d75fd164",
+      "label": "open",
+      "first": "2020-07-27T04:04:36.394Z",
+      "last": "2020-07-27T04:04:36.394Z",
+      "signed_return_5m_bps": "-9.442520606740556",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "03c659bd-11cf-e135-b291-19147f6ca66c",
+      "label": "open",
+      "first": "2020-07-27T07:59:53.689Z",
+      "last": "2020-07-27T07:59:53.689Z",
+      "signed_return_5m_bps": "-0.7171627861279894",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "9cc6337c-66c5-a6a1-6cca-25f3f7ff5ce5",
+      "label": "open",
+      "first": "2020-07-27T11:11:09.033Z",
+      "last": "2020-07-27T11:11:09.033Z",
+      "signed_return_5m_bps": "-24.920936116382684",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "ef4aed2e-e9ed-c492-6423-dc8c98a806d9",
+      "label": "open",
+      "first": "2020-07-27T16:29:22.623Z",
+      "last": "2020-07-27T16:29:22.623Z",
+      "signed_return_5m_bps": "4.551988500238746",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "76471821-8da6-9d84-b0ad-10c7be945ef0",
+      "label": "open",
+      "first": "2020-07-28T10:12:40.233Z",
+      "last": "2020-07-28T10:12:40.233Z",
+      "signed_return_5m_bps": "-10.888493586742598",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "859859d3-e82a-64e1-6402-3c290923c128",
+      "label": "open",
+      "first": "2020-07-29T17:36:55.816Z",
+      "last": "2020-07-29T17:36:55.816Z",
+      "signed_return_5m_bps": "-12.040133779264162",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "31809ccb-8290-d99f-d5d7-dc1240d868d6",
+      "label": "open",
+      "first": "2020-08-02T04:39:08.114Z",
+      "last": "2020-08-02T04:39:08.114Z",
+      "signed_return_5m_bps": "73.8832556864888",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "010428d7-b6c1-17f9-f94d-cd9304a9987b",
+      "label": "open",
+      "first": "2020-08-03T21:59:23.805Z",
+      "last": "2020-08-03T21:59:23.805Z",
+      "signed_return_5m_bps": "80.02865842736907",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "34ee50ed-d1c3-759c-bc98-db81885815cb",
+      "label": "open",
+      "first": "2020-08-07T09:30:32.273Z",
+      "last": "2020-08-07T09:30:32.273Z",
+      "signed_return_5m_bps": "6.401420658745938",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "5483c5b8-7638-74c4-f20c-ce3b224750d6",
+      "label": "open",
+      "first": "2020-08-07T17:32:49.387Z",
+      "last": "2020-08-07T17:32:49.387Z",
+      "signed_return_5m_bps": "30.353176849715613",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "14963026-f272-ebf2-d840-ede712733cf9",
+      "label": "mixed",
+      "first": "2020-08-07T22:22:53.037Z",
+      "last": "2020-08-07T22:22:53.037Z",
+      "signed_return_5m_bps": "9.360347571728544",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "f56abb07-6d87-c5a8-703d-290d32f805d5",
+      "label": "open",
+      "first": "2020-08-09T12:45:25.669Z",
+      "last": "2020-08-09T12:45:25.669Z",
+      "signed_return_5m_bps": "-18.182598986515863",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "330ced7d-2f01-6bfc-0a3c-ebfe737fc64c",
+      "label": "open",
+      "first": "2020-08-09T22:31:03.411Z",
+      "last": "2020-08-09T22:31:03.411Z",
+      "signed_return_5m_bps": "-14.533641104557127",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "fcac66f4-3c1a-d21f-43ca-00b7248ef320",
+      "label": "mixed",
+      "first": "2020-08-11T06:34:34.625Z",
+      "last": "2020-08-11T06:34:34.625Z",
+      "signed_return_5m_bps": "-34.59441036128163",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e6c0394a-4455-0599-3b72-ebbcdbebb402",
+      "label": "open",
+      "first": "2020-08-13T08:27:59.919Z",
+      "last": "2020-08-13T08:27:59.919Z",
+      "signed_return_5m_bps": "-22.637889688248425",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "3bb39c7c-5e59-4369-9ad2-c622ab0497de",
+      "label": "open",
+      "first": "2020-08-14T16:28:11.305Z",
+      "last": "2020-08-14T16:28:11.305Z",
+      "signed_return_5m_bps": "-14.806695054596641",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "0412646d-42ee-1d50-9285-9a6910eb5b1d",
+      "label": "open",
+      "first": "2020-08-15T12:22:23.180Z",
+      "last": "2020-08-15T12:22:23.180Z",
+      "signed_return_5m_bps": "99.91877912196134",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a8b6e314-8c08-1052-eb25-58b4c91d62a6",
+      "label": "open",
+      "first": "2020-08-17T10:23:21.207Z",
+      "last": "2020-08-17T10:23:21.207Z",
+      "signed_return_5m_bps": "-12.415529905561717",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "7e1024a9-44da-1c2f-c7d1-e6712234e931",
+      "label": "open",
+      "first": "2020-08-17T18:53:38.701Z",
+      "last": "2020-08-17T18:53:38.701Z",
+      "signed_return_5m_bps": "1.0300498803683666",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "c2d88ec8-3209-ea9e-29c7-1c3f567521fc",
+      "label": "open",
+      "first": "2020-08-19T20:20:39.670Z",
+      "last": "2020-08-19T20:20:39.670Z",
+      "signed_return_5m_bps": "91.08029890717573",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "78f2dc6b-fb9c-5f04-08f3-cf779d4d5e96",
+      "label": "open",
+      "first": "2020-08-21T10:05:28.197Z",
+      "last": "2020-08-21T10:05:28.197Z",
+      "signed_return_5m_bps": "18.228857409449127",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "665f4450-fae4-f586-5304-c457d44a858b",
+      "label": "open",
+      "first": "2020-08-30T08:53:07.559Z",
+      "last": "2020-08-30T08:53:07.559Z",
+      "signed_return_5m_bps": "2.698961937717126",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "b008374e-4707-0c64-93b2-0bf5ef01f2e9",
+      "label": "open",
+      "first": "2020-08-31T11:20:51.550Z",
+      "last": "2020-08-31T11:20:51.550Z",
+      "signed_return_5m_bps": "-2.9935240382550354",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "2a6bcf9e-8630-66e5-4feb-6bd003304a2d",
+      "label": "open",
+      "first": "2020-09-03T19:57:02.692Z",
+      "last": "2020-09-03T19:57:02.692Z",
+      "signed_return_5m_bps": "7.088418197971347",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e321b7c1-c2be-21dd-eeb1-cfafc4e2a408",
+      "label": "mixed",
+      "first": "2020-09-04T07:06:54.474Z",
+      "last": "2020-09-04T07:06:54.474Z",
+      "signed_return_5m_bps": "36.65786643199276",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "2e8203b9-da7f-d5db-e1b3-ba626ddf4c9a",
+      "label": "open",
+      "first": "2020-09-04T14:51:02.611Z",
+      "last": "2020-09-04T14:51:02.611Z",
+      "signed_return_5m_bps": "84.44290451913083",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "da09079e-d5c6-8050-4463-a55ddcd31666",
+      "label": "open",
+      "first": "2020-09-04T18:25:15.745Z",
+      "last": "2020-09-04T18:25:15.745Z",
+      "signed_return_5m_bps": "18.748793203320346",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "9af4affb-c1a1-4ed2-7e95-f7afcd57f192",
+      "label": "open",
+      "first": "2020-09-05T18:53:31.003Z",
+      "last": "2020-09-05T18:53:31.003Z",
+      "signed_return_5m_bps": "202.2273502558436",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "62475bd1-d01b-9135-9ba4-92fe13da19a8",
+      "label": "open",
+      "first": "2020-09-06T14:44:50.876Z",
+      "last": "2020-09-06T14:44:50.876Z",
+      "signed_return_5m_bps": "8.049140049140036",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "bcbb5554-8150-95be-e0a1-af2a1cec495d",
+      "label": "open",
+      "first": "2020-09-07T11:05:06.352Z",
+      "last": "2020-09-07T11:05:06.352Z",
+      "signed_return_5m_bps": "-24.090909090908053",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "11c55a27-4448-6504-6063-a0b3d9611aaf",
+      "label": "open",
+      "first": "2020-09-07T22:04:21.263Z",
+      "last": "2020-09-07T22:04:21.263Z",
+      "signed_return_5m_bps": "12.949781552207273",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "df1f3852-5c0f-c9b6-81fd-d23687823e03",
+      "label": "mixed",
+      "first": "2020-09-08T11:43:40.751Z",
+      "last": "2020-09-08T11:43:40.751Z",
+      "signed_return_5m_bps": "-6.508048948001832",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "6969c8f2-6fd1-c820-a3e9-fc7a75ceda43",
+      "label": "mixed",
+      "first": "2020-09-08T14:30:50.526Z",
+      "last": "2020-09-08T14:30:50.526Z",
+      "signed_return_5m_bps": "3.8261901230907114",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "f97fff4d-c828-e0be-a691-df7513f32334",
+      "label": "mixed",
+      "first": "2020-09-12T15:27:52.719Z",
+      "last": "2020-09-12T15:27:52.719Z",
+      "signed_return_5m_bps": "10.624849215923327",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "018c5bb5-7d29-0f01-844b-7545a5bc964d",
+      "label": "open",
+      "first": "2020-09-14T12:39:17.319Z",
+      "last": "2020-09-14T12:39:17.319Z",
+      "signed_return_5m_bps": "2.7440481881635392",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "947744e1-d7e2-4b04-07ce-d6717d8a3213",
+      "label": "open",
+      "first": "2020-09-16T07:32:13.330Z",
+      "last": "2020-09-16T07:32:13.330Z",
+      "signed_return_5m_bps": "8.295695455802221",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "ea16e636-6163-1804-9b9a-d04cbbcd9f83",
+      "label": "open",
+      "first": "2020-09-16T17:10:27.838Z",
+      "last": "2020-09-16T17:10:27.838Z",
+      "signed_return_5m_bps": "14.18869974646908",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "8eb2bfc2-75a1-496a-9aa3-cc157868a1ec",
+      "label": "mixed",
+      "first": "2020-09-19T09:15:58.383Z",
+      "last": "2020-09-19T09:15:58.383Z",
+      "signed_return_5m_bps": "-1.5182695385740352",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "45f569ac-de89-2a18-bd0c-7ceaeece7dfa",
+      "label": "mixed",
+      "first": "2020-09-20T09:10:23.087Z",
+      "last": "2020-09-20T09:10:23.087Z",
+      "signed_return_5m_bps": "0.7957195774466186",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "f778857c-9986-f83a-0907-f6f5c8cd2963",
+      "label": "open",
+      "first": "2020-09-21T14:39:31.283Z",
+      "last": "2020-09-21T14:39:31.283Z",
+      "signed_return_5m_bps": "10.610156400849835",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "89e4331a-f508-23e5-5509-22ba062b33f9",
+      "label": "open",
+      "first": "2020-09-21T17:14:08.959Z",
+      "last": "2020-09-21T17:14:08.959Z",
+      "signed_return_5m_bps": "17.41221741221821",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "638d951d-7e77-057c-35f2-bdbe614f7ad1",
+      "label": "mixed",
+      "first": "2020-09-22T00:03:20.911Z",
+      "last": "2020-09-22T00:03:20.990Z",
+      "signed_return_5m_bps": "44.359778152880395",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "10276c5d-a7d5-ac64-ea78-3f3fceffa199",
+      "label": "open",
+      "first": "2020-09-23T00:23:49.396Z",
+      "last": "2020-09-23T00:23:49.396Z",
+      "signed_return_5m_bps": "6.958836391290912",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "767b2a42-c2fa-b518-888a-90175fbf00b8",
+      "label": "open",
+      "first": "2020-09-23T19:04:47.308Z",
+      "last": "2020-09-23T19:04:47.308Z",
+      "signed_return_5m_bps": "-90.92572969848666",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "63bcff3b-9e09-ee13-1e69-762e0410a479",
+      "label": "mixed",
+      "first": "2020-09-23T20:49:53.347Z",
+      "last": "2020-09-23T20:49:53.347Z",
+      "signed_return_5m_bps": "-28.438388393294822",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "1dbb985b-496a-ae5b-3460-09ae716568a5",
+      "label": "mixed",
+      "first": "2020-09-23T20:52:14.671Z",
+      "last": "2020-09-23T20:52:14.671Z",
+      "signed_return_5m_bps": "47.48903454733666",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4683fc4e-cc30-d481-ce2b-82acc7118e2a",
+      "label": "mixed",
+      "first": "2020-09-23T23:25:20.531Z",
+      "last": "2020-09-23T23:25:20.531Z",
+      "signed_return_5m_bps": "-2.0935237722552458",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "322699eb-79d1-0af9-4d96-004a983f7ce6",
+      "label": "open",
+      "first": "2020-09-25T18:29:35.980Z",
+      "last": "2020-09-25T18:29:35.980Z",
+      "signed_return_5m_bps": "-16.24190467315878",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "99084494-41a1-235e-ac2c-fe9f0a2a48b4",
+      "label": "mixed",
+      "first": "2020-09-26T21:51:56.827Z",
+      "last": "2020-09-26T21:51:56.827Z",
+      "signed_return_5m_bps": "-16.750418760469454",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "56b7d8f0-d9fa-22d1-2aec-ce6e058e77c8",
+      "label": "mixed",
+      "first": "2020-09-28T00:31:03.411Z",
+      "last": "2020-09-28T00:31:03.411Z",
+      "signed_return_5m_bps": "-16.07980141583143",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4095aa75-aec9-4af9-8555-74dadf86a4d8",
+      "label": "mixed",
+      "first": "2020-09-29T23:04:33.209Z",
+      "last": "2020-09-29T23:04:33.209Z",
+      "signed_return_5m_bps": "12.53656498119593",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "b9448e14-42da-422a-a3f0-4bc04dda539e",
+      "label": "mixed",
+      "first": "2020-09-30T14:10:55.245Z",
+      "last": "2020-09-30T14:10:55.245Z",
+      "signed_return_5m_bps": "1.4521759367003284",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "3792dd43-55c3-4321-87c3-1f291ed7eaef",
+      "label": "mixed",
+      "first": "2020-10-01T16:22:24.232Z",
+      "last": "2020-10-01T16:22:24.232Z",
+      "signed_return_5m_bps": "38.24162743658155",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "1eadaea6-813e-488c-b28c-cca9c00a0b6e",
+      "label": "mixed",
+      "first": "2020-10-01T16:30:10.103Z",
+      "last": "2020-10-01T16:30:10.745Z",
+      "signed_return_5m_bps": "9.064618593845886",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "95116b51-6e22-41a2-98ca-6619865ccf42",
+      "label": "mixed",
+      "first": "2020-10-01T16:45:32.303Z",
+      "last": "2020-10-01T16:45:32.303Z",
+      "signed_return_5m_bps": "49.959394257870215",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "fef78e96-5b2f-4868-b527-8d9044c306af",
+      "label": "mixed",
+      "first": "2020-10-01T16:50:42.245Z",
+      "last": "2020-10-01T16:50:42.245Z",
+      "signed_return_5m_bps": "24.913165532665094",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "8f96c8e3-b2a0-45c3-9e75-d582ac46ce9b",
+      "label": "mixed",
+      "first": "2020-10-02T06:54:23.065Z",
+      "last": "2020-10-02T06:54:23.065Z",
+      "signed_return_5m_bps": "1.9154714823454988",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "27cf93c9-8251-4f97-9903-998ac442d0a2",
+      "label": "mixed",
+      "first": "2020-10-02T10:37:25.319Z",
+      "last": "2020-10-02T10:37:25.319Z",
+      "signed_return_5m_bps": "2.979926220476603",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "b1d4eb17-4ff6-4cc7-8296-773d9751c05a",
+      "label": "open",
+      "first": "2020-10-02T14:56:59.637Z",
+      "last": "2020-10-02T14:56:59.637Z",
+      "signed_return_5m_bps": "-18.028275927507444",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "04202e4a-5e43-4b74-8cd0-696f20e12bf7",
+      "label": "mixed",
+      "first": "2020-10-05T07:05:43.662Z",
+      "last": "2020-10-05T07:05:43.662Z",
+      "signed_return_5m_bps": "-8.93896713615061",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "679345c0-e394-4c12-9f3f-2c5a1be272f9",
+      "label": "mixed",
+      "first": "2020-10-08T12:30:47.149Z",
+      "last": "2020-10-08T12:30:47.149Z",
+      "signed_return_5m_bps": "-13.920721397707725",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "59362687-ba57-4876-b872-33ce4c03dbdc",
+      "label": "mixed",
+      "first": "2020-10-09T06:00:18.167Z",
+      "last": "2020-10-09T06:00:18.190Z",
+      "signed_return_5m_bps": "0.4332595870204514",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "50274af1-230c-482a-a4e0-3b9f52a05ac3",
+      "label": "open",
+      "first": "2020-10-09T13:56:08.712Z",
+      "last": "2020-10-09T13:56:08.712Z",
+      "signed_return_5m_bps": "-8.780795957042953",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "9caf7280-d020-4bd6-a523-b7fa6e6a3337",
+      "label": "open",
+      "first": "2020-10-09T19:05:28.023Z",
+      "last": "2020-10-09T19:05:28.023Z",
+      "signed_return_5m_bps": "-6.18061534278791",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "bf492c0f-7b34-44b2-aef1-432f4904f21c",
+      "label": "open",
+      "first": "2020-10-10T23:11:30.758Z",
+      "last": "2020-10-10T23:11:30.758Z",
+      "signed_return_5m_bps": "2.140267091181869",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "def7bc49-b04a-4e38-b0b2-b94a7f59ee68",
+      "label": "open",
+      "first": "2020-10-11T16:21:31.675Z",
+      "last": "2020-10-11T16:21:31.675Z",
+      "signed_return_5m_bps": "-6.5962945118480665",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "d61da1d7-3d5e-4b0c-8580-8fdb3f551266",
+      "label": "mixed",
+      "first": "2020-10-12T11:30:32.948Z",
+      "last": "2020-10-12T11:30:32.948Z",
+      "signed_return_5m_bps": "5.776494112419428",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4a893be2-ec04-41df-8c6d-0b254cd68d40",
+      "label": "open",
+      "first": "2020-10-13T08:38:24.259Z",
+      "last": "2020-10-13T08:38:24.259Z",
+      "signed_return_5m_bps": "-7.361642882004471",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "95d07d23-7775-46e4-bd18-e40632cce11f",
+      "label": "mixed",
+      "first": "2020-10-15T12:24:38.175Z",
+      "last": "2020-10-15T12:24:38.175Z",
+      "signed_return_5m_bps": "-2.6316630998468593",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "06b8ecfd-284c-4750-a66a-535b25ede802",
+      "label": "mixed",
+      "first": "2020-10-16T11:53:02.856Z",
+      "last": "2020-10-16T11:53:02.885Z",
+      "signed_return_5m_bps": "-14.45698166431475",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "52c9fa78-e09f-4050-b746-695bd0de0a37",
+      "label": "mixed",
+      "first": "2020-10-16T12:29:47.244Z",
+      "last": "2020-10-16T12:29:47.244Z",
+      "signed_return_5m_bps": "-7.487572038186174",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e04a12f7-2512-4e3f-b740-382241a8ca34",
+      "label": "mixed",
+      "first": "2020-10-18T00:47:44.762Z",
+      "last": "2020-10-18T00:47:44.762Z",
+      "signed_return_5m_bps": "-4.9813309905555325",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "f2b413a6-929e-49a4-9c75-dbae69c88182",
+      "label": "mixed",
+      "first": "2020-10-18T08:55:53.777Z",
+      "last": "2020-10-18T08:55:53.777Z",
+      "signed_return_5m_bps": "-6.689401888771984",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "6c9509ba-489e-42e2-8c0b-527547e7006a",
+      "label": "open",
+      "first": "2020-10-18T20:27:25.884Z",
+      "last": "2020-10-18T20:27:25.884Z",
+      "signed_return_5m_bps": "10.095438227826214",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "bbdaaabd-3288-4223-b0c2-12d92f3406b8",
+      "label": "mixed",
+      "first": "2020-10-19T10:01:38.419Z",
+      "last": "2020-10-19T10:01:38.419Z",
+      "signed_return_5m_bps": "-6.659122562673314",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "59a224d2-0fb0-4ed2-b15b-931a3c177a1f",
+      "label": "open",
+      "first": "2020-10-19T14:11:28.818Z",
+      "last": "2020-10-19T14:11:28.818Z",
+      "signed_return_5m_bps": "-1.65012247002716",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "c3072b96-5009-40de-8d95-7feae67f1be5",
+      "label": "open",
+      "first": "2020-10-19T18:44:30.260Z",
+      "last": "2020-10-19T18:44:30.260Z",
+      "signed_return_5m_bps": "-22.646669230440565",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "23d48433-b14a-48dd-a8dc-ed1920e0b7ba",
+      "label": "mixed",
+      "first": "2020-10-20T08:43:48.530Z",
+      "last": "2020-10-20T08:43:48.530Z",
+      "signed_return_5m_bps": "-0.9535566812823859",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "71b11de7-43a3-453c-bd91-035c855a2c5e",
+      "label": "open",
+      "first": "2020-10-20T15:54:49.276Z",
+      "last": "2020-10-20T15:54:49.276Z",
+      "signed_return_5m_bps": "17.04970379395876",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "4da71014-1e33-4f93-8476-ac67cce55811",
+      "label": "mixed",
+      "first": "2020-10-20T17:16:36.543Z",
+      "last": "2020-10-20T17:16:36.543Z",
+      "signed_return_5m_bps": "-6.912961803381412",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "5b7590a1-5139-4355-a582-57ecae59b49e",
+      "label": "mixed",
+      "first": "2020-10-20T17:52:32.423Z",
+      "last": "2020-10-20T17:52:32.423Z",
+      "signed_return_5m_bps": "-30.189173410215542",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "86586039-8eca-40e9-a4d3-d3426dc66b07",
+      "label": "open",
+      "first": "2020-10-20T20:19:52.681Z",
+      "last": "2020-10-20T20:19:52.681Z",
+      "signed_return_5m_bps": "1.6257423240539914",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "cf3a787c-b687-4e43-a727-f77f5701a267",
+      "label": "open",
+      "first": "2020-10-21T07:35:54.484Z",
+      "last": "2020-10-21T07:35:54.484Z",
+      "signed_return_5m_bps": "-2.927872357924022",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "c076a67f-a370-474f-b66b-2e3d032582e8",
+      "label": "mixed",
+      "first": "2020-10-21T17:05:38.097Z",
+      "last": "2020-10-21T17:05:38.466Z",
+      "signed_return_5m_bps": "-28.595870435899062",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a345beec-e7b7-4561-ba80-00dce2afd1a7",
+      "label": "mixed",
+      "first": "2020-10-22T11:37:33.914Z",
+      "last": "2020-10-22T11:37:33.922Z",
+      "signed_return_5m_bps": "13.528774752475936",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "82f6411f-7b61-4b88-a797-f82bca9656ad",
+      "label": "mixed",
+      "first": "2020-10-22T20:39:24.169Z",
+      "last": "2020-10-22T20:39:24.169Z",
+      "signed_return_5m_bps": "0.3953320409011418",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "b4c2580e-4756-48b7-8639-0daa75d51c68",
+      "label": "open",
+      "first": "2020-10-22T20:55:38.412Z",
+      "last": "2020-10-22T20:55:38.412Z",
+      "signed_return_5m_bps": "-4.528819762122938",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "b60d1f9c-934d-49c4-a4d8-5c6945156211",
+      "label": "open",
+      "first": "2020-10-27T05:28:44.856Z",
+      "last": "2020-10-27T05:28:44.856Z",
+      "signed_return_5m_bps": "2.283227062731541",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "d6bac47f-34b3-4996-89ce-f57ee6005426",
+      "label": "mixed",
+      "first": "2020-10-27T16:45:29.839Z",
+      "last": "2020-10-27T16:45:38.678Z",
+      "signed_return_5m_bps": "11.511055608609544",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "40d8812b-57e8-40f0-a185-dd99e3e90e8b",
+      "label": "open",
+      "first": "2020-10-28T11:44:56.279Z",
+      "last": "2020-10-28T11:44:56.279Z",
+      "signed_return_5m_bps": "11.161230195712024",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "2f894bad-c83a-4cae-a231-3009e344d291",
+      "label": "open",
+      "first": "2020-10-29T14:40:01.925Z",
+      "last": "2020-10-29T14:40:01.925Z",
+      "signed_return_5m_bps": "-1.6446511627909999",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "f4011af5-dd27-4866-a385-bf1ec61b4725",
+      "label": "open",
+      "first": "2020-10-30T16:21:04.452Z",
+      "last": "2020-10-30T16:21:04.452Z",
+      "signed_return_5m_bps": "-7.027406886859211",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "ec4a4859-6dff-40a9-835c-ea6ee7245b7f",
+      "label": "open",
+      "first": "2020-10-30T22:39:55.027Z",
+      "last": "2020-10-30T22:39:55.027Z",
+      "signed_return_5m_bps": "-21.170922220993262",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "8f0eca24-d920-43e4-8b45-af5d19a5d914",
+      "label": "open",
+      "first": "2020-10-31T09:54:58.223Z",
+      "last": "2020-10-31T09:54:58.223Z",
+      "signed_return_5m_bps": "-2.1457373271882574",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "07de42f3-8e95-4e78-a91c-10ff65baaf6f",
+      "label": "mixed",
+      "first": "2020-11-02T02:08:15.337Z",
+      "last": "2020-11-02T02:08:15.337Z",
+      "signed_return_5m_bps": "49.20374621916079",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "5b4d2641-29d4-4c11-851b-430f95265653",
+      "label": "mixed",
+      "first": "2020-11-04T11:05:50.204Z",
+      "last": "2020-11-04T11:05:50.204Z",
+      "signed_return_5m_bps": "16.969242161882782",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "05a5b346-8def-48df-a9a7-c1bc99ccc75b",
+      "label": "open",
+      "first": "2020-11-04T17:04:20.121Z",
+      "last": "2020-11-04T17:04:20.121Z",
+      "signed_return_5m_bps": "68.82989183874089",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "beb59b46-1b48-496f-ac16-22e3b007666a",
+      "label": "open",
+      "first": "2020-11-05T00:22:11.999Z",
+      "last": "2020-11-05T00:22:11.999Z",
+      "signed_return_5m_bps": "-31.755326654437923",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "7df7d550-4930-4da3-93d1-8a5e094a423d",
+      "label": "open",
+      "first": "2020-11-05T14:16:19.346Z",
+      "last": "2020-11-05T14:16:19.346Z",
+      "signed_return_5m_bps": "12.103301205629302",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "df51eaee-3b2e-4d5c-b27c-abe55cc1f4b4",
+      "label": "open",
+      "first": "2020-11-05T23:18:19.825Z",
+      "last": "2020-11-05T23:18:19.825Z",
+      "signed_return_5m_bps": "34.4282664797535",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "ec498fb2-711d-4baa-9ebc-27c0e8291d33",
+      "label": "mixed",
+      "first": "2020-11-06T20:10:53.722Z",
+      "last": "2020-11-06T20:10:53.722Z",
+      "signed_return_5m_bps": "13.613744844181985",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "8e1af4df-f6fd-48b6-8ff8-545a5284f54b",
+      "label": "mixed",
+      "first": "2020-11-07T14:16:35.626Z",
+      "last": "2020-11-07T14:16:35.626Z",
+      "signed_return_5m_bps": "39.36453004778295",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "a8db93f9-7254-4ebc-a353-bd95e9b9d675",
+      "label": "open",
+      "first": "2020-11-07T22:37:26.115Z",
+      "last": "2020-11-07T22:37:26.115Z",
+      "signed_return_5m_bps": "-24.699851612033363",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "00e4090a-e362-4d59-8d43-32064538dbd2",
+      "label": "mixed",
+      "first": "2020-11-09T13:52:41.018Z",
+      "last": "2020-11-09T13:52:41.018Z",
+      "signed_return_5m_bps": "45.36082474226877",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "2446a5be-4f35-42b5-bece-9cd0a04311de",
+      "label": "mixed",
+      "first": "2020-11-09T15:16:00.812Z",
+      "last": "2020-11-09T15:16:01.956Z",
+      "signed_return_5m_bps": "22.90745971091468",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "c6903120-036b-4186-b6da-0d12d09aac63",
+      "label": "open",
+      "first": "2020-11-10T05:26:40.525Z",
+      "last": "2020-11-10T05:26:40.525Z",
+      "signed_return_5m_bps": "-44.317152103559025",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "120e505c-37eb-4936-9de6-272ace8e9e41",
+      "label": "open",
+      "first": "2020-11-14T16:48:38.566Z",
+      "last": "2020-11-14T16:48:38.566Z",
+      "signed_return_5m_bps": "25.02360717658192",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4346995c-f4e0-48f2-9b50-69e78d772b91",
+      "label": "mixed",
+      "first": "2020-11-15T20:26:46.379Z",
+      "last": "2020-11-15T20:26:46.379Z",
+      "signed_return_5m_bps": "14.454789332492002",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "0e26d4cc-69b4-45b8-8f2e-43d1b4ac5c51",
+      "label": "open",
+      "first": "2020-11-16T01:06:58.472Z",
+      "last": "2020-11-16T01:06:58.472Z",
+      "signed_return_5m_bps": "-24.929884699282923",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "5a90358a-0be7-413e-8f7b-8df34078df21",
+      "label": "open",
+      "first": "2020-11-16T17:15:06.821Z",
+      "last": "2020-11-16T17:15:06.821Z",
+      "signed_return_5m_bps": "-4.884195367813593",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "c648e269-6fc4-42dc-86bc-e12982ddb808",
+      "label": "open",
+      "first": "2020-11-18T02:03:54.075Z",
+      "last": "2020-11-18T02:03:54.075Z",
+      "signed_return_5m_bps": "-23.854090319671563",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "04e9fb7b-b168-460d-8f3d-7a54557afd45",
+      "label": "open",
+      "first": "2020-11-19T08:46:11.520Z",
+      "last": "2020-11-19T08:46:11.520Z",
+      "signed_return_5m_bps": "-29.780654028979114",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "1c6e970e-3ed8-4c0b-8949-ce930b5d5d33",
+      "label": "open",
+      "first": "2020-11-19T16:07:59.430Z",
+      "last": "2020-11-19T16:07:59.430Z",
+      "signed_return_5m_bps": "7.6375368526448995",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "939e61f9-7162-47cc-bdc3-241173cd4071",
+      "label": "mixed",
+      "first": "2020-11-20T09:36:58.793Z",
+      "last": "2020-11-20T09:36:58.793Z",
+      "signed_return_5m_bps": "-2.72495994693589",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "077e5fca-2320-4314-ae84-228f18e7336f",
+      "label": "mixed",
+      "first": "2020-11-20T14:43:45.273Z",
+      "last": "2020-11-20T14:43:45.273Z",
+      "signed_return_5m_bps": "2.82982263530962",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "48e7f165-1b5f-4890-9d73-f38b8a4bf8ae",
+      "label": "open",
+      "first": "2020-11-21T02:41:52.184Z",
+      "last": "2020-11-21T02:41:52.184Z",
+      "signed_return_5m_bps": "8.225441977934844",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "bd3547cd-09f4-446b-995b-f265b5693d38",
+      "label": "open",
+      "first": "2020-11-23T17:26:16.790Z",
+      "last": "2020-11-23T17:26:16.790Z",
+      "signed_return_5m_bps": "-43.35633932938343",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "c4c50ed5-23b2-43bf-b02a-39bf42cac59c",
+      "label": "mixed",
+      "first": "2020-11-24T09:37:31.814Z",
+      "last": "2020-11-24T09:37:31.814Z",
+      "signed_return_5m_bps": "78.07061425449513",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "b258ba22-681c-4a68-a3bd-a4bf9fc51b78",
+      "label": "open",
+      "first": "2020-11-24T16:15:11.428Z",
+      "last": "2020-11-24T16:15:11.428Z",
+      "signed_return_5m_bps": "56.31042995268509",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "f57faca7-fffd-4a90-8067-ca1a98925d8b",
+      "label": "open",
+      "first": "2020-11-25T05:02:53.980Z",
+      "last": "2020-11-25T05:02:53.980Z",
+      "signed_return_5m_bps": "-4.187113292084543",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "639bf1f2-a02d-4e12-8a65-4b85fdc0d464",
+      "label": "mixed",
+      "first": "2020-11-25T14:29:20.200Z",
+      "last": "2020-11-25T14:29:20.200Z",
+      "signed_return_5m_bps": "18.45809007506194",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "be2823df-906f-4ef9-811d-ddd5cab43b82",
+      "label": "open",
+      "first": "2020-11-25T15:48:42.683Z",
+      "last": "2020-11-25T15:48:42.683Z",
+      "signed_return_5m_bps": "30.804012265475134",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "ae14f076-0c54-4fd9-a147-fbb4249f3e97",
+      "label": "open",
+      "first": "2020-11-26T05:51:37.972Z",
+      "last": "2020-11-26T05:51:37.972Z",
+      "signed_return_5m_bps": "-0.44146409611700577",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "cf6c9429-0cd8-477b-bf4e-a7c849c86c30",
+      "label": "mixed",
+      "first": "2020-11-26T08:31:45.596Z",
+      "last": "2020-11-26T08:31:45.596Z",
+      "signed_return_5m_bps": "56.41817025275442",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4c01d177-d85e-4058-8891-e02f5aaa5bcd",
+      "label": "mixed",
+      "first": "2020-11-26T11:59:39.503Z",
+      "last": "2020-11-26T11:59:39.503Z",
+      "signed_return_5m_bps": "-40.46554447410089",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "07c05027-60a0-4454-928a-8f8be721346f",
+      "label": "open",
+      "first": "2020-11-26T17:01:29.742Z",
+      "last": "2020-11-26T17:01:29.742Z",
+      "signed_return_5m_bps": "-44.25249169435097",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a7f13f1b-5200-40b0-b756-d8e574b499bb",
+      "label": "mixed",
+      "first": "2020-11-28T04:44:44.987Z",
+      "last": "2020-11-28T04:44:44.987Z",
+      "signed_return_5m_bps": "-0.5905279319717849",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "5caf393f-6c76-498d-9a4d-ef556dc3542b",
+      "label": "mixed",
+      "first": "2020-11-28T12:36:16.625Z",
+      "last": "2020-11-28T12:36:16.625Z",
+      "signed_return_5m_bps": "0.29256019426049384",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "0ec37dfc-617a-4618-a0a0-31a25e3c45f2",
+      "label": "open",
+      "first": "2020-11-30T14:56:09.826Z",
+      "last": "2020-11-30T14:56:09.826Z",
+      "signed_return_5m_bps": "-50.86353376784758",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "12832551-689d-4dc4-87a8-2536675c3d6c",
+      "label": "open",
+      "first": "2020-12-01T03:55:55.191Z",
+      "last": "2020-12-01T03:55:55.191Z",
+      "signed_return_5m_bps": "-62.51536255633017",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "675a649b-0c6e-47e0-96ce-03fd8520110a",
+      "label": "open",
+      "first": "2020-12-01T14:29:02.977Z",
+      "last": "2020-12-01T14:29:02.977Z",
+      "signed_return_5m_bps": "99.13057307957551",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a8b83358-5bdb-4105-8b0c-380b626307f3",
+      "label": "mixed",
+      "first": "2020-12-01T14:50:29.199Z",
+      "last": "2020-12-01T14:50:29.199Z",
+      "signed_return_5m_bps": "-20.31891133849273",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "9717f261-e0c0-4c98-81a7-1b9c3a1907c2",
+      "label": "mixed",
+      "first": "2020-12-07T12:03:25.850Z",
+      "last": "2020-12-07T12:03:25.850Z",
+      "signed_return_5m_bps": "-17.24613178794021",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4381d1ad-1477-4ff5-950e-c2fa726160d3",
+      "label": "mixed",
+      "first": "2020-12-10T09:53:27.583Z",
+      "last": "2020-12-10T09:53:27.583Z",
+      "signed_return_5m_bps": "18.458678476720447",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "9843bcfa-4eba-4e94-beaa-e05224cbd369",
+      "label": "mixed",
+      "first": "2020-12-10T18:48:20.048Z",
+      "last": "2020-12-10T18:48:20.059Z",
+      "signed_return_5m_bps": "17.185792349727613",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "56f2fd35-998b-4c23-b266-13aab66283a2",
+      "label": "open",
+      "first": "2020-12-11T01:01:51.050Z",
+      "last": "2020-12-11T01:01:51.050Z",
+      "signed_return_5m_bps": "38.75695784733235",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "6f4df102-8454-4cfb-aa6d-21beedd81acd",
+      "label": "open",
+      "first": "2020-12-12T21:41:21.823Z",
+      "last": "2020-12-12T21:41:21.823Z",
+      "signed_return_5m_bps": "-22.350561558525108",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "39b7f540-a3ec-43dc-b7c7-e4648839b100",
+      "label": "mixed",
+      "first": "2020-12-16T22:52:43.106Z",
+      "last": "2020-12-16T22:52:43.106Z",
+      "signed_return_5m_bps": "13.000515150094483",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "c10d42a1-c91b-4188-867d-4218fef4ec09",
+      "label": "open",
+      "first": "2020-12-17T09:41:46.320Z",
+      "last": "2020-12-17T09:41:46.320Z",
+      "signed_return_5m_bps": "35.479192234741944",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "4cce0287-0de9-4178-b00e-d7153e48022d",
+      "label": "open",
+      "first": "2020-12-17T20:46:25.902Z",
+      "last": "2020-12-17T20:46:25.902Z",
+      "signed_return_5m_bps": "182.2346744368497",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a607dd04-0ed0-4c18-b637-93307f5d8fc4",
+      "label": "mixed",
+      "first": "2020-12-21T17:25:09.585Z",
+      "last": "2020-12-21T17:25:10.654Z",
+      "signed_return_5m_bps": "12.293931953701875",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "f004a8aa-bb1b-4fd6-bed9-60c32da6f56d",
+      "label": "open",
+      "first": "2020-12-21T23:57:20.972Z",
+      "last": "2020-12-21T23:57:20.972Z",
+      "signed_return_5m_bps": "-36.855026083906225",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "1da305fb-de40-418d-877b-3035e3a10c71",
+      "label": "open",
+      "first": "2020-12-23T22:14:30.283Z",
+      "last": "2020-12-23T22:14:30.283Z",
+      "signed_return_5m_bps": "-78.60466122784571",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "5b13f8ca-c9e8-400c-8f03-72b70a38ac42",
+      "label": "open",
+      "first": "2020-12-25T21:16:23.465Z",
+      "last": "2020-12-25T21:16:23.465Z",
+      "signed_return_5m_bps": "13.60807747784909",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "c68ef205-6108-41d5-b434-9f441fdadc5b",
+      "label": "open",
+      "first": "2020-12-26T09:28:19.089Z",
+      "last": "2020-12-26T09:28:19.089Z",
+      "signed_return_5m_bps": "-2.7969487831458473",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "8636a609-00e7-43c2-b237-4c54001c6f03",
+      "label": "mixed",
+      "first": "2020-12-27T21:17:09.916Z",
+      "last": "2020-12-27T21:17:09.929Z",
+      "signed_return_5m_bps": "-44.42572096051478",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "ee869f53-910d-4485-8f43-ba5b78067bb0",
+      "label": "open",
+      "first": "2020-12-31T04:03:40.549Z",
+      "last": "2020-12-31T04:03:40.549Z",
+      "signed_return_5m_bps": "-7.167470709854573",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "961721d6-133b-4bbe-b026-9243f2e1acaa",
+      "label": "mixed",
+      "first": "2021-01-02T12:33:01.573Z",
+      "last": "2021-01-02T12:33:01.573Z",
+      "signed_return_5m_bps": "-73.51543942992977",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "2df51f18-196b-47b3-9cba-ac6145c273fb",
+      "label": "mixed",
+      "first": "2021-01-02T16:07:48.436Z",
+      "last": "2021-01-02T16:07:48.436Z",
+      "signed_return_5m_bps": "29.625818521983316",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "28863afd-97aa-4089-9ac6-914778b08a2c",
+      "label": "mixed",
+      "first": "2021-01-02T20:12:50.757Z",
+      "last": "2021-01-02T20:12:50.757Z",
+      "signed_return_5m_bps": "17.235549463102686",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "778a2c6f-89a4-4690-9242-51f910f09075",
+      "label": "mixed",
+      "first": "2021-01-02T20:36:17.382Z",
+      "last": "2021-01-02T20:36:17.382Z",
+      "signed_return_5m_bps": "38.63678516228819",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "ed749f19-e92a-490c-905c-447bf3ed882e",
+      "label": "mixed",
+      "first": "2021-01-03T10:24:57.874Z",
+      "last": "2021-01-03T10:24:57.874Z",
+      "signed_return_5m_bps": "6.885129539807577",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "f109ff1f-e242-4555-8f97-2840b5695dbf",
+      "label": "open",
+      "first": "2021-01-03T17:22:17.147Z",
+      "last": "2021-01-03T17:22:17.147Z",
+      "signed_return_5m_bps": "-8.704976213849136",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "baa99adf-3b89-4d14-a8af-a5f4a301d75e",
+      "label": "open",
+      "first": "2021-01-04T10:58:27.489Z",
+      "last": "2021-01-04T10:58:27.489Z",
+      "signed_return_5m_bps": "39.7061743101057",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "8ea0592e-c96b-4b55-8d40-78e065719ae0",
+      "label": "mixed",
+      "first": "2021-01-04T11:31:09.155Z",
+      "last": "2021-01-04T11:31:09.523Z",
+      "signed_return_5m_bps": "-44.8075454152963",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "c4f34468-1556-4a4e-a50f-7a16836f9e67",
+      "label": "open",
+      "first": "2021-01-04T19:51:15.017Z",
+      "last": "2021-01-04T19:51:15.017Z",
+      "signed_return_5m_bps": "2.8346854383032305",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "1edd3b32-10da-482c-87d5-3c64060a524d",
+      "label": "open",
+      "first": "2021-01-05T18:43:07.595Z",
+      "last": "2021-01-05T18:43:07.595Z",
+      "signed_return_5m_bps": "8.880702069669066",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "97338fdd-3dd4-4c44-93e8-3d577207d5f9",
+      "label": "open",
+      "first": "2021-01-06T05:46:47.662Z",
+      "last": "2021-01-06T05:46:47.662Z",
+      "signed_return_5m_bps": "-4.412984412984766",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "1ed6c486-2b51-4266-842f-03149c6ed208",
+      "label": "mixed",
+      "first": "2021-01-06T07:49:25.966Z",
+      "last": "2021-01-06T07:49:25.966Z",
+      "signed_return_5m_bps": "18.322681170921395",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "f96c8cbf-114b-49ec-a897-44cfd16ca076",
+      "label": "open",
+      "first": "2021-01-06T20:04:24.564Z",
+      "last": "2021-01-06T20:04:24.564Z",
+      "signed_return_5m_bps": "68.81134768298658",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "23972cc1-1b53-49be-9e2c-8a234fa95704",
+      "label": "open",
+      "first": "2021-01-07T19:40:30.950Z",
+      "last": "2021-01-07T19:40:30.950Z",
+      "signed_return_5m_bps": "-78.82822219657193",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "b5f1d789-1ae8-4618-b2c3-bc1d9b8aea8f",
+      "label": "mixed",
+      "first": "2021-01-08T10:37:00.960Z",
+      "last": "2021-01-08T10:37:00.960Z",
+      "signed_return_5m_bps": "77.3723171701124",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "67c59cd5-457c-41c0-8e05-e5b15c027a1b",
+      "label": "mixed",
+      "first": "2021-01-08T20:53:38.971Z",
+      "last": "2021-01-08T20:53:38.971Z",
+      "signed_return_5m_bps": "-44.78756557961594",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e89a671a-0d26-414a-b0df-0a2c52a3424e",
+      "label": "mixed",
+      "first": "2021-01-08T21:05:25.835Z",
+      "last": "2021-01-08T21:05:25.835Z",
+      "signed_return_5m_bps": "-19.290206354718453",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "32e0949c-8a90-4c1f-ad26-8945caac55cb",
+      "label": "open",
+      "first": "2021-01-08T21:54:56.796Z",
+      "last": "2021-01-08T21:54:56.796Z",
+      "signed_return_5m_bps": "109.04716921720458",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "548cba77-30bd-45e6-8484-bacb678043c5",
+      "label": "open",
+      "first": "2021-01-09T02:45:30.854Z",
+      "last": "2021-01-09T02:45:30.854Z",
+      "signed_return_5m_bps": "60.56630008848485",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "f6bd91fa-3f2a-466c-a3ec-ef3b7235b119",
+      "label": "mixed",
+      "first": "2021-01-09T18:07:50.841Z",
+      "last": "2021-01-09T18:07:50.841Z",
+      "signed_return_5m_bps": "-15.953007403781694",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "69d0fd0e-adc6-4eaa-a95e-bea014b91345",
+      "label": "mixed",
+      "first": "2021-01-10T19:59:08.444Z",
+      "last": "2021-01-10T19:59:08.450Z",
+      "signed_return_5m_bps": "102.32115064670255",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "352b4bc8-ce11-42f1-a001-b29e21930e14",
+      "label": "mixed",
+      "first": "2021-01-10T21:05:41.216Z",
+      "last": "2021-01-10T21:05:41.216Z",
+      "signed_return_5m_bps": "-14.313376803003486",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "aa7f1d88-01a9-407e-b0ae-c9d801894ec4",
+      "label": "mixed",
+      "first": "2021-01-11T00:20:35.232Z",
+      "last": "2021-01-11T00:20:35.232Z",
+      "signed_return_5m_bps": "-54.93749513827528",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "d96be3fd-6277-4e4a-aef7-6cdfc1d24972",
+      "label": "open",
+      "first": "2021-01-11T00:45:16.855Z",
+      "last": "2021-01-11T00:45:16.855Z",
+      "signed_return_5m_bps": "-32.7763150824778",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "40ffc14a-e170-4d08-9ad1-d5a341f2d203",
+      "label": "mixed",
+      "first": "2021-01-11T04:21:52.312Z",
+      "last": "2021-01-11T04:21:52.338Z",
+      "signed_return_5m_bps": "-139.6513542672184",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "0ed8d0db-c346-4a05-a07d-d794ba6e129a",
+      "label": "open",
+      "first": "2021-01-11T17:45:09.951Z",
+      "last": "2021-01-11T17:45:09.951Z",
+      "signed_return_5m_bps": "51.499527107423674",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "7ecf250f-6e27-4102-8a9e-b4726c6aa7ed",
+      "label": "mixed",
+      "first": "2021-01-11T18:51:57.740Z",
+      "last": "2021-01-11T18:51:58.120Z",
+      "signed_return_5m_bps": "-100.26995874787615",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "d4a687f1-b086-4572-a222-b7746f84520e",
+      "label": "mixed",
+      "first": "2021-01-12T13:25:08.247Z",
+      "last": "2021-01-12T13:25:08.256Z",
+      "signed_return_5m_bps": "25.808322459039967",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "9caa803a-49cb-4586-a374-ed2fe9df9742",
+      "label": "mixed",
+      "first": "2021-01-13T05:27:50.940Z",
+      "last": "2021-01-13T05:27:50.940Z",
+      "signed_return_5m_bps": "-2.58138795049212",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "f629dacb-4d35-47f0-89a3-8547f0e6052b",
+      "label": "open",
+      "first": "2021-01-13T05:53:40.164Z",
+      "last": "2021-01-13T05:53:40.164Z",
+      "signed_return_5m_bps": "88.40628031037801",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "755b0e60-6850-46a6-98c1-a1dd1959e866",
+      "label": "mixed",
+      "first": "2021-01-15T06:15:16.128Z",
+      "last": "2021-01-15T06:15:16.128Z",
+      "signed_return_5m_bps": "-36.59727644482081",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "68c3480e-b53a-4f2f-979a-29a81f62dd8b",
+      "label": "open",
+      "first": "2021-01-15T13:05:57.734Z",
+      "last": "2021-01-15T13:05:57.734Z",
+      "signed_return_5m_bps": "5.796030405404995",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "43f80a09-e1dc-478b-9c4e-13725a5e396f",
+      "label": "mixed",
+      "first": "2021-01-15T14:25:04.799Z",
+      "last": "2021-01-15T14:25:04.799Z",
+      "signed_return_5m_bps": "-0.29490247874575104",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "ef3d1729-9803-40cd-adef-f94027d71359",
+      "label": "mixed",
+      "first": "2021-01-15T22:43:07.197Z",
+      "last": "2021-01-15T22:43:07.197Z",
+      "signed_return_5m_bps": "-26.833616271428884",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "d53b47d0-1e65-400a-888e-c5ff5499b9dd",
+      "label": "open",
+      "first": "2021-01-16T00:38:36.967Z",
+      "last": "2021-01-16T00:38:36.967Z",
+      "signed_return_5m_bps": "-10.916924734079014",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "1277d99e-190a-40fe-a024-5626d14c81f9",
+      "label": "open",
+      "first": "2021-01-16T02:52:08.822Z",
+      "last": "2021-01-16T02:52:08.822Z",
+      "signed_return_5m_bps": "-66.95203600043942",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "73e0ec3b-4056-4314-933c-5eafbb8d88e9",
+      "label": "mixed",
+      "first": "2021-01-17T06:11:40.492Z",
+      "last": "2021-01-17T06:11:40.492Z",
+      "signed_return_5m_bps": "-31.230129273518425",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "28b72b5b-3413-409b-b7f5-f9262dc94f34",
+      "label": "open",
+      "first": "2021-01-17T06:21:34.502Z",
+      "last": "2021-01-17T06:21:34.502Z",
+      "signed_return_5m_bps": "23.371592948078224",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "8b4be1ac-76af-43ae-94a8-fefe9d5c3769",
+      "label": "open",
+      "first": "2021-01-17T09:30:51.337Z",
+      "last": "2021-01-17T09:30:51.337Z",
+      "signed_return_5m_bps": "-6.326020070736016",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "2c0e9510-d730-4d8f-87b6-2d51d7e20734",
+      "label": "mixed",
+      "first": "2021-01-17T12:27:32.607Z",
+      "last": "2021-01-17T12:27:32.607Z",
+      "signed_return_5m_bps": "53.047169188904505",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "0f03bb29-a43c-4911-950e-c3878585f6b7",
+      "label": "open",
+      "first": "2021-01-17T14:00:58.239Z",
+      "last": "2021-01-17T14:00:58.239Z",
+      "signed_return_5m_bps": "-3.725338602067474",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "2273f7c7-6ee1-409b-bc0c-4614ca1f7c74",
+      "label": "open",
+      "first": "2021-01-17T14:59:56.470Z",
+      "last": "2021-01-17T14:59:56.470Z",
+      "signed_return_5m_bps": "30.744457543778747",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "3c7517c3-098d-47fb-8864-a8c9286d9685",
+      "label": "open",
+      "first": "2021-01-18T12:06:37.022Z",
+      "last": "2021-01-18T12:06:37.022Z",
+      "signed_return_5m_bps": "-74.28648648648561",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "950c0f41-aad2-4f62-96c8-bc39ab8620d7",
+      "label": "mixed",
+      "first": "2021-01-18T23:22:12.610Z",
+      "last": "2021-01-18T23:22:12.610Z",
+      "signed_return_5m_bps": "-15.707526408450523",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "ff95f9db-5633-4fb8-b51e-61f59a6d71d0",
+      "label": "open",
+      "first": "2021-01-20T11:16:37.835Z",
+      "last": "2021-01-20T11:16:37.835Z",
+      "signed_return_5m_bps": "-4.327625504061405",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "b6360117-7100-4cd9-9000-f0ed0860c9a1",
+      "label": "mixed",
+      "first": "2021-01-22T06:01:15.040Z",
+      "last": "2021-01-22T06:01:15.040Z",
+      "signed_return_5m_bps": "6.761985626203559",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "78348496-3a8d-4f85-ae15-bfe816bc6f29",
+      "label": "mixed",
+      "first": "2021-01-22T07:34:42.605Z",
+      "last": "2021-01-22T07:34:42.710Z",
+      "signed_return_5m_bps": "-34.411915767847965",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "60aad75d-e8db-4687-9066-33c2fa3f713e",
+      "label": "open",
+      "first": "2021-01-24T13:06:53.382Z",
+      "last": "2021-01-24T13:06:53.382Z",
+      "signed_return_5m_bps": "-8.167290770961788",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "2ad13be5-a0ad-42a5-bcb8-6247405f1698",
+      "label": "mixed",
+      "first": "2021-01-28T06:10:29.152Z",
+      "last": "2021-01-28T06:10:29.152Z",
+      "signed_return_5m_bps": "-5.666194745947983",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "b9162bbf-053f-474e-87ca-4e5a89bfa9b5",
+      "label": "open",
+      "first": "2021-01-28T23:44:17.509Z",
+      "last": "2021-01-28T23:44:17.509Z",
+      "signed_return_5m_bps": "-30.966274650627845",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "d9c506c5-c911-470e-9f27-3eda6b11a2fd",
+      "label": "mixed",
+      "first": "2021-01-29T02:38:53.467Z",
+      "last": "2021-01-29T02:38:55.987Z",
+      "signed_return_5m_bps": "-7.784466477808172",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "e4cd0973-856d-43c5-929c-a06f413a75bd",
+      "label": "mixed",
+      "first": "2021-01-29T08:18:30.298Z",
+      "last": "2021-01-29T08:18:30.298Z",
+      "signed_return_5m_bps": "-36.916640842888924",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "c6a00124-1f7e-4530-aa71-ea347cec42f5",
+      "label": "mixed",
+      "first": "2021-01-29T17:59:13.567Z",
+      "last": "2021-01-29T17:59:13.567Z",
+      "signed_return_5m_bps": "8.715169178121762",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "be2cd506-6c40-4a02-99a7-8987475ffd36",
+      "label": "open",
+      "first": "2021-01-31T15:36:56.365Z",
+      "last": "2021-01-31T15:36:56.365Z",
+      "signed_return_5m_bps": "-41.424514544476935",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e66c8a94-2e0c-4f93-a774-32b0d319ef83",
+      "label": "mixed",
+      "first": "2021-02-01T01:42:22.423Z",
+      "last": "2021-02-01T01:42:22.423Z",
+      "signed_return_5m_bps": "-8.353305784790654",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "1797e805-34d4-48f6-8ec3-05e8cbaf659e",
+      "label": "mixed",
+      "first": "2021-02-02T20:04:15.047Z",
+      "last": "2021-02-02T20:04:15.047Z",
+      "signed_return_5m_bps": "21.880912632163962",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "38464f31-d220-44c2-b6c7-fd2e3b79ae76",
+      "label": "mixed",
+      "first": "2021-02-04T08:14:53.842Z",
+      "last": "2021-02-04T08:14:53.842Z",
+      "signed_return_5m_bps": "10.835122937817854",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "58c0dd6c-efc5-413b-bc96-0f08c9e30d08",
+      "label": "mixed",
+      "first": "2021-02-04T12:02:33.275Z",
+      "last": "2021-02-04T12:02:33.275Z",
+      "signed_return_5m_bps": "73.7397751541291",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "1b103d4b-0c8e-4399-8281-19539e2df7c8",
+      "label": "open",
+      "first": "2021-02-04T13:36:21.702Z",
+      "last": "2021-02-04T13:36:21.702Z",
+      "signed_return_5m_bps": "-46.78146616893475",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "103205b1-4b14-42bc-9615-09f355b5be48",
+      "label": "mixed",
+      "first": "2021-02-04T18:19:33.036Z",
+      "last": "2021-02-04T18:19:33.279Z",
+      "signed_return_5m_bps": "-61.30896384894502",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "aeea663f-1db1-4561-8eaa-7ec84bbbfcea",
+      "label": "open",
+      "first": "2021-02-05T14:59:46.939Z",
+      "last": "2021-02-05T14:59:46.939Z",
+      "signed_return_5m_bps": "30.109328968904727",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "2e6c670e-cc80-4b55-9840-58b82cf0b8fe",
+      "label": "mixed",
+      "first": "2021-02-07T04:36:41.586Z",
+      "last": "2021-02-07T04:36:41.586Z",
+      "signed_return_5m_bps": "-11.515832962895045",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "8facb1f4-7f6e-4e9b-97de-b517535d6b0d",
+      "label": "mixed",
+      "first": "2021-02-13T10:59:10.817Z",
+      "last": "2021-02-13T11:22:01.710Z",
+      "signed_return_5m_bps": "-2.5753011360984956",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "9a6a6331-6582-4e50-8301-c2e4eef2be95",
+      "label": "mixed",
+      "first": "2021-02-22T15:00:07.665Z",
+      "last": "2021-02-22T15:00:07.665Z",
+      "signed_return_5m_bps": "-55.69468868803496",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "d37eff01-a55c-42cb-8435-5c9bf1979bf7",
+      "label": "mixed",
+      "first": "2021-02-22T17:09:30.901Z",
+      "last": "2021-02-22T17:09:30.914Z",
+      "signed_return_5m_bps": "-15.749215107981884",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "1c00bbf0-ac1e-4b68-acfc-be3fe9ff0946",
+      "label": "mixed",
+      "first": "2021-02-27T19:59:51.385Z",
+      "last": "2021-02-27T19:59:54.511Z",
+      "signed_return_5m_bps": "-23.42490437201694",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "cfba29f6-3903-418a-ada0-c8a83d76f874",
+      "label": "open",
+      "first": "2021-03-03T11:23:17.332Z",
+      "last": "2021-03-03T11:23:17.332Z",
+      "signed_return_5m_bps": "28.498663914104938",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4e05ae14-bc09-4256-b499-f355e880be59",
+      "label": "mixed",
+      "first": "2021-03-10T21:04:42.597Z",
+      "last": "2021-03-10T21:04:42.660Z",
+      "signed_return_5m_bps": "-41.71859099105557",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "2240b50a-de2c-4413-8951-ef4f132c1098",
+      "label": "mixed",
+      "first": "2021-03-22T19:59:04.684Z",
+      "last": "2021-03-22T19:59:04.684Z",
+      "signed_return_5m_bps": "-35.693273542600764",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4be5a6c2-13ed-4e21-803e-44f122af5f5d",
+      "label": "mixed",
+      "first": "2021-03-25T06:14:42.027Z",
+      "last": "2021-03-25T06:14:42.038Z",
+      "signed_return_5m_bps": "6.309255079006704",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "6b546c66-35c1-4f62-ad01-3cf12ed6ef86",
+      "label": "open",
+      "first": "2021-03-25T15:00:36.070Z",
+      "last": "2021-03-25T15:00:36.070Z",
+      "signed_return_5m_bps": "-80.51047247929932",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "2a0232e9-25fc-4b32-acdb-2a022082b41f",
+      "label": "mixed",
+      "first": "2021-03-25T22:46:44.810Z",
+      "last": "2021-03-25T22:46:46.083Z",
+      "signed_return_5m_bps": "-44.08282320431445",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a686d101-fbaa-42ae-84c8-52e343b79373",
+      "label": "open",
+      "first": "2021-03-26T23:54:29.520Z",
+      "last": "2021-03-26T23:54:29.520Z",
+      "signed_return_5m_bps": "-2.0902060216099194",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "74d91aa3-889a-40bb-b786-bab5bb017d0f",
+      "label": "mixed",
+      "first": "2021-04-25T08:13:34.823Z",
+      "last": "2021-04-25T08:13:34.823Z",
+      "signed_return_5m_bps": "-44.032884450497804",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "15661f7a-ac4d-4a7f-953e-1400aebf8554",
+      "label": "mixed",
+      "first": "2021-04-25T10:54:31.320Z",
+      "last": "2021-04-25T10:54:31.320Z",
+      "signed_return_5m_bps": "-20.7821727924018",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "a15dbb45-5bf7-431c-9d6c-49cc5c4bf6e1",
+      "label": "mixed",
+      "first": "2021-04-26T01:22:01.954Z",
+      "last": "2021-04-26T01:22:01.954Z",
+      "signed_return_5m_bps": "15.218033852884005",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4e8681f2-1965-4379-b8dd-a146c6cf605b",
+      "label": "mixed",
+      "first": "2021-05-13T09:41:06.288Z",
+      "last": "2021-05-13T09:41:07.106Z",
+      "signed_return_5m_bps": "-33.320581484315156",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "9cff138a-c7f9-40df-aff6-b3b386c58479",
+      "label": "mixed",
+      "first": "2021-05-13T18:02:46.435Z",
+      "last": "2021-05-13T18:02:46.435Z",
+      "signed_return_5m_bps": "65.77595066803666",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "53d55d54-f02d-4ef7-a736-98dd44767363",
+      "label": "mixed",
+      "first": "2021-05-13T19:17:53.922Z",
+      "last": "2021-05-13T19:18:22.660Z",
+      "signed_return_5m_bps": "36.555278624772484",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "f160d2cb-f903-4adf-9cde-86d6c2ba8d70",
+      "label": "open",
+      "first": "2021-05-15T10:27:28.057Z",
+      "last": "2021-05-15T10:27:28.057Z",
+      "signed_return_5m_bps": "-37.1367735470951",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "3638a09e-ab78-41ef-a13a-549067352fc8",
+      "label": "mixed",
+      "first": "2021-05-15T12:31:34.066Z",
+      "last": "2021-05-15T12:31:34.940Z",
+      "signed_return_5m_bps": "-37.899906264009516",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "2741f09a-5afa-49b9-bacf-2ead8145d877",
+      "label": "mixed",
+      "first": "2021-05-17T00:47:24.491Z",
+      "last": "2021-05-17T00:47:24.491Z",
+      "signed_return_5m_bps": "26.7505440843685",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "5378d2ae-117a-4db9-a580-bb337ca79087",
+      "label": "mixed",
+      "first": "2021-05-18T20:08:42.689Z",
+      "last": "2021-05-18T20:08:42.689Z",
+      "signed_return_5m_bps": "29.96353840079791",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "6f0e4ffc-3b97-4dd8-854b-e833c7065a32",
+      "label": "mixed",
+      "first": "2021-05-19T08:51:26.161Z",
+      "last": "2021-05-19T08:51:26.161Z",
+      "signed_return_5m_bps": "1.8951856370075237",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "8a4e5191-804a-4cc6-b863-cce483377a5f",
+      "label": "open",
+      "first": "2021-05-19T10:37:10.497Z",
+      "last": "2021-05-19T10:37:10.497Z",
+      "signed_return_5m_bps": "74.48799570453302",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "6bee6c59-79c4-49a2-af4b-acc1959cf50b",
+      "label": "open",
+      "first": "2021-05-19T18:44:26.462Z",
+      "last": "2021-05-19T18:44:26.462Z",
+      "signed_return_5m_bps": "64.56751446928254",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "b6609779-d3f0-4d33-92d4-b5e5e7ecda62",
+      "label": "open",
+      "first": "2021-05-20T16:02:39.349Z",
+      "last": "2021-05-20T16:02:39.349Z",
+      "signed_return_5m_bps": "-318.22509016855906",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "f5591405-ef40-428b-b2fe-8d0ed1da4469",
+      "label": "open",
+      "first": "2021-05-20T22:39:34.834Z",
+      "last": "2021-05-20T22:39:34.834Z",
+      "signed_return_5m_bps": "-7.721978520647266",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "6dc0c4ed-6da1-47b4-afc1-393f9242e3de",
+      "label": "open",
+      "first": "2021-05-20T22:53:48.851Z",
+      "last": "2021-05-20T22:53:48.851Z",
+      "signed_return_5m_bps": "4.99358865797328",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "8f650ab0-0b27-4a7e-a93f-191e8e5e3a28",
+      "label": "mixed",
+      "first": "2021-05-22T18:18:06.694Z",
+      "last": "2021-05-22T18:18:06.694Z",
+      "signed_return_5m_bps": "-4.44245662653886",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e8433cee-f736-4a4d-8401-01a098eafcd5",
+      "label": "mixed",
+      "first": "2021-05-23T08:51:40.032Z",
+      "last": "2021-05-23T08:51:40.055Z",
+      "signed_return_5m_bps": "-127.01773803629024",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "5c974d84-52c7-4b31-9355-71e0e9664226",
+      "label": "open",
+      "first": "2021-05-23T11:17:27.605Z",
+      "last": "2021-05-23T11:17:27.605Z",
+      "signed_return_5m_bps": "61.94756339201079",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "2dc51e6e-d5e5-4dab-8fe9-f8632f1bdd11",
+      "label": "mixed",
+      "first": "2021-05-31T15:16:46.974Z",
+      "last": "2021-05-31T15:16:46.974Z",
+      "signed_return_5m_bps": "64.26389908771979",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "a5953800-312c-41a4-aee7-221ea45dc47b",
+      "label": "mixed",
+      "first": "2021-06-06T00:44:11.992Z",
+      "last": "2021-06-06T00:44:11.992Z",
+      "signed_return_5m_bps": "5.731303028601031",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "17e9c551-a8b3-4c5b-9f0b-4d9601fd166e",
+      "label": "mixed",
+      "first": "2021-06-13T17:29:52.969Z",
+      "last": "2021-06-13T17:29:52.969Z",
+      "signed_return_5m_bps": "-14.377538122259947",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "490fb463-902d-4ed6-8128-e78e7351329b",
+      "label": "mixed",
+      "first": "2021-06-19T04:24:25.908Z",
+      "last": "2021-06-19T04:24:25.908Z",
+      "signed_return_5m_bps": "58.354143181267304",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "40073e5d-c047-4b4c-a94f-ddb645fae043",
+      "label": "mixed",
+      "first": "2021-06-19T11:03:19.104Z",
+      "last": "2021-06-19T11:03:19.104Z",
+      "signed_return_5m_bps": "-10.44555422258231",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "69296ec4-49da-40ba-903e-f065223f4af0",
+      "label": "mixed",
+      "first": "2021-06-25T10:44:40.317Z",
+      "last": "2021-06-25T10:44:40.317Z",
+      "signed_return_5m_bps": "-35.707793852526315",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "2b2940d7-d5f2-4c9e-a2bf-276abcd94e7b",
+      "label": "open",
+      "first": "2021-06-25T14:03:10.487Z",
+      "last": "2021-06-25T14:03:10.487Z",
+      "signed_return_5m_bps": "-22.0366022515206",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "1624ac94-eb96-4fa9-8a39-b4be154d4373",
+      "label": "open",
+      "first": "2021-06-28T09:34:12.994Z",
+      "last": "2021-06-28T09:34:12.994Z",
+      "signed_return_5m_bps": "-26.60531933306509",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "24db94ba-b4a1-4804-95c5-84e94d457cd4",
+      "label": "mixed",
+      "first": "2021-06-29T12:07:41.780Z",
+      "last": "2021-06-29T12:07:41.984Z",
+      "signed_return_5m_bps": "43.44970232272094",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "c95a321d-c9bc-4ade-8e3c-3e59f12d833e",
+      "label": "open",
+      "first": "2021-07-03T20:01:35.006Z",
+      "last": "2021-07-03T20:01:35.006Z",
+      "signed_return_5m_bps": "-2.0145253328718304",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4ad07ff4-bee4-4a91-8d51-c827f166df63",
+      "label": "mixed",
+      "first": "2021-07-04T07:28:07.884Z",
+      "last": "2021-07-04T07:28:07.884Z",
+      "signed_return_5m_bps": "-18.982257859950778",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4a32fdab-9725-499c-a8a8-e9663718484a",
+      "label": "mixed",
+      "first": "2021-07-04T12:55:01.360Z",
+      "last": "2021-07-04T12:55:04.075Z",
+      "signed_return_5m_bps": "-13.264295617235744",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "bed6deda-9b9e-4af1-98e9-0edbc4a5a6a6",
+      "label": "mixed",
+      "first": "2021-07-08T07:58:06.420Z",
+      "last": "2021-07-08T07:58:06.420Z",
+      "signed_return_5m_bps": "-55.56983827637474",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "b89bf054-be07-4fce-998e-fae17db80edd",
+      "label": "mixed",
+      "first": "2021-07-09T13:08:10.613Z",
+      "last": "2021-07-09T13:08:10.613Z",
+      "signed_return_5m_bps": "12.016947363659991",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "1fd2df1b-237a-4faf-93af-afbc218c40d3",
+      "label": "mixed",
+      "first": "2021-07-24T02:05:22.588Z",
+      "last": "2021-07-24T02:05:22.588Z",
+      "signed_return_5m_bps": "-1.758379077967387",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "bd1636fa-5800-43d8-8972-643f58183be3",
+      "label": "mixed",
+      "first": "2021-07-26T06:54:54.589Z",
+      "last": "2021-07-26T06:54:54.589Z",
+      "signed_return_5m_bps": "-2.7421380390735273",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "7f810541-b3a7-4824-863b-4daf75875399",
+      "label": "mixed",
+      "first": "2021-07-26T21:46:35.454Z",
+      "last": "2021-07-26T21:46:35.454Z",
+      "signed_return_5m_bps": "53.40639810426539",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "045740c2-93a9-40fe-84d7-ff32f4c8a038",
+      "label": "open",
+      "first": "2021-07-27T02:43:53.379Z",
+      "last": "2021-07-27T02:43:53.379Z",
+      "signed_return_5m_bps": "12.922053128237021",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "cbdd17de-335f-4b9d-abe7-3d53ae418464",
+      "label": "open",
+      "first": "2021-07-27T21:33:39.890Z",
+      "last": "2021-07-27T21:33:39.890Z",
+      "signed_return_5m_bps": "-13.669224055958829",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "256bd4be-4950-4604-8330-2e93635a1694",
+      "label": "open",
+      "first": "2021-07-28T11:31:18.895Z",
+      "last": "2021-07-28T11:31:18.895Z",
+      "signed_return_5m_bps": "34.84776141330248",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "65127469-ed9d-46af-9ee3-799a14b171fc",
+      "label": "mixed",
+      "first": "2021-08-06T16:03:20.478Z",
+      "last": "2021-08-06T16:03:23.414Z",
+      "signed_return_5m_bps": "7.910949313918447",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "b0f7ad3d-bf5e-4b68-8618-0aa808bc6dd1",
+      "label": "open",
+      "first": "2021-10-17T20:02:24.334Z",
+      "last": "2021-10-17T20:02:24.334Z",
+      "signed_return_5m_bps": "50.32179130493031",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "8f9a32aa-7d42-4561-b96e-2074d18d225e",
+      "label": "mixed",
+      "first": "2021-10-27T07:43:34.432Z",
+      "last": "2021-10-27T07:43:34.432Z",
+      "signed_return_5m_bps": "0.5845177728380779",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "a441e9de-bd46-4226-8968-a40401ec0a4f",
+      "label": "mixed",
+      "first": "2021-10-28T08:51:50.771Z",
+      "last": "2021-10-28T08:51:50.771Z",
+      "signed_return_5m_bps": "-10.563305478907825",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "b3bb06f6-760d-4dfd-b30c-aa1d7923b758",
+      "label": "open",
+      "first": "2021-11-10T21:20:42.499Z",
+      "last": "2021-11-10T21:20:42.499Z",
+      "signed_return_5m_bps": "-77.79129316422772",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "ca0bd31a-a0fb-48f8-a04c-5b9e2d3c320a",
+      "label": "open",
+      "first": "2021-11-30T07:06:23.130Z",
+      "last": "2021-11-30T07:06:23.130Z",
+      "signed_return_5m_bps": "-6.530885868269998",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "bb049141-b3bc-4053-a86b-fad2027c9a45",
+      "label": "mixed",
+      "first": "2021-12-03T13:35:05.037Z",
+      "last": "2021-12-03T13:35:18.331Z",
+      "signed_return_5m_bps": "-14.656103082012484",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "3ae05646-1605-4e38-b0fb-ecd93f0bc642",
+      "label": "open",
+      "first": "2021-12-03T20:19:20.606Z",
+      "last": "2021-12-03T20:19:20.606Z",
+      "signed_return_5m_bps": "295.84405035873783",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "70f6a91d-8288-4024-a2a5-13c1431980a0",
+      "label": "open",
+      "first": "2021-12-04T04:55:34.631Z",
+      "last": "2021-12-04T04:55:34.631Z",
+      "signed_return_5m_bps": "99.0179999999996",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "6f1fe9fe-8de9-4b58-9f92-0db86a4ec85c",
+      "label": "mixed",
+      "first": "2021-12-04T11:39:53.726Z",
+      "last": "2021-12-04T11:39:58.049Z",
+      "signed_return_5m_bps": "-3.394988453154779",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "ceed41c0-bedd-4706-b5bc-9516c91b689d",
+      "label": "mixed",
+      "first": "2021-12-04T15:09:52.768Z",
+      "last": "2021-12-04T15:09:52.771Z",
+      "signed_return_5m_bps": "-41.20940649496197",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a038f309-fccf-4bfa-8c7e-c92de6900d55",
+      "label": "mixed",
+      "first": "2021-12-06T15:15:27.129Z",
+      "last": "2021-12-06T15:15:27.209Z",
+      "signed_return_5m_bps": "6.598035589528983",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "4f59174f-2e6d-4b6d-9386-5ffe6a58c8e7",
+      "label": "open",
+      "first": "2021-12-09T20:59:28.129Z",
+      "last": "2021-12-09T20:59:28.129Z",
+      "signed_return_5m_bps": "-22.040294345793132",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "1a497053-4a21-4a45-9c2f-c6d8a91b8a65",
+      "label": "open",
+      "first": "2021-12-10T02:19:13.454Z",
+      "last": "2021-12-10T02:19:13.454Z",
+      "signed_return_5m_bps": "29.882647923218375",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a2b51dbc-8a0f-4a36-b14d-4ded995e8df8",
+      "label": "mixed",
+      "first": "2021-12-11T07:29:44.430Z",
+      "last": "2021-12-11T07:39:28.170Z",
+      "signed_return_5m_bps": "-3.3406766688259815",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "fa2f71e8-cf60-4412-b77e-8dcba5a18b03",
+      "label": "mixed",
+      "first": "2021-12-16T22:08:01.186Z",
+      "last": "2021-12-16T22:08:01.238Z",
+      "signed_return_5m_bps": "30.56895193065401",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "0ee00730-f7aa-4c87-b36d-857098045f76",
+      "label": "open",
+      "first": "2021-12-17T20:17:37.515Z",
+      "last": "2021-12-17T20:17:37.515Z",
+      "signed_return_5m_bps": "3.086671678660391",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a8646d6b-39e1-4d18-8b67-f7ecd155a158",
+      "label": "mixed",
+      "first": "2021-12-18T02:05:22.877Z",
+      "last": "2021-12-18T02:05:22.927Z",
+      "signed_return_5m_bps": "50.183294918231255",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "9dfacb4d-ec36-4eed-9437-09e35e7a89ce",
+      "label": "mixed",
+      "first": "2021-12-29T12:27:01.471Z",
+      "last": "2021-12-29T12:27:02.109Z",
+      "signed_return_5m_bps": "-5.974361989886656",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "8827c85f-55aa-4094-9126-f36c642dc573",
+      "label": "mixed",
+      "first": "2022-01-03T23:38:28.794Z",
+      "last": "2022-01-03T23:39:19.374Z",
+      "signed_return_5m_bps": "-2.91228748898531",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "aa0dfc82-86c0-4084-8f5a-295b1f511fe7",
+      "label": "mixed",
+      "first": "2022-01-05T12:09:58.365Z",
+      "last": "2022-01-05T12:11:25.672Z",
+      "signed_return_5m_bps": "-7.005652164497889",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "c540b4b1-0bef-4bfe-9530-4d88a1bff225",
+      "label": "mixed",
+      "first": "2022-01-05T15:04:22.731Z",
+      "last": "2022-01-05T15:04:22.731Z",
+      "signed_return_5m_bps": "-29.728112175102517",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "ca63e0aa-45f7-4f26-bdfb-967b55f9fb57",
+      "label": "mixed",
+      "first": "2022-01-07T03:23:23.160Z",
+      "last": "2022-01-07T03:23:24.451Z",
+      "signed_return_5m_bps": "-31.07828655834588",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "3ac8558e-c2fc-44ba-9b6d-330b9d2b7bfc",
+      "label": "open",
+      "first": "2022-01-07T15:52:49.956Z",
+      "last": "2022-01-07T15:52:49.956Z",
+      "signed_return_5m_bps": "136.83835979485082",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "c4be9eda-d983-4269-9953-bcec44b204c9",
+      "label": "mixed",
+      "first": "2022-01-08T00:53:10.073Z",
+      "last": "2022-01-08T00:53:10.073Z",
+      "signed_return_5m_bps": "9.876040314129586",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "3fef0fad-46f4-43f9-88d6-76d8f2f73eef",
+      "label": "open",
+      "first": "2022-01-08T21:46:09.148Z",
+      "last": "2022-01-08T21:46:09.148Z",
+      "signed_return_5m_bps": "-23.89944614209383",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "52f13150-82bd-49ce-b0a4-6639c75f7542",
+      "label": "mixed",
+      "first": "2022-01-08T22:28:34.924Z",
+      "last": "2022-01-08T22:28:35.413Z",
+      "signed_return_5m_bps": "33.155143458617474",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "3cdccd62-2827-4ac2-bcaf-0615f2fe382a",
+      "label": "mixed",
+      "first": "2022-01-09T13:59:38.355Z",
+      "last": "2022-01-09T13:59:58.934Z",
+      "signed_return_5m_bps": "9.032491409970422",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "0730c526-803a-42be-b3fd-d1f61f8bd980",
+      "label": "mixed",
+      "first": "2022-01-10T15:35:45.869Z",
+      "last": "2022-01-10T15:35:45.869Z",
+      "signed_return_5m_bps": "-34.30414307765916",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "3fde7be4-59cc-4cdd-8448-06ce80467ba6",
+      "label": "mixed",
+      "first": "2022-01-10T17:32:43.900Z",
+      "last": "2022-01-10T17:32:43.900Z",
+      "signed_return_5m_bps": "-41.324905678866706",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "0afb57c1-9f12-4b19-a4ec-5225262f7a73",
+      "label": "open",
+      "first": "2022-01-10T17:49:25.779Z",
+      "last": "2022-01-10T17:49:25.779Z",
+      "signed_return_5m_bps": "38.74875337501082",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "941abe7e-3e3e-452d-a1c5-f7428b62456c",
+      "label": "mixed",
+      "first": "2022-01-10T17:56:38.117Z",
+      "last": "2022-01-10T17:56:38.230Z",
+      "signed_return_5m_bps": "-18.83702877104487",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "9979391a-327d-4b0b-9ed2-81a4dccebeca",
+      "label": "mixed",
+      "first": "2022-01-10T19:02:14.676Z",
+      "last": "2022-01-10T19:02:14.676Z",
+      "signed_return_5m_bps": "-8.706536521958519",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "41993dde-b54a-4286-834b-5c67596a8d60",
+      "label": "open",
+      "first": "2022-01-14T10:25:40.272Z",
+      "last": "2022-01-14T10:25:40.272Z",
+      "signed_return_5m_bps": "5.077830188678911",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "0807b376-7c63-4591-8fce-ae448764f83a",
+      "label": "open",
+      "first": "2022-01-15T20:33:55.342Z",
+      "last": "2022-01-15T20:33:55.342Z",
+      "signed_return_5m_bps": "13.3896384797616",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "c72b288f-c270-447a-af99-44121365ac3a",
+      "label": "mixed",
+      "first": "2022-01-25T21:35:00.880Z",
+      "last": "2022-01-25T21:35:00.895Z",
+      "signed_return_5m_bps": "31.890023049061522",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "6f51e08e-b1bc-4fc8-b055-bf810c910f49",
+      "label": "mixed",
+      "first": "2022-01-26T13:43:58.288Z",
+      "last": "2022-01-26T13:43:58.288Z",
+      "signed_return_5m_bps": "-43.570826306913446",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "47ad7f3b-6f47-4c6b-8c7f-3358ce4d667e",
+      "label": "open",
+      "first": "2022-01-26T22:01:33.556Z",
+      "last": "2022-01-26T22:01:33.556Z",
+      "signed_return_5m_bps": "-36.24183185986452",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "59aea4cc-1e0c-4728-bd16-aa2d3bc7dfd7",
+      "label": "mixed",
+      "first": "2022-01-27T03:43:54.473Z",
+      "last": "2022-01-27T03:43:54.482Z",
+      "signed_return_5m_bps": "-46.158806706666496",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "5d3d2617-976a-497e-b304-3840b6a75d1d",
+      "label": "mixed",
+      "first": "2022-01-27T11:45:04.013Z",
+      "last": "2022-01-27T11:45:04.013Z",
+      "signed_return_5m_bps": "-18.65088692891259",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "cf692800-ec32-43f0-a89b-f286f6d16513",
+      "label": "mixed",
+      "first": "2022-01-30T03:24:48.871Z",
+      "last": "2022-01-30T03:24:48.871Z",
+      "signed_return_5m_bps": "-7.493295472471573",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "85d3222c-6ac7-4313-a8b4-f28f66be0a17",
+      "label": "open",
+      "first": "2022-01-30T04:12:37.040Z",
+      "last": "2022-01-30T04:12:37.040Z",
+      "signed_return_5m_bps": "-3.825302396749386",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "8b640651-1600-44bf-a6ae-54740cc16146",
+      "label": "mixed",
+      "first": "2022-01-31T17:58:00.085Z",
+      "last": "2022-01-31T17:58:05.922Z",
+      "signed_return_5m_bps": "-12.848154634493847",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "b26e919b-0954-49bc-bad1-0e86154d0b49",
+      "label": "mixed",
+      "first": "2022-02-02T05:16:13.816Z",
+      "last": "2022-02-02T05:16:13.816Z",
+      "signed_return_5m_bps": "21.81103847030963",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "040a22af-b2b7-4b5b-abf7-5aa4116684e2",
+      "label": "open",
+      "first": "2022-02-02T12:10:58.943Z",
+      "last": "2022-02-02T12:10:58.943Z",
+      "signed_return_5m_bps": "4.269901205193882",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "0fee0f71-78e3-4119-a875-0459420dc716",
+      "label": "mixed",
+      "first": "2022-02-02T16:02:55.800Z",
+      "last": "2022-02-02T16:02:56.037Z",
+      "signed_return_5m_bps": "-34.39584282002639",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "506ed735-87cd-474c-90d0-a4ed7b30b80e",
+      "label": "mixed",
+      "first": "2022-02-04T05:35:36.323Z",
+      "last": "2022-02-04T05:35:36.323Z",
+      "signed_return_5m_bps": "13.898422326867887",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "836671f8-6f57-44dd-94f3-f438fafa7a1d",
+      "label": "mixed",
+      "first": "2022-02-07T00:29:52.002Z",
+      "last": "2022-02-07T00:29:52.002Z",
+      "signed_return_5m_bps": "-2.8737901247866127",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "57cc792f-48a4-4c16-a8bc-5f46807bf3ee",
+      "label": "open",
+      "first": "2022-02-07T09:35:32.247Z",
+      "last": "2022-02-07T09:35:32.247Z",
+      "signed_return_5m_bps": "-6.399262986321874",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "d9f2bbab-d6b1-4afa-83e6-6284f9cb0889",
+      "label": "open",
+      "first": "2022-02-09T02:29:50.677Z",
+      "last": "2022-02-09T02:29:50.677Z",
+      "signed_return_5m_bps": "-43.1711961225556",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "fbba9d2f-5bde-4de8-bd77-25897ac361f4",
+      "label": "mixed",
+      "first": "2022-02-11T13:42:59.367Z",
+      "last": "2022-02-11T13:42:59.367Z",
+      "signed_return_5m_bps": "-30.456922339185954",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "d3da9f19-b28e-4ea4-ac7a-681894a6a31c",
+      "label": "mixed",
+      "first": "2022-02-16T13:34:58.970Z",
+      "last": "2022-02-16T13:34:58.975Z",
+      "signed_return_5m_bps": "12.531899380241462",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "3f999d2a-02b4-4416-868f-9fd51dd82e17",
+      "label": "mixed",
+      "first": "2022-02-20T21:31:41.821Z",
+      "last": "2022-02-20T21:31:41.821Z",
+      "signed_return_5m_bps": "0.3938713616125078",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "3616852a-4bab-4951-a9c5-4a8b40afd7ff",
+      "label": "open",
+      "first": "2022-02-21T11:39:59.467Z",
+      "last": "2022-02-21T11:39:59.467Z",
+      "signed_return_5m_bps": "-53.789795837252406",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "c1312fd1-49ae-4931-8aae-3d02c957c0a7",
+      "label": "mixed",
+      "first": "2022-02-21T18:04:58.609Z",
+      "last": "2022-02-21T18:04:58.746Z",
+      "signed_return_5m_bps": "-78.04405839568874",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "4c681cd7-2dfb-43b4-a48f-29c05767117e",
+      "label": "mixed",
+      "first": "2022-02-22T16:51:02.492Z",
+      "last": "2022-02-22T16:51:02.492Z",
+      "signed_return_5m_bps": "-27.66882221986733",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "121fd896-a7e2-4600-bbf9-248644a08b63",
+      "label": "mixed",
+      "first": "2022-02-24T07:51:41.695Z",
+      "last": "2022-02-24T07:51:41.695Z",
+      "signed_return_5m_bps": "-15.834318932455016",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "a4960095-1c15-4d44-b5ce-b1d123a4abea",
+      "label": "open",
+      "first": "2022-02-26T08:02:04.064Z",
+      "last": "2022-02-26T08:02:04.064Z",
+      "signed_return_5m_bps": "-14.944404774048792",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "81783b3e-7014-485c-ba2f-2d24658a38a8",
+      "label": "mixed",
+      "first": "2022-02-27T19:48:21.263Z",
+      "last": "2022-02-27T19:48:21.263Z",
+      "signed_return_5m_bps": "-21.197792562086537",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "b9984407-f8bd-45e0-87af-6249deee2700",
+      "label": "mixed",
+      "first": "2022-02-28T06:15:23.716Z",
+      "last": "2022-02-28T06:15:23.716Z",
+      "signed_return_5m_bps": "-84.84268784839321",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "c3ecba17-41dd-465b-ad90-c38227fd59b6",
+      "label": "mixed",
+      "first": "2022-02-28T09:59:58.336Z",
+      "last": "2022-02-28T10:00:00.224Z",
+      "signed_return_5m_bps": "27.367426727191724",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a44d2f25-4469-4233-bcc4-324ba058cda6",
+      "label": "mixed",
+      "first": "2022-02-28T18:17:05.404Z",
+      "last": "2022-02-28T18:17:05.521Z",
+      "signed_return_5m_bps": "19.574926793053393",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "e32d8e51-9991-40d5-973b-9d2a7733734e",
+      "label": "mixed",
+      "first": "2022-03-04T00:52:48.070Z",
+      "last": "2022-03-04T00:52:48.412Z",
+      "signed_return_5m_bps": "-6.521320627586036",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "4abe1dd7-5a9a-45b6-997d-7d170afd306e",
+      "label": "open",
+      "first": "2022-03-06T05:53:49.113Z",
+      "last": "2022-03-06T05:53:49.113Z",
+      "signed_return_5m_bps": "1.8740582224308078",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "55cce33e-dfea-41c1-8d0a-a449309b2156",
+      "label": "mixed",
+      "first": "2022-03-07T04:33:12.160Z",
+      "last": "2022-03-07T04:33:12.160Z",
+      "signed_return_5m_bps": "15.07862236222901",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e6e9be75-9672-4b9c-abab-6d4e58765cd5",
+      "label": "open",
+      "first": "2022-03-10T00:30:14.702Z",
+      "last": "2022-03-10T00:30:14.702Z",
+      "signed_return_5m_bps": "-24.487070969587688",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "96ab81bf-5554-4bc0-926a-6077924ed02d",
+      "label": "mixed",
+      "first": "2022-03-10T13:35:15.107Z",
+      "last": "2022-03-10T13:35:15.107Z",
+      "signed_return_5m_bps": "183.50667717993986",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e80a4539-f666-42f7-bf57-d6a0311d1734",
+      "label": "mixed",
+      "first": "2022-03-23T10:21:29.546Z",
+      "last": "2022-03-23T10:21:29.546Z",
+      "signed_return_5m_bps": "-9.14865377322771",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e11fb8c2-8729-4a31-8902-d713a94e9edd",
+      "label": "mixed",
+      "first": "2022-03-23T12:57:54.250Z",
+      "last": "2022-03-23T12:57:54.265Z",
+      "signed_return_5m_bps": "3.7033105709460834",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "37666b8c-8a53-4260-aa00-3f97df366cb7",
+      "label": "open",
+      "first": "2022-04-01T01:53:35.251Z",
+      "last": "2022-04-01T01:53:35.251Z",
+      "signed_return_5m_bps": "-16.333696304362544",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "35bb1a6f-be23-4a91-90a4-abdfc12cdb15",
+      "label": "mixed",
+      "first": "2022-04-03T22:03:16.956Z",
+      "last": "2022-04-03T22:03:17.779Z",
+      "signed_return_5m_bps": "-48.39532412327263",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "7385c5be-ea35-4b0e-941d-0000bcf54282",
+      "label": "open",
+      "first": "2022-04-05T16:01:51.360Z",
+      "last": "2022-04-05T16:01:51.360Z",
+      "signed_return_5m_bps": "16.379801164980723",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "bf77cbe6-0915-4051-ab3e-bfbe3b91461d",
+      "label": "open",
+      "first": "2022-04-06T10:18:27.653Z",
+      "last": "2022-04-06T10:18:27.653Z",
+      "signed_return_5m_bps": "33.58382656114989",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "bc626c2b-ec55-4d87-b4b2-4788eb8c3f10",
+      "label": "open",
+      "first": "2022-04-17T23:11:53.717Z",
+      "last": "2022-04-17T23:11:53.717Z",
+      "signed_return_5m_bps": "-7.642290682670083",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "142345d5-66bd-4720-9554-132764c4ecae",
+      "label": "mixed",
+      "first": "2022-04-18T17:09:55.362Z",
+      "last": "2022-04-18T17:09:55.362Z",
+      "signed_return_5m_bps": "-96.69019134241674",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "43db9198-b225-45b8-bd8f-e2fff14e7cb8",
+      "label": "mixed",
+      "first": "2022-04-20T11:45:47.206Z",
+      "last": "2022-04-20T11:45:47.249Z",
+      "signed_return_5m_bps": "3.9419629075532203",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "102c56ca-6600-4c72-b317-c4bad96ecc10",
+      "label": "mixed",
+      "first": "2022-04-21T11:37:47.073Z",
+      "last": "2022-04-21T11:37:47.669Z",
+      "signed_return_5m_bps": "19.128187052050993",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "5a57a5ad-9c07-42c9-a20a-8db1ae8f27ae",
+      "label": "mixed",
+      "first": "2022-04-21T22:10:01.799Z",
+      "last": "2022-04-21T22:10:04.302Z",
+      "signed_return_5m_bps": "19.229181167199627",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "08594da8-9cab-4b35-9ecb-635cb3ed5e81",
+      "label": "mixed",
+      "first": "2022-04-25T00:32:44.493Z",
+      "last": "2022-04-25T00:32:45.724Z",
+      "signed_return_5m_bps": "-20.59420178209148",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "9f3b1429-40e1-49db-b025-db2b6c8bef5d",
+      "label": "mixed",
+      "first": "2022-04-28T14:33:06.427Z",
+      "last": "2022-04-28T14:33:06.427Z",
+      "signed_return_5m_bps": "2.359186080801434",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "815b78fa-281e-441d-820f-0158bb5920c2",
+      "label": "mixed",
+      "first": "2022-04-29T09:06:03.812Z",
+      "last": "2022-04-29T09:06:04.995Z",
+      "signed_return_5m_bps": "-0.10198358064372748",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "3dfbee86-30a2-4c00-82e2-0b698032291a",
+      "label": "open",
+      "first": "2022-04-29T10:45:58.897Z",
+      "last": "2022-04-29T10:45:58.897Z",
+      "signed_return_5m_bps": "56.09777994382448",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "7912364f-7f49-4df2-9bba-c40cd6768db4",
+      "label": "open",
+      "first": "2022-05-07T23:12:29.264Z",
+      "last": "2022-05-07T23:12:29.264Z",
+      "signed_return_5m_bps": "-9.136165638967686",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "5797798f-62c3-4fc4-8d4b-e636cb2fd197",
+      "label": "open",
+      "first": "2022-05-08T07:56:47.073Z",
+      "last": "2022-05-08T07:56:47.073Z",
+      "signed_return_5m_bps": "0.7800199338414693",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "62e4ff10-dc55-4e71-ae59-aa53e2395194",
+      "label": "mixed",
+      "first": "2022-05-14T03:56:57.170Z",
+      "last": "2022-05-14T03:56:57.170Z",
+      "signed_return_5m_bps": "-19.580920582558115",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "683ec2f5-fc86-4785-9cc9-cba640becbfd",
+      "label": "mixed",
+      "first": "2022-05-16T15:36:16.846Z",
+      "last": "2022-05-16T15:36:16.846Z",
+      "signed_return_5m_bps": "19.342031591984554",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "d725e966-9547-424d-b837-ca275372421f",
+      "label": "mixed",
+      "first": "2022-05-19T03:19:04.900Z",
+      "last": "2022-05-19T03:19:04.900Z",
+      "signed_return_5m_bps": "-43.474665218659055",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "c9df712c-d31a-46b1-83cd-7fcc50abdc75",
+      "label": "mixed",
+      "first": "2022-06-07T03:22:43.245Z",
+      "last": "2022-06-07T03:22:43.245Z",
+      "signed_return_5m_bps": "26.781022763868734",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "1badc5b7-d95c-437d-87b3-6b96590bc311",
+      "label": "open",
+      "first": "2022-06-12T02:29:36.272Z",
+      "last": "2022-06-12T02:29:36.272Z",
+      "signed_return_5m_bps": "38.233070525974796",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "4b1b78a3-fc67-46f1-8086-6d3fc169b99b",
+      "label": "mixed",
+      "first": "2022-07-08T09:09:57.181Z",
+      "last": "2022-07-08T09:09:57.341Z",
+      "signed_return_5m_bps": "0.140627197300347",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "7ca2e796-8105-4b61-b7c3-09107fac38be",
+      "label": "open",
+      "first": "2022-07-08T16:43:03.326Z",
+      "last": "2022-07-08T16:43:03.326Z",
+      "signed_return_5m_bps": "62.90883785664558",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "9b1be983-bd99-4d58-b3e0-2c791e705ca6",
+      "label": "mixed",
+      "first": "2022-07-15T15:59:00.608Z",
+      "last": "2022-07-15T15:59:04.220Z",
+      "signed_return_5m_bps": "10.107330220916477",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "90649e43-4adb-4235-8674-5e28e2356d20",
+      "label": "mixed",
+      "first": "2022-09-21T18:02:14.194Z",
+      "last": "2022-09-21T18:02:14.234Z",
+      "signed_return_5m_bps": "-155.27659131159388",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "9276cd01-0c0e-45a4-8bc9-24dc4af3c548",
+      "label": "open",
+      "first": "2022-09-28T12:56:41.271Z",
+      "last": "2022-09-28T12:56:41.271Z",
+      "signed_return_5m_bps": "17.91060454855664",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "9b4e3342-bef0-4da8-99bf-bd3ce077460c",
+      "label": "open",
+      "first": "2022-10-02T10:15:21.725Z",
+      "last": "2022-10-02T10:15:21.725Z",
+      "signed_return_5m_bps": "43.290726421545415",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "de28de2a-4e1e-4ad8-9609-a3b619adf935",
+      "label": "open",
+      "first": "2022-10-03T04:23:40.614Z",
+      "last": "2022-10-03T04:23:40.614Z",
+      "signed_return_5m_bps": "-10.785905021204467",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "582e13e5-fa8a-4687-b55e-5584f8197fdb",
+      "label": "open",
+      "first": "2022-10-08T22:52:00.646Z",
+      "last": "2022-10-08T22:52:00.646Z",
+      "signed_return_5m_bps": "-9.928381208470505",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "76c55c99-cd18-496f-8054-23a648ca2546",
+      "label": "mixed",
+      "first": "2022-10-17T11:13:45.875Z",
+      "last": "2022-10-17T11:13:45.900Z",
+      "signed_return_5m_bps": "-20.343162437068685",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "9503d933-b87c-4bf5-a53a-9efd50d0b73c",
+      "label": "mixed",
+      "first": "2022-10-19T06:02:17.253Z",
+      "last": "2022-10-19T06:02:17.253Z",
+      "signed_return_5m_bps": "-5.929451228119387",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "1c631157-1509-4d4c-bd5f-99b77b601725",
+      "label": "mixed",
+      "first": "2022-10-20T18:13:51.214Z",
+      "last": "2022-10-20T18:13:51.214Z",
+      "signed_return_5m_bps": "-24.302998421883437",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "f4f99ca0-7ca3-45c6-9177-f69057fc4944",
+      "label": "mixed",
+      "first": "2022-10-22T06:54:42.803Z",
+      "last": "2022-10-22T06:54:42.803Z",
+      "signed_return_5m_bps": "-0.6271066865259911",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "f26ac103-2c58-4e27-bec6-3ac47f3c33f7",
+      "label": "mixed",
+      "first": "2022-10-25T15:22:26.980Z",
+      "last": "2022-10-25T15:22:26.993Z",
+      "signed_return_5m_bps": "33.6330843875432",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "4bcb7f5a-8c21-40e3-b95d-1adb45b76e25",
+      "label": "open",
+      "first": "2022-10-29T05:02:02.923Z",
+      "last": "2022-10-29T05:02:02.923Z",
+      "signed_return_5m_bps": "-11.024878508739677",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "018e6616-2288-4348-b57c-8e51d5566a18",
+      "label": "mixed",
+      "first": "2022-10-29T09:21:20.771Z",
+      "last": "2022-10-29T09:21:20.771Z",
+      "signed_return_5m_bps": "1.6758840288244592",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "14d47d28-afbf-4343-95fc-8f315c03d8c3",
+      "label": "mixed",
+      "first": "2022-10-30T16:03:12.211Z",
+      "last": "2022-10-30T16:03:12.211Z",
+      "signed_return_5m_bps": "-12.539640272095642",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "d1bf96df-bcf9-44d6-8681-39a29e414cf1",
+      "label": "mixed",
+      "first": "2022-10-31T16:42:56.429Z",
+      "last": "2022-10-31T16:42:56.798Z",
+      "signed_return_5m_bps": "18.442925293857826",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "56e141c4-d86d-429b-abae-50c9f1b7d95d",
+      "label": "open",
+      "first": "2022-11-01T05:04:56.002Z",
+      "last": "2022-11-01T05:04:56.002Z",
+      "signed_return_5m_bps": "4.337337654427564",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "62e1fadc-d4e4-4835-84ff-f3985ce21b85",
+      "label": "mixed",
+      "first": "2022-11-01T11:18:22.968Z",
+      "last": "2022-11-01T11:18:22.968Z",
+      "signed_return_5m_bps": "7.850212102002985",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "154ea2f8-7a04-4f53-b4a9-eb22e8414b44",
+      "label": "mixed",
+      "first": "2022-11-04T06:03:25.430Z",
+      "last": "2022-11-04T06:03:59.932Z",
+      "signed_return_5m_bps": "46.89291726645006",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "c8e1eea1-f63e-4eae-862f-55c557c71eca",
+      "label": "mixed",
+      "first": "2022-11-04T21:52:09.842Z",
+      "last": "2022-11-04T21:52:09.842Z",
+      "signed_return_5m_bps": "14.713412430997774",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "6e041e82-bc67-478c-a903-4193b7e441d1",
+      "label": "open",
+      "first": "2022-11-09T03:42:56.959Z",
+      "last": "2022-11-09T03:42:56.959Z",
+      "signed_return_5m_bps": "-53.12026449924234",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "68da4050-5725-4ca5-8961-b95d58e281f5",
+      "label": "open",
+      "first": "2022-11-11T14:34:16.131Z",
+      "last": "2022-11-11T14:34:16.131Z",
+      "signed_return_5m_bps": "-33.32528374788701",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "15a72d46-8a0c-4a97-8a01-9dfdd8d4ba32",
+      "label": "mixed",
+      "first": "2022-11-12T04:23:45.704Z",
+      "last": "2022-11-12T04:23:53.707Z",
+      "signed_return_5m_bps": "-40.39016623409886",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "985d56fd-73b5-43ea-afc4-196c2387d726",
+      "label": "mixed",
+      "first": "2022-11-14T06:37:44.921Z",
+      "last": "2022-11-14T06:37:44.921Z",
+      "signed_return_5m_bps": "187.520904634928",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "3feafec5-0474-4432-bb1c-5aa4a8516b46",
+      "label": "mixed",
+      "first": "2022-11-14T08:38:46.477Z",
+      "last": "2022-11-14T08:38:46.482Z",
+      "signed_return_5m_bps": "58.79000569903204",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "b2f5ae37-c871-4f57-a37d-cc43501ca49d",
+      "label": "open",
+      "first": "2022-11-14T13:51:11.596Z",
+      "last": "2022-11-14T13:51:11.596Z",
+      "signed_return_5m_bps": "227.5137083825629",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "c17227af-8ad0-4ec1-aad8-16c3b6522e24",
+      "label": "mixed",
+      "first": "2022-11-15T07:17:13.349Z",
+      "last": "2022-11-15T07:17:27.161Z",
+      "signed_return_5m_bps": "16.562343051742534",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "f1e04da6-bb42-4ee0-959f-8076cdd076f3",
+      "label": "mixed",
+      "first": "2022-11-15T08:30:28.440Z",
+      "last": "2022-11-15T08:30:28.440Z",
+      "signed_return_5m_bps": "-8.335303854337672",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4d814efc-a76b-4b43-b635-2c890f131582",
+      "label": "mixed",
+      "first": "2022-11-15T11:04:20.933Z",
+      "last": "2022-11-15T11:04:20.965Z",
+      "signed_return_5m_bps": "-11.542856984069205",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "a8b22fb4-8f31-46b3-b8ef-3d07d9b5921d",
+      "label": "mixed",
+      "first": "2022-11-15T12:04:58.431Z",
+      "last": "2022-11-15T12:04:58.819Z",
+      "signed_return_5m_bps": "-42.29935536978591",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "417e6b84-d424-4533-bf83-8a4dcaa70c03",
+      "label": "mixed",
+      "first": "2022-11-15T13:10:09.404Z",
+      "last": "2022-11-15T13:12:25.995Z",
+      "signed_return_5m_bps": "-0.3871610282824012",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "28694b99-d303-48c1-929a-00e598a21e79",
+      "label": "mixed",
+      "first": "2022-11-16T08:17:46.729Z",
+      "last": "2022-11-16T08:17:46.729Z",
+      "signed_return_5m_bps": "-11.553464550517756",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "7dd55244-a854-48e7-9293-100d8a2f488b",
+      "label": "mixed",
+      "first": "2022-11-17T17:04:43.322Z",
+      "last": "2022-11-17T17:04:47.586Z",
+      "signed_return_5m_bps": "-12.685762366781983",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "5d01583a-827d-456f-98ed-a5e24ed053b8",
+      "label": "mixed",
+      "first": "2022-11-18T12:32:56.395Z",
+      "last": "2022-11-18T12:32:56.395Z",
+      "signed_return_5m_bps": "4.298122556189998",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "c459f221-168d-4365-8de8-a0f9bc4b0a73",
+      "label": "open",
+      "first": "2022-11-21T02:09:25.506Z",
+      "last": "2022-11-21T02:09:25.506Z",
+      "signed_return_5m_bps": "-3.7386671651551406",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "e0f941a7-e9c2-4cee-a840-bc3faacf9506",
+      "label": "open",
+      "first": "2022-11-23T10:57:18.589Z",
+      "last": "2022-11-23T10:57:18.589Z",
+      "signed_return_5m_bps": "11.453372716860866",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "2f70268b-e119-45cb-a283-0463ed8f6f32",
+      "label": "open",
+      "first": "2022-11-27T23:03:17.065Z",
+      "last": "2022-11-27T23:03:17.065Z",
+      "signed_return_5m_bps": "16.153028692877935",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "ca8d5775-5d85-4b24-a0a8-feadba19dda2",
+      "label": "mixed",
+      "first": "2022-12-05T00:15:43.593Z",
+      "last": "2022-12-05T00:18:13.321Z",
+      "signed_return_5m_bps": "-10.989653358274287",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "27785d58-f082-4242-a662-d92c3413c7ab",
+      "label": "mixed",
+      "first": "2022-12-08T20:05:22.009Z",
+      "last": "2022-12-08T20:05:22.009Z",
+      "signed_return_5m_bps": "-16.542619212153163",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "283d1961-e601-4c6c-bccf-2ee80eafb862",
+      "label": "mixed",
+      "first": "2022-12-12T00:05:21.459Z",
+      "last": "2022-12-12T00:05:21.459Z",
+      "signed_return_5m_bps": "-5.641251652710455",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "7dbc767c-8070-4ca8-b553-bb992171132f",
+      "label": "mixed",
+      "first": "2022-12-13T10:12:18.809Z",
+      "last": "2022-12-13T10:12:18.809Z",
+      "signed_return_5m_bps": "-12.745435756115198",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "6c945e46-6517-4ffe-bcad-84dbaf115277",
+      "label": "open",
+      "first": "2022-12-15T13:22:53.904Z",
+      "last": "2022-12-15T13:22:53.904Z",
+      "signed_return_5m_bps": "13.7302378578541",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "77e1c096-30cd-4199-9b2f-0cf3bcb6b2d1",
+      "label": "mixed",
+      "first": "2022-12-22T17:29:18.835Z",
+      "last": "2022-12-22T17:29:18.835Z",
+      "signed_return_5m_bps": "7.344530732646959",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "ef0d2689-b3a3-48d5-b43c-04ebbca56e52",
+      "label": "open",
+      "first": "2023-01-04T03:07:12.031Z",
+      "last": "2023-01-04T03:07:12.031Z",
+      "signed_return_5m_bps": "3.153260352213305",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "4ce63680-7da1-4b0b-8161-ff2b783ba47e",
+      "label": "open",
+      "first": "2023-01-07T02:56:57.362Z",
+      "last": "2023-01-07T02:56:57.362Z",
+      "signed_return_5m_bps": "3.780048431871741",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "3d300d94-311f-4abc-93b8-b8bc986999c6",
+      "label": "mixed",
+      "first": "2023-01-11T18:10:09.827Z",
+      "last": "2023-01-11T18:10:09.827Z",
+      "signed_return_5m_bps": "21.658262341217593",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "195aef39-0c70-46cc-8409-8b62cf0e1561",
+      "label": "mixed",
+      "first": "2023-01-18T13:47:13.880Z",
+      "last": "2023-01-18T13:47:13.880Z",
+      "signed_return_5m_bps": "9.82513408891883",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "d2c4ed2a-8d6f-4547-b968-79a7a32b6baa",
+      "label": "open",
+      "first": "2023-01-20T20:59:02.759Z",
+      "last": "2023-01-20T20:59:02.759Z",
+      "signed_return_5m_bps": "-25.83863212528348",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "119015c0-d487-4bbc-9747-abe9e8f16a7e",
+      "label": "open",
+      "first": "2023-01-23T08:02:35.608Z",
+      "last": "2023-01-23T08:02:35.608Z",
+      "signed_return_5m_bps": "25.986058413483004",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a1ea6671-b190-4e13-b189-5d04e00a2131",
+      "label": "mixed",
+      "first": "2023-01-29T01:07:11.596Z",
+      "last": "2023-01-29T01:07:14.682Z",
+      "signed_return_5m_bps": "-7.130968625327361",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "b68d63e6-ed1a-49fc-91b6-c770ecc09230",
+      "label": "mixed",
+      "first": "2023-01-29T16:36:25.095Z",
+      "last": "2023-01-29T16:37:07.866Z",
+      "signed_return_5m_bps": "-18.554598402962252",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "c7e5b697-8793-4998-97c9-24be32ae3eaf",
+      "label": "mixed",
+      "first": "2023-01-29T18:44:41.192Z",
+      "last": "2023-01-29T18:44:41.192Z",
+      "signed_return_5m_bps": "2.0661157024803867",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "42759e5a-601d-48be-a466-c71bec5cad19",
+      "label": "mixed",
+      "first": "2023-01-30T00:22:48.258Z",
+      "last": "2023-01-30T00:22:48.258Z",
+      "signed_return_5m_bps": "-1.6031049611875403",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "69bfd1cd-d2bf-4035-9d51-1be279cf6728",
+      "label": "mixed",
+      "first": "2023-02-01T19:52:30.346Z",
+      "last": "2023-02-01T19:52:30.347Z",
+      "signed_return_5m_bps": "12.519762423620628",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "e5da4d8b-70c2-4655-ad9e-109b1e8a4fa6",
+      "label": "open",
+      "first": "2023-02-02T15:52:22.733Z",
+      "last": "2023-02-02T15:52:22.733Z",
+      "signed_return_5m_bps": "4.825141082929196",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "ce3295a8-2f49-49bc-8ff7-69affa75e846",
+      "label": "open",
+      "first": "2023-02-09T03:05:47.797Z",
+      "last": "2023-02-09T03:05:47.797Z",
+      "signed_return_5m_bps": "15.134031599501885",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e3f020fa-b9a5-4fd3-97e5-60ef15be4764",
+      "label": "mixed",
+      "first": "2023-02-13T18:31:49.901Z",
+      "last": "2023-02-13T18:37:30.503Z",
+      "signed_return_5m_bps": "1.8932546899708136",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "166bfbee-dbf5-48b5-81ea-62f40ca4ad18",
+      "label": "open",
+      "first": "2023-02-14T07:42:49.230Z",
+      "last": "2023-02-14T07:42:49.230Z",
+      "signed_return_5m_bps": "-17.671493814976902",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "964daba9-05f0-4c96-828d-b95ab8f1a14a",
+      "label": "mixed",
+      "first": "2023-02-15T08:34:10.379Z",
+      "last": "2023-02-15T08:38:17.217Z",
+      "signed_return_5m_bps": "-14.468508387213141",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "15918c06-c67e-4544-91fd-2edeb1346612",
+      "label": "open",
+      "first": "2023-02-16T22:40:03.164Z",
+      "last": "2023-02-16T22:40:03.164Z",
+      "signed_return_5m_bps": "68.71119629984656",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "d42b0a66-ec74-4f00-8b11-ecbdf407bad8",
+      "label": "mixed",
+      "first": "2023-02-18T18:12:11.194Z",
+      "last": "2023-02-18T18:12:11.194Z",
+      "signed_return_5m_bps": "-5.674579904858534",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "d6203aa6-d399-490d-9b9a-c1923579c24d",
+      "label": "mixed",
+      "first": "2023-02-19T14:40:24.600Z",
+      "last": "2023-02-19T14:40:24.600Z",
+      "signed_return_5m_bps": "-6.669496149881438",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "01d6e566-040d-4dd0-8565-2f49f8551421",
+      "label": "mixed",
+      "first": "2023-02-19T17:58:09.212Z",
+      "last": "2023-02-19T17:58:09.472Z",
+      "signed_return_5m_bps": "32.46619816709817",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "b935041d-aca7-48a4-9b71-93b3dcd75b5d",
+      "label": "mixed",
+      "first": "2023-02-21T02:34:28.504Z",
+      "last": "2023-02-21T02:34:28.504Z",
+      "signed_return_5m_bps": "22.572204408717322",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "2eaaa160-b702-480b-acc2-a4f05e84b6cb",
+      "label": "mixed",
+      "first": "2023-02-23T02:50:17.618Z",
+      "last": "2023-02-23T02:50:54.733Z",
+      "signed_return_5m_bps": "-12.923277842544767",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "a4e277cc-bc4f-4f0e-a17e-b9875f83c4c7",
+      "label": "mixed",
+      "first": "2023-02-27T00:06:20.094Z",
+      "last": "2023-02-27T00:06:20.094Z",
+      "signed_return_5m_bps": "8.928571428571397",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "7a129da8-b124-4af0-89bc-bfe2b9188449",
+      "label": "open",
+      "first": "2023-02-27T16:13:02.820Z",
+      "last": "2023-02-27T16:13:02.820Z",
+      "signed_return_5m_bps": "-16.71452449320654",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "9a96ca8c-e7f2-4798-ab49-692c86afdd45",
+      "label": "mixed",
+      "first": "2023-02-28T07:30:01.235Z",
+      "last": "2023-02-28T07:30:01.298Z",
+      "signed_return_5m_bps": "9.428706124372521",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "8a888a8e-cde5-4f7e-b7df-603fd9b1685d",
+      "label": "mixed",
+      "first": "2023-03-03T10:50:20.982Z",
+      "last": "2023-03-03T10:50:21.128Z",
+      "signed_return_5m_bps": "4.16219119226513",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a1659246-e99b-42e6-8fe2-4b472e7b5e50",
+      "label": "mixed",
+      "first": "2023-03-04T19:55:14.975Z",
+      "last": "2023-03-04T19:55:16.298Z",
+      "signed_return_5m_bps": "10.305103051031494",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "498032a9-72c0-4547-bec0-7069a7661e77",
+      "label": "mixed",
+      "first": "2023-03-07T15:00:59.421Z",
+      "last": "2023-03-07T15:00:59.426Z",
+      "signed_return_5m_bps": "11.487494912034713",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "ec66a0ee-34e8-4961-8b5b-e697a44f6489",
+      "label": "open",
+      "first": "2023-03-08T05:40:56.718Z",
+      "last": "2023-03-08T05:40:56.718Z",
+      "signed_return_5m_bps": "27.041866849690788",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "1fdc3e26-3e2e-4572-8663-05c8f10436ff",
+      "label": "open",
+      "first": "2023-03-08T22:56:10.735Z",
+      "last": "2023-03-08T22:56:10.735Z",
+      "signed_return_5m_bps": "36.35025077071808",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "31d2532b-57c5-4902-b4a3-b7c1168205ad",
+      "label": "mixed",
+      "first": "2023-03-10T10:26:38.738Z",
+      "last": "2023-03-10T10:26:38.738Z",
+      "signed_return_5m_bps": "28.62254025044697",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "908f6dbe-3364-4247-bad1-fde4376872e0",
+      "label": "mixed",
+      "first": "2023-03-11T08:09:19.869Z",
+      "last": "2023-03-11T08:09:19.869Z",
+      "signed_return_5m_bps": "-30.322547274949095",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e8fdf012-9e0a-44c9-ab03-0ef607b2a454",
+      "label": "mixed",
+      "first": "2023-03-11T17:07:48.084Z",
+      "last": "2023-03-11T17:07:51.928Z",
+      "signed_return_5m_bps": "-97.09551753045109",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "09bcd4da-3a2d-4534-8c37-8298809c9ef0",
+      "label": "mixed",
+      "first": "2023-03-12T17:33:27.314Z",
+      "last": "2023-03-12T17:33:27.314Z",
+      "signed_return_5m_bps": "-95.58750646901149",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "1e748733-ebb3-4efe-ad81-3f1d6810434a",
+      "label": "mixed",
+      "first": "2023-03-12T22:35:26.578Z",
+      "last": "2023-03-12T22:35:28.181Z",
+      "signed_return_5m_bps": "-66.84027777777769",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "68ee63bc-657c-445f-821d-fac2824ef519",
+      "label": "open",
+      "first": "2023-03-13T02:47:32.902Z",
+      "last": "2023-03-13T02:47:32.902Z",
+      "signed_return_5m_bps": "-75.26978014597118",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a415e4b4-fab5-473b-af61-e28e52eab918",
+      "label": "open",
+      "first": "2023-03-13T15:01:34.046Z",
+      "last": "2023-03-13T15:01:34.046Z",
+      "signed_return_5m_bps": "138.60925471618435",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e0459811-2f1d-4156-9c90-3241a318729d",
+      "label": "mixed",
+      "first": "2023-03-14T19:15:17.702Z",
+      "last": "2023-03-14T19:15:17.702Z",
+      "signed_return_5m_bps": "41.655958266737514",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "1c25be25-2373-45a1-ba7d-c4d31f6e9894",
+      "label": "open",
+      "first": "2023-03-14T20:21:02.459Z",
+      "last": "2023-03-14T20:21:02.459Z",
+      "signed_return_5m_bps": "-33.0389860034841",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "77137387-0eea-47b0-b25f-b795ae5e9308",
+      "label": "mixed",
+      "first": "2023-03-17T01:33:51.114Z",
+      "last": "2023-03-17T01:34:33.810Z",
+      "signed_return_5m_bps": "10.94903094210009",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "86879a46-b957-412a-b1e1-65ab9bcc4039",
+      "label": "mixed",
+      "first": "2023-03-17T19:32:00.109Z",
+      "last": "2023-03-17T19:32:00.678Z",
+      "signed_return_5m_bps": "-28.289596128792116",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "a3067d3f-5c08-4aaf-98eb-1aa8b6b14791",
+      "label": "open",
+      "first": "2023-03-18T15:29:01.704Z",
+      "last": "2023-03-18T15:29:01.704Z",
+      "signed_return_5m_bps": "-59.48853034793089",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "d7c9a35c-ca3b-49f9-b528-8832c5c92e3a",
+      "label": "mixed",
+      "first": "2023-03-18T20:07:35.445Z",
+      "last": "2023-03-18T20:07:37.147Z",
+      "signed_return_5m_bps": "-13.244063951999285",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "7ee9428c-6b8e-4ecc-b1f3-aede678a0161",
+      "label": "open",
+      "first": "2023-03-20T02:44:03.856Z",
+      "last": "2023-03-20T02:44:03.856Z",
+      "signed_return_5m_bps": "15.909298710798936",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "e60fa0f4-e848-465b-913b-039165cb1833",
+      "label": "open",
+      "first": "2023-03-22T19:09:03.041Z",
+      "last": "2023-03-22T19:09:03.041Z",
+      "signed_return_5m_bps": "64.8372639776662",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "515df121-d678-4918-ac4a-4bf150af1f41",
+      "label": "open",
+      "first": "2023-03-23T13:20:40.461Z",
+      "last": "2023-03-23T13:20:40.461Z",
+      "signed_return_5m_bps": "297.0815289022788",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "e2936784-398c-43c3-b32a-336ab4e59a28",
+      "label": "open",
+      "first": "2023-03-23T13:49:11.880Z",
+      "last": "2023-03-23T13:49:11.880Z",
+      "signed_return_5m_bps": "12.84162001975675",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "a0192092-4896-4d56-9075-b17dc57be83c",
+      "label": "mixed",
+      "first": "2023-03-27T15:00:23.483Z",
+      "last": "2023-03-27T15:00:23.497Z",
+      "signed_return_5m_bps": "-21.172912115611233",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "17941ca1-0e25-4396-a3b0-2562185822ea",
+      "label": "mixed",
+      "first": "2023-04-09T06:14:05.859Z",
+      "last": "2023-04-09T06:14:05.859Z",
+      "signed_return_5m_bps": "15.593426440871916",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "7a79e9d4-004a-482e-8ec3-22e8d6c7dc5f",
+      "label": "open",
+      "first": "2023-04-10T17:10:28.196Z",
+      "last": "2023-04-10T17:10:28.196Z",
+      "signed_return_5m_bps": "-27.320442461233885",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "22934fa2-3f53-4bd2-b277-868b58e6cfc5",
+      "label": "open",
+      "first": "2023-04-12T12:16:13.290Z",
+      "last": "2023-04-12T12:16:13.290Z",
+      "signed_return_5m_bps": "-1.9695882225301276",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "30045f34-e761-45b5-b9df-344ce7ec71d0",
+      "label": "mixed",
+      "first": "2023-04-12T18:45:20.126Z",
+      "last": "2023-04-12T18:55:43.282Z",
+      "signed_return_5m_bps": "16.33114527373469",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "044d7553-9aa7-4897-86ef-c6e6072463c7",
+      "label": "mixed",
+      "first": "2023-04-20T23:32:14.098Z",
+      "last": "2023-04-20T23:32:14.098Z",
+      "signed_return_5m_bps": "-16.955465299823835",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "8b2bdac4-f27f-4235-9a28-e9cfaf746b53",
+      "label": "mixed",
+      "first": "2023-04-21T20:12:29.468Z",
+      "last": "2023-04-21T20:12:29.468Z",
+      "signed_return_5m_bps": "12.633197846863009",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "b6fd60be-a315-4a85-925a-9db855448352",
+      "label": "mixed",
+      "first": "2023-04-25T21:15:14.524Z",
+      "last": "2023-04-25T21:15:14.559Z",
+      "signed_return_5m_bps": "21.649776769895325",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "3881103a-85d7-42e0-94af-f3c2dc760a4b",
+      "label": "mixed",
+      "first": "2023-04-26T10:53:02.524Z",
+      "last": "2023-04-26T10:53:04.677Z",
+      "signed_return_5m_bps": "33.06353216133151",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "643a1ed8-c832-4e80-9848-450c4e814a5a",
+      "label": "mixed",
+      "first": "2023-04-26T19:39:05.375Z",
+      "last": "2023-04-26T19:39:05.375Z",
+      "signed_return_5m_bps": "-78.7882781405791",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "8df1b197-6fc5-4161-9a7c-ad62c066211f",
+      "label": "mixed",
+      "first": "2023-04-26T19:43:06.086Z",
+      "last": "2023-04-26T19:43:06.086Z",
+      "signed_return_5m_bps": "-129.11385060348834",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "d8dbcebf-64b5-4e44-9431-d7b088544bdd",
+      "label": "mixed",
+      "first": "2023-04-26T19:56:32.681Z",
+      "last": "2023-04-26T19:56:32.681Z",
+      "signed_return_5m_bps": "238.36924955082827",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e704c88f-e4e3-4651-81ac-559beb847ee2",
+      "label": "mixed",
+      "first": "2023-04-26T19:58:11.019Z",
+      "last": "2023-04-26T19:58:11.019Z",
+      "signed_return_5m_bps": "-137.8812138976715",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "cb0709f4-adc9-4bcd-ac85-96149e5c418f",
+      "label": "mixed",
+      "first": "2023-04-26T20:28:29.280Z",
+      "last": "2023-04-26T20:28:29.280Z",
+      "signed_return_5m_bps": "-51.72912747793301",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "0ac28ab3-a57f-4559-be43-8b4c14cfc681",
+      "label": "mixed",
+      "first": "2023-04-27T05:01:10.489Z",
+      "last": "2023-04-27T05:01:10.500Z",
+      "signed_return_5m_bps": "4.00429349565079",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "4da7d48b-5ba5-4926-be41-b11375740c44",
+      "label": "open",
+      "first": "2023-05-01T01:51:28.796Z",
+      "last": "2023-05-01T01:51:28.796Z",
+      "signed_return_5m_bps": "32.78688524590123",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "dc1df5d8-3405-4d20-abe7-94f0ec195057",
+      "label": "mixed",
+      "first": "2023-05-03T21:53:48.748Z",
+      "last": "2023-05-03T21:53:48.748Z",
+      "signed_return_5m_bps": "-24.371326634378132",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "eba2e79c-a6b8-4b43-b435-f61fb6ae6200",
+      "label": "mixed",
+      "first": "2023-05-11T22:16:38.459Z",
+      "last": "2023-05-11T22:26:47.668Z",
+      "signed_return_5m_bps": "-7.700994094670399",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "8057738f-60d1-45b9-ace2-026964780354",
+      "label": "mixed",
+      "first": "2023-05-12T05:50:42.398Z",
+      "last": "2023-05-12T05:50:42.545Z",
+      "signed_return_5m_bps": "-43.568032429770476",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "ff723021-1402-4b5c-b89b-cefb5722cdde",
+      "label": "mixed",
+      "first": "2023-05-19T15:21:56.098Z",
+      "last": "2023-05-19T15:21:56.098Z",
+      "signed_return_5m_bps": "-22.159949854355652",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "6badf537-19ce-4271-ac4e-e77b827c6ac0",
+      "label": "open",
+      "first": "2023-05-24T13:49:34.106Z",
+      "last": "2023-05-24T13:49:34.106Z",
+      "signed_return_5m_bps": "71.69242367131568",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "bf8f0c7a-1fb3-411a-a4f7-64f7d829d077",
+      "label": "open",
+      "first": "2023-05-25T19:10:36.410Z",
+      "last": "2023-05-25T19:10:36.410Z",
+      "signed_return_5m_bps": "3.841012219690798",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "b8815d41-8698-449a-ba5c-09f7970af53d",
+      "label": "open",
+      "first": "2023-05-28T22:11:50.205Z",
+      "last": "2023-05-28T22:11:50.205Z",
+      "signed_return_5m_bps": "-29.97866287340001",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "8b785ef2-19d8-41c9-b251-251476036a17",
+      "label": "mixed",
+      "first": "2023-05-30T14:46:18.293Z",
+      "last": "2023-05-30T14:46:18.293Z",
+      "signed_return_5m_bps": "1.6171912162832314",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "5203aa88-a083-43cc-8292-b31d4fca77e2",
+      "label": "mixed",
+      "first": "2023-06-02T02:42:25.194Z",
+      "last": "2023-06-02T02:42:25.194Z",
+      "signed_return_5m_bps": "-13.985495149593241",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "89c8a2fd-3be8-4037-8db8-ce60d004fbb3",
+      "label": "mixed",
+      "first": "2023-06-05T16:02:32.313Z",
+      "last": "2023-06-05T16:02:32.319Z",
+      "signed_return_5m_bps": "-26.382153249272513",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "fcfdc881-a531-4998-9592-ff42d2f464b6",
+      "label": "mixed",
+      "first": "2023-06-06T12:11:14.364Z",
+      "last": "2023-06-06T12:11:14.374Z",
+      "signed_return_5m_bps": "24.18911489829423",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "b1acf8f8-2ddc-45f5-abd1-56ef6999348b",
+      "label": "mixed",
+      "first": "2023-06-06T17:28:15.676Z",
+      "last": "2023-06-06T17:28:16.166Z",
+      "signed_return_5m_bps": "-27.559055118110408",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "2d574544-8dad-45c0-a646-ca2b49986811",
+      "label": "mixed",
+      "first": "2023-06-07T14:55:09.003Z",
+      "last": "2023-06-07T14:55:09.087Z",
+      "signed_return_5m_bps": "6.2659021000266435",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "b8e49d12-ba4f-48a0-a799-b241c89b2439",
+      "label": "open",
+      "first": "2023-06-14T18:46:46.146Z",
+      "last": "2023-06-14T18:46:46.146Z",
+      "signed_return_5m_bps": "3.625494166425991",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "02745ddf-311a-4de1-bd2b-c5ef3cef8b83",
+      "label": "mixed",
+      "first": "2023-06-15T05:26:32.239Z",
+      "last": "2023-06-15T05:26:32.239Z",
+      "signed_return_5m_bps": "-24.709156805029497",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "4e17b6d7-17d9-40fe-b4f2-3656dede7344",
+      "label": "mixed",
+      "first": "2023-06-15T08:40:05.681Z",
+      "last": "2023-06-15T08:41:15.544Z",
+      "signed_return_5m_bps": "11.374103888823761",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "2754e74c-0885-4943-ba89-84781963b3d9",
+      "label": "mixed",
+      "first": "2023-06-15T16:05:57.678Z",
+      "last": "2023-06-15T16:05:57.691Z",
+      "signed_return_5m_bps": "-10.031498906566405",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "d09160b4-c34e-4cc6-995e-c800a64abcb4",
+      "label": "mixed",
+      "first": "2023-06-16T02:55:35.512Z",
+      "last": "2023-06-16T02:56:24.409Z",
+      "signed_return_5m_bps": "2.507247512339994",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "9347b926-325a-4802-9607-5fef32536e55",
+      "label": "mixed",
+      "first": "2023-06-19T22:17:43.272Z",
+      "last": "2023-06-19T22:49:05.474Z",
+      "signed_return_5m_bps": "-1.457317414943482",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "e93ee345-b0df-40c8-9599-506689d4f2e5",
+      "label": "mixed",
+      "first": "2023-06-28T08:02:21.505Z",
+      "last": "2023-06-28T08:02:21.505Z",
+      "signed_return_5m_bps": "-2.9792445959808678",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "ef6d81a7-7375-4c2b-8f0f-ace1b2b0f370",
+      "label": "mixed",
+      "first": "2023-06-30T03:36:25.066Z",
+      "last": "2023-06-30T03:36:25.066Z",
+      "signed_return_5m_bps": "-21.60235730446547",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "fb127d9d-c9eb-4e49-8fc6-6aa04c2b4ae6",
+      "label": "mixed",
+      "first": "2023-07-03T13:47:08.721Z",
+      "last": "2023-07-03T13:47:08.721Z",
+      "signed_return_5m_bps": "-10.136071050272921",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "9c7a6250-325b-4cda-8342-c36b539d9266",
+      "label": "open",
+      "first": "2023-07-06T16:59:36.460Z",
+      "last": "2023-07-06T16:59:36.460Z",
+      "signed_return_5m_bps": "10.499380932726954",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "80560b75-91f5-431f-bcfd-1a270e971c70",
+      "label": "mixed",
+      "first": "2023-07-08T19:20:39.068Z",
+      "last": "2023-07-08T19:20:39.068Z",
+      "signed_return_5m_bps": "14.597087217596005",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "81f348c0-45a9-43cd-816e-c1ec9ce03e13",
+      "label": "mixed",
+      "first": "2023-07-10T15:45:18.441Z",
+      "last": "2023-07-10T15:45:18.441Z",
+      "signed_return_5m_bps": "-16.86496476839494",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "2141c905-054d-43e1-8a37-649990d92e6f",
+      "label": "open",
+      "first": "2023-07-14T22:34:46.760Z",
+      "last": "2023-07-14T22:34:46.760Z",
+      "signed_return_5m_bps": "-6.645506843879767",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "5b93ef30-6740-4155-88c1-7f7d53eb32c4",
+      "label": "mixed",
+      "first": "2023-07-17T18:26:43.871Z",
+      "last": "2023-07-17T18:26:43.871Z",
+      "signed_return_5m_bps": "3.1688320352241117",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "697f909d-be67-4a3c-a7b2-62f8c5b26f71",
+      "label": "mixed",
+      "first": "2023-07-18T12:13:25.564Z",
+      "last": "2023-07-18T12:13:25.564Z",
+      "signed_return_5m_bps": "-3.048606853670588",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "33233fd7-1c96-4937-ab0c-07b5b6a3f769",
+      "label": "mixed",
+      "first": "2023-07-24T14:51:04.347Z",
+      "last": "2023-07-24T14:51:04.347Z",
+      "signed_return_5m_bps": "7.2159989004194625",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "3422aa9a-60df-47e6-8984-00a3af421c63",
+      "label": "open",
+      "first": "2023-07-29T06:21:05.251Z",
+      "last": "2023-07-29T06:21:05.251Z",
+      "signed_return_5m_bps": "0.4090397791189915",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "d7893575-75fd-4391-8e97-b25cdbc9bd4f",
+      "label": "mixed",
+      "first": "2023-07-31T16:11:05.039Z",
+      "last": "2023-07-31T16:11:07.405Z",
+      "signed_return_5m_bps": "-3.6072459755809305",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "6b70478f-322d-4456-b9e3-3349218b6652",
+      "label": "open",
+      "first": "2023-08-06T06:03:30.497Z",
+      "last": "2023-08-06T06:03:30.497Z",
+      "signed_return_5m_bps": "-3.4750296753771615",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "0020ee7d-edeb-4161-8ac7-711898bdf71e",
+      "label": "mixed",
+      "first": "2023-08-09T13:42:06.361Z",
+      "last": "2023-08-09T13:42:06.361Z",
+      "signed_return_5m_bps": "4.784738643740516",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "89458e59-cf0e-492e-8e2b-767d316fe583",
+      "label": "mixed",
+      "first": "2023-08-10T11:45:11.453Z",
+      "last": "2023-08-10T11:45:11.453Z",
+      "signed_return_5m_bps": "-10.793747772517293",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "00e878c2-9339-426e-8752-6b58bec8cf9a",
+      "label": "mixed",
+      "first": "2023-08-14T12:25:15.047Z",
+      "last": "2023-08-14T12:25:15.047Z",
+      "signed_return_5m_bps": "-6.888907835280733",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "55d209f4-7ade-4505-b1a1-0d15443feab2",
+      "label": "mixed",
+      "first": "2023-08-14T14:43:23.235Z",
+      "last": "2023-08-14T14:43:23.235Z",
+      "signed_return_5m_bps": "-6.025727826675098",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "eeecfde0-b3af-48d3-886c-11ac44132309",
+      "label": "mixed",
+      "first": "2023-08-15T15:41:58.695Z",
+      "last": "2023-08-15T15:41:58.695Z",
+      "signed_return_5m_bps": "-10.168739656377657",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "0150dec4-3c58-45e1-9560-3c9d5fb0c7c5",
+      "label": "mixed",
+      "first": "2023-10-16T13:31:52.349Z",
+      "last": "2023-10-16T13:31:52.368Z",
+      "signed_return_5m_bps": "-280.9550995734955",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "84b239bc-4904-4d14-9a03-adfabfa72597",
+      "label": "open",
+      "first": "2023-10-16T14:58:29.508Z",
+      "last": "2023-10-16T14:58:29.508Z",
+      "signed_return_5m_bps": "2.4823135161966547",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "2dc6f608-9ef1-43fb-befe-bf447090b49c",
+      "label": "mixed",
+      "first": "2023-11-17T23:03:53.761Z",
+      "last": "2023-11-17T23:03:53.761Z",
+      "signed_return_5m_bps": "35.628737368709196",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "5e5d95de-d59b-4b2d-95c4-fd4d5a374a89",
+      "label": "mixed",
+      "first": "2023-11-18T16:09:04.794Z",
+      "last": "2023-11-18T16:09:04.794Z",
+      "signed_return_5m_bps": "28.18819364063474",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "bc91e467-69f4-4df8-a257-a23f2431a8c6",
+      "label": "mixed",
+      "first": "2023-11-19T06:06:32.862Z",
+      "last": "2023-11-19T06:06:32.862Z",
+      "signed_return_5m_bps": "-14.655926716273804",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "578b1ec8-6282-4c8d-bc8d-178f830657d7",
+      "label": "mixed",
+      "first": "2023-11-20T14:53:05.348Z",
+      "last": "2023-11-20T14:53:05.348Z",
+      "signed_return_5m_bps": "40.98854731766188",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "ca4ef8fc-957b-445e-88b1-01729360260b",
+      "label": "mixed",
+      "first": "2023-11-21T05:34:26.792Z",
+      "last": "2023-11-21T05:48:22.303Z",
+      "signed_return_5m_bps": "6.678829248389917",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "da307894-06b1-47e4-a5be-c4aeda36b4e9",
+      "label": "mixed",
+      "first": "2023-11-21T17:04:49.493Z",
+      "last": "2023-11-21T17:04:49.493Z",
+      "signed_return_5m_bps": "-17.530201342282894",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "61202d3f-0c5e-444c-bbfc-3b37973ddf66",
+      "label": "mixed",
+      "first": "2023-11-23T02:32:06.319Z",
+      "last": "2023-11-23T02:35:02.238Z",
+      "signed_return_5m_bps": "-2.3551767051621653",
+      "liquidity": "mixed"
+    },
+    {
+      "orderID": "a66833dc-36f6-431c-bfa8-368df256193c",
+      "label": "open",
+      "first": "2023-11-23T11:22:20.479Z",
+      "last": "2023-11-23T11:22:20.479Z",
+      "signed_return_5m_bps": "3.650810694726392",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "10ea185c-fd6d-4a0d-9c69-d9ee9dba9b80",
+      "label": "mixed",
+      "first": "2023-11-23T11:25:38.989Z",
+      "last": "2023-11-23T11:25:39.797Z",
+      "signed_return_5m_bps": "-29.36356553743691",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "9611382a-73bc-473d-b592-a23348a86acd",
+      "label": "mixed",
+      "first": "2023-11-26T03:31:35.727Z",
+      "last": "2023-11-26T03:31:35.727Z",
+      "signed_return_5m_bps": "-2.5438887048689907",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "75d2889d-6c68-4477-9115-b25ce4effab8",
+      "label": "open",
+      "first": "2023-11-27T16:00:13.774Z",
+      "last": "2023-11-27T16:00:13.774Z",
+      "signed_return_5m_bps": "30.218731249660458",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "9427485a-b7bf-4f56-ba0f-d4ad96803726",
+      "label": "mixed",
+      "first": "2023-11-29T06:42:15.924Z",
+      "last": "2023-11-29T06:42:15.924Z",
+      "signed_return_5m_bps": "-3.281873555975867",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "f5120b92-321d-4afd-b930-5488dd18c602",
+      "label": "open",
+      "first": "2023-11-29T11:15:27.234Z",
+      "last": "2023-11-29T11:15:27.234Z",
+      "signed_return_5m_bps": "-3.0232527570750456",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "c65b20e6-b30d-43b3-9ceb-d574801a7aa1",
+      "label": "open",
+      "first": "2023-12-01T10:05:56.770Z",
+      "last": "2023-12-01T10:05:56.770Z",
+      "signed_return_5m_bps": "73.30757083616857",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "97d3a75d-108e-4b07-a0a3-98ebc9e7d072",
+      "label": "open",
+      "first": "2023-12-02T16:43:30.082Z",
+      "last": "2023-12-02T16:43:30.082Z",
+      "signed_return_5m_bps": "15.912109450554324",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "63ec2bee-6a3f-4856-bb0e-3b90950501c1",
+      "label": "mixed",
+      "first": "2023-12-13T13:20:19.196Z",
+      "last": "2023-12-13T13:20:19.196Z",
+      "signed_return_5m_bps": "15.788071772766532",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "bf41a7ae-9e53-499f-a405-fa49b49a1238",
+      "label": "open",
+      "first": "2023-12-13T19:36:50.783Z",
+      "last": "2023-12-13T19:36:50.783Z",
+      "signed_return_5m_bps": "-35.64899451553805",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "0685ed9b-c14a-4ae8-9168-f970e5e3fe7f",
+      "label": "mixed",
+      "first": "2024-02-27T01:49:28.194Z",
+      "last": "2024-02-27T01:49:28.254Z",
+      "signed_return_5m_bps": "-39.20439204392112",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "1c6b0433-b97c-47f6-a001-df1a8fe72890",
+      "label": "open",
+      "first": "2024-03-05T19:56:11.521Z",
+      "last": "2024-03-05T19:56:11.521Z",
+      "signed_return_5m_bps": "276.86576431143584",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "37b06579-dcc0-4464-b77d-f38888a38cff",
+      "label": "mixed",
+      "first": "2024-03-07T11:31:56.346Z",
+      "last": "2024-03-07T11:31:56.346Z",
+      "signed_return_5m_bps": "7.669022428631322",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "f07e85c1-d076-4e15-afdd-750ba92efde1",
+      "label": "mixed",
+      "first": "2024-04-14T14:36:43.082Z",
+      "last": "2024-04-14T14:36:43.104Z",
+      "signed_return_5m_bps": "37.69672980868943",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "f1820b4b-0723-4a94-af03-376ce8a09ac3",
+      "label": "open",
+      "first": "2024-04-19T13:16:56.358Z",
+      "last": "2024-04-19T13:16:56.358Z",
+      "signed_return_5m_bps": "-16.669633252590632",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "0ec9a99c-bae6-4d24-8371-fa1ec9d5b6d8",
+      "label": "open",
+      "first": "2024-08-05T12:32:46.196Z",
+      "last": "2024-08-05T12:32:46.196Z",
+      "signed_return_5m_bps": "111.19777604447822",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "38436ae8-acca-4c31-a7b0-4a0fed2495af",
+      "label": "open",
+      "first": "2024-08-05T13:42:44.496Z",
+      "last": "2024-08-05T13:42:44.496Z",
+      "signed_return_5m_bps": "275.84573481229893",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "f1824aa6-0c44-4a8e-94f2-ed5f4358fb02",
+      "label": "mixed",
+      "first": "2024-08-05T14:04:13.064Z",
+      "last": "2024-08-05T14:04:13.069Z",
+      "signed_return_5m_bps": "128.1817165430632",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "134bccf7-4aa5-4ad9-9c04-4dfc697a742f",
+      "label": "mixed",
+      "first": "2024-08-27T16:58:20.109Z",
+      "last": "2024-08-27T16:58:20.109Z",
+      "signed_return_5m_bps": "5.314310159514335",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "bb1aa5b5-20e1-4355-9bce-5a41164242ee",
+      "label": "mixed",
+      "first": "2024-08-31T09:51:16.197Z",
+      "last": "2024-08-31T09:51:16.197Z",
+      "signed_return_5m_bps": "5.652983418531488",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "9fb573bb-8ac7-46e9-8150-62c7c74d292e",
+      "label": "mixed",
+      "first": "2024-10-27T13:12:55.506Z",
+      "last": "2024-10-27T13:12:55.506Z",
+      "signed_return_5m_bps": "7.924344376735171",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "e360a680-83ec-47f5-b2c1-8a72323c73fb",
+      "label": "mixed",
+      "first": "2025-03-01T21:48:45.094Z",
+      "last": "2025-03-01T21:48:45.094Z",
+      "signed_return_5m_bps": "12.73694698766148",
+      "liquidity": "taker"
+    },
+    {
+      "orderID": "43aed38e-a51d-462b-af4b-4a8bd4069f40",
+      "label": "open",
+      "first": "2025-03-02T02:03:26.103Z",
+      "last": "2025-03-02T02:03:26.103Z",
+      "signed_return_5m_bps": "-12.150626064193482",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "2591b812-9292-418d-9791-86dfacddee15",
+      "label": "open",
+      "first": "2026-02-25T18:29:00.559Z",
+      "last": "2026-02-25T18:29:00.559Z",
+      "signed_return_5m_bps": "29.002695883344476",
+      "liquidity": "maker"
+    },
+    {
+      "orderID": "04d4e3df-9289-472c-8e74-9d4b1090b1c1",
+      "label": "open",
+      "first": "2026-03-04T09:06:41.267Z",
+      "last": "2026-03-04T09:06:41.267Z",
+      "signed_return_5m_bps": "33.497849676819015",
+      "liquidity": "maker"
+    }
+  ],
+  "causal_entry_policy": false,
+  "LBank_actual_performance": false,
+  "TP1_first": null,
+  "actual_emergency_5m": null,
+  "funding_adjusted_expectancy": null,
+  "correlated_CI": null,
+  "full_double_cost": null,
+  "promotion": false,
+  "limitations": [
+    "Same selected trader retrospective public ledger, not independent forward sample.",
+    "An order can mix first open and subsequent adds; pure-open label excludes initial entries.",
+    "Source future price is Binance candle close at floor(last fill minute)+5min; whole-order VWAP known after fills. Not exactly five minutes after first fill.",
+    "Postfill direction return cannot establish TP1-first or emergency warning.",
+    "No rule-based counterfactual/unfilled orders/native quotes; no causal maker advantage.",
+    "10/20bp sensitivity is not full funding/slippage doublecost.",
+    "All source rows retained, missing paths not liquidated; dynamic overlapping inventory means orders are not independent trades."
+  ]
+}
