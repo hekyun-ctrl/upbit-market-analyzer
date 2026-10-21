@@ -227,3 +227,8 @@ Pinned710eef59fullcode/fetch/tree read, frozenprobe21a472c actualexecution: unch
 
 ## 2026-10-21 11:20 KST — actual committed BTC component cash attribution
 Frozen0792ee9d, original45dda879 notebookJSONtextonly/noexecutionoroptimizer.10sourceSHA/6600continuousrawhours/2184historyhours;BTC recordednet90838.60,ETH302180.54,portfolio393019.14 exactsummaryreconciled. CurrentcloseTheta_t getsalreadyfinishedsamebarreturn;fixedpath1barlagBTCnet-8770.14 diagnosticnotrepairedstrategy.6398BTCcleanprices differfromraw/fullsampleclipping;324portfolio rebalance segments notclosedBTCtrades.6553+4378actualcashchecksnotperformancevalidation. ResultSHAfa3a03e3aa882491a3cc8d5cc6e89cf58807db335088add0bf402008c04955d5/readback51c4026a03b1700d338418d93b44ac1c9f8e416c. [Details](lbank_original_BTC_attribution_2026-10-21.md). No adoption/repair/riskchange/deploy. Nextboundedmax2artifact-firstpublicBTCfixedraw+closedledger/costdiscovery via screening1120;metisdocaggregategridnotshortlisted. Existingreferencealerts/warningsstay;nofailure-onlyusernotice.
+
+
+### 2026-10-21 12:15 KST — 공개 원장 계산
+
+종료·반전687개와 미종료1개를 구분하여 실제 계산 완료. 자금조달비 제외 체결비 차감 계산41.5874XBT/PF1.346이며 알람 성과로 채택하지 않음. 같은 거래자의 원장/분석 저장소라 독립 표본 아님. 상세 원전·SHA·명령·제약·다음 최초진입 전수 진단: [문서](lbank_public_discretionary_ledger_2026-10-21.md). 운영 변경·배포 없음.
