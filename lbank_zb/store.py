@@ -18,11 +18,14 @@ def plan_from(x):
     return Plan(candidate_from(x['candidate']),**{k:costs_from(v) if k=='costs' else dec(v) for k,v in x.items() if k!='candidate'})
 def position_from(x):
     x=dict(x);x['plan']=plan_from(x['plan'])
-    for k in ('remaining','cash','active_stop','funding','last_price','high','low','last_trail_sent'):
+    if 'remaining_funding' not in x:
+        x['remaining_funding']='0'
+        if dec(x['funding'])!=0:x['health']=list(set(x['health'])|{'LEGACY_FUNDING_ALLOCATION_UNKNOWN'})
+    for k in ('remaining','cash','active_stop','funding','remaining_funding','last_price','high','low','last_trail_sent'):
         if x[k] is not None:x[k]=dec(x[k])
     x['health']=set(x['health']);x['review']=set(x['review']);return Position(**x)
 def snapshot(e):
-    x=vars(e).copy();x['strategies']=sorted(e.strategies);x['seen']=sorted(e.seen);x['health']=sorted(e.health)
+    x=vars(e).copy();x['strategies']=sorted(e.strategies);x['seen']=sorted(e.seen);x['health']=sorted(e.health);x['data_issues']=sorted(e.data_issues);x['crosscheck_failures']=sorted(e.crosscheck_failures)
     def pos(p):
         v=asdict(p);v['health']=sorted(p.health);v['review']=sorted(p.review);return v
     x['position']=pos(e.position) if e.position else None;x['closed']=[pos(p) for p in e.closed]
@@ -32,9 +35,15 @@ def restore(text):
     for k in ('one','five','fifteen'):x[k]=[bar_from(b) for b in x[k]]
     x['costs']=costs_from(x['costs']);x['pending']=[candidate_from(c) for c in x['pending']]
     x['position']=position_from(x['position']) if x['position'] else None;x['closed']=[position_from(p) for p in x['closed']]
-    for k in ('equity','peak','day_start'):x[k]=dec(x[k])
-    for k in ('strategies','seen','health'):x[k]=set(x[k])
+    for k in ('equity','peak','day_start','last_mark'):
+        if x.get(k) is not None:x[k]=dec(x[k])
+    for k in ('strategies','seen','health','data_issues','crosscheck_failures'):
+        if k in x:x[k]=set(x[k])
     e.__dict__.update(x);return e
+
+def economic_content(row):
+    # Arrival, provenance label and revision counter are not economic changes.
+    return {k:v for k,v in row.items() if k not in ('received','source','revision')}
 
 class Store:
     def __init__(self,path,engine):
@@ -51,9 +60,12 @@ class Store:
         CREATE TABLE IF NOT EXISTS outbox(key TEXT PRIMARY KEY,kind TEXT,payload TEXT,expires INTEGER,status TEXT,attempts INTEGER DEFAULT 0,error TEXT);''')
         row=self.db.execute('SELECT payload FROM snapshots WHERE id=1').fetchone();self.engine=restore(row[0]) if row else engine
     def ingest(self,b,now):
-        key=f'{b.period}:{b.start}';payload=dumps(b);old=self.db.execute('SELECT payload FROM inputs WHERE id=?',(key,)).fetchone()
+        b.validate(now)
+        key=f'{b.exchange}:{b.market_type}:{b.symbol}:{b.settlement_asset}:{b.price_basis}:{b.period}:{b.start}';payload=dumps(b);old=self.db.execute('SELECT payload FROM inputs WHERE id=?',(key,)).fetchone()
+        if old is None:
+            old=self.db.execute('SELECT payload FROM inputs WHERE id=?',(f'{b.period}:{b.start}',)).fetchone()
         if old:
-            if old[0]!=payload:
+            if economic_content(json.loads(old[0]))!=economic_content(json.loads(payload)):
                 # Preserve correction, never retroactively alter the already-published thesis.
                 with self.db:self.db.execute('INSERT INTO corrections VALUES(?,?,?)',(key,payload,now))
                 raise ValueError('REVISION_REQUIRES_REPLAY_VERSION')
