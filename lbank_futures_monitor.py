@@ -849,6 +849,14 @@ def run():
     if os.getenv("LBANK_NATIVE_CANDLES_ENABLED", "true").lower() == "true":
         NativeCandleThread().start()
         LOG.info("NATIVE_CANDLES collection enabled; entry_source=native readiness_required=true")
+    # ZB runtime supervisor is isolated from the existing risk/entry loop.
+    if os.getenv("LBANK_ZB_RUNTIME_ENABLED", "true").lower() == "true":
+        try:
+            from lbank_zb.runtime import RuntimeThread
+            threading.Thread(target=RuntimeThread(sender=TELEGRAM_DELIVERY.send).run,
+                             name="lbank-zb-connection-supervisor",daemon=True).start()
+        except Exception as exc:
+            LOG.error("ZB_RUNTIME_INIT_FAILED exception=%s existing_risk_loop_unchanged=true",type(exc).__name__)
     native_feed = NativeEntryFeed()
     market_context = None
     try:
@@ -885,7 +893,7 @@ def run():
     except Exception as exc:
         LOG.error("RSI_DIVERGENCE study_unavailable exception=%s existing_entries_unchanged=true", type(exc).__name__)
     # Separate reader/sender: existing study rules and safety loop are untouched.
-    if os.getenv("LBANK_PAPER_NOTIFICATIONS_ENABLED", "true").lower() == "true":
+    if os.getenv("LBANK_PAPER_NOTIFICATIONS_ENABLED", "false").lower() == "true":
         try:
             threading.Thread(target=PaperNotificationThread().run,
                              name="lbank-paper-notification-worker",daemon=True).start()

@@ -1,0 +1,52 @@
+{
+  "spec_version": "ZB-1.0",
+  "baseline_commit": "25388b431c9c9d38df6a434670586c65f382d604",
+  "files": [
+    {
+      "path": "research/native-5m-audit-20261017.json",
+      "SHA256": "6e4bbca9a9b16d11322d666f1d3f1d3fe5b8d5a218b78578096c316ee26649dc",
+      "rows": 53,
+      "closure": "stream_inferred_not_rest_verified",
+      "source": "Railway logged LBank native 1m aggregated 5m"
+    },
+    {
+      "path": "research/signal-coherence-native-20261019.json",
+      "SHA256": "badeb082cf9a04ca9c6d3bb6805cac9b9d5193a8405f0dde4549845ea67cf146",
+      "rows": 156,
+      "closure": "stream_inferred_not_rest_verified",
+      "source": "Railway native 1m aggregated 5m logs"
+    },
+    {
+      "path": "research/four-traders-native-20261019.json",
+      "SHA256": "a782025e1804a52c8e4a0712ef92b92bd3096f2e4767ad68ad35b87512e6e1bc",
+      "rows": 51,
+      "closure": "stream_inferred_not_rest_verified",
+      "source": "Railway LBank native 1m-aggregated 5m logs"
+    },
+    {
+      "path": "research/rsi-divergence-native-20261018.json",
+      "SHA256": "50ba17c58c05dda5b6406c39368181d43c49f0a4afd71490f27768e472613691",
+      "rows": 284,
+      "closure": null,
+      "source": "Railway native closed 5m logs, deployment fc637c30-e106-4ab6-8785-615c16e7b941"
+    }
+  ],
+  "deduplicated_5m": 543,
+  "max_consecutive_5m": 284,
+  "earliest_UTC": "2026-10-17T04:15:00+00:00",
+  "latest_end_UTC": "2026-10-19T07:00:00+00:00",
+  "raw_1m_in_this_inventory": 0,
+  "verified_original5m_not_aggregate": 0,
+  "ninety_day_native_dataset_available": false,
+  "tick": null,
+  "quantity_step": null,
+  "volume_unit": null,
+  "contract_multiplier": null,
+  "fee_entry": null,
+  "fee_exit": null,
+  "funding_schedule": null,
+  "historical_displayed_funding": null,
+  "classification": "EVIDENCE_INSUFFICIENT",
+  "P2_profitability_comparison_possible": false,
+  "reason": "Archived inferred5m aggregates are not a complete raw1m+original5m+cost dataset. No exchange/spot substitution or invented zero cost."
+}
