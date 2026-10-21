@@ -1,0 +1,27 @@
+{
+  "reviewed_commit": "22724922c146eeb9c927d65afa8aaad88164115d",
+  "at_UTC": "2026-10-21T07:47:46.756963+00:00",
+  "scope": [
+    "R1",
+    "R2",
+    "R3",
+    "R4",
+    "R5",
+    "R6"
+  ],
+  "tests": 38,
+  "passed": true,
+  "engineering_ready": false,
+  "market_performance_measured": false,
+  "deployment_changed": false,
+  "hashes": {
+    "lbank_zb/core.py": "e7607a1f191c3c7c622d466d472a1e99974383e4c4b67c9736889df0f78047ba",
+    "lbank_zb/engine.py": "7ca54d5f524e2e3347e1582c658adac5126397e381b228d92f21f6e622ccdfd8",
+    "lbank_zb/store.py": "6fa195f766fd45fb84de7f8822f98671c34793a5df716afcf639ac6095409c11",
+    "tests/zerobase/test_core.py": "80422876d208cff9bcc7df7e3e0a82da6767482103096b8637b0ef4c3307ed67",
+    "tests/zerobase/test_review.py": "448149c696107820d3c78ab0905295544d3d0ba6bfae587c72d523375e06a22f",
+    "research/zerobase/review_before.json": "9c1f9cec93a14bc91a5175c3f8faded2036b58c1b650070fe7730954444b34f9",
+    "research/zerobase/review_after.json": "97e82869067ea2253301dc2f9ea7dc63a9f8034f57c9f13fa64be84a0ca20d30",
+    "research/zerobase/review_test_results.txt": "2f0e9bb0fa283b0a58b2f39992a4fb0a1a452daa680805382dab0598dce5cd51"
+  }
+}
