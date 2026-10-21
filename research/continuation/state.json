@@ -67,8 +67,8 @@
     "docs/lbank_full_management_replay_2026-10-20.md"
   ],
   "next_work": {
-    "stage": "artifact_first_new_public_BTC_closedledger_fixed_input_discovery",
-    "instruction": "1120finiteactualoriginalcashattributioncompleted. Read docs/lbank_original_BTC_attribution_2026-10-21.md/report.10filesSHA/6600contiguousrawhrs/2184sourceOOShrs, BTCoriginalgross102439.69-cost11601.08=net90838.60, ETH302180.54 sum393019.14 matchesoriginal. CurrentTheta_t fromcurrentclose multipliedsamecompletedbarreturn islookahead; samefixedpositionpath1barlagBTCnet-8770.14 (diagnosticnotrepairedstrategy). Sourcecleanprice6398BTCbarschangedfullsampleclipping, Rollcostwholetest.324PnLrows areportfolio rebalance segments NOTclosedBTCcampaigns, endingETH100kopen. No sourceoptimizer/notebookexecution/reselection;6553+4378cashchecks nottrades; reportreadbackandSHAfa3a03e3aa882491a3cc8d5cc6e89cf58807db335088add0bf402008c04955d5 preserved. ExcludeTHISpublicversionasBTCprofitabilityproof; no unchangedarithmetic/repair/optimizer/ETHportfolio gaintransfer. NEXT boundedartifact-firstdiscovery max2distinctPRIMARYpublicBTC sources: useexactqueries andexclusions in source_screening_20261021_1120.json; resolvecommit+actualGittree first, requirefixedraw+BTCclosedledger+explicitcosts beforemoretheory/codeforensics. No genericharness/aggregateTPSLgrid/unreleaseddata/multipairheadline asalpha. Ifactualmaterial exists freezeexactcash/rules andperformbounded arithmeticalcash/data integrity samefullwindow, notgoodperiodselection. Shayawnn/metis182aac29 docread only:notshortlisted selected80kaggregate1d/4h/1-4%stops/feesunknown andBTC+0.007R notedge; no moresweep/engineaudit. Allcurrent4/RSI/sourcesdedup preserve; donotaddpapertechniquesfromunprovenleads. Nativeexistingpaper distinctnewclosed/censors/deliverygaps mayreadboundedalongsideactualresearch; priorbox06:10->08:10model-3.4303sameepisodeunchangednotnewnotice. Existinglive referencealerts/riskwarnings/source25388kept; no promotion/deploy. Userpurposeaccuracy/netprofitabilityvsbaseline notmessages/testcounts, nofailure-onlyusernotice.",
+    "stage": "public_real_ledger_initial_entry_only_cost_and_path_diagnostic",
+    "instruction": "Read docs/lbank_public_discretionary_ledger_2026-10-21.md and report. Same trader two repos NOT independent evidence. 687closed/reversed+1open censored. Derived after executionfee41.5874XBT/PF1.346 EXCLUDES funding/dynamic inventory not fixed alerts. NEXT bounded actual initial-entry diagnostic: pinned TradeTrace27d2d50 reports/tables/order_fill_summary.csv and position_actions.csv, fullSHA; action=open fullset238 reported; distinguish adds/reductions/lastfill hindsight; calculate5min signedreturn/fee sensitivity, missing/overlap and first-lastfill delay. Inspect columns first; no future-firstfill substitution/positive subset. Ledger submodulef02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6 differs latest9ff0d, do notcombine or accessaccounts. Binance proxy notnativeLBank; funding/TP1/emergency null. No repeat687sum/causal maker claim/reverseengineered rule/paperaddition/relaxation/deploy. Existingreference alerts/warnings kept. No continuouscollection newclaim. Preserve actualnegative/unknown results; finite source limitation if nontransferable rules.",
     "sources_to_screen": [
       {
         "repository": "maxs231/lsob-backtest",
@@ -2204,6 +2204,21 @@
     "closed_BTC_campaigns_known": false,
     "causally_valid_performance": false,
     "full_double_cost": null,
+    "promotion": false,
+    "production_changed": false
+  },
+  "public_discretionary_ledger_1215": {
+    "document": "docs/lbank_public_discretionary_ledger_2026-10-21.md",
+    "code": "research/continuation/public_ledger_20261021_1215.py",
+    "report": "research/continuation/results/public_ledger_20261021_1215/report.json",
+    "verified_blob": "b6639bdf5a0cc95d50aa7eebc6b45160e75cefbc",
+    "analysis_commit": "27d2d50fc0def523d417cc84c42cc16ee3432d86",
+    "ledger_submodule": "f02a691c7f7cfd0cd08ffb7f13a656ebaf2c6ca6",
+    "closed_or_reversed": 687,
+    "open_censored": 1,
+    "after_execution_fee_XBT": "41.58738764326405335090926727",
+    "PF_excluding_funding": "1.346074091079424826911515410",
+    "full_cost_net": null,
     "promotion": false,
     "production_changed": false
   }
