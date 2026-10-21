@@ -242,3 +242,8 @@ Frozen0792ee9d, original45dda879 notebookJSONtextonly/noexecutionoroptimizer.10s
 ### 2026-10-21 13:48 KST — Native 사건 중복 제거·원인 대조
 
 [원본·실제 계산·한계](lbank_native_episode_reconciliation_2026-10-21_1348.md). 23progress ACK는0거래. 연구40행에 신규BBshort사건1개13판단(9분봉반응대기/4context),새진입·종료 관측0. 미관측가격으로 손익 생성하지 않음; 범위 밖 무누락 보장 없음. 운영25388/4bbSUCCESS 유지. 다음은 완결 규칙/고정자료/비용후BTC종료원장이 있는 별개 원전 최대2개 유한 탐색과 실제 계산; 현재 사건은 새 시간만 추적.
+
+
+### 2026-10-21 14:47 KST — 고정 원본 BTC ledger 비용 계산
+
+[원전·코드·실제결과·한계](lbank_cipher_BTC_cost_2026-10-21.md). Cipher e0b424cf 원래100ledger행 현금식 대조/BTC38행−109.589478USDT모형/PF.6393/IS·OOS모두음수.8788개BTC15m봉43개단일누락 확인·무보간. 기본 net에서slip중복차감 안함;조건부추가costBTC−334.989599는전체2배재실행 아님. 음수버전 튜닝/좋은기간 선택 없이 제외, XGBoosta178원본자료·ledger없음. 새후보/운영변경/배포 없음. 다음신규native사건이 없으면 별개완결원전 실제입력 우선; 이번소스 재감사 금지.
