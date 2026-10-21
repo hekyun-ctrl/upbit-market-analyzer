@@ -853,7 +853,8 @@ def run():
     if os.getenv("LBANK_ZB_RUNTIME_ENABLED", "true").lower() == "true":
         try:
             from lbank_zb.runtime import RuntimeThread
-            RuntimeThread(sender=TELEGRAM_DELIVERY.send).start()
+            threading.Thread(target=RuntimeThread(sender=TELEGRAM_DELIVERY.send).run,
+                             name="lbank-zb-connection-supervisor",daemon=True).start()
         except Exception as exc:
             LOG.error("ZB_RUNTIME_INIT_FAILED exception=%s existing_risk_loop_unchanged=true",type(exc).__name__)
     native_feed = NativeEntryFeed()
