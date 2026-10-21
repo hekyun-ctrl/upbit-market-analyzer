@@ -1,0 +1,189 @@
+{
+  "LSOB": {
+    "commit": "710eef5926f9f37f43581b8609c56c8e08f49403",
+    "source_blob": "0eb78e985edd82f97638624de7b3995a00842289",
+    "fetch_blob": "ae352c872c418284fb58e2e689fd809afffc030e",
+    "tree": [
+      {
+        "path": ".gitattributes",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "c4b49e6700762594c692b76218b5e94931b7bc2a",
+        "size": 187,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/c4b49e6700762594c692b76218b5e94931b7bc2a"
+      },
+      {
+        "path": ".gitignore",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "b2bcc6140e19fdd6bc40dd9350dcb3cb5efb85da",
+        "size": 398,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/b2bcc6140e19fdd6bc40dd9350dcb3cb5efb85da"
+      },
+      {
+        "path": ".vscode",
+        "mode": "040000",
+        "type": "tree",
+        "sha": "f0d412a2acf4eadfdf5771ddc18f900f458ea7f0",
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/trees/f0d412a2acf4eadfdf5771ddc18f900f458ea7f0"
+      },
+      {
+        "path": ".vscode/launch.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "a108dae030c3a2915e6b8a98bde5eb6c0bfb5bdf",
+        "size": 1472,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/a108dae030c3a2915e6b8a98bde5eb6c0bfb5bdf"
+      },
+      {
+        "path": ".vscode/settings.json",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "1ed727340f58bebc4c8cac7aa357ad2848c21cc4",
+        "size": 231,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/1ed727340f58bebc4c8cac7aa357ad2848c21cc4"
+      },
+      {
+        "path": "LICENSE",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "f6570dcbd79426a059cbdcc55b3363cd3a6b61ac",
+        "size": 1060,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/f6570dcbd79426a059cbdcc55b3363cd3a6b61ac"
+      },
+      {
+        "path": "README.md",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "76956b49095edb552847a1dfbd2519579554c7ab",
+        "size": 27599,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/76956b49095edb552847a1dfbd2519579554c7ab"
+      },
+      {
+        "path": "backtest_lsob.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "0eb78e985edd82f97638624de7b3995a00842289",
+        "size": 29321,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/0eb78e985edd82f97638624de7b3995a00842289"
+      },
+      {
+        "path": "equity_curve.png",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2ec02bc9c2891d6b6d926ad728d3c51136a72b78",
+        "size": 210331,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/2ec02bc9c2891d6b6d926ad728d3c51136a72b78"
+      },
+      {
+        "path": "fetch_data.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "807c0ab6db1df4a736b9f1863ed41cfa4c39052a",
+        "size": 4059,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/807c0ab6db1df4a736b9f1863ed41cfa4c39052a"
+      },
+      {
+        "path": "fetch_data_binance.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ae352c872c418284fb58e2e689fd809afffc030e",
+        "size": 5426,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/ae352c872c418284fb58e2e689fd809afffc030e"
+      },
+      {
+        "path": "monte_carlo.png",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "02658310668f91dc06b49659cec7cbe277388196",
+        "size": 317294,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/02658310668f91dc06b49659cec7cbe277388196"
+      },
+      {
+        "path": "monte_carlo.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "d5dd4d12c99197a55de5ffd69729872c725c2f3a",
+        "size": 9481,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/d5dd4d12c99197a55de5ffd69729872c725c2f3a"
+      },
+      {
+        "path": "plot_trade_anatomy.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "2c598e8370c053da055b281f39c5baf8194103a3",
+        "size": 7737,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/2c598e8370c053da055b281f39c5baf8194103a3"
+      },
+      {
+        "path": "requirements.txt",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "ca4daa118a30fd6881dd8e03267a76965d63e512",
+        "size": 518,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/ca4daa118a30fd6881dd8e03267a76965d63e512"
+      },
+      {
+        "path": "sweep.py",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "40ec79423b2af032e2a54674a61bb1b39d7ef231",
+        "size": 4131,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/40ec79423b2af032e2a54674a61bb1b39d7ef231"
+      },
+      {
+        "path": "trade_anatomy.png",
+        "mode": "100644",
+        "type": "blob",
+        "sha": "94a566b93b82fce2b3c04380036f4f498c84f09c",
+        "size": 113125,
+        "url": "https://api.github.com/repos/maxs231/lsob-backtest/git/blobs/94a566b93b82fce2b3c04380036f4f498c84f09c"
+      }
+    ],
+    "decision": "Exclude this public release as adopted profitability evidence; exact input notfrozen and actual causal/execution fixtures fail. No repairtosalvage or unchangedrepeat."
+  },
+  "additional_bounded_screen": {
+    "jhadchiti": {
+      "commit": "bb7a36673c60636fd40f4d97f8cec46cba755874",
+      "readme_blob": "e353c666924c14d768aac19e55c96fb84b510ca7",
+      "status": "README-only excluded for BTC frequentmanual contract: daily multiasset top30trend mostlydormant plus spot/perphedge; no code/account read"
+    }
+  },
+  "no_persisted_market_result_candidates": [
+    {
+      "repo": "farrellh1/crypto-funding-rate-strategy",
+      "tree_sha": "ac3557f567bbd487f8ab8fa203bfa666027add8d",
+      "tree_only": true,
+      "persisted_CSV_parquet_JSON_found": false,
+      "not_source_rule_audit": true
+    },
+    {
+      "repo": "juriok/chart-pattern-backtester",
+      "tree_sha": "2972c880144997ec305dc3dac23d78ee5a831176",
+      "tree_only": true,
+      "persisted_CSV_parquet_JSON_found": false,
+      "not_source_rule_audit": true
+    },
+    {
+      "repo": "pgup-ai/strategy-lab",
+      "tree_sha": "debf9ed3f81effadaa9a9d2f68062d3d9a6b7149",
+      "tree_only": true,
+      "persisted_CSV_parquet_JSON_found": false,
+      "not_source_rule_audit": true
+    }
+  ],
+  "existing_candidate_next": {
+    "repository": "buffettlaw/BTC-ETH-Trend-following-and-Lead-lag-Trading-Strategies",
+    "commit": "45dda879fbfb3bc6e8dbac46bd8605f01ca28c20",
+    "visibility": {
+      "private": false,
+      "visibility": "public"
+    },
+    "reason_new_scope": "Previously README/tree only parked. Now actualrawBTCparquet plus portfoliohistory and labelledtradePnLexist. Need determine BTCattribution availability; no ETH gains transfer.",
+    "ledger_blob": "9bcd84588d49235bb71219761d03835701d14fc2",
+    "ledger_rows": 324,
+    "ledger_schema": "strategy,trade_id,entry_time,exit_time,bars_held,gross_pnl_usdt,transaction_cost_usdt,net_pnl_usdt,turnover_usdt,ending_V_t",
+    "read_scope": "CSV firstrows/header and fullREADME only; no numerical netprofit audit yet.",
+    "next": "Inspect notebook as JSONtext only, no execution. Locate perasset BTC positions/cost and closed-vs-hourlylabel in history. IfBTC contribution derivable from exactpublicraw/history, freeze boundedcash/decomposition before compute. Originallabel trade rows entry==exit onhourlybars are NOT automatically closed campaigns. LeadlagETHonly excluded. No portfolio10xreturntransfer, parametersearch, notebookexecution, .pyc/pickle loading or live routes."
+  }
+}
