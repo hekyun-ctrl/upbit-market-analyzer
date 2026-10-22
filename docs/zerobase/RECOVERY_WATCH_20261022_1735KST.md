@@ -1,0 +1,7 @@
+# Recovery checkpoint — 2026-10-22 17:35 KST
+
+Read required deployment retry/checkpoint and latest STOP_PAPER_NOTIFICATIONS.json. Official https://status.railway.com/ latest08:01UTC=17:01KST: deployments can go live but start slowly/queue; explicitly do not trigger same deployment more than once. Builds still Pro/Enterprise only, Hobby/Free/Trial pending. No target tier eligibility established; no plan change.
+
+No build/redeploy/restart/source/config write, secret access or unrelated-service mutation. Stop checkpoint unchanged runtime_applied=false despite false switches saved. Prior service read16:12KST showed old4bbda6c7-29e8-4811-8322-5f8d0574c1be SUCCESS/configured06b88; not new runtime proof. Existing reference/risk retained, no prohibited paper/ZB outbound or ACK test. Credential replacement unconfirmed; do not infer rotation or account compromise. Old research remains stopped.
+
+Next upon applicable recovery/security checkpoint: fresh production/research/concurrent work, staged changes and deployment list review. If a matching build/deployment is queued, poll its existing ID; never duplicate trigger. Otherwise create exact still-approved source build only in target service with false outbound switches. Verify terminalSUCCESS/commit/runtime/native/reference-risk and runtime paper stop. Preserve rollback4bbda6c7-29e8-4811-8322-5f8d0574c1be/source25388b431c9c9d38df6a434670586c65f382d604. Partial transient recovery task retained, unchanged target result not re-notified.
