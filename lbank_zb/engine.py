@@ -2,16 +2,19 @@
 No running collector or transport is started by importing or executing this module.
 """
 from .core import *
+from .context import HigherTimeframes, render_context
 
 class Engine:
-    def __init__(self,costs,latency=60,strategies=None):
+    def __init__(self,costs,latency=60,strategies=None,context_mode='record'):
         if latency not in (60,120):raise ValueError('scenario latency')
+        if context_mode not in ('off','record'):raise ValueError('reference context mode')
         self.costs=costs;self.latency=latency;self.strategies=set(strategies or ['TREND_PULLBACK','BREAKOUT_RETEST','FAILED_BREAK_RECLAIM'])
         self.one=[];self.five=[];self.fifteen=[];self.watches={};self.pending=[];self.position=None;self.closed=[]
         self.equity=D(1000);self.peak=D(1000);self.day=None;self.day_start=D(1000);self.review=False;self.health=set()
         self.events=[];self.seen=set();self.last_exit=0;self.counts={};self.daily={};self.clock=0
         self.daily_halted=False;self.daily_halt_at=None;self.daily_halt_received_at=None
         self.data_issues=set();self.crosscheck_failures=set();self.market_asof=None;self.last_mark=None
+        self.context_mode=context_mode;self.higher_timeframes=HigherTimeframes();self.signal_contexts={}
     def emit(self,kind,now,**data):
         self.counts[kind]=self.counts.get(kind,0)+1;self.events.append({'kind':kind,'time':now,**data})
     def nav(self,price=None):
@@ -107,6 +110,9 @@ class Engine:
                 self.health.add('DATA_DEGRADED');self.crosscheck_failures.add(b.start);self.emit('BAR_MISMATCH_OR_UNIT_UNKNOWN',now,bar=b.start)
             elif abs(agg[0].v-b.v)>D('.00000001'):
                 self.health.add('DATA_DEGRADED');self.crosscheck_failures.add(b.start);self.emit('VOLUME_MISMATCH',now,bar=b.start)
+            crosscheck_ok=(len(agg)==1 and self.costs.tick is not None and
+                all(abs(getattr(agg[0],k)-getattr(b,k))<=self.costs.tick for k in ('o','h','l','c')) and agg[0].v==b.v)
+            if self.context_mode=='record':self.higher_timeframes.ingest(b,now,crosscheck_ok)
             self.fifteen=aggregate(self.five,900)[-160:]
             state=regime(self.fifteen) if contiguous(self.fifteen) else 'UNKNOWN'
             self.emit('REGIME',now,value=state)
@@ -117,15 +123,17 @@ class Engine:
                     for ev in self.position.events[n:]:self.emit(ev['kind'],ev['time'],id=self.position.plan.id,detail=ev)
                     self.finish_position(now)
             if len(self.five)<150 or len(self.fifteen)<150 or len(self.one)<60 or state=='UNKNOWN':self.emit('WARMUP',now);return
-            crosscheck_ok=(len(agg)==1 and self.costs.tick is not None and
-                all(abs(getattr(agg[0],k)-getattr(b,k))<=self.costs.tick for k in ('o','h','l','c')) and agg[0].v==b.v)
             self.recover_data_health(now,crosscheck_ok)
             candidates,watch_events=detect(self.five,state,self.watches)
             for e in watch_events:self.emit(e['type'],now,detail=e)
             plans=[];mapping={};levels=pivots(self.five,b.end)
             for c in candidates:
                 if c.strategy not in self.strategies:continue
-                self.emit('DETECTED',now,id=c.id,thesis=c,features={'rsi':features(self.five)['rsi'][-1],'divergence':divergence(self.five,b.end),'BTC_D':'UNKNOWN','USDT_D':'UNKNOWN','USDT_USD':'UNKNOWN'})
+                annotations={'rsi':features(self.five)['rsi'][-1],'divergence':divergence(self.five,b.end),'BTC_D':'UNKNOWN','USDT_D':'UNKNOWN','USDT_USD':'UNKNOWN'}
+                if self.context_mode=='record':
+                    context=self.higher_timeframes.snapshot(now,b.c,c.side)
+                    self.signal_contexts[c.id]=context;annotations['higher_timeframes']=context
+                self.emit('DETECTED',now,id=c.id,thesis=c,features=annotations)
                 why=[]
                 if now>c.expires:why.append('STALE_SIGNAL')
                 if c.origin<=self.last_exit:why.append('NEW_PATTERN_REQUIRED')
@@ -140,7 +148,9 @@ class Engine:
             chosen,suppressed=select(plans)
             for id,reason in suppressed.items():self.emit(reason,now,id=id)
             if chosen:
-                self.pending.append(mapping[chosen.id]);self.emit('READY',now,id=chosen.id,message=render(chosen),expires=chosen.candidate.expires)
+                message=render(chosen)
+                if chosen.id in self.signal_contexts:message+='\n'+render_context(self.signal_contexts[chosen.id])
+                self.pending.append(mapping[chosen.id]);self.emit('READY',now,id=chosen.id,message=message,expires=chosen.candidate.expires)
         else:raise ValueError('ingest raw1m then native5m only;15m internally derived')
     def quote_ready(self,quote,now,candidate):
         # Connection hook deliberately fails closed unless native normalized quantity-aware quote supplied.
