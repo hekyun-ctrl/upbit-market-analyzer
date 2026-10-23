@@ -1,0 +1,7 @@
+# Recovery checkpoint — 2026-10-23 05:19 KST
+
+Required retry/checkpoint/STOP files freshly read, blobs unchanged: 6a5c3254387602e916046f180c287f1950c61dbf / 324986077642a711532136e86c6b93ea7bf41e1e / c02580c2d50fc8cf97d6eed267ea88680ec1ead5. Fresh https://status.railway.com/ still latest 2026-10-22 19:42 UTC / 2026-10-23 04:42 KST: Pro/Enterprise normal; Hobby/Free/Trial not yet enabled; incident Identified. No change from 05:16 checkpoint e177d068237bbc8bf60aeb375041ab4f27ca1aa3.
+
+No deployment/restart/message/secret access. Target tier unverified; no billing changes. No runtime re-read; last service read 2026-10-22 23:09 KST showed live old SUCCESS 4bbda6c7-29e8-4811-8322-5f8d0574c1be, no staged changes, source config pin 06b88b94a6b5ff0ab5fda0ed0c08a03bc5faa03b. STOP runtime_applied=false remains. Do not claim stopped/deployed. Rollback source 25388b431c9c9d38df6a434670586c65f382d604 retained.
+
+Next unchanged: establish applicable build availability; review latest production/concurrent work; build exact approved source once with LBANK_PAPER_NOTIFICATIONS_ENABLED=false and LBANK_ZB_RUNTIME_ENABLED=false; verify runtime preserving reference/invalidation/risk. Retain tests; no paper/ZB-status sends for superseded ACK criterion. Recheck credential-safety checkpoint before broader deployment; Telegram rotation unconfirmed. Temporary outage: recovery task retained, research remains stopped. Suppress duplicate notification.

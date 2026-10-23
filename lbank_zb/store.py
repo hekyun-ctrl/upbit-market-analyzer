@@ -5,6 +5,7 @@ import sqlite3,json,copy,fcntl,os
 from pathlib import Path
 from .core import *
 from .engine import Engine
+from .context import HigherTimeframes
 
 def bar_from(row):
     x=dict(row)
@@ -26,12 +27,14 @@ def position_from(x):
     x['health']=set(x['health']);x['review']=set(x['review']);return Position(**x)
 def snapshot(e):
     x=vars(e).copy();x['strategies']=sorted(e.strategies);x['seen']=sorted(e.seen);x['health']=sorted(e.health);x['data_issues']=sorted(e.data_issues);x['crosscheck_failures']=sorted(e.crosscheck_failures)
+    x['higher_timeframes']=e.higher_timeframes.to_dict()
     def pos(p):
         v=asdict(p);v['health']=sorted(p.health);v['review']=sorted(p.review);return v
     x['position']=pos(e.position) if e.position else None;x['closed']=[pos(p) for p in e.closed]
     return dumps(x)
 def restore(text):
-    x=json.loads(text);e=Engine(costs_from(x['costs']),x['latency'],x['strategies'])
+    x=json.loads(text);e=Engine(costs_from(x['costs']),x['latency'],x['strategies'],x.get('context_mode','record'))
+    if 'higher_timeframes' in x:x['higher_timeframes']=HigherTimeframes.from_dict(x['higher_timeframes'])
     for k in ('one','five','fifteen'):x[k]=[bar_from(b) for b in x[k]]
     x['costs']=costs_from(x['costs']);x['pending']=[candidate_from(c) for c in x['pending']]
     x['position']=position_from(x['position']) if x['position'] else None;x['closed']=[position_from(p) for p in x['closed']]
