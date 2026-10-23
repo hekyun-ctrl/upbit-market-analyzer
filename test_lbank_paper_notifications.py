@@ -77,7 +77,9 @@ class PaperNotificationsTests(unittest.TestCase):
                  for n in ast.parse(src).body
                  if isinstance(n,ast.FunctionDef) and n.name in expected}
         self.assertEqual(expected,current)
-        files={'lbank_public_techniques.py': 'c9ff5a3f2bd6a72651b878b372385796c094300544b56ce4b3740bc108928b61', 'lbank_rsi_divergence.py': '602a4faae7cff60ecb33cc0fd21ae20953e69e4b89acc2bba62979c49737f269', 'lbank_performance.py': '39ce555def76ece101c28bb31ea22d70091b0fbf5febb65fc4de95ac86ace04c'}
+        # 2026-10-23: only PerformanceBook startup cleanup changed: close the
+        # connection if schema initialization fails. Accounting rules unchanged.
+        files={'lbank_public_techniques.py': 'c9ff5a3f2bd6a72651b878b372385796c094300544b56ce4b3740bc108928b61', 'lbank_rsi_divergence.py': '602a4faae7cff60ecb33cc0fd21ae20953e69e4b89acc2bba62979c49737f269', 'lbank_performance.py': '8386b38bda3d4bfd93a6efb6490efb482ef69077706e553ebff4e3ba687ff7be'}
         for f,sha in files.items():self.assertEqual(hashlib.sha256(Path(f).read_bytes()).hexdigest(),sha)
 
 

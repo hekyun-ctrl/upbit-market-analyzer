@@ -31,6 +31,8 @@ from lbank_notification_schedule import is_quiet_new_entry_time, quiet_hours_ena
 from lbank_compact_alert import format_compact_entry_alert
 from lbank_telegram_transport import TelegramTransport
 from lbank_performance import PerformanceBook
+from lbank_operational_health import (JournalRecovery, OperationalNotices,
+                                      StorageReserve, blocked_diagnostic)
 from lbank_native_candles import NativeCandleThread
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
@@ -906,18 +908,18 @@ def run():
         except Exception as exc:
             LOG.error("PAPER_NOTIFICATION_START_FAILED type=%s", type(exc).__name__)
     pending_journal = []
-    try:
-        performance = PerformanceBook(
-            os.getenv("LBANK_PERFORMANCE_DB", "/data/lbank_performance.sqlite3"),
-            REF_BALANCE, goal_pct=DAILY_GOAL_PCT)
+    performance_path = os.getenv("LBANK_PERFORMANCE_DB", "/data/lbank_performance.sqlite3")
+    journal_recovery = JournalRecovery(lambda: PerformanceBook(
+        performance_path, REF_BALANCE, goal_pct=DAILY_GOAL_PCT))
+    storage_reserve = StorageReserve(os.path.dirname(performance_path))
+    operational_notices = OperationalNotices(telegram)
+    performance = journal_recovery.get(time.time())
+    if performance is not None:
         LOG.info("PERFORMANCE_V3 ready daily_goal_pct=7 report_kst=22:50 "
                  "partial_exit=50pct source=ticker_samples actual_account_pnl=false")
         LOG.info("TREND_RUNNER enabled=%s policy=%s atr=14 trail_atr=2 "
                  "ema=9/21 max_tracking_hours=6 goal_is_exit_cap=false validated_profit=false",
                  RUNNER_ENABLED, POLICY_VERSION)
-    except Exception as exc:
-        LOG.error("PERFORMANCE_V2 unavailable exception=%s; new_entries_paused=true",
-                  type(exc).__name__)
     LOG.info("position_report_tracking=enabled; recorded_position_present=%s", bool(position_ledger.position))
     # Read-only reconstruction of the latest public signal in a separate thread.
     # No account state, Telegram calls, source DB changes or live strategy gates.
@@ -988,7 +990,8 @@ def run():
                         "suppressed": 0, "range_watch": 0, "trend_watch": 0,
                         "breakout_watch": 0, "range_confirmed": 0,
                         "trend_confirmed": 0, "breakout_confirmed": 0,
-                        "data_gap": 0, "no_setup": 0, "retest_momentum": 0,
+                        "data_gap": 0, "journal_unavailable": 0,
+                        "no_setup": 0, "retest_momentum": 0,
                         "sampled_context": 0, "rsi_direction": 0,
                         "risk_or_target": 0, "other_reject": 0,
                         "confirm_reject": 0, "quality_wait": 0, "quality_reject": 0}
@@ -1011,6 +1014,9 @@ def run():
             position_bot.poll()
             price, change24 = get_perpetual_snapshot(exchange)
             now = time.time()
+            if performance is None:
+                performance = journal_recovery.get(now)
+            storage_status = storage_reserve.check()
             native_state, native_diag = native_feed.snapshot(now, price)
             native_key = completed_key(native_state)
             try:
@@ -1168,10 +1174,16 @@ def run():
                                  bucket, audit_state["closes"][-1], audit_state["rsi"][-1], NATIVE_SOURCE)
                         sampled_closes = audit_state["closes"]
                         sampled_rsis = audit_state["rsi"]
-                        hypotheses, outcomes = rsi_research.observe(
-                            bucket, sampled_closes[-1], sampled_closes, sampled_rsis)
-                        neutral_outcomes = neutral_exit_study.observe(
-                            bucket, sampled_closes, sampled_rsis)
+                        hypotheses, outcomes, neutral_outcomes = {}, [], []
+                        if storage_status["research_writable"]:
+                            try:
+                                hypotheses, outcomes = rsi_research.observe(
+                                    bucket, sampled_closes[-1], sampled_closes, sampled_rsis)
+                                neutral_outcomes = neutral_exit_study.observe(
+                                    bucket, sampled_closes, sampled_rsis)
+                            except Exception as exc:
+                                LOG.warning("RSI_SHADOW_RECORD_FAILED exception=%s entry_review_continues=true",
+                                            type(exc).__name__)
                         for outcome in neutral_outcomes:
                             LOG.info("NEUTRAL_EXIT_SHADOW %s",
                                      json.dumps(outcome, sort_keys=True))
@@ -1233,11 +1245,15 @@ def run():
                 continuous = native_state is not None
                 if not audit_ready:
                     watch = None
+                    count_event("journal_unavailable")
+                    last_entry_diagnostics = blocked_diagnostic(
+                        now, audit_ready, continuous, native_diag)
                     LOG.error("ENTRY JOURNAL UNAVAILABLE new_entries_paused=true risk_notices=active")
                 elif not continuous:
                     watch = None
                     count_event("data_gap")
-                    last_entry_diagnostics = {"reason": "native_data_unavailable", "native": native_diag}
+                    last_entry_diagnostics = blocked_diagnostic(
+                        now, audit_ready, continuous, native_diag)
                     if performance is not None:
                         performance.sample(now, price, decision=last_entry_diagnostics)
                 elif watch is not None:
@@ -1420,6 +1436,9 @@ def run():
                         if bucket not in counter_template:
                             bucket = "other_reject"
                         count_event(bucket)
+            operational_notices.observe(now,
+                "journal" if not audit_ready else "native" if native_state is None else
+                "storage_" + storage_status["status"] if not storage_status["research_writable"] else None)
             if sample_due:
                 LOG.info("contract=BTCUSDT price=%.1f count=%d watch=%s confirmed_total=%d tracked_references=%d",
                          price, len(prices), watch["plan"]["side"] if watch else "none",
@@ -1430,13 +1449,14 @@ def run():
                     next_log_summary = now + 3600
                 if now >= next_diag_summary:
                     LOG.info("NATIVE_SETUP_DIAGNOSTICS %s", json.dumps(last_entry_diagnostics, sort_keys=True))
-                    LOG.info("ALERT_DIAGNOSTICS_10M no_setup=%d data_gap=%d "
+                    LOG.info("ALERT_DIAGNOSTICS_10M no_setup=%d data_gap=%d journal_unavailable=%d "
                              "retest_momentum=%d sampled_context=%d "
                              "rsi_direction=%d risk_or_target=%d "
                              "confirm_reject=%d watched=%d confirmed=%d "
                              "suppressed=%d quality_wait=%d quality_reject=%d "
                              "(no_setup != rejected trade)",
                              diag_counters["no_setup"], diag_counters["data_gap"],
+                             diag_counters["journal_unavailable"],
                              diag_counters["retest_momentum"],
                              diag_counters["sampled_context"],
                              diag_counters["rsi_direction"],
@@ -1447,14 +1467,17 @@ def run():
                              diag_counters["quality_reject"])
                     diag_counters = dict(counter_template)
                     next_diag_summary = now + 600
-                if divergence_study is not None:
+                    LOG.info("ENTRY_OPERATIONAL_STATUS %s", json.dumps(dict(
+                        at=now, journal_ready=audit_ready, native=native_diag,
+                        storage=storage_status, strategy_reason=last_entry_diagnostics.get("reason")), sort_keys=True))
+                if divergence_study is not None and storage_status["research_writable"]:
                     try:
                         study = divergence_study.step(now,price,native_state,calculate_plan,native_context_gate,
                                   baseline_reason=last_entry_diagnostics.get("reason","not_reviewed"))
                         LOG.info("RSI_DIVERGENCE_STUDY %s",json.dumps(study,sort_keys=True))
                     except Exception as exc:
                         LOG.error("RSI_DIVERGENCE study_failed exception=%s existing_entries_unchanged=true",type(exc).__name__)
-                if technique_study is not None:
+                if technique_study is not None and storage_status["research_writable"]:
                     try:
                         technique_result = technique_study.step(now,price,native_state,calculate_plan,native_context_gate,
                             baseline_reason=last_entry_diagnostics.get("reason","not_reviewed"))
@@ -1487,6 +1510,9 @@ def run():
                         LOG.error("PERFORMANCE_V2 report_failed exception=%s", type(exc).__name__)
         except Exception as exc:
             LOG.error("LBank market error (%s): %s", type(exc).__name__, str(exc)[:160])
+            last_entry_diagnostics = {"reason": "monitor_error", "at": time.time(),
+                                      "strategy_evaluated": False, "error": type(exc).__name__}
+            operational_notices.observe(time.time(), "monitor_error")
         time.sleep(RISK_POLL)
 
 

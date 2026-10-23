@@ -46,9 +46,10 @@ class PerformanceBook:
             os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
         self.db = sqlite3.connect(path, timeout=2)
         self.db.row_factory = sqlite3.Row
-        self.db.execute("PRAGMA journal_mode=WAL")
-        self.db.execute("PRAGMA synchronous=FULL")
-        self.db.executescript('''
+        try:
+            self.db.execute("PRAGMA journal_mode=WAL")
+            self.db.execute("PRAGMA synchronous=FULL")
+            self.db.executescript('''
           CREATE TABLE IF NOT EXISTS samples(ts REAL PRIMARY KEY, price REAL NOT NULL);
           CREATE TABLE IF NOT EXISTS decisions(ts REAL PRIMARY KEY, detail TEXT NOT NULL);
           CREATE TABLE IF NOT EXISTS signals(
@@ -61,7 +62,10 @@ class PerformanceBook:
             id TEXT, ts REAL, detail TEXT NOT NULL, PRIMARY KEY(id,ts));
           CREATE TABLE IF NOT EXISTS risk_cautions(
             id TEXT, ts REAL, detail TEXT NOT NULL, PRIMARY KEY(id,ts));
-        ''')
+            ''')
+        except Exception:
+            self.db.close()
+            raise
         self.last_prune = 0.0
 
     def sample(self, ts, price, decision=None):
