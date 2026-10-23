@@ -3,7 +3,7 @@ import json
 import os
 import tempfile
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 from lbank_orderbook_shadow import (
     OrderBookShadow, OrderBookShadowThread,
@@ -22,6 +22,21 @@ def book(mid=80000.25, bid_qty=8, ask_qty=1, wrap=False):
 
 
 class PublicDepthShadowTests(unittest.TestCase):
+    def test_low_storage_pauses_fetch_and_discards_gap_before_recovery(self):
+        class StopLoop(BaseException):pass
+        with tempfile.TemporaryDirectory() as directory:
+            fetcher=MagicMock(return_value=book())
+            worker=OrderBookShadowThread(directory=directory,fetcher=fetcher)
+            worker.study.pending=[{'incomplete_before_storage_gap':True}]
+            worker.storage_reserve=MagicMock()
+            worker.storage_reserve.check.side_effect=[{'research_writable':False},
+                                                     {'research_writable':True}]
+            with patch('lbank_orderbook_shadow.time.sleep',side_effect=[None,StopLoop()]):
+                with self.assertRaises(StopLoop):worker._loop()
+            fetcher.assert_called_once()
+            self.assertEqual(worker.study.sample_count,1)
+            self.assertEqual(worker.study.outcome_count,0)
+
     def test_public_depth_is_validated_with_or_without_data_wrapper(self):
         for wrapped in (False, True):
             f = extract_features(book(wrap=wrapped))

@@ -14,7 +14,8 @@ class StopLoop(BaseException):
 
 
 def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
-              ready_at=None,qualify_at=None,stop_at=9075.,cancel_at=None):
+              ready_at=None,qualify_at=None,stop_at=9075.,cancel_at=None,
+              journal_open_failures=0,shadow_fails=False,low_storage=False):
     clock=SimpleNamespace(now=9000.);order=[];saved=[];sent=[];confirmed=[]
     state=structural_state();state['rsi5']['closes']=[b['close'] for b in state['five_bars']]
     p=state['quote'];plan=dict(direction=1,side='롱',strategy='breakout',price=p,
@@ -42,6 +43,7 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
     book=MagicMock();book.observe.return_value=[];book.sample.side_effect=sample;book.daily_message.return_value=None
     feed=MagicMock();feed.snapshot.side_effect=snapshot
     research=MagicMock();research.observe.return_value=({},[])
+    if shadow_fails:research.observe.side_effect=OSError('disk full in optional research')
     neutral=MagicMock();neutral.observe.return_value=[]
     exchange=MagicMock();exchange.market.return_value={'swap':True}
     calls=[]
@@ -51,6 +53,11 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
         return copy.deepcopy(plan) if len(calls)==1 else None
     classifier=MagicMock(side_effect=classify)
     log=MagicMock()
+    attempts=[]
+    def open_book(*a,**kw):
+        attempts.append(clock.now)
+        if len(attempts)<=journal_open_failures:raise OSError('startup disk full')
+        return book
     with ExitStack() as stack:
         for name,value in dict(POLL=60,RISK_POLL=15,STARTUP_TEST_ENABLED=False).items():stack.enter_context(patch.object(monitor,name,value))
         stack.enter_context(patch.object(monitor.time,'time',lambda:clock.now))
@@ -60,8 +67,12 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
         for name in ('NativeCandleThread','MarketContextThread','MacroMonitor','OrderBookShadowThread'):
             stack.enter_context(patch.object(monitor,name))
         for name in ('DivergenceStudy','TechniqueStudy'):stack.enter_context(patch.object(monitor,name,side_effect=RuntimeError('disabled in isolated test')))
-        for name,obj in [('NativeEntryFeed',feed),('SignalRiskTracker',risk),('PositionState',position),('ResearchTracker',research),('NeutralExitStudy',neutral),('PerformanceBook',book)]:
+        for name,obj in [('NativeEntryFeed',feed),('SignalRiskTracker',risk),('PositionState',position),('ResearchTracker',research),('NeutralExitStudy',neutral)]:
             stack.enter_context(patch.object(monitor,name,return_value=obj))
+        stack.enter_context(patch.object(monitor,'PerformanceBook',side_effect=open_book))
+        storage=stack.enter_context(patch.object(monitor,'StorageReserve'))
+        storage.return_value.check.return_value={'status':'low' if low_storage else 'ok',
+            'free_bytes':0 if low_storage else 100000000,'research_writable':not low_storage}
         stack.enter_context(patch.object(monitor,'TelegramBot'))
         stack.enter_context(patch.object(monitor,'load_snapshots',return_value=([],
             {'day':'1970-01-01','count':0,'last_time':None,'last_side':None})))
@@ -81,10 +92,39 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
     errors=[a for a in log.error.call_args_list if a.args and a.args[0].startswith('LBank market error')]
     if errors:raise AssertionError(errors)
     return dict(confirmed=confirmed,sent=sent,saved=saved,book=book,risk=risk,order=order,
-                classifier=classifier,classify_times=calls)
+                classifier=classifier,classify_times=calls,open_attempts=attempts,
+                research=research,log=log)
 
 
 class ConfirmationCadenceTests(unittest.TestCase):
+    def test_startup_journal_failure_recovers_without_restart_and_keeps_risk_polling(self):
+        r=run_clock(journal_open_failures=1,stop_at=9135.)
+        self.assertEqual(r['open_attempts'],[9000.,9060.])
+        self.assertEqual([t for t,_ in r['sent']],[9090.])
+        self.assertEqual([t for t,event in r['order'] if event=='risk'],
+                         list(range(9000,9135,15)))
+        self.assertEqual(r['classify_times'][0],9060.)
+
+    def test_optional_research_write_failure_does_not_skip_entry_review(self):
+        r=run_clock(shadow_fails=True)
+        self.assertEqual([t for t,_ in r['sent']],[9030.])
+        self.assertTrue(r['research'].observe.called)
+
+    def test_storage_reserve_pauses_research_without_adding_entry_gate(self):
+        r=run_clock(low_storage=True)
+        self.assertEqual([t for t,_ in r['sent']],[9030.])
+        r['research'].observe.assert_not_called()
+
+    def test_journal_outage_diagnostic_cannot_reuse_last_market_rejection(self):
+        import json
+        r=run_clock(journal_open_failures=100,stop_at=9615.)
+        lines=[a.args[1] for a in r['log'].info.call_args_list
+               if a.args[0]=='NATIVE_SETUP_DIAGNOSTICS %s']
+        self.assertEqual(len(lines),1)
+        self.assertEqual(json.loads(lines[0])['reason'],'entry_journal_unavailable')
+        self.assertFalse(json.loads(lines[0])['strategy_evaluated'])
+        self.assertEqual(r['classifier'].call_count,0)
+
     def test_existing_native_gates_accept_30s_and_keep_no_chase_limit(self):
         from test_lbank_native_entry import NativeEntryTests
         fixture=NativeEntryTests('test_native_watch_and_confirmation_never_call_sampled_gates')

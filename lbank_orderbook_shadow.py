@@ -12,6 +12,7 @@ import math
 import os
 import threading
 import time
+from lbank_operational_health import StorageReserve
 import urllib.parse
 import urllib.request
 
@@ -193,6 +194,7 @@ class OrderBookShadowThread:
         self.error_count = 0
         self.last_error_log = 0.0
         self.last_summary_log = 0.0
+        self.storage_reserve = StorageReserve(self.directory)
 
     def _loop(self):
         LOG.info("ORDERBOOK_SHADOW_START interval=%ds source=perpetual_public_depth "
@@ -200,6 +202,11 @@ class OrderBookShadowThread:
         while True:
             start = time.monotonic()
             try:
+                if not self.storage_reserve.check()["research_writable"]:
+                    # Do not record an outcome across an unobserved storage gap.
+                    self.study.pending.clear()
+                    time.sleep(self.interval)
+                    continue
                 payload = self.fetcher()
                 now = time.time()
                 candidate, outcomes = self.study.observe(now, payload)
