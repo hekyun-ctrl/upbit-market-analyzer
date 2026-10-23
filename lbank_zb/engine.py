@@ -15,6 +15,7 @@ class Engine:
         self.daily_halted=False;self.daily_halt_at=None;self.daily_halt_received_at=None
         self.data_issues=set();self.crosscheck_failures=set();self.market_asof=None;self.last_mark=None
         self.context_mode=context_mode;self.higher_timeframes=HigherTimeframes();self.signal_contexts={}
+        self.execution_mode='minute'
     def emit(self,kind,now,**data):
         self.counts[kind]=self.counts.get(kind,0)+1;self.events.append({'kind':kind,'time':now,**data})
     def nav(self,price=None):
@@ -73,7 +74,7 @@ class Engine:
             if self.one and b.start<=self.one[-1].start:raise ValueError('OUT_OF_ORDER')
             self.one=(self.one+[b])[-60:]
             # Pending entry uses the first minute open at or beyond the fixed latency.
-            for c in list(self.pending):
+            for c in list(self.pending) if self.execution_mode=='minute' else []:
                 if b.start<c.signal_time+self.latency:
                     if b.start>=c.signal_time and (b.l<=c.S if c.side==1 else b.h>=c.S):
                         self.pending.remove(c);self.emit('CANCELLED',now,id=c.id,reason='STOP_BEFORE_FILL')
@@ -92,7 +93,7 @@ class Engine:
                 if why:self.emit('UNFILLED',now,id=c.id,reasons=why);continue
                 if p.risk>nav*D('.005'):self.emit('RISK_HALT',now,id=c.id);continue
                 self.position=Position.open(p,b.start);self.emit('PAPER_OPEN',b.start,id=p.id,plan=p)
-            if self.position:
+            if self.position and self.execution_mode=='minute':
                 n=len(self.position.events);self.position.minute(b,now)
                 for ev in self.position.events[n:]:self.emit(ev['kind'],ev['time'],id=self.position.plan.id,detail=ev)
                 self.finish_position(now)
@@ -119,9 +120,7 @@ class Engine:
             if self.position:
                 a=features(self.five)['atr'][-1]
                 if a:
-                    n=len(self.position.events);self.position.five(b,a,state,now)
-                    for ev in self.position.events[n:]:self.emit(ev['kind'],ev['time'],id=self.position.plan.id,detail=ev)
-                    self.finish_position(now)
+                    self.manage_five_position(b,a,state,now)
             if len(self.five)<150 or len(self.fifteen)<150 or len(self.one)<60 or state=='UNKNOWN':self.emit('WARMUP',now);return
             self.recover_data_health(now,crosscheck_ok)
             candidates,watch_events=detect(self.five,state,self.watches)
@@ -150,8 +149,12 @@ class Engine:
             if chosen:
                 message=render(chosen)
                 if chosen.id in self.signal_contexts:message+='\n'+render_context(self.signal_contexts[chosen.id])
-                self.pending.append(mapping[chosen.id]);self.emit('READY',now,id=chosen.id,message=message,expires=chosen.candidate.expires)
+                self.pending.append(mapping[chosen.id]);self.emit('READY' if self.execution_mode=='minute' else 'AWAITING_QUOTE',now,id=chosen.id,message=message,expires=chosen.candidate.expires)
         else:raise ValueError('ingest raw1m then native5m only;15m internally derived')
+    def manage_five_position(self,b,a,state,now):
+        n=len(self.position.events);self.position.five(b,a,state,now)
+        for ev in self.position.events[n:]:self.emit(ev['kind'],ev['time'],id=self.position.plan.id,detail=ev)
+        self.finish_position(now)
     def quote_ready(self,quote,now,candidate):
         # Connection hook deliberately fails closed unless native normalized quantity-aware quote supplied.
         if quote is None:return False

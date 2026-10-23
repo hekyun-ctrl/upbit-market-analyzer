@@ -34,6 +34,9 @@ def snapshot(e):
     return dumps(x)
 def restore(text):
     x=json.loads(text);e=Engine(costs_from(x['costs']),x['latency'],x['strategies'],x.get('context_mode','record'))
+    if x.get('execution_mode')=='quote':
+        from .live import LiveEngine
+        e=LiveEngine(costs_from(x['costs']),x['latency'],x['strategies'],x.get('context_mode','record'))
     if 'higher_timeframes' in x:x['higher_timeframes']=HigherTimeframes.from_dict(x['higher_timeframes'])
     for k in ('one','five','fifteen'):x[k]=[bar_from(b) for b in x[k]]
     x['costs']=costs_from(x['costs']);x['pending']=[candidate_from(c) for c in x['pending']]
