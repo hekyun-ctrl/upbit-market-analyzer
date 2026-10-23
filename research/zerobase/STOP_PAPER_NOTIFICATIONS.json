@@ -5,12 +5,12 @@
   "existing_reference_alerts_enabled": true,
   "existing_risk_alerts_enabled": true,
   "runtime_applied": true,
-  "blocker": "Code deployment succeeded, but production persistent volume is full (50 MB configured, disk usage 0.050118656 GB). Runtime logs report Errno 28 No space left on device, NATIVE_CANDLES_STOPPED OperationalError and new_entries_paused=true. Operational recovery is incomplete.",
+  "blocker": null,
   "required_environment": {
     "LBANK_PAPER_NOTIFICATIONS_ENABLED": "false",
     "LBANK_ZB_RUNTIME_ENABLED": "false"
   },
-  "next": "Inspect lbank-position-state volume settings and increase capacity while preserving data. Restart native collection if its stopped thread does not recover; verify exact release, native writes/readiness, sample and followup persistence. Do not resume paper/ZB outbound or claim live strategy qualification.",
+  "next": "Storage and native collection recovered. Continue accumulating verified continuous native candles until existing readiness gates pass. Full live ZB engine integration and real-market strategy comparison/qualification remain pending; keep paper/ZB supervisor outbound disabled.",
   "verification_date_kst": "2026-10-23",
   "reconnection_verified": true,
   "configuration_saved": true,
@@ -27,7 +27,7 @@
   "staged_patch_id": "0b34d341-eadf-4d51-aa07-11e86ca395a7",
   "staged_changes_scope": "Only existing LBank service source pinned to 12b39da and the two disabled outbound switches. Existing volume, pre-deploy tests, monitor and risk paths preserved.",
   "predeploy_full_suite_executed": true,
-  "release_validation": "Production release 12b39da reached terminal SUCCESS and runtime logged the same exact commit. All 410 pre-deploy tests passed. Startup risk paths remain active; native collection and storage are degraded by full persistent disk. Full live ZB engine integration and real-market qualification remain pending.",
+  "release_validation": "Release 12b39da reached terminal SUCCESS; 410 pre-deploy tests passed. After the user expanded the same persistent volume to 500 MB and explicitly approved one in-place restart, the same deployment is Online with one running replica. Exact runtime commit verified at restart. Native WebSocket connected and completed native 1m records advanced from 0 to 1; historical readiness remains false. No post-restart disk-full/SQLite OperationalError/persistence failures observed in the bounded logs through 2026-10-23T04:39:05.921422342Z.",
   "last_execution_error": null,
   "predeploy_tests": {
     "command": "python -m unittest discover -p 'test_lbank*.py'",
@@ -40,7 +40,7 @@
   "deployment_status": "SUCCESS",
   "deployment_success_at_utc": "2026-10-23T04:27:01.158Z",
   "runtime_commit_verified": true,
-  "runtime_commit_log_time_utc": "2026-10-23T04:26:59.324809805Z",
+  "runtime_commit_log_time_utc": "2026-10-23T04:37:03.835613454Z",
   "outbound_verification": {
     "prepared_values": {
       "LBANK_PAPER_NOTIFICATIONS_ENABLED": "false",
@@ -49,19 +49,35 @@
     "six_change_patch_applied": true,
     "staged_remaining": false,
     "oauth_values_redacted": true,
-    "limitation": "Plugin read-back exposes variable names only, not values. No paper/ZB worker startup or delivery was observed in the bounded new-runtime logs; absence alone is not independent proof of flag values."
+    "limitation": "OAuth values remain redacted. Prepared false values were in the six-change patch the user committed. Paper/ZB supervisor was not re-enabled; no paper/ZB startup or delivery was observed in the bounded post-restart logs. Absence alone is not independent proof of variable values."
   },
   "storage_incident": {
     "volume_id": "f8af8ebe-f46d-4995-b59f-733e607f815e",
     "name": "lbank-position-state",
     "mount": "/data",
-    "configured_size_mb": 50,
-    "current_disk_usage_gb": 0.050118656,
+    "configured_size_mb": 500,
+    "current_disk_usage_gb": 0.059826176,
     "observed_error": "OSError: [Errno 28] No space left on device",
-    "native_collection_stopped": true,
+    "native_collection_stopped": false,
     "new_entries_paused": true,
     "risk_notices_active": true,
-    "recovery_complete": false
+    "recovery_complete": true,
+    "original_configured_size_mb": 50,
+    "original_disk_usage_gb": 0.050118656,
+    "recovery_evidence": {
+      "restart_explicitly_approved": true,
+      "restart_deployment_id": "a17b9db8-4716-4fdf-893d-7c9797e3ff3a",
+      "rebuild": false,
+      "online_running_replicas": 1,
+      "native_connected_at_utc": "2026-10-23T04:37:04.551792675Z",
+      "native_completed_1m": 1,
+      "native_completed_5m": 0,
+      "native_entry_readiness": false,
+      "readiness_reason": "native_history_missing_stale_or_gapped",
+      "log_at_utc": "2026-10-23T04:38:45.918816141Z",
+      "post_restart_storage_errors_observed": 0
+    },
+    "new_entries_paused_reason": "Native history warm-up/readiness, no longer full-volume write failures."
   },
   "historical_approval_cancellation": "Cancelled — the user did not approve this action. No changes were made."
 }
