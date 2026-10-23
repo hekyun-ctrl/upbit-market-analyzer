@@ -1,0 +1,71 @@
+{
+  "date_kst": "2026-10-23",
+  "pull_request": "https://github.com/hekyun-ctrl/upbit-market-analyzer/pull/17",
+  "release_commit": "d34a005959ce5ed3dbda60af905fb0d77961bf0c",
+  "tested_tree": "06202c2e5b2a668376118c0c853ae3df85505ba0",
+  "merged_tree_matches_tested": true,
+  "deployment": {
+    "id": "a2456aab-1f99-4163-b04a-26cd2e133988",
+    "status": "SUCCESS",
+    "at_utc": "2026-10-23T07:45:34.880Z",
+    "environment": "production",
+    "service": "lbank-btc-futures-monitor",
+    "running_replicas": 1,
+    "crashed_replicas": 0
+  },
+  "predeploy_tests": {
+    "command": "python -m unittest discover -p 'test_lbank*.py'",
+    "count": 425,
+    "result": "OK",
+    "seconds": 2.777,
+    "log_at_utc": "2026-10-23T07:43:57.967733713Z"
+  },
+  "runtime_commit_verified": true,
+  "enabled": {
+    "zb_computation": true,
+    "paper_notifications": false,
+    "zb_connection_status_notifications": false,
+    "orders": false
+  },
+  "volume": {
+    "size_mb": 500,
+    "observed_usage_gb": 0.0612352
+  },
+  "acceptance": {
+    "worker_started_at_utc": "2026-10-23T07:45:07.604490221Z",
+    "native_connected": true,
+    "journal_inputs_before": 2,
+    "journal_inputs_after": 4,
+    "native_1m_ingested": 1,
+    "native_cursor": [
+      1792741560,
+      1792741560,
+      60
+    ],
+    "log_at_utc": "2026-10-23T07:46:09.300434253Z",
+    "public_instrument_and_current_funding_observed": true,
+    "storage_errors_observed_after_start": 0,
+    "local_public_probe_failed": true,
+    "local_public_probe_failure": "Public API timeout after two real native completed 1m arrivals; failed result retained. Production stream-to-journal acceptance subsequently succeeded."
+  },
+  "qualification": {
+    "engineering_ready": false,
+    "entry_publication_enabled": false,
+    "performance_claim": false,
+    "verified_net": null,
+    "blocked_reasons": [
+      "RAW5M_INDEPENDENCE_UNVERIFIED",
+      "CANDLE_VOLUME_UNIT_UNVERIFIED"
+    ],
+    "required_continuous_histories": "60 raw1m and 450 independent raw5m / 150 derived15m",
+    "additional_unfinished": [
+      "confirmed funding settlement history and coverage",
+      "matched baseline execution/risk normalization",
+      "favorable and unfavorable intrabar evaluation bounds",
+      "complete daily calendar and sealed performance qualification"
+    ],
+    "optional_1h_4h_add_entry_gate": false
+  },
+  "limitations": "Deployment and computation are verified. ZB entry alarms and strategy qualification are not complete; waiting for warmup alone cannot certify independent data or cost evidence. Outbound remains stopped. No orders or account access.",
+  "rollback_commit": "12b39daead208e391333472ad2c8cbf956930132"
+}
