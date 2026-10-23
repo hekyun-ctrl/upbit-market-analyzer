@@ -177,11 +177,11 @@ class Plan:
     @property
     def id(self):return self.candidate.id
 
-def plan(c,price,costs,equity,levels=(),qty_risk=D('.0025')):
+def plan(c,price,costs,equity,levels=(),qty_risk=D('.0025'),entry_fill=None):
     reasons=[];d=c.side
     if not costs.known():return None,['COST_OR_PRODUCT_UNKNOWN']
     if min(costs.tick,costs.step)<=0 or min(costs.fee_entry,costs.fee_exit,costs.slip_bps,costs.minimum_notional,costs.funding_per_btc)<0:raise ValueError('COST_METADATA')
-    stop=rounding(c.S,costs.tick,up=d<0);entry=costs.fill(price,d)
+    stop=rounding(c.S,costs.tick,up=d<0);entry=costs.fill(price,d) if entry_fill is None else dec(entry_fill)
     if not c.band[0]<=entry<=c.band[1]:reasons.append('ENTRY_RANGE')
     if d*(entry-stop)<=0 or d*(entry-c.I)<=0:reasons.append('STRUCTURE_ORDER')
     dist=abs(entry-stop);target=entry+d*D('1.5')*dist;ref=entry+d*3*dist

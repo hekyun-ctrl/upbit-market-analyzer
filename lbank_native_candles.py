@@ -64,6 +64,9 @@ class NativeCandleStore:
             quality TEXT, PRIMARY KEY(period,start));
           CREATE TABLE IF NOT EXISTS native_snapshots(
             start INTEGER PRIMARY KEY, payload TEXT, server_ms INTEGER);
+          CREATE TABLE IF NOT EXISTS native_arrivals(
+            period INTEGER, start INTEGER, received INTEGER NOT NULL,
+            source TEXT NOT NULL, PRIMARY KEY(period,start));
         ''')
         # Incomplete bars from a previous process cannot be certified.
         with self.db:
@@ -79,7 +82,7 @@ class NativeCandleStore:
                                 (self.current,))
         self.current, self.last_seen = None, None
 
-    def ingest(self, frame, received):
+    def ingest(self, frame, received, wall_received=None):
         if frame.get("x") != 2 or frame.get("z") not in (3, 4):
             return []
         self.server_time = max(self.server_time, int(frame["w"]) / 1000)
@@ -87,6 +90,7 @@ class NativeCandleStore:
         if isinstance(raw_rows, dict):
             raw_rows = [raw_rows]
         parsed = [(raw, parse_bar(raw)) for raw in raw_rows]
+        wall_received = int(time.time() if wall_received is None else wall_received)
         closed = []
         with self.db:
             for raw, bar in parsed:
@@ -108,9 +112,14 @@ class NativeCandleStore:
                              and 0 <= received - self.last_seen <= 15)
                     self.db.execute("UPDATE native_bars SET quality=? WHERE period=60 AND start=?",
                                     ("stream_closed" if clean else "gap", self.current))
+                    if clean:
+                        self.db.execute("INSERT OR IGNORE INTO native_arrivals VALUES(?,?,?,?)",
+                                        (60, self.current, wall_received, 'lbank_native_stream_1m'))
                     finished = self._aggregate(self.current // 300 * 300)
                     if finished is not None:
                         closed.append(finished)
+                        self.db.execute("INSERT OR IGNORE INTO native_arrivals VALUES(?,?,?,?)",
+                                        (300, finished['start'], wall_received, 'lbank_native_1m_derived_5m'))
                 self.db.execute('''INSERT INTO native_bars VALUES(?,?,?,?,?,?,?,?,?,?)
                     ON CONFLICT(period,start) DO UPDATE SET
                     open=excluded.open,high=excluded.high,low=excluded.low,close=excluded.close,
@@ -118,9 +127,10 @@ class NativeCandleStore:
                     quality=excluded.quality''', (*bar, "forming"))
                 self.current, self.last_seen = start, received
             if closed:
-                cutoff = self.server_time - 14 * 86400
+                cutoff = self.server_time - 32 * 86400
                 self.db.execute("DELETE FROM native_bars WHERE start<?", (cutoff,))
                 self.db.execute("DELETE FROM native_snapshots WHERE start<?", (cutoff,))
+                self.db.execute("DELETE FROM native_arrivals WHERE start<?", (cutoff,))
         return closed
 
     def _aggregate(self, start):
@@ -168,10 +178,13 @@ class NativeCandleThread(threading.Thread):
         self.path = path or os.getenv("LBANK_NATIVE_CANDLE_DB", "/data/lbank_native_candles.sqlite3")
 
     def run(self):
-        try:
-            asyncio.run(self._run())
-        except Exception as exc:
-            LOG.error("NATIVE_CANDLES_STOPPED exception=%s", type(exc).__name__)
+        while True:
+            try:
+                asyncio.run(self._run())
+                return
+            except Exception as exc:
+                LOG.error("NATIVE_CANDLES_RESTART exception=%s retry_seconds=30", type(exc).__name__)
+                time.sleep(30)
 
     async def _heartbeat(self, ws):
         while True:

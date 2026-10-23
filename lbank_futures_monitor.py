@@ -858,6 +858,12 @@ def run():
         except Exception as exc:
             LOG.error("ZB_RUNTIME_INIT_FAILED exception=%s existing_risk_loop_unchanged=true",type(exc).__name__)
     native_feed = NativeEntryFeed()
+    if os.getenv("LBANK_ZB_ENGINE_ENABLED", "false").lower() == "true":
+        try:
+            from lbank_zb.service import EngineThread
+            EngineThread().start()
+        except Exception as exc:
+            LOG.error("ZB_ENGINE_INIT_FAILED exception=%s existing_risk_loop_unchanged=true", type(exc).__name__)
     market_context = None
     try:
         market_context = MarketContextThread()
