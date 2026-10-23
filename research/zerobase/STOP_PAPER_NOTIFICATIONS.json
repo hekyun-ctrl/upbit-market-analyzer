@@ -5,58 +5,60 @@
   "existing_reference_alerts_enabled": true,
   "existing_risk_alerts_enabled": true,
   "runtime_applied": true,
-  "blocker": null,
+  "blocker": "ZB entry publication/complete qualification: independent raw5m source and candle volume provenance unavailable; confirmed funding coverage and matched/sealed evaluation remain incomplete.",
   "required_environment": {
     "LBANK_PAPER_NOTIFICATIONS_ENABLED": "false",
     "LBANK_ZB_RUNTIME_ENABLED": "false"
   },
-  "next": "Storage and native collection recovered. Continue accumulating verified continuous native candles until existing readiness gates pass. Full live ZB engine integration and real-market strategy comparison/qualification remain pending; keep paper/ZB supervisor outbound disabled.",
+  "next": "Preserve running data collection and disabled paper/connection-status outbound. Obtain genuine independent native5m plus verified candle volume semantics and confirmed funding history, complete matched risk/latency baseline and intrabar uncertainty evaluation, then reassess qualification. Do not label deployment or elapsed warmup as completed alarm qualification.",
   "verification_date_kst": "2026-10-23",
   "reconnection_verified": true,
   "configuration_saved": true,
-  "configuration_apply_mode": "User applied the prepared six-change patch once through Railway dashboard. No staged changes remain.",
-  "active_deployment_id": "a17b9db8-4716-4fdf-893d-7c9797e3ff3a",
-  "active_commit": "12b39daead208e391333472ad2c8cbf956930132",
+  "configuration_apply_mode": "Prepared patch committed through Railway tool under the instruction to take all necessary ZB completion steps.",
+  "active_deployment_id": "a2456aab-1f99-4163-b04a-26cd2e133988",
+  "active_commit": "d34a005959ce5ed3dbda60af905fb0d77961bf0c",
   "redeploy_error": "Deploys have been paused temporarily. The response also said the selected deployment has no build to copy, despite canRedeploy=true. Do not infer a missing build or retry unrelated builds from this conflicting message.",
   "last_observed_paper_delivery_at_kst": "2026-10-22T08:45:04+09:00",
-  "production_release_commit": "12b39daead208e391333472ad2c8cbf956930132",
-  "production_pull_request": "https://github.com/hekyun-ctrl/upbit-market-analyzer/pull/16",
+  "production_release_commit": "d34a005959ce5ed3dbda60af905fb0d77961bf0c",
+  "production_pull_request": "https://github.com/hekyun-ctrl/upbit-market-analyzer/pull/17",
   "production_pr_merged": true,
   "source_tree_verified_against_reviewed_candidate": true,
   "release_user_instruction": "User explicitly requested and approved deployment; user clicked Deploy in Railway dashboard after execution tool approval cancellations.",
-  "staged_patch_id": "0b34d341-eadf-4d51-aa07-11e86ca395a7",
-  "staged_changes_scope": "Only existing LBank service source pinned to 12b39da and the two disabled outbound switches. Existing volume, pre-deploy tests, monitor and risk paths preserved.",
+  "staged_patch_id": "96750f8d-382b-4f4e-b8cb-dfb37f0f0015",
+  "staged_changes_scope": "Only the existing LBank service commit pin and LBANK_ZB_ENGINE_ENABLED=true; paper and connection-status switches explicitly kept false. All four changes committed; no staged changes remain.",
   "predeploy_full_suite_executed": true,
-  "release_validation": "Release 12b39da reached terminal SUCCESS; 410 pre-deploy tests passed. After the user expanded the same persistent volume to 500 MB and explicitly approved one in-place restart, the same deployment is Online with one running replica. Exact runtime commit verified at restart. Native WebSocket connected and completed native 1m records advanced from 0 to 1; historical readiness remains false. No post-restart disk-full/SQLite OperationalError/persistence failures observed in the bounded logs through 2026-10-23T04:39:05.921422342Z.",
+  "release_validation": "PR17 merged with an exact match to the tested Git tree. All 425 pre-deploy tests passed. d34a005 reached terminal SUCCESS; runtime commit and opt-in ZB computation confirmed. Native stream -> recorded arrival -> durable ZB journal grew from 2 to 4 inputs and ingested one completed native 1m. No outbound transport is connected to the new worker. ZB alarm completion/entry qualification remain unfulfilled for the explicitly recorded provenance, funding and evaluation reasons.",
   "last_execution_error": null,
   "predeploy_tests": {
     "command": "python -m unittest discover -p 'test_lbank*.py'",
-    "count": 410,
+    "count": 425,
     "result": "OK",
-    "duration_seconds": 2.186,
-    "log_time_utc": "2026-10-23T04:26:38.998379570Z",
-    "warnings": "SQLite ResourceWarnings and deliberate failure-path messages occurred during tests; the suite completed OK."
+    "seconds": 2.777,
+    "log_at_utc": "2026-10-23T07:43:57.967733713Z"
   },
   "deployment_status": "SUCCESS",
-  "deployment_success_at_utc": "2026-10-23T04:27:01.158Z",
+  "deployment_success_at_utc": "2026-10-23T07:45:34.880Z",
   "runtime_commit_verified": true,
-  "runtime_commit_log_time_utc": "2026-10-23T04:37:03.835613454Z",
+  "runtime_commit_log_time_utc": "2026-10-23T07:45:08.211614037Z",
   "outbound_verification": {
     "prepared_values": {
       "LBANK_PAPER_NOTIFICATIONS_ENABLED": "false",
-      "LBANK_ZB_RUNTIME_ENABLED": "false"
+      "LBANK_ZB_RUNTIME_ENABLED": "false",
+      "LBANK_ZB_ENGINE_ENABLED": "true"
     },
-    "six_change_patch_applied": true,
+    "patch_committed": true,
     "staged_remaining": false,
     "oauth_values_redacted": true,
-    "limitation": "OAuth values remain redacted. Prepared false values were in the six-change patch the user committed. Paper/ZB supervisor was not re-enabled; no paper/ZB startup or delivery was observed in the bounded post-restart logs. Absence alone is not independent proof of variable values."
+    "runtime_new_engine_outbound": false,
+    "runtime_orders": false,
+    "limitation": "OAuth does not expose variable values; explicit false writes were committed, and the new worker logs paper_outbound=false. No sender is passed to its inert outbox."
   },
   "storage_incident": {
     "volume_id": "f8af8ebe-f46d-4995-b59f-733e607f815e",
     "name": "lbank-position-state",
     "mount": "/data",
     "configured_size_mb": 500,
-    "current_disk_usage_gb": 0.059826176,
+    "current_disk_usage_gb": 0.0612352,
     "observed_error": "OSError: [Errno 28] No space left on device",
     "native_collection_stopped": false,
     "new_entries_paused": true,
@@ -79,5 +81,9 @@
     },
     "new_entries_paused_reason": "Native history warm-up/readiness, no longer full-volume write failures."
   },
-  "historical_approval_cancellation": "Cancelled — the user did not approve this action. No changes were made."
+  "historical_approval_cancellation": "Cancelled — the user did not approve this action. No changes were made.",
+  "zb_computation_enabled": true,
+  "zb_alarm_completion": false,
+  "engineering_ready": false,
+  "deployment_evidence_path": "research/zerobase/INTEGRATION_DEPLOYMENT_20261023.json"
 }
