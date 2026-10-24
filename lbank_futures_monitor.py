@@ -1005,9 +1005,16 @@ def run():
     LOG.info("NATIVE_TARGET_ROOM policy=%s "
              "single_pivot=ranked repeated_barrier=block stages=watch,confirm additional_wait=false "
              "direction=15m_and_5m_ema max_extension_atr=2.5 historical_range_exception_cap_atr=6", ENTRY_PRIORITY_POLICY)
-    LOG.info("NATIVE_ENTRY_GEOMETRY stop_floor=max(0.05pct,1.5ATR5) "
+    LOG.info("ENTRY_REFINEMENT_POLICY mode=%s adaptive_capture=%s "
+             "continuation_local_stop=%s profitability_validated=false",
+             ENTRY_REFINEMENT_MODE, ENTRY_REFINEMENT_MODE == 'capture',
+             ENTRY_REFINEMENT_MODE != 'legacy')
+    LOG.info("NATIVE_ENTRY_GEOMETRY range_stop_floor=max(0.05pct,1.5ATR5) "
+             "continuation_stop_floor=%s "
              "structural_stop_preserved=true range_floor=cost_solved_TP1 "
-             "net_rr1=1.5 risk_limit_unchanged=true")
+             "net_rr1=1.5 risk_limit_unchanged=true",
+             "min(legacy,max(0.05pct,1.5ATR1))" if ENTRY_REFINEMENT_MODE != 'legacy'
+             else "max(0.05pct,1.5ATR5)")
     watch = None
     alert_state = cached_alert_state
     last_sample = observations[-1][0] if observations else 0
