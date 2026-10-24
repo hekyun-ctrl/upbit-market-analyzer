@@ -1,0 +1,22 @@
+{
+  "requested_at_kst": "2026-10-22",
+  "paper_outbound_enabled": false,
+  "connection_status_outbound_enabled": false,
+  "existing_reference_alerts_enabled": true,
+  "existing_risk_alerts_enabled": true,
+  "runtime_applied": false,
+  "blocker": "Railway deployments are temporarily paused. Existing-build redeploy was rejected; no new deployment was created.",
+  "required_environment": {
+    "LBANK_PAPER_NOTIFICATIONS_ENABLED": "false",
+    "LBANK_ZB_RUNTIME_ENABLED": "false"
+  },
+  "next": "After Railway restores deployment operations, apply the two already-saved false switches to the existing LBank service's running process and verify runtime. Preserve existing reference/risk alerts. Do not claim stopped based on saved configuration alone. Do not deploy or resume ZB status/entry outbound; keep research and paper outbound automations stopped. Recheck credential-safety checkpoint before any broader deployment.",
+  "verification_date_kst": "2026-10-22",
+  "reconnection_verified": true,
+  "configuration_saved": true,
+  "configuration_apply_mode": "Saved on the existing LBank production service, with automatic deployment skipped.",
+  "active_deployment_id": "4bbda6c7-29e8-4811-8322-5f8d0574c1be",
+  "active_commit": "25388b431c9c9d38df6a434670586c65f382d604",
+  "redeploy_error": "Deploys have been paused temporarily. The response also said the selected deployment has no build to copy, despite canRedeploy=true. Do not infer a missing build or retry unrelated builds from this conflicting message.",
+  "last_observed_paper_delivery_at_kst": "2026-10-22T08:45:04+09:00"
+}

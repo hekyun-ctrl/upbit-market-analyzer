@@ -1,0 +1,87 @@
+{
+  "source": "Railway native 1m aggregated 5m logs",
+  "unique_bars": 156,
+  "cases": [
+    {
+      "reference": 8,
+      "entry_kst": "2026-10-19T07:23:37+09:00",
+      "entry": 81639.8,
+      "stop": 81469.7,
+      "target1": 82184.9,
+      "full_post_entry_bars": 71,
+      "observed_min_low": 81476.9,
+      "observed_max_high": 82788,
+      "first_observed_target1_interval_kst": [
+        "2026-10-19T08:30:00+09:00",
+        "2026-10-19T08:35:00+09:00"
+      ],
+      "stop_touch_in_observed_full_bars": false,
+      "continuous_entry_through_target1": true,
+      "no_observed_stop_before_target1": true,
+      "partial_entry_candle_not_used_as_post_entry_touch": true,
+      "intrabar_order_or_venue_fill_verified": false,
+      "gaps": [
+        {
+          "after_kst": "2026-10-19T13:00:00+09:00",
+          "before_kst": "2026-10-19T13:05:00+09:00"
+        }
+      ]
+    },
+    {
+      "reference": 9,
+      "entry_kst": "2026-10-19T08:29:56+09:00",
+      "entry": 82090.3,
+      "stop": 81758.3,
+      "target1": 82879.8,
+      "full_post_entry_bars": 71,
+      "observed_min_low": 81978.2,
+      "observed_max_high": 82855,
+      "first_observed_target1_interval_kst": null,
+      "stop_touch_in_observed_full_bars": false,
+      "continuous_entry_through_target1": false,
+      "no_observed_stop_before_target1": false,
+      "partial_entry_candle_not_used_as_post_entry_touch": true,
+      "intrabar_order_or_venue_fill_verified": false,
+      "gaps": [
+        {
+          "after_kst": "2026-10-19T13:00:00+09:00",
+          "before_kst": "2026-10-19T13:05:00+09:00"
+        }
+      ]
+    },
+    {
+      "reference": 10,
+      "entry_kst": "2026-10-19T10:09:46+09:00",
+      "entry": 82469.1,
+      "stop": 82246.9,
+      "target1": 83095.3,
+      "full_post_entry_bars": 69,
+      "observed_min_low": 82322.7,
+      "observed_max_high": 82884.2,
+      "first_observed_target1_interval_kst": null,
+      "stop_touch_in_observed_full_bars": false,
+      "continuous_entry_through_target1": false,
+      "no_observed_stop_before_target1": false,
+      "partial_entry_candle_not_used_as_post_entry_touch": true,
+      "intrabar_order_or_venue_fill_verified": false,
+      "gaps": [
+        {
+          "after_kst": "2026-10-19T13:00:00+09:00",
+          "before_kst": "2026-10-19T13:05:00+09:00"
+        }
+      ]
+    }
+  ],
+  "old_warning_prices": {
+    "8": 81530.9,
+    "10": 82325.5
+  },
+  "signal9_six_hour_price": 82637.0,
+  "strategy_profitability_verified": false,
+  "limitations": [
+    "Screenshot/reference values are rounded.",
+    "No original full minute history, venue positions, fills, or Mark Price trigger history.",
+    "No missing candle was filled. A gap prevents a claim about unobserved extrema.",
+    "No retroactive new-policy win rate or PnL is asserted."
+  ]
+}
