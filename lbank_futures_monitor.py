@@ -52,6 +52,11 @@ from lbank_paper_notifications import PaperNotificationThread
 from lbank_breakout_freshness import (evidence as breakout_evidence,
     confirmation_allowed as breakout_confirmation_allowed, POLICY as BREAKOUT_CONFIRMATION_POLICY,
     REJECT_REASON as BREAKOUT_CONFIRMATION_REJECT)
+from lbank_entry_refinement import MODES as ENTRY_REFINEMENT_MODES, local_stop_floor, pullback_floor
+
+ENTRY_REFINEMENT_MODE = os.getenv('LBANK_ENTRY_REFINEMENT_MODE', 'legacy')
+if ENTRY_REFINEMENT_MODE not in ENTRY_REFINEMENT_MODES:
+    raise ValueError('Unknown LBANK_ENTRY_REFINEMENT_MODE')
 
 LOG = logging.getLogger("lbank_monitor")
 TELEGRAM_DELIVERY = TelegramTransport()
@@ -314,10 +319,12 @@ def minimum_net_rr_target(direction, entry, unit_loss, ratio):
     return entry + direction * high
 
 
-def native_entry_geometry(native_state):
+def native_entry_geometry(native_state, strategy=None):
     """Volatility-scaled lower stop bound, not a substitute for swing anchors.
 
-Use 1.5 completed 5m ATR, with a 0.05% noise floor. The actual stop remains
+Default: 1.5 completed 5m ATR, with a 0.05% noise floor. The opt-in research
+variant uses 1m ATR for breakout/pullback only; range geometry stays original.
+The actual stop remains
 beyond the structural extreme plus its existing buffer, and never exceeds
 the existing 0.60% distance/risk/margin caps. No missing-data fallback.
 The range lower width is the necessary cost-aware minimum TP1 distance,
@@ -330,6 +337,12 @@ not the old unconditional 0.60%. Real remaining room is checked in the plan.
                 and math.isfinite(atr) and atr > 0):
             return None
         floor = max(.0005, 1.5 * atr / curr)
+        local = None
+        if ENTRY_REFINEMENT_MODE != 'legacy' and strategy in ('breakout', 'trend_retest'):
+            local = local_stop_floor(native_state, floor)
+            if local is None:
+                return None
+            floor = local['floor']
         targets = []
         for direction in (1, -1):
             loss = -net_pnl_per_btc(direction, curr, curr*(1-direction*floor))
@@ -337,9 +350,13 @@ not the old unconditional 0.60%. Real remaining room is checked in the plan.
             if target is None:
                 return None
             targets.append(abs(target-curr)/curr)
-        return {"atr5": atr, "stop_floor_fraction": floor,
+        result = {"atr5": atr, "stop_floor_fraction": floor,
                 "minimum_target_fraction": max(targets),
                 "min_range_fraction": max(targets)+.00015}
+        if local is not None:
+            result.update(atr1=local['atr1'], stop_floor_basis=local['basis'],
+                          refinement_mode=ENTRY_REFINEMENT_MODE)
+        return result
     except (KeyError, TypeError, ValueError, OverflowError):
         return None
 
@@ -374,7 +391,7 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     if len(prices) < MIN_SAMPLES:
         return None
     curr = native_state["quote"] if native_state is not None else prices[-1]
-    geometry = native_entry_geometry(native_state) if native_state is not None else None
+    geometry = native_entry_geometry(native_state, strategy) if native_state is not None else None
     if native_state is not None and geometry is None:
         return None
     ranked = (ranked_entry_evidence(native_state,direction,curr)
@@ -520,18 +537,24 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
         setup_diag = {}
         setups = detect_structures(prices, ema, rsi, bars=bars,
                                    min_range_fraction=geometry["min_range_fraction"],
+                                   pullback_min_fraction=(pullback_floor(geometry['atr5'], native_state['quote'])
+                                       if ENTRY_REFINEMENT_MODE == 'capture' else .0015),
                                    diagnostics=setup_diag)
         setup_diag.update(atr5=geometry["atr5"],
                           minimum_stop_pct=geometry["stop_floor_fraction"]*100,
                           minimum_target_pct=geometry["minimum_target_fraction"]*100,
                           range60_pct=(max(b["high"] for b in bars[-60:])-
                                        min(b["low"] for b in bars[-60:]))/native_state["quote"]*100)
+        if ENTRY_REFINEMENT_MODE != 'legacy':
+            setup_diag.update(entry_refinement_mode=ENTRY_REFINEMENT_MODE,
+                legacy_minimum_fields_apply_to='range_rebound',
+                continuation_geometry=native_entry_geometry(native_state, 'trend_retest'))
         if diagnostics is not None:
             diagnostics["market"] = setup_diag
     else:
         first = detect_structure(prices, ema, rsi)
         setups = ([first] if first is not None else []) + detect_structures(prices, ema, rsi)
-    fresh = breakout_evidence(prices, native_state, ema)
+    fresh = breakout_evidence(prices, native_state, ema, adaptive=ENTRY_REFINEMENT_MODE == 'capture')
     if native_state is not None and diagnostics is not None:
         diagnostics["market"].update(
             **{k:fresh[k] for k in ('momentum5_pct','momentum15_pct','breakout_long','breakout_short')})
@@ -670,6 +693,9 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
     if watch.get("strategy", "breakout") != "breakout":
         valid = (confirm_structure(prices, watch, ema, rsi, current_price=current)
                  if native_state is not None else confirm_structure(prices, watch, ema, rsi))
+    elif ENTRY_REFINEMENT_MODE == 'capture' and native_state is not None:
+        fresh = breakout_evidence(prices, native_state, ema, adaptive=True)
+        valid = valid or fresh['breakout_long' if direction == 1 else 'breakout_short']
     if not valid:
         if entry_quality and (entry_quality['priority'].get('dominant_intact')
                 or ranked_confirmation['may_override_minor_reaction']):
@@ -727,7 +753,8 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
                 native_state['minute_bars'][-1]['start']+60)
             plan['entry_quality']['ranked_entry'] = plan['entry_decision_priority']
             if watch.get('strategy','breakout') == 'breakout' and not breakout_confirmation_allowed(
-                    plan, breakout_evidence(prices,native_state,ema)):
+                    plan, breakout_evidence(prices,native_state,ema,
+                        adaptive=ENTRY_REFINEMENT_MODE == 'capture')):
                 mark(BREAKOUT_CONFIRMATION_REJECT)
                 return None
         plan["sampled_rsi5"] = sampled_rsi5  # Legacy schema alias; see data_source.
@@ -978,9 +1005,16 @@ def run():
     LOG.info("NATIVE_TARGET_ROOM policy=%s "
              "single_pivot=ranked repeated_barrier=block stages=watch,confirm additional_wait=false "
              "direction=15m_and_5m_ema max_extension_atr=2.5 historical_range_exception_cap_atr=6", ENTRY_PRIORITY_POLICY)
-    LOG.info("NATIVE_ENTRY_GEOMETRY stop_floor=max(0.05pct,1.5ATR5) "
+    LOG.info("ENTRY_REFINEMENT_POLICY mode=%s adaptive_capture=%s "
+             "continuation_local_stop=%s profitability_validated=false",
+             ENTRY_REFINEMENT_MODE, ENTRY_REFINEMENT_MODE == 'capture',
+             ENTRY_REFINEMENT_MODE != 'legacy')
+    LOG.info("NATIVE_ENTRY_GEOMETRY range_stop_floor=max(0.05pct,1.5ATR5) "
+             "continuation_stop_floor=%s "
              "structural_stop_preserved=true range_floor=cost_solved_TP1 "
-             "net_rr1=1.5 risk_limit_unchanged=true")
+             "net_rr1=1.5 risk_limit_unchanged=true",
+             "min(legacy,max(0.05pct,1.5ATR1))" if ENTRY_REFINEMENT_MODE != 'legacy'
+             else "max(0.05pct,1.5ATR5)")
     watch = None
     alert_state = cached_alert_state
     last_sample = observations[-1][0] if observations else 0

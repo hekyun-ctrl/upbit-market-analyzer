@@ -1,5 +1,12 @@
 {
   "$schema": "https://railway.com/railway.schema.json",
   "build": {"builder": "RAILPACK"},
-  "deploy": {"startCommand": "python lbank_futures_monitor.py", "restartPolicyType": "ALWAYS"}
+  "deploy": {
+    "startCommand": "python lbank_futures_monitor.py",
+    "restartPolicyType": "ALWAYS",
+    "preDeployCommand": [
+      "env LBANK_ENTRY_REFINEMENT_MODE=legacy python -m unittest discover -p 'test_lbank*.py'",
+      "python -c \"import os; import lbank_futures_monitor as m; assert m.ENTRY_REFINEMENT_MODE == os.getenv('LBANK_ENTRY_REFINEMENT_MODE', 'legacy'); print('PREDEPLOY_ENTRY_MODE=' + m.ENTRY_REFINEMENT_MODE)\""
+    ]
+  }
 }

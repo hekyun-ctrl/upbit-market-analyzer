@@ -11,7 +11,8 @@ def detect_structure(prices, ema, rsi):
     return candidates[0] if candidates else None
 
 
-def detect_structures(prices, ema, rsi, bars=None, min_range_fraction=.006, diagnostics=None):
+def detect_structures(prices, ema, rsi, bars=None, min_range_fraction=.006, diagnostics=None,
+                      pullback_min_fraction=.0015):
     """Return all range-bounce and trend-pullback candidates independently."""
     if len(prices) < 65:
         return []
@@ -64,14 +65,14 @@ def detect_structures(prices, ema, rsi, bars=None, min_range_fraction=.006, diag
     if diagnostics is not None:
         diagnostics.update(long_pullback_pct=(peak-swing_low)/curr*100,
                            short_pullback_pct=(swing_high-trough)/curr*100,
-                           pullback_min_pct=.15,
+                           pullback_min_pct=pullback_min_fraction*100,
                            ema_direction=1 if fast[-1]>slow[-1] else -1 if fast[-1]<slow[-1] else 0)
     if (fast[-1] > slow[-1] and fast[-1] > fast[-9] + curr * .00025 and
             slow[-1] > slow[-12] and
             fast[-1] - curr * .0015 <= swing_low <= fast[-1] + curr * .0006 and
             curr > fast[-1] + curr * .0001 and curr > prices[-2] and
             curr - swing_low >= curr * .00055 and
-            .0015 <= (peak - swing_low) / curr <= .006 and
+            pullback_min_fraction <= (peak - swing_low) / curr <= .006 and
             histogram[-1] > histogram[-3]):
         candidates.append({"direction": 1, "strategy": "trend_retest",
                 "level": fast[-1], "structure_anchor": swing_low})
@@ -80,7 +81,7 @@ def detect_structures(prices, ema, rsi, bars=None, min_range_fraction=.006, diag
             fast[-1] - curr * .0006 <= swing_high <= fast[-1] + curr * .0015 and
             curr < fast[-1] - curr * .0001 and curr < prices[-2] and
             swing_high - curr >= curr * .00055 and
-            .0015 <= (swing_high - trough) / curr <= .006 and
+            pullback_min_fraction <= (swing_high - trough) / curr <= .006 and
             histogram[-1] < histogram[-3]):
         candidates.append({"direction": -1, "strategy": "trend_retest",
                 "level": fast[-1], "structure_anchor": swing_high})

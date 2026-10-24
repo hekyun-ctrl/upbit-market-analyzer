@@ -70,8 +70,11 @@ class PaperNotificationsTests(unittest.TestCase):
         self.assertNotIn('모의 진입 ·',self.messages[-1])
 
     def test_live_gates_and_study_rules_unchanged(self):
-        # Frozen source text from production 862339d; independent of Python AST schema.
-        expected={'calculate_plan': '39a580a2cde5fbfe4cf54caeb02f27ae22034ad4201c9ccd1a826ac397d7ecec', 'classify': 'd4da5506ae4d587dec4f73c79bb2550b64a84cc1a09673bc0ce4b70f0dc5af9f', 'assess_candidate': 'b91c60a36a148544cedd4612469f97ca2089b6670c367bc0a4e23d60857f2c14', 'confirm_watch': '4966fd56dc71bea02445395dd7c1cd2507b70611e90e86264bc9db74131649e5', 'alert_gate': 'e047eeeb07dd40558cd745dea5e3731c2c177cde127a7137c37fd14a3213ffab', 'record_alert': '89147d99872cc78f1b8f8b4e6d86660806736030e335bf732f2975de24f3e04b'}
+        # Frozen source guard: three intentionally changed entry functions now include
+        # the 2026-10-24 opt-in comparison policy; legacy behavior is also covered
+        # by entry/refinement and incident replay regressions. Notification gates,
+        # research accounting and default activation remain unchanged.
+        expected={'calculate_plan': '36ed8da6244bef8baddedaed952b593d40eb1006df93306d79ffd50e889794bf', 'classify': '78cecfd5a3998f00ed25ec44ec9b739b617efc179ef3b005da9dadf6eb7ad4ba', 'assess_candidate': 'b91c60a36a148544cedd4612469f97ca2089b6670c367bc0a4e23d60857f2c14', 'confirm_watch': '715712a172075cb4f574b0663035b4932155aa5fabf35fe5023225a7b162f586', 'alert_gate': 'e047eeeb07dd40558cd745dea5e3731c2c177cde127a7137c37fd14a3213ffab', 'record_alert': '89147d99872cc78f1b8f8b4e6d86660806736030e335bf732f2975de24f3e04b'}
         src=Path('lbank_futures_monitor.py').read_text()
         current={n.name:hashlib.sha256(ast.get_source_segment(src,n).encode()).hexdigest()
                  for n in ast.parse(src).body
