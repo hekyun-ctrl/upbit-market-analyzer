@@ -1,0 +1,226 @@
+{
+  "product": "LBank BTCUSDT USDT linear perpetual",
+  "price_basis": "LAST",
+  "source": "existing native WebSocket collector; recovered NATIVE_CANDLE_CLOSED Railway logs",
+  "five_minute_origin": "aggregation of five continuous stream_closed native 1m bars",
+  "raw_1m_bars_in_this_export": 0,
+  "independent_exchange_5m_bars": 0,
+  "volume_unit_verified": false,
+  "live_engine_imported": false,
+  "profitability_validated": false,
+  "gap_fill_applied": false,
+  "logged_at_semantics": "original log observation; not a fabricated historical receipt time",
+  "duplicates_identical": 1,
+  "conflicting_duplicates": 0,
+  "raw_log_sha256": "0254b28096f864b24e7b39a3d04bd464e33e03a588b4f36b0ea5e4dace9576b7",
+  "outputs": [
+    {
+      "file": "BTCUSDT_5m_derived.csv",
+      "sha256": "3f72c3f2f231c52366a6f5c0e3814bd2cfe529f63a9114df127b8f45b3e61e6c",
+      "bars": 1541,
+      "first_start_utc": "2026-10-17T04:15:00+00:00",
+      "last_end_utc": "2026-10-23T11:15:00+00:00",
+      "longest_contiguous_bars": 398,
+      "trailing_contiguous_bars": 42,
+      "missing_bars_inside_span": 271,
+      "gaps": [
+        {
+          "start": "2026-10-18T13:25:00+00:00",
+          "end_exclusive": "2026-10-18T13:30:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-19T04:00:00+00:00",
+          "end_exclusive": "2026-10-19T04:05:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-19T14:45:00+00:00",
+          "end_exclusive": "2026-10-19T14:50:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-20T01:40:00+00:00",
+          "end_exclusive": "2026-10-20T01:45:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-20T18:05:00+00:00",
+          "end_exclusive": "2026-10-20T18:10:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-21T22:45:00+00:00",
+          "end_exclusive": "2026-10-21T22:50:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-22T00:55:00+00:00",
+          "end_exclusive": "2026-10-22T01:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-22T06:45:00+00:00",
+          "end_exclusive": "2026-10-23T04:40:00+00:00",
+          "missing_bars": 263
+        },
+        {
+          "start": "2026-10-23T07:40:00+00:00",
+          "end_exclusive": "2026-10-23T07:45:00+00:00",
+          "missing_bars": 1
+        }
+      ]
+    },
+    {
+      "file": "BTCUSDT_15m_derived.csv",
+      "sha256": "cd4e6f37bf5f9015ce094ed9db2bbbab8ef9ab3e3303cc94b78a0334c3bd4c06",
+      "bars": 508,
+      "first_start_utc": "2026-10-17T04:15:00+00:00",
+      "last_end_utc": "2026-10-23T11:15:00+00:00",
+      "longest_contiguous_bars": 132,
+      "trailing_contiguous_bars": 14,
+      "missing_bars_inside_span": 96,
+      "gaps": [
+        {
+          "start": "2026-10-18T13:15:00+00:00",
+          "end_exclusive": "2026-10-18T13:30:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-19T04:00:00+00:00",
+          "end_exclusive": "2026-10-19T04:15:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-19T14:45:00+00:00",
+          "end_exclusive": "2026-10-19T15:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-20T01:30:00+00:00",
+          "end_exclusive": "2026-10-20T01:45:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-20T18:00:00+00:00",
+          "end_exclusive": "2026-10-20T18:15:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-21T22:45:00+00:00",
+          "end_exclusive": "2026-10-21T23:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-22T00:45:00+00:00",
+          "end_exclusive": "2026-10-22T01:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-22T06:45:00+00:00",
+          "end_exclusive": "2026-10-23T04:45:00+00:00",
+          "missing_bars": 88
+        },
+        {
+          "start": "2026-10-23T07:30:00+00:00",
+          "end_exclusive": "2026-10-23T07:45:00+00:00",
+          "missing_bars": 1
+        }
+      ]
+    },
+    {
+      "file": "BTCUSDT_1h_derived.csv",
+      "sha256": "fe491c6afa369440bb3d7969fabb03f81d7040e2946d5e68dcf7b5468cb57208",
+      "bars": 119,
+      "first_start_utc": "2026-10-17T05:00:00+00:00",
+      "last_end_utc": "2026-10-23T11:00:00+00:00",
+      "longest_contiguous_bars": 32,
+      "trailing_contiguous_bars": 3,
+      "missing_bars_inside_span": 31,
+      "gaps": [
+        {
+          "start": "2026-10-18T13:00:00+00:00",
+          "end_exclusive": "2026-10-18T14:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-19T04:00:00+00:00",
+          "end_exclusive": "2026-10-19T05:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-19T14:00:00+00:00",
+          "end_exclusive": "2026-10-19T15:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-20T01:00:00+00:00",
+          "end_exclusive": "2026-10-20T02:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-20T18:00:00+00:00",
+          "end_exclusive": "2026-10-20T19:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-21T22:00:00+00:00",
+          "end_exclusive": "2026-10-21T23:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-22T00:00:00+00:00",
+          "end_exclusive": "2026-10-22T01:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-22T06:00:00+00:00",
+          "end_exclusive": "2026-10-23T05:00:00+00:00",
+          "missing_bars": 23
+        },
+        {
+          "start": "2026-10-23T07:00:00+00:00",
+          "end_exclusive": "2026-10-23T08:00:00+00:00",
+          "missing_bars": 1
+        }
+      ]
+    },
+    {
+      "file": "BTCUSDT_4h_derived.csv",
+      "sha256": "bd78d6000780e1512a59e2a89ce4b156e056970c9c32ac0a0331dadeb64361f0",
+      "bars": 22,
+      "first_start_utc": "2026-10-17T08:00:00+00:00",
+      "last_end_utc": "2026-10-21T20:00:00+00:00",
+      "longest_contiguous_bars": 7,
+      "trailing_contiguous_bars": 6,
+      "missing_bars_inside_span": 5,
+      "gaps": [
+        {
+          "start": "2026-10-18T12:00:00+00:00",
+          "end_exclusive": "2026-10-18T16:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-19T04:00:00+00:00",
+          "end_exclusive": "2026-10-19T08:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-19T12:00:00+00:00",
+          "end_exclusive": "2026-10-19T16:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-20T00:00:00+00:00",
+          "end_exclusive": "2026-10-20T04:00:00+00:00",
+          "missing_bars": 1
+        },
+        {
+          "start": "2026-10-20T16:00:00+00:00",
+          "end_exclusive": "2026-10-20T20:00:00+00:00",
+          "missing_bars": 1
+        }
+      ]
+    }
+  ]
+}
