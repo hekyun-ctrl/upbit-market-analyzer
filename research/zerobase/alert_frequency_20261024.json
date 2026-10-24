@@ -1,0 +1,117 @@
+{
+  "checked_at_utc": "2026-10-24T00:37:11.793Z",
+  "window_start_utc": "2026-10-23T10:59:00Z",
+  "window_end_utc": "2026-10-24T00:37:11.793Z",
+  "operating_sha": "4217f2047119fae96bca796f818c363594884bd9",
+  "research_sha": "5ea63fea7fb5a312a99702535c31d4dccd8155fd",
+  "deployment_id": "acfc7649-7f88-4c0b-ab7b-876f22655893",
+  "deployment_status": "SUCCESS",
+  "evaluations": 1382,
+  "unique_1m_bars": 815,
+  "reasons": {
+    "market_no_setup": 1271,
+    "sampled_context": 30,
+    "risk_or_target": 45,
+    "price_deviation": 16,
+    "rsi_direction": 14,
+    "qualified": 4,
+    "retest_momentum": 2
+  },
+  "candidate_results": {
+    "trend_retest:sampled_context": 5,
+    "breakout:risk_or_target": 34,
+    "trend_retest:risk_or_target": 11,
+    "breakout:sampled_context": 15,
+    "range_rebound:rsi_direction": 9,
+    "trend_retest:rsi_direction": 5,
+    "breakout:qualified": 1,
+    "trend_retest:retest_momentum": 2,
+    "trend_retest:qualified": 3,
+    "range_rebound:sampled_context": 10
+  },
+  "no_setup_pct": 91.96816208393632,
+  "no_setup_range_width_failed": 1063,
+  "no_setup_range_unbalanced": 1105,
+  "minimum_target_pct": {
+    "min": 0.5113076553272442,
+    "median": 0.6491286185957008,
+    "max": 0.9376251497404995
+  },
+  "qualified": [
+    {
+      "at": "2026-10-23T15:17:17.276731209Z",
+      "candidates": [
+        {
+          "direction": -1,
+          "reason": "qualified",
+          "strategy": "breakout"
+        }
+      ],
+      "bar": 1792768560
+    },
+    {
+      "at": "2026-10-23T23:10:10.392947650Z",
+      "candidates": [
+        {
+          "direction": -1,
+          "reason": "qualified",
+          "strategy": "trend_retest"
+        }
+      ],
+      "bar": 1792796940
+    },
+    {
+      "at": "2026-10-24T00:36:04.336135128Z",
+      "candidates": [
+        {
+          "direction": -1,
+          "reason": "qualified",
+          "strategy": "trend_retest"
+        }
+      ],
+      "bar": 1792802100
+    },
+    {
+      "at": "2026-10-24T00:36:44.117449215Z",
+      "candidates": [
+        {
+          "direction": -1,
+          "reason": "qualified",
+          "strategy": "trend_retest"
+        }
+      ],
+      "bar": 1792802100
+    }
+  ],
+  "native_bars": {
+    "count": 164,
+    "min_low": 80466.6,
+    "max_high": 82032.7,
+    "gaps": 0
+  },
+  "plan_reject_occurrences": {
+    "target_outside_observed_range": 19,
+    "native_target_barrier_conflict": 17,
+    "entry_extended_from_native_ema": 10,
+    "target_barrier_conflict": 4
+  },
+  "telegram_ack_count": 2,
+  "recipient_receipt_verified": false,
+  "send_failed_records": 0,
+  "post_setup_cooldown_suppression_occurrences": 1,
+  "zb_status": {
+    "native_5m": 202,
+    "required_contiguous_5m": 450,
+    "qualification_blockers": [
+      "RAW5M_INDEPENDENCE_UNVERIFIED",
+      "CANDLE_VOLUME_UNIT_UNVERIFIED"
+    ],
+    "paper_outbound_enabled": false
+  },
+  "interpretation_limits": [
+    "Evaluation and rejection counts include repeated assessment of the same market interval; not unique trade opportunities.",
+    "No profitability or counterfactual missed-trade results were calculated.",
+    "Data ingestion, journal and storage were healthy in sampled operational logs; Telegram acknowledgement is not proof of device receipt.",
+    "Detailed BLOCKED filter hit its 500-record cap and was excluded from full-window totals."
+  ]
+}
