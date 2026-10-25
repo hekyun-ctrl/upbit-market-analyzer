@@ -196,7 +196,10 @@ def test_clock_fix_keeps_forming_candle_out_of_structural_judgment(monkeypatch):
 def test_updated_flow_uses_execution_clock_and_still_requires_real_source(monkeypatch):
     fixture = structure_fixture(monkeypatch)
     now,one,five,fifteen,btc,alert,ticker = fixture[0]
-    alert.update(market_regime='neutral',market_breadth_5m_pct=50)
+    # v3.23 admits two independent quality votes. Isolate the flow vote:
+    # higher-timeframe + verified local flow, not leadership + breadth.
+    monkeypatch.setattr(ca, '_fresh_structure_leadership_ok', lambda *args: False)
+    alert.update(market_regime='neutral',market_breadth_5m_pct=0)
     alert['trade_flow_context']={'source':'upbit_websocket_trade','ready':True,'as_of':now.timestamp()+5,
         'windows':[{'count':3,'buy_krw':1e7,'sell_krw':0,'close':101} for _ in range(3)]}
     for book in fixture[2]:
