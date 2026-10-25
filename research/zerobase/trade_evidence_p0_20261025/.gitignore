@@ -1,0 +1,2 @@
+# Reproducible intermediate ledgers, not inputs; reports/manifest are tracked.
+*.sqlite3.gz

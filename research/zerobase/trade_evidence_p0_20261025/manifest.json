@@ -1,0 +1,26 @@
+{
+  "schema": "trade_evidence_v1",
+  "policy_outputs_exactly_reproduced": true,
+  "diagnostic_only": true,
+  "ledger_rebuild_command": "python research/compare_signal_decisions.py",
+  "sqlite_archives": "generated intermediate files; rebuild from pinned code and inputs",
+  "ingest_sequence_basis": "offline_import_order_not_historical_receive_order",
+  "source_code_sha256": {
+    "research/compare_signal_decisions.py": "32da50557e2908d5de91122c497313990f90b2c9aa7e4e4f3e5a756a768cdca1",
+    "lbank_signal_evidence.py": "51aad7f26c4b514a5b59d3de2c8b435b21e9bd8fe70cadec7546a2201e4cada6"
+  },
+  "output_sha256": {
+    "summary.json": "d141a697d733dec100e1e7ed343a938c77201a34c0cc49327e590f002c96bbf3",
+    "trade_cards.json": "b15532ec6e35dad53d5dcf77c3af81b8502c4f9417db1a034892211d9b42293c",
+    "trades.csv": "931d0b29563ee16ff560976e7f02cf820299eaa8649cee0c3557ded21748da15",
+    "opportunities.csv": "e9674803cddf70724a1f95c0ad559890f7f7bfe1806232f99d9f529f9f04975a",
+    "gate_decisions.csv": "18a0b6721b3e50e9b4edfe4cc1f56087466a7c3dfe126a474ae907dfda89fc79"
+  },
+  "inputs": {
+    "research/zerobase/entry_location_20261025/comparison.json": "47fb01bae99d8c0c315a52d26afb97d5bde8fedbe8faed7281c1ce5579640ab2",
+    "research/zerobase/entry_comparison_20261024/archive_chunks.json": "0d8b8db7cdccd009d2d08e7c9ece7403231bce3b4af8227b5bddff246daa8cce",
+    "research/zerobase/entry_comparison_20261024/recorded_quotes.json": "088b245a78a95453fe51d7555e3017eb413aea0ba39ff4fa729fc14a0071e88b",
+    "research/zerobase/entry_comparison_20261024/outcome_candle_logs.jsonl": "0254b28096f864b24e7b39a3d04bd464e33e03a588b4f36b0ea5e4dace9576b7",
+    "docs/zerobase/TRADE_EVIDENCE_ALERT_DESIGN_20261025.md": "9a58c22803dba4624951b661ea34d02cb480534bab2897c8e69d6681c1595ef5"
+  }
+}

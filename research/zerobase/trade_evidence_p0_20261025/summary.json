@@ -1,0 +1,398 @@
+{
+  "schema": "trade_evidence_v1",
+  "diagnostic_only": true,
+  "profitability_validated": false,
+  "orders": 0,
+  "sends": 0,
+  "experiments": {
+    "0": {
+      "policies": {
+        "capture": {
+          "aggregate": {
+            "ready_observations": 763,
+            "raw_candidate_bar_families": 67,
+            "qualified_candidate_bars": 8,
+            "modeled_alerts": 3,
+            "outcome_status": {
+              "exact_in_model": 3
+            },
+            "resolved_only_net_low": -28.07791962494808,
+            "resolved_only_net_high": -28.07791962494808,
+            "total_net_usdt": -28.07791962494808,
+            "closed_trade_drawdown_usdt": 28.07791962494808,
+            "full_mark_to_market_drawdown_available": false
+          },
+          "frozen_window_output_sha256": "ff884c575961512763e39309de22a836ba618dd19db9de9bfd6411660fdd7fb8",
+          "observations": 763,
+          "input_states": {
+            "native_history_missing_stale_or_gapped": 305,
+            "valid": 763
+          },
+          "first_reject": {
+            "native_history_missing_stale_or_gapped": 305,
+            "market_no_setup": 697,
+            "risk_or_target": 36,
+            "sampled_context": 7,
+            "rsi_direction": 12,
+            "price_deviation": 2,
+            "global_cooldown": 1,
+            "retest_momentum": 4,
+            "breakout_trigger_lost_without_higher_priority": 1,
+            "breakout_level_not_held": 2
+          },
+          "unique_candidate_events": 52,
+          "unique_flow": {
+            "detected": 52,
+            "candidate_qualified": 9,
+            "confirmed": 3,
+            "alert_eligible": 3
+          },
+          "phase_rejections": {
+            "input_unavailable": {
+              "native_history_missing_stale_or_gapped": {
+                "evaluations": 305,
+                "unique_events": 0
+              }
+            },
+            "candidate": {
+              "retest_momentum": {
+                "evaluations": 4,
+                "unique_events": 2
+              },
+              "risk_or_target": {
+                "evaluations": 36,
+                "unique_events": 31
+              },
+              "rsi_direction": {
+                "evaluations": 12,
+                "unique_events": 7
+              },
+              "sampled_context": {
+                "evaluations": 7,
+                "unique_events": 7
+              }
+            },
+            "confirmation": {
+              "breakout_level_not_held": {
+                "evaluations": 2,
+                "unique_events": 1
+              },
+              "breakout_trigger_lost_without_higher_priority": {
+                "evaluations": 1,
+                "unique_events": 1
+              }
+            },
+            "alert_eligibility": {
+              "global_cooldown": {
+                "evaluations": 1,
+                "unique_events": 1
+              }
+            }
+          }
+        },
+        "location": {
+          "aggregate": {
+            "ready_observations": 763,
+            "raw_candidate_bar_families": 77,
+            "qualified_candidate_bars": 3,
+            "modeled_alerts": 1,
+            "outcome_status": {
+              "unresolved": 1
+            },
+            "resolved_only_net_low": 0,
+            "resolved_only_net_high": 0,
+            "total_net_usdt": null,
+            "closed_trade_drawdown_usdt": null,
+            "full_mark_to_market_drawdown_available": false
+          },
+          "frozen_window_output_sha256": "468c47fd200995d6e7bfcaeeaaed1035f57889534225a56f9be9cda37eb58194",
+          "observations": 763,
+          "input_states": {
+            "native_history_missing_stale_or_gapped": 305,
+            "valid": 763
+          },
+          "first_reject": {
+            "native_history_missing_stale_or_gapped": 305,
+            "market_no_setup": 687,
+            "risk_or_target": 51,
+            "sampled_context": 8,
+            "rsi_direction": 12,
+            "price_deviation": 4,
+            "breakout_trigger_lost_without_higher_priority": 1,
+            "breakout_level_not_held": 1,
+            "retest_momentum": 4,
+            "entry_location_extended_or_lost": 2
+          },
+          "unique_candidate_events": 61,
+          "unique_flow": {
+            "detected": 61,
+            "candidate_qualified": 3,
+            "confirmed": 1,
+            "alert_eligible": 1
+          },
+          "phase_rejections": {
+            "input_unavailable": {
+              "native_history_missing_stale_or_gapped": {
+                "evaluations": 305,
+                "unique_events": 0
+              }
+            },
+            "candidate": {
+              "retest_momentum": {
+                "evaluations": 4,
+                "unique_events": 2
+              },
+              "risk_or_target": {
+                "evaluations": 51,
+                "unique_events": 44
+              },
+              "rsi_direction": {
+                "evaluations": 12,
+                "unique_events": 7
+              },
+              "sampled_context": {
+                "evaluations": 8,
+                "unique_events": 8
+              }
+            },
+            "confirmation": {
+              "breakout_level_not_held": {
+                "evaluations": 1,
+                "unique_events": 1
+              },
+              "breakout_trigger_lost_without_higher_priority": {
+                "evaluations": 1,
+                "unique_events": 1
+              },
+              "entry_location_extended_or_lost": {
+                "evaluations": 2,
+                "unique_events": 1
+              },
+              "price_deviation": {
+                "evaluations": 2,
+                "unique_events": 1
+              }
+            },
+            "alert_eligibility": {}
+          }
+        }
+      },
+      "pairing": {
+        "excluded": 3,
+        "added": 1
+      },
+      "first_rejection_details": {
+        "target_outside_observed_range": 28,
+        "entry_extended_from_native_ema": 9,
+        "native_target_barrier_conflict": 21,
+        "target_barrier_conflict": 2,
+        "entry_location_extended_or_lost": 27
+      },
+      "unmatched_reasons": {},
+      "sources": 2398,
+      "decisions": 2172,
+      "dispatches": 0
+    },
+    "15": {
+      "policies": {
+        "capture": {
+          "aggregate": {
+            "ready_observations": 571,
+            "raw_candidate_bar_families": 53,
+            "qualified_candidate_bars": 6,
+            "modeled_alerts": 2,
+            "outcome_status": {
+              "exact_in_model": 2
+            },
+            "resolved_only_net_low": -18.71863977838745,
+            "resolved_only_net_high": -18.71863977838745,
+            "total_net_usdt": -18.71863977838745,
+            "closed_trade_drawdown_usdt": 18.71863977838745,
+            "full_mark_to_market_drawdown_available": false
+          },
+          "frozen_window_output_sha256": "e276a059c9aa65a798d6287788b0e23ea6a8e36d61d8bd7d00375b018af3b2bf",
+          "observations": 571,
+          "input_states": {
+            "native_history_missing_stale_or_gapped": 228,
+            "nominal_publication_delay": 269,
+            "valid": 571
+          },
+          "first_reject": {
+            "native_history_missing_stale_or_gapped": 228,
+            "nominal_publication_delay": 269,
+            "market_no_setup": 519,
+            "risk_or_target": 29,
+            "sampled_context": 6,
+            "rsi_direction": 9,
+            "price_deviation": 4,
+            "breakout_level_not_held": 3,
+            "retest_momentum": 3,
+            "breakout_trigger_lost_without_higher_priority": 1
+          },
+          "unique_candidate_events": 40,
+          "unique_flow": {
+            "detected": 40,
+            "candidate_qualified": 6,
+            "confirmed": 2,
+            "alert_eligible": 2
+          },
+          "phase_rejections": {
+            "input_unavailable": {
+              "native_history_missing_stale_or_gapped": {
+                "evaluations": 228,
+                "unique_events": 0
+              },
+              "nominal_publication_delay": {
+                "evaluations": 269,
+                "unique_events": 0
+              }
+            },
+            "candidate": {
+              "retest_momentum": {
+                "evaluations": 3,
+                "unique_events": 2
+              },
+              "risk_or_target": {
+                "evaluations": 29,
+                "unique_events": 24
+              },
+              "rsi_direction": {
+                "evaluations": 9,
+                "unique_events": 5
+              },
+              "sampled_context": {
+                "evaluations": 6,
+                "unique_events": 6
+              }
+            },
+            "confirmation": {
+              "breakout_level_not_held": {
+                "evaluations": 3,
+                "unique_events": 2
+              },
+              "breakout_trigger_lost_without_higher_priority": {
+                "evaluations": 1,
+                "unique_events": 1
+              },
+              "price_deviation": {
+                "evaluations": 2,
+                "unique_events": 1
+              }
+            },
+            "alert_eligibility": {}
+          }
+        },
+        "location": {
+          "aggregate": {
+            "ready_observations": 571,
+            "raw_candidate_bar_families": 59,
+            "qualified_candidate_bars": 2,
+            "modeled_alerts": 1,
+            "outcome_status": {
+              "unresolved": 1
+            },
+            "resolved_only_net_low": 0,
+            "resolved_only_net_high": 0,
+            "total_net_usdt": null,
+            "closed_trade_drawdown_usdt": null,
+            "full_mark_to_market_drawdown_available": false
+          },
+          "frozen_window_output_sha256": "fd59a8ab14f05731cf292cebbc527c7725cb377977b7afce6e1a13dd54adfa5e",
+          "observations": 571,
+          "input_states": {
+            "native_history_missing_stale_or_gapped": 228,
+            "nominal_publication_delay": 269,
+            "valid": 571
+          },
+          "first_reject": {
+            "native_history_missing_stale_or_gapped": 228,
+            "nominal_publication_delay": 269,
+            "market_no_setup": 513,
+            "risk_or_target": 39,
+            "sampled_context": 6,
+            "rsi_direction": 9,
+            "price_deviation": 4,
+            "breakout_level_not_held": 1,
+            "retest_momentum": 3,
+            "entry_location_extended_or_lost": 2
+          },
+          "unique_candidate_events": 46,
+          "unique_flow": {
+            "detected": 46,
+            "candidate_qualified": 2,
+            "confirmed": 1,
+            "alert_eligible": 1
+          },
+          "phase_rejections": {
+            "input_unavailable": {
+              "native_history_missing_stale_or_gapped": {
+                "evaluations": 228,
+                "unique_events": 0
+              },
+              "nominal_publication_delay": {
+                "evaluations": 269,
+                "unique_events": 0
+              }
+            },
+            "candidate": {
+              "retest_momentum": {
+                "evaluations": 3,
+                "unique_events": 2
+              },
+              "risk_or_target": {
+                "evaluations": 39,
+                "unique_events": 34
+              },
+              "rsi_direction": {
+                "evaluations": 9,
+                "unique_events": 5
+              },
+              "sampled_context": {
+                "evaluations": 6,
+                "unique_events": 6
+              }
+            },
+            "confirmation": {
+              "breakout_level_not_held": {
+                "evaluations": 1,
+                "unique_events": 1
+              },
+              "entry_location_extended_or_lost": {
+                "evaluations": 2,
+                "unique_events": 1
+              },
+              "price_deviation": {
+                "evaluations": 2,
+                "unique_events": 1
+              }
+            },
+            "alert_eligibility": {}
+          }
+        }
+      },
+      "pairing": {
+        "excluded": 2,
+        "added": 1
+      },
+      "first_rejection_details": {
+        "target_outside_observed_range": 25,
+        "entry_extended_from_native_ema": 6,
+        "native_target_barrier_conflict": 14,
+        "target_barrier_conflict": 2,
+        "entry_location_extended_or_lost": 21
+      },
+      "unmatched_reasons": {},
+      "sources": 2394,
+      "decisions": 2167,
+      "dispatches": 0
+    }
+  },
+  "source_commit": "ce33a017ff6aca0729175a8f88c3ec978f4a84a2",
+  "input_sha256": {
+    "research/zerobase/entry_location_20261025/comparison.json": "47fb01bae99d8c0c315a52d26afb97d5bde8fedbe8faed7281c1ce5579640ab2",
+    "research/zerobase/entry_comparison_20261024/archive_chunks.json": "0d8b8db7cdccd009d2d08e7c9ece7403231bce3b4af8227b5bddff246daa8cce",
+    "research/zerobase/entry_comparison_20261024/recorded_quotes.json": "088b245a78a95453fe51d7555e3017eb413aea0ba39ff4fa729fc14a0071e88b",
+    "research/zerobase/entry_comparison_20261024/outcome_candle_logs.jsonl": "0254b28096f864b24e7b39a3d04bd464e33e03a588b4f36b0ea5e4dace9576b7",
+    "docs/zerobase/TRADE_EVIDENCE_ALERT_DESIGN_20261025.md": "9a58c22803dba4624951b661ea34d02cb480534bab2897c8e69d6681c1595ef5"
+  }
+}
