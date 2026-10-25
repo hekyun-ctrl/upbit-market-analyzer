@@ -53,6 +53,9 @@ from lbank_breakout_freshness import (evidence as breakout_evidence,
     confirmation_allowed as breakout_confirmation_allowed, POLICY as BREAKOUT_CONFIRMATION_POLICY,
     REJECT_REASON as BREAKOUT_CONFIRMATION_REJECT)
 from lbank_entry_refinement import MODES as ENTRY_REFINEMENT_MODES, local_stop_floor, pullback_floor
+from lbank_entry_location import (first_retests, location_check,
+                                  confirmation_check as location_confirmation_check,
+                                  POLICY as ENTRY_LOCATION_POLICY)
 
 ENTRY_REFINEMENT_MODE = os.getenv('LBANK_ENTRY_REFINEMENT_MODE', 'legacy')
 if ENTRY_REFINEMENT_MODE not in ENTRY_REFINEMENT_MODES:
@@ -391,6 +394,12 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     if len(prices) < MIN_SAMPLES:
         return None
     curr = native_state["quote"] if native_state is not None else prices[-1]
+    location_proof = None
+    if ENTRY_REFINEMENT_MODE == 'location':
+        ok, reason, location_proof = location_check(native_state, direction, setup)
+        if not ok:
+            LOG.info("PLAN REJECT reason=%s strategy=%s direction=%s", reason, strategy, direction)
+            return None
     geometry = native_entry_geometry(native_state, strategy) if native_state is not None else None
     if native_state is not None and geometry is None:
         return None
@@ -459,7 +468,7 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     if native_state is not None:
         native_target_room = observed_target_room(native_state['five_bars'], direction, curr, t1)
         if (native_target_room['target_room'] == 'conflict'
-                and not ranked['may_override_single_pivots']):
+                and (ENTRY_REFINEMENT_MODE == 'location' or not ranked['may_override_single_pivots'])):
             LOG.info("PLAN REJECT reason=native_target_barrier_conflict strategy=%s direction=%s "
                      "price=%.1f target1=%.1f barrier=%.1f",
                      strategy, direction, curr, t1, native_target_room['observed_barrier'])
@@ -509,6 +518,8 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
         "native_entry_geometry": geometry,
         "native_target_room": native_target_room,
         "entry_decision_priority": ranked,
+        **({"entry_location": setup.get('entry_location'), "location_evidence": location_proof}
+           if ENTRY_REFINEMENT_MODE == 'location' else {}),
     }
 
 
@@ -538,8 +549,12 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
         setups = detect_structures(prices, ema, rsi, bars=bars,
                                    min_range_fraction=geometry["min_range_fraction"],
                                    pullback_min_fraction=(pullback_floor(geometry['atr5'], native_state['quote'])
-                                       if ENTRY_REFINEMENT_MODE == 'capture' else .0015),
+                                       if ENTRY_REFINEMENT_MODE in ('capture', 'location') else .0015),
                                    diagnostics=setup_diag)
+        if ENTRY_REFINEMENT_MODE == 'location':
+            location_diag = {}
+            setups = first_retests(native_state, location_diag) + setups
+            setup_diag['entry_location'] = location_diag
         setup_diag.update(atr5=geometry["atr5"],
                           minimum_stop_pct=geometry["stop_floor_fraction"]*100,
                           minimum_target_pct=geometry["minimum_target_fraction"]*100,
@@ -554,7 +569,8 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
     else:
         first = detect_structure(prices, ema, rsi)
         setups = ([first] if first is not None else []) + detect_structures(prices, ema, rsi)
-    fresh = breakout_evidence(prices, native_state, ema, adaptive=ENTRY_REFINEMENT_MODE == 'capture')
+    fresh = breakout_evidence(prices, native_state, ema,
+                              adaptive=ENTRY_REFINEMENT_MODE in ('capture', 'location'))
     if native_state is not None and diagnostics is not None:
         diagnostics["market"].update(
             **{k:fresh[k] for k in ('momentum5_pct','momentum15_pct','breakout_long','breakout_short')})
@@ -594,7 +610,8 @@ def assess_candidate(prices, direction, setup, observations=None, diagnostics=No
     LOG.info("PREWATCH candidate strategy=%s direction=%s price=%.1f rsi1=%.1f",
              (setup or {}).get("strategy", "breakout"),
              "LONG" if direction == 1 else "SHORT", curr, strength)
-    if setup is not None and setup.get("strategy") == "trend_retest":
+    if (setup is not None and setup.get("strategy") == "trend_retest"
+            and not (ENTRY_REFINEMENT_MODE == 'location' and setup.get('entry_location'))):
         momentum_ok, momentum_reason, directional5, directional15 = (
             trend_retest_momentum_gate(prices, direction))
         if not momentum_ok and native_state is not None:
@@ -675,11 +692,17 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
         return None
     entry_quality = None
     ranked_confirmation = None
+    location_confirmation = None
     if native_state is not None:
         quality_ok, quality_reason, entry_quality = confirmation_quality(native_state, watch)
         if not quality_ok:
             mark(quality_reason)
             return None
+        if ENTRY_REFINEMENT_MODE == 'location':
+            location_ok, location_reason, location_confirmation = location_confirmation_check(native_state, watch)
+            if not location_ok:
+                mark(location_reason)
+                return None
         ranked_confirmation = ranked_entry_evidence(native_state,direction,current,watch.get('target1'))
     m5 = (current / prices[-6] - 1) * 100
     m15 = (current / prices[-16] - 1) * 100
@@ -693,9 +716,11 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
     if watch.get("strategy", "breakout") != "breakout":
         valid = (confirm_structure(prices, watch, ema, rsi, current_price=current)
                  if native_state is not None else confirm_structure(prices, watch, ema, rsi))
-    elif ENTRY_REFINEMENT_MODE == 'capture' and native_state is not None:
+    elif ENTRY_REFINEMENT_MODE in ('capture', 'location') and native_state is not None:
         fresh = breakout_evidence(prices, native_state, ema, adaptive=True)
         valid = valid or fresh['breakout_long' if direction == 1 else 'breakout_short']
+    if ENTRY_REFINEMENT_MODE == 'location' and watch.get('entry_location') and location_confirmation:
+        valid = True
     if not valid:
         if entry_quality and (entry_quality['priority'].get('dominant_intact')
                 or ranked_confirmation['may_override_minor_reaction']):
@@ -703,7 +728,8 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
     if not valid:
         mark("structure_or_momentum")
         return None
-    if watch.get("strategy") == "trend_retest":
+    if (watch.get("strategy") == "trend_retest"
+            and not (ENTRY_REFINEMENT_MODE == 'location' and watch.get('entry_location'))):
         momentum_ok, momentum_reason, directional5, directional15 = (
             trend_retest_momentum_gate(prices, direction))
         if not momentum_ok and entry_quality and (entry_quality['priority'].get('dominant_intact')
@@ -748,15 +774,21 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
             plan["native_5m_count"] = len(native_state["five_bars"])
             plan["rsi5"] = sampled_rsi5
             plan["entry_quality"] = entry_quality
+            if location_confirmation:
+                plan['entry_quality']['location_confirmation'] = location_confirmation
             plan['entry_quality']['priority']=direction_priority(
                 native_state,direction,current,plan['target1'],
                 native_state['minute_bars'][-1]['start']+60)
             plan['entry_quality']['ranked_entry'] = plan['entry_decision_priority']
-            if watch.get('strategy','breakout') == 'breakout' and not breakout_confirmation_allowed(
-                    plan, breakout_evidence(prices,native_state,ema,
-                        adaptive=ENTRY_REFINEMENT_MODE == 'capture')):
-                mark(BREAKOUT_CONFIRMATION_REJECT)
-                return None
+            if watch.get('strategy','breakout') == 'breakout':
+                fresh = breakout_evidence(prices,native_state,ema,
+                    adaptive=ENTRY_REFINEMENT_MODE in ('capture', 'location'))
+                allowed = breakout_confirmation_allowed(plan, fresh)
+                if ENTRY_REFINEMENT_MODE == 'location':
+                    allowed = allowed and fresh['breakout_long' if direction == 1 else 'breakout_short']
+                if not allowed:
+                    mark(BREAKOUT_CONFIRMATION_REJECT)
+                    return None
         plan["sampled_rsi5"] = sampled_rsi5  # Legacy schema alias; see data_source.
         plan["sampled_context"] = context
         plan["rsi_direction_status"] = reason if native_state is not None or observations is not None else None
@@ -1003,12 +1035,17 @@ def run():
     LOG.info("SIGNAL_THESIS_POLICY policy=%s frozen_followup_policy_unchanged=true missing_evidence_is_reversal=false "
              "review_hours=6 tracking_hours=24 time_alone_is_exit=false", FOLLOWUP_POLICY)
     LOG.info("NATIVE_TARGET_ROOM policy=%s "
-             "single_pivot=ranked repeated_barrier=block stages=watch,confirm additional_wait=false "
-             "direction=15m_and_5m_ema max_extension_atr=2.5 historical_range_exception_cap_atr=6", ENTRY_PRIORITY_POLICY)
+             "single_pivot=%s repeated_barrier=block stages=watch,confirm additional_wait=false "
+             "direction=15m_and_5m_ema max_extension_atr=2.5 historical_range_exception_cap_atr=6",
+             ENTRY_PRIORITY_POLICY, 'block_before_target' if ENTRY_REFINEMENT_MODE == 'location' else 'ranked')
     LOG.info("ENTRY_REFINEMENT_POLICY mode=%s adaptive_capture=%s "
              "continuation_local_stop=%s profitability_validated=false",
-             ENTRY_REFINEMENT_MODE, ENTRY_REFINEMENT_MODE == 'capture',
+             ENTRY_REFINEMENT_MODE, ENTRY_REFINEMENT_MODE in ('capture', 'location'),
              ENTRY_REFINEMENT_MODE != 'legacy')
+    LOG.info("ENTRY_LOCATION_POLICY policy=%s enabled=%s first_retest=true "
+             "fresh_progress=true known_barrier_override=false extra_wait_seconds=0 "
+             "risk_caps_unchanged=true profitability_validated=false",
+             ENTRY_LOCATION_POLICY, ENTRY_REFINEMENT_MODE == 'location')
     LOG.info("NATIVE_ENTRY_GEOMETRY range_stop_floor=max(0.05pct,1.5ATR5) "
              "continuation_stop_floor=%s "
              "structural_stop_preserved=true range_floor=cost_solved_TP1 "
@@ -1186,7 +1223,9 @@ def run():
             sample_due = now - last_sample >= POLL
             confirm_due = watch is not None and now - watch["time"] >= 30
             new_setup_bar = native_key is not None and native_key != last_setup_key
-            setup_due = sample_due or (watch is None and new_setup_bar)
+            quote_setup_due = (ENTRY_REFINEMENT_MODE == 'location' and watch is None
+                               and native_state is not None)
+            setup_due = sample_due or (watch is None and new_setup_bar) or quote_setup_due
             if sample_due:
                 last_sample = now
                 observations.append((now, price))
@@ -1418,7 +1457,8 @@ def run():
                     timing = setup_evidence(native_state, now, time.time(),
                                             first_ready_observed_at,
                                             "periodic_and_new_bar" if sample_due and new_setup_bar
-                                            else "periodic" if sample_due else "new_completed_bar")
+                                            else "periodic" if sample_due else
+                                            "new_completed_bar" if new_setup_bar else "closed_retest_quote")
                     if proposal is not None:
                         proposal["entry_timing"] = timing
                     rejection["entry_timing"] = timing

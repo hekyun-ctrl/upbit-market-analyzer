@@ -74,7 +74,7 @@ class PaperNotificationsTests(unittest.TestCase):
         # the 2026-10-24 opt-in comparison policy; legacy behavior is also covered
         # by entry/refinement and incident replay regressions. Notification gates,
         # research accounting and default activation remain unchanged.
-        expected={'calculate_plan': '36ed8da6244bef8baddedaed952b593d40eb1006df93306d79ffd50e889794bf', 'classify': '78cecfd5a3998f00ed25ec44ec9b739b617efc179ef3b005da9dadf6eb7ad4ba', 'assess_candidate': 'b91c60a36a148544cedd4612469f97ca2089b6670c367bc0a4e23d60857f2c14', 'confirm_watch': '715712a172075cb4f574b0663035b4932155aa5fabf35fe5023225a7b162f586', 'alert_gate': 'e047eeeb07dd40558cd745dea5e3731c2c177cde127a7137c37fd14a3213ffab', 'record_alert': '89147d99872cc78f1b8f8b4e6d86660806736030e335bf732f2975de24f3e04b'}
+        expected={'calculate_plan': '7c8faa5cc5f16c158764553ce89906bf49b06347a48638cddcb9b162165ee976', 'classify': '3a4b9b128796029a0319f852f35d8c4d1e2a5fe485b1da562ede1555adc21a5b', 'assess_candidate': '7baf0c17c52483df450ff1731c95a2f7f996cd9f7bbf9ab525021ed128310d6c', 'confirm_watch': 'f72998d1a3cde2eba38cf4c3fbc86d0deb14417106c38550b8abba47a4c645a4', 'alert_gate': 'e047eeeb07dd40558cd745dea5e3731c2c177cde127a7137c37fd14a3213ffab', 'record_alert': '89147d99872cc78f1b8f8b4e6d86660806736030e335bf732f2975de24f3e04b'}
         src=Path('lbank_futures_monitor.py').read_text()
         current={n.name:hashlib.sha256(ast.get_source_segment(src,n).encode()).hexdigest()
                  for n in ast.parse(src).body
