@@ -7,7 +7,7 @@ import math
 
 from lbank_trend_runner import atr_wilder
 
-MODES = ('legacy', 'structure_cost', 'capture')
+MODES = ('legacy', 'structure_cost', 'capture', 'location')
 
 
 def minute_atr(state):
