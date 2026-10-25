@@ -37,6 +37,7 @@ from trend_context import higher_timeframe_context
 from filter_audit import filter_audit, REJECTIONS
 from exit_plan import exit_plan_metrics, execution_cost_metrics, modeled_exit_return, partial_plan_summary
 from upbit_client import UpbitPublicClient
+from zil_watch import run_zil_watch, STATUS as ZIL_WATCH_STATUS
 from trade_flow import TradeFlow, buying_persistent
 from audit_store import AuditStore, configured_audit_path
 from alert_limits import early_watch_daily_limits, restored_early_watch_usage
@@ -5261,6 +5262,7 @@ async def run_monitor_forever() -> None:
     LOGGER.info("UPBIT_MINUTE_SURGE_RUNTIME version=%s commit=%s enabled=%s completed_only=true outbound=validated_candidate_only", STRATEGY_VERSION, os.getenv("RAILWAY_GIT_COMMIT_SHA", "unknown"), minute_surge_enabled())
     config = MonitorConfig.from_env()
     dispatcher = AlertDispatcher()
+    zil_watch_task = asyncio.create_task(run_zil_watch(dispatcher, MONITOR_STATE.audit_store))
     engine = SignalEngine(config)
     candidate_analyzer = CandidateAnalyzer(
         CandidateConfig.from_env(), dispatcher, engine.relative_strength_snapshot
@@ -5374,7 +5376,8 @@ async def run_monitor_forever() -> None:
                 warmed_markets.update(engine.active_markets or ())
     finally:
         inactivity_status_task.cancel()
-        tasks: list[asyncio.Task[Any]] = [inactivity_status_task]
+        zil_watch_task.cancel()
+        tasks: list[asyncio.Task[Any]] = [inactivity_status_task, zil_watch_task]
         if volume_history_task is not None:
             volume_history_task.cancel()
             tasks.append(volume_history_task)
@@ -5409,6 +5412,7 @@ def public_config() -> dict[str, Any]:
     """Return non-secret threshold configuration for inspection."""
     return {
         "strategy_version": STRATEGY_VERSION,
+        "zil_watch": dict(ZIL_WATCH_STATUS),
         "minute_surge": {"enabled": minute_surge_enabled(), "version": "minute-surge-v1",
                          "survival_seconds": 8, "proof_ttl_seconds": 90,
                          "outbound": "validated_candidate_only", "profitability_validated": False},
