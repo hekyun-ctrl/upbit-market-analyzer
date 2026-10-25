@@ -1352,6 +1352,10 @@ def validate_candidate_survival(
     impulse. Requiring the complete entry screen again turned the survival
     delay into a second discovery test and removed otherwise intact setups.
     """
+    if candidate.get("surge_entry"):
+        from minute_surge import survival
+        return survival(candidate, ticker, orderbook_samples, _completed(candles_1m, 1, as_of), config,
+                        execution_as_of or as_of or datetime.now(timezone.utc))
     c1 = _completed(candles_1m, 1, as_of)
     if len(c1) < 21:
         return {}, ["생존 확인용 완료봉 데이터 부족"]
@@ -1582,6 +1586,16 @@ def evaluate_candidate(
     alert.pop("screening_metrics", None)
     context_now = (as_of or datetime.now(timezone.utc)).astimezone(timezone.utc)
     execution_now = (execution_as_of or context_now).astimezone(timezone.utc)
+    if alert.get("signal") in {"minute_acceleration", "minute_restart"}:
+        from minute_surge import evaluate, enabled
+        if not enabled():
+            return None, ["1분 가속 경로 비활성"]
+        candidate, rejected = evaluate(alert, ticker, orderbook_samples or [orderbook],
+            _completed(candles_1m,1,context_now), _completed(candles_5m,5,context_now), config, now=execution_now,
+            btc_ticker=btc_ticker, btc_candles_5m=_completed(btc_candles_5m or [],5,context_now))
+        alert["screening_metrics"] = {"minute_surge": alert.get("surge_proof"),
+            "decision": "qualified" if candidate else "rejected", "reasons": rejected}
+        return candidate, rejected
     if alert.get("signal") not in {
         "price_volume_surge",
         "breakout",

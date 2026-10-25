@@ -40,10 +40,11 @@ from upbit_client import UpbitPublicClient
 from trade_flow import TradeFlow, buying_persistent
 from audit_store import AuditStore, configured_audit_path
 from alert_limits import early_watch_daily_limits, restored_early_watch_usage
+from minute_surge import MinuteSurgeEngine, enabled as minute_surge_enabled, dispatch_guard as surge_dispatch_guard
 from volume_history import build_72h_turnover_snapshot, summarize_72h_ranked_outcomes
 
 LOGGER = logging.getLogger("upbit-monitor")
-STRATEGY_VERSION = "structure-and-audit-v3.23-structure-votes"
+STRATEGY_VERSION = "structure-and-audit-v3.24-minute-surge"
 
 
 class _TelegramTokenFilter(logging.Filter):
@@ -995,6 +996,7 @@ class SignalEngine:
 
     def __init__(self, config: MonitorConfig) -> None:
         self.config = config
+        self.minute_surge = MinuteSurgeEngine()
         self.active_markets: set[str] | None = None
         self._windows: dict[str, deque[_SecondBucket]] = defaultdict(deque)
         self._last_evaluated_second: dict[str, int] = {}
@@ -1051,6 +1053,8 @@ class SignalEngine:
         """Seed rolling momentum and minute values after a process restart."""
         current_second = int(now or time.time())
         boundary = current_second - current_second % 60
+        if minute_surge_enabled():
+            self.minute_surge.warm(market, candles, current_second)
         historical_prices: dict[int, float] = {}
         historical_buckets: dict[int, _SecondBucket] = {}
         for candle in candles:
@@ -1234,6 +1238,8 @@ class SignalEngine:
         if price <= 0 or volume < 0:
             return []
         second = int(timestamp_ms / 1000)
+        minute_alert = (self.minute_surge.update(market, price, volume, timestamp_ms, sequential_id)
+                        if minute_surge_enabled() else None)
         self.trade_flow.observe(market, price, volume, timestamp_ms, ask_bid, sequential_id)
         self._update_momentum_price(market, second, price)
         window = self._windows[market]
@@ -1265,9 +1271,11 @@ class SignalEngine:
             window.popleft()
 
         if self._last_evaluated_second.get(market) == second:
-            return []
+            return [minute_alert] if minute_alert else []
         self._last_evaluated_second[market] = second
-        return self._evaluate(market, window, second)
+        if minute_alert:
+            minute_alert.update(self.relative_strength_snapshot(market, second))
+        return ([minute_alert] if minute_alert else []) + self._evaluate(market, window, second)
 
     def _evaluate(
         self, market: str, window: deque[_SecondBucket], now: int
@@ -1755,7 +1763,9 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
     risk_notes = "·".join(candidate.get("risk_notes", []))
     risk_line = f"위험 감점: {risk_notes}\n" if risk_notes else ""
     labels = []
-    if candidate.get("completed_structure_entry"):
+    if candidate.get("surge_entry"):
+        labels.append("1분 재시동형" if candidate.get("source_signal") == "minute_restart" else "1분 초기 가속형")
+    elif candidate.get("completed_structure_entry"):
         labels.append("완료 5분 첫 재지지형" if candidate.get("first_retest_confirmed") else "완료 5분 구조 돌파형")
     elif candidate.get("trade_flow_leader"):
         labels.append("완료봉 상승 지속형" if candidate.get("flow_continuation_entry") else "체결 매수 지속형")
@@ -1882,10 +1892,12 @@ def _candidate_text(candidate: dict[str, Any]) -> str:
             volume_line += (f"15분 대안: 완료 5분봉 3개 합산 {float(proof.get('rolling_15m_volume_ratio') or 0):.2f}배"
                             "(연속 63봉·이전 20개 비중복 구간 대비)\n")
     cost_line = ""
-    if candidate.get("tick_spread_exception") or candidate.get("flow_execution_override") or candidate.get("completed_structure_entry"):
+    if candidate.get("surge_entry") or candidate.get("tick_spread_exception") or candidate.get("flow_execution_override") or candidate.get("completed_structure_entry"):
         cost = candidate.get("execution_cost") or {}
         quote_label = ("공식 최소 1호가 단위·반복 호가·매수 체결 통과" if candidate.get("tick_spread_exception")
                        else "가까운 호가 깊이·실제 매수 체결·전송 직전 호가 확인")
+        if candidate.get("surge_entry"):
+            quote_label = "완료 1분 가속·반복 호가·전송 직전 호가 확인"
         if candidate.get("completed_structure_entry"):
             book = candidate.get("survival_structure_book_context") or {}
             quote_label = "가까운 호가 깊이 3회·전송 직전 호가 확인"
@@ -2153,7 +2165,7 @@ def _revalidate_candidate_for_dispatch(
         return None, f"전송 직전 {label} 손익비 부족({actual_rr:.2f})"
     if stop_pct > max_stop_loss_pct:
         return None, f"전송 직전 계획 손절폭 초과({stop_pct:.2f}%)"
-    if candidate.get("tick_spread_exception") or candidate.get("flow_execution_override") or candidate.get("completed_structure_entry"):
+    if candidate.get("surge_entry") or candidate.get("tick_spread_exception") or candidate.get("flow_execution_override") or candidate.get("completed_structure_entry"):
         proof = candidate.get("survival_execution_spread_context") or candidate.get("execution_spread_context") or {}
         quote = candidate.get("dispatch_execution_quote") or {}
         if candidate.get("tick_spread_exception") and not proof.get("confirmed"):
@@ -2606,6 +2618,11 @@ class AlertDispatcher:
         structural stop and completed-candle qualifications.
         """
         reasons = []
+        if candidate.get("surge_entry"):
+            reason = surge_dispatch_guard(candidate, candidate.get("dispatch_execution_quote"),
+                                          time.time(), self._candidate_risk_config)
+            if reason:
+                reasons.append(reason)
         score_floor = self._candidate_min_score
         if candidate.get("completed_structure_entry"):
             cfg = self._candidate_risk_config
@@ -2892,6 +2909,7 @@ class CandidateAnalyzer:
         self._last_delivered_at: dict[str, float] = {}
         self._last_leader_recheck_at: dict[str, float] = {}
         self._lifecycles: dict[str, dict[str, Any]] = {}
+        self._surge_pending: dict[str, dict[str, Any]] = {}
         self._watchlist: dict[str, dict[str, Any]] = {}
         self._signal_tracks: dict[str, dict[str, Any]] = {}
         self._early_watch_tracks: dict[str, dict[str, Any]] = {}
@@ -2919,6 +2937,8 @@ class CandidateAnalyzer:
             "persistent_leader_acceleration": 25,
             "breakout": 30,
             "consolidation_rebreakout": 40,
+            "minute_acceleration": 45,
+            "minute_restart": 45,
         }.get(str(alert.get("signal")), 0)
         if alert.get("watchlist_recheck"):
             priority += 5
@@ -3906,6 +3926,7 @@ class CandidateAnalyzer:
         if not self.config.enabled:
             return False
         if alert.get("signal") not in {
+            "minute_acceleration", "minute_restart",
             "price_volume_surge",
             "breakout",
             "consolidation_rebreakout",
@@ -4052,7 +4073,7 @@ class CandidateAnalyzer:
                 return True
             return False
         if (
-            not watchlist_recheck
+            not watchlist_recheck and not scheduled.get("surge_proof")
             and now - self._last_checked_at.get(market, 0) < self.config.cooldown_seconds
         ):
             return False
@@ -4382,6 +4403,9 @@ class CandidateAnalyzer:
 
     def observe_price(self, market: str, price: float) -> bool:
         """Schedule one fresh recheck after price leaves and retakes the entry zone."""
+        pending = self._surge_pending.get(market)
+        if pending and (price <= pending["stop_price"] or price < pending["breakout_level"]):
+            pending["surge_live_guard"]["invalidated"] = True
         now = time.time()
         self._observe_early_watch_track(market, price, now)
         self._observe_signal_track(market, price, now)
@@ -4606,6 +4630,9 @@ class CandidateAnalyzer:
         self, candidate: dict[str, Any], relative: dict[str, Any]
     ) -> list[str]:
         """Reject a candidate that loses leadership during the survival wait."""
+        if candidate.get("surge_entry"):
+            # Leadership/RSI/long-window trend are explanatory, not new gates.
+            return []
         structure_lane = bool(candidate.get("completed_structure_entry"))
         if not candidate.get("relative_strength_ready") and not structure_lane:
             return []
@@ -4762,7 +4789,7 @@ class CandidateAnalyzer:
                     alert, "rejected", rejected
                 )
                 return
-            if fast_leader and candidate.get("selection_lane") != "explosive_leader" and not candidate.get("rsi_breakout_exception") and not candidate.get("breadth_breakout_exception") and not candidate.get("completed_breakout_entry") and not candidate.get("trade_flow_leader") and not candidate.get("completed_wb_retest_entry") and not candidate.get("completed_structure_entry"):
+            if fast_leader and not candidate.get("surge_entry") and candidate.get("selection_lane") != "explosive_leader" and not candidate.get("rsi_breakout_exception") and not candidate.get("breadth_breakout_exception") and not candidate.get("completed_breakout_entry") and not candidate.get("trade_flow_leader") and not candidate.get("completed_wb_retest_entry") and not candidate.get("completed_structure_entry"):
                 candidate["survival_confirmed"] = True
                 candidate["survival_seconds"] = max(
                     self.config.fast_leader_confirm_seconds,
@@ -4790,6 +4817,10 @@ class CandidateAnalyzer:
                 )
                 if first_candidate.get("completed_structure_entry"):
                     survival_seconds = max(60, survival_seconds)
+                if first_candidate.get("surge_entry"):
+                    survival_seconds = 8
+                    first_candidate["surge_live_guard"] = {"invalidated": False}
+                    self._surge_pending[market] = first_candidate
                 LOGGER.info(
                     "CANDIDATE_SURVIVAL_PENDING market=%s seconds=%d score=%d",
                     market,
@@ -4831,6 +4862,8 @@ class CandidateAnalyzer:
                 )
                 survival_metrics.update(btc_metrics)
                 survival_rejected.extend(btc_rejected)
+                if (first_candidate.get("surge_live_guard") or {}).get("invalidated"):
+                    survival_rejected.append("1분 가속 생존 중 실시간 최초 구조 침범")
                 if (
                     float(
                         (survival_snapshot.get("btc_ticker") or {}).get(
@@ -4881,12 +4914,14 @@ class CandidateAnalyzer:
                 candidate["survival_seconds"] = survival_seconds
             verification_client = UpbitPublicClient()
             try:
-                if candidate.get("tick_spread_exception") or candidate.get("flow_execution_override") or candidate.get("completed_structure_entry"):
+                if candidate.get("surge_entry") or candidate.get("tick_spread_exception") or candidate.get("flow_execution_override") or candidate.get("completed_structure_entry"):
                     latest_ticker, latest_book = await asyncio.gather(
                         verification_client.ticker(market), verification_client.orderbook(market))
                     candidate["dispatch_execution_quote"] = {
                         **_quote_execution_context(latest_book, float(latest_ticker["trade_price"]), self.config),
                         "as_of": time.time(),
+                        "source_timestamp": float(latest_book.get("timestamp") or 0) / 1000,
+                        "ticker_timestamp": float(latest_ticker.get("timestamp") or 0) / 1000,
                     }
                 else:
                     latest_ticker = await verification_client.ticker(market)
@@ -5010,6 +5045,7 @@ class CandidateAnalyzer:
                 "survival_execution_spread_context", "survival_execution_cost", "dispatch_execution_quote",
                 "cleared_resistance_levels",
                 "sustained_retest",
+                "surge_entry", "surge_proof", "surge_execution_context", "survival_surge_execution_context", "target_basis",
             ):
                 accepted_record[key] = candidate.get(key)
             MONITOR_STATE.add_screening_record(accepted_record)
@@ -5075,6 +5111,10 @@ class CandidateAnalyzer:
             self._record_early_watch_screening(
                 alert, "analysis_failed", [f"{type(exc).__name__}: {exc}"]
             )
+        finally:
+            pending = self._surge_pending.get(market)
+            if pending and pending.get("setup_id") == alert.get("setup_id"):
+                self._surge_pending.pop(market, None)
 
 
 async def _resolve_markets(config: MonitorConfig) -> list[str]:
@@ -5103,8 +5143,9 @@ async def _warm_signal_engine(
     async def warm_one(market: str) -> bool:
         try:
             async with semaphore:
+                requested_at = int(time.time())
                 candles = await client.candles(market, "minute1", 65)
-            return engine.warm_market(market, candles)
+            return engine.warm_market(market, candles, now=requested_at)
         except asyncio.CancelledError:
             raise
         except Exception as exc:
@@ -5217,6 +5258,7 @@ async def _refresh_market_subscriptions(websocket, config, engine, markets, warm
 
 
 async def run_monitor_forever() -> None:
+    LOGGER.info("UPBIT_MINUTE_SURGE_RUNTIME version=%s commit=%s enabled=%s completed_only=true outbound=validated_candidate_only", STRATEGY_VERSION, os.getenv("RAILWAY_GIT_COMMIT_SHA", "unknown"), minute_surge_enabled())
     config = MonitorConfig.from_env()
     dispatcher = AlertDispatcher()
     engine = SignalEngine(config)
@@ -5260,6 +5302,7 @@ async def run_monitor_forever() -> None:
                 ) as websocket:
                     await websocket.send(_trade_subscription(markets))
                     engine.trade_flow.clear()  # Require fresh executions after reconnect.
+                    engine.minute_surge.reset_live()
                     MONITOR_STATE.mark_connected()
                     LOGGER.info(
                         "Connected to Upbit WebSocket for %d markets", len(markets)
@@ -5295,6 +5338,10 @@ async def run_monitor_forever() -> None:
                             sequential_id=message.get("sequential_id"),
                         )
                         for alert in alerts:
+                            if alert.get("surge_proof"):
+                                MONITOR_STATE.add_alert(alert)
+                                candidate_analyzer.schedule(alert)
+                                continue
                             if alert.get("internal_only"):
                                 if alert.get("signal") == "persistent_leader_acceleration":
                                     candidate_analyzer.schedule(alert)
@@ -5362,6 +5409,9 @@ def public_config() -> dict[str, Any]:
     """Return non-secret threshold configuration for inspection."""
     return {
         "strategy_version": STRATEGY_VERSION,
+        "minute_surge": {"enabled": minute_surge_enabled(), "version": "minute-surge-v1",
+                         "survival_seconds": 8, "proof_ttl_seconds": 90,
+                         "outbound": "validated_candidate_only", "profitability_validated": False},
         **asdict(MonitorConfig.from_env()),
         "candidate_analysis": CandidateConfig.from_env().public(),
         "trend_exit_plan": {"mode": "partial_50_50", "minimum_first_target_r": 1.0,
