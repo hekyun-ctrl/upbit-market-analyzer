@@ -6,7 +6,7 @@ import logging
 import os
 import time
 from datetime import datetime, timezone, timedelta
-from statistics import median
+from decimal import Decimal, InvalidOperation
 
 from upbit_client import UpbitPublicClient
 
@@ -16,6 +16,24 @@ KST = timezone(timedelta(hours=9))
 # Known Upbit termination time. May be overridden only after checking a new notice.
 END_DEFAULT = "2026-11-16T15:00:00+09:00"
 STATUS = {"state": "not_started", "interval_seconds": 60, "market": MARKET}
+POLICY_VERSION = "fixed-volume-1.5x-v2"
+MULTIPLIER = Decimal("1.5")
+
+
+def volume_reference(minutes):
+    """Require a persisted reference; never fall back to noisy rolling ratios."""
+    if minutes not in (1, 5):
+        raise ValueError("unsupported ZIL interval")
+    prefix = f"ZIL_WATCH_REFERENCE_{minutes}M_"
+    try:
+        volume = Decimal(os.environ[prefix + "VOLUME"])
+        start = int(os.environ[prefix + "START"])
+    except (KeyError, ValueError, InvalidOperation) as exc:
+        raise ValueError("ZIL volume reference is missing or invalid") from exc
+    if not volume.is_finite() or volume <= 0 or start <= 0 or start % (minutes * 60):
+        raise ValueError("invalid ZIL volume reference")
+    return {"volume": str(volume), "start": start,
+            "threshold": str(volume * MULTIPLIER)}
 
 
 def end_at():
@@ -37,66 +55,45 @@ def completed(rows, minutes, now):
     return sorted({stamp(r): r for r in rows if stamp(r) + minutes * 60 <= now}.values(), key=stamp)
 
 
-def detect(rows, minutes, now):
-    """Scan recent closes with strictly prior baselines, never unfinished candles."""
+def detect(rows, minutes, now, reference=None):
+    """Only a new completed volume >= 1.5 times the fixed reference qualifies."""
+    reference = volume_reference(minutes) if reference is None else reference
+    threshold = Decimal(reference["threshold"])
     bars = completed(rows, minutes, now)
     hits = []
-    threshold, minimum = (5, 10_000_000) if minutes == 1 else (3, 30_000_000)
-    for i in range(20, len(bars)):
-        row = bars[i]
+    for row in bars:
         start = stamp(row)
         if not now - 180 < start + minutes * 60 <= now:
             continue  # Bounded recovery, not a replay of old alarms.
-        prior = bars[i-20:i]
-        baseline = median(float(r["candle_acc_trade_volume"]) for r in prior)
-        value = float(row["candle_acc_trade_price"])
-        ratio = float(row["candle_acc_trade_volume"]) / baseline if baseline > 0 else None
-        if ratio is None or ratio < threshold or value < minimum:
+        if start < reference["start"] + minutes * 60:
+            continue  # The reference must already have closed before this event.
+        volume = Decimal(str(row["candle_acc_trade_volume"]))
+        value = Decimal(str(row["candle_acc_trade_price"]))
+        if not volume.is_finite() or not value.is_finite() or value < 0 or volume < threshold:
             continue
         hits.append({"id": f"{MARKET}:{minutes}:{int(start)}", "start": start,
-                     "minutes": minutes, "ratio": ratio, "value": value,
-                     "change": (float(row["trade_price"]) / float(row["opening_price"]) - 1) * 100,
-                     "close": float(row["trade_price"]), "high": float(row["high_price"]),
-                     "low": float(row["low_price"]),
-                     "sparse": start - stamp(prior[0]) > 25 * minutes * 60,
-                     "prior_high": max(float(r["high_price"]) for r in prior),
-                     "prior_low": min(float(r["low_price"]) for r in prior)})
+                     "minutes": minutes, "ratio": float(volume / Decimal(reference["volume"])),
+                     "value": float(value), "volume": str(volume),
+                     "reference_volume": reference["volume"],
+                     "reference_start": reference["start"], "threshold": reference["threshold"]})
     return hits
 
 
-def trend(rows, minutes, now):
-    bars = completed(rows, minutes, now)
-    if len(bars) < 3:
-        return "자료 부족"
-    closes = [float(r["trade_price"]) for r in bars[-3:]]
-    return "상승" if closes[0] < closes[1] < closes[2] else "하락" if closes[0] > closes[1] > closes[2] else "혼조"
-
-
-def message(hits, ticker, five, hour, book, now):
+def message(hits, ticker, now):
     price = float(ticker["trade_price"])
-    bars = completed(five, 5, now)[-36:]
-    lows = [float(r["low_price"]) for r in bars if float(r["low_price"]) < price]
-    highs = [float(r["high_price"]) for r in bars if float(r["high_price"]) > price]
-    support = f"{max(lows):g}원" if lows else "확인 불가"
-    resistance = f"{min(highs):g}원" if highs else "확인 불가"
-    hit = max(hits, key=lambda h: h["start"] + h["minutes"] * 60)
-    direction = "상승 동반" if hit["change"] > 0 else "하락 동반" if hit["change"] < 0 else "방향 불분명"
-    flow = "기존 고점 돌파 유지" if hit["close"] > hit["prior_high"] and price > hit["prior_high"] else "돌파 후 되돌림" if hit["high"] > hit["prior_high"] else "기존 저점 이탈" if price < hit["prior_low"] else "박스권 내 급증"
-    units = book.get("orderbook_units", []) if book else []
-    spread = ((float(units[0]["ask_price"]) / float(units[0]["bid_price"]) - 1) * 100) if units else None
-    spread_text = f"{spread:.2f}%" if spread is not None else "확인 불가"
-    details = " / ".join(f"{datetime.fromtimestamp(h['start'], KST):%H:%M} {h['minutes']}분 {h['ratio']:.1f}배·{h['value']/10000:,.0f}만원" + ("(저유동성 기준)" if h["sparse"] else "") for h in hits[-3:])
-    return (f"[질리카 전용 관찰 | {direction}]\n"
+    details = "\n".join(
+        f"발생 {datetime.fromtimestamp(h['start'], KST):%H:%M} {h['minutes']}분 · 거래량 {float(h['volume']):,.2f} ZIL · 고정 기준의 {h['ratio']:.2f}배\n"
+        f"기준 {datetime.fromtimestamp(h['reference_start'], KST):%m/%d %H:%M} {float(h['reference_volume']):,.2f} ZIL · 거래대금 {h['value']/10000:,.0f}만원"
+        for h in hits[-3:])
+    return ("[질리카 거래량 확대 | 고정 기준 1.5배 이상]\n"
             f"확인 {datetime.fromtimestamp(now, KST):%m/%d %H:%M:%S} KST · 현재 {price:g}원\n"
-            f"발생 {details} · 기준은 각각 직전 20개 완료봉 중앙값\n"
-            f"최근 급증봉 {hit['change']:+.2f}% · {flow} · 1시간 흐름 {trend(hour, 60, now)}\n"
-            f"가까운 관측 지지 {support} / 저항 {resistance} · 호가 간격 {spread_text}\n"
-            "완료봉 급증 관찰이며 매수 신호가 아닙니다. 추격 시 되돌림·체결 위험이 있습니다.")
+            f"{details}\n완료봉 거래량 관찰이며 매수 신호가 아닙니다.")
 
 
 class ZilWatcher:
     def __init__(self, dispatcher, audit, client):
         self.dispatcher, self.audit, self.client = dispatcher, audit, client
+        self.references = {m: volume_reference(m) for m in (1, 5)}
 
     async def tick(self, now=None):
         fixed_now = now is not None
@@ -110,7 +107,7 @@ class ZilWatcher:
         if checked >= end_at():
             STATUS.update(state="expired", checked_at=checked)
             return False
-        hits = detect(one, 1, checked) + detect(five, 5, checked)
+        hits = detect(one, 1, checked, self.references[1]) + detect(five, 5, checked, self.references[5])
         seen = self.audit.get("zil_watch_sent") or {}
         hits = [h for h in hits if h["id"] not in seen]
         STATUS.update(state="running", checked_at=checked, new_events=len(hits),
@@ -119,13 +116,11 @@ class ZilWatcher:
         if not hits:
             return True
         ticker = await self.client.ticker(MARKET)
-        hour = await self.client.candles(MARKET, "minute60", 30)
-        book = await self.client.orderbook(MARKET)
         if abs(checked - float(ticker["timestamp"]) / 1000) > 120:
             raise ValueError("stale ZIL ticker; delivery deferred")
         if self.dispatcher.mode != "telegram":
             raise RuntimeError("ZIL Telegram delivery unavailable")
-        await self.dispatcher._deliver_telegram(message(hits, ticker, five, hour, book, checked),
+        await self.dispatcher._deliver_telegram(message(hits, ticker, checked),
                                                 category="zil_volume_watch", market=MARKET,
                                                 signal=",".join(h["id"] for h in hits))
         # Only acknowledged sends are suppressed. Network ambiguity can still duplicate.
@@ -144,9 +139,18 @@ async def run_zil_watch(dispatcher, audit):
         STATUS["state"] = "blocked_no_persistent_audit"
         LOGGER.error("ZIL_WATCH_BLOCKED persistent audit required")
         return
+    try:
+        references = {m: volume_reference(m) for m in (1, 5)}
+    except ValueError:
+        STATUS.update(state="blocked_invalid_volume_reference", policy_version=POLICY_VERSION)
+        LOGGER.error("ZIL_WATCH_BLOCKED valid fixed volume references required")
+        return
+    STATUS.update(policy_version=POLICY_VERSION, direction_alerts=False,
+                  multiplier=str(MULTIPLIER), references=references)
     client = UpbitPublicClient()
     watcher = ZilWatcher(dispatcher, audit, client)
-    LOGGER.info("ZIL_WATCH_STARTED interval=60 market=%s end=%s mode=%s", MARKET, end_at(), dispatcher.mode)
+    LOGGER.info("ZIL_WATCH_STARTED interval=60 market=%s policy=%s references=%s direction_alerts=false end=%s mode=%s",
+                MARKET, POLICY_VERSION, references, end_at(), dispatcher.mode)
     try:
         while enabled():
             try:
