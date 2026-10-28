@@ -1,0 +1,256 @@
+{
+  "diagnostic_only": true,
+  "rows": [
+    {
+      "scenario": "base_delay0",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "comparison": "capture_e3_vs_capture_e3_e4",
+      "basis": "shared earliest observed confirmed plan; retrospective attribution, not actual policy path",
+      "shared_plan_id": "plan-v1:fbf840863f1c966bc5fbfa33e0e2ca903bc08cf1b6735f6e7781f07385922909",
+      "shared_plan_known_at": "2026-10-22T06:27:40.475148030Z",
+      "actual_received_at": null,
+      "old": {
+        "observed_at": "2026-10-22T06:27:40.475148030Z",
+        "entry": 82591.1,
+        "stop": 82769.02325999999,
+        "target1": 82031.1242840934,
+        "target2": 81729.34317186996,
+        "status": "unresolved",
+        "outcome": {
+          "status": "unresolved",
+          "reason": "missing_or_invalid_outcome_bar",
+          "at": "2026-10-22T06:45:00+00:00"
+        },
+        "quantity_btc": 0.0309948650641534,
+        "net_pnl_model": null
+      },
+      "new": {
+        "observed_at": "2026-10-22T06:27:40.475148030Z",
+        "entry": 82591.1,
+        "stop": 82769.02325999999,
+        "target1": 82031.1242840934,
+        "target2": 81729.34317186996,
+        "status": "unresolved",
+        "outcome": {
+          "status": "unresolved",
+          "reason": "missing_or_invalid_outcome_bar",
+          "at": "2026-10-22T06:45:00+00:00"
+        },
+        "quantity_btc": 0.0309948650641534,
+        "net_pnl_model": null
+      },
+      "net_timing_difference": null,
+      "actual_plan_changes": {}
+    },
+    {
+      "scenario": "base_delay0",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e4",
+      "basis": "shared earliest observed confirmed plan; retrospective attribution, not actual policy path",
+      "shared_plan_id": "plan-v1:c064f8a49f6447cb84082742c0df76f13d97e40d53ed5adda65f66a65f8e65e5",
+      "shared_plan_known_at": "2026-10-22T06:27:40.475148030Z",
+      "actual_received_at": null,
+      "old": {
+        "observed_at": "2026-10-22T06:27:40.475148030Z",
+        "entry": 82591.1,
+        "stop": 82769.02325999999,
+        "target1": 82031.1242840934,
+        "target2": 81729.34317186996,
+        "status": "unresolved",
+        "outcome": {
+          "status": "unresolved",
+          "reason": "missing_or_invalid_outcome_bar",
+          "at": "2026-10-22T06:45:00+00:00"
+        },
+        "quantity_btc": 0.0309948650641534,
+        "net_pnl_model": null
+      },
+      "new": {
+        "observed_at": "2026-10-22T06:27:40.475148030Z",
+        "entry": 82591.1,
+        "stop": 82769.02325999999,
+        "target1": 82031.1242840934,
+        "target2": 81729.34317186996,
+        "status": "unresolved",
+        "outcome": {
+          "status": "unresolved",
+          "reason": "missing_or_invalid_outcome_bar",
+          "at": "2026-10-22T06:45:00+00:00"
+        },
+        "quantity_btc": 0.0309948650641534,
+        "net_pnl_model": null
+      },
+      "net_timing_difference": null,
+      "actual_plan_changes": {}
+    },
+    {
+      "scenario": "base_delay15",
+      "event_id": "op-v1:2265552af9bec3e51697732c5112fa75e016460f820b320fb18d4bc4fcb5d8c8",
+      "comparison": "capture_e3_vs_capture_e3_e4",
+      "basis": "shared earliest observed confirmed plan; retrospective attribution, not actual policy path",
+      "shared_plan_id": "plan-v1:b2b7d6ac2c532155ec1edc86165a489ff094a0f17c796377683121b7fde90311",
+      "shared_plan_known_at": "2026-10-20T04:04:28.345918809Z",
+      "actual_received_at": null,
+      "old": {
+        "observed_at": "2026-10-20T04:04:28.345918809Z",
+        "entry": 82153.3,
+        "stop": 82033.68251,
+        "target1": 82624.49485986508,
+        "target2": 82867.38249441193,
+        "status": "exact_in_model",
+        "outcome": {
+          "status": "exact_in_model",
+          "net_usdt_low": -9.358853512730962,
+          "net_usdt_high": -9.358853512730962,
+          "latest_exit_bar_end": "2026-10-20T04:10:00+00:00"
+        },
+        "quantity_btc": 0.03855475069169467,
+        "net_pnl_model": -9.358853512730962
+      },
+      "new": {
+        "observed_at": "2026-10-20T04:04:28.345918809Z",
+        "entry": 82153.3,
+        "stop": 82033.68251,
+        "target1": 82624.49485986508,
+        "target2": 82867.38249441193,
+        "status": "exact_in_model",
+        "outcome": {
+          "status": "exact_in_model",
+          "net_usdt_low": -9.358853512730962,
+          "net_usdt_high": -9.358853512730962,
+          "latest_exit_bar_end": "2026-10-20T04:10:00+00:00"
+        },
+        "quantity_btc": 0.03855475069169467,
+        "net_pnl_model": -9.358853512730962
+      },
+      "net_timing_difference": 0.0,
+      "actual_plan_changes": {}
+    },
+    {
+      "scenario": "base_delay15",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "comparison": "capture_e3_vs_capture_e3_e4",
+      "basis": "shared earliest observed confirmed plan; retrospective attribution, not actual policy path",
+      "shared_plan_id": "plan-v1:330ac83265d986cf0b6cbc4345c6ebecdd732633f408e2378ca13a83d8e7fc33",
+      "shared_plan_known_at": "2026-10-22T06:27:40.475148030Z",
+      "actual_received_at": null,
+      "old": {
+        "observed_at": "2026-10-22T06:27:40.475148030Z",
+        "entry": 82591.1,
+        "stop": 82769.02325999999,
+        "target1": 82031.1242840934,
+        "target2": 81729.34317186996,
+        "status": "unresolved",
+        "outcome": {
+          "status": "unresolved",
+          "reason": "missing_or_invalid_outcome_bar",
+          "at": "2026-10-22T06:45:00+00:00"
+        },
+        "quantity_btc": 0.0309948650641534,
+        "net_pnl_model": null
+      },
+      "new": {
+        "observed_at": "2026-10-22T06:27:40.475148030Z",
+        "entry": 82591.1,
+        "stop": 82769.02325999999,
+        "target1": 82031.1242840934,
+        "target2": 81729.34317186996,
+        "status": "unresolved",
+        "outcome": {
+          "status": "unresolved",
+          "reason": "missing_or_invalid_outcome_bar",
+          "at": "2026-10-22T06:45:00+00:00"
+        },
+        "quantity_btc": 0.0309948650641534,
+        "net_pnl_model": null
+      },
+      "net_timing_difference": null,
+      "actual_plan_changes": {}
+    },
+    {
+      "scenario": "base_delay15",
+      "event_id": "op-v1:2265552af9bec3e51697732c5112fa75e016460f820b320fb18d4bc4fcb5d8c8",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e4",
+      "basis": "shared earliest observed confirmed plan; retrospective attribution, not actual policy path",
+      "shared_plan_id": "plan-v1:d40edc632d5671363c145ee701cd9b46a6a397e48ed82a5fc05815c8a97c8b43",
+      "shared_plan_known_at": "2026-10-20T04:04:28.345918809Z",
+      "actual_received_at": null,
+      "old": {
+        "observed_at": "2026-10-20T04:04:28.345918809Z",
+        "entry": 82153.3,
+        "stop": 82033.68251,
+        "target1": 82624.49485986508,
+        "target2": 82867.38249441193,
+        "status": "exact_in_model",
+        "outcome": {
+          "status": "exact_in_model",
+          "net_usdt_low": -9.358853512730962,
+          "net_usdt_high": -9.358853512730962,
+          "latest_exit_bar_end": "2026-10-20T04:10:00+00:00"
+        },
+        "quantity_btc": 0.03855475069169467,
+        "net_pnl_model": -9.358853512730962
+      },
+      "new": {
+        "observed_at": "2026-10-20T04:04:28.345918809Z",
+        "entry": 82153.3,
+        "stop": 82033.68251,
+        "target1": 82624.49485986508,
+        "target2": 82867.38249441193,
+        "status": "exact_in_model",
+        "outcome": {
+          "status": "exact_in_model",
+          "net_usdt_low": -9.358853512730962,
+          "net_usdt_high": -9.358853512730962,
+          "latest_exit_bar_end": "2026-10-20T04:10:00+00:00"
+        },
+        "quantity_btc": 0.03855475069169467,
+        "net_pnl_model": -9.358853512730962
+      },
+      "net_timing_difference": 0.0,
+      "actual_plan_changes": {}
+    },
+    {
+      "scenario": "base_delay15",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e4",
+      "basis": "shared earliest observed confirmed plan; retrospective attribution, not actual policy path",
+      "shared_plan_id": "plan-v1:127953898125d5aca448dc2abf672336c08c6ce36c350fd5657bc20cf4cee790",
+      "shared_plan_known_at": "2026-10-22T06:27:40.475148030Z",
+      "actual_received_at": null,
+      "old": {
+        "observed_at": "2026-10-22T06:27:40.475148030Z",
+        "entry": 82591.1,
+        "stop": 82769.02325999999,
+        "target1": 82031.1242840934,
+        "target2": 81729.34317186996,
+        "status": "unresolved",
+        "outcome": {
+          "status": "unresolved",
+          "reason": "missing_or_invalid_outcome_bar",
+          "at": "2026-10-22T06:45:00+00:00"
+        },
+        "quantity_btc": 0.0309948650641534,
+        "net_pnl_model": null
+      },
+      "new": {
+        "observed_at": "2026-10-22T06:27:40.475148030Z",
+        "entry": 82591.1,
+        "stop": 82769.02325999999,
+        "target1": 82031.1242840934,
+        "target2": 81729.34317186996,
+        "status": "unresolved",
+        "outcome": {
+          "status": "unresolved",
+          "reason": "missing_or_invalid_outcome_bar",
+          "at": "2026-10-22T06:45:00+00:00"
+        },
+        "quantity_btc": 0.0309948650641534,
+        "net_pnl_model": null
+      },
+      "net_timing_difference": null,
+      "actual_plan_changes": {}
+    }
+  ],
+  "assumptions": "earliest observed S/T fixed for both actual retained entry quotes; Q capped by shared Q and same risk/margin budget; original fee/stop-slip/funding model; no account fills or funding verification"
+}

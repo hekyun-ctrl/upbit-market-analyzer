@@ -62,7 +62,12 @@ def main():
                     confirmation_evaluations=len(confirmations),
                     confirmation_status='evaluated' if confirmations else 'no_confirmation_evaluation_observed',
                     limitation=None if confirmations else 'No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.',
-                    recorded_rejections=[dict(phase=d['phase'],evaluated_at=d['evaluated_at'],reason=d['first_reject'],detail=d['plan_reject_detail']) for d in local if d['first_reject']])
+                    recorded_rejections=[dict(phase=d['phase'],evaluated_at=d['evaluated_at'],reason=d['first_reject'],detail=d['plan_reject_detail']) for d in local if d['first_reject']],
+                    simultaneous_other_event_actions=[dict(event_id=d['event_id'],phase=d['phase'],state=d['state'],evaluated_at=d['evaluated_at'],reason=d['first_reject'],detail=d['plan_reject_detail'])
+                        for d in decisions if d['scenario']==row['scenario'] and d['policy']==policy
+                        and d['event_id'] and d['event_id']!=row['event_id']
+                        and d['evaluated_at'] in {x['evaluated_at'] for x in local if x['phase']=='candidate'}
+                        and d['phase'] in ('candidate','alert_eligibility','confirmation')])
             accounting.append(dict(scenario=row['scenario'],comparison=row['comparison'],event_id=row['event_id'],group=row['group'],
                 confirmation_lead_seconds=row['confirmation_lead_seconds'] or None,
                 outcomes=json.loads(row['outcome_status']),
@@ -97,6 +102,24 @@ def main():
                 matching_basis='same exact source anchor; absent counterpart is unmatched, not a fabricated lead'))
     p1.write_json(OUT/'candidate_accounting.json',dict(detection=detection,comparisons=candidate_pairs,
         limitation='Repeated evaluations and nominal-delay variants are not independent market events. E4 retains capture momentum/context/RSI/risk checks; original E1/E3 factors remain separately declared.'))
+    flow=[]
+    for scenario,case in summary['experiments'].items():
+        for policy in case['arms']:
+            local=[d for d in decisions if d['scenario']==scenario and d['policy']==policy]
+            candidates=[d for d in local if d['phase']=='candidate']
+            confirmations=[d for d in local if d['phase']=='confirmation']
+            alerts=[c for c in cards if c['scenario']==scenario and c['policy']==policy]
+            phases={}
+            for phase in ('candidate','confirmation','alert_eligibility','watch_scheduling'):
+                failed=[d for d in local if d['phase']==phase and d['first_reject']]
+                phases[phase]={reason:dict(evaluations=sum((d['plan_reject_detail'] or d['first_reject'])==reason for d in failed),
+                    unique_events=len({d['event_id'] for d in failed if d['event_id'] and (d['plan_reject_detail'] or d['first_reject'])==reason}))
+                    for reason in sorted({d['plan_reject_detail'] or d['first_reject'] for d in failed})}
+            flow.append(dict(scenario=scenario,policy=policy,detected_unique_events=len({d['event_id'] for d in candidates if d['event_id']}),
+                candidate_qualified_unique_events=len({d['event_id'] for d in candidates if d['event_id'] and d['state']=='qualified'}),
+                confirmation_qualified_unique_events=len({d['event_id'] for d in confirmations if d['event_id'] and d['state']=='qualified'}),
+                alert_eligible_unique_events=len({c['event_id'] for c in alerts if c['event_id']}),
+                no_canonical_anchor_candidates=sum(not d['event_id'] for d in candidates),phase_rejections=phases))
     e4_rows=[]
     for scenario,case in summary['experiments'].items():
         for policy in case['arms']:
@@ -131,7 +154,7 @@ def main():
             signed_new_entry_worsening=worsening,common_discovery_atr1=atr,
             common_atr_basis='earliest E4 plan assessment known before both entries' if atr else 'unavailable',
             signed_worsening_common_atr1=worsening/atr if atr else None))
-    p1.write_json(OUT/'e4_gate_accounting.json',dict(evaluations=e4_rows,paired_entries=entry_distance,
+    p1.write_json(OUT/'e4_gate_accounting.json',dict(flow=flow,evaluations=e4_rows,paired_entries=entry_distance,
         limitations='Execution counts are repeated gate evaluations, not independent trades. Other gates may preempt E4; unexecuted E4 checks remain null. Current-ATR location check is unchanged PR21, common ATR attribution is separate.'))
     inputs=['comparison.json','trade_cards.json','trades.csv','opportunities.csv','gate_decisions.csv.gz','manifest.json','experiment_manifest.json']
     outputs=['fixed_plan_attribution.json','event_accounting.json','candidate_accounting.json','e4_gate_accounting.json']
