@@ -1,16 +1,13 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "checkpoint_complete_feature_incomplete",
+  "status": "implementation_in_progress",
   "lease": {
-    "owner": "zb-ledger-20261028-sole-worker",
-    "active": false,
-    "acquired_at": "2026-10-28T12:52:48.754373+00:00",
-    "expires_at": "2026-10-28T14:52:48.754373+00:00",
-    "expected_head": "1a30b248b2dae9eb16b16b28b756b65b379d16a8",
-    "released_at": "2026-10-28T13:12:10.385604+00:00",
-    "release_reason": "Disabled live EvidenceLedger hooks, additive migration, atomic restart/anchor causality, outage isolation, bounded nondeleting retention and verified archive implemented; full code/artifacts at9b0be7a,425-blob nontruncated remote tree matches local index. Whole feature/P3-P5 incomplete.",
-    "last_verified_head": "9b0be7aa99b4eefc72a7f2af1626d2c7824ed7d1"
+    "owner": "zb-sealed-importer-20261028-sole-worker",
+    "active": true,
+    "acquired_at": "2026-10-28T14:38:39.904347+00:00",
+    "expires_at": "2026-10-28T16:38:39.904347+00:00",
+    "expected_head": "8e2f3009d76de94f26269fa5ad1f3b2412e26f92"
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -3843,5 +3840,6 @@
     "artifact_commit": "9b0be7aa99b4eefc72a7f2af1626d2c7824ed7d1",
     "verified_tree": "7dd683a5c6afe28a2821f4aa5e32f6c8096f6384",
     "verified_nontruncated_blob_count": 425
-  }
+  },
+  "sealed_importer_started_at": "2026-10-28T14:38:39.904347+00:00"
 }

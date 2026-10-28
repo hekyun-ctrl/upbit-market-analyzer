@@ -216,3 +216,8 @@ artifact 저장용 test-report가 d의 list/dict 형태를 하나로 가정해1�
 운영b4c7d94/연구5ea63fe/PR21ce33a01/PR22d098f56은 시작과 같고 PR21/22/27은 open/draft/unmerged다. P1/E1/E3/E4/E5 원문·기존 E5의32×3/48개 대조·48개 최종출력 비교 증거와 별도 ZB EventStore/engine도 unchanged blob을 확인했다. RAW5M_INDEPENDENCE_UNVERIFIED·CANDLE_VOLUME_UNIT_UNVERIFIED, 공식 final/volume/독립5m/실수신 연속성·funding/체결 근거 부족은 그대로다. 수수료6/8bp·stop slip2/5bp·가정 funding1/3bp와 실제 funding0일, 수동/명목 지연 변형의 비독립성을 유지한다.1h/4h 참고뿐이며 수익 문턱 완화·100paper/30일 선행조건 추가가 없다. 발송·주문·배포·운영병합·Railway/Upbit·CAP·ZIL 변경·추가 작업자/모델 대체/자동화 생성 없음.
 
 다음 기술 작업은 sealed received-stream importer와 정확한 raw occurrence/revision→완료봉→snapshot의 causal binding 및 재시작/gap provenance다. P3 전체 실제 gate trace·독립 연속 상태/미사용 비교, 검토된 archive/retention 운영, P4 qualified review와 P5 승인된 적용은 남아 있다. 이번은 비활성 live 연결 코드의 로컬 구현/검증 완료이며 실제 운영 연결이 동작한다고 보고하지 않는다. 전체 기능·수익성 완료가 아니고 단일 lease만 해제했다.
+
+
+## Sealed received-stream importer lease
+
+Started 2026-10-28T14:38:39.904347+00:00. Actual production/research/PR21/22/27 heads and inactive lease verified. Sole worker, expected-head writes; baseline PR27 8e2f3009. Implement exact occurrence/revision/final-bar/snapshot causal binding with sealed bounded input, restart/gap provenance and fail-closed schema/final/receipt validation. Retained six forming frames remain unqualified. No policy changes, live activation, sends, orders, deployment or repeated completed comparisons. P3-P5 and source blockers remain.
