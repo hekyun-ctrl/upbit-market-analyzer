@@ -15,12 +15,12 @@ def row(start, volume=100000, value=1000000, close=3):
                 opening_price=3, high_price=max(3, close), low_price=min(3, close), trade_price=close)
 
 
-def bars(minutes=1, close=3.3):
+def bars(minutes=5, close=3.3):
     start = NOW - 3 - minutes * 60
     return [row(start - i * minutes * 60) for i in range(20, 0, -1)] + [row(start, 1000000, 40000000, close)]
 
 
-@pytest.mark.parametrize("minutes", [1, 5])
+@pytest.mark.parametrize("minutes", [5])
 @pytest.mark.parametrize("close", [2.7, 3, 3.3])
 def test_both_directions_and_flat_volume_alert(minutes, close):
     hits = detect(bars(minutes, close), minutes, NOW)
@@ -29,24 +29,24 @@ def test_both_directions_and_flat_volume_alert(minutes, close):
 
 def test_incomplete_future_old_and_low_value_excluded():
     b = bars()
-    assert not detect(b, 1, NOW - 5)
-    assert not detect(b, 1, NOW + 180)
-    b[-1]["candle_acc_trade_price"] = 9999999
-    assert not detect(b, 1, NOW)
+    assert not detect(b, 5, NOW - 5)
+    assert not detect(b, 5, NOW + 180)
+    b[-1]["candle_acc_trade_price"] = 29999999
+    assert not detect(b, 5, NOW)
 
 
 def test_sparse_baseline_disclosed_and_zero_baseline_excluded():
     b = bars()
-    b[0] = row(NOW - 7200)
-    assert detect(b, 1, NOW)[0]["sparse"]
+    b[0] = row(NOW - 10000)
+    assert detect(b, 5, NOW)[0]["sparse"]
     for r in b[:-1]:
         r["candle_acc_trade_volume"] = 0
-    assert not detect(b, 1, NOW)
+    assert not detect(b, 5, NOW)
 
 
 def test_prior_only_and_duplicate_rows():
     b = bars()
-    assert detect(b + [b[-1], row(NOW + 60, 1e10, 1e10)], 1, NOW)[0]["ratio"] == 10
+    assert detect(b + [b[-1], row(NOW + 60, 1e10, 1e10)], 5, NOW)[0]["ratio"] == 10
 
 
 def make_watcher(tmp_path):
@@ -60,14 +60,15 @@ def make_watcher(tmp_path):
     return ZilWatcher(dispatcher, audit, client), dispatcher
 
 
-def test_persistent_dedup_and_combines_intervals(tmp_path):
+def test_persistent_dedup_and_five_minute_only(tmp_path):
     watch, d = make_watcher(tmp_path)
     assert asyncio.run(watch.tick(NOW))
     assert d._deliver_telegram.await_count == 1
+    watch.client.candles.assert_awaited_once_with("KRW-ZIL", "minute5", 100)
     restored = ZilWatcher(d, AuditStore(str(tmp_path / "audit.sqlite3")), watch.client)
     asyncio.run(restored.tick(NOW + 60))
     assert d._deliver_telegram.await_count == 1
-    assert len(watch.audit.get("zil_watch_sent")) == 2
+    assert len(watch.audit.get("zil_watch_sent")) == 1
 
 
 def test_failure_retries_without_marking_sent(tmp_path):
@@ -92,13 +93,13 @@ def test_expiry_and_stale_ticker_prevent_send(tmp_path):
 
 
 def test_text_separates_observation_and_structure():
-    text = message(detect(bars(), 1, NOW), {"trade_price": 3.3}, NOW)
+    text = message(detect(bars(), 5, NOW), {"trade_price": 3.3}, NOW)
     assert "매수 신호가 아닙니다" in text
     assert "[질리카 거래량 급증]" in text and "직전 20개 완료봉 중앙값" in text
     for old in ("상승 동반", "하락 동반", "방향 불분명", "기존 저점", "1시간 흐름", "고정 기준"):
         assert old not in text
 
-@pytest.mark.parametrize("minutes,ratio,minimum", [(1,5,10000000),(5,3,30000000)])
+@pytest.mark.parametrize("minutes,ratio,minimum", [(5,3,30000000)])
 def test_original_threshold_boundaries_restored(minutes, ratio, minimum):
     b=bars(minutes)
     b[-1]["candle_acc_trade_volume"]=100000*ratio
@@ -114,7 +115,7 @@ def test_original_threshold_boundaries_restored(minutes, ratio, minimum):
 def test_retired_fixed_reference_variables_have_no_effect(monkeypatch):
     monkeypatch.setenv("ZIL_WATCH_REFERENCE_1M_VOLUME", "999999999999")
     monkeypatch.setenv("ZIL_WATCH_REFERENCE_5M_VOLUME", "999999999999")
-    assert detect(bars(),1,NOW)[0]["ratio"]==10
+    assert not detect(bars(1),1,NOW)
     assert detect(bars(5),5,NOW)[0]["ratio"]==10
 
 
@@ -126,3 +127,53 @@ def test_below_original_threshold_never_dispatches(tmp_path):
     watch.client.candles.side_effect=lambda *a,**k:low
     assert asyncio.run(watch.tick(NOW))
     dispatcher._deliver_telegram.assert_not_called()
+
+
+def test_rising_volume_bar_with_peak_retracement_explains_current_price():
+    b = bars(close=3.3)
+    b[-1]['high_price'] = 4
+    text = message(detect(b, 5, NOW), {'trade_price': 3.1}, NOW)
+    assert '급증봉 변동 +10.00%' in text
+    assert '고점 4원' in text and '대비 -22.50%' in text
+    assert '급증봉 종가 대비 -6.06%' in text
+    assert '고점에서 되밀린 가격' in text
+    assert '상승 지속을 뜻하지 않습니다' in text
+    assert '상승 동반' not in text and '하락 동반' not in text
+
+
+@pytest.mark.parametrize('current', [3.3, 3.4])
+def test_at_or_above_observed_peak_never_claims_retracement(current):
+    text = message(detect(bars(), 5, NOW), {'trade_price': current}, NOW)
+    assert '관측 고점 이상' in text
+    assert '되밀린' not in text
+
+
+def test_peak_uses_twenty_available_completed_bars_only():
+    b = bars()
+    b[0]['high_price'] = 100  # Baseline's oldest bar is outside peak's 20-bar window.
+    b[-2]['high_price'] = 3.6
+    forming = row(NOW - 3, 1e10, 1e10)
+    forming['high_price'] = 1000
+    hit, = detect(b + [forming, b[-2]], 5, NOW)
+    assert hit['reference_peak'] == 3.6 and hit['peak_window_bars'] == 20
+    assert hit['reference_peak_start'] < hit['start']
+
+
+def test_watcher_schedules_five_minute_boundaries(monkeypatch, tmp_path):
+    import zil_watch
+    watch, dispatcher = make_watcher(tmp_path)
+    active = [True]
+    delays = []
+
+    async def sleep(delay):
+        delays.append(delay)
+        active[0] = False
+
+    monkeypatch.setattr(zil_watch, 'UpbitPublicClient', lambda: watch.client)
+    monkeypatch.setattr(zil_watch, 'enabled', lambda: active[0])
+    monkeypatch.setattr(zil_watch.time, 'time', lambda: NOW)
+    monkeypatch.setattr(zil_watch.asyncio, 'sleep', sleep)
+    asyncio.run(zil_watch.run_zil_watch(dispatcher, watch.audit))
+    assert delays == [300]
+    watch.client.candles.assert_awaited_once_with('KRW-ZIL', 'minute5', 100)
+    watch.client.close.assert_awaited_once()
