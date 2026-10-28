@@ -8,6 +8,7 @@ import json
 import csv
 import gzip
 import sys
+from collections import Counter
 from pathlib import Path
 from unittest.mock import patch
 
@@ -67,10 +68,40 @@ def main():
                 outcomes=json.loads(row['outcome_status']),
                 actual_policy_net_model=json.loads(row['net_pnl_model']),policies=facts))
     p1.write_json(OUT/'event_accounting.json',accounting)
-    inputs=['comparison.json','trade_cards.json','trades.csv','gate_decisions.csv.gz','manifest.json','experiment_manifest.json']
-    outputs=['fixed_plan_attribution.json','event_accounting.json']
+    with (OUT/'opportunities.csv').open(newline='') as source:
+        opportunities=list(csv.DictReader(source))
+    detection=[]
+    candidate_pairs=[]
+    for scenario,case in summary['experiments'].items():
+        for policy in case['arms']:
+            local=[d for d in decisions if d['scenario']==scenario and d['policy']==policy
+                   and d['phase']=='candidate' and json.loads(d.get('e1_detection') or 'null')]
+            detection.append(dict(scenario=scenario,policy=policy,
+                first_retest_evaluations=len(local),
+                first_retest_unique_events=len({d['event_id'] for d in local if d['event_id']}),
+                qualified_evaluations=sum(d['state']=='qualified' for d in local),
+                first_reject=dict(Counter(d['first_reject'] for d in local if d['first_reject'])),
+                rejection_detail=dict(Counter(d['plan_reject_detail'] or d['first_reject'] for d in local if d['first_reject'])),
+                detector_sources=dict(Counter(json.loads(d['e1_detection'])['source'] for d in local)),
+                final_first_retest_alerts=sum(bool(c['plan'].get('_p2_e1_detection')) for c in cards
+                    if c['scenario']==scenario and c['policy']==policy)))
+        for old,new in json.loads(experiment.DECLARATION.read_text())['comparison_pairs']:
+            name=old+'_vs_'+new
+            local=[r for r in opportunities if r['scenario']==scenario and r['comparison']==name]
+            common=[r for r in local if r['old_candidate_at'] and r['new_candidate_at']]
+            candidate_pairs.append(dict(scenario=scenario,comparison=name,
+                common_events=len(common),
+                old_only_events=sum(bool(r['old_candidate_at']) and not r['new_candidate_at'] for r in local),
+                new_only_events=sum(bool(r['new_candidate_at']) and not r['old_candidate_at'] for r in local),
+                candidate_lead_seconds=[float(r['candidate_lead_seconds']) for r in common],
+                matching_basis='same exact source anchor; absent counterpart is unmatched, not a fabricated lead'))
+    p1.write_json(OUT/'candidate_accounting.json',dict(detection=detection,comparisons=candidate_pairs,
+        limitation='Repeated evaluations and nominal-delay variants are not independent market events. E1 retains capture momentum/context/RSI/risk checks.'))
+    inputs=['comparison.json','trade_cards.json','trades.csv','opportunities.csv','gate_decisions.csv.gz','manifest.json','experiment_manifest.json']
+    outputs=['fixed_plan_attribution.json','event_accounting.json','candidate_accounting.json']
     p1.write_json(OUT/'report_manifest.json',dict(command='python research/render_first_retest_report.py',
-        code_sha256={str(Path(__file__).relative_to(ROOT)):hashlib.sha256(Path(__file__).read_bytes()).hexdigest()},
+        code_sha256={path:hashlib.sha256((ROOT/path).read_bytes()).hexdigest() for path in
+            ('research/render_first_retest_report.py','research/render_confirmation_report.py')},
         input_sha256={name:hashlib.sha256((OUT/name).read_bytes()).hexdigest() for name in inputs},
         output_sha256={name:hashlib.sha256((OUT/name).read_bytes()).hexdigest() for name in outputs}))
     return rows
