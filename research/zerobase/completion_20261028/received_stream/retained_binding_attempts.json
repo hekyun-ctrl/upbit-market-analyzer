@@ -1,0 +1,53 @@
+{
+  "attempts": [
+    {
+      "bar_index": 0,
+      "occurrence_seq": 2,
+      "period": 300,
+      "reason": "FINAL_RECEIPT_UNVERIFIED",
+      "result": "rejected"
+    },
+    {
+      "bar_index": 0,
+      "occurrence_seq": 3,
+      "period": 60,
+      "reason": "FINAL_RECEIPT_UNVERIFIED",
+      "result": "rejected"
+    },
+    {
+      "bar_index": 0,
+      "occurrence_seq": 4,
+      "period": 60,
+      "reason": "FINAL_RECEIPT_UNVERIFIED",
+      "result": "rejected"
+    },
+    {
+      "bar_index": 0,
+      "occurrence_seq": 7,
+      "period": 300,
+      "reason": "FINAL_RECEIPT_UNVERIFIED",
+      "result": "rejected"
+    },
+    {
+      "bar_index": 0,
+      "occurrence_seq": 8,
+      "period": 60,
+      "reason": "FINAL_RECEIPT_UNVERIFIED",
+      "result": "rejected"
+    },
+    {
+      "bar_index": 0,
+      "occurrence_seq": 9,
+      "period": 60,
+      "reason": "FINAL_RECEIPT_UNVERIFIED",
+      "result": "rejected"
+    }
+  ],
+  "evaluated_at": "2026-10-28T14:50:44.643189+00:00",
+  "evaluation_basis": "current_offline_evaluation; not a historical receive timestamp",
+  "profitability_validated": false,
+  "raw_receipts_fabricated": false,
+  "remaining_records": 10,
+  "remaining_snapshots": 0,
+  "schema": "retained_final_binding_attempts_v1"
+}
