@@ -1,12 +1,14 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "in_progress_E4_research",
+  "status": "checkpoint_complete_feature_incomplete",
   "lease": {
     "owner": "zb-e4-20261028-sole-worker",
-    "active": true,
+    "active": false,
     "acquired_at": "2026-10-28T09:30:48.819727+00:00",
-    "expires_at": "2026-10-28T11:30:48.819727+00:00"
+    "expires_at": "2026-10-28T11:30:48.819727+00:00",
+    "released_at": "2026-10-28T09:49:30.321965+00:00",
+    "release_reason": "E4 isolated implementation and sixteen-arm comparison complete; all19 uploaded artifact blob hashes and entire fetched tree verified; sole worker checkpoint ended"
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -28,16 +30,19 @@
     "92 related tests including19 new synthetic E3/attribution/scheduling regressions; final code, raw CSV and report hashes verified; no live activation",
     "P2 E1 first-retest detector-only research adapter using unchanged PR21 detector; capture momentum/context/RSI/cost/risk and30s default retained, no bundled location mode",
     "Predeclared8-arm E1×E3×target-panel development comparison;12 original full control outputs reproduced,12 E1 final-alert outputs unchanged; all candidate/rejection/matching/outcome artifacts preserved",
-    "44 targeted tests including10 new synthetic E1 isolation cases; remote16 artifact blobs and entire fetched tree match local; no live activation"
+    "44 targeted tests including10 new synthetic E1 isolation cases; remote16 artifact blobs and entire fetched tree match local; no live activation",
+    "P2 E4 research-only unchanged PR21 location/chase check and removal of single-pivot barrier exception only inside plan calculation; no production/core P1/E1/E3 changes",
+    "Predeclared16-arm E4×E1×E3×target-panel development comparison;24 original full control arm-scenario windows exactly reproduced; full exclusions/additions, peer selection, fixed-plan timing/common ATR and manual-delay evidence retained",
+    "59 distinct related tests (58-test run including14 new E4 plus1 new exact-boundary test);15 new E4 total; hashes/zero-null semantics and19 uploaded artifact blob hashes/entire fetched tree verified"
   ],
   "blockers": [
     "RAW5M_INDEPENDENCE_UNVERIFIED",
     "CANDLE_VOLUME_UNIT_UNVERIFIED"
   ],
-  "next_work": "Implement and compare predeclared E4 nearby known-barrier exception/chase only with frozen E1/E3/target panels; preserve full outputs and release lease. E5/live ledger/P3-P5 remain.",
+  "next_work": "Acquire latest heads/new sole lease, predeclare and implement E5 early-reversal route per actual design (observed support/resistance sweep/reclaim, completed1m recovery structure and small opposite high/low break; RSI/5m15m trend explanatory rather than all mandatory). Freeze hard data/cost/structural-risk/RR/targets and compare isolated E5 plus necessary E1/E3/E4/target interactions without tuning reused outcomes. Separately implement failure-isolated live EvidenceLedger migration/restart/outage/bounded retention. P3-P5 and qualified data remain incomplete; no sends/orders/deploy.",
   "outbound": false,
   "orders": false,
-  "ended_at": "2026-10-28T08:25:19.509976+00:00",
+  "ended_at": "2026-10-28T09:49:30.321965+00:00",
   "started_at_precision": "minute",
   "evidence_commits": {
     "lease": "f57b995bb7af938a200fb9d3c3ba4ad4499e76a0",
@@ -50,7 +55,11 @@
     "p2_implementation": "a9f4eddbe6be77070da701ed1c7b3c0afeb2ebd6",
     "e1_lease_predeclaration": "be8191e9f9280acd207ce9c95ae966c754b6b2d8",
     "e1_code": "546bd05a573761fd9adedd76f2bd45da81370663",
-    "e1_comparison_artifacts": "097a07193e9e75b792300c9658bb547adecc2132"
+    "e1_comparison_artifacts": "097a07193e9e75b792300c9658bb547adecc2132",
+    "e4_lease_predeclaration": "116f43b7a89a5c6a6080b23062f703a3f656010e",
+    "e4_code": "9b7aa8a441455d07cf60c3477dc6ed223745e706",
+    "e4_reporting_checkpoint": "0b6348d18d633e06db47b68efd4aa290bae0ee3d",
+    "e4_comparison_artifacts": "b97a75c97d154b59561f396750c42c7da15acb0c"
   },
   "pr": {
     "number": 27,
@@ -68,9 +77,9 @@
   "stages": {
     "P0": "research ledger/replay complete only",
     "P1": "research implementation complete; alert utility/profitability unproven, not production qualified",
-    "P2": "E1 detection-only and E3 standalone plus E1/E3 interaction research comparison complete in both target panels; E4/E5 and further combinations incomplete",
+    "P2": "E1 detection-only, E3 and E4 standalone plus E1/E3/E4 interactions research comparison complete in both frozen target panels; E5 and its combinations incomplete",
     "P3": "real continuous received-time comparison remains blocked",
-    "P4": "not qualified; E3 legacy-target panel has unresolved outcomes, P1/P1+E3 no entries; economic improvement unproven",
+    "P4": "not qualified; E4 legacy-target base0/base15 entered outcomes unresolved; E3+E4 has1SL+1unresolved; P1 combinations no entries; economic improvement unproven",
     "P5": "not performed or authorized",
     "live_ledger": "integration, migration, outage isolation and bounded retention remain incomplete"
   },
@@ -131,7 +140,7 @@
     }
   },
   "technical_remaining": [
-    "P2: E4 and E5 isolated factors and necessary combinations; E1 detector-only retains capture momentum and does not implement every PR21 bundled behavior",
+    "P2: E5 isolated early-reversal route and necessary combinations; E1 remains detector-only, E4 is a joint barrier/chase factor with actual sample barrier effect masked by chase",
     "Connect live EvidenceLedger through failure-isolated adapter; migration/restart/outage/retention remain",
     "P3: unseen continuous same-data true-receipt comparison; P4 qualified evidence review and P5 authorized application remain"
   ],
@@ -175,7 +184,10 @@
     "p2_validation": "research/zerobase/completion_20261028/p2/validation.json",
     "e1_manifest": "research/zerobase/completion_20261028/p2_e1/manifest.json",
     "e1_report_manifest": "research/zerobase/completion_20261028/p2_e1/report_manifest.json",
-    "e1_validation": "research/zerobase/completion_20261028/p2_e1/validation.json"
+    "e1_validation": "research/zerobase/completion_20261028/p2_e1/validation.json",
+    "e4_manifest": "research/zerobase/completion_20261028/p2_e4/manifest.json",
+    "e4_report_manifest": "research/zerobase/completion_20261028/p2_e4/report_manifest.json",
+    "e4_validation": "research/zerobase/completion_20261028/p2_e4/validation.json"
   },
   "deployment_performed": false,
   "production_merge": false,
@@ -1265,5 +1277,1191 @@
     "duplicate_worker_or_automation_created": false
   },
   "e4_started_at": "2026-10-28T09:30:48.819727+00:00",
-  "e4_source_checkpoint": "7c8fb9b2f1c6a0b74f7b2de41a0f0141c73844c3"
+  "e4_source_checkpoint": "7c8fb9b2f1c6a0b74f7b2de41a0f0141c73844c3",
+  "e4_ended_at": "2026-10-28T09:49:30.321965+00:00",
+  "e4_result": {
+    "base_delay0": {
+      "arms": {
+        "capture": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 67,
+          "qualified_candidate_bars": 8,
+          "modeled_alerts": 3,
+          "outcome_status": {
+            "exact_in_model": 3
+          },
+          "resolved_only_net_low": -28.07791962494808,
+          "resolved_only_net_high": -28.07791962494808,
+          "total_net_usdt": -28.07791962494808,
+          "closed_trade_drawdown_usdt": 28.07791962494808,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 3,
+          "stop_first_count": 3,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 0.0,
+          "immediate_confirmations": 0
+        },
+        "capture_e3": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 67,
+          "qualified_candidate_bars": 8,
+          "modeled_alerts": 5,
+          "outcome_status": {
+            "unresolved": 2,
+            "exact_in_model": 3
+          },
+          "resolved_only_net_low": -28.077582652338823,
+          "resolved_only_net_high": -28.077582652338823,
+          "total_net_usdt": null,
+          "closed_trade_drawdown_usdt": null,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 5,
+          "stop_first_count": 3,
+          "stop_first_unknown_count": 2,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 0.4,
+          "immediate_confirmations": 4
+        },
+        "structural_p1": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 67,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e3": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 67,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "capture_e1": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 77,
+          "qualified_candidate_bars": 8,
+          "modeled_alerts": 3,
+          "outcome_status": {
+            "exact_in_model": 3
+          },
+          "resolved_only_net_low": -28.07791962494808,
+          "resolved_only_net_high": -28.07791962494808,
+          "total_net_usdt": -28.07791962494808,
+          "closed_trade_drawdown_usdt": 28.07791962494808,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 3,
+          "stop_first_count": 3,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 0.0,
+          "immediate_confirmations": 0
+        },
+        "capture_e1_e3": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 77,
+          "qualified_candidate_bars": 8,
+          "modeled_alerts": 5,
+          "outcome_status": {
+            "unresolved": 2,
+            "exact_in_model": 3
+          },
+          "resolved_only_net_low": -28.077582652338823,
+          "resolved_only_net_high": -28.077582652338823,
+          "total_net_usdt": null,
+          "closed_trade_drawdown_usdt": null,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 5,
+          "stop_first_count": 3,
+          "stop_first_unknown_count": 2,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 0.4,
+          "immediate_confirmations": 4
+        },
+        "structural_p1_e1": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 77,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e1_e3": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 77,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "capture_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 67,
+          "qualified_candidate_bars": 3,
+          "modeled_alerts": 1,
+          "outcome_status": {
+            "unresolved": 1
+          },
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": null,
+          "closed_trade_drawdown_usdt": null,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 1,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 1,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 1.0,
+          "immediate_confirmations": 0
+        },
+        "capture_e3_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 67,
+          "qualified_candidate_bars": 3,
+          "modeled_alerts": 2,
+          "outcome_status": {
+            "exact_in_model": 1,
+            "unresolved": 1
+          },
+          "resolved_only_net_low": -9.359422340183945,
+          "resolved_only_net_high": -9.359422340183945,
+          "total_net_usdt": null,
+          "closed_trade_drawdown_usdt": null,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 2,
+          "stop_first_count": 1,
+          "stop_first_unknown_count": 1,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 0.5,
+          "immediate_confirmations": 2
+        },
+        "structural_p1_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 67,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e3_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 67,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "capture_e1_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 77,
+          "qualified_candidate_bars": 3,
+          "modeled_alerts": 1,
+          "outcome_status": {
+            "unresolved": 1
+          },
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": null,
+          "closed_trade_drawdown_usdt": null,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 1,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 1,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 1.0,
+          "immediate_confirmations": 0
+        },
+        "capture_e1_e3_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 77,
+          "qualified_candidate_bars": 3,
+          "modeled_alerts": 2,
+          "outcome_status": {
+            "exact_in_model": 1,
+            "unresolved": 1
+          },
+          "resolved_only_net_low": -9.359422340183945,
+          "resolved_only_net_high": -9.359422340183945,
+          "total_net_usdt": null,
+          "closed_trade_drawdown_usdt": null,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 2,
+          "stop_first_count": 1,
+          "stop_first_unknown_count": 1,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 0.5,
+          "immediate_confirmations": 2
+        },
+        "structural_p1_e1_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 77,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e1_e3_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 77,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        }
+      },
+      "comparisons": {
+        "capture_vs_capture_e4": {
+          "pairing": {
+            "excluded": 3,
+            "added": 1
+          },
+          "confirmation_lead_seconds": []
+        },
+        "capture_e3_vs_capture_e3_e4": {
+          "pairing": {
+            "excluded": 4,
+            "added": 1,
+            "matched": 1
+          },
+          "confirmation_lead_seconds": [
+            0.0
+          ]
+        },
+        "structural_p1_vs_structural_p1_e4": {
+          "pairing": {},
+          "confirmation_lead_seconds": []
+        },
+        "structural_p1_e3_vs_structural_p1_e3_e4": {
+          "pairing": {},
+          "confirmation_lead_seconds": []
+        },
+        "capture_e1_vs_capture_e1_e4": {
+          "pairing": {
+            "excluded": 3,
+            "added": 1
+          },
+          "confirmation_lead_seconds": []
+        },
+        "capture_e1_e3_vs_capture_e1_e3_e4": {
+          "pairing": {
+            "excluded": 4,
+            "added": 1,
+            "matched": 1
+          },
+          "confirmation_lead_seconds": [
+            0.0
+          ]
+        },
+        "structural_p1_e1_vs_structural_p1_e1_e4": {
+          "pairing": {},
+          "confirmation_lead_seconds": []
+        },
+        "structural_p1_e1_e3_vs_structural_p1_e1_e3_e4": {
+          "pairing": {},
+          "confirmation_lead_seconds": []
+        }
+      }
+    },
+    "base_delay15": {
+      "arms": {
+        "capture": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 53,
+          "qualified_candidate_bars": 6,
+          "modeled_alerts": 2,
+          "outcome_status": {
+            "exact_in_model": 2
+          },
+          "resolved_only_net_low": -18.71863977838745,
+          "resolved_only_net_high": -18.71863977838745,
+          "total_net_usdt": -18.71863977838745,
+          "closed_trade_drawdown_usdt": 18.71863977838745,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 2,
+          "stop_first_count": 2,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 0.0,
+          "immediate_confirmations": 0
+        },
+        "capture_e3": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 53,
+          "qualified_candidate_bars": 6,
+          "modeled_alerts": 4,
+          "outcome_status": {
+            "unresolved": 2,
+            "exact_in_model": 2
+          },
+          "resolved_only_net_low": -18.718210898477167,
+          "resolved_only_net_high": -18.718210898477167,
+          "total_net_usdt": null,
+          "closed_trade_drawdown_usdt": null,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 4,
+          "stop_first_count": 2,
+          "stop_first_unknown_count": 2,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 0.5,
+          "immediate_confirmations": 4
+        },
+        "structural_p1": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 53,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e3": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 53,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "capture_e1": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 59,
+          "qualified_candidate_bars": 6,
+          "modeled_alerts": 2,
+          "outcome_status": {
+            "exact_in_model": 2
+          },
+          "resolved_only_net_low": -18.71863977838745,
+          "resolved_only_net_high": -18.71863977838745,
+          "total_net_usdt": -18.71863977838745,
+          "closed_trade_drawdown_usdt": 18.71863977838745,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 2,
+          "stop_first_count": 2,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 0.0,
+          "immediate_confirmations": 0
+        },
+        "capture_e1_e3": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 59,
+          "qualified_candidate_bars": 6,
+          "modeled_alerts": 4,
+          "outcome_status": {
+            "unresolved": 2,
+            "exact_in_model": 2
+          },
+          "resolved_only_net_low": -18.718210898477167,
+          "resolved_only_net_high": -18.718210898477167,
+          "total_net_usdt": null,
+          "closed_trade_drawdown_usdt": null,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 4,
+          "stop_first_count": 2,
+          "stop_first_unknown_count": 2,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 0.5,
+          "immediate_confirmations": 4
+        },
+        "structural_p1_e1": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 59,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e1_e3": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 59,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "capture_e4": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 53,
+          "qualified_candidate_bars": 2,
+          "modeled_alerts": 1,
+          "outcome_status": {
+            "unresolved": 1
+          },
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": null,
+          "closed_trade_drawdown_usdt": null,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 1,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 1,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 1.0,
+          "immediate_confirmations": 0
+        },
+        "capture_e3_e4": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 53,
+          "qualified_candidate_bars": 2,
+          "modeled_alerts": 2,
+          "outcome_status": {
+            "exact_in_model": 1,
+            "unresolved": 1
+          },
+          "resolved_only_net_low": -9.358853512730962,
+          "resolved_only_net_high": -9.358853512730962,
+          "total_net_usdt": null,
+          "closed_trade_drawdown_usdt": null,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 2,
+          "stop_first_count": 1,
+          "stop_first_unknown_count": 1,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 0.5,
+          "immediate_confirmations": 2
+        },
+        "structural_p1_e4": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 53,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e3_e4": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 53,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "capture_e1_e4": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 59,
+          "qualified_candidate_bars": 2,
+          "modeled_alerts": 1,
+          "outcome_status": {
+            "unresolved": 1
+          },
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": null,
+          "closed_trade_drawdown_usdt": null,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 1,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 1,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 1.0,
+          "immediate_confirmations": 0
+        },
+        "capture_e1_e3_e4": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 59,
+          "qualified_candidate_bars": 2,
+          "modeled_alerts": 2,
+          "outcome_status": {
+            "exact_in_model": 1,
+            "unresolved": 1
+          },
+          "resolved_only_net_low": -9.358853512730962,
+          "resolved_only_net_high": -9.358853512730962,
+          "total_net_usdt": null,
+          "closed_trade_drawdown_usdt": null,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 2,
+          "stop_first_count": 1,
+          "stop_first_unknown_count": 1,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 0.5,
+          "immediate_confirmations": 2
+        },
+        "structural_p1_e1_e4": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 59,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e1_e3_e4": {
+          "ready_observations": 571,
+          "raw_candidate_bar_families": 59,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        }
+      },
+      "comparisons": {
+        "capture_vs_capture_e4": {
+          "pairing": {
+            "excluded": 2,
+            "added": 1
+          },
+          "confirmation_lead_seconds": []
+        },
+        "capture_e3_vs_capture_e3_e4": {
+          "pairing": {
+            "matched": 2,
+            "excluded": 2
+          },
+          "confirmation_lead_seconds": [
+            0.0,
+            0.0
+          ]
+        },
+        "structural_p1_vs_structural_p1_e4": {
+          "pairing": {},
+          "confirmation_lead_seconds": []
+        },
+        "structural_p1_e3_vs_structural_p1_e3_e4": {
+          "pairing": {},
+          "confirmation_lead_seconds": []
+        },
+        "capture_e1_vs_capture_e1_e4": {
+          "pairing": {
+            "excluded": 2,
+            "added": 1
+          },
+          "confirmation_lead_seconds": []
+        },
+        "capture_e1_e3_vs_capture_e1_e3_e4": {
+          "pairing": {
+            "matched": 2,
+            "excluded": 2
+          },
+          "confirmation_lead_seconds": [
+            0.0,
+            0.0
+          ]
+        },
+        "structural_p1_e1_vs_structural_p1_e1_e4": {
+          "pairing": {},
+          "confirmation_lead_seconds": []
+        },
+        "structural_p1_e1_e3_vs_structural_p1_e1_e3_e4": {
+          "pairing": {},
+          "confirmation_lead_seconds": []
+        }
+      }
+    },
+    "adverse_delay0": {
+      "arms": {
+        "capture": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 65,
+          "qualified_candidate_bars": 1,
+          "modeled_alerts": 1,
+          "outcome_status": {
+            "exact_in_model": 1
+          },
+          "resolved_only_net_low": -9.358642725245979,
+          "resolved_only_net_high": -9.358642725245979,
+          "total_net_usdt": -9.358642725245979,
+          "closed_trade_drawdown_usdt": 9.358642725245979,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 1,
+          "stop_first_count": 1,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 0.0,
+          "immediate_confirmations": 0
+        },
+        "capture_e3": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 65,
+          "qualified_candidate_bars": 1,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 65,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e3": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 65,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "capture_e1": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 75,
+          "qualified_candidate_bars": 1,
+          "modeled_alerts": 1,
+          "outcome_status": {
+            "exact_in_model": 1
+          },
+          "resolved_only_net_low": -9.358642725245979,
+          "resolved_only_net_high": -9.358642725245979,
+          "total_net_usdt": -9.358642725245979,
+          "closed_trade_drawdown_usdt": 9.358642725245979,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 1,
+          "stop_first_count": 1,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": 0.0,
+          "immediate_confirmations": 0
+        },
+        "capture_e1_e3": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 75,
+          "qualified_candidate_bars": 1,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e1": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 75,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e1_e3": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 75,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "capture_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 65,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "capture_e3_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 65,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 65,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e3_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 65,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "capture_e1_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 75,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "capture_e1_e3_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 75,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e1_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 75,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        },
+        "structural_p1_e1_e3_e4": {
+          "ready_observations": 763,
+          "raw_candidate_bar_families": 75,
+          "qualified_candidate_bars": 0,
+          "modeled_alerts": 0,
+          "outcome_status": {},
+          "resolved_only_net_low": 0,
+          "resolved_only_net_high": 0,
+          "total_net_usdt": 0.0,
+          "closed_trade_drawdown_usdt": 0.0,
+          "full_mark_to_market_drawdown_available": false,
+          "trade_count": 0,
+          "stop_first_count": 0,
+          "stop_first_unknown_count": 0,
+          "emergency_count": null,
+          "full_mtm_drawdown": null,
+          "unresolved_ratio": null,
+          "immediate_confirmations": 0
+        }
+      },
+      "comparisons": {
+        "capture_vs_capture_e4": {
+          "pairing": {
+            "excluded": 1
+          },
+          "confirmation_lead_seconds": []
+        },
+        "capture_e3_vs_capture_e3_e4": {
+          "pairing": {},
+          "confirmation_lead_seconds": []
+        },
+        "structural_p1_vs_structural_p1_e4": {
+          "pairing": {},
+          "confirmation_lead_seconds": []
+        },
+        "structural_p1_e3_vs_structural_p1_e3_e4": {
+          "pairing": {},
+          "confirmation_lead_seconds": []
+        },
+        "capture_e1_vs_capture_e1_e4": {
+          "pairing": {
+            "excluded": 1
+          },
+          "confirmation_lead_seconds": []
+        },
+        "capture_e1_e3_vs_capture_e1_e3_e4": {
+          "pairing": {},
+          "confirmation_lead_seconds": []
+        },
+        "structural_p1_e1_vs_structural_p1_e1_e4": {
+          "pairing": {},
+          "confirmation_lead_seconds": []
+        },
+        "structural_p1_e1_e3_vs_structural_p1_e1_e3_e4": {
+          "pairing": {},
+          "confirmation_lead_seconds": []
+        }
+      }
+    }
+  },
+  "e4_interpretation": {
+    "e1_final_e4_outputs_unchanged": true,
+    "common_e4_confirmation_leads_seconds": [
+      0
+    ],
+    "economic_improvement_demonstrated": false,
+    "base0_capture_excluded_stop_first": 3,
+    "base0_capture_added_unresolved": 1,
+    "base0_e3_excluded_stop_first": 3,
+    "base0_e3_excluded_unresolved": 1,
+    "base0_e3_added_stop_first": 1,
+    "base0_e3_matched_unresolved": 1,
+    "base0_e4_cause": "Old3 signals first fail location/chase. E3 added breakout was already a qualified same-side baseline candidate; existing priority selected a trend-retest that E4 blocks. E4-only added unresolved event reflects earlier location failure retaining an original watch before the later breakout-freshness cancellation could run; unchanged scheduling later confirms.",
+    "original_true_pivot_override_seen_after_chase": 0,
+    "barrier_effect": "No new actual barrier-only removal can be established because location preempts true-override paths; synthetic tests verify reachable disabling. Counts of native barrier rejections are not all new E4 exclusions.",
+    "no_entry_is_profitability": false,
+    "reused_development_data": true,
+    "unseen_data": false
+  },
+  "e4_commands": [
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_barrier_chase_experiment test_lbank_first_retest_experiment test_lbank_confirmation_experiment test_lbank_entry_location test_lbank_structural_comparison -q",
+      "exit_code": 0,
+      "tests": 58,
+      "new_tests": 14
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_barrier_chase_experiment.E4Tests.test_exact_location_limit_is_inclusive -q",
+      "exit_code": 0,
+      "tests": 1,
+      "new_tests": 1
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/compare_barrier_chase_experiment.py",
+      "exit_code": 0
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/render_barrier_chase_report.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python research/validate_barrier_chase_experiment.py",
+      "exit_code": 0
+    },
+    {
+      "command": "git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --cached --check",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --cached --check",
+      "exit_code": 2,
+      "reason": "Standard csv.DictWriter CRLF treated as trailing whitespace by default; CRLF-aware check passes with original artifact bytes unchanged"
+    }
+  ],
+  "e4_remote_verification": {
+    "checked_at": "2026-10-28T09:49:30.321965+00:00",
+    "fetched_artifact_commit": "b97a75c97d154b59561f396750c42c7da15acb0c",
+    "tree_sha": "4843c3f5153b9b3dca009fbd56084d5fa0e4b00e",
+    "entire_remote_tree_equal_local": true,
+    "remote_tree_entries": 405,
+    "remote_tree_truncated": false,
+    "uploaded_artifact_blob_shas_verified": 19,
+    "original_control_arm_scenarios_full_window_exact": 24,
+    "all_code_input_output_and_decompressed_csv_hashes_match": true,
+    "distinct_related_tests": 59,
+    "new_tests": 15,
+    "replay_repeated": false,
+    "source_probes_repeated": false,
+    "duplicate_worker_or_automation_created": false,
+    "exec_transport_disconnect_recovered": true,
+    "standard_csv_crlf_default_check": 2,
+    "crlf_aware_staged_whitespace_check": 0
+  }
 }
