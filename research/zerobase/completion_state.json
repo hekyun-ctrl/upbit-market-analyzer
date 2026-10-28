@@ -6,7 +6,8 @@
     "owner": "zb-next-p2-20261028-sole-worker",
     "active": true,
     "acquired_at": "2026-10-28T04:20:48.403976+00:00",
-    "expires_at": "2026-10-28T05:50:48.403976+00:00"
+    "expires_at": "2026-10-28T08:01:03.129Z",
+    "resumed_at": "2026-10-28T07:16:03.129Z"
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -205,5 +206,6 @@
     "duplicate_worker_started": false
   },
   "p2_started_at": "2026-10-28T04:20:48.403976+00:00",
-  "p2_source_checkpoint": "669ea78c524ba1c7e56225517594d9f82d888472"
+  "p2_source_checkpoint": "669ea78c524ba1c7e56225517594d9f82d888472",
+  "resume_reason": "same sole worker resumed after usage-limit interruption; original lease expired; head unchanged and no other active owner"
 }
