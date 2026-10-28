@@ -1,12 +1,14 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "in_progress",
+  "status": "checkpoint_complete_feature_incomplete",
   "lease": {
     "owner": "zb-completion-20261028-sole-worker",
     "acquired_at": "2026-10-28T03:22:00Z",
     "expires_at": "2026-10-28T05:22:00Z",
-    "active": true
+    "active": false,
+    "released_at": "2026-10-28T03:41:47.562197+00:00",
+    "release_reason": "implementation and evidence checkpoint persisted; no active worker after handoff"
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -15,14 +17,155 @@
     "pr22": "d098f5657d823769f468846df1fac5ec04986d0e"
   },
   "completed": [
-    "latest heads and PR states read",
-    "P0 design and evidence read"
+    "Read latest four branch heads, PR21/22 states and required P0 design/evidence",
+    "Finite public official HTTP/WS probes and six raw forming chart-feed frames; exact UTC/raw hashes and reconnect revisions preserved",
+    "P1-only nearest unbreached structural target, cost-aware inverse entry bound, frozen stop/target and receipt availability handling",
+    "Quantity/tick/minimum checks with explicitly assumed old public instrument metadata",
+    "Same-data capture versus P1 replay, exact base0/base15 capture preservation, adverse-cost and same-trade manual-delay scenarios",
+    "121 targeted tests including17 new synthetic P1 cases; manifests/decompressed CSV hashes validated",
+    "Remote implementation, full evidence and draft PR27"
   ],
   "blockers": [
     "RAW5M_INDEPENDENCE_UNVERIFIED",
     "CANDLE_VOLUME_UNIT_UNVERIFIED"
   ],
-  "next_work": "P1 structural target only; official-source bounded read probes; same-data replay",
+  "next_work": "P2 independent detection/confirmation experiment manifest and live ledger failure-isolated adapter can progress in code while official candle/volume and continuous-data evidence waits.",
   "outbound": false,
-  "orders": false
+  "orders": false,
+  "ended_at": "2026-10-28T03:41:47.562197+00:00",
+  "started_at_precision": "minute",
+  "evidence_commits": {
+    "lease": "f57b995bb7af938a200fb9d3c3ba4ad4499e76a0",
+    "implementation": "8d31e21fcaee1fd2a0faeda90a5795f6208c2d6c",
+    "artifact_bytes": "8c4aa41238d0eae53b1e922b93fafc6c17bb07de"
+  },
+  "pr": {
+    "number": 27,
+    "url": "https://github.com/hekyun-ctrl/upbit-market-analyzer/pull/27",
+    "draft": true,
+    "merged": false,
+    "base": "research/trade-evidence-p0-20261025"
+  },
+  "end_base_heads": {
+    "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
+    "research": "5ea63fea7fb5a312a99702535c31d4dccd8155fd",
+    "pr21": "ce33a017ff6aca0729175a8f88c3ec978f4a84a2",
+    "pr22": "d098f5657d823769f468846df1fac5ec04986d0e"
+  },
+  "stages": {
+    "P0": "research ledger/replay complete only",
+    "P1": "research implementation complete; alert utility/profitability unproven, not production qualified",
+    "P2": "separate detection/confirmation experiments remain",
+    "P3": "real continuous received-time comparison remains blocked",
+    "P4": "not qualified; P1 produces no alerts in development replay",
+    "P5": "not performed or authorized",
+    "live_ledger": "integration, migration, outage isolation and bounded retention remain incomplete"
+  },
+  "result": {
+    "base_delay0": {
+      "capture_trades": 3,
+      "p1_trades": 0,
+      "capture_stop_first": 3,
+      "p1_stop_first": 0,
+      "capture_model_net_usdt": -28.07791962494808,
+      "p1_model_net_usdt": 0.0,
+      "capture_closed_drawdown_usdt": 28.07791962494808,
+      "p1_closed_drawdown_usdt": 0.0,
+      "capture_unresolved_ratio": 0.0,
+      "p1_unresolved_ratio": null,
+      "emergency_count": null,
+      "full_mtm_drawdown": null,
+      "common_candidate_events": 52,
+      "candidate_lead_seconds_all": 0.0,
+      "common_final_alerts": 0,
+      "excluded": 3,
+      "added": 0
+    },
+    "base_delay15": {
+      "capture_trades": 2,
+      "p1_trades": 0,
+      "excluded": 2,
+      "added": 0,
+      "common_candidate_events": 40,
+      "candidate_lead_seconds_all": 0.0
+    },
+    "adverse_delay0": {
+      "capture_trades": 1,
+      "p1_trades": 0,
+      "excluded": 1,
+      "added": 0
+    }
+  },
+  "data_status": {
+    "RAW5M_INDEPENDENCE_UNVERIFIED": true,
+    "CANDLE_VOLUME_UNIT_UNVERIFIED": true,
+    "verified": false,
+    "raw_chart_1m_messages": 4,
+    "raw_chart_5m_messages": 2,
+    "independent_5m_messages": 0,
+    "verified_closed_bars": 0,
+    "exact_duplicate_frames": 0,
+    "repeated_key_revisions": 4,
+    "gaps": null,
+    "closed_restart_continuity": null,
+    "funding_history_days": 0,
+    "unseen_evaluation": false,
+    "inherited_runtime_1214KST": {
+      "verified_closed": 0,
+      "baseline_comparison": null,
+      "funding_history_days": 0,
+      "not_rechecked_in_this_worker": true
+    }
+  },
+  "technical_remaining": [
+    "P2: separate detection and confirmation experiments; no target/RR threshold tuning from these development outcomes",
+    "Connect live EvidenceLedger via failure-isolated adapter with retention/migration/restart tests",
+    "Replay continuous unseen observations when qualified inputs exist; fixed-event old/new outcomes and real receipt timing"
+  ],
+  "actual_data_waiting": [
+    "Official futures candle subscription/schema including final-bar and volume unit definition",
+    "Independently published 5m alongside native1m with raw receipt records spanning closed rollovers, reconnects and overlaps",
+    "Actual funding settlement history and fill/spread/slippage evidence; never backfill missing receive timestamps"
+  ],
+  "commands": [
+    {
+      "command": "python -m unittest test_lbank_structural_target_plan test_lbank_fee_risk test_lbank_native_target_room test_lbank_entry_geometry test_lbank_entry_refinement test_lbank_entry_location test_lbank_paper_notifications -q",
+      "exit_code": 0,
+      "tests": 121,
+      "new_p1_tests": 17,
+      "log": "targeted_tests.txt"
+    },
+    {
+      "command": "python research/compare_structural_targets.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python research/probe_structural_target_sources.py",
+      "exit_code": 0,
+      "meaning": "successful audit execution; HTTP403, official WS empty, same-feed raw forming updates, blockers unresolved"
+    },
+    {
+      "command": "python research/probe_structural_target_sources.py --analyze-existing",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "input_output_hashes": {
+    "p1_manifest": "research/zerobase/completion_20261028/p1/manifest.json",
+    "validation": "research/zerobase/completion_20261028/validation.json",
+    "source_audit": "research/zerobase/completion_20261028/source_probe/audit.json"
+  },
+  "deployment_performed": false,
+  "production_merge": false,
+  "upbit_cap_zil_edits": false,
+  "promotion_thresholds_added": false,
+  "old100paper_or30day_prerequisite_added": false,
+  "remote_verification": {
+    "fetched_evidence_commit": "8c4aa41238d0eae53b1e922b93fafc6c17bb07de",
+    "all_code_input_output_and_decompressed_csv_hashes_match": true,
+    "checked_at": "2026-10-28T03:41:47.562197+00:00"
+  }
 }
