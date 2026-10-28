@@ -4,12 +4,14 @@
   "status": "blocked_external_source_specification_required",
   "lease": {
     "owner": "zb-source-qualification-20261028-sole-worker",
-    "active": true,
+    "active": false,
     "acquired_at": "2026-10-28T19:15:19.939564+00:00",
     "expires_at": "2026-10-28T21:15:19.939564+00:00",
-    "expected_head": "518a72646ac6e40afc37fc4c49357270924fc439",
+    "expected_head": "2318a51f4142635cb768219ba40167f3a60006da",
     "scope": "Finite actual documented source qualification only; no repeated completed tests or old HTTP/WS probes; no implementation expansion.",
-    "last_verified_head": "02ce89542e2aa507ace3ecb73f76d71d4af8bdab"
+    "last_verified_head": "2318a51f4142635cb768219ba40167f3a60006da",
+    "released_at": "2026-10-28T19:23:10.158645+00:00",
+    "release_reason": "Finite actual source qualification complete. Official SDK/support/TradingView paths and scoped runtime read yield0new qualified inputs. External official futures final/volume/independent5m/raw-derived receipt action required.493blob nontruncated remote tree exact; no strategy tests/probes/comparisons repeated or code/runtime changes."
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -48,7 +50,7 @@
   "next_work": "External-source blocker: obtain official public futures BTCUSDT SwapU candle1m/independently published5m subscription/REST, documented final/revision and volume/turnover units plus genuine original raw receipts per source_qualification/acquisition_request.md. Do not rerun identical HTTP/WS probes, completed tests/comparisons or expand engineering while unchanged. On actual new documentation/receipts, review only existing source-dependent decoder/derived-input qualification, then predeclare one unused continuous comparison and original P4 verdict. Existing unseen path must stay blocked until reviewed qualification exists; no boolean bypass. P5/runtime rollout separate authorization.",
   "outbound": false,
   "orders": false,
-  "ended_at": "2026-10-28T18:26:50.911266+00:00",
+  "ended_at": "2026-10-28T19:23:10.158645+00:00",
   "started_at_precision": "minute",
   "evidence_commits": {
     "lease": "f57b995bb7af938a200fb9d3c3ba4ad4499e76a0",
@@ -87,7 +89,8 @@
     "original_schedule_initial_checkpoint": "237b40486687d3cf9883b73fe8922a98ab207034",
     "original_schedule_code": "43211060ad3dc4fdaafa925e4556ebf69da76890",
     "original_schedule_artifacts": "3c289e0d3bafc9ba2b00bfcf7a875d9498c842d8",
-    "source_qualification_lease": "02ce89542e2aa507ace3ecb73f76d71d4af8bdab"
+    "source_qualification_lease": "02ce89542e2aa507ace3ecb73f76d71d4af8bdab",
+    "source_qualification_artifacts": "2318a51f4142635cb768219ba40167f3a60006da"
   },
   "pr": {
     "number": 27,
@@ -4021,6 +4024,34 @@
     "same_probe_or_strategy_test_or_comparison_reruns": 0,
     "outbound": false,
     "orders": false,
-    "production_changes": false
+    "production_changes": false,
+    "ended_at": "2026-10-28T19:23:10.158645+00:00",
+    "artifact_commit": "2318a51f4142635cb768219ba40167f3a60006da",
+    "remote_verification": {
+      "tree": "39f44caa3ef0c22535b83ac057335442ad1421c3",
+      "blobs": 493,
+      "truncated": false,
+      "entire_local_index_equal": true
+    },
+    "artifact_validation": {
+      "command": "Exact inline Python validation_command in source_qualification/manifest.json; git diff --cached --check; git write-tree; GitHub GET recursive tree and compare493paths/modes/blob SHAs",
+      "exit_code": 0,
+      "artifact_sha256_verified": 5,
+      "required_immutable_pr22_blobs_verified": 4,
+      "strategy_tests_run": 0,
+      "replays_run": 0,
+      "identical_source_probes_run": 0
+    },
+    "final_heads": {
+      "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
+      "research": "5ea63fea7fb5a312a99702535c31d4dccd8155fd",
+      "pr21": "ce33a017ff6aca0729175a8f88c3ec978f4a84a2",
+      "pr22": "d098f5657d823769f468846df1fac5ec04986d0e",
+      "pr27_before_release": "2318a51f4142635cb768219ba40167f3a60006da",
+      "states": "PR21/22/27 open/draft/unmerged"
+    },
+    "source_qualification_manifest_sha256": "aadc2ef806afc274f3931c5a0c1974d31479107656f3c60be5657d447b210d5c",
+    "source_qualification_validation_sha256": "17258e6c0bd0fe4bc5f3eeb10d3004358762f7469e55cefbdd688632dcfc8cfc",
+    "sole_lease_released": true
   }
 }
