@@ -1,0 +1,206 @@
+{
+  "schema": "zb_source_qualification_validation_v1",
+  "checks_passed": true,
+  "required_pr22_four_files_exact": {
+    "docs/zerobase/TRADE_EVIDENCE_ALERT_DESIGN_20261025.md": {
+      "git_blob_sha": "8e2648574216e437692e78f5ecdfbb5f217a0cda",
+      "sha256": "9a58c22803dba4624951b661ea34d02cb480534bab2897c8e69d6681c1595ef5",
+      "actual_immutable_pr22_ref": "d098f5657d823769f468846df1fac5ec04986d0e"
+    },
+    "research/zerobase/trade_evidence_p0_20261025/README.md": {
+      "git_blob_sha": "1dda1fcaf45934f23e62f7608e71837486859261",
+      "sha256": "c8e185a47d62b6171b8f4b3a9e50b0e9ee05ba0287fbf5eeb2d91abd567f9788",
+      "actual_immutable_pr22_ref": "d098f5657d823769f468846df1fac5ec04986d0e"
+    },
+    "research/zerobase/trade_evidence_p0_20261025/summary.json": {
+      "git_blob_sha": "193eb023313705823174d5ab7eea519a85fb8b67",
+      "sha256": "d141a697d733dec100e1e7ed343a938c77201a34c0cc49327e590f002c96bbf3",
+      "actual_immutable_pr22_ref": "d098f5657d823769f468846df1fac5ec04986d0e"
+    },
+    "research/zerobase/trade_evidence_p0_20261025/manifest.json": {
+      "git_blob_sha": "c1149c82cd15fcd87d70b6fe6ee6b41ee58eee8f",
+      "sha256": "93cfcc8a8a627f0b4a1477d358909e93fc11d91f414d261590a148ca1d914353",
+      "actual_immutable_pr22_ref": "d098f5657d823769f468846df1fac5ec04986d0e"
+    }
+  },
+  "runtime_selected_count": 27,
+  "runtime_zb_status_count": 9,
+  "runtime_statuses": [
+    {
+      "provider_log_timestamp": "2026-10-28T19:07:31.579195930Z",
+      "classification": "EVIDENCE_INSUFFICIENT",
+      "funding_history_days": 0,
+      "verified_closed": 0,
+      "verified_net": null,
+      "baseline_comparison": null,
+      "native_1m": 60,
+      "native_5m": 347,
+      "qualification": {
+        "candle_units": false,
+        "fees": true,
+        "funding_plan": true,
+        "independent_5m": false,
+        "product": true
+      }
+    },
+    {
+      "provider_log_timestamp": "2026-10-28T19:08:35.085017088Z",
+      "classification": "EVIDENCE_INSUFFICIENT",
+      "funding_history_days": 0,
+      "verified_closed": 0,
+      "verified_net": null,
+      "baseline_comparison": null,
+      "native_1m": 60,
+      "native_5m": 347,
+      "qualification": {
+        "candle_units": false,
+        "fees": true,
+        "funding_plan": true,
+        "independent_5m": false,
+        "product": true
+      }
+    },
+    {
+      "provider_log_timestamp": "2026-10-28T19:09:37.907098065Z",
+      "classification": "EVIDENCE_INSUFFICIENT",
+      "funding_history_days": 0,
+      "verified_closed": 0,
+      "verified_net": null,
+      "baseline_comparison": null,
+      "native_1m": 60,
+      "native_5m": 347,
+      "qualification": {
+        "candle_units": false,
+        "fees": true,
+        "funding_plan": true,
+        "independent_5m": false,
+        "product": true
+      }
+    },
+    {
+      "provider_log_timestamp": "2026-10-28T19:10:37.575431354Z",
+      "classification": "EVIDENCE_INSUFFICIENT",
+      "funding_history_days": 0,
+      "verified_closed": 0,
+      "verified_net": null,
+      "baseline_comparison": null,
+      "native_1m": 60,
+      "native_5m": 348,
+      "qualification": {
+        "candle_units": false,
+        "fees": true,
+        "funding_plan": true,
+        "independent_5m": false,
+        "product": true
+      }
+    },
+    {
+      "provider_log_timestamp": "2026-10-28T19:11:38.247702830Z",
+      "classification": "EVIDENCE_INSUFFICIENT",
+      "funding_history_days": 0,
+      "verified_closed": 0,
+      "verified_net": null,
+      "baseline_comparison": null,
+      "native_1m": 60,
+      "native_5m": 348,
+      "qualification": {
+        "candle_units": false,
+        "fees": true,
+        "funding_plan": true,
+        "independent_5m": false,
+        "product": true
+      }
+    },
+    {
+      "provider_log_timestamp": "2026-10-28T19:12:38.037000362Z",
+      "classification": "EVIDENCE_INSUFFICIENT",
+      "funding_history_days": 0,
+      "verified_closed": 0,
+      "verified_net": null,
+      "baseline_comparison": null,
+      "native_1m": 60,
+      "native_5m": 348,
+      "qualification": {
+        "candle_units": false,
+        "fees": true,
+        "funding_plan": true,
+        "independent_5m": false,
+        "product": true
+      }
+    },
+    {
+      "provider_log_timestamp": "2026-10-28T19:13:37.766260399Z",
+      "classification": "EVIDENCE_INSUFFICIENT",
+      "funding_history_days": 0,
+      "verified_closed": 0,
+      "verified_net": null,
+      "baseline_comparison": null,
+      "native_1m": 60,
+      "native_5m": 348,
+      "qualification": {
+        "candle_units": false,
+        "fees": true,
+        "funding_plan": true,
+        "independent_5m": false,
+        "product": true
+      }
+    },
+    {
+      "provider_log_timestamp": "2026-10-28T19:14:33.490178471Z",
+      "classification": "EVIDENCE_INSUFFICIENT",
+      "funding_history_days": 0,
+      "verified_closed": 0,
+      "verified_net": null,
+      "baseline_comparison": null,
+      "native_1m": 60,
+      "native_5m": 348,
+      "qualification": {
+        "candle_units": false,
+        "fees": true,
+        "funding_plan": true,
+        "independent_5m": false,
+        "product": true
+      }
+    },
+    {
+      "provider_log_timestamp": "2026-10-28T19:15:36.584270733Z",
+      "classification": "EVIDENCE_INSUFFICIENT",
+      "funding_history_days": 0,
+      "verified_closed": 0,
+      "verified_net": null,
+      "baseline_comparison": null,
+      "native_1m": 60,
+      "native_5m": 349,
+      "qualification": {
+        "candle_units": false,
+        "fees": true,
+        "funding_plan": true,
+        "independent_5m": false,
+        "product": true
+      }
+    }
+  ],
+  "all7_document_candidates_unqualified": true,
+  "new_qualified_observations": 0,
+  "tests_replays_or_identical_probes_rerun": 0,
+  "files": {
+    "README.md": {
+      "bytes": 5222,
+      "sha256": "c586a8e7338aa1e1e8912b06bbce5f53bc8a1230b6070c51d5145709e79cb643"
+    },
+    "acquisition_request.md": {
+      "bytes": 6656,
+      "sha256": "763b403e112144ec05c8553319e9075a486286bab4d41fa98d2f8441862bd7f3"
+    },
+    "runtime_selected.json": {
+      "bytes": 55904,
+      "sha256": "223724a9f4a4d74b1c12000354cbe74072477369ed259da3ec85e217bf6b612d"
+    },
+    "source_audit.json": {
+      "bytes": 5496,
+      "sha256": "eb46d1dcfe1165e78fde5df2c5dc924a975bc3a4583a090e16ab4506303f435e"
+    }
+  },
+  "time_semantics": "provider log timestamps preserved; exact tool call receipt null; observed clock bounds only",
+  "source_retrieval_hash_limitation": "Web retrieval provides refs/URLs but no original HTTP bytes; no original document-byte SHA256 claimed. SDK Git blob identities are exact."
+}

@@ -285,3 +285,16 @@ Started 2026-10-28T16:24:21.745134+00:00. Actual production/research/PR21/22/27 
 ## Actual source qualification finite lease
 
 Started 2026-10-28T19:15:19.939564+00:00. Actual production b4c7d94/research5ea63fe/PR21ce33a01/PR22d098f56 and PR27 518a726 were checked; PR21/22/27 open/draft/unmerged and sole lease inactive. Required PR22 design/P0 four files reread at immutable d098f5657d823769f468846df1fac5ec04986d0e and local tree equals current remote34ae4c264391e677fd8f106f5a705493e5eb781f. Sole source-qualification worker, expected-head writes. Scope: finite public official documentation discovery plus scoped Railway runtime read for actual source availability; no rerun of completed tests/development comparisons or identical HTTP/WS probe, no implementation scope expansion, sends/orders/deployment/production changes.
+
+
+## Actual source qualification — finite acquisition blocked
+
+단일 lease 시작2026-10-28T19:15:19.939564+00:00, lease commit `02ce89542e2aa507ace3ecb73f76d71d4af8bdab`, 시작 PR27 `518a72646ac6e40afc37fc4c49357270924fc439`/tree34ae4c264391e677fd8f106f5a705493e5eb781f. 실제 운영b4c7d94/연구5ea63fe/PR21ce33a01/PR22d098f56을 다시 확인했으며 PR21/22/27 open/draft/unmerged다. 실제 PR22 필수4파일을 불변d098f565에서 읽고 Git blob/내용 hash가 기존 파일과 정확히 같음을 확인했다. 이번 범위는 유한 source 획득/검증뿐이며 새 기술 구현을 추가하지 않았다.
+
+공식 Python SDK tree538d465의 spot market/generic websocket 소스와 support API 분류를 확인했으나 futures candle final/volume 명세는 확인되지 않았다. 새로 발견한 공식 LBank TradingView BTCUSDT.P 안내와 provider의 정식 CSV export는 문서화된 chart 배포 경로다. 독립native5m/원래 수신시각/final/단위 근거는 없어 proxy나 현물 대체로 사용하지 않았다. 현재 공개 문서/SDK의 유한 조사 결과이지 API 자체가 없다는 증명은 아니다.
+
+Railway skill의 읽기 전용 get_logs로 지정 project e7d240ac-2468-45c9-8411-33f5e24f425b/env677e12e4-aff7-4880-bc11-ff30de315e68/service8edd0d1a-3f5e-47fb-8e01-a0cc57935c34만 조회했다. retained read limit100/실제101줄 중 상태·자료부재27줄/실제ZB상태9줄 원문을 저장했다. 성공deployment a30cf7a6, 범위19:06:51.849882710~19:15:56.558555178UTC다. independent5m/candle_units=false, funding0일, verified_closed0, baseline_comparison/verified_net=null, native closure stream_inferred_not_rest_verified가 유지된다. provider 로그시각은 원래 exchange receipt가 아니며 요약으로 파생 입력 lineage를 복원하지 않았다.
+
+[전체 조사/판정](https://github.com/hekyun-ctrl/upbit-market-analyzer/blob/research/zb-completion-20261028/research/zerobase/completion_20261028/source_qualification/README.md)과 source_audit.json, runtime_selected.json, acquisition_request.md, manifest.json, validation.json을 추가했다. 새 qualified final/독립5m/unseen 관측0, 필수 actual P3 비교 미실행, 정식 P4 승격 판단 불가, 수익 입증 없음이다. 원래86/신규26시험·retained20 restart exact·완료96-arm·동일HTTP403/빈WS probe를 반복하지 않았다. source 차단·capture1SL 모형-9.35927984656063/P1미진입0·기존미확정null을 유지한다.
+
+**현재 허용된 자율 획득 범위에서 완전히 차단됐다.** 다음 실제 진전에는 거래소/사용자로부터 공식 공개 futures1m/독립5m 발행 명세(final/revision/volume 단위 포함) 또는 정확한 raw receipt/provenance가 와야 한다. 보내지 않은 기술팀 요청 항목과 기존 importer/매poll/전체 derived receipt 인수표를 acquisition_request.md에 준비했다. 자료가 오면 기존 잔여 source-dependent decoder/파생 연결 검토→사전 고정 미사용 연속 비교→원래P4 순서다. 현재 unseen 코드는 계속 차단하며 manifest boolean으로 우회하지 않는다. 새100paper/30day·필터/임계값·개발 scope를 추가하지 않았다. 운영/배포/발송/paper/ZB/주문/계정/비밀키/leverage/billing/Upbit/CAP/ZIL/추가worker/model/automation 변경이 없다.

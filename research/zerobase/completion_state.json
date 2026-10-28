@@ -1,14 +1,15 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "checkpoint_complete_feature_incomplete",
+  "status": "blocked_external_source_specification_required",
   "lease": {
     "owner": "zb-source-qualification-20261028-sole-worker",
     "active": true,
     "acquired_at": "2026-10-28T19:15:19.939564+00:00",
     "expires_at": "2026-10-28T21:15:19.939564+00:00",
     "expected_head": "518a72646ac6e40afc37fc4c49357270924fc439",
-    "scope": "Finite actual documented source qualification only; no repeated completed tests or old HTTP/WS probes; no implementation expansion."
+    "scope": "Finite actual documented source qualification only; no repeated completed tests or old HTTP/WS probes; no implementation expansion.",
+    "last_verified_head": "02ce89542e2aa507ace3ecb73f76d71d4af8bdab"
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -44,7 +45,7 @@
     "RAW5M_INDEPENDENCE_UNVERIFIED",
     "CANDLE_VOLUME_UNIT_UNVERIFIED"
   ],
-  "next_work": "First check current actual heads/sole lease. Current original entry-schedule and every-poll input-port mechanics are complete locally and not deployed. Finite original remaining work: official documented final/volume/native-independent5m and full derived-input receipt qualification when real sources exist; then predeclare/run one unused continuous comparison and original P4 evidence verdict. No new implementation scope or repeat completed comparisons/probes without changed source/code reason. P5/runtime rollout separately authorized, not an invented extra research completion prerequisite. Preserve source blockers/zero-null semantics; no sends/orders/deploy.",
+  "next_work": "External-source blocker: obtain official public futures BTCUSDT SwapU candle1m/independently published5m subscription/REST, documented final/revision and volume/turnover units plus genuine original raw receipts per source_qualification/acquisition_request.md. Do not rerun identical HTTP/WS probes, completed tests/comparisons or expand engineering while unchanged. On actual new documentation/receipts, review only existing source-dependent decoder/derived-input qualification, then predeclare one unused continuous comparison and original P4 verdict. Existing unseen path must stay blocked until reviewed qualification exists; no boolean bypass. P5/runtime rollout separate authorization.",
   "outbound": false,
   "orders": false,
   "ended_at": "2026-10-28T18:26:50.911266+00:00",
@@ -85,7 +86,8 @@
     "original_schedule_lease": "b3e1bbfa64d611e0390aa3ad4356c84f452be98a",
     "original_schedule_initial_checkpoint": "237b40486687d3cf9883b73fe8922a98ab207034",
     "original_schedule_code": "43211060ad3dc4fdaafa925e4556ebf69da76890",
-    "original_schedule_artifacts": "3c289e0d3bafc9ba2b00bfcf7a875d9498c842d8"
+    "original_schedule_artifacts": "3c289e0d3bafc9ba2b00bfcf7a875d9498c842d8",
+    "source_qualification_lease": "02ce89542e2aa507ace3ecb73f76d71d4af8bdab"
   },
   "pr": {
     "number": 27,
@@ -174,7 +176,8 @@
   "actual_data_waiting": [
     "Official futures candle subscription/schema including final-bar and volume unit definition",
     "Independently published 5m alongside native1m with raw receipt records spanning closed rollovers, reconnects and overlaps",
-    "Actual funding settlement history and fill/spread/slippage evidence; never backfill missing receive timestamps"
+    "Actual funding settlement history and fill/spread/slippage evidence; never backfill missing receive timestamps",
+    "Official technical response/public docs + exact receipt input handover in completion_20261028/source_qualification/acquisition_request.md; official TradingView CSV alone cannot satisfy original receipt/final/volume/independence."
   ],
   "commands": [
     {
@@ -269,7 +272,9 @@
     "received_stream_validation": "research/zerobase/completion_20261028/received_stream/validation.json",
     "received_stream_seal": "53f372ed471ecbc31e277d88eb76472d5522d3feeedfa9aa78cd803f3a7888e1",
     "gate_trace_manifest": "research/zerobase/completion_20261028/gate_trace/manifest.json",
-    "gate_trace_validation": "research/zerobase/completion_20261028/gate_trace/validation.json"
+    "gate_trace_validation": "research/zerobase/completion_20261028/gate_trace/validation.json",
+    "source_qualification_manifest": "research/zerobase/completion_20261028/source_qualification/manifest.json",
+    "source_qualification_validation": "research/zerobase/completion_20261028/source_qualification/validation.json"
   },
   "deployment_performed": false,
   "production_merge": false,
@@ -3996,5 +4001,26 @@
     "P5_runtime_application": "separate_authorization_not_new_research_prerequisite",
     "whole_requested_implementation_and_required_comparison_complete": false,
     "profitability_validated": false
+  },
+  "source_qualification_checkpoint": {
+    "started_at": "2026-10-28T19:15:19.939564+00:00",
+    "lease_commit": "02ce89542e2aa507ace3ecb73f76d71d4af8bdab",
+    "baseline_head": "518a72646ac6e40afc37fc4c49357270924fc439",
+    "artifact_directory": "research/zerobase/completion_20261028/source_qualification",
+    "manifest": "research/zerobase/completion_20261028/source_qualification/manifest.json",
+    "validation": "research/zerobase/completion_20261028/source_qualification/validation.json",
+    "technical_implementation_changed": false,
+    "qualified_data_acquired": 0,
+    "official_document_candidates_reviewed": 7,
+    "new_distribution_path": "Official LBank TradingView BTCUSDT.P announcement and provider CSV export found; insufficient final/volume/independent-native5m/original-receipt evidence, never substituted.",
+    "runtime": "Scoped read-only active deployment a30cf7a6; bounded101returned/27selected/9ZBstatus rows, latest retained row19:15:56.558555178Z. Still independent5m/candle_units=false, funding0, verified_closed0, baseline_comparison/null verified_net/null. Log times are not raw market receipts.",
+    "required_actual_comparison": "not executed; new qualified unseen observations0; current unseen gate remains fail-closed",
+    "profitability": "unproven; existing capture1SL model-9.35927984656063/P1noentry0 and entered-unresolved null unchanged",
+    "finite_acquisition_verdict": "Fully blocked within current autonomous scope; official futures candle specification/independent5m provenance and genuine raw receipts required from provider/human. Not proof API does not exist.",
+    "actionable_request": "research/zerobase/completion_20261028/source_qualification/acquisition_request.md",
+    "same_probe_or_strategy_test_or_comparison_reruns": 0,
+    "outbound": false,
+    "orders": false,
+    "production_changes": false
   }
 }
