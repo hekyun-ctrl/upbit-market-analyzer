@@ -34,7 +34,8 @@ def policy_spec(index, *, e5=False):
                 confirmation_on_discovery=any(c.__name__=='E3Mixin' for c in cls.__mro__))
 
 
-def declaration(policies, costs, *, purpose='development', source_commit=None):
+def declaration(policies, costs, *, purpose='development', source_commit=None,
+                schedule='frozen_retained_replay_classify_then_confirm_then_arm_v1', schedule_config=None):
     if purpose not in ('development','unseen') or len(policies)<2:
         raise ValueError('COMPARISON_DECLARATION_REQUIRED')
     if len({(p['index'],p['e5']) for p in policies}) != len(policies):
@@ -46,11 +47,20 @@ def declaration(policies, costs, *, purpose='development', source_commit=None):
             for p in sorted(ROOT.glob('lbank_*.py'))}
     code.update({str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest()
         for p in sorted((ROOT/'research').glob('*.py'))})
-    return dict(schema='continuous_comparison_v1', purpose=purpose,
-        schedule='frozen_retained_replay_classify_then_confirm_then_arm_v1',
+    if schedule not in ('frozen_retained_replay_classify_then_confirm_then_arm_v1',
+                        'original_live_entry_ast_v1'):
+        raise ValueError('UNKNOWN_COMPARISON_SCHEDULE')
+    result = dict(schema='continuous_comparison_v1', purpose=purpose,
+        schedule=schedule,
         policies=policies, costs=costs, nominal_delay_seconds=0,
         source_commit=source_commit, code_sha256=code, source_blockers=BLOCKERS,
         outbound=False, orders=False, production_scheduler_equivalence_claimed=False)
+    if schedule == 'original_live_entry_ast_v1':
+        from research.original_live_schedule import schedule_definition
+        result['schedule_config'] = schedule_definition(schedule_config)
+    elif schedule_config is not None:
+        raise ValueError('UNEXPECTED_SCHEDULE_CONFIG')
+    return result
 
 
 def initial_state():
@@ -67,7 +77,11 @@ class ContinuousComparison:
         self.book, self.db, self.manifest = book, book.db, copy.deepcopy(manifest)
         if manifest.get('schema') != 'continuous_comparison_v1' or manifest.get('outbound') is not False or manifest.get('orders') is not False:
             raise ValueError('INERT_COMPARISON_REQUIRED')
-        expected = declaration(manifest['policies'],manifest['costs'],purpose=manifest['purpose'],source_commit=manifest.get('source_commit'))
+        expected = declaration(manifest['policies'],manifest['costs'],purpose=manifest['purpose'],
+            source_commit=manifest.get('source_commit'), schedule=manifest['schedule'],
+            schedule_config=manifest.get('schedule_config'))
+        if manifest['schedule'] == 'original_live_entry_ast_v1' and type(self) is ContinuousComparison:
+            raise ValueError('ORIGINAL_LIVE_ADAPTER_REQUIRED')
         if manifest != expected:
             raise ValueError('FROZEN_MANIFEST_OR_CODE_CHANGED')
         self.identity = digest(manifest)

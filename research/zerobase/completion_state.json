@@ -6,8 +6,9 @@
     "owner": "zb-original-live-schedule-20261028-sole-worker",
     "active": true,
     "acquired_at": "2026-10-28T16:24:21.745134+00:00",
-    "expires_at": "2026-10-28T18:24:21.745134+00:00",
-    "expected_head": "60b70e73ab6891d63bbf7851f466fb00e7db26d2"
+    "expires_at": "2026-10-28T20:14:10.648838+00:00",
+    "expected_head": "b3e1bbfa64d611e0390aa3ad4356c84f452be98a",
+    "resumed_at": "2026-10-28T18:14:10.648838+00:00"
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -42,7 +43,7 @@
     "RAW5M_INDEPENDENCE_UNVERIFIED",
     "CANDLE_VOLUME_UNIT_UNVERIFIED"
   ],
-  "next_work": "Implement exact original live-schedule/event adapter with finite independent state regression; preserve all frozen policy helpers, source blockers and zero/null semantics. No sends/orders/deployment.",
+  "next_work": "Original live entry AST adapter initial implementation checkpoint only: syntax checked; targeted functional tests/finite evidence still required. Same sole worker resumed after capacity pause; actual official source/derived receipt qualification unavailable. No deployment/sends/orders.",
   "outbound": false,
   "orders": false,
   "ended_at": "2026-10-28T15:27:07.288145+00:00",
