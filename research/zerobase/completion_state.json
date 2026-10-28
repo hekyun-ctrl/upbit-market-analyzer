@@ -1,14 +1,12 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "checkpoint_complete_feature_incomplete",
+  "status": "in_progress_E4_research",
   "lease": {
-    "owner": "zb-e1-20261028-sole-worker",
-    "active": false,
-    "acquired_at": "2026-10-28T08:08:26.034318+00:00",
-    "expires_at": "2026-10-28T10:08:26.034318+00:00",
-    "released_at": "2026-10-28T08:25:19.509976+00:00",
-    "release_reason": "E1 detection-only and E1/E3 eight-arm comparison complete; all artifacts fetched and entire tree verified; sole worker checkpoint ended"
+    "owner": "zb-e4-20261028-sole-worker",
+    "active": true,
+    "acquired_at": "2026-10-28T09:30:48.819727+00:00",
+    "expires_at": "2026-10-28T11:30:48.819727+00:00"
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -36,7 +34,7 @@
     "RAW5M_INDEPENDENCE_UNVERIFIED",
     "CANDLE_VOLUME_UNIT_UNVERIFIED"
   ],
-  "next_work": "Predeclare and implement isolated E4 nearby-barrier exception/chase rules, then E5 early-reversal route and necessary combinations without tuning RR/targets/costs to reused outcomes; separately failure-isolated live EvidenceLedger adapter with migration/restart/outage/retention. Acquire latest heads/new lease first. P3-P5 and qualified data remain incomplete; no sends/orders/deploy.",
+  "next_work": "Implement and compare predeclared E4 nearby known-barrier exception/chase only with frozen E1/E3/target panels; preserve full outputs and release lease. E5/live ledger/P3-P5 remain.",
   "outbound": false,
   "orders": false,
   "ended_at": "2026-10-28T08:25:19.509976+00:00",
@@ -1265,5 +1263,7 @@
     "replay_repeated": false,
     "source_probes_repeated": false,
     "duplicate_worker_or_automation_created": false
-  }
+  },
+  "e4_started_at": "2026-10-28T09:30:48.819727+00:00",
+  "e4_source_checkpoint": "7c8fb9b2f1c6a0b74f7b2de41a0f0141c73844c3"
 }
