@@ -31,7 +31,7 @@ class E4Tests(unittest.TestCase):
         fn=original or m.calculate_plan
         return t,t.plan(fn,state['prices'],setup['direction'],setup=setup,native_state=state)
 
-    def test_chase_bounds_are_symmetric_and_inclusive(self):
+    def test_chase_bounds_are_symmetric(self):
         for d in (1,-1):
             s=retest_state(d);atr=first_retests(s)[0]['entry_location']['atr1']
             for strategy,key,limit in [('breakout','level',1.5),('trend_retest','structure_anchor',2.)]:
@@ -40,6 +40,16 @@ class E4Tests(unittest.TestCase):
                     t,result=self.plan(s,setup,lambda *a,**kw: {'passed':True})
                     self.assertEqual(result is not None,allowed,(d,strategy,distance))
                     self.assertEqual(t.e4_evidence['location']['passed'],allowed)
+
+    def test_exact_location_limit_is_inclusive(self):
+        for d in (1,-1):
+            s=retest_state(d)
+            for strategy,key,distance in [('breakout','level',3.),('trend_retest','structure_anchor',4.)]:
+                setup=dict(strategy=strategy,direction=d,**{key:s['quote']-d*distance})
+                with patch('lbank_entry_location.minute_atr',return_value=2.):
+                    t,result=self.plan(s,setup,lambda *a,**kw: {'passed':True})
+                self.assertIsNotNone(result)
+                self.assertEqual(t.e4_evidence['location']['proof']['extension_atr1'],distance/2.)
 
     def test_range_rebound_location_is_unchanged(self):
         s=retest_state();setup=dict(strategy='range_rebound',direction=1,structure_anchor=1)
