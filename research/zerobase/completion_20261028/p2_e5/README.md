@@ -87,7 +87,7 @@ E5만 RSI 방향/5·15분 역추세를 설명 변수로 기록한다. 자료 누
 
 ## 시험·시도와 미완료
 
-초기 관련60개, 수정 후 E5 최종22개가 통과했다. 중복 제외 고유66개/신규22개다. 첫 비교는 결과를 보기 전에 코드 검토로 발견한 우선순위/사건 구분 문제 때문에 중단(exit130)했다. 원래 breakout 우선순위와 서로 다른 sweep의 ID를 고치고, preempt된 readiness를 null로 초기화했다. 파라미터/성과 문턱을 바꾼 재시도가 아니다. attempts.json과 first_attempt.log에 남겼으며, 수정본 완전 비교는1회다. 사용량 중단은 완료된 보고서/비교 뒤 업로드 중 발생해 재개 후 둘을 반복하지 않았다.
+초기 관련60개, 수정 후 E5 최종22개가 통과했다. 중복 제외 고유66개/신규22개다. 첫 비교는 결과를 보기 전에 코드 검토로 발견한 우선순위/사건 구분 문제 때문에 중단(exit130)했다. 원래 breakout 우선순위와 서로 다른 sweep의 ID를 고치고, preempt된 readiness를 null로 초기화했다. 파라미터/성과 문턱을 바꾼 재시도가 아니다. attempts.json과 first_attempt.log에 남겼으며, 수정본 완전 비교는1회다. 사용량 중단 후 재개 시 비교·보고서가 모두 이미 완료됐음을 확인했다. 업로드가 끝나지 않아 전체 결과 저장만 진행했으며 두 계산을 반복하지 않았다.
 
 ```bash
 PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_early_reversal_experiment -q

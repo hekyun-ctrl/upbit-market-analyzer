@@ -1,14 +1,16 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "e5_complete_replay_persisting_artifacts",
+  "status": "checkpoint_complete_feature_incomplete",
   "lease": {
     "owner": "zb-e5-20261028-sole-worker",
-    "active": true,
+    "active": false,
     "acquired_at": "2026-10-28T09:55:58.304189+00:00",
     "expires_at": "2026-10-28T13:32:35.807677+00:00",
     "resumed_at": "2026-10-28T12:32:35.807677+00:00",
-    "resume_reason": "Same sole worker after usage pause; latest remote e9b0420 unchanged; no duplicate worker. Corrected replay and report already finished; do not repeat."
+    "resume_reason": "Same sole worker after usage pause; latest remote e9b0420 unchanged; no duplicate worker. Corrected replay and report already finished; do not repeat.",
+    "released_at": "2026-10-28T12:41:40.592643+00:00",
+    "release_reason": "E5 isolated route and32-arm development comparison complete; full artifact commit7fd3010 and411-blob nontruncated remote tree verified. Sole worker checkpoint ended; whole feature incomplete."
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -43,7 +45,7 @@
   "next_work": "Check latest actual heads and sole lease, then implement failure-isolated live EvidenceLedger adapter with versioned migration/restart/outage/bounded-retention evidence without activating sends/orders. Preserve frozen P1/E1/E3/E4/E5 and source blockers. P3 continuous true-receipt/unseen comparison, P4 qualified review and P5 authorized application remain; do not repeat completed development comparisons without code/data reason.",
   "outbound": false,
   "orders": false,
-  "ended_at": "2026-10-28T09:49:30.321965+00:00",
+  "ended_at": "2026-10-28T12:41:40.592643+00:00",
   "started_at_precision": "minute",
   "evidence_commits": {
     "lease": "f57b995bb7af938a200fb9d3c3ba4ad4499e76a0",
@@ -66,7 +68,8 @@
     "e5_causality_fixes": "907b01e9aa1edd850f2f13827c3965fe200719ad",
     "e5_final_code": "826c930a3c5efa9165dc902427bbabbf9f1fdf69",
     "e5_report_code": "e9b0420212aa4edae5f0ded0795eabee94fff5fd",
-    "e5_resume_verified": "ae75e860a676bace009e8c20327c8780e140ed73"
+    "e5_resume_verified": "ae75e860a676bace009e8c20327c8780e140ed73",
+    "e5_comparison_artifacts": "7fd30103af06baf2863b74e2e9e058137a2b4b04"
   },
   "pr": {
     "number": 27,
@@ -3752,5 +3755,52 @@
     "distinct_related_tests": 66,
     "development_only": true,
     "profitability_validated": false
-  }
+  },
+  "e5_ended_at": "2026-10-28T12:41:40.592643+00:00",
+  "e5_remote_verification": {
+    "fetched_artifact_commit": "7fd30103af06baf2863b74e2e9e058137a2b4b04",
+    "tree_sha": "435d72d778fcb736616e07ac1e75adc56687ca6e",
+    "truncated": false,
+    "entire_remote_blob_tree_matches_local_index": true,
+    "verified_tree_blob_count": 411,
+    "verified_new_artifact_blob_count": 20,
+    "checked_at": "2026-10-28T12:41:40.592643+00:00"
+  },
+  "e5_commands": [
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_early_reversal_experiment test_lbank_first_retest_experiment test_lbank_confirmation_experiment test_lbank_barrier_chase_experiment -q",
+      "exit_code": 0,
+      "tests_at_checkpoint": 60,
+      "new_tests_at_checkpoint": 16
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_early_reversal_experiment -q",
+      "exit_code": 0,
+      "tests": 20,
+      "reason": "Causality/priority/identity/readiness and malformed availability fixes before outcomes; four added tests"
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_early_reversal_experiment -q",
+      "exit_code": 0,
+      "tests": 22,
+      "reason": "Two additional cached import integrity tests; final E5 code"
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/compare_early_reversal_experiment.py",
+      "exit_code": 0
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/render_early_reversal_report.py",
+      "exit_code": 0
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/validate_early_reversal_experiment.py",
+      "exit_code": 0
+    },
+    {
+      "command": "git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --cached --check",
+      "exit_code": 0
+    }
+  ],
+  "e5_resume_transport_note": "An initial resumed state text transfer was truncated; immediately repaired linearly to complete byte-verified JSON atae75e860. No concurrent head was overwritten. All subsequent file reads are chunked and blob/tree-hash checked."
 }

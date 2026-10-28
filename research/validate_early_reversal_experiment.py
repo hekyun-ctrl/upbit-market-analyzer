@@ -26,12 +26,16 @@ def main():
     assert hashlib.sha256(gzip.decompress((OUT/'gate_decisions.csv.gz').read_bytes())).hexdigest()==m['uncompressed_decision_sha256']
     assert sha(OUT/'experiment_manifest.json')==m['declaration_sha256']==summary['declaration_sha256']
     for p,h in declaration['input_sha256'].items():assert sha(ROOT/p)==h,('DECLARED',p)
-    count=0
+    count=0;new_count=0
     for scenario,case in summary['experiments'].items():
         assert len(case['arms'])==32
         for old,new in declaration['comparison_pairs']:
             assert economic(case['arms'][old]['windows'])==economic(frozen['experiments'][scenario]['arms'][old]['windows']),('CONTROL',scenario,old)
             assert new==old+'_e5';count+=1
+            def signals(windows):
+                return {k:v['signals'] for k,v in economic(windows).items()}
+            assert signals(case['arms'][old]['windows'])==signals(case['arms'][new]['windows']),('E5_FINAL_ALERT_CHANGED',scenario,old)
+            new_count+=1
         for arm in case['arms'].values():
             a=arm['aggregate']
             if not a['trade_count']:assert a['total_net_usdt']==0 and a['unresolved_ratio'] is None
@@ -78,7 +82,7 @@ def main():
     commands=[dict(command=prefix+'python -m unittest test_lbank_early_reversal_experiment test_lbank_first_retest_experiment test_lbank_confirmation_experiment test_lbank_barrier_chase_experiment -q',exit_code=0,tests_at_checkpoint=60,new_tests_at_checkpoint=16),dict(command=prefix+'python -m unittest test_lbank_early_reversal_experiment -q',exit_code=0,tests=20,reason='Causality/priority/identity/readiness and malformed availability fixes before outcomes; four added tests'),dict(command=prefix+'python -m unittest test_lbank_early_reversal_experiment -q',exit_code=0,tests=22,reason='Two additional cached import integrity tests; final E5 code')]
     commands += [dict(command=prefix+x,exit_code=0) for x in ['python research/compare_early_reversal_experiment.py','python research/render_early_reversal_report.py','python research/validate_early_reversal_experiment.py']]
     commands += [dict(command='git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --cached --check',exit_code=0)]
-    checks=dict(all_code_input_output_hashes_match=True,decompressed_csv_hash_matches=True,original_arm_scenario_windows_exactly_equal=count,frozen_original_code_unchanged=unchanged,no_entry_zero_unresolved_null=True,per_event_recorded_rejections_or_explicit_no_confirmation=True,orders_sends_zero=True,blockers_preserved=True,trade_comparison_scenario_rows=len(trades),e5_candidate_evaluations=routes,explanatory_gate_evaluations=explanatory,e5_structure_scans=scans,exact_explanatory_input_reconstructions=len(variables),distinct_targeted_tests=66,new_synthetic_e5_tests=22)
+    checks=dict(all_code_input_output_hashes_match=True,decompressed_csv_hash_matches=True,original_arm_scenario_windows_exactly_equal=count,e5_final_alert_output_comparisons_equal=new_count,frozen_original_code_unchanged=unchanged,no_entry_zero_unresolved_null=True,per_event_recorded_rejections_or_explicit_no_confirmation=True,orders_sends_zero=True,blockers_preserved=True,trade_comparison_scenario_rows=len(trades),e5_candidate_evaluations=routes,explanatory_gate_evaluations=explanatory,e5_structure_scans=scans,exact_explanatory_input_reconstructions=len(variables),distinct_targeted_tests=66,new_synthetic_e5_tests=22)
     files=[p for p in OUT.iterdir() if p.is_file() and p.name not in ('validation.json','gate_decisions.csv') and not p.name.startswith('.gate_decisions.csv.')]
     result=dict(schema='zb_p2_e5_validation_v1',checked_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),started_at=state['e5_started_at'],source_checkpoint=BASE,predeclared_lease_commit='884da546f96ed88ccb813649af8ff24490521d3b',final_code_checkpoint='826c930a3c5efa9165dc902427bbabbf9f1fdf69',checks=checks,commands=commands,runtime=dict(python=platform.python_version(),sqlite=sqlite3.sqlite_version,ccxt=importlib.metadata.version('ccxt'),requests=importlib.metadata.version('requests')),file_sha256={p.name:sha(p) for p in sorted(files)},additional_code_sha256={p:sha(ROOT/p) for p in ('research/validate_early_reversal_experiment.py','test_lbank_early_reversal_experiment.py')},limits=['Reused development observations; no unseen/continuous qualification','Explanatory strata overlap; cost/delay variants not independent samples','One initial interrupted attempt before outcome inspection; causality corrections retained in attempts.json','Live ledger/P3-P5 incomplete; no profitability or whole-feature completion'])
     (OUT/'validation.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')

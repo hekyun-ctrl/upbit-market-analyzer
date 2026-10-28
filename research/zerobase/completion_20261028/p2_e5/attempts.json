@@ -16,7 +16,7 @@
     "completed_full_comparisons": 1,
     "report_completed": true,
     "code_checkpoint": "826c930a3c5efa9165dc902427bbabbf9f1fdf69",
-    "resume": "Usage pause interrupted artifact upload, not comparison/report. Both already complete on resume; neither rerun."
+    "resume": "On resume both comparison/report were already complete. Artifact upload had not committed, so only persistence/validation resumed; neither calculation rerun."
   },
   "strategy_parameter_versions": 1
 }
