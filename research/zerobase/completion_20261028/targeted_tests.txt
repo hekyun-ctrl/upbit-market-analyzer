@@ -1,0 +1,5 @@
+PAPER_SOURCE_UNAVAILABLE source=techniques
+----------------------------------------------------------------------
+Ran 121 tests in 0.244s
+
+OK

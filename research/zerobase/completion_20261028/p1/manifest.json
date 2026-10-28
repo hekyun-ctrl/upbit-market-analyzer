@@ -1,0 +1,26 @@
+{
+  "policy": "structural_target_inverse_entry_p1_v1",
+  "code_sha256": {
+    "lbank_structural_target_plan.py": "171f685144317452d184118e768b5d5e65a160f40d4c759a7b2d57aa1c04bdb3",
+    "lbank_futures_monitor.py": "e894569c9f30b1a52acbbb8e6552a90043445b89ed8de8929784ae19835b49b6",
+    "research/compare_structural_targets.py": "64aa40ef1bbb878b065a3c9f6a3f432a5d40366e32a6d25ea3d30eac1bb59369",
+    "research/compare_signal_decisions.py": "32da50557e2908d5de91122c497313990f90b2c9aa7e4e4f3e5a756a768cdca1",
+    "research/compare_entry_refinement.py": "ac44d78396bd03c46461df963a2789efc1ae60eeed390473ac83fa561ae4e021"
+  },
+  "input_sha256": {
+    "research/zerobase/entry_comparison_20261024/archive_chunks.json": "0d8b8db7cdccd009d2d08e7c9ece7403231bce3b4af8227b5bddff246daa8cce",
+    "research/zerobase/entry_comparison_20261024/recorded_quotes.json": "088b245a78a95453fe51d7555e3017eb413aea0ba39ff4fa729fc14a0071e88b",
+    "research/zerobase/entry_comparison_20261024/outcome_candle_logs.jsonl": "0254b28096f864b24e7b39a3d04bd464e33e03a588b4f36b0ea5e4dace9576b7",
+    "research/zerobase/entry_location_20261025/comparison.json": "47fb01bae99d8c0c315a52d26afb97d5bde8fedbe8faed7281c1ce5579640ab2"
+  },
+  "output_sha256": {
+    "comparison.json": "f553b743b79b929a94196be8510154b8458e1777c0930ec64bfcf769554b3610",
+    "gate_decisions.csv.gz": "dc85a902a002e773f2a74fc2caae00e9b2da72a1381ecf6d96c66019951ff276",
+    "trades.csv": "8124bf4a13bc6d56163c9a509e0372ffb142f67003033ed57c2f3857f2ca3c00",
+    "opportunities.csv": "13cc03498f2ce274f6d9e3f87985d0ccf3841b0e1b22618a0c9a4a617b195f8e",
+    "trade_cards.json": "51a192aaba98b09cf879057a06af4456374180d52bf9e5c6e2e65a2e01c6b63c"
+  },
+  "uncompressed_decision_sha256": "292c4580719f70a083c30a6948c287b3180a0c3124e2cadaf22aae513bfadc6d",
+  "command": "python research/compare_structural_targets.py",
+  "sample_class": "real retained public observations, development only; costs/receipts/fills modeled"
+}

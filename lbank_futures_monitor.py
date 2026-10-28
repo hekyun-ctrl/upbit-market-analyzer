@@ -387,7 +387,7 @@ def trend_retest_momentum_gate(prices, direction):
     return True, "retest_momentum_confirmed", momentum5, momentum15
 
 
-def calculate_plan(prices, direction, setup=None, native_state=None):
+def calculate_plan(prices, direction, setup=None, native_state=None, *, target_policy=None):
     """Cost-aware hypothetical levels with optional structure-anchored stop."""
     setup = setup or {"strategy": "breakout"}
     strategy = setup.get("strategy", "breakout")
@@ -433,6 +433,16 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
         stop = (min(curr * (1 - minimum_stop), anchor - curr * .0002)
                 if direction == 1 else
                 max(curr * (1 + minimum_stop), anchor + curr * .0002))
+    # Research-only dependency injection. No environment flag or live caller
+    # enables this path; detection and confirmation clocks remain independent.
+    structural = None
+    if target_policy is not None:
+        structural = target_policy(direction, curr, stop, setup, native_state)
+        if structural['status'] != 'qualified':
+            LOG.info("PLAN REJECT reason=%s strategy=%s direction=%s",
+                     structural['status'], strategy, direction)
+            return None
+        stop = structural['stop']
     stop_distance = abs(curr - stop) / curr
     if not (minimum_stop - 1e-10 <= stop_distance <= .0060):
         LOG.info("PLAN REJECT reason=stop_distance strategy=%s direction=%s price=%.1f stop=%.1f dist_pct=%.3f min_pct=%.3f max_pct=0.600",
@@ -441,8 +451,10 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     unit_loss = -net_pnl_per_btc(direction, curr, stop)
     if unit_loss <= 0:
         return None
-    t1 = minimum_net_rr_target(direction, curr, unit_loss, MIN_NET_RR)
-    t2 = minimum_net_rr_target(direction, curr, unit_loss, 2.5)
+    t1 = (structural['target1'] if structural else
+          minimum_net_rr_target(direction, curr, unit_loss, MIN_NET_RR))
+    t2 = (structural['target2'] if structural else
+          minimum_net_rr_target(direction, curr, unit_loss, 2.5))
     if t1 is None or t2 is None or t1 <= 0 or t2 <= 0:
         return None
     if native_state is not None:
@@ -484,6 +496,9 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     # This is still only an estimate: live venue contract steps are unverified.
     margin = math.floor(raw_qty * effective_entry / LEVERAGE * 100) / 100
     qty = margin * LEVERAGE / effective_entry
+    if structural:
+        qty = target_policy.quantity(qty, curr)
+        margin = qty * effective_entry / LEVERAGE
     if qty <= 0:
         return None
     net_loss = -qty * net_pnl_per_btc(direction, curr, stop)
@@ -518,6 +533,7 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
         "native_entry_geometry": geometry,
         "native_target_room": native_target_room,
         "entry_decision_priority": ranked,
+        **({'structural_target_plan': structural} if structural else {}),
         **({"entry_location": setup.get('entry_location'), "location_evidence": location_proof}
            if ENTRY_REFINEMENT_MODE == 'location' else {}),
     }
