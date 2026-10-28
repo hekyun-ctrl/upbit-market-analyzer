@@ -1,13 +1,16 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "implementation_in_progress",
+  "status": "checkpoint_complete_feature_incomplete",
   "lease": {
     "owner": "zb-sealed-importer-20261028-sole-worker",
-    "active": true,
+    "active": false,
     "acquired_at": "2026-10-28T14:38:39.904347+00:00",
     "expires_at": "2026-10-28T16:38:39.904347+00:00",
-    "expected_head": "8e2f3009d76de94f26269fa5ad1f3b2412e26f92"
+    "expected_head": "ebea0f0af9c8d6e762e95b5aeafc0a8598ffd698",
+    "released_at": "2026-10-28T14:52:59.313403+00:00",
+    "last_verified_head": "ebea0f0af9c8d6e762e95b5aeafc0a8598ffd698",
+    "release_reason": "Sealed received-stream importer/optional exact native-bar snapshot and immutable candidate-anchor binding implemented;76 focused tests/26 new pass; retained6 frames remain forming,6 final bindings rejected; artifact439-blob nontruncated remote tree matches local index. Whole P3-P5 incomplete."
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -34,16 +37,17 @@
     "Predeclared16-arm E4×E1×E3×target-panel development comparison;24 original full control arm-scenario windows exactly reproduced; full exclusions/additions, peer selection, fixed-plan timing/common ATR and manual-delay evidence retained",
     "59 distinct related tests (58-test run including14 new E4 plus1 new exact-boundary test);15 new E4 total; hashes/zero-null semantics and19 uploaded artifact blob hashes/entire fetched tree verified",
     "P2 E5 observed sweep/first completed reclaim/frozen opposite-trigger route; macro trend/RSI explanatory only;32 arms×3 scenarios;48 old full-window controls and48 E5 final-alert outputs exactly equal.66 distinct targeted tests including22 new synthetic;4336 E5 candidate evaluations and4340 exact-input explanation records; no final E5 entries or demonstrated improvement.",
-    "Disabled-by-default live EvidenceLedger sidecar connected to native wire receipts and monitor stages/frozen plan/delivery/followups; v0/v1-to-v2 additive migration, atomic envelopes, immutable candidate-anchor/restart links, explicit outage/crash gaps, bounded nondeleting recording and integrity/hash archive.140 distinct targeted tests/25 new;12 real policy input/output pairs unchanged under healthy/failed storage,6 retained raw frames preserve actual original bytes/receipts; no live deployment or qualification."
+    "Disabled-by-default live EvidenceLedger sidecar connected to native wire receipts and monitor stages/frozen plan/delivery/followups; v0/v1-to-v2 additive migration, atomic envelopes, immutable candidate-anchor/restart links, explicit outage/crash gaps, bounded nondeleting recording and integrity/hash archive.140 distinct targeted tests/25 new;12 real policy input/output pairs unchanged under healthy/failed storage,6 retained raw frames preserve actual original bytes/receipts; no live deployment or qualification.",
+    "Sealed received-stream importer: bounded atomic append-only seal chains, exact raw occurrence/revision/original UTC receipt, explicit restart/gaps and latest-final-bar snapshot coverage; optional live binding retains immutable original candidate source across restart. Archive inventories seals/snapshots.76 focused tests/26 new, original6 real frames/10 archived records,6 fail-closed final binding rejections, zero verified final bars/snapshots; production decoder remains chart-final-unknown, no live qualification."
   ],
   "blockers": [
     "RAW5M_INDEPENDENCE_UNVERIFIED",
     "CANDLE_VOLUME_UNIT_UNVERIFIED"
   ],
-  "next_work": "Check latest actual production/research/PR21/22/27 heads and inactive sole lease; implement sealed received-stream importer with exact wire occurrence/revision/closed-bar-to-snapshot causal binding and restart/gap provenance. Preserve immutable candidate/plan links, bounded nondeleting evidence and frozen strategies. P3 full actual gate traces/independent continuous unseen comparison, reviewed retention rotation and P4/P5 remain. Do not repeat completed P1/E1-E5 full comparisons/probes without changed-code/data reason. No sends/orders/deployment.",
+  "next_work": "Check latest actual production/research/PR21/22/27 heads and inactive sole lease. Next technical work: exact production gate-execution trace coverage and independent continuous comparison-state orchestration preserving frozen strategies; collect/qualify actual sources only when official final/volume schema and independently published native5m receipts become available. Sealed importer mechanics done, actual final-bar binding unqualified. Preserve all original development outcomes and bounded nondeleting evidence. No repeat completed P1/E1-E5 full comparisons/probes without changed-code/data reason; no sends/orders/deployment.",
   "outbound": false,
   "orders": false,
-  "ended_at": "2026-10-28T13:12:10.385604+00:00",
+  "ended_at": "2026-10-28T14:52:59.313403+00:00",
   "started_at_precision": "minute",
   "evidence_commits": {
     "lease": "f57b995bb7af938a200fb9d3c3ba4ad4499e76a0",
@@ -70,7 +74,10 @@
     "e5_comparison_artifacts": "7fd30103af06baf2863b74e2e9e058137a2b4b04",
     "live_ledger_lease": "392ec8edd9360730ee746bf69af6eb415e072432",
     "live_ledger_initial_code": "436656a696e2c9d9c9f39e128c16f441feec0640",
-    "live_ledger_full_artifacts": "9b0be7aa99b4eefc72a7f2af1626d2c7824ed7d1"
+    "live_ledger_full_artifacts": "9b0be7aa99b4eefc72a7f2af1626d2c7824ed7d1",
+    "sealed_importer_lease": "56393786ddb63bc1b09dd24c6c82e6d22ac70207",
+    "sealed_importer_code": "2603092abbcba078f3095e27e5241912950d8fad",
+    "sealed_importer_artifacts": "ebea0f0af9c8d6e762e95b5aeafc0a8598ffd698"
   },
   "pr": {
     "number": 27,
@@ -89,10 +96,10 @@
     "P0": "research ledger/replay complete only",
     "P1": "research implementation complete; alert utility/profitability unproven, not production qualified",
     "P2": "E1~E5 isolated research implementation and full necessary E5×E1×E3×E4×target development comparison complete only; no qualified unseen selection or production activation",
-    "P3": "real continuous received-time comparison remains blocked",
+    "P3": "Sealed occurrence/revision/restart-gap importer and optional immutable bar/snapshot/candidate binding mechanics implemented/tested; actual chart final unknown, full actual live gate/quote provenance and independent continuous unseen comparison remain incomplete",
     "P4": "not qualified; E5 final alerts unchanged in all48 contrasts, E5 entries0; prior E3/E4 unresolved outcomes persist; profitability/economic improvement unproven",
     "P5": "not performed or authorized",
-    "live_ledger": "Disabled runtime hooks and additive migration/atomic restart/outage/bounded nondeleting retention/verified backup implemented and locally tested; no deployed operation, raw-to-snapshot causal qualification, full gate traces or authorized archival rotation."
+    "live_ledger": "Disabled runtime hooks, migration/atomic restart/outage/bounded nondeleting archive plus sealed receipt binding mechanics implemented and locally tested; no deployed operation, official final decoder, actual source qualification, full gate traces or operator-reviewed archival rotation."
   },
   "result": {
     "base_delay0": {
@@ -151,9 +158,10 @@
     }
   },
   "technical_remaining": [
-    "P3: sealed received-stream importer and exact raw-occurrence-to-native-bar/snapshot causal binding, restart/gap audit and full actual gate trace coverage; continuous independent policy states and unseen comparison remain",
-    "Operator-reviewed archival retention/rotation and actual runtime enablement remain unperformed; bounded sidecar currently pauses recording rather than delete unfinished evidence",
-    "P4 qualified evidence review and P5 explicitly authorized application remain; whole feature incomplete"
+    "P3: full actually executed live gate traces and exact quote/all-input receipt provenance; optional sealed binding currently covers native bars only, not unexecuted gates or indicator derivation",
+    "P3: independent continuous policy-state comparison on unseen final/receipt-qualified native1m and independently published5m, including no-signal intervals, common-event timing, all exclusions/additions and frozen followups/costs; actual sealed raw-to-snapshot qualification is unavailable with retained forming frames",
+    "Operator-reviewed archival retention/rotation and actual runtime enablement remain unperformed; bounded sidecar pauses recording rather than delete unfinished evidence",
+    "P4 qualified evidence review/promotion decision and P5 explicitly authorized application remain; whole feature incomplete"
   ],
   "actual_data_waiting": [
     "Official futures candle subscription/schema including final-bar and volume unit definition",
@@ -193,6 +201,14 @@
       "anchor_followup_tests": 11,
       "wire_followup_tests": 12,
       "artifact_capture_report_error_preserved_and_fixed": true
+    },
+    {
+      "manifest": "research/zerobase/completion_20261028/received_stream/manifest.json",
+      "distinct_related_tests": 76,
+      "new_tests": 26,
+      "artifact_validator_passed": true,
+      "manifest_hashes_verified": 15,
+      "real_final_binding_failures": 6
     }
   ],
   "input_output_hashes": {
@@ -212,7 +228,10 @@
     "e5_report_manifest": "research/zerobase/completion_20261028/p2_e5/report_manifest.json",
     "e5_validation": "research/zerobase/completion_20261028/p2_e5/validation.json",
     "live_ledger_manifest": "research/zerobase/completion_20261028/live_ledger/manifest.json",
-    "live_ledger_validation": "research/zerobase/completion_20261028/live_ledger/validation.json"
+    "live_ledger_validation": "research/zerobase/completion_20261028/live_ledger/validation.json",
+    "received_stream_manifest": "research/zerobase/completion_20261028/received_stream/manifest.json",
+    "received_stream_validation": "research/zerobase/completion_20261028/received_stream/validation.json",
+    "received_stream_seal": "53f372ed471ecbc31e277d88eb76472d5522d3feeedfa9aa78cd803f3a7888e1"
   },
   "deployment_performed": false,
   "production_merge": false,
@@ -3841,5 +3860,45 @@
     "verified_tree": "7dd683a5c6afe28a2821f4aa5e32f6c8096f6384",
     "verified_nontruncated_blob_count": 425
   },
-  "sealed_importer_started_at": "2026-10-28T14:38:39.904347+00:00"
+  "sealed_importer_started_at": "2026-10-28T14:38:39.904347+00:00",
+  "sealed_importer_ended_at": "2026-10-28T14:52:59.313403+00:00",
+  "sealed_importer_result": {
+    "started_at": "2026-10-28T14:38:39.904347+00:00",
+    "ended_at": "2026-10-28T14:52:59.313403+00:00",
+    "related_tests": 76,
+    "new_tests": 26,
+    "retained_wire_occurrences": 6,
+    "retained_records": 10,
+    "retained_attempts": 2,
+    "explicit_restart_gap_records": 4,
+    "verified_final_bars": 0,
+    "actual_snapshot_bindings": 0,
+    "real_binding_rejections": 6,
+    "duplicate_reimport_identical": true,
+    "receipt_continuity_verified": false,
+    "raw_to_snapshot_qualification": false,
+    "full_actual_gate_vector_available": false,
+    "quote_receipt_verified": false,
+    "official_final_decoder_implemented": false,
+    "synthetic_final_decoder_test_only": true,
+    "source_blockers_unchanged": true,
+    "new_network_requests": 0,
+    "new_independent_samples": 0,
+    "profitability_validated": false,
+    "live_enabled": false,
+    "orders": false,
+    "outbound": false,
+    "deployment_performed": false
+  },
+  "sealed_importer_remote_verification": {
+    "fetched_artifact_commit": "ebea0f0af9c8d6e762e95b5aeafc0a8598ffd698",
+    "tree_sha": "db9ad1bff84d1e3ba97fc33c17723de2c7a86e75",
+    "truncated": false,
+    "entire_remote_blob_tree_matches_local_index": true,
+    "verified_blob_count": 439,
+    "checked_at": "2026-10-28T14:52:59.313403+00:00",
+    "pr21_22_27_open_draft_unmerged": true,
+    "production_research_pr21_pr22_heads_unchanged": true,
+    "required_actual_pr22_files_match_local": true
+  }
 }
