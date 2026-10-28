@@ -1,0 +1,28 @@
+{
+  "schema": "zb_completion_v1",
+  "started_at": "2026-10-28T03:18:00Z",
+  "status": "in_progress",
+  "lease": {
+    "owner": "zb-completion-20261028-sole-worker",
+    "acquired_at": "2026-10-28T03:22:00Z",
+    "expires_at": "2026-10-28T05:22:00Z",
+    "active": true
+  },
+  "base_heads": {
+    "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
+    "research": "5ea63fea7fb5a312a99702535c31d4dccd8155fd",
+    "pr21": "ce33a017ff6aca0729175a8f88c3ec978f4a84a2",
+    "pr22": "d098f5657d823769f468846df1fac5ec04986d0e"
+  },
+  "completed": [
+    "latest heads and PR states read",
+    "P0 design and evidence read"
+  ],
+  "blockers": [
+    "RAW5M_INDEPENDENCE_UNVERIFIED",
+    "CANDLE_VOLUME_UNIT_UNVERIFIED"
+  ],
+  "next_work": "P1 structural target only; official-source bounded read probes; same-data replay",
+  "outbound": false,
+  "orders": false
+}
