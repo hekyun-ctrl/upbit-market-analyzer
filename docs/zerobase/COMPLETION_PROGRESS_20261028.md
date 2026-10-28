@@ -258,3 +258,8 @@ Production/research/PR21/22 heads remain unchanged; PR21/22/27 open/draft/unmerg
 Original P3 acceptance remains incomplete: finite implementation left is original live-schedule/event integration plus reviewed official source and derived-input receipt linkage; real data still waits on documented final/volume semantics, independent native5m alongside1m with closed rollover/reconnect receipts and actual funding/fill/spread evidence. Then a predeclared unused continuous comparison and original P4 qualified report; reviewed retention operation and P5 explicitly authorized application remain distinct. No new short-circuit operand instrumentation is imposed as a profit prerequisite. **Whole feature/P3–P5/profitability are not complete.** Sole lease released.
 
 Raw captured command outputs preserve their original bytes including two trailing blank lines; the default staged whitespace check flagged those2 blank-at-EOF warnings. The staged check allowing raw-log blank EOF passed; code whitespace is clean.
+
+
+## Original live-schedule adapter lease
+
+Started 2026-10-28T16:24:21.745134+00:00. Actual production/research/PR21/22/27 heads and inactive sole lease verified. PR27 baseline60b70e73; production b4c7d94, research5ea63fe, PR21ce33a01, PR22d098f56 remain open/draft/unmerged. Single worker with expected-head writes. Implement original live scheduling/event adapter, independent restartable state and exact source-derived-input availability evidence without inventing historical receipts. Preserve frozen helper/strategy semantics; no new probes or completed full comparisons, no sends/orders/deployment. Actual official final/volume/independent5m sources remain unavailable.

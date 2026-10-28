@@ -1,16 +1,13 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "checkpoint_complete_feature_incomplete",
+  "status": "implementation_in_progress",
   "lease": {
-    "owner": "zb-gate-trace-orchestration-20261028-sole-worker",
-    "active": false,
-    "acquired_at": "2026-10-28T14:57:26.944652+00:00",
-    "expires_at": "2026-10-28T16:57:26.944652+00:00",
-    "expected_head": "9aafb3173f3877221fef323ac29857d833e30d1c",
-    "released_at": "2026-10-28T15:27:07.288145+00:00",
-    "last_verified_head": "9aafb3173f3877221fef323ac29857d833e30d1c",
-    "release_reason": "Original direct policy gate call/return/source/quote/decision-chain tracing and independent bounded restartable retained-schedule orchestration implemented/tested.117 related tests/28new pass;12 retained outputs exact,20-observation restart and original control exact; real finals/quote receipts/unseen qualified0. Original live schedule/source qualification/P3-P5 incomplete;463-blob remote tree matches local index."
+    "owner": "zb-original-live-schedule-20261028-sole-worker",
+    "active": true,
+    "acquired_at": "2026-10-28T16:24:21.745134+00:00",
+    "expires_at": "2026-10-28T18:24:21.745134+00:00",
+    "expected_head": "60b70e73ab6891d63bbf7851f466fb00e7db26d2"
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -45,7 +42,7 @@
     "RAW5M_INDEPENDENCE_UNVERIFIED",
     "CANDLE_VOLUME_UNIT_UNVERIFIED"
   ],
-  "next_work": "First recheck actual production/research/PR21/22/27 heads and inactive sole lease. Continue finite original P3: exact original live-schedule input adapter and reviewed official source/derived-input receipt linkage when documented sources exist; then predeclared unused continuous comparison, original P4 report and separately authorized P5. Do not repeat completed96-arm development replay, finite mechanics regression or same probes without a code/data reason. Preserve current source blockers and zero/null/frozen plan semantics. No deployment/sends/orders authorized by this checkpoint.",
+  "next_work": "Implement exact original live-schedule/event adapter with finite independent state regression; preserve all frozen policy helpers, source blockers and zero/null semantics. No sends/orders/deployment.",
   "outbound": false,
   "orders": false,
   "ended_at": "2026-10-28T15:27:07.288145+00:00",
