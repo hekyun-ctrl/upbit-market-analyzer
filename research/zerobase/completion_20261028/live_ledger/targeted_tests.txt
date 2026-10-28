@@ -1,0 +1,12 @@
+EVIDENCE_LOSS producer=true exception=Full risk_and_collector_unblocked=true
+EVIDENCE_LOSS producer=true exception=ValueError risk_and_collector_unblocked=true
+EVIDENCE_UNAVAILABLE exception=OperationalError risk_and_collector_unblocked=true
+EVIDENCE_LOSS writer=true exception=OperationalError risk_and_collector_unblocked=true
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+STORAGE_RESERVE status=low free_bytes=4096 reserve_bytes=8192 research_writable=False
+STORAGE_RESERVE status=ok free_bytes=10240 reserve_bytes=8192 research_writable=True
+STORAGE_RESERVE status=unknown free_bytes=None reserve_bytes=67108864 research_writable=False
+----------------------------------------------------------------------
+Ran 136 tests in 3.154s
+
+OK

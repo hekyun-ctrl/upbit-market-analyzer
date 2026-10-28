@@ -17,6 +17,7 @@ import time
 import zlib
 
 import aiohttp
+from lbank_live_evidence import observe
 
 LOG = logging.getLogger("lbank_native_candles")
 WS_URL = "wss://uuws.rerrkvifj.com/ws/v3"
@@ -173,9 +174,10 @@ class NativeCandleStore:
 
 
 class NativeCandleThread(threading.Thread):
-    def __init__(self, path=None):
+    def __init__(self, path=None, *, evidence=None):
         super().__init__(name="lbank-native-candles", daemon=True)
         self.path = path or os.getenv("LBANK_NATIVE_CANDLE_DB", "/data/lbank_native_candles.sqlite3")
+        self.evidence = evidence
 
     def run(self):
         while True:
@@ -208,7 +210,11 @@ class NativeCandleThread(threading.Thread):
                         next_log = 0
                         async for msg in ws:
                             if msg.type in (aiohttp.WSMsgType.TEXT, aiohttp.WSMsgType.BINARY):
+                                received_at = time.time()
                                 frame = decode_frame(msg.data)
+                                observe(self.evidence, 'native_frame', at=received_at,
+                                        frame=frame, received_at=received_at,
+                                        event_time=frame.get('w', 0) / 1000)
                                 for bar in store.ingest(frame, time.monotonic()):
                                     LOG.info("NATIVE_CANDLE_CLOSED %s", json.dumps(bar))
                                 if frame.get("x") == 2 and frame.get("z") in (3, 4):

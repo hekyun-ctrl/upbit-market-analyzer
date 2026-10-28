@@ -34,6 +34,8 @@ from lbank_performance import PerformanceBook
 from lbank_operational_health import (JournalRecovery, OperationalNotices,
                                       StorageReserve, blocked_diagnostic)
 from lbank_native_candles import NativeCandleThread
+from lbank_live_evidence import (from_environment as live_evidence_from_environment,
+                                 observe as observe_evidence, delivery_state)
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
 from lbank_entry_quality import (confirmation_quality, direction_priority,
@@ -929,8 +931,9 @@ def run():
     LOG.info("price_sample_cache_restored=%d", len(observations))
     # Only the writer thread owns a writable native DB connection. The entry
     # reader fails closed on missing, stale or discontinuous native history.
+    live_evidence = live_evidence_from_environment()
     if os.getenv("LBANK_NATIVE_CANDLES_ENABLED", "true").lower() == "true":
-        NativeCandleThread().start()
+        NativeCandleThread(evidence=live_evidence).start()
         LOG.info("NATIVE_CANDLES collection enabled; entry_source=native readiness_required=true")
     # ZB runtime supervisor is isolated from the existing risk/entry loop.
     if os.getenv("LBANK_ZB_RUNTIME_ENABLED", "true").lower() == "true":
@@ -1193,6 +1196,11 @@ def run():
                 [] if position_ledger.position else risk_tracker.check(
                     observed_prices, now, native_state=native_state)
             ):
+                observe_evidence(live_evidence, 'followup', at=now,
+                    reference=tracked.number, sent_at=tracked.sent_at,
+                    value=dict(status='observed_followup', reason=reason,
+                        quote=observed_price, observed_at=now,
+                        net_pnl_model=None, actual_fill_verified=False))
                 observed_kst = datetime.fromtimestamp(
                     now, tz=timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M")
                 notice = (
@@ -1338,6 +1346,10 @@ def run():
                         audit_ready = False
                         LOG.error("PERFORMANCE_V2 sample_failed exception=%s", type(exc).__name__)
                 continuous = native_state is not None
+                observe_evidence(live_evidence, 'observation', at=now,
+                    policy=ENTRY_REFINEMENT_MODE, quote=price,
+                    native_state=native_state, diagnostics=native_diag,
+                    reason=None if continuous else 'data_gap')
                 if not audit_ready:
                     watch = None
                     count_event("journal_unavailable")
@@ -1365,6 +1377,11 @@ def run():
                         plan = confirm_watch(prices, watch["plan"], age,
                                              native_state=native_state,
                                              diagnostics=confirm_diag)
+                        observe_evidence(live_evidence, 'confirmation', at=now,
+                            policy=ENTRY_REFINEMENT_MODE, quote=price,
+                            native_state=native_state, plan=plan or watch['plan'],
+                            reason=None if plan else confirm_diag.get('reason'),
+                            diagnostics=confirm_diag)
                         if plan is None:
                             count_event("confirm_reject")
                             if confirm_diag.get("reason") == "await_two_post_watch_closed_minutes":
@@ -1422,7 +1439,21 @@ def run():
                                     plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat(),
                                     reference_number=risk_tracker.next_number)
                                 send_started_at = time.time()
-                                if telegram(message):
+                                frozen_record = observe_evidence(live_evidence, 'frozen_plan', at=now,
+                                    policy=ENTRY_REFINEMENT_MODE, quote=price,
+                                    native_state=native_state, plan=plan,
+                                    candidate_at=watch['time'])
+                                delivered = telegram(message)
+                                if frozen_record:
+                                    observe_evidence(live_evidence, 'delivery', at=time.time(),
+                                        frozen_record_hash=frozen_record,
+                                        status=delivery_state(delivered, TELEGRAM_DELIVERY.last_class),
+                                        receipt=dict(requested_at=send_started_at,
+                                            transport_returned_success=delivered,
+                                            transport_class=TELEGRAM_DELIVERY.last_class,
+                                            provider_message_id=None,
+                                            recipient_receipt_verified=False))
+                                if delivered:
                                     acknowledged_at = time.time()
                                     plan["entry_timing"].update(send_started_at=send_started_at,
                                         telegram_acknowledged_at=acknowledged_at,
@@ -1435,6 +1466,10 @@ def run():
                                     save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
                                                    observations, alert_state)
                                     sent_signal = risk_tracker.add_sent_signal(plan, now)
+                                    if frozen_record:
+                                        observe_evidence(live_evidence, 'signal_link', at=now,
+                                            reference=sent_signal.number, sent_at=sent_signal.sent_at,
+                                            frozen_record_hash=frozen_record)
                                     LOG.info("ENTRY_QUALITY_SENT reference=%d evidence=%s",
                                              sent_signal.number, json.dumps(plan["entry_quality"], sort_keys=True))
                                     LOG.info("ENTRY_PRIORITY_SENT reference=%d evidence=%s",
@@ -1486,6 +1521,11 @@ def run():
                     rejection["entry_timing"] = timing
                     rejection["data_source"] = NATIVE_SOURCE
                     last_entry_diagnostics = rejection
+                    observe_evidence(live_evidence, 'candidate', at=now,
+                        policy=ENTRY_REFINEMENT_MODE, quote=price,
+                        native_state=native_state, plan=proposal,
+                        reason=None if proposal else rejection.get('reason'),
+                        diagnostics=rejection)
                     performance.sample(now, price, decision=rejection)
                     LOG.info("ENTRY_SETUP_EVALUATED %s", json.dumps(rejection, sort_keys=True))
                     if proposal is not None:
