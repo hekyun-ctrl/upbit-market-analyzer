@@ -1263,6 +1263,16 @@ def run():
                               tracked.number, reason)
             # Newly completed native bars must not wait for the unrelated price
             # sample timer. Never promote a forming candle or append a quote.
+            observe_evidence(live_evidence, 'entry_poll', at=now,
+                policy=ENTRY_REFINEMENT_MODE, quote=price,
+                quote_record_hash=quote_evidence.get('record_hash'),
+                native_state=native_state, journal_available=audit_ready,
+                native_diagnostics=native_diag,
+                original_schedule_state=dict(last_sample=last_sample,
+                    last_setup_key=last_setup_key, observed_ready_key=observed_ready_key,
+                    first_ready_observed_at=first_ready_observed_at,
+                    watch=watch, alert_state=alert_state, poll_seconds=POLL),
+                receipt_continuity_verified=False)
             sample_due = now - last_sample >= POLL
             confirm_due = watch is not None and now - watch["time"] >= 30
             new_setup_bar = native_key is not None and native_key != last_setup_key

@@ -21,7 +21,7 @@ from lbank_signal_evidence import EvidenceLedger, canonical, digest, gate_vector
 LOG = logging.getLogger('lbank_live_evidence')
 VERSION = 2
 KINDS = frozenset(('native_frame', 'observation', 'candidate', 'confirmation', 'alert_eligibility',
-                   'frozen_plan', 'delivery', 'outcome', 'gap', 'signal_link', 'followup', 'quote_frame'))
+                   'frozen_plan', 'delivery', 'outcome', 'gap', 'signal_link', 'followup', 'quote_frame', 'entry_poll'))
 BLOCKERS = ['RAW5M_INDEPENDENCE_UNVERIFIED', 'CANDLE_VOLUME_UNIT_UNVERIFIED']
 
 
@@ -165,7 +165,7 @@ class LiveEvidenceStore:
                                   transport_received_at=data['received_at']),
                 event_time=data.get('event_time'), received_at=data['received_at'],
                 quality='raw_chart_feed; final_and_volume_and_independent_5m_unverified')
-        elif kind in ('observation', 'candidate', 'confirmation', 'alert_eligibility', 'frozen_plan'):
+        elif kind in ('entry_poll', 'observation', 'candidate', 'confirmation', 'alert_eligibility', 'frozen_plan'):
             state = data.get('native_state')
             plan = data.get('plan')
             binding = None

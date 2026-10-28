@@ -10,6 +10,7 @@ import copy
 from collections import Counter, deque
 from contextlib import ExitStack
 import hashlib
+import math
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -42,7 +43,8 @@ def source_slice():
             len(n.targets) == 1 and isinstance(n.targets[0], ast.Name) and n.targets[0].id == name)
     ready = unique(lambda n: isinstance(n, ast.If) and ast.unparse(n.test) ==
                    'native_key is not None and native_key != observed_ready_key')
-    sample = unique(lambda n: isinstance(n, ast.If) and ast.unparse(n.test) == 'sample_due')
+    sample = unique(lambda n: isinstance(n, ast.If) and ast.unparse(n.test) == 'sample_due'
+                    and n.body and isinstance(n.body[0], ast.Assign))
     # Only the original sample cursor/cache writes affect the entry scheduler.
     # Neutral RSI/manual-position shadow work remains outside this adapter.
     if not (len(sample.body) >= 3 and ast.unparse(sample.body[0]) == 'last_sample = now'
@@ -66,6 +68,7 @@ def schedule_definition(config):
     if (type(value['poll_seconds']) is not int or value['poll_seconds'] < 30
             or value['delivery_model'] not in ('modeled_success', 'modeled_failure')
             or type(value['initial_last_sample']) not in (int, float)
+            or not math.isfinite(value['initial_last_sample'])
             or value['initial_last_sample'] < 0 or value['entry_mode'] != 'capture'):
         raise ValueError('INVALID_ORIGINAL_SCHEDULE_CONFIG')
     actual = hashlib.sha256(ast.dump(source_slice(), include_attributes=False).encode()).hexdigest()
@@ -87,6 +90,50 @@ def runtime_state(settings):
         observations=[],last_entry_diagnostics={})
 
 
+def stored_poll_points(db, *, after_rowid=0, limit=1000):
+    """Exact recorded poll inputs, never interpolate missing live quote polls.
+
+    rowid is sidecar insertion order, not exchange receive sequence. Recorded
+    gaps are carried; unclean restart inventory remains in the source store.
+    Missing/unclean continuity stays unverified. No receipt is synthesized.
+    A caller declares the policy start state and persists its own input cursor.
+    """
+    import json
+    if type(after_rowid) is not int or after_rowid<0 or type(limit) is not int or not 0<limit<=10000:
+        raise ValueError('BOUNDED_POLL_EXPORT_REQUIRED')
+    rows=db.execute("SELECT rowid,record_hash,payload FROM live_records WHERE kind='entry_poll' AND rowid>? ORDER BY rowid LIMIT ?",
+                    (after_rowid,limit)).fetchall()
+    points=[];previous_rowid=after_rowid
+    for rowid,key,raw in rows:
+        envelope=json.loads(raw)
+        if digest(envelope)!=key:raise ValueError('POLL_ENVELOPE_HASH_MISMATCH')
+        data=envelope['data'];at=envelope['observed_at']
+        quote_key=data.get('quote_record_hash');quote=None
+        if quote_key is not None:
+            record=db.execute("SELECT payload FROM live_records WHERE record_hash=? AND kind='quote_frame'",(quote_key,)).fetchone()
+            if not record:raise ValueError('POLL_QUOTE_RECEIPT_MISSING')
+            quote=json.loads(record[0])
+            if digest(quote)!=quote_key or quote['observed_at']>at or quote['data']['quote']!=data['quote']:
+                raise ValueError('POLL_QUOTE_RECEIPT_MISMATCH')
+        if type(data.get('journal_available')) is not bool:
+            raise ValueError('POLL_JOURNAL_STATE_REQUIRED')
+        gaps=db.execute("SELECT payload FROM live_records WHERE kind='gap' AND rowid>? AND rowid<? ORDER BY rowid LIMIT 1001",
+                        (previous_rowid,rowid)).fetchall()
+        if len(gaps)>1000:raise ValueError('POLL_GAP_EXPORT_CAP_NONDELETING')
+        points.append(dict(sidecar_rowid=rowid,observed_at=at,quote=data['quote'],
+            native_state=copy.deepcopy(data.get('native_state')),
+            source_observation=dict(entry_poll_record_hash=key,entry_poll_envelope=envelope,
+                normalized_quote_receipt_envelope=quote,
+                sidecar_gap_records=[json.loads(r[0]) for r in gaps],
+                unclean_restart_inventory='source_store.live_audit; not assigned an invented historical time',
+                receipt_continuity_verified=False),
+            journal_available=data['journal_available'],
+            native_diagnostics=copy.deepcopy(data.get('native_diagnostics',{})),
+            quote_record_hash=quote_key,received_snapshot_hash=data.get('received_snapshot_hash')))
+        previous_rowid=rowid
+    return points
+
+
 class OriginalLiveComparison(ContinuousComparison):
     def __init__(self, book, manifest, **kwargs):
         if manifest.get('schedule') != SCHEDULE:
@@ -96,6 +143,11 @@ class OriginalLiveComparison(ContinuousComparison):
         if any(p['confirmation_on_discovery'] or p['e5'] for p in manifest['policies']):
             raise ValueError('POLICY_REQUIRES_EXPLICIT_EXPERIMENTAL_SCHEDULE')
         self.code = compile(source_slice(), str(SOURCE), 'exec')
+        run = next(n for n in ast.parse(SOURCE.read_text()).body
+                   if isinstance(n,ast.FunctionDef) and n.name=='run')
+        self.counter_template = ast.literal_eval(next(n.value for n in run.body
+            if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and
+                t.id=='counter_template' for t in n.targets)))
         self.settings = schedule_definition(manifest['schedule_config'])
         super().__init__(book, manifest, **kwargs)
 
@@ -162,7 +214,7 @@ class OriginalLiveComparison(ContinuousComparison):
                 audit_ready=point.get('journal_available',True),live_evidence=ADAPTER,
                 quote_evidence=dict(record_hash=point.get('quote_record_hash')),
                 market_context=copy.deepcopy(point.get('market_context',{})),
-                pending_journal=[],count_event=lambda key:counters.update([key]),
+                pending_journal=[],counter_template=self.counter_template,count_event=lambda key:counters.update([key]),
                 telegram=send,TELEGRAM_DELIVERY=SimpleNamespace(last_class='offline_model_no_transport'),
                 time=SimpleNamespace(time=lambda:at),observe_evidence=observe,
                 save_snapshots=lambda *a,**kw:virtual('sample_cache_write'),
@@ -183,17 +235,19 @@ class OriginalLiveComparison(ContinuousComparison):
         current['original_live_runtime']=runtime
         current['watch']=copy.deepcopy(runtime['watch']);current['alert']=copy.deepcopy(runtime['alert_state'])
         current['watches']+=counters['watched'];current['expired']+=counters['expired']
-        current['plans'].extend(frozen)
+        entered = frozen if namespace.get('delivered') is True else []
+        current['plans'].extend(entered)
         evaluated=namespace['sample_due'] or namespace['confirm_due'] or namespace['setup_due']
         valid=state is not None and namespace['audit_ready']
         if valid:current['valid']+=1
         else:current['unavailable']+=1
         result.update(status='evaluated' if evaluated else 'no_entry_evaluation_due',valid_interval=valid,
-            modeled_net_usdt=0 if valid and not frozen else None,no_entry=not frozen,
-            plan_ids=[c['plan_id'] for c in frozen],
+            modeled_net_usdt=0 if valid and not entered else None,no_entry=not entered,
+            plan_ids=[c['plan_id'] for c in entered],
+            qualified_frozen_plan_ids=[c['plan_id'] for c in frozen],
             schedule=dict((k,namespace[k]) for k in ('sample_due','confirm_due','new_setup_bar','quote_setup_due','setup_due')),
             actual_policy_call_order=calls,events=events,counters=dict(counters),
-            no_signal_interval=not frozen,phases=copy.deepcopy(trace.decisions),
+            no_signal_interval=not entered,phases=copy.deepcopy(trace.decisions),
             declared_delivery_model=self.settings['delivery_model'],
             full_live_network_or_followup_loop_executed=False,actual_outbound=0)
         return result
