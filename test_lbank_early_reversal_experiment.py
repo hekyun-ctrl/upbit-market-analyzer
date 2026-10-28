@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import lbank_futures_monitor as monitor
-from lbank_signal_evidence import EvidenceLedger,gate_vector
+from lbank_signal_evidence import EvidenceLedger,gate_vector,event_id
 from research.early_reversal_experiment import (detect_reversals,frozen_recovery,
     canonical_anchor,E5Mixin,E5_CLASSES,BASE_CLASSES,STRATEGY,replay)
 from research.compare_confirmation_experiment import E3Mixin
@@ -92,6 +92,17 @@ class E5Tests(unittest.TestCase):
         p2=self.proposal(s);self.assertEqual(canonical_anchor(p2['_p2_e5_detection'],0),a)
         self.assertEqual(p2['_p2_e5_detection']['trigger'],f['trigger'])
 
+    def test_new_sweep_against_same_support_is_a_distinct_event(self):
+        s=reversal_state();f=self.proposal(s)['_p2_e5_detection'];first=canonical_anchor(f,0)
+        second=copy.deepcopy(f);second['sweep_source']['start']+=60
+        self.assertNotEqual(event_id(1,STRATEGY,first),event_id(1,STRATEGY,canonical_anchor(second,0)))
+
+    def test_invalid_clock_delay_and_receipt_fail_closed(self):
+        for now,delay in ((None,0),(self.now(reversal_state()),float('nan'))):
+            self.assertEqual(detect_reversals(reversal_state(),now,delay),[])
+        s=reversal_state();s['minute_bars'][-1]['received_at']=float('nan')
+        self.assertEqual(detect_reversals(s,self.now(s)),[])
+
     def test_first_post_recovery_stop_or_level_loss_is_terminal(self):
         for d in (1,-1):
             for kind in ('stop','level'):
@@ -153,6 +164,23 @@ class E5Tests(unittest.TestCase):
         with patch.object(t,'record'):self.assertIsNone(t.schedule(p))
         p['_evidence_event_id']='new-structure'
         self.assertEqual(t.schedule(p),p)
+
+    def test_existing_fresh_breakout_priority_precedes_added_e5(self):
+        s=reversal_state();t=self.trace(s);seen=[]
+        def assess(prices,d,setup,**kwargs):
+            seen.append(setup['strategy']);kwargs['diagnostics']['reason']='synthetic_no_plan';return None
+        fresh=dict(breakout_long=True,breakout_short=False,prior_high=80020.,prior_low=79980.,momentum5_pct=0,momentum15_pct=0)
+        with patch.object(monitor,'detect_structures',return_value=[]),patch.object(monitor,'breakout_evidence',return_value=fresh),patch.object(monitor,'assess_candidate',side_effect=assess):
+            self.classify(t,s)
+        self.assertEqual(seen,['breakout',STRATEGY])
+
+    def test_preempted_confirmation_does_not_reuse_prior_e5_readiness(self):
+        s=reversal_state();t=self.trace(s,E5_CLASSES[1]);p=self.proposal(s)
+        p.update(stop=79950.,native_watch_1m_start=s['minute_bars'][-1]['start'])
+        t.e5_readiness={'stale':'previous event'}
+        with patch.object(t,'inputs',return_value='input'),patch.object(t,'record') as record:
+            t.confirm(lambda *a,**kw:None,s['prices'],p,0,native_state=s,diagnostics={})
+        self.assertIsNone(t.e5_readiness)
 
     def test_all16_combinations_have_distinct_expected_names_and_clocks(self):
         s=reversal_state();names=set()

@@ -19,14 +19,17 @@ STRATEGY = 'early_reversal'
 
 
 def available_minutes(state, now, delay=0):
-    valid = valid_minutes(state)
-    if valid is None or not math.isfinite(now) or delay < 0:
+    try:
+        valid = valid_minutes(state)
+        if valid is None or not math.isfinite(now) or not math.isfinite(delay) or delay < 0:
+            return None
+        bars, atr = valid
+        if any(b['start']+60+delay > now or
+               (b.get('received_at') is not None and (not math.isfinite(b['received_at']) or b['received_at'] > now)) for b in bars):
+            return None
+        return bars, atr
+    except (KeyError, TypeError, ValueError, OverflowError):
         return None
-    bars, atr = valid
-    if any(b['start']+60+delay > now or
-           (b.get('received_at') is not None and b['received_at'] > now) for b in bars):
-        return None
-    return bars, atr
 
 
 def detect_reversals(state, now, delay=0, diagnostics=None):
@@ -118,7 +121,8 @@ def frozen_recovery(state, watch, now, delay=0):
 
 def canonical_anchor(proof, delay):
     b=proof['level_source'];s=proof['sweep_source'];d=proof['direction']
-    return dict(bar_hash=digest(b),bar_start=b['start'],period=60,
+    return dict(bar_hash=digest(dict(level_source=b,sweep_source=s)),
+        bar_hash_basis='composite_exact_level_and_sweep_sources',bar_start=b['start'],period=60,
         field='low' if d==1 else 'high',price=proof['level'],
         sweep_hash=digest(s),sweep_start=s['start'],known_at=None,
         nominal_available_at=s['start']+60+delay,
@@ -134,7 +138,14 @@ class E5Mixin:
     def classify(self,original,prices,*args,**kwargs):
         state=kwargs['native_state'];detector=replay.monitor.detect_structures
         def injected(*a,**kw):
-            capture=detector(*a,**kw);diag={}
+            capture=list(detector(*a,**kw));diag={}
+            # classify appends fresh breakout proposals after detect_structures.
+            # Put byte-identical fresh proposals before E5 here; classify's
+            # existing (strategy,direction) dedupe ignores its later duplicates.
+            # This keeps every original capture proposal ahead of the new route.
+            fresh=replay.monitor.breakout_evidence(prices,state,replay.monitor.ema,adaptive=True)
+            for d,key,level in ((1,'breakout_long','prior_high'),(-1,'breakout_short','prior_low')):
+                if fresh[key]:capture.append(dict(strategy='breakout',direction=d,level=fresh[level]))
             proposals=detect_reversals(state,self.now,self.delay,diag)
             if kw.get('diagnostics') is not None:kw['diagnostics']['e5_detection']=diag
             return capture+proposals
@@ -178,6 +189,7 @@ class E5Mixin:
             return result
 
     def confirm(self,original,prices,watch,age,*args,**kwargs):
+        self.e5_readiness=None
         if watch.get('strategy')!=STRATEGY:
             return super().confirm(original,prices,watch,age,*args,**kwargs)
         def checked(*a,**kw):

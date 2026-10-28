@@ -1,0 +1,13 @@
+{
+  "schema": "e5_attempts_v1",
+  "recorded_at": "2026-10-28T10:03:00.304530+00:00",
+  "first_attempt": {
+    "code_checkpoint": "43d201bd48ab5bd0486dbbf1d469fa7709c95c4d",
+    "status": "excluded_before_reading_outcomes",
+    "reason": "Code inspection found appended fresh breakout priority could be changed and canonical event identity ignores extra sweep fields. Also reset preempted readiness to null. No parameters changed, no outcome inspection/tuning. Any completed artifact of this execution is retained separately as invalid."
+  },
+  "final_attempt": {
+    "status": "not_started",
+    "code_review_fixes": "Keep original fresh breakout before E5, composite exact level+sweep anchor hash, clear readiness before preempted confirmation, malformed availability fails closed. Added regression tests."
+  }
+}
