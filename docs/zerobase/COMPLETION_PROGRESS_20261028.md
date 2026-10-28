@@ -192,3 +192,8 @@ E5만 RSI/5·15분 역추세를 실행·기록한 설명 변수로 다루고, �
 운영b4c7d94/연구5ea63fe/PR21ce33a01/PR22d098f56은 시작과 같고 PR21/22/27은 open/draft/unmerged다. 발송·주문·배포·운영병합·Railway/Upbit·CAP·ZIL 변경 없음. RAW5M_INDEPENDENCE_UNVERIFIED·CANDLE_VOLUME_UNIT_UNVERIFIED, 공식 완료/volume/독립5m/수신 연속성·실제 펀딩/체결·미사용 자료 부족을 유지한다. 6개 같은feed forming frame을 독립자료로 승격하지 않았다. 수익 기준을 낮추거나100paper/30일 선행조건을 추가하지 않았다.
 
 P2는 E1~E5 독립 연구 구현·필요 조합의 개발 비교까지 완료다. 다음 기술 작업은 실패 격리 live EvidenceLedger adapter의 versioned migration/restart/outage/보존 연결이다. P3 실제 연속 수신/미사용 비교·P4 정식 승격 보고·P5 승인된 적용은 미완료다. 전체 기능 완료·수익 입증으로 보고하지 않으며 이번 단일 lease만 해제한다.
+
+
+## Failure-isolated live ledger implementation lease
+
+Started 2026-10-28T12:52:48.754373+00:00. Actual production/research/PR21/22/27 heads and inactive lease verified; PR27 starts at1a30b248. Sole worker claims the lease with expected-head writes. Next: disabled-by-default bounded asynchronous EvidenceLedger adapter, versioned migration, idempotent restart, outage/gap audit, safe retention with archive hashes, and meaningful failure injection plus retained-real-data integration checks. No strategy/replay retuning, sends, orders, deployment or production merge. P3~P5 and source blockers remain.

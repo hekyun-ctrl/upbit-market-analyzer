@@ -1,16 +1,13 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "checkpoint_complete_feature_incomplete",
+  "status": "live_ledger_implementation_in_progress",
   "lease": {
-    "owner": "zb-e5-20261028-sole-worker",
-    "active": false,
-    "acquired_at": "2026-10-28T09:55:58.304189+00:00",
-    "expires_at": "2026-10-28T13:32:35.807677+00:00",
-    "resumed_at": "2026-10-28T12:32:35.807677+00:00",
-    "resume_reason": "Same sole worker after usage pause; latest remote e9b0420 unchanged; no duplicate worker. Corrected replay and report already finished; do not repeat.",
-    "released_at": "2026-10-28T12:41:40.592643+00:00",
-    "release_reason": "E5 isolated route and32-arm development comparison complete; full artifact commit7fd3010 and411-blob nontruncated remote tree verified. Sole worker checkpoint ended; whole feature incomplete."
+    "owner": "zb-ledger-20261028-sole-worker",
+    "active": true,
+    "acquired_at": "2026-10-28T12:52:48.754373+00:00",
+    "expires_at": "2026-10-28T14:52:48.754373+00:00",
+    "expected_head": "1a30b248b2dae9eb16b16b28b756b65b379d16a8"
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -3802,5 +3799,6 @@
       "exit_code": 0
     }
   ],
-  "e5_resume_transport_note": "An initial resumed state text transfer was truncated; immediately repaired linearly to complete byte-verified JSON atae75e860. No concurrent head was overwritten. All subsequent file reads are chunked and blob/tree-hash checked."
+  "e5_resume_transport_note": "An initial resumed state text transfer was truncated; immediately repaired linearly to complete byte-verified JSON atae75e860. No concurrent head was overwritten. All subsequent file reads are chunked and blob/tree-hash checked.",
+  "live_ledger_started_at": "2026-10-28T12:52:48.754373+00:00"
 }
