@@ -20,7 +20,7 @@ from lbank_signal_evidence import EvidenceLedger, canonical, digest, gate_vector
 
 LOG = logging.getLogger('lbank_live_evidence')
 VERSION = 2
-KINDS = frozenset(('native_frame', 'observation', 'candidate', 'confirmation',
+KINDS = frozenset(('native_frame', 'observation', 'candidate', 'confirmation', 'alert_eligibility',
                    'frozen_plan', 'delivery', 'outcome', 'gap', 'signal_link', 'followup'))
 BLOCKERS = ['RAW5M_INDEPENDENCE_UNVERIFIED', 'CANDLE_VOLUME_UNIT_UNVERIFIED']
 
@@ -133,11 +133,16 @@ class LiveEvidenceStore:
         if kind == 'native_frame':
             # Same wire frame can arrive repeatedly. Receipt versions are not
             # overwritten, and raw frame hash is distinct from occurrence hash.
+            wire_hex, wire_sha256 = data.get('wire_hex'), data.get('wire_sha256')
+            if wire_hex is not None and hashlib.sha256(bytes.fromhex(wire_hex)).hexdigest() != wire_sha256:
+                raise ValueError('RAW_WIRE_HASH_MISMATCH')
             self.book.source(dict(frame=data['frame'], wire_hash=digest(data['frame']),
+                                  raw_wire_hex=wire_hex, raw_wire_sha256=wire_sha256,
+                                  exact_wire_bytes_available=wire_hex is not None,
                                   transport_received_at=data['received_at']),
                 event_time=data.get('event_time'), received_at=data['received_at'],
                 quality='raw_chart_feed; final_and_volume_and_independent_5m_unverified')
-        elif kind in ('observation', 'candidate', 'confirmation', 'frozen_plan'):
+        elif kind in ('observation', 'candidate', 'confirmation', 'alert_eligibility', 'frozen_plan'):
             state = data.get('native_state')
             plan = data.get('plan')
             for period, name in ((60, 'minute_bars'), (300, 'five_bars')):
@@ -145,9 +150,22 @@ class LiveEvidenceStore:
                     if bar['start'] + period > at or (bar.get('received_at') is not None
                                                       and bar['received_at'] > at):
                         raise ValueError('INPUT_NOT_AVAILABLE_AT_EVALUATION')
-            anchor, family = anchor_for(plan, state)
+            anchor, family = anchor_for(plan, state) if kind == 'candidate' else (None, None)
+            first_observed_at = at
+            anchor_link_status = 'candidate_source' if anchor else 'anchor_not_available'
+            if kind in ('confirmation', 'alert_eligibility', 'frozen_plan'):
+                prior = self.db.execute("SELECT payload FROM live_records WHERE record_hash=? AND kind='candidate'",
+                    (data.get('candidate_record_hash'),)).fetchone()
+                if prior:
+                    original = json.loads(prior[0])
+                    first_observed_at = original['observed_at']
+                    anchor, family = anchor_for(original['data'].get('plan'), original['data'].get('native_state'))
+                    anchor_link_status = 'immutable_candidate_source' if anchor else 'candidate_anchor_missing'
+                else:
+                    anchor, family = None, None
+                    anchor_link_status = 'candidate_record_missing'
             event = (self.book.opportunity(plan['direction'], family, anchor,
-                         first_observed_at=at) if anchor else None)
+                         first_observed_at=first_observed_at) if anchor else None)
             # Snapshot observation is not a raw candle receipt. Never fill in
             # received_at/known_at from monitor evaluation time.
             raw = self.book.source(dict(kind='monitor_snapshot', at=at, state=state,
@@ -159,11 +177,13 @@ class LiveEvidenceStore:
                 input_hash=inputs, state=kind, gates=gate_vector(),
                 first_reject=data.get('reason'), available_at=None, availability_basis=None,
                 diagnostics=data.get('diagnostics'), source_blockers=BLOCKERS,
-                actual_gate_vector_available=False, candidate_is_entry=False)
+                actual_gate_vector_available=False, candidate_is_entry=False,
+                anchor_link_status=anchor_link_status)
             if kind == 'frozen_plan':
                 plan_id = self.book.freeze(event=event, policy=data['policy'], plan=plan,
                     provenance=dict(input_hash=inputs, anchor=anchor, candidate_at=data.get('candidate_at'),
-                                    confirm_at=at, live_record_hash=key, actual_fill_verified=False), intent=True)
+                                    confirm_at=at, live_record_hash=key, anchor_link_status=anchor_link_status,
+                                    actual_fill_verified=False), intent=True)
                 # Store a model-unresolved lifecycle immediately. No-entry is not
                 # represented by a synthetic zero-return trade.
                 self.book.outcome(plan_id, dict(status='unresolved', net_pnl_model=None,
@@ -272,8 +292,11 @@ class LiveEvidenceAdapter:
             payload = canonical(envelope)
             if len(payload.encode()) > self.max_event_bytes:
                 raise ValueError('EVIDENCE_EVENT_TOO_LARGE')
-            self.queue.put_nowait(payload)
-            self.stats['accepted'] += 1
+            with self.lock:
+                if self.stop.is_set():
+                    raise ValueError('EVIDENCE_CLOSED')
+                self.queue.put_nowait(payload)
+                self.stats['accepted'] += 1
             return digest(envelope)
         except Exception as exc:
             with self.lock:
@@ -339,7 +362,8 @@ class LiveEvidenceAdapter:
 
     def close(self, timeout=0):
         # Live callers never wait for storage. Tests/admin may request a bound.
-        self.stop.set()
+        with self.lock:
+            self.stop.set()
         self.thread.join(timeout)
         return not self.thread.is_alive()
 
@@ -369,3 +393,15 @@ def delivery_state(delivered, transport_class):
     # is retained as evidence but cannot certify an ACK with an invented ID.
     return ('send_ack_unknown' if delivered or transport_class == 'network_or_response_error'
             else 'send_failed')
+
+
+def capture_native_frame(adapter, frame, wire, received_at):
+    if not getattr(adapter, 'enabled', False):
+        return None
+    try:
+        raw = wire.encode('utf-8') if isinstance(wire, str) else bytes(wire)
+        return observe(adapter, 'native_frame', at=received_at, frame=frame,
+            received_at=received_at, event_time=frame.get('w', 0)/1000,
+            wire_hex=raw.hex(), wire_sha256=hashlib.sha256(raw).hexdigest())
+    except Exception:
+        return None

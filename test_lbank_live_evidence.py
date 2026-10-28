@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 from lbank_signal_evidence import EvidenceLedger, canonical, digest
 from lbank_live_evidence import (LiveEvidenceStore, LiveEvidenceAdapter, DisabledEvidence,
-    from_environment, observe, delivery_state, VERSION)
+    from_environment, observe, delivery_state, capture_native_frame, VERSION)
 
 
 def envelope(kind='candidate', at=300., **data):
@@ -34,6 +34,14 @@ def wait_for(predicate, timeout=3):
             return
         time.sleep(.005)
     raise AssertionError('sidecar did not reach expected test state')
+
+
+def preserve_case(name, value):
+    destination = os.getenv('ZB_LEDGER_TEST_ARTIFACTS')
+    if destination:
+        path = Path(destination)
+        path.mkdir(parents=True, exist_ok=True)
+        (path/(name+'.json')).write_text(json.dumps(value, ensure_ascii=False, sort_keys=True, indent=2)+'\n')
 
 
 class StoreTests(unittest.TestCase):
@@ -142,6 +150,47 @@ class StoreTests(unittest.TestCase):
                                       status='send_failed', receipt={}))
         self.assertEqual(self.store.db.execute("SELECT count(*) FROM live_records WHERE kind='delivery'").fetchone()[0], 3)
 
+    def test_confirmation_freeze_keep_original_candidate_anchor_across_restart(self):
+        bars = [dict(start=t, low=99. if t>=180 else 98., high=101.) for t in (60,120,180,240)]
+        candidate = envelope(plan=dict(direction=1, strategy='trend_retest', structure_anchor=99.,
+            price=100., stop=98., target1=102.), native_state=dict(minute_bars=bars))
+        candidate_key = self.store.append(candidate)
+        event = self.store.db.execute('SELECT event_id FROM decision_events').fetchone()[0]
+        self.store.close(); self.store = LiveEvidenceStore(self.path)
+        current = copy.deepcopy(candidate['data']['native_state'])
+        current['minute_bars'].append(dict(start=300, low=99., high=101.))
+        value = frozen(); value['observed_at']=360.; value['data'].update(
+            plan=candidate['data']['plan'], native_state=current, candidate_record_hash=candidate_key)
+        self.store.append(value)
+        stored = self.store.db.execute('SELECT event_id,payload FROM frozen_plans').fetchone()
+        self.assertEqual(stored[0], event)
+        provenance = json.loads(stored[1])['provenance']
+        self.assertEqual(provenance['anchor']['bar_start'], 180)
+        self.assertEqual(provenance['anchor_link_status'], 'immutable_candidate_source')
+        self.assertEqual(self.store.db.execute('SELECT count(*) FROM opportunity_events').fetchone()[0], 1)
+
+    def test_missing_candidate_record_is_explicitly_unmatched_not_reanchored(self):
+        value = frozen(); value['data']['candidate_record_hash']='dropped-candidate'
+        self.store.append(value)
+        event, payload = self.store.db.execute('SELECT event_id,payload FROM frozen_plans').fetchone()
+        self.assertIsNone(event)
+        self.assertEqual(json.loads(payload)['provenance']['anchor_link_status'], 'candidate_record_missing')
+
+    def test_wire_capture_preserves_original_bytes_and_rejects_hash_revision(self):
+        store = self.store
+        class Sink:
+            enabled = True
+            def emit(self, kind, data, *, observed_at):
+                return store.append(dict(version=VERSION, kind=kind, data=data, observed_at=observed_at))
+        wire = ' {"w":100000, "x":2} '
+        self.assertIsNotNone(capture_native_frame(Sink(), json.loads(wire), wire, 101.))
+        row = json.loads(self.store.db.execute('SELECT payload FROM source_events').fetchone()[0])
+        self.assertEqual(bytes.fromhex(row['raw']['raw_wire_hex']), wire.encode())
+        self.assertEqual(row['raw']['raw_wire_sha256'], hashlib.sha256(wire.encode()).hexdigest())
+        with self.assertRaisesRegex(ValueError, 'RAW_WIRE_HASH'):
+            self.store.append(envelope('native_frame', frame=json.loads(wire), event_time=100.,
+                received_at=101., wire_hex=wire.encode().hex(), wire_sha256='0'*64))
+
     def test_reference_reuse_cannot_reassign_prior_plan_and_followup_is_not_fill(self):
         key = self.store.append(frozen())
         self.store.append(envelope('signal_link', reference=1, sent_at=300., frozen_record_hash=key))
@@ -228,6 +277,12 @@ class AdapterTests(unittest.TestCase):
         self.assertTrue(result)
         self.assertLess(time.monotonic()-start, .5)
         self.assertEqual(adapter.queue.qsize(), 1)
+        preserve_case('blocked_writer_risk_collector', dict(worker_blocked=True, queue_capacity=1,
+            queue_size=adapter.queue.qsize(), producer_overflow_dropped=adapter.stats['dropped'],
+            native_rows=collector.db.execute('SELECT count(*) FROM native_bars').fetchone()[0],
+            risk_events=[dict(reason=r[1], price=r[2]) for r in result],
+            elapsed_seconds=time.monotonic()-start, required_upper_bound_seconds=.5,
+            synthetic_failure_fixture=True, sends=0, orders=0))
         release.set()
         wait_for(lambda: adapter.stats['persisted']==1)
         self.assertTrue(adapter.close(2))
@@ -287,6 +342,15 @@ class AdapterTests(unittest.TestCase):
         self.assertEqual(rows, [('gap',), ('candidate',)])
         self.assertEqual(db.execute('SELECT count(*) FROM frozen_plans').fetchone()[0], 0)
 
+    def test_closed_adapter_rejects_late_producer_without_stranding_accepted_record(self):
+        adapter = LiveEvidenceAdapter(self.path)
+        observe(adapter, 'candidate', at=300., policy='capture', quote=100.)
+        wait_for(lambda: adapter.stats['persisted']==1)
+        self.assertTrue(adapter.close(2))
+        self.assertIsNone(observe(adapter, 'candidate', at=301., policy='capture', quote=100.))
+        self.assertEqual(adapter.queue.qsize(), 0)
+        self.assertEqual(adapter.stats['accepted'], adapter.stats['persisted'])
+
     def test_external_instrumentation_exception_never_escapes_and_boolean_ack_is_not_fabricated(self):
         class Broken:
             enabled = True
@@ -305,6 +369,7 @@ class RetainedDataTests(unittest.TestCase):
         root = Path(__file__).resolve().parent
         audit = json.loads((root/'research/zerobase/completion_20261028/source_probe/audit.json').read_text())
         count = 0
+        records = []
         with tempfile.TemporaryDirectory() as directory:
             store = LiveEvidenceStore(Path(directory)/'live.sqlite3')
             try:
@@ -315,12 +380,21 @@ class RetainedDataTests(unittest.TestCase):
                         frame = decode_frame(raw)
                         receipt = datetime.fromisoformat(retained['received_at']).timestamp()
                         store.append(envelope('native_frame', at=receipt, frame=frame,
-                            received_at=receipt, event_time=frame.get('w', 0)/1000))
+                            received_at=receipt, event_time=frame.get('w', 0)/1000,
+                            wire_hex=raw.hex(), wire_sha256=retained['sha256']))
+                        records.append(dict(raw_sha256=retained['sha256'],
+                            received_at=retained['received_at'], server_ms=frame.get('w'),
+                            basis=attempt['basis'], periods=[b.get('b') for b in (frame['d'] if isinstance(frame.get('d'), list) else [frame.get('d', {})])]))
                         count += 1
                 self.assertEqual(count, 6)
                 rows = [json.loads(r[0]) for r in store.db.execute('SELECT payload FROM source_events')]
                 self.assertTrue(all(r['received_at'] is not None for r in rows))
+                self.assertTrue(all(r['raw']['exact_wire_bytes_available'] for r in rows))
+                self.assertEqual({r['raw']['raw_wire_sha256'] for r in rows}, {r['raw_sha256'] for r in records})
                 self.assertTrue(all('unverified' in r['quality'] for r in rows))
+                preserve_case('retained_raw_receipts', dict(records=records, source_rows=len(rows),
+                    actual_retained_receipts=True, independent_5m_verified=False, closed_bars_verified=0,
+                    candle_volume_unit_verified=False, new_network_requests=0))
                 self.assertEqual(store.db.execute('SELECT count(*) FROM frozen_plans').fetchone()[0], 0)
             finally:
                 store.close()
@@ -347,8 +421,11 @@ class RetainedDataTests(unittest.TestCase):
                     break
             self.assertEqual(len(chosen), 12)
             store = LiveEvidenceStore(Path(directory)/'sidecar.sqlite3')
+            failed = LiveEvidenceStore(Path(directory)/'failed-sidecar.sqlite3')
+            failed.db.executescript("CREATE TRIGGER fail_record BEFORE INSERT ON live_records BEGIN SELECT RAISE(ABORT,'disk outage fixture'); END;")
             config = {replay.CONFIG_MAP[k]:v for k,v in bundles[0]['model_config'].items()}
             config['ENTRY_REFINEMENT_MODE'] = 'capture'
+            cases = []
             try:
                 with patch.multiple(replay.monitor, **config), patch.object(replay.monitor, 'telegram', side_effect=AssertionError('SEND_FORBIDDEN')):
                     for point, state, ts in chosen:
@@ -356,13 +433,26 @@ class RetainedDataTests(unittest.TestCase):
                         diag1 = {}; plan1 = replay.monitor.classify(state['prices'], native_state=state, diagnostics=diag1)
                         store.append(envelope(at=ts, quote=point['price'], native_state=state,
                                               plan=plan1, diagnostics=diag1, reason=diag1.get('reason')))
+                        with self.assertRaises(sqlite3.IntegrityError):
+                            failed.append(envelope(at=ts, quote=point['price'], native_state=state,
+                                                   plan=plan1, diagnostics=diag1))
                         diag2 = {}; plan2 = replay.monitor.classify(state['prices'], native_state=state, diagnostics=diag2)
                         self.assertEqual((plan1, diag1), (plan2, diag2))
                         self.assertEqual(state, original)
+                        cases.append(dict(logged_at=point['logged_at'], window=point['window'], quote=point['price'],
+                            input_hash=digest(original), policy_output_sha256=digest(dict(plan=plan1, diagnostics=diag1)),
+                            after_healthy_and_failed_storage_output_sha256=digest(dict(plan=plan2, diagnostics=diag2)),
+                            reason=diag1.get('reason'), qualified_candidate=plan1 is not None,
+                            input_unchanged=state==original, injected_failure='sqlite_abort_before_live_record_insert'))
+                    preserve_case('retained_policy_integration', dict(cases=cases, observation_count=len(cases),
+                        actual_historical_receive_times=None, nominal_delay_seconds=0, new_strategy_comparison=False,
+                        reused_development_data=True, sends=0, orders=0, profitability_validated=False))
                     self.assertEqual(store.db.execute('SELECT count(*) FROM live_records').fetchone()[0], 12)
                     self.assertEqual(store.db.execute('SELECT count(*) FROM frozen_plans').fetchone()[0], 0)
+                    self.assertEqual(failed.db.execute('SELECT count(*) FROM decision_events').fetchone()[0], 0)
             finally:
                 store.close()
+                failed.close()
 
 
 if __name__ == '__main__':

@@ -1,0 +1,154 @@
+{
+  "schema": "live_evidence_checkpoint_v1",
+  "started_at": "2026-10-28T12:52:48.754373+00:00",
+  "recorded_at": "2026-10-28T13:09:40.544886+00:00",
+  "base_heads": {
+    "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
+    "research": "5ea63fea7fb5a312a99702535c31d4dccd8155fd",
+    "pr21": "ce33a017ff6aca0729175a8f88c3ec978f4a84a2",
+    "pr22": "d098f5657d823769f468846df1fac5ec04986d0e"
+  },
+  "starting_pr27_head": "1a30b248b2dae9eb16b16b28b756b65b379d16a8",
+  "lease_commit": "392ec8edd9360730ee746bf69af6eb415e072432",
+  "initial_code_checkpoint": "436656a696e2c9d9c9f39e128c16f441feec0640",
+  "code_sha256": {
+    "lbank_signal_evidence.py": "3d000b5414042a2b7e165c20c85aef39f711e592f93d745fe73ae5c101370ad3",
+    "lbank_live_evidence.py": "5bfba087c615002ea32524493d3b46a624284d3cc91edca4d1f57e1ce8dc8628",
+    "lbank_futures_monitor.py": "28cc66f392dd223fad3caa698593b977b4386ba2c484504bcd11ca1552053d61",
+    "lbank_native_candles.py": "0deb8d4f88cf04e88f4335b2c19dde90d686f2fe7def56f61a2ecd1b736065be",
+    "test_lbank_live_evidence.py": "c0883643f032773d9289eff6c0656543c9cdd79c9bcafdf7196b1ac659c177a8",
+    "research/validate_live_evidence_artifacts.py": "943c6dc4735b1447c3455446d2ee7c838c191c10bab948b67ce4a3719cf015ec"
+  },
+  "input_sha256": {
+    "research/zerobase/completion_20261028/source_probe/audit.json": "899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690",
+    "research/zerobase/entry_comparison_20261024/archive_chunks.json": "0d8b8db7cdccd009d2d08e7c9ece7403231bce3b4af8227b5bddff246daa8cce",
+    "research/zerobase/entry_comparison_20261024/recorded_quotes.json": "088b245a78a95453fe51d7555e3017eb413aea0ba39ff4fa729fc14a0071e88b",
+    "research/zerobase/entry_location_20261025/comparison.json": "47fb01bae99d8c0c315a52d26afb97d5bde8fedbe8faed7281c1ce5579640ab2",
+    "docs/zerobase/TRADE_EVIDENCE_ALERT_DESIGN_20261025.md": "9a58c22803dba4624951b661ea34d02cb480534bab2897c8e69d6681c1595ef5",
+    "research/zerobase/trade_evidence_p0_20261025/README.md": "c8e185a47d62b6171b8f4b3a9e50b0e9ee05ba0287fbf5eeb2d91abd567f9788",
+    "research/zerobase/trade_evidence_p0_20261025/summary.json": "d141a697d733dec100e1e7ed343a938c77201a34c0cc49327e590f002c96bbf3",
+    "research/zerobase/trade_evidence_p0_20261025/manifest.json": "93cfcc8a8a627f0b4a1477d358909e93fc11d91f414d261590a148ca1d914353"
+  },
+  "output_sha256": {
+    "blocked_writer_risk_collector.json": "78eb8af57550ab6031ac68e2e1ca45e786987125a7c6cec694ba8a9e1147d9bf",
+    "README.md": "c2f010447cf3e7b993fcfa190af19177c203bbbbcba274627d9351d50e4e2532",
+    "retained_policy_integration.json": "95510032dcbf31145735736b635b9ceefbd9d271a095d921e3cba89c069849f8",
+    "targeted_tests.txt": "f54346de7703c0e112c511adf71553a0bf7ac5725f08f1e30f5338515e7c7f56",
+    "artifact_capture_resolution.txt": "5fdf65bb5fe40f133e9164d12f1836a1bc75950c956bbb2d7c5bfe3dcfaa6a5c",
+    "anchor_causality_tests.txt": "3c048bcae78bee06730dd8d8b46726372ca3374a310a544bf8cc56745e88edca",
+    "raw_wire_tests.txt": "cb22a1f4c3103a87706a7c9f8f8f14b2d22a54c3893751defea92ef306138479",
+    "artifact_capture_attempt.txt": "507ea7f767fffa8a6a07035e8a62984dcdad212512d699bb1918f255088e7093",
+    "retained_raw_receipts.json": "cfe5d69f840ef183d67764ec89d867b27e8874c02605e30dc3e928581cfda02b"
+  },
+  "new_tests": [
+    "test_additive_migration_preserves_legacy_bytes_and_is_repeatable",
+    "test_atomic_envelope_rolls_back_all_derived_rows_after_disk_failure",
+    "test_blocked_worker_and_full_queue_do_not_block_real_collector_or_risk_check",
+    "test_candidate_is_not_entry_and_unknown_receipts_and_unrun_gates_stay_unknown",
+    "test_closed_adapter_rejects_late_producer_without_stranding_accepted_record",
+    "test_confirmation_freeze_keep_original_candidate_anchor_across_restart",
+    "test_default_is_disabled_and_has_no_file_thread_or_sender",
+    "test_delivery_failure_unknown_ack_and_immutable_ack_history_survive_restart",
+    "test_external_instrumentation_exception_never_escapes_and_boolean_ack_is_not_fabricated",
+    "test_future_closed_bar_or_receipt_is_not_consumed",
+    "test_hard_sqlite_page_cap_and_failure_leave_existing_evidence_intact",
+    "test_missing_candidate_record_is_explicitly_unmatched_not_reanchored",
+    "test_newer_database_is_rejected_without_mutation",
+    "test_oversize_and_mutated_producer_payload_do_not_corrupt_queued_snapshot",
+    "test_pinned_wal_reader_is_detected_before_further_unbounded_writes",
+    "test_reference_reuse_cannot_reassign_prior_plan_and_followup_is_not_fill",
+    "test_restart_replay_is_idempotent_and_pending_delivery_stays_disabled",
+    "test_retained_raw_frames_keep_actual_receipts_without_upgrading_source_quality",
+    "test_retained_real_policy_inputs_outputs_unchanged_by_healthy_and_failed_sidecar",
+    "test_retention_record_cap_refuses_new_evidence_without_deletion_and_can_archive",
+    "test_same_wire_frame_multiple_receipts_are_distinct_without_rewriting",
+    "test_startup_outage_recovers_without_producer_storage_wait",
+    "test_unclean_restart_explicit_unknown_gap_clean_restart_does_not_add_gap",
+    "test_wire_capture_preserves_original_bytes_and_rejects_hash_revision",
+    "test_write_failure_recovers_with_gap_and_no_resend"
+  ],
+  "distinct_related_tests": 140,
+  "new_test_count": 25,
+  "commands": [
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_live_evidence test_lbank_signal_evidence test_lbank_native_candles test_lbank_native_entry test_lbank_entry_timing test_lbank_operational_health test_lbank_fee_risk -q",
+      "exit_code": 0,
+      "tests": 137,
+      "log": "targeted_tests.txt"
+    },
+    {
+      "command": "ZB_LEDGER_TEST_ARTIFACTS=research/zerobase/completion_20261028/live_ledger PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_live_evidence -q",
+      "exit_code": 1,
+      "tests": 22,
+      "passed": 21,
+      "reporting_only_errors": 1,
+      "log": "artifact_capture_attempt.txt"
+    },
+    {
+      "command": "ZB_LEDGER_TEST_ARTIFACTS=research/zerobase/completion_20261028/live_ledger PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_live_evidence.RetainedDataTests.test_retained_raw_frames_keep_actual_receipts_without_upgrading_source_quality -q",
+      "exit_code": 0,
+      "tests": 1,
+      "log": "artifact_capture_resolution.txt"
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_live_evidence.StoreTests.test_confirmation_freeze_keep_original_candidate_anchor_across_restart test_lbank_live_evidence.StoreTests.test_missing_candidate_record_is_explicitly_unmatched_not_reanchored test_lbank_live_evidence.StoreTests.test_atomic_envelope_rolls_back_all_derived_rows_after_disk_failure test_lbank_live_evidence.StoreTests.test_restart_replay_is_idempotent_and_pending_delivery_stays_disabled test_lbank_entry_timing -q",
+      "exit_code": 0,
+      "tests": 11,
+      "log": "anchor_causality_tests.txt"
+    },
+    {
+      "command": "ZB_LEDGER_TEST_ARTIFACTS=research/zerobase/completion_20261028/live_ledger PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_live_evidence.StoreTests.test_wire_capture_preserves_original_bytes_and_rejects_hash_revision test_lbank_live_evidence.RetainedDataTests.test_retained_raw_frames_keep_actual_receipts_without_upgrading_source_quality test_lbank_native_candles -q",
+      "exit_code": 0,
+      "tests": 12,
+      "log": "raw_wire_tests.txt"
+    },
+    {
+      "command": "python -m py_compile lbank_live_evidence.py lbank_futures_monitor.py lbank_native_candles.py",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    },
+    {
+      "command": "python research/validate_live_evidence_artifacts.py",
+      "exit_code": 0
+    }
+  ],
+  "checks": {
+    "atomic_failure_rollback": true,
+    "immutable_candidate_anchor_restart": true,
+    "wire_bytes_verified": true,
+    "queue_full_risk_collector_progress": true,
+    "raw_retained_frames": 6,
+    "real_observation_pairs": 12,
+    "real_qualified_candidates": 6,
+    "real_policy_outputs_equal": true,
+    "live_deployed": false,
+    "live_enabled": false,
+    "new_network_requests": 0,
+    "new_sends": 0,
+    "orders": 0,
+    "profitability_validated": false,
+    "automatic_deletion": false,
+    "qualified_continuous_capture": false
+  },
+  "bounds": {
+    "queue_records": 64,
+    "envelope_bytes": 524288,
+    "main_sqlite_bytes": 67108864,
+    "records": 100000,
+    "wal_note": "main+WAL transient physical size can approach2x main cap plus SQLite/WAL/SHM overhead; pinned readers stop new recording"
+  },
+  "remaining": [
+    "sealed received-stream importer and raw-occurrence-to-native-snapshot causal binding",
+    "full actual gate trace coverage and parallel continuous independent policy states",
+    "P3 true-receipt/unseen comparison with independently qualified source data",
+    "P4 qualified review and P5 explicitly authorized application",
+    "operator-reviewed archival retention rotation, no deletion performed"
+  ],
+  "blockers": [
+    "RAW5M_INDEPENDENCE_UNVERIFIED",
+    "CANDLE_VOLUME_UNIT_UNVERIFIED"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "live_evidence_validation_v1",
+  "manifest_sha256": "c5ed418b253ab85282ec32b4bec6e99ac38065dfa0d5f17085f2689a82329cf4",
+  "files_checked": 23,
+  "code_input_output_hashes_match": true,
+  "policy_pairs_equal": 12,
+  "retained_frames": 6,
+  "new_tests": 25,
+  "related_distinct_tests": 140,
+  "reporting_error_fixed": true,
+  "full_replay_repeated": false,
+  "source_blockers_unchanged": true,
+  "live_qualification": false
+}

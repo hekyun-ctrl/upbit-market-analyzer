@@ -1,0 +1,18 @@
+{
+  "elapsed_seconds": 0.010104292000050918,
+  "native_rows": 1,
+  "orders": 0,
+  "producer_overflow_dropped": 1,
+  "queue_capacity": 1,
+  "queue_size": 1,
+  "required_upper_bound_seconds": 0.5,
+  "risk_events": [
+    {
+      "price": 98.0,
+      "reason": "stop_breached"
+    }
+  ],
+  "sends": 0,
+  "synthetic_failure_fixture": true,
+  "worker_blocked": true
+}

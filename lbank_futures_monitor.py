@@ -1214,7 +1214,14 @@ def run():
                     if reason in ("trail_update", "target_extended", "trend_exit", "neutral_exit", "time_exit")
                     else format_risk_alert(tracked, reason, observed_price, observed_kst)
                 )
-                if telegram(notice):
+                followup_delivered = telegram(notice)
+                observe_evidence(live_evidence, 'followup', at=time.time(),
+                    reference=tracked.number, sent_at=tracked.sent_at,
+                    value=dict(status='followup_notification_transport_success' if followup_delivered
+                        else 'followup_notification_failed_or_unknown', reason=reason,
+                        transport_class=TELEGRAM_DELIVERY.last_class,
+                        net_pnl_model=None, actual_fill_verified=False))
+                if followup_delivered:
                     if reason == "risk_caution" and performance is not None:
                         try:
                             performance.record_caution(tracked.number,tracked.sent_at,
@@ -1348,8 +1355,8 @@ def run():
                 continuous = native_state is not None
                 observe_evidence(live_evidence, 'observation', at=now,
                     policy=ENTRY_REFINEMENT_MODE, quote=price,
-                    native_state=native_state, diagnostics=native_diag,
-                    reason=None if continuous else 'data_gap')
+                    native_state=native_state, diagnostics=dict(native=native_diag, journal_available=audit_ready),
+                    reason='journal_unavailable' if not audit_ready else None if continuous else 'data_gap')
                 if not audit_ready:
                     watch = None
                     count_event("journal_unavailable")
@@ -1367,6 +1374,11 @@ def run():
                     age = now - watch["time"]
                     if age > ENTRY_CONFIRM_MAX_AGE_SECONDS:
                         expired_plan = watch["plan"]
+                        observe_evidence(live_evidence, 'confirmation', at=now,
+                            policy=ENTRY_REFINEMENT_MODE, quote=price,
+                            native_state=native_state, plan=expired_plan, reason='watch_expired',
+                            candidate_record_hash=watch.get('evidence_candidate_record'),
+                            diagnostics=dict(age_seconds=age))
                         watch = None
                         count_event("expired")
                         LOG.info("watch expired; no ENTRY REVIEW signal side=%s strategy=%s price=%.1f",
@@ -1380,6 +1392,7 @@ def run():
                         observe_evidence(live_evidence, 'confirmation', at=now,
                             policy=ENTRY_REFINEMENT_MODE, quote=price,
                             native_state=native_state, plan=plan or watch['plan'],
+                            candidate_record_hash=watch.get('evidence_candidate_record'),
                             reason=None if plan else confirm_diag.get('reason'),
                             diagnostics=confirm_diag)
                         if plan is None:
@@ -1404,6 +1417,12 @@ def run():
                                 watch, plan, native_state, now, time.time())
                             side = plan["side"]
                             gate_reason = alert_gate(now, side, alert_state, plan=plan)
+                            observe_evidence(live_evidence, 'alert_eligibility', at=now,
+                                policy=ENTRY_REFINEMENT_MODE, quote=price,
+                                native_state=native_state, plan=plan,
+                                candidate_record_hash=watch.get('evidence_candidate_record'),
+                                reason=None if gate_reason == 'ok' else gate_reason,
+                                diagnostics=dict(phase='confirmation', alert_gate=gate_reason))
                             if gate_reason == "ok":
                                 # The next reference ID is assigned only after
                                 # Telegram delivery succeeds. This same ID is
@@ -1442,7 +1461,8 @@ def run():
                                 frozen_record = observe_evidence(live_evidence, 'frozen_plan', at=now,
                                     policy=ENTRY_REFINEMENT_MODE, quote=price,
                                     native_state=native_state, plan=plan,
-                                    candidate_at=watch['time'])
+                                    candidate_at=watch['time'],
+                                    candidate_record_hash=watch.get('evidence_candidate_record'))
                                 delivered = telegram(message)
                                 if frozen_record:
                                     observe_evidence(live_evidence, 'delivery', at=time.time(),
@@ -1521,7 +1541,7 @@ def run():
                     rejection["entry_timing"] = timing
                     rejection["data_source"] = NATIVE_SOURCE
                     last_entry_diagnostics = rejection
-                    observe_evidence(live_evidence, 'candidate', at=now,
+                    evidence_candidate_record = observe_evidence(live_evidence, 'candidate', at=now,
                         policy=ENTRY_REFINEMENT_MODE, quote=price,
                         native_state=native_state, plan=proposal,
                         reason=None if proposal else rejection.get('reason'),
@@ -1531,8 +1551,15 @@ def run():
                     if proposal is not None:
                         side = proposal["side"]
                         gate_reason = alert_gate(now, side, alert_state, plan=proposal)
+                        observe_evidence(live_evidence, 'alert_eligibility', at=now,
+                            policy=ENTRY_REFINEMENT_MODE, quote=price,
+                            native_state=native_state, plan=proposal,
+                            candidate_record_hash=evidence_candidate_record,
+                            reason=None if gate_reason == 'ok' else gate_reason,
+                            diagnostics=dict(phase='candidate', alert_gate=gate_reason))
                         if gate_reason == "ok":
-                            watch = {"plan": proposal, "time": now}
+                            watch = {"plan": proposal, "time": now,
+                                     "evidence_candidate_record": evidence_candidate_record}
                             count_event("watched")
                             source = proposal.get("strategy", "breakout")
                             count_event({"range_rebound": "range_watch",
