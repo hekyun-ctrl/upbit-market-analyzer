@@ -34,8 +34,9 @@ from lbank_performance import PerformanceBook
 from lbank_operational_health import (JournalRecovery, OperationalNotices,
                                       StorageReserve, blocked_diagnostic)
 from lbank_native_candles import NativeCandleThread
+from lbank_gate_trace import record_call as record_gate_execution
 from lbank_live_evidence import (from_environment as live_evidence_from_environment,
-                                 observe as observe_evidence, delivery_state)
+                                 observe as observe_evidence, delivery_state, capture_quote)
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
 from lbank_entry_quality import (confirmation_quality, direction_priority,
@@ -280,8 +281,10 @@ def telegram(message):
     return TELEGRAM_DELIVERY.send(message)
 
 
-def get_perpetual_snapshot(exchange):
+def get_perpetual_snapshot(exchange, *, evidence=None, quote_evidence=None):
+    quote_requested_at = time.time() if getattr(evidence, "enabled", False) else None
     ticker = exchange.fetch_ticker(SYMBOL)
+    quote_received_at = time.time() if quote_requested_at is not None else None
     if not ticker or ticker.get("symbol") != SYMBOL:
         raise ValueError("LBank returned wrong futures ticker symbol")
     price = float(ticker["last"])
@@ -290,6 +293,8 @@ def get_perpetual_snapshot(exchange):
     timestamp = ticker.get("timestamp")
     if timestamp and abs(int(time.time() * 1000) - int(timestamp)) > MAX_AGE_MS:
         raise ValueError("Stale LBank perpetual ticker")
+    if quote_evidence is not None and quote_requested_at is not None:
+        quote_evidence["record_hash"] = capture_quote(evidence, ticker, quote_requested_at, quote_received_at)
     return price, ticker.get("percentage")
 
 
@@ -1108,7 +1113,8 @@ def run():
         try:
             # Inbound updates use the same authorized existing Telegram chat.
             position_bot.poll()
-            price, change24 = get_perpetual_snapshot(exchange)
+            quote_evidence = {}
+            price, change24 = get_perpetual_snapshot(exchange, evidence=live_evidence, quote_evidence=quote_evidence)
             now = time.time()
             if performance is None:
                 performance = journal_recovery.get(now)
@@ -1355,6 +1361,7 @@ def run():
                 continuous = native_state is not None
                 observe_evidence(live_evidence, 'observation', at=now,
                     policy=ENTRY_REFINEMENT_MODE, quote=price,
+                    quote_record_hash=quote_evidence.get("record_hash"),
                     native_state=native_state, diagnostics=dict(native=native_diag, journal_available=audit_ready),
                     reason='journal_unavailable' if not audit_ready else None if continuous else 'data_gap')
                 if not audit_ready:
@@ -1374,8 +1381,9 @@ def run():
                     age = now - watch["time"]
                     if age > ENTRY_CONFIRM_MAX_AGE_SECONDS:
                         expired_plan = watch["plan"]
-                        observe_evidence(live_evidence, 'confirmation', at=now,
+                        confirmation_record = observe_evidence(live_evidence, 'confirmation', at=now,
                             policy=ENTRY_REFINEMENT_MODE, quote=price,
+                            quote_record_hash=quote_evidence.get("record_hash"),
                             native_state=native_state, plan=expired_plan, reason='watch_expired',
                             candidate_record_hash=watch.get('evidence_candidate_record'),
                             diagnostics=dict(age_seconds=age))
@@ -1386,15 +1394,19 @@ def run():
                                  expired_plan.get("price"))
                     else:
                         confirm_diag = {}
-                        plan = confirm_watch(prices, watch["plan"], age,
-                                             native_state=native_state,
-                                             diagnostics=confirm_diag)
-                        observe_evidence(live_evidence, 'confirmation', at=now,
+                        confirm_trace_diag = {}
+                        with record_gate_execution(live_evidence, confirm_watch, prices, watch["plan"], age,
+                                native_state=native_state, diagnostics=confirm_diag,
+                                trace_diagnostics=confirm_trace_diag, trace_context=dict(native_state=native_state, quote=price, evaluated_at=now)):
+                            plan = confirm_watch(prices, watch["plan"], age,
+                                                 native_state=native_state, diagnostics=confirm_diag)
+                        confirmation_record = observe_evidence(live_evidence, 'confirmation', at=now,
                             policy=ENTRY_REFINEMENT_MODE, quote=price,
+                            quote_record_hash=quote_evidence.get("record_hash"),
                             native_state=native_state, plan=plan or watch['plan'],
                             candidate_record_hash=watch.get('evidence_candidate_record'),
                             reason=None if plan else confirm_diag.get('reason'),
-                            diagnostics=confirm_diag)
+                            diagnostics=dict(confirm_diag, **confirm_trace_diag))
                         if plan is None:
                             count_event("confirm_reject")
                             if confirm_diag.get("reason") == "await_two_post_watch_closed_minutes":
@@ -1416,13 +1428,18 @@ def run():
                             plan["entry_timing"] = confirmation_evidence(
                                 watch, plan, native_state, now, time.time())
                             side = plan["side"]
-                            gate_reason = alert_gate(now, side, alert_state, plan=plan)
-                            observe_evidence(live_evidence, 'alert_eligibility', at=now,
+                            alert_trace_diag = {}
+                            with record_gate_execution(live_evidence, alert_gate, now, side, alert_state, plan=plan,
+                                    trace_diagnostics=alert_trace_diag,
+                                    trace_context=dict(native_state=native_state, quote=price, evaluated_at=now)):
+                                gate_reason = alert_gate(now, side, alert_state, plan=plan)
+                            confirmation_alert_record = observe_evidence(live_evidence, 'alert_eligibility', at=now,
                                 policy=ENTRY_REFINEMENT_MODE, quote=price,
+                                quote_record_hash=quote_evidence.get("record_hash"),
                                 native_state=native_state, plan=plan,
                                 candidate_record_hash=watch.get('evidence_candidate_record'),
                                 reason=None if gate_reason == 'ok' else gate_reason,
-                                diagnostics=dict(phase='confirmation', alert_gate=gate_reason))
+                                diagnostics=dict(phase='confirmation', alert_gate=gate_reason, **alert_trace_diag))
                             if gate_reason == "ok":
                                 # The next reference ID is assigned only after
                                 # Telegram delivery succeeds. This same ID is
@@ -1460,9 +1477,12 @@ def run():
                                 send_started_at = time.time()
                                 frozen_record = observe_evidence(live_evidence, 'frozen_plan', at=now,
                                     policy=ENTRY_REFINEMENT_MODE, quote=price,
+                                    quote_record_hash=quote_evidence.get("record_hash"),
                                     native_state=native_state, plan=plan,
                                     candidate_at=watch['time'],
-                                    candidate_record_hash=watch.get('evidence_candidate_record'))
+                                    candidate_record_hash=watch.get('evidence_candidate_record'),
+                                    decision_record_hashes=dict(candidate=watch.get('evidence_candidate_record'),
+                                        confirmation=confirmation_record, alert_eligibility=confirmation_alert_record))
                                 delivered = telegram(message)
                                 if frozen_record:
                                     observe_evidence(live_evidence, 'delivery', at=time.time(),
@@ -1529,8 +1549,11 @@ def run():
                 if setup_due and continuous and audit_ready and watch is None:
                     last_setup_key = native_key
                     rejection = {}
-                    proposal = classify(prices, native_state=native_state,
-                                        diagnostics=rejection)
+                    candidate_trace_diag = {}
+                    with record_gate_execution(live_evidence, classify, prices, native_state=native_state,
+                            diagnostics=rejection, trace_diagnostics=candidate_trace_diag,
+                            trace_context=dict(native_state=native_state, quote=price, evaluated_at=now)):
+                        proposal = classify(prices, native_state=native_state, diagnostics=rejection)
                     timing = setup_evidence(native_state, now, time.time(),
                                             first_ready_observed_at,
                                             "periodic_and_new_bar" if sample_due and new_setup_bar
@@ -1543,20 +1566,26 @@ def run():
                     last_entry_diagnostics = rejection
                     evidence_candidate_record = observe_evidence(live_evidence, 'candidate', at=now,
                         policy=ENTRY_REFINEMENT_MODE, quote=price,
+                        quote_record_hash=quote_evidence.get("record_hash"),
                         native_state=native_state, plan=proposal,
                         reason=None if proposal else rejection.get('reason'),
-                        diagnostics=rejection)
+                        diagnostics=dict(rejection, **candidate_trace_diag))
                     performance.sample(now, price, decision=rejection)
                     LOG.info("ENTRY_SETUP_EVALUATED %s", json.dumps(rejection, sort_keys=True))
                     if proposal is not None:
                         side = proposal["side"]
-                        gate_reason = alert_gate(now, side, alert_state, plan=proposal)
+                        alert_trace_diag = {}
+                        with record_gate_execution(live_evidence, alert_gate, now, side, alert_state, plan=proposal,
+                                trace_diagnostics=alert_trace_diag,
+                                trace_context=dict(native_state=native_state, quote=price, evaluated_at=now)):
+                            gate_reason = alert_gate(now, side, alert_state, plan=proposal)
                         observe_evidence(live_evidence, 'alert_eligibility', at=now,
                             policy=ENTRY_REFINEMENT_MODE, quote=price,
+                            quote_record_hash=quote_evidence.get("record_hash"),
                             native_state=native_state, plan=proposal,
                             candidate_record_hash=evidence_candidate_record,
                             reason=None if gate_reason == 'ok' else gate_reason,
-                            diagnostics=dict(phase='candidate', alert_gate=gate_reason))
+                            diagnostics=dict(phase='candidate', alert_gate=gate_reason, **alert_trace_diag))
                         if gate_reason == "ok":
                             watch = {"plan": proposal, "time": now,
                                      "evidence_candidate_record": evidence_candidate_record}

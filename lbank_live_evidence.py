@@ -21,7 +21,7 @@ from lbank_signal_evidence import EvidenceLedger, canonical, digest, gate_vector
 LOG = logging.getLogger('lbank_live_evidence')
 VERSION = 2
 KINDS = frozenset(('native_frame', 'observation', 'candidate', 'confirmation', 'alert_eligibility',
-                   'frozen_plan', 'delivery', 'outcome', 'gap', 'signal_link', 'followup'))
+                   'frozen_plan', 'delivery', 'outcome', 'gap', 'signal_link', 'followup', 'quote_frame'))
 BLOCKERS = ['RAW5M_INDEPENDENCE_UNVERIFIED', 'CANDLE_VOLUME_UNIT_UNVERIFIED']
 
 
@@ -144,7 +144,16 @@ class LiveEvidenceStore:
     def _apply(self, envelope, key):
         kind, data, at = envelope['kind'], envelope['data'], envelope['observed_at']
         plan_id = None
-        if kind == 'native_frame':
+        if kind == 'quote_frame':
+            from lbank_received_stream import receipt_time
+            requested, received = receipt_time(data['requested_at']), receipt_time(data['received_at'])
+            if (requested > received or abs(received-at) > .000001 or not math.isfinite(data['quote'])
+                    or data['quote'] <= 0 or data['normalized']['last'] != data['quote']
+                    or data['normalized']['symbol'] != 'BTC/USDT:USDT'):
+                raise ValueError('INVALID_QUOTE_RECEIPT')
+            self.book.source(data, event_time=data.get('event_time'), received_at=received,
+                quality='ccxt_normalized_public_response; exchange_wire_not_available')
+        elif kind == 'native_frame':
             # Same wire frame can arrive repeatedly. Receipt versions are not
             # overwritten, and raw frame hash is distinct from occurrence hash.
             wire_hex, wire_sha256 = data.get('wire_hex'), data.get('wire_sha256')
@@ -200,22 +209,75 @@ class LiveEvidenceStore:
                                         quote=data.get('quote')),
                                    event_time=at, received_at=None,
                                    quality='evaluation_snapshot; raw_receipt_unknown')
-            inputs = self.book.inputs([raw] + (binding['input_sources'] if binding else []))
+            quote_receipt = None
+            if data.get('quote_record_hash') is not None:
+                quote_row = self.db.execute("SELECT payload FROM live_records WHERE record_hash=? AND kind='quote_frame'",
+                    (data['quote_record_hash'],)).fetchone()
+                if not quote_row:
+                    raise ValueError('QUOTE_RECEIPT_RECORD_REQUIRED')
+                quote_envelope = json.loads(quote_row[0])
+                quote_receipt = quote_envelope['data']
+                if quote_envelope['observed_at'] > at or quote_receipt['quote'] != data.get('quote'):
+                    raise ValueError('QUOTE_RECEIPT_SNAPSHOT_MISMATCH')
+            trace = (data.get('diagnostics') or {}).get('execution_trace')
+            if trace and trace.get('snapshot_sha256') is not None:
+                from lbank_gate_trace import validated_trace
+                trace = validated_trace(trace, dict(native_state=state, quote=data.get('quote'), evaluated_at=at))
+            elif trace:
+                trace = None
+            source_keys = [raw] + (binding['input_sources'] if binding else [])
+            if quote_receipt:
+                source_keys.append(digest(quote_receipt))
+            inputs = self.book.inputs(source_keys)
             self.book.decision(event=event, policy=data['policy'], evaluated_at=at,
-                input_hash=inputs, state=kind, gates=gate_vector(),
+                input_hash=inputs, state=kind, gates=trace['gates'] if trace else gate_vector(),
                 first_reject=data.get('reason'), available_at=None, availability_basis=None,
                 diagnostics=data.get('diagnostics'), source_blockers=BLOCKERS,
-                actual_gate_vector_available=False, candidate_is_entry=False,
+                actual_gate_vector_available=bool(trace and trace['complete']), candidate_is_entry=False,
+                execution_trace=trace,
+                actual_gate_trace_scope='executed_calls_and_source_lines; short_circuit_operand_values_unavailable' if trace else None,
+                quote_record_hash=data.get('quote_record_hash'),
+                quote_receipt=quote_receipt,
+                quote_normalized_response_receipt_bound=quote_receipt is not None,
+                quote_exchange_wire_verified=False,
                 anchor_link_status=anchor_link_status,
                 received_snapshot_hash=data.get('received_snapshot_hash'),
                 bar_available_at=binding['available_at'] if binding else None,
                 bar_receipt_binding_available=binding is not None,
                 full_input_receipt_coverage_verified=False)
+            decision_links = None
+            if kind == 'frozen_plan' and data.get('decision_record_hashes') is not None:
+                requested = data['decision_record_hashes']
+                if set(requested) != {'candidate','confirmation','alert_eligibility'}:
+                    raise ValueError('EXECUTED_DECISION_CHAIN_REQUIRED')
+                decision_links = {}
+                prior_time = -1
+                economics = ('direction','strategy','price','stop','target1','target2','quantity_btc','margin','net_loss')
+                for phase in ('candidate','confirmation','alert_eligibility'):
+                    record = self.db.execute('SELECT payload FROM live_records WHERE record_hash=? AND kind=?',
+                                             (requested[phase],phase)).fetchone()
+                    if not record:raise ValueError('EXECUTED_DECISION_RECORD_REQUIRED')
+                    original = json.loads(record[0]); body=original['data']
+                    if (original['observed_at'] < prior_time or original['observed_at'] > at
+                            or body.get('policy') != data['policy'] or body.get('reason') is not None):
+                        raise ValueError('EXECUTED_DECISION_CHAIN_MISMATCH')
+                    prior_time=original['observed_at']
+                    if phase=='candidate':
+                        if requested[phase] != data.get('candidate_record_hash'):
+                            raise ValueError('EXECUTED_CANDIDATE_RECORD_MISMATCH')
+                    elif (body.get('candidate_record_hash') != requested['candidate']
+                            or any((body.get('plan') or {}).get(k) != (plan or {}).get(k) for k in economics)):
+                        raise ValueError('EXECUTED_DECISION_PLAN_MISMATCH')
+                    executed = (body.get('diagnostics') or {}).get('execution_trace')
+                    decision_links[phase]=dict(record_hash=requested[phase],
+                        actual_trace_complete=bool(executed and executed.get('complete')))
             if kind == 'frozen_plan':
                 plan_id = self.book.freeze(event=event, policy=data['policy'], plan=plan,
                     provenance=dict(input_hash=inputs, anchor=anchor, candidate_at=data.get('candidate_at'),
                                     confirm_at=at, live_record_hash=key, anchor_link_status=anchor_link_status,
-                                    actual_fill_verified=False), intent=True)
+                                    actual_fill_verified=False, executed_decision_links=decision_links,
+                                    executed_decision_chain_available=bool(decision_links and all(
+                                        v['actual_trace_complete'] for v in decision_links.values()))), intent=True)
                 # Store a model-unresolved lifecycle immediately. No-entry is not
                 # represented by a synthetic zero-return trade.
                 self.book.outcome(plan_id, dict(status='unresolved', net_pnl_model=None,
@@ -441,5 +503,22 @@ def capture_native_frame(adapter, frame, wire, received_at):
         return observe(adapter, 'native_frame', at=received_at, frame=frame,
             received_at=received_at, event_time=frame.get('w', 0)/1000,
             wire_hex=raw.hex(), wire_sha256=hashlib.sha256(raw).hexdigest())
+    except Exception:
+        return None
+
+
+def capture_quote(adapter, ticker, requested_at, received_at):
+    """Actual CCXT response boundary; never claim raw exchange wire or fills."""
+    if not getattr(adapter, 'enabled', False):
+        return None
+    try:
+        from datetime import datetime, timezone
+        stamp = lambda at: datetime.fromtimestamp(at, timezone.utc).isoformat()
+        normalized = {k:ticker.get(k) for k in ('symbol','last','timestamp','percentage')}
+        return observe(adapter, 'quote_frame', at=received_at,
+            quote=float(ticker['last']), normalized=normalized,
+            requested_at=stamp(requested_at), received_at=stamp(received_at),
+            event_time=ticker.get('timestamp')/1000 if ticker.get('timestamp') else None,
+            raw_exchange_wire_available=False, actual_fill_verified=False)
     except Exception:
         return None
