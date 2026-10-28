@@ -1,16 +1,13 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "checkpoint_complete_feature_incomplete",
+  "status": "gate_trace_continuous_orchestration_in_progress",
   "lease": {
-    "owner": "zb-sealed-importer-20261028-sole-worker",
-    "active": false,
-    "acquired_at": "2026-10-28T14:38:39.904347+00:00",
-    "expires_at": "2026-10-28T16:38:39.904347+00:00",
-    "expected_head": "ebea0f0af9c8d6e762e95b5aeafc0a8598ffd698",
-    "released_at": "2026-10-28T14:52:59.313403+00:00",
-    "last_verified_head": "ebea0f0af9c8d6e762e95b5aeafc0a8598ffd698",
-    "release_reason": "Sealed received-stream importer/optional exact native-bar snapshot and immutable candidate-anchor binding implemented;76 focused tests/26 new pass; retained6 frames remain forming,6 final bindings rejected; artifact439-blob nontruncated remote tree matches local index. Whole P3-P5 incomplete."
+    "owner": "zb-gate-trace-orchestration-20261028-sole-worker",
+    "active": true,
+    "acquired_at": "2026-10-28T14:57:26.944652+00:00",
+    "expires_at": "2026-10-28T16:57:26.944652+00:00",
+    "expected_head": "b26cc6f7e79205ffaa0d057ff4d44a878f09b62f"
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -3900,5 +3897,6 @@
     "pr21_22_27_open_draft_unmerged": true,
     "production_research_pr21_pr22_heads_unchanged": true,
     "required_actual_pr22_files_match_local": true
-  }
+  },
+  "gate_trace_started_at": "2026-10-28T14:57:26.944652+00:00"
 }
