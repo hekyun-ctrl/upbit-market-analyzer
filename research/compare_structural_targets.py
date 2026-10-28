@@ -113,6 +113,28 @@ def manual_sensitivity(card,points,outcomes):
 
 
 def write_json(path,value):path.write_text(json.dumps(value,ensure_ascii=False,indent=2,allow_nan=False)+'\n')
+
+
+def paired_plan_evidence(cards, decisions):
+    """Keep exact-anchor rejection evidence on every paired trade row.
+
+    Decisions belong to this scenario only. Repeated evaluations remain separate
+    evidence records, not extra trades; unobserved reasons stay absent.
+    """
+    groups = pair_plans(cards, decisions, new='structural_p1')
+    for group in groups:
+        event = group.get('event_id')
+        group['gate_reasons'] = [
+            dict(policy=d['policy'], phase=d.get('phase'),
+                 evaluated_at=d.get('evaluated_at'), first_reject=d['first_reject'],
+                 detail=d.get('plan_reject_detail'), input_hash=d.get('input_hash'),
+                 structural_target_evidence=copy.deepcopy(d.get('structural_target_evidence')))
+            for d in decisions
+            if event and d.get('event_id') == event and d.get('first_reject')
+        ]
+    return groups
+
+
 def write_csv(path,rows):
     if not rows:path.write_text('');return
     keys=list(dict.fromkeys(k for row in rows for k in row))
@@ -194,7 +216,7 @@ def main():
                             for phase in ('candidate','confirmation','alert_eligibility')},
                         input_states=dict(Counter('valid' if c['valid'] else c['reason'] for t in traces if t.policy==policy for c in t.coverage)))
                 cards=[c for t in traces for c in t.cards];decisions=[d for t in traces for d in t.decisions]
-                groups=pair_plans(cards,decisions,new='structural_p1')
+                groups=paired_plan_evidence(cards,decisions)
                 rows=evidence.csv_rows(groups)
                 for r in rows:r['scenario']=scenario
                 all_rows+=rows;all_cards+=cards

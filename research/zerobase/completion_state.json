@@ -1,12 +1,14 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "in_progress_review",
+  "status": "checkpoint_complete_feature_incomplete",
   "lease": {
     "owner": "zb-completion-root-evidence-review-20261028",
     "acquired_at": "2026-10-28T03:44:53.747Z",
     "expires_at": "2026-10-28T04:09:53.747Z",
-    "active": true
+    "active": false,
+    "released_at": "2026-10-28T03:49:17.083Z",
+    "release_reason": "P1 per-trade rejection evidence repaired and same-data replay verified; review checkpoint persisted"
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -21,21 +23,23 @@
     "Quantity/tick/minimum checks with explicitly assumed old public instrument metadata",
     "Same-data capture versus P1 replay, exact base0/base15 capture preservation, adverse-cost and same-trade manual-delay scenarios",
     "121 targeted tests including17 new synthetic P1 cases; manifests/decompressed CSV hashes validated",
-    "Remote implementation, full evidence and draft PR27"
+    "Remote implementation, full evidence and draft PR27",
+    "Review fixed missing P1 per-trade gate reasons; 3 new regression tests pass; six scenario rows repaired; all original model aggregates/timings and full decisions unchanged."
   ],
   "blockers": [
     "RAW5M_INDEPENDENCE_UNVERIFIED",
     "CANDLE_VOLUME_UNIT_UNVERIFIED"
   ],
-  "next_work": "Fix missing per-trade P1 rejection reasons; reproduce unchanged model results and preserve full evidence hashes, then release lease for P2.",
+  "next_work": "P2: independently specify and compare detection/confirmation changes with P1 targets and costs frozen. Preserve exact-event rejection evidence; continue qualified-source verification and failure-isolated live ledger implementation. No sends/orders/deploy.",
   "outbound": false,
   "orders": false,
-  "ended_at": "2026-10-28T03:41:47.562197+00:00",
+  "ended_at": "2026-10-28T03:49:17.083Z",
   "started_at_precision": "minute",
   "evidence_commits": {
     "lease": "f57b995bb7af938a200fb9d3c3ba4ad4499e76a0",
     "implementation": "8d31e21fcaee1fd2a0faeda90a5795f6208c2d6c",
-    "artifact_bytes": "8c4aa41238d0eae53b1e922b93fafc6c17bb07de"
+    "artifact_bytes": "8c4aa41238d0eae53b1e922b93fafc6c17bb07de",
+    "review_lease": "5ac0b45fd19e8065b1e3d85ee037721acb148b24"
   },
   "pr": {
     "number": 27,
@@ -165,5 +169,41 @@
     "fetched_evidence_commit": "8c4aa41238d0eae53b1e922b93fafc6c17bb07de",
     "all_code_input_output_and_decompressed_csv_hashes_match": true,
     "checked_at": "2026-10-28T03:41:47.562197+00:00"
+  },
+  "review": {
+    "checked_at": "2026-10-28T03:49:17.083Z",
+    "source_checkpoint": "82bcccd3b43d9e39ec78ecdd1bb505a851002912",
+    "fix": "Populate exact-event per-trade gate_reasons with observed policy, phase, evaluation time, input hash and structural target evidence; no synthetic reasons.",
+    "commands": [
+      {
+        "command": "python -m unittest test_lbank_structural_comparison -q",
+        "exit_code": 0,
+        "tests": 3
+      },
+      {
+        "command": "python research/compare_structural_targets.py",
+        "exit_code": 0
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ],
+    "checks": {
+      "same_inputs": true,
+      "baseline_all_window_outputs_reproduced": true,
+      "all_three_scenario_aggregates_pairing_and_candidate_timing_unchanged": true,
+      "all_six_scenario_trade_rows_have_observed_p1_rejections": true,
+      "full_decision_table_unchanged": true
+    },
+    "note": "Six scenario rows are repeated scenarios of the same events, not six independent trades. Original 121-test run preserved; not rerun for this report-only fix."
+  },
+  "execution_verification": {
+    "automation_id": "6ad658e93c208191bd473ceb228e15b8",
+    "run_id": "dc43a56c-99e8-8328-8374-a7585bd7a8df",
+    "status": "completed",
+    "completed_at": "2026-10-28T03:42:43.843641Z",
+    "model": "GPT-6.1 Sol reported in run result; independent execution-model metadata unavailable",
+    "duplicate_worker_started": false
   }
 }

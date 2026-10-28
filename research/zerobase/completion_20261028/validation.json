@@ -53,12 +53,40 @@
     "source_probe/audit.json": "899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690",
     "source_probe/http_0.txt": "2938e9f1284180959e33ab1718d0793a72ff6e4cdb8108c34dcd14e69446de5c",
     "source_probe/http_3.txt": "2938e9f1284180959e33ab1718d0793a72ff6e4cdb8108c34dcd14e69446de5c",
-    "p1/comparison.json": "f553b743b79b929a94196be8510154b8458e1777c0930ec64bfcf769554b3610",
+    "p1/comparison.json": "401a325d6fa7a0ff7d5a137a854989131de0d97531e9aae60c8925d17ff9541c",
     "p1/gate_decisions.csv.gz": "dc85a902a002e773f2a74fc2caae00e9b2da72a1381ecf6d96c66019951ff276",
-    "p1/trades.csv": "8124bf4a13bc6d56163c9a509e0372ffb142f67003033ed57c2f3857f2ca3c00",
+    "p1/trades.csv": "3d4dea554173c10c84faa083b36b06d58eb5b9121b5f1c271fa3d7f6484834eb",
     "p1/opportunities.csv": "13cc03498f2ce274f6d9e3f87985d0ccf3841b0e1b22618a0c9a4a617b195f8e",
-    "p1/manifest.json": "f5483e9e18810b077f161d710166e3654b1b50dac4ab0de467028085b0ccd1f5",
-    "p1/trade_cards.json": "51a192aaba98b09cf879057a06af4456374180d52bf9e5c6e2e65a2e01c6b63c",
+    "p1/manifest.json": "adea1894e96e58241d1f9c386b91778afab943ca0944b61e912caea07ab66b10",
+    "p1/trade_cards.json": "81cb01c5552a63fed0b714941ab99da44c180e13fdec1ba118ef2e579f206fb7",
     "p1/.gitignore": "a0092d31272057c4244284dbe5eb324ac7000d65f98337dc2b30c5d35d65c1c2"
+  },
+  "review": {
+    "checked_at": "2026-10-28T03:49:17.083Z",
+    "source_checkpoint": "82bcccd3b43d9e39ec78ecdd1bb505a851002912",
+    "fix": "Populate exact-event per-trade gate_reasons with observed policy, phase, evaluation time, input hash and structural target evidence; no synthetic reasons.",
+    "commands": [
+      {
+        "command": "python -m unittest test_lbank_structural_comparison -q",
+        "exit_code": 0,
+        "tests": 3
+      },
+      {
+        "command": "python research/compare_structural_targets.py",
+        "exit_code": 0
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ],
+    "checks": {
+      "same_inputs": true,
+      "baseline_all_window_outputs_reproduced": true,
+      "all_three_scenario_aggregates_pairing_and_candidate_timing_unchanged": true,
+      "all_six_scenario_trade_rows_have_observed_p1_rejections": true,
+      "full_decision_table_unchanged": true
+    },
+    "note": "Six scenario rows are repeated scenarios of the same events, not six independent trades. Original 121-test run preserved; not rerun for this report-only fix."
   }
 }
