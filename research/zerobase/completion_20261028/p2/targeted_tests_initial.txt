@@ -1,0 +1,32 @@
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+PAPER_SOURCE_UNAVAILABLE source=techniques
+======================================================================
+FAIL: test_live_gates_and_study_rules_unchanged (test_lbank_paper_notifications.PaperNotificationsTests.test_live_gates_and_study_rules_unchanged)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/fc80326ac0b9/repo/test_lbank_paper_notifications.py", line 84, in test_live_gates_and_study_rules_unchanged
+    self.assertEqual(expected,current)
+AssertionError: {'cal[263 chars]h': 'f72998d1a3cde2eba38cf4c3fbc86d0deb1441710[186 chars]04b'} != {'cal[263 chars]h': '4f7850f9cea00130532bd0291608bda5ce73a1edf[186 chars]04b'}
+  {'alert_gate': 'e047eeeb07dd40558cd745dea5e3731c2c177cde127a7137c37fd14a3213ffab',
+   'assess_candidate': '7baf0c17c52483df450ff1731c95a2f7f996cd9f7bbf9ab525021ed128310d6c',
+   'calculate_plan': 'd7b3368db1538fffd1b2577622fac5888349e70b816b527731552648efe7d2f9',
+   'classify': '3a4b9b128796029a0319f852f35d8c4d1e2a5fe485b1da562ede1555adc21a5b',
+-  'confirm_watch': 'f72998d1a3cde2eba38cf4c3fbc86d0deb14417106c38550b8abba47a4c645a4',
++  'confirm_watch': '4f7850f9cea00130532bd0291608bda5ce73a1edffe151af19f561557459f1e6',
+   'record_alert': '89147d99872cc78f1b8f8b4e6d86660806736030e335bf732f2975de24f3e04b'}
+
+----------------------------------------------------------------------
+Ran 85 tests in 0.687s
+
+FAILED (failures=1)

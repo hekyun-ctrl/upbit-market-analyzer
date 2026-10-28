@@ -1,0 +1,18 @@
+{
+  "command": "python research/render_confirmation_report.py",
+  "code_sha256": {
+    "research/render_confirmation_report.py": "810b8603aeb2ffc7a76fdbd06d4362d3ab642f71666023a00d778429da82b4c9"
+  },
+  "input_sha256": {
+    "comparison.json": "343b704d5238d33b84760e83b557d2affaa00d56175fb398bcb31c32bc562fe9",
+    "trade_cards.json": "5ad9eb6ad490ca4ea5ef7c8af8bde67cc45ad233921b487722097c6cd75c1672",
+    "trades.csv": "2627ef65bd397616a99d6d613b37e36ead8110e6d3b75df18a786513392c0cec",
+    "gate_decisions.csv.gz": "2e30981d4fc55eda6d334c56fe77c6543eab0510f88a2c6dbc494c65827c8bf7",
+    "manifest.json": "b7d58830f43997bdc9af72e5a3ea00a4ebe498c7bd47d885fff4687118498719",
+    "experiment_manifest.json": "80c39d13b1694257c43f706c801b8fc27f4d80468ca48ef8fb3fb9e8618cfe4e"
+  },
+  "output_sha256": {
+    "fixed_plan_attribution.json": "419f1749ce95f5be21674cd7dd41ea1dfc69298e854fe00c18d870d1b9c10366",
+    "event_accounting.json": "2d261b8c50327d82a490de25e7d83ba5183f61ae6f3fc9936e4d0ac9e557a0a9"
+  }
+}

@@ -682,7 +682,8 @@ def assess_candidate(prices, direction, setup, observations=None, diagnostics=No
     return plan
 
 
-def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=None, native_state=None):
+def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=None, native_state=None,
+                  *, minimum_confirmation_seconds=30):
     """Separate second-stage ENTRY REVIEW with fresh price confirmation.
 
     Used for user-side manual checking only, not a guaranteed market entry.
@@ -692,7 +693,12 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
         if diagnostics is not None:
             diagnostics["reason"] = reason
 
-    if watch is None or age_seconds < 30 or age_seconds > ENTRY_CONFIRM_MAX_AGE_SECONDS:
+    # Explicit research injection only; live callers keep the existing 30s wait.
+    # Never replace the actual age argument with a fictional elapsed duration.
+    if (minimum_confirmation_seconds not in (0, 30)
+            or watch is None or not math.isfinite(age_seconds)
+            or age_seconds < minimum_confirmation_seconds
+            or age_seconds > ENTRY_CONFIRM_MAX_AGE_SECONDS):
         mark("invalid_watch_age")
         return None
     if len(prices) < MIN_SAMPLES:
