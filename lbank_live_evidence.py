@@ -51,6 +51,20 @@ def anchor_for(plan, state):
                 field=field, price=level, known_at=None), family
 
 
+def _bind_anchor(anchor, binding):
+    matches = [item for item in binding['links']
+               if item['snapshot_bar_hash'] == anchor['bar_hash']
+               and item['bar']['period'] == anchor['period']
+               and item['bar']['start'] == anchor['bar_start']]
+    if not matches:
+        raise ValueError('ANCHOR_RECEIVED_OCCURRENCE_REQUIRED')
+    source = matches[0]
+    return dict(anchor, known_at=source['known_at'],
+                received_occurrence=dict(stream=binding['stream'], seq=source['occurrence_seq'],
+                                         index=source['bar_index'], revision=source['revision'],
+                                         source_hash=source['source_hash']))
+
+
 class LiveEvidenceStore:
     """Additive v0/v1 -> v2 migration; legacy evidence payloads stay untouched."""
     def __init__(self, path, *, max_bytes=64*1024*1024, max_records=100000):
@@ -145,12 +159,19 @@ class LiveEvidenceStore:
         elif kind in ('observation', 'candidate', 'confirmation', 'alert_eligibility', 'frozen_plan'):
             state = data.get('native_state')
             plan = data.get('plan')
+            binding = None
+            if data.get('received_snapshot_hash') is not None:
+                from lbank_received_stream import snapshot_binding
+                binding = snapshot_binding(self.db, data['received_snapshot_hash'], state,
+                                           data.get('quote'), at)
             for period, name in ((60, 'minute_bars'), (300, 'five_bars')):
                 for bar in (state or {}).get(name, []):
                     if bar['start'] + period > at or (bar.get('received_at') is not None
                                                       and bar['received_at'] > at):
                         raise ValueError('INPUT_NOT_AVAILABLE_AT_EVALUATION')
             anchor, family = anchor_for(plan, state) if kind == 'candidate' else (None, None)
+            if anchor and binding:
+                anchor = _bind_anchor(anchor, binding)
             first_observed_at = at
             anchor_link_status = 'candidate_source' if anchor else 'anchor_not_available'
             if kind in ('confirmation', 'alert_eligibility', 'frozen_plan'):
@@ -160,6 +181,13 @@ class LiveEvidenceStore:
                     original = json.loads(prior[0])
                     first_observed_at = original['observed_at']
                     anchor, family = anchor_for(original['data'].get('plan'), original['data'].get('native_state'))
+                    original_key = original['data'].get('received_snapshot_hash')
+                    if anchor and original_key:
+                        from lbank_received_stream import snapshot_binding
+                        original_binding = snapshot_binding(self.db, original_key,
+                            original['data'].get('native_state'), original['data'].get('quote'),
+                            original['observed_at'])
+                        anchor = _bind_anchor(anchor, original_binding)
                     anchor_link_status = 'immutable_candidate_source' if anchor else 'candidate_anchor_missing'
                 else:
                     anchor, family = None, None
@@ -172,13 +200,17 @@ class LiveEvidenceStore:
                                         quote=data.get('quote')),
                                    event_time=at, received_at=None,
                                    quality='evaluation_snapshot; raw_receipt_unknown')
-            inputs = self.book.inputs([raw])
+            inputs = self.book.inputs([raw] + (binding['input_sources'] if binding else []))
             self.book.decision(event=event, policy=data['policy'], evaluated_at=at,
                 input_hash=inputs, state=kind, gates=gate_vector(),
                 first_reject=data.get('reason'), available_at=None, availability_basis=None,
                 diagnostics=data.get('diagnostics'), source_blockers=BLOCKERS,
                 actual_gate_vector_available=False, candidate_is_entry=False,
-                anchor_link_status=anchor_link_status)
+                anchor_link_status=anchor_link_status,
+                received_snapshot_hash=data.get('received_snapshot_hash'),
+                bar_available_at=binding['available_at'] if binding else None,
+                bar_receipt_binding_available=binding is not None,
+                full_input_receipt_coverage_verified=False)
             if kind == 'frozen_plan':
                 plan_id = self.book.freeze(event=event, policy=data['policy'], plan=plan,
                     provenance=dict(input_hash=inputs, anchor=anchor, candidate_at=data.get('candidate_at'),
@@ -249,6 +281,12 @@ class LiveEvidenceStore:
                      archive_bytes=destination.stat().st_size, comparison_reference=comparison_reference,
                      records=self.db.execute('SELECT count(*) FROM live_records').fetchone()[0],
                      created_at=time.time(), deletion_performed=False)
+        if self.db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='received_segments'").fetchone():
+            audit['sealed_received_streams'] = dict(
+                segments=[r[0] for r in self.db.execute('SELECT seal FROM received_segments ORDER BY seal')],
+                records=self.db.execute('SELECT count(*) FROM received_records').fetchone()[0],
+                bars=self.db.execute('SELECT count(*) FROM received_bars').fetchone()[0],
+                snapshots=[r[0] for r in self.db.execute('SELECT snapshot_hash FROM received_snapshots ORDER BY snapshot_hash')])
         # Sidecar manifest remains usable when the database has hit its hard cap.
         manifest = destination.with_suffix(destination.suffix + '.json')
         with manifest.open('x') as stream:
