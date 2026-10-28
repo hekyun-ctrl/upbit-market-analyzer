@@ -1,0 +1,13 @@
+======================================================================
+FAIL: test_manifest_code_costs_and_spec_are_frozen (test_lbank_continuous_comparison.ContinuousTests.test_manifest_code_costs_and_spec_are_frozen)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/test_lbank_continuous_comparison.py", line 73, in test_manifest_code_costs_and_spec_are_frozen
+    with self.assertRaisesRegex(ValueError,'MANIFEST_OR_CODE_CHANGED'):ContinuousComparison(self.book,bad)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 35 tests in 0.892s
+
+FAILED (failures=1)

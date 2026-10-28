@@ -16,6 +16,7 @@ from types import SimpleNamespace
 
 from lbank_signal_evidence import canonical, digest, pair_plans
 from lbank_gate_trace import evaluate
+from lbank_live_evidence import LiveEvidenceStore
 from research.early_reversal_experiment import BASE_CLASSES, E5_CLASSES, replay
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,9 +60,10 @@ def initial_state():
 
 
 class ContinuousComparison:
-    def __init__(self, book, manifest, *, max_observations=100000):
+    def __init__(self, book, manifest, *, max_observations=100000, max_bytes=64*1024*1024):
         if type(max_observations) is not int or max_observations<1:raise ValueError("INVALID_COMPARISON_CAP")
         self.max_observations=max_observations
+        if type(max_bytes) is not int or max_bytes<128*1024:raise ValueError("INVALID_COMPARISON_BYTE_CAP")
         self.book, self.db, self.manifest = book, book.db, copy.deepcopy(manifest)
         if manifest.get('schema') != 'continuous_comparison_v1' or manifest.get('outbound') is not False or manifest.get('orders') is not False:
             raise ValueError('INERT_COMPARISON_REQUIRED')
@@ -69,6 +71,15 @@ class ContinuousComparison:
         if manifest != expected:
             raise ValueError('FROZEN_MANIFEST_OR_CODE_CHANGED')
         self.identity = digest(manifest)
+        path=Path(self.db.execute('PRAGMA database_list').fetchone()[2])
+        page_size=self.db.execute('PRAGMA page_size').fetchone()[0]
+        if self.db.execute('PRAGMA page_count').fetchone()[0]*page_size>max_bytes:
+            raise ValueError('EXISTING_COMPARISON_EXCEEDS_BYTE_CAP')
+        self.db.execute('PRAGMA max_page_count='+str(max_bytes//page_size))
+        self.capacity_guard=SimpleNamespace(db=self.db,path=path,max_bytes=max_bytes)
+        # Reuse the sidecar's nondeleting main/WAL guard. This is an offline
+        # analysis writer; a pinned reader/cap pauses it rather than deleting.
+        LiveEvidenceStore._check_wal_cap(self.capacity_guard)
         self.db.executescript('''
           CREATE TABLE IF NOT EXISTS comparison_runs(run_id TEXT PRIMARY KEY,manifest TEXT NOT NULL,cursor INTEGER NOT NULL);
           CREATE TABLE IF NOT EXISTS comparison_observations(run_id TEXT NOT NULL,seq INTEGER NOT NULL,observation_hash TEXT NOT NULL,payload TEXT NOT NULL,PRIMARY KEY(run_id,seq));
@@ -128,6 +139,7 @@ class ContinuousComparison:
             if at<prior['observed_at']:raise ValueError('COMPARISON_TIME_REGRESSION')
         if not LOCK.acquire(blocking=False):raise RuntimeError('COMPARISON_ALREADY_EVALUATING')
         try:
+            LiveEvidenceStore._check_wal_cap(self.capacity_guard)
             with self.book.transaction():
                 self.db.execute('INSERT INTO comparison_observations VALUES(?,?,?,?)',(self.identity,seq,key,canonical(point)))
                 for spec in self.manifest['policies']:
@@ -136,6 +148,7 @@ class ContinuousComparison:
                     self.db.execute('UPDATE comparison_states SET payload=? WHERE run_id=? AND policy=?',(canonical(current),self.identity,name))
                     self.db.execute('INSERT INTO comparison_steps VALUES(?,?,?,?)',(self.identity,seq,name,canonical(result)))
                 self.db.execute('UPDATE comparison_runs SET cursor=? WHERE run_id=?',(seq,self.identity))
+            self.db.execute('PRAGMA wal_checkpoint(TRUNCATE)')
             return self.steps(seq)
         finally:
             LOCK.release()
@@ -208,13 +221,15 @@ class ContinuousComparison:
                 if hasattr(trace,field):current[field]=sorted(getattr(trace,field))
         result.update(status='evaluated',valid_interval=True,
             modeled_net_usdt=0 if result['no_entry'] else None,
-            no_signal_interval=all(p.get('diagnostics',{}).get('reason')!='qualified' for p in result['phases']))
+            no_signal_interval=result['no_entry'],
+            no_qualified_candidate=all(p.get('diagnostics',{}).get('reason')!='qualified' for p in result['phases']))
         return result
 
     def followups(self,bars):
         """Original fixed six-hour benchmark; missing/ambiguous paths stay null."""
         if not LOCK.acquire(blocking=False):raise RuntimeError('COMPARISON_ALREADY_EVALUATING')
         try:
+            LiveEvidenceStore._check_wal_cap(self.capacity_guard)
             with self.book.transaction(), ExitStack() as hooks:
                 for key,attribute in replay.CONFIG_MAP.items():
                     hooks.enter_context(replay.patch.object(replay.monitor,attribute,self.manifest['costs'][key]))
@@ -232,6 +247,7 @@ class ContinuousComparison:
                         self.book.outcome(card['plan_id'],outcome)
                         card['outcome']=outcome
                     self.db.execute('UPDATE comparison_states SET payload=? WHERE run_id=? AND policy=?',(canonical(current),self.identity,name))
+            self.db.execute('PRAGMA wal_checkpoint(TRUNCATE)')
         finally:
             LOCK.release()
 

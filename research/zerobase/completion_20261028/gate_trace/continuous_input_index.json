@@ -1,0 +1,242 @@
+[
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "c37b3ef939f04fd70fa8c78bcc984e27a46fcc50525e077bb695e772be18f668",
+    "native_state_sha256": "e1d90942f587637eea61930b8b1f1f33cee6493e2151038d6f4be37a19e4c78a",
+    "observed_at": 1792466745.556549,
+    "seq": 0,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:25:45.556549867Z",
+      "price": 81879.9,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "9c15f55fb7361e68b23e4eda34286edfe1da7c40e7f75b3c68d31c4e4be383c0",
+    "native_state_sha256": "a790ba7a4ec49fd2df63499e84a9e885d558670b8381196649f1a65a1ce9dcd2",
+    "observed_at": 1792466808.534515,
+    "seq": 1,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:26:48.534515388Z",
+      "price": 81842,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "451b7980f766885dcef3baa144ec87fde3cba86938e68336fd8ff5dbdabb8774",
+    "native_state_sha256": "5c4482db1b7291519aefa4299d8a05c6f7297801e7a3eaf0ecb0ed2e9f3adc09",
+    "observed_at": 1792466872.22692,
+    "seq": 2,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:27:52.226920388Z",
+      "price": 81832.4,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "c1b324825d0f5d23eff5e4c305d34b837b2537ebd4fa9795449c01559123359c",
+    "native_state_sha256": "17e9b9165bb999539852dc8d19e4e69cb50b50297dd05ef3f858c1f2467ecb6c",
+    "observed_at": 1792466933.290566,
+    "seq": 3,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:28:53.290566605Z",
+      "price": 81856.3,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "6659d6f7d0bdb7681708a2865cd27333b01f1641dc64a65b76caf9d2873da553",
+    "native_state_sha256": "e10192d67f888aa4cb41f4b5d714935824096bf0e504b175aee21afe414ad008",
+    "observed_at": 1792466993.540414,
+    "seq": 4,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:29:53.540414729Z",
+      "price": 81840.1,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "bc015fa76e3dbabb20c8d3fc31654bd76c70f7ec4e7a5bb76dbcdf56e5f71a37",
+    "native_state_sha256": "e2402fcfdbca8b307506e309ff79e750a79d0cda825de3d65a42f6935328e5ba",
+    "observed_at": 1792467054.071358,
+    "seq": 5,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:30:54.071358903Z",
+      "price": 81825.1,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "e247cae6a501ec4d3aab7aee1b63a4306cd75f96ffe821e4b763e17e7afedeb6",
+    "native_state_sha256": "800c09e4ff85ca9584632603994d82b78b8f011eb1fbb09ef187a0dfaab33987",
+    "observed_at": 1792467118.224487,
+    "seq": 6,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:31:58.224487943Z",
+      "price": 81855.4,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "dbdfb9c15bfe73720700011e5f8903aa0d3dc9b541c2952bcc8699a891883baa",
+    "native_state_sha256": "7e146c4b9ff38c83f13dca82e5c5e1cb116916362b6637301db626bfb180b21e",
+    "observed_at": 1792467177.849012,
+    "seq": 7,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:32:57.849012549Z",
+      "price": 81926.9,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "facfad3cecc56b440fd264b9d1aa67ed8ed1ba8221e35099328faa28de0cf423",
+    "native_state_sha256": "5c5d4a07396b1ad26bb7ac321878f4ab3a8b2399158abceaf455b8106e3c6bb8",
+    "observed_at": 1792467239.343184,
+    "seq": 8,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:33:59.343184311Z",
+      "price": 81965.5,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "7c17405f2c5ffeb1706428ed60a2e246341f09022ffd9200ad3798f6758d3c42",
+    "native_state_sha256": "8c58d5e95b9b78684cf1082dc01df6a0cd346cb4b90455dceb6ed49ee1e2b84d",
+    "observed_at": 1792467302.123575,
+    "seq": 9,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:35:02.123575452Z",
+      "price": 81971,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "ab163d0ed51ac291e5beca1c7754002347d017a814d01f2ae9406212eb7f8987",
+    "native_state_sha256": "7921d249dfbb62e9bdcd84756b17ed27f05d17b1b44d59063fc5c03253d2c574",
+    "observed_at": 1792467374.461983,
+    "seq": 10,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:36:14.461983474Z",
+      "price": 81974.1,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "a828d80b0e7becd6b4026ed3c328d33d3a313f947a90df2a650073f053464bb4",
+    "native_state_sha256": "d5a2b05985d9aace6475c9906b71c97ca143fea9beefb9a411a64a49b84c2d0b",
+    "observed_at": 1792467434.41831,
+    "seq": 11,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:37:14.418310099Z",
+      "price": 82011.8,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "adf5ab0b3d99ff330994bccb2bd693c9463e79a1ed20e3153e29cf4233d4eacc",
+    "native_state_sha256": "3c94fc2458a8e641d18c9a43b57080fa3f38ff559cd562c6dba89fae8896f2c3",
+    "observed_at": 1792467495.896508,
+    "seq": 12,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:38:15.896508058Z",
+      "price": 82026.9,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "1c2648b251ff5641f04864350dfb94003928f6157482e1903ddf9e264aeca1af",
+    "native_state_sha256": "1162056486168b5706456b312a0f3cfd1a5424aad1c4caa69ea306d85de1ec19",
+    "observed_at": 1792467558.766728,
+    "seq": 13,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:39:18.766728654Z",
+      "price": 82030.7,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "26be3235cfca6d60af1063ab61d49cd9cd66cf1b77d5a7b87acec296fa856d9d",
+    "native_state_sha256": "279f2b01c22f71dde064ed8800693ac789d896a9f5f32412ab142e642b5f0c82",
+    "observed_at": 1792467621.109031,
+    "seq": 14,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:40:21.109031021Z",
+      "price": 81982.7,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "cad628bf7cb31d2460416c19d3e6afe6932ff80c0926286cfc5b8df93904f187",
+    "native_state_sha256": "504ea0c760e726c89cf46a8556946f8194a740bb3859acff83321f1f38ef4ac4",
+    "observed_at": 1792467684.206657,
+    "seq": 15,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:41:24.206657070Z",
+      "price": 81985.3,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "b38580c5cf66fc3d3bcdb3cc24ff18a050d15c4444ab226df056127aee07e76d",
+    "native_state_sha256": "5915111c8a201ee7a1a2df746d43a05614b0ded3dcd205e4582aa81cb579f881",
+    "observed_at": 1792467743.332222,
+    "seq": 16,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:42:23.332222154Z",
+      "price": 81995,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "28e6f938a0126cffc43ade752b48be954482f542e023bb7a66d6c3a74266cb16",
+    "native_state_sha256": "2db01e4c89c981122257c93ad733c550b8c113e9e7e5f63eb90a6a248ff02c4b",
+    "observed_at": 1792467805.921316,
+    "seq": 17,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:43:25.921316890Z",
+      "price": 82002.9,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "5d3cbc2cef778cf5f811e25b114c6e0133954eff5f8cc50a7e240d024a9061cf",
+    "native_state_sha256": "b00acb9f62429cac1b3effebe1cb4979aa2d5c2e67ea90f28d00832831819f2e",
+    "observed_at": 1792467878.444635,
+    "seq": 18,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:44:38.444635976Z",
+      "price": 81986.6,
+      "window": "signal15"
+    }
+  },
+  {
+    "actual_historical_receive_time": null,
+    "input_sha256": "f4b6579dc5eb81e6e6f90463b008f916c8d1326ad7f5983d618547633521a9f6",
+    "native_state_sha256": "0dd6552dd9408e6b56f29eca3eb1ef9e92b7c763db5f532f322159d42883de8d",
+    "observed_at": 1792467940.728202,
+    "seq": 19,
+    "source_observation": {
+      "logged_at": "2026-10-20T03:45:40.728202672Z",
+      "price": 81976.5,
+      "window": "signal15"
+    }
+  }
+]

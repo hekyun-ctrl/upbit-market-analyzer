@@ -1,0 +1,113 @@
+{
+  "P1Trace": {
+    "confirmation_reasons": {},
+    "cooldown_reasons": {},
+    "evaluations": {
+      "market_no_setup": 18,
+      "risk_or_target": 2
+    },
+    "expired": 0,
+    "initial_cooldown_assumption": "empty; prior unobserved alerts unknown",
+    "median_qualified_tp1_distance_pct": null,
+    "modeled_alerts": 0,
+    "opportunities": [],
+    "pending_at_end": 0,
+    "qualified_candidate_bars": 0,
+    "quote_observations": 20,
+    "raw_candidate_bar_families": 3,
+    "ready_observations": 20,
+    "signals": [],
+    "unavailable": {},
+    "watches": 0
+  },
+  "Trace": {
+    "confirmation_reasons": {
+      "qualified": 1
+    },
+    "cooldown_reasons": {
+      "confirm:ok": 1,
+      "discovery:ok": 1
+    },
+    "evaluations": {
+      "market_no_setup": 18,
+      "qualified": 1,
+      "risk_or_target": 1
+    },
+    "expired": 0,
+    "initial_cooldown_assumption": "empty; prior unobserved alerts unknown",
+    "median_qualified_tp1_distance_pct": 0.7439681464294079,
+    "modeled_alerts": 1,
+    "opportunities": [
+      {
+        "at": "2026-10-20T03:37:14.418310+00:00",
+        "direction": 1,
+        "entry_location": null,
+        "location_evidence": null,
+        "margin": 76.27,
+        "native_entry_geometry": {
+          "atr1": 38.1370281609392,
+          "atr5": 116.58700783521688,
+          "min_range_fraction": 0.004748034194114408,
+          "minimum_target_fraction": 0.004598034194114408,
+          "refinement_mode": "capture",
+          "stop_floor_basis": "1m_structure_with_1_5atr_noise_floor",
+          "stop_floor_fraction": 0.0006975281879120907
+        },
+        "net_gain1": 14.037991517356433,
+        "net_gain2": 23.39665252892751,
+        "net_loss": 9.358661011570854,
+        "price": 82011.8,
+        "quantity_btc": 0.02789964370980761,
+        "rr1": 1.5000000000000162,
+        "stop": 81799.19764000001,
+        "stop_distance_pct": 0.25923386634605,
+        "strategy": "trend_retest",
+        "structure_anchor": 81815.6,
+        "target1": 82621.9416683134,
+        "target1_distance_pct": 0.7439681464294079,
+        "target2": 82957.58321544997
+      }
+    ],
+    "pending_at_end": 0,
+    "qualified_candidate_bars": 1,
+    "quote_observations": 20,
+    "raw_candidate_bar_families": 3,
+    "ready_observations": 20,
+    "signals": [
+      {
+        "at": "2026-10-20T03:38:15.896508+00:00",
+        "direction": 1,
+        "entry_location": null,
+        "evidence_event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+        "evidence_plan_id": "plan-v1:3fe9119bde0e30c039bc5ea4e11f5d061fac2286b2b1542d59e7fdf1e14a1a2d",
+        "location_evidence": null,
+        "margin": 73.0,
+        "native_entry_geometry": {
+          "atr1": 37.562954720871495,
+          "atr5": 116.58700783521688,
+          "min_range_fraction": 0.004732097924905541,
+          "minimum_target_fraction": 0.004582097924905541,
+          "refinement_mode": "capture",
+          "stop_floor_basis": "1m_structure_with_1_5atr_noise_floor",
+          "stop_floor_fraction": 0.0006869018831786554
+        },
+        "net_gain1": 14.038919769841243,
+        "net_gain2": 23.3981996164016,
+        "net_loss": 9.35927984656063,
+        "price": 82026.9,
+        "quantity_btc": 0.02669855864356693,
+        "rr1": 1.5000000000000318,
+        "stop": 81799.19462000001,
+        "stop_distance_pct": 0.27759842198106344,
+        "strategy": "trend_retest",
+        "structure_anchor": 81815.6,
+        "target1": 82659.74530187006,
+        "target1_distance_pct": 0.7715094705152525,
+        "target2": 83010.50951018767,
+        "watch_at": "2026-10-20T03:37:14.418310+00:00"
+      }
+    ],
+    "unavailable": {},
+    "watches": 1
+  }
+}

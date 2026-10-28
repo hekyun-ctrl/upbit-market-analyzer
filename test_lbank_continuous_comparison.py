@@ -105,4 +105,35 @@ class ContinuousTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'FUTURE_COMPARISON_SOURCE'):self.runner.step(point)
         self.assertEqual(self.book.db.execute('SELECT count(*) FROM comparison_observations').fetchone()[0],0)
 
+    def test_entered_unresolved_stays_null_and_followups_do_not_rewrite_frozen_plan(self):
+        name=self.manifest['policies'][0]['class_name'];state=self.runner.state(name)
+        plan=dict(direction=1,strategy='breakout',price=100.,stop=99.,target1=102.,target2=103.,quantity_btc=1.)
+        provenance=dict(candidate_at=300.,confirm_at=300.,costs=self.costs)
+        identity=self.book.freeze(event=None,policy=name,plan=plan,provenance=provenance,intent=False)
+        frozen=self.book.db.execute('SELECT payload FROM frozen_plans').fetchone()[0]
+        state.update(observations=1,valid=1,plans=[dict(plan_id=identity,event_id=None,policy=name,plan=plan,provenance=provenance,outcome=dict(status='unresolved'))])
+        self.book.db.execute('UPDATE comparison_states SET payload=? WHERE run_id=? AND policy=?',(canonical(state),self.runner.identity,name));self.book.db.commit()
+        self.runner.followups({})
+        metric=self.runner.report()['metrics'][name]
+        self.assertIsNone(metric['net_pnl_model']);self.assertEqual(metric['unresolved_ratio'],1.)
+        self.assertEqual(self.book.db.execute('SELECT payload FROM frozen_plans').fetchone()[0],frozen)
+        self.runner.followups({300:dict(start=300,open=100.,high=101.,low=98.,close=99.,quality='stream_closed')})
+        metric=self.runner.report()['metrics'][name]
+        self.assertIsNotNone(metric['net_pnl_model']);self.assertEqual(metric['stop_first_count'],1)
+        self.assertEqual(self.book.db.execute('SELECT payload FROM frozen_plans').fetchone()[0],frozen)
+        self.assertGreaterEqual(self.book.db.execute('SELECT count(*) FROM outcome_events').fetchone()[0],2)
+
+    def test_e3_e5_confirmation_declarations_preserve_original_mixin_scope(self):
+        self.assertFalse(policy_spec(0)['confirmation_on_discovery'])
+        self.assertTrue(policy_spec(1)['confirmation_on_discovery'])
+        self.assertFalse(policy_spec(0,e5=True)['confirmation_on_discovery'])
+        self.assertTrue(policy_spec(1,e5=True)['confirmation_on_discovery'])
+
+    def test_reused_main_wal_storage_cap_rolls_back_cursor_without_deleting_evidence(self):
+        runner=ContinuousComparison(self.book,self.manifest,max_bytes=128*1024)
+        point=self.point();point['source_observation']['retained_fixture']='x'*300000
+        with self.assertRaises(sqlite3.OperationalError):runner.step(point)
+        self.assertEqual(self.book.db.execute('SELECT count(*) FROM comparison_observations').fetchone()[0],0)
+        self.assertTrue(all(s['observations']==0 for s in runner.report()['metrics'].values()))
+
 if __name__=='__main__':unittest.main()

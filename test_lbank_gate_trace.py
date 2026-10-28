@@ -150,4 +150,30 @@ class TraceTests(unittest.TestCase):
         quote={};self.assertEqual(m.get_perpetual_snapshot(exchange,evidence=Broken(),quote_evidence=quote),(100.,1.))
         self.assertIsNone(quote['record_hash'])
 
+    def test_trace_install_failure_is_unavailable_and_does_not_skip_original_call(self):
+        diag={}
+        with patch('lbank_gate_trace.sys.settrace',side_effect=RuntimeError('fixture')):
+            self.assertIsNone(evaluate(ENABLED,m.confirm_watch,[],{},0,diagnostics=diag))
+        self.assertEqual(diag['reason'],'invalid_watch_age')
+        self.assertFalse(diag['execution_trace']['complete'])
+        self.assertEqual(diag['execution_trace']['unavailable_reason'],'thread_trace_install_failed')
+
+    def test_frozen_plan_binds_original_decision_chain_and_rejects_plan_revision(self):
+        plan=dict(direction=1,strategy='trend_retest',price=100.,stop=99.,target1=102.,target2=103.)
+        with tempfile.TemporaryDirectory() as directory:
+            store=LiveEvidenceStore(Path(directory)/'book.sqlite3')
+            try:
+                candidate=store.append(envelope(plan=plan))
+                confirmation=store.append(envelope('confirmation',at=301.,plan=plan,candidate_record_hash=candidate))
+                eligibility=store.append(envelope('alert_eligibility',at=301.,plan=plan,candidate_record_hash=candidate))
+                links=dict(candidate=candidate,confirmation=confirmation,alert_eligibility=eligibility)
+                store.append(envelope('frozen_plan',at=301.,plan=plan,candidate_record_hash=candidate,decision_record_hashes=links))
+                row=json.loads(store.db.execute('SELECT payload FROM frozen_plans').fetchone()[0])
+                self.assertEqual(row['provenance']['executed_decision_links']['candidate']['record_hash'],candidate)
+                self.assertFalse(row['provenance']['executed_decision_chain_available'])
+                with self.assertRaisesRegex(ValueError,'DECISION_PLAN_MISMATCH'):
+                    store.append(envelope('frozen_plan',at=302.,plan=dict(plan,target1=104.),candidate_record_hash=candidate,decision_record_hashes=links))
+                self.assertEqual(store.db.execute('SELECT count(*) FROM frozen_plans').fetchone()[0],1)
+            finally:store.close()
+
 if __name__=='__main__':unittest.main()

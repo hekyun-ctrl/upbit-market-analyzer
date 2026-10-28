@@ -18,13 +18,14 @@ GATE_CALLS = dict(momentum=('trend_retest_momentum_gate',),
     rsi=('five_minute_rsi_entry_gate',), confirmation=('confirm_watch',),
     plan=('calculate_plan',), alert_limits=('alert_gate',))
 SOURCES = {}
-NO_LINE_FUNCTIONS = frozenset(('ema','rsi','atr_wilder','wilder_rsi_series'))
+INFRASTRUCTURE = frozenset(('lbank_gate_trace.py','lbank_live_evidence.py','lbank_signal_evidence.py','lbank_received_stream.py'))
+NO_LINE_FUNCTIONS = frozenset(('ema','rsi','atr_wilder','wilder_rsi_series','net_pnl_per_btc'))
 COMPREHENSIONS = frozenset(('<listcomp>','<genexpr>','<dictcomp>','<setcomp>'))
 CONFIG_FIELDS = ('ENTRY_REFINEMENT_MODE','ENTRY_MAX_CHASE_PCT','ENTRY_CONFIRM_MAX_AGE_SECONDS',
     'MIN_SAMPLES','MIN_NET_RR','TAKER_FEE','MAKER_FEE','STOP_SLIPPAGE','FUNDING_BUFFER',
     'REF_BALANCE','RISK_FRACTION','MAX_MARGIN_FRACTION','LEVERAGE','COOLDOWN',
     'REVERSAL_COOLDOWN','MAX_DAILY_ALERTS','RUNNER_ENABLED')
-LOCAL_FIELDS = ('direction','stop_distance','minimum_stop','unit_loss','t1','t2','observed_range',
+LOCAL_FIELDS = ('entry','exit_price','exit_kind','direction','stop_distance','minimum_stop','unit_loss','t1','t2','observed_range',
     'barrier','raw_qty','qty','margin','net_loss','net_gain1','net_gain2',
     'relative','age_seconds','minimum_confirmation_seconds','momentum_ok','context_ok',
     'allowed','quality_ok','valid')
@@ -71,7 +72,7 @@ def result_summary(value):
 
 
 class ExecutionTrace:
-    def __init__(self, function, *, max_calls=512, max_lines=12000):
+    def __init__(self, function, *, max_calls=2048, max_lines=40000):
         self.function = function
         self.max_calls, self.max_lines = max_calls, max_lines
         self.calls, self.frames, self.files = [], {}, {}
@@ -81,7 +82,7 @@ class ExecutionTrace:
     def callback(self, frame, event, value):
         try:
             filename = frame.f_code.co_filename
-            if filename == __file__:
+            if Path(filename).name in INFRASTRUCTURE:
                 return None
             if Path(filename).parent != ROOT or not Path(filename).name.startswith('lbank_'):
                 return None
@@ -134,11 +135,17 @@ class ExecutionTrace:
             self.complete, self.failure = False, 'existing_thread_tracer'
             yield
             return
-        sys.settrace(self.callback)
+        try:
+            sys.settrace(self.callback)
+        except Exception:
+            self.complete,self.failure=False,'thread_trace_install_failed'
+            yield
+            return
         try:
             yield
         finally:
-            sys.settrace(previous)
+            try:sys.settrace(previous)
+            except Exception:self.complete,self.failure=False,'thread_trace_restore_failed'
 
     def report(self, context):
         if not self.calls and self.complete:
@@ -178,6 +185,7 @@ class ExecutionTrace:
             calls=self.calls, coverage=coverage, gates=gates,
             branch_boolean_values_available=False,
             excluded_line_scopes=sorted(NO_LINE_FUNCTIONS|COMPREHENSIONS),
+            excluded_infrastructure_modules=sorted(INFRASTRUCTURE),
             line_semantics='source_line_reached_only; never imply every short_circuit_operand_evaluated',
             quote_receipt_verified=False, full_input_receipt_coverage_verified=False)
 

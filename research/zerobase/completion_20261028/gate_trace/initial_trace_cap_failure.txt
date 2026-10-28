@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/capture_gate_trace_evidence.py", line 153, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/capture_gate_trace_evidence.py", line 64, in main
+    assert trace['complete'],trace['unavailable_reason']
+           ~~~~~^^^^^^^^^^^^
+AssertionError: trace_line_cap
