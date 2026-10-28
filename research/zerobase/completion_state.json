@@ -1,14 +1,12 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "checkpoint_complete_feature_incomplete",
+  "status": "in_progress_review",
   "lease": {
-    "owner": "zb-completion-20261028-sole-worker",
-    "acquired_at": "2026-10-28T03:22:00Z",
-    "expires_at": "2026-10-28T05:22:00Z",
-    "active": false,
-    "released_at": "2026-10-28T03:41:47.562197+00:00",
-    "release_reason": "implementation and evidence checkpoint persisted; no active worker after handoff"
+    "owner": "zb-completion-root-evidence-review-20261028",
+    "acquired_at": "2026-10-28T03:44:53.747Z",
+    "expires_at": "2026-10-28T04:09:53.747Z",
+    "active": true
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -29,7 +27,7 @@
     "RAW5M_INDEPENDENCE_UNVERIFIED",
     "CANDLE_VOLUME_UNIT_UNVERIFIED"
   ],
-  "next_work": "P2 independent detection/confirmation experiment manifest and live ledger failure-isolated adapter can progress in code while official candle/volume and continuous-data evidence waits.",
+  "next_work": "Fix missing per-trade P1 rejection reasons; reproduce unchanged model results and preserve full evidence hashes, then release lease for P2.",
   "outbound": false,
   "orders": false,
   "ended_at": "2026-10-28T03:41:47.562197+00:00",
@@ -68,15 +66,15 @@
       "capture_stop_first": 3,
       "p1_stop_first": 0,
       "capture_model_net_usdt": -28.07791962494808,
-      "p1_model_net_usdt": 0.0,
+      "p1_model_net_usdt": 0,
       "capture_closed_drawdown_usdt": 28.07791962494808,
-      "p1_closed_drawdown_usdt": 0.0,
-      "capture_unresolved_ratio": 0.0,
+      "p1_closed_drawdown_usdt": 0,
+      "capture_unresolved_ratio": 0,
       "p1_unresolved_ratio": null,
       "emergency_count": null,
       "full_mtm_drawdown": null,
       "common_candidate_events": 52,
-      "candidate_lead_seconds_all": 0.0,
+      "candidate_lead_seconds_all": 0,
       "common_final_alerts": 0,
       "excluded": 3,
       "added": 0
@@ -87,7 +85,7 @@
       "excluded": 2,
       "added": 0,
       "common_candidate_events": 40,
-      "candidate_lead_seconds_all": 0.0
+      "candidate_lead_seconds_all": 0
     },
     "adverse_delay0": {
       "capture_trades": 1,
