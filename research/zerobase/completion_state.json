@@ -1,13 +1,16 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "gate_trace_continuous_orchestration_in_progress",
+  "status": "checkpoint_complete_feature_incomplete",
   "lease": {
     "owner": "zb-gate-trace-orchestration-20261028-sole-worker",
-    "active": true,
+    "active": false,
     "acquired_at": "2026-10-28T14:57:26.944652+00:00",
     "expires_at": "2026-10-28T16:57:26.944652+00:00",
-    "expected_head": "b26cc6f7e79205ffaa0d057ff4d44a878f09b62f"
+    "expected_head": "9aafb3173f3877221fef323ac29857d833e30d1c",
+    "released_at": "2026-10-28T15:27:07.288145+00:00",
+    "last_verified_head": "9aafb3173f3877221fef323ac29857d833e30d1c",
+    "release_reason": "Original direct policy gate call/return/source/quote/decision-chain tracing and independent bounded restartable retained-schedule orchestration implemented/tested.117 related tests/28new pass;12 retained outputs exact,20-observation restart and original control exact; real finals/quote receipts/unseen qualified0. Original live schedule/source qualification/P3-P5 incomplete;463-blob remote tree matches local index."
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -35,16 +38,17 @@
     "59 distinct related tests (58-test run including14 new E4 plus1 new exact-boundary test);15 new E4 total; hashes/zero-null semantics and19 uploaded artifact blob hashes/entire fetched tree verified",
     "P2 E5 observed sweep/first completed reclaim/frozen opposite-trigger route; macro trend/RSI explanatory only;32 arms×3 scenarios;48 old full-window controls and48 E5 final-alert outputs exactly equal.66 distinct targeted tests including22 new synthetic;4336 E5 candidate evaluations and4340 exact-input explanation records; no final E5 entries or demonstrated improvement.",
     "Disabled-by-default live EvidenceLedger sidecar connected to native wire receipts and monitor stages/frozen plan/delivery/followups; v0/v1-to-v2 additive migration, atomic envelopes, immutable candidate-anchor/restart links, explicit outage/crash gaps, bounded nondeleting recording and integrity/hash archive.140 distinct targeted tests/25 new;12 real policy input/output pairs unchanged under healthy/failed storage,6 retained raw frames preserve actual original bytes/receipts; no live deployment or qualification.",
-    "Sealed received-stream importer: bounded atomic append-only seal chains, exact raw occurrence/revision/original UTC receipt, explicit restart/gaps and latest-final-bar snapshot coverage; optional live binding retains immutable original candidate source across restart. Archive inventories seals/snapshots.76 focused tests/26 new, original6 real frames/10 archived records,6 fail-closed final binding rejections, zero verified final bars/snapshots; production decoder remains chart-final-unknown, no live qualification."
+    "Sealed received-stream importer: bounded atomic append-only seal chains, exact raw occurrence/revision/original UTC receipt, explicit restart/gaps and latest-final-bar snapshot coverage; optional live binding retains immutable original candidate source across restart. Archive inventories seals/snapshots.76 focused tests/26 new, original6 real frames/10 archived records,6 fail-closed final binding rejections, zero verified final bars/snapshots; production decoder remains chart-final-unknown, no live qualification.",
+    "Original direct policy execution trace with actual helper returns, source/return/control-flow coverage, argument/config/snapshot hashes, explicit unrun/incomplete checks, normalized quote response receipt and immutable decision-chain binding. Disabled-by-default; bounded failure-isolated mechanics;117 related tests/28new. Independent restartable/capped policy-state retained-replay orchestration, atomic cursor/observations/decisions/plans, frozen followups and zero/null report;12 retained actual outputs unchanged and finite20-observation capture/P1 uninterrupted/restart/original-runner outputs equal. No new independent data or qualified unseen execution."
   ],
   "blockers": [
     "RAW5M_INDEPENDENCE_UNVERIFIED",
     "CANDLE_VOLUME_UNIT_UNVERIFIED"
   ],
-  "next_work": "Check latest actual production/research/PR21/22/27 heads and inactive sole lease. Next technical work: exact production gate-execution trace coverage and independent continuous comparison-state orchestration preserving frozen strategies; collect/qualify actual sources only when official final/volume schema and independently published native5m receipts become available. Sealed importer mechanics done, actual final-bar binding unqualified. Preserve all original development outcomes and bounded nondeleting evidence. No repeat completed P1/E1-E5 full comparisons/probes without changed-code/data reason; no sends/orders/deployment.",
+  "next_work": "First recheck actual production/research/PR21/22/27 heads and inactive sole lease. Continue finite original P3: exact original live-schedule input adapter and reviewed official source/derived-input receipt linkage when documented sources exist; then predeclared unused continuous comparison, original P4 report and separately authorized P5. Do not repeat completed96-arm development replay, finite mechanics regression or same probes without a code/data reason. Preserve current source blockers and zero/null/frozen plan semantics. No deployment/sends/orders authorized by this checkpoint.",
   "outbound": false,
   "orders": false,
-  "ended_at": "2026-10-28T14:52:59.313403+00:00",
+  "ended_at": "2026-10-28T15:27:07.288145+00:00",
   "started_at_precision": "minute",
   "evidence_commits": {
     "lease": "f57b995bb7af938a200fb9d3c3ba4ad4499e76a0",
@@ -74,7 +78,11 @@
     "live_ledger_full_artifacts": "9b0be7aa99b4eefc72a7f2af1626d2c7824ed7d1",
     "sealed_importer_lease": "56393786ddb63bc1b09dd24c6c82e6d22ac70207",
     "sealed_importer_code": "2603092abbcba078f3095e27e5241912950d8fad",
-    "sealed_importer_artifacts": "ebea0f0af9c8d6e762e95b5aeafc0a8598ffd698"
+    "sealed_importer_artifacts": "ebea0f0af9c8d6e762e95b5aeafc0a8598ffd698",
+    "gate_trace_lease": "b1663e2995516980f8af2359bbd17acb0d1d9988",
+    "gate_trace_early_code": "580afb266d70f2b9d7c9ffd84f2f1bc36bcc8a2a",
+    "gate_trace_finite_predeclaration": "2a3bf170487a572b0a0779c77cc9d711ff63c1bb",
+    "gate_trace_final_code_artifacts": "9aafb3173f3877221fef323ac29857d833e30d1c"
   },
   "pr": {
     "number": 27,
@@ -93,10 +101,10 @@
     "P0": "research ledger/replay complete only",
     "P1": "research implementation complete; alert utility/profitability unproven, not production qualified",
     "P2": "E1~E5 isolated research implementation and full necessary E5×E1×E3×E4×target development comparison complete only; no qualified unseen selection or production activation",
-    "P3": "Sealed occurrence/revision/restart-gap importer and optional immutable bar/snapshot/candidate binding mechanics implemented/tested; actual chart final unknown, full actual live gate/quote provenance and independent continuous unseen comparison remain incomplete",
+    "P3": "Original policy executed-call/source-return coverage, quote/decision-chain receipt mechanics and independent capped restartable retained-replay orchestration implemented/tested only. Exact qualified original live-schedule source/derived-input linkage and unused continuous comparison remain; actual final/quote receipts/unseen qualification0.",
     "P4": "not qualified; E5 final alerts unchanged in all48 contrasts, E5 entries0; prior E3/E4 unresolved outcomes persist; profitability/economic improvement unproven",
     "P5": "not performed or authorized",
-    "live_ledger": "Disabled runtime hooks, migration/atomic restart/outage/bounded nondeleting archive plus sealed receipt binding mechanics implemented and locally tested; no deployed operation, official final decoder, actual source qualification, full gate traces or operator-reviewed archival rotation."
+    "live_ledger": "Disabled direct-policy trace and normalized quote/decision-chain binding plus prior bounded sidecar/sealed-bar mechanics implemented/tested; no deployed operation, official final decoder, full derived-input receipt qualification or operator-reviewed archive rotation."
   },
   "result": {
     "base_delay0": {
@@ -155,10 +163,11 @@
     }
   },
   "technical_remaining": [
-    "P3: full actually executed live gate traces and exact quote/all-input receipt provenance; optional sealed binding currently covers native bars only, not unexecuted gates or indicator derivation",
-    "P3: independent continuous policy-state comparison on unseen final/receipt-qualified native1m and independently published5m, including no-signal intervals, common-event timing, all exclusions/additions and frozen followups/costs; actual sealed raw-to-snapshot qualification is unavailable with retained forming frames",
-    "Operator-reviewed archival retention/rotation and actual runtime enablement remain unperformed; bounded sidecar pauses recording rather than delete unfinished evidence",
-    "P4 qualified evidence review/promotion decision and P5 explicitly authorized application remain; whole feature incomplete"
+    "P3 implementation/data: reviewed documented official final/volume decoder and full derived-input receipt linkage; current normalized quote response boundary and sealed native-bar links do not prove every indicator input receipt. No retained historical quote receipts or verified final bars.",
+    "P3 implementation: feed the exact original live scheduling/event path into independent comparison orchestration; current checkpoint explicitly implements the frozen retained-replay schedule and does not claim the full deployed poll scheduler. Preserve frozen policy/cooldown/invalidation semantics.",
+    "P3 actual evaluation: predeclare unused continuous final/receipt-qualified native1m and independently published5m, including no-signal intervals, all exact-event added/excluded outcomes, timing and frozen costs/followups; current retained20 observations are reused development mechanics only.",
+    "Operator-reviewed retention/rotation/runtime operation remains unperformed; existing sidecar and new offline runner pause at bounds rather than delete unfinished evidence.",
+    "P4 original qualified evidence review/promotion decision and P5 explicitly authorized application remain; whole feature incomplete, profitability unproven."
   ],
   "actual_data_waiting": [
     "Official futures candle subscription/schema including final-bar and volume unit definition",
@@ -206,6 +215,20 @@
       "artifact_validator_passed": true,
       "manifest_hashes_verified": 15,
       "real_final_binding_failures": 6
+    },
+    {
+      "manifest": "research/zerobase/completion_20261028/gate_trace/manifest.json",
+      "related_tests": 117,
+      "new_tests": 28,
+      "validator_passed": true,
+      "file_hashes_verified": 34,
+      "gzip_decompressed_hashes_verified": 2,
+      "retained_comparison": "finite20observations/2policies/original unchanged runner; not full96arms"
+    },
+    {
+      "command": "git -c core.whitespace=blank-at-eol,space-before-tab,cr-at-eol,-blank-at-eof diff --cached --check",
+      "exit_code": 0,
+      "note": "Preserve exact raw captured test/report logs with their two trailing blank lines; default staged whitespace flagged2 blank-at-EOF warnings. Code whitespace clean."
     }
   ],
   "input_output_hashes": {
@@ -228,7 +251,9 @@
     "live_ledger_validation": "research/zerobase/completion_20261028/live_ledger/validation.json",
     "received_stream_manifest": "research/zerobase/completion_20261028/received_stream/manifest.json",
     "received_stream_validation": "research/zerobase/completion_20261028/received_stream/validation.json",
-    "received_stream_seal": "53f372ed471ecbc31e277d88eb76472d5522d3feeedfa9aa78cd803f3a7888e1"
+    "received_stream_seal": "53f372ed471ecbc31e277d88eb76472d5522d3feeedfa9aa78cd803f3a7888e1",
+    "gate_trace_manifest": "research/zerobase/completion_20261028/gate_trace/manifest.json",
+    "gate_trace_validation": "research/zerobase/completion_20261028/gate_trace/validation.json"
   },
   "deployment_performed": false,
   "production_merge": false,
@@ -3898,5 +3923,52 @@
     "production_research_pr21_pr22_heads_unchanged": true,
     "required_actual_pr22_files_match_local": true
   },
-  "gate_trace_started_at": "2026-10-28T14:57:26.944652+00:00"
+  "gate_trace_started_at": "2026-10-28T14:57:26.944652+00:00",
+  "gate_trace_ended_at": "2026-10-28T15:27:07.288145+00:00",
+  "gate_trace_result": {
+    "started_at": "2026-10-28T14:57:26.944652+00:00",
+    "ended_at": "2026-10-28T15:27:07.288145+00:00",
+    "related_tests": 117,
+    "new_tests": 28,
+    "complete_retained_function_traces": 12,
+    "retained_qualified_candidates": 6,
+    "retained_outputs_unchanged": true,
+    "continuous_observations": 20,
+    "policies": 2,
+    "uninterrupted_restart_and_original_control_exact": true,
+    "original_schedule": "retained_replay_not_full_deployed_poll",
+    "capture_entries": 1,
+    "capture_model_net_usdt": -9.35927984656063,
+    "capture_closed_model_dd_usdt": 9.35927984656063,
+    "p1_entries": 0,
+    "p1_model_net_usdt": 0,
+    "unseen_valid_observations": 0,
+    "unseen_model_net_usdt": null,
+    "independent_market_samples": 0,
+    "actual_historical_quote_receipts": 0,
+    "actual_verified_final_bars": 0,
+    "full_input_receipt_coverage_verified": false,
+    "individual_short_circuit_boolean_values_available": false,
+    "production_strategy_function_asts_unchanged": 23,
+    "frozen_research_zb_config_result_blobs_unchanged": 24,
+    "new_network_requests": 0,
+    "source_blockers_unchanged": true,
+    "live_enabled": false,
+    "deployment_performed": false,
+    "outbound": false,
+    "orders": false,
+    "profitability_validated": false
+  },
+  "gate_trace_remote_verification": {
+    "artifact_commit": "9aafb3173f3877221fef323ac29857d833e30d1c",
+    "tree_sha": "cb9f74593d520d00981799bd23ba1c2e6164e80f",
+    "entire_remote_tree_matches_local_index": true,
+    "verified_blob_count": 463,
+    "checked_at": "2026-10-28T15:27:07.288145+00:00",
+    "remote_fetched": true,
+    "base_heads_unchanged": true,
+    "pr27_open_draft_unmerged": true,
+    "required_pr22_files_match": true,
+    "pr21_22_27_open_draft_unmerged": true
+  }
 }
