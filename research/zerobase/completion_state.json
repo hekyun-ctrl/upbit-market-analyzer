@@ -3,15 +3,12 @@
   "started_at": "2026-10-28T03:18:00Z",
   "status": "checkpoint_complete_feature_incomplete",
   "lease": {
-    "owner": "zb-original-live-schedule-20261028-sole-worker",
-    "active": false,
-    "acquired_at": "2026-10-28T16:24:21.745134+00:00",
-    "expires_at": "2026-10-28T20:14:10.648838+00:00",
-    "expected_head": "3c289e0d3bafc9ba2b00bfcf7a875d9498c842d8",
-    "resumed_at": "2026-10-28T18:14:10.648838+00:00",
-    "last_verified_head": "3c289e0d3bafc9ba2b00bfcf7a875d9498c842d8",
-    "released_at": "2026-10-28T18:26:50.911266+00:00",
-    "release_reason": "Original unchanged entry scheduling AST and disabled every-poll input capture/export implemented and verified.86 related tests/26new pass, retained20 capture/P1 restart exact, original23 helper AST/24 frozen blobs unchanged;487-blob artifact remote tree equals local tree. Actual official final/volume/independent5m/all-derived receipts and unused comparison remain unavailable; whole feature/profitability incomplete."
+    "owner": "zb-source-qualification-20261028-sole-worker",
+    "active": true,
+    "acquired_at": "2026-10-28T19:15:19.939564+00:00",
+    "expires_at": "2026-10-28T21:15:19.939564+00:00",
+    "expected_head": "518a72646ac6e40afc37fc4c49357270924fc439",
+    "scope": "Finite actual documented source qualification only; no repeated completed tests or old HTTP/WS probes; no implementation expansion."
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",

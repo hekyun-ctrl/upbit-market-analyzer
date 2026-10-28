@@ -280,3 +280,8 @@ Started 2026-10-28T16:24:21.745134+00:00. Actual production/research/PR21/22/27 
 현재 **원래 entry-schedule/매poll 입력 포트의 유한 기술 구현은 완료**다. 공식 futures final/volume·독립native5m/1m 연속 rollover/reconnect·full derived input 실제receipt·funding/fill/spread는 부족하다. RAW5M_INDEPENDENCE_UNVERIFIED/CANDLE_VOLUME_UNIT_UNVERIFIED 유지; 같은feed6forming을 독립5m나 final로 승격하지 않았다. 문서화 소스가 실제 제공되면 정확한 decoder/derived receipt 연결, 그 뒤 사전고정 미사용 연속 비교와 원래 P4 판정이 남는다. 이는 자료 의존 잔여이며 새 무한 구현요건이 아니다. 별도 승인 P5/운영보존 활성화는 연구 기술완성의 새 선행조건으로 추가하지 않는다. 필수 실제 비교가 미완료라 전체기능/수익성 완료가 아니다.
 
 최종 운영/연구/PR21/22 unchanged, PR21/22/27 open/draft/unmerged. 발송/주문/배포/운영merge/Railway/Upbit·CAP·ZIL변경·추가agent/model/자동화 없음. 현재 poll 입력 포트 범위에서 종료하고 단일 lease를 해제한다. 다음 작업자는 실제 최신 head/lease부터 확인하고 자료가 바뀐 근거 없이 완료 replay/probe를 반복하지 않는다.
+
+
+## Actual source qualification finite lease
+
+Started 2026-10-28T19:15:19.939564+00:00. Actual production b4c7d94/research5ea63fe/PR21ce33a01/PR22d098f56 and PR27 518a726 were checked; PR21/22/27 open/draft/unmerged and sole lease inactive. Required PR22 design/P0 four files reread at immutable d098f5657d823769f468846df1fac5ec04986d0e and local tree equals current remote34ae4c264391e677fd8f106f5a705493e5eb781f. Sole source-qualification worker, expected-head writes. Scope: finite public official documentation discovery plus scoped Railway runtime read for actual source availability; no rerun of completed tests/development comparisons or identical HTTP/WS probe, no implementation scope expansion, sends/orders/deployment/production changes.
