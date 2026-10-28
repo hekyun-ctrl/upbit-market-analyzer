@@ -197,3 +197,22 @@ P2는 E1~E5 독립 연구 구현·필요 조합의 개발 비교까지 완료다
 ## Failure-isolated live ledger implementation lease
 
 Started 2026-10-28T12:52:48.754373+00:00. Actual production/research/PR21/22/27 heads and inactive lease verified; PR27 starts at1a30b248. Sole worker claims the lease with expected-head writes. Next: disabled-by-default bounded asynchronous EvidenceLedger adapter, versioned migration, idempotent restart, outage/gap audit, safe retention with archive hashes, and meaningful failure injection plus retained-real-data integration checks. No strategy/replay retuning, sends, orders, deployment or production merge. P3~P5 and source blockers remain.
+
+
+## 실패 격리 live EvidenceLedger 구현 체크포인트 — 운영 활성화 전
+
+시작2026-10-28T12:52:48.754373+00:00, 종료2026-10-28T13:12:10.385604+00:00. 실제 운영/연구/PR21/22/27과 비활성 lease를 먼저 확인했다. 시작 PR27은1a30b248, 단일 lease392ec8ed, 초기 코드436656a6, 최종 코드·전체 증거는 `9b0be7aa99b4eefc72a7f2af1626d2c7824ed7d1`이다. [전체 구현/한계 보고서](https://github.com/hekyun-ctrl/upbit-market-analyzer/blob/9b0be7aa99b4eefc72a7f2af1626d2c7824ed7d1/research/zerobase/completion_20261028/live_ledger/README.md) · [manifest](https://github.com/hekyun-ctrl/upbit-market-analyzer/blob/9b0be7aa99b4eefc72a7f2af1626d2c7824ed7d1/research/zerobase/completion_20261028/live_ledger/manifest.json).
+
+선택적 sidecar를 native 원문 wire/정밀 수신 시각과 기존 monitor의 관측·후보·확인/만료·알람 자격·고정 계획·기존 알림 결과·후속 관측에 연결했다. 기본 false이며 활성화/배포하지 않았다. SQLite는 daemon worker만 열고 producer는 크기 제한 JSON snapshot과64개 nonwaiting queue를 사용한다. core EvidenceLedger transaction을 중첩 가능하게 해 envelope와 파생 source/decision/plan/불활성 intent/미확정 결과를 원자적으로 기록한다. additive SQLite version0/1→2 migration, 미래 버전 사전 거절, 재시작 dedup·unclean session의 lost_records:null, outage/queue 손실 gap을 구현했다.
+
+후속 검토에서 같은 가격의 새 봉으로 anchor를 다시 고를 수 있는 문제를 발견해 후보 record hash를 watch→확인→고정계획에 전달하도록 수정했다. 재시작 뒤에도 원래 후보 anchor를 유지하고 후보 기록 유실은 명시적으로 unmatched다. source 원문 wire byte/hash도 parsed frame과 함께 보존한다. source blocker는 유지한다. monitor snapshot의 실제 봉 수신/known_at는 null이며 연구 전체 gate trace 연결을 주장하지 않는다. 후보·미진입과 계획 이후 unresolved/null, 관측 exit와 실제 체결, boolean transport 성공과 provider ACK를 구분한다. 기존 transport는 ID가 없어 true/모호 timeout도 send_ack_unknown이다. 새 sender/주문/재전송은 없다.
+
+기본 main DB64MiB·envelope100,000개 상한과 WAL checkpoint/포화 차단을 구현했다.64MiB는 전체 물리 파일 합계가 아니며 main+WAL은 한 transaction 동안 약2배+SQLite 부가량까지 고려한다. cap에 닿으면 분석 기록을 중단하고 미완료 비교·미확정 계획을 지우지 않는다. 새 경로로 integrity/foreign-key 검증 backup과 SHA256/byte/건수/comparison-reference manifest를 만드는 archive API가 있다. 실제 archive 운영·자동 prune/rotation/deletion은 수행하지 않았다. 완료 비교/보존 정책 검토 없이 공간을 만들려고 자료를 지우지 않는다.
+
+관련137개 통과 뒤 anchor11개(신규2)·원문 wire12개(신규1)를 통과해 합집합140개/신규25개다. 마지막140개 단일 suite 실행을 뜻하지 않는다. core transaction 변경 때문에 P0 15개와 관련 회귀를 다시 확인했으며 전체 P0/P1/E1~E5 비교/HTTP·WS probe는 반복하지 않았다. 저장 worker가 실제로 막히고 queue가 가득한 동안 실제 NativeCandleStore.ingest와 SignalRiskTracker.check가 약0.0101초에 진행했다. 합성 fixture의 위험 event1개/native row1개를 보존했다. 실제 개발 관측12개(기존 qualified 후보6개)의 입력과 정책 출력 hash는 정상/강제 SQLite abort 뒤 같았다. 기존 raw6개는 원문 byte/hash/실제 수신 시각 그대로고4개1m/2개5m forming이며 새 요청·독립5m·검증 완료봉0이다. 새 독립 거래/성과/미사용 자료가 아니다.
+
+artifact 저장용 test-report가 d의 list/dict 형태를 하나로 가정해1개 오류를 냈다. 실패 로그를 보존하고 reporting 추출을 고친 뒤 그 test만 통과시켰다. runtime 실패·전략 튜닝이 아니다. 이후 wire 변경의 관련 실행도 통과했다. code/input/output23개 SHA256을 검증했고17개 업로드 blob과 비절단 전체 remote tree `7dd683a5c6afe28a2821f4aa5e32f6c8096f6384`의425개 blob이 local index와 같다.
+
+운영b4c7d94/연구5ea63fe/PR21ce33a01/PR22d098f56은 시작과 같고 PR21/22/27은 open/draft/unmerged다. P1/E1/E3/E4/E5 원문·기존 E5의32×3/48개 대조·48개 최종출력 비교 증거와 별도 ZB EventStore/engine도 unchanged blob을 확인했다. RAW5M_INDEPENDENCE_UNVERIFIED·CANDLE_VOLUME_UNIT_UNVERIFIED, 공식 final/volume/독립5m/실수신 연속성·funding/체결 근거 부족은 그대로다. 수수료6/8bp·stop slip2/5bp·가정 funding1/3bp와 실제 funding0일, 수동/명목 지연 변형의 비독립성을 유지한다.1h/4h 참고뿐이며 수익 문턱 완화·100paper/30일 선행조건 추가가 없다. 발송·주문·배포·운영병합·Railway/Upbit·CAP·ZIL 변경·추가 작업자/모델 대체/자동화 생성 없음.
+
+다음 기술 작업은 sealed received-stream importer와 정확한 raw occurrence/revision→완료봉→snapshot의 causal binding 및 재시작/gap provenance다. P3 전체 실제 gate trace·독립 연속 상태/미사용 비교, 검토된 archive/retention 운영, P4 qualified review와 P5 승인된 적용은 남아 있다. 이번은 비활성 live 연결 코드의 로컬 구현/검증 완료이며 실제 운영 연결이 동작한다고 보고하지 않는다. 전체 기능·수익성 완료가 아니고 단일 lease만 해제했다.
