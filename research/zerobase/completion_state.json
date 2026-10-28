@@ -1,14 +1,17 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "implementation_in_progress",
+  "status": "checkpoint_complete_feature_incomplete",
   "lease": {
     "owner": "zb-original-live-schedule-20261028-sole-worker",
-    "active": true,
+    "active": false,
     "acquired_at": "2026-10-28T16:24:21.745134+00:00",
     "expires_at": "2026-10-28T20:14:10.648838+00:00",
-    "expected_head": "b3e1bbfa64d611e0390aa3ad4356c84f452be98a",
-    "resumed_at": "2026-10-28T18:14:10.648838+00:00"
+    "expected_head": "3c289e0d3bafc9ba2b00bfcf7a875d9498c842d8",
+    "resumed_at": "2026-10-28T18:14:10.648838+00:00",
+    "last_verified_head": "3c289e0d3bafc9ba2b00bfcf7a875d9498c842d8",
+    "released_at": "2026-10-28T18:26:50.911266+00:00",
+    "release_reason": "Original unchanged entry scheduling AST and disabled every-poll input capture/export implemented and verified.86 related tests/26new pass, retained20 capture/P1 restart exact, original23 helper AST/24 frozen blobs unchanged;487-blob artifact remote tree equals local tree. Actual official final/volume/independent5m/all-derived receipts and unused comparison remain unavailable; whole feature/profitability incomplete."
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -37,16 +40,17 @@
     "P2 E5 observed sweep/first completed reclaim/frozen opposite-trigger route; macro trend/RSI explanatory only;32 arms×3 scenarios;48 old full-window controls and48 E5 final-alert outputs exactly equal.66 distinct targeted tests including22 new synthetic;4336 E5 candidate evaluations and4340 exact-input explanation records; no final E5 entries or demonstrated improvement.",
     "Disabled-by-default live EvidenceLedger sidecar connected to native wire receipts and monitor stages/frozen plan/delivery/followups; v0/v1-to-v2 additive migration, atomic envelopes, immutable candidate-anchor/restart links, explicit outage/crash gaps, bounded nondeleting recording and integrity/hash archive.140 distinct targeted tests/25 new;12 real policy input/output pairs unchanged under healthy/failed storage,6 retained raw frames preserve actual original bytes/receipts; no live deployment or qualification.",
     "Sealed received-stream importer: bounded atomic append-only seal chains, exact raw occurrence/revision/original UTC receipt, explicit restart/gaps and latest-final-bar snapshot coverage; optional live binding retains immutable original candidate source across restart. Archive inventories seals/snapshots.76 focused tests/26 new, original6 real frames/10 archived records,6 fail-closed final binding rejections, zero verified final bars/snapshots; production decoder remains chart-final-unknown, no live qualification.",
-    "Original direct policy execution trace with actual helper returns, source/return/control-flow coverage, argument/config/snapshot hashes, explicit unrun/incomplete checks, normalized quote response receipt and immutable decision-chain binding. Disabled-by-default; bounded failure-isolated mechanics;117 related tests/28new. Independent restartable/capped policy-state retained-replay orchestration, atomic cursor/observations/decisions/plans, frozen followups and zero/null report;12 retained actual outputs unchanged and finite20-observation capture/P1 uninterrupted/restart/original-runner outputs equal. No new independent data or qualified unseen execution."
+    "Original direct policy execution trace with actual helper returns, source/return/control-flow coverage, argument/config/snapshot hashes, explicit unrun/incomplete checks, normalized quote response receipt and immutable decision-chain binding. Disabled-by-default; bounded failure-isolated mechanics;117 related tests/28new. Independent restartable/capped policy-state retained-replay orchestration, atomic cursor/observations/decisions/plans, frozen followups and zero/null report;12 retained actual outputs unchanged and finite20-observation capture/P1 uninterrupted/restart/original-runner outputs equal. No new independent data or qualified unseen execution.",
+    "Original live entry-slice AST adapter plus disabled per-quote-poll sidecar envelope/export port: confirm-before-classify, due boundaries, original expiry/rearm, independent persistent sample/ready/watch/cooldown state and declared in-memory delivery/journal boundaries.86 related tests/26new;20 retained development observations exact across restart after10; capture1SL net-9.35927984656063/P1noentry0; unseen20 all blocked/null. No original missing polls fabricated;23 helper ASTs/24 frozen blobs unchanged."
   ],
   "blockers": [
     "RAW5M_INDEPENDENCE_UNVERIFIED",
     "CANDLE_VOLUME_UNIT_UNVERIFIED"
   ],
-  "next_work": "Original live entry AST adapter initial implementation checkpoint only: syntax checked; targeted functional tests/finite evidence still required. Same sole worker resumed after capacity pause; actual official source/derived receipt qualification unavailable. No deployment/sends/orders.",
+  "next_work": "First check current actual heads/sole lease. Current original entry-schedule and every-poll input-port mechanics are complete locally and not deployed. Finite original remaining work: official documented final/volume/native-independent5m and full derived-input receipt qualification when real sources exist; then predeclare/run one unused continuous comparison and original P4 evidence verdict. No new implementation scope or repeat completed comparisons/probes without changed source/code reason. P5/runtime rollout separately authorized, not an invented extra research completion prerequisite. Preserve source blockers/zero-null semantics; no sends/orders/deploy.",
   "outbound": false,
   "orders": false,
-  "ended_at": "2026-10-28T15:27:07.288145+00:00",
+  "ended_at": "2026-10-28T18:26:50.911266+00:00",
   "started_at_precision": "minute",
   "evidence_commits": {
     "lease": "f57b995bb7af938a200fb9d3c3ba4ad4499e76a0",
@@ -80,7 +84,11 @@
     "gate_trace_lease": "b1663e2995516980f8af2359bbd17acb0d1d9988",
     "gate_trace_early_code": "580afb266d70f2b9d7c9ffd84f2f1bc36bcc8a2a",
     "gate_trace_finite_predeclaration": "2a3bf170487a572b0a0779c77cc9d711ff63c1bb",
-    "gate_trace_final_code_artifacts": "9aafb3173f3877221fef323ac29857d833e30d1c"
+    "gate_trace_final_code_artifacts": "9aafb3173f3877221fef323ac29857d833e30d1c",
+    "original_schedule_lease": "b3e1bbfa64d611e0390aa3ad4356c84f452be98a",
+    "original_schedule_initial_checkpoint": "237b40486687d3cf9883b73fe8922a98ab207034",
+    "original_schedule_code": "43211060ad3dc4fdaafa925e4556ebf69da76890",
+    "original_schedule_artifacts": "3c289e0d3bafc9ba2b00bfcf7a875d9498c842d8"
   },
   "pr": {
     "number": 27,
@@ -99,10 +107,10 @@
     "P0": "research ledger/replay complete only",
     "P1": "research implementation complete; alert utility/profitability unproven, not production qualified",
     "P2": "E1~E5 isolated research implementation and full necessary E5×E1×E3×E4×target development comparison complete only; no qualified unseen selection or production activation",
-    "P3": "Original policy executed-call/source-return coverage, quote/decision-chain receipt mechanics and independent capped restartable retained-replay orchestration implemented/tested only. Exact qualified original live-schedule source/derived-input linkage and unused continuous comparison remain; actual final/quote receipts/unseen qualification0.",
+    "P3": "Original executed gate/quote/decision-chain, sealed native receipt integrity, independent capped restartable retained runner and exact original entry AST/every-poll capture/export mechanics implemented/tested locally.86 related/26new pass;20 reused development observations restart exact. Official final/volume/independent5m/full derived receipts and unused actual comparison remain unavailable; no deployed equivalence claim.",
     "P4": "not qualified; E5 final alerts unchanged in all48 contrasts, E5 entries0; prior E3/E4 unresolved outcomes persist; profitability/economic improvement unproven",
     "P5": "not performed or authorized",
-    "live_ledger": "Disabled direct-policy trace and normalized quote/decision-chain binding plus prior bounded sidecar/sealed-bar mechanics implemented/tested; no deployed operation, official final decoder, full derived-input receipt qualification or operator-reviewed archive rotation."
+    "live_ledger": "Disabled failure-isolated original gate, quote/native receipt and every-entry-poll envelope capture/export implemented/tested; no deployed enablement, official final decoder or full input receipt qualification/operational rotation."
   },
   "result": {
     "base_delay0": {
@@ -161,11 +169,10 @@
     }
   },
   "technical_remaining": [
-    "P3 implementation/data: reviewed documented official final/volume decoder and full derived-input receipt linkage; current normalized quote response boundary and sealed native-bar links do not prove every indicator input receipt. No retained historical quote receipts or verified final bars.",
-    "P3 implementation: feed the exact original live scheduling/event path into independent comparison orchestration; current checkpoint explicitly implements the frozen retained-replay schedule and does not claim the full deployed poll scheduler. Preserve frozen policy/cooldown/invalidation semantics.",
-    "P3 actual evaluation: predeclare unused continuous final/receipt-qualified native1m and independently published5m, including no-signal intervals, all exact-event added/excluded outcomes, timing and frozen costs/followups; current retained20 observations are reused development mechanics only.",
-    "Operator-reviewed retention/rotation/runtime operation remains unperformed; existing sidecar and new offline runner pause at bounds rather than delete unfinished evidence.",
-    "P4 original qualified evidence review/promotion decision and P5 explicitly authorized application remain; whole feature incomplete, profitability unproven."
+    "P3 source-dependent linkage: reviewed documented official final/volume decoder and complete source-to-derived-input receipt binding when documented genuine sources exist. Existing chart feed has no verified final flag, independent5m or volume unit; no historical quote receipts are fabricated.",
+    "P3 required actual comparison: predeclare unused continuous final/receipt-qualified native1m and independently published5m through the implemented original entry scheduler/every-poll port; include all no-signal intervals/exact-event added-excluded outcomes/timing/frozen costs. Retained20 observations are development mechanics only.",
+    "P4 original evidence/promotion verdict after qualified required comparison; current diagnostic verdict remains data insufficient and no demonstrated economic/utility improvement.",
+    "Actual runtime/retention operation and P5 application remain separately reviewed/authorized operation, not additional invented implementation prerequisites."
   ],
   "actual_data_waiting": [
     "Official futures candle subscription/schema including final-bar and volume unit definition",
@@ -227,6 +234,20 @@
       "command": "git -c core.whitespace=blank-at-eol,space-before-tab,cr-at-eol,-blank-at-eof diff --cached --check",
       "exit_code": 0,
       "note": "Preserve exact raw captured test/report logs with their two trailing blank lines; default staged whitespace flagged2 blank-at-EOF warnings. Code whitespace clean."
+    },
+    {
+      "command": "PYTHONPYCACHEPREFIX=/tmp/zb-original-schedule-pycache PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_original_live_schedule test_lbank_continuous_comparison test_lbank_live_evidence test_lbank_entry_timing test_lbank_gate_trace -q",
+      "exit_code": 0,
+      "tests": 86,
+      "new_tests": 26,
+      "log": "original_live_schedule/final_related_tests.txt"
+    },
+    {
+      "command": "PYTHONPYCACHEPREFIX=/tmp/zb-original-schedule-pycache PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/capture_original_live_schedule.py",
+      "exit_code": 0,
+      "observations": 20,
+      "reused_development": true,
+      "log": "original_live_schedule/final_finite_run.txt"
     }
   ],
   "input_output_hashes": {
@@ -3968,5 +3989,15 @@
     "pr27_open_draft_unmerged": true,
     "required_pr22_files_match": true,
     "pr21_22_27_open_draft_unmerged": true
+  },
+  "finite_acceptance_matrix": {
+    "exact_original_entry_schedule_poll_port": "implemented_locally_verified_not_deployed",
+    "independent_atomic_restartable_state": "implemented_and_finite_development_verified",
+    "official_source_all_derived_receipt_linkage": "waiting_documented_genuine_source",
+    "unused_continuous_required_comparison": "waiting_actual_qualified_data_not_done",
+    "P4_promotion_verdict": "diagnostic_data_insufficient_pending_required_comparison",
+    "P5_runtime_application": "separate_authorization_not_new_research_prerequisite",
+    "whole_requested_implementation_and_required_comparison_complete": false,
+    "profitability_validated": false
   }
 }

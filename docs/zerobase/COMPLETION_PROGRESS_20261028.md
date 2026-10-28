@@ -263,3 +263,20 @@ Raw captured command outputs preserve their original bytes including two trailin
 ## Original live-schedule adapter lease
 
 Started 2026-10-28T16:24:21.745134+00:00. Actual production/research/PR21/22/27 heads and inactive sole lease verified. PR27 baseline60b70e73; production b4c7d94, research5ea63fe, PR21ce33a01, PR22d098f56 remain open/draft/unmerged. Single worker with expected-head writes. Implement original live scheduling/event adapter, independent restartable state and exact source-derived-input availability evidence without inventing historical receipts. Preserve frozen helper/strategy semantics; no new probes or completed full comparisons, no sends/orders/deployment. Actual official final/volume/independent5m sources remain unavailable.
+
+
+## 원래 entry schedule·매 poll 입력 포트 체크포인트 — 실제 자료 자격은 대기
+
+시작2026-10-28T16:24:21.745134+00:00, 종료2026-10-28T18:26:50.911266+00:00. 실제 운영b4c7d94/연구5ea63fe/PR21ce33a01/PR22d098f56/PR27 및 비활성 lease를 먼저 확인했다. 단일 lease b3e1bbfa, 사용량 중단 뒤 같은 작업자 재개·초기 코드237b4048, 최종 코드43211060, 전체 증거 **3c289e0d3bafc9ba2b00bfcf7a875d9498c842d8**. [보고서·유한 인수표](https://github.com/hekyun-ctrl/upbit-market-analyzer/blob/3c289e0d3bafc9ba2b00bfcf7a875d9498c842d8/research/zerobase/completion_20261028/original_live_schedule/README.md) · [manifest](https://github.com/hekyun-ctrl/upbit-market-analyzer/blob/3c289e0d3bafc9ba2b00bfcf7a875d9498c842d8/research/zerobase/completion_20261028/original_live_schedule/manifest.json).
+
+원래 run()의 ready key·sample/confirm/new-bar due 식·sample cursor와 **전체 entry branch AST를 수정 없이 실행**하는 무발송 adapter다. 기존 watch 확인→필요시 후보 심사, periodic tick의30초 미만 확인 호출, 만료/취소 후 같은 poll 재심사를 원문대로 유지한다. 정책별 timer/key/watch/cache/cooldown·장부/cursor를 원자 저장한다. 네트워크/startup/위험경고/followup 전체 loop를 재생했다고 주장하지 않는다. 명시적60초·capture·모형 delivery/journal port이고 실패 delivery는 qualified plan만 보존, 진입/쿨다운을 만들지 않는다. E3/E5 실험 스케줄을 원래 스케줄로 속이지 않는다.
+
+기존 비활성 sidecar에 entry_poll을 due 검사 직전 연결해 평가 없는 quote poll도 snapshot·기존 quote receipt ID·journal/원래 schedule state로 보존한다. bounded exporter는 정확한 envelope·정규화 응답/원래 request·receipt 텍스트·기록된 gap만 연결한다. sidecar rowid는 거래소 수신순서가 아니며 과거 누락 poll/수신 시각을 보간하지 않는다. disabled/failure 격리는 유지하고 운영 활성화하지 않았다.
+
+**관련86개/신규26개 통과**.23개 원래 helper AST/24 frozen blob/실제 PR22 네 파일 unchanged. 같은20개 개발 관측 capture/P1의 전체 결과·상태·입력은 중간10번째 DB restart와 정확히 같다. capture1SL, 모형 net/closed DD −9.35927984656063/9.35927984656063USDT, P1미진입0/미확정비율null, 공통 최종진입0/시각·진입 개선null이다. unseen으로 제시하면20개 모두 차단/유효0/전체손익null. SQLite integrity/FK와30개 파일/해제 gzip hash를 확인했고 artifact remote tree02497c90의487개 blob이 local tree와 정확히 같다. 원래 과거 poll 전체가 없어 운영 scheduler 실경로 동일성을 주장하지 않는다.
+
+초기 CCXT cache EOF는 새 task cache에서 동일 설치 source로 해결했다. AST sample selector/원래 counter local 누락과 합성 delivery fixture 필드 누락 실패를 보존하고 고쳤다. 최종 유한 실행은 adapter 코드 변경 검증만 반복했고96-arm/P0/legacy467·동일 HTTP/WS probe는 반복하지 않았다. 수수료6/8bp·stop slip2/5bp·가정funding1/3bp/실제funding0일, 수동30/60초·명목0/15초 비독립성, prior E5 48controls/48contrasts동일·entry0, E3/E4미확정null/P1미진입0을 유지한다.
+
+현재 **원래 entry-schedule/매poll 입력 포트의 유한 기술 구현은 완료**다. 공식 futures final/volume·독립native5m/1m 연속 rollover/reconnect·full derived input 실제receipt·funding/fill/spread는 부족하다. RAW5M_INDEPENDENCE_UNVERIFIED/CANDLE_VOLUME_UNIT_UNVERIFIED 유지; 같은feed6forming을 독립5m나 final로 승격하지 않았다. 문서화 소스가 실제 제공되면 정확한 decoder/derived receipt 연결, 그 뒤 사전고정 미사용 연속 비교와 원래 P4 판정이 남는다. 이는 자료 의존 잔여이며 새 무한 구현요건이 아니다. 별도 승인 P5/운영보존 활성화는 연구 기술완성의 새 선행조건으로 추가하지 않는다. 필수 실제 비교가 미완료라 전체기능/수익성 완료가 아니다.
+
+최종 운영/연구/PR21/22 unchanged, PR21/22/27 open/draft/unmerged. 발송/주문/배포/운영merge/Railway/Upbit·CAP·ZIL변경·추가agent/model/자동화 없음. 현재 poll 입력 포트 범위에서 종료하고 단일 lease를 해제한다. 다음 작업자는 실제 최신 head/lease부터 확인하고 자료가 바뀐 근거 없이 완료 replay/probe를 반복하지 않는다.
