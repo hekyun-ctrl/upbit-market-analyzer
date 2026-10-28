@@ -1,0 +1,71 @@
+{
+  "note": "Same finite retained input subset, different declared schedules. Missing original quote polls are not reconstructed. No live-runtime equivalence or independent sample claim.",
+  "original_entry_ast": {
+    "P1Trace": {
+      "closed_drawdown_model": 0.0,
+      "comparison_economics_complete": true,
+      "emergency_count": null,
+      "full_mtm_drawdown": null,
+      "net_pnl_model": 0.0,
+      "observations": 20,
+      "pending_watch": false,
+      "stop_first_count": 0,
+      "stop_first_unknown_count": 0,
+      "trade_count": 0,
+      "unavailable": 0,
+      "unresolved_count": 0,
+      "unresolved_ratio": null,
+      "valid_observations": 20
+    },
+    "Trace": {
+      "closed_drawdown_model": 9.35927984656063,
+      "comparison_economics_complete": true,
+      "emergency_count": null,
+      "full_mtm_drawdown": null,
+      "net_pnl_model": -9.35927984656063,
+      "observations": 20,
+      "pending_watch": false,
+      "stop_first_count": 1,
+      "stop_first_unknown_count": 0,
+      "trade_count": 1,
+      "unavailable": 0,
+      "unresolved_count": 0,
+      "unresolved_ratio": 0.0,
+      "valid_observations": 20
+    }
+  },
+  "retained_replay_previous": {
+    "P1Trace": {
+      "closed_drawdown_model": 0.0,
+      "comparison_economics_complete": true,
+      "emergency_count": null,
+      "full_mtm_drawdown": null,
+      "net_pnl_model": 0.0,
+      "observations": 20,
+      "pending_watch": false,
+      "stop_first_count": 0,
+      "stop_first_unknown_count": 0,
+      "trade_count": 0,
+      "unavailable": 0,
+      "unresolved_count": 0,
+      "unresolved_ratio": null,
+      "valid_observations": 20
+    },
+    "Trace": {
+      "closed_drawdown_model": 9.35927984656063,
+      "comparison_economics_complete": true,
+      "emergency_count": null,
+      "full_mtm_drawdown": null,
+      "net_pnl_model": -9.35927984656063,
+      "observations": 20,
+      "pending_watch": false,
+      "stop_first_count": 1,
+      "stop_first_unknown_count": 0,
+      "trade_count": 1,
+      "unavailable": 0,
+      "unresolved_count": 0,
+      "unresolved_ratio": 0.0,
+      "valid_observations": 20
+    }
+  }
+}
