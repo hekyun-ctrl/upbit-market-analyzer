@@ -21,7 +21,7 @@ from research.barrier_chase_experiment import (E4Mixin, E4Trace, E4E3Trace, E4P1
 from lbank_signal_evidence import EvidenceLedger, digest, pair_plans
 
 evidence, replay = p1.evidence, p1.replay
-from research.early_reversal_experiment import E5Mixin, BASE_CLASSES, E5_CLASSES, POLICY
+from research.early_reversal_experiment import E5Mixin, BASE_CLASSES, E5_CLASSES, CachedResearchLedger, POLICY
 OUT = ROOT/'research/zerobase/completion_20261028/p2_e5'
 DECLARATION = OUT/'experiment_manifest.json'
 CODE = list(dict.fromkeys(p1.CODE + ['research/evidence_confirmation.py',
@@ -77,7 +77,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix='p2-e5-') as directory:
         feed = replay.make_feed(directory, bars)
         for scenario, delay, model in scenarios:
-            ledger = EvidenceLedger(Path(directory)/(scenario+'.sqlite3'))
+            ledger = CachedResearchLedger(Path(directory)/(scenario+'.sqlite3'))
             traces, arms = [], {}
             attrs = {replay.CONFIG_MAP[k]:v for k,v in model.items()}
             attrs.update(COOLDOWN=2700, REVERSAL_COOLDOWN=5400, MAX_DAILY_ALERTS=8,

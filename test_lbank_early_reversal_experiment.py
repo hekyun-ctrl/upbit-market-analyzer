@@ -9,7 +9,7 @@ from unittest.mock import patch
 import lbank_futures_monitor as monitor
 from lbank_signal_evidence import EvidenceLedger,gate_vector,event_id
 from research.early_reversal_experiment import (detect_reversals,frozen_recovery,
-    canonical_anchor,E5Mixin,E5_CLASSES,BASE_CLASSES,STRATEGY,replay)
+    canonical_anchor,CachedResearchLedger,E5Mixin,E5_CLASSES,BASE_CLASSES,STRATEGY,replay)
 from research.compare_confirmation_experiment import E3Mixin
 from test_lbank_entry_location import retest_state
 
@@ -181,6 +181,29 @@ class E5Tests(unittest.TestCase):
         with patch.object(t,'inputs',return_value='input'),patch.object(t,'record') as record:
             t.confirm(lambda *a,**kw:None,s['prices'],p,0,native_state=s,diagnostics={})
         self.assertIsNone(t.e5_readiness)
+
+    def test_cached_import_keeps_revision_guard_and_unique_source_order(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            ledger=CachedResearchLedger(Path(tmp)/'cached.sqlite3')
+            try:
+                first=ledger.source({'bar':1},event_time=60,received_at=61,quality='closed')
+                second=ledger.source({'bar':2},event_time=120,received_at=None,quality='closed')
+                self.assertEqual(first,ledger.source({'bar':1},event_time=60,received_at=61,quality='closed'))
+                self.assertEqual(ledger.inputs([first,second]),ledger.inputs([second,first,first]))
+                self.assertEqual(ledger.db.execute('select raw_hash from source_events order by ingest_seq').fetchall(),[(first,),(second,)])
+                with self.assertRaisesRegex(ValueError,'REVISION'):
+                    ledger.source({'bar':1},event_time=60,received_at=62,quality='closed')
+            finally:ledger.close()
+
+    def test_cached_input_does_not_bypass_future_receipt_validation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            ledger=CachedResearchLedger(Path(tmp)/'cached.sqlite3')
+            try:
+                source=ledger.source({'bar':1},event_time=60,received_at=61,quality='closed')
+                inputs=ledger.inputs([source]);self.assertEqual(inputs,ledger.inputs([source]))
+                with self.assertRaisesRegex(ValueError,'INPUT_NOT_AVAILABLE'):
+                    ledger.decision(event=None,policy='synthetic',evaluated_at=60,input_hash=inputs,state='observed')
+            finally:ledger.close()
 
     def test_all16_combinations_have_distinct_expected_names_and_clocks(self):
         s=reversal_state();names=set()

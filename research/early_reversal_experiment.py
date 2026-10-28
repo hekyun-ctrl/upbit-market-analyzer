@@ -10,12 +10,36 @@ from contextlib import contextmanager
 from unittest.mock import patch
 
 from lbank_entry_location import valid_minutes
-from lbank_signal_evidence import digest
+from lbank_signal_evidence import digest, canonical, EvidenceLedger
 from research import compare_barrier_chase_experiment as baseline
 
 evidence, replay = baseline.evidence, baseline.replay
 POLICY = 'p2_e5_observed_sweep_first_reclaim_v1'
 STRATEGY = 'early_reversal'
+
+
+class CachedResearchLedger(EvidenceLedger):
+    """Deduplicate immutable source imports, preserving receipt revision checks.
+
+    This only skips repeated SQL writes of already identical source/input sets.
+    All decisions still execute the original full future/receipt validation.
+    No source/decision/delivery schema, ordering or transaction is changed.
+    """
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs);self._sources={};self._input_sets={}
+
+    def source(self,raw,*,event_time,received_at=None,quality=None):
+        key=digest(raw);metadata=canonical(dict(event_time=event_time,received_at=received_at,quality=quality))
+        if key in self._sources:
+            if self._sources[key]!=metadata:raise ValueError('SOURCE_RECEIPT_REVISION_REQUIRES_VERSION')
+            return key
+        result=super().source(raw,event_time=event_time,received_at=received_at,quality=quality)
+        self._sources[key]=metadata;return result
+
+    def inputs(self,hashes):
+        identity=tuple(sorted(set(hashes)))
+        if identity not in self._input_sets:self._input_sets[identity]=super().inputs(hashes)
+        return self._input_sets[identity]
 
 
 def available_minutes(state, now, delay=0):
