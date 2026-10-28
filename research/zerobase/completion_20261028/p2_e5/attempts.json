@@ -10,8 +10,13 @@
     "log": "first_attempt.log"
   },
   "final_attempt": {
-    "status": "ready_to_run",
+    "status": "completed",
     "code_review_fixes": "Keep original fresh breakout before E5, composite exact level+sweep anchor hash, clear readiness before preempted confirmation, malformed availability fails closed. Added regression tests.",
-    "performance_only": "Research ledger memoizes identical immutable source/input SQL imports; original decision availability validation preserved; two integrity tests. No strategy/output change."
-  }
+    "performance_only": "Research ledger memoizes identical immutable source/input SQL imports; original decision availability validation preserved; two integrity tests. No strategy/output change.",
+    "completed_full_comparisons": 1,
+    "report_completed": true,
+    "code_checkpoint": "826c930a3c5efa9165dc902427bbabbf9f1fdf69",
+    "resume": "Usage pause interrupted artifact upload, not comparison/report. Both already complete on resume; neither rerun."
+  },
+  "strategy_parameter_versions": 1
 }

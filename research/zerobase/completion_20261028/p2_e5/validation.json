@@ -1,0 +1,111 @@
+{
+  "schema": "zb_p2_e5_validation_v1",
+  "checked_at": "2026-10-28T12:37:19.483795+00:00",
+  "started_at": "2026-10-28T09:55:58.304189+00:00",
+  "source_checkpoint": "fc2fecb090bdc6a733d42414892554d0baeada37",
+  "predeclared_lease_commit": "884da546f96ed88ccb813649af8ff24490521d3b",
+  "final_code_checkpoint": "826c930a3c5efa9165dc902427bbabbf9f1fdf69",
+  "checks": {
+    "all_code_input_output_hashes_match": true,
+    "decompressed_csv_hash_matches": true,
+    "original_arm_scenario_windows_exactly_equal": 48,
+    "frozen_original_code_unchanged": [
+      "lbank_futures_monitor.py",
+      "lbank_entry_location.py",
+      "lbank_structural_target_plan.py",
+      "research/evidence_confirmation.py",
+      "research/compare_confirmation_experiment.py",
+      "research/first_retest_experiment.py",
+      "research/barrier_chase_experiment.py",
+      "research/compare_barrier_chase_experiment.py",
+      "lbank_signal_evidence.py",
+      "lbank_entry_priority.py",
+      "lbank_entry_quality.py"
+    ],
+    "no_entry_zero_unresolved_null": true,
+    "per_event_recorded_rejections_or_explicit_no_confirmation": true,
+    "orders_sends_zero": true,
+    "blockers_preserved": true,
+    "trade_comparison_scenario_rows": 42,
+    "e5_candidate_evaluations": 4336,
+    "explanatory_gate_evaluations": 5824,
+    "e5_structure_scans": 33552,
+    "exact_explanatory_input_reconstructions": 4340,
+    "distinct_targeted_tests": 66,
+    "new_synthetic_e5_tests": 22
+  },
+  "commands": [
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_early_reversal_experiment test_lbank_first_retest_experiment test_lbank_confirmation_experiment test_lbank_barrier_chase_experiment -q",
+      "exit_code": 0,
+      "tests_at_checkpoint": 60,
+      "new_tests_at_checkpoint": 16
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_early_reversal_experiment -q",
+      "exit_code": 0,
+      "tests": 20,
+      "reason": "Causality/priority/identity/readiness and malformed availability fixes before outcomes; four added tests"
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_early_reversal_experiment -q",
+      "exit_code": 0,
+      "tests": 22,
+      "reason": "Two additional cached import integrity tests; final E5 code"
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/compare_early_reversal_experiment.py",
+      "exit_code": 0
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/render_early_reversal_report.py",
+      "exit_code": 0
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/validate_early_reversal_experiment.py",
+      "exit_code": 0
+    },
+    {
+      "command": "git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --cached --check",
+      "exit_code": 0
+    }
+  ],
+  "runtime": {
+    "python": "3.12.14",
+    "sqlite": "3.53.1",
+    "ccxt": "4.5.90",
+    "requests": "2.34.2"
+  },
+  "file_sha256": {
+    ".gitignore": "1ef376b9d58f8eef2f377bc4401567368564ea08c022083277a49db65ca25da8",
+    "README.md": "f02fe915ea535159edee0f99a12c95a2a6c574332b409805967982b624f19b73",
+    "attempts.json": "93bfbec934e4854a80a71c8aada5f8ca258b1d4f29bcc7e1a3ac0551460ef313",
+    "candidate_accounting.json": "e8b81d8f9d6bdcf8df17f9da9788cbe753f5b8a894e117dd9370b35042295333",
+    "candidate_selection_accounting.json": "97d32609a687a557765a2c078d14ebfc1615db855380a069b0eafc7a39c51099",
+    "comparison.json": "13c7442fd6f1f0d523d5381217ddf9703742027e9c691e29e78a82c6a80e2a32",
+    "e4_gate_accounting.json": "a00369a868e57f1b8e52cef255dd51a7dfe9683d89f007db894cba24e5b861e7",
+    "e5_route_accounting.json": "2262bc4d117fed5095ce879bd89ad17ac73bd31c1dbb4a253d64d645c31ee007",
+    "event_accounting.json": "ea04ba054338d475da59bdd8f5e32f88f8001993741e34a5b1be06e3315224d7",
+    "experiment_manifest.json": "2069deee8e5b0de1c7305f96e889fffc37134c4fb0bcb0ed4f0d924b7057e01d",
+    "explanatory_variables.json": "6a82527698ef25688646c496c611c7ff1e471dcdbf435535bb16d163ac7cabc5",
+    "first_attempt.log": "c43f7243e7ceb0ad55e759f2f1a10689f212f217f08b55147a2484251ad1cc94",
+    "fixed_plan_attribution.json": "9ddab6f9f85314a9ad7c4d1654f9e75fded1b6704baa6b1c55fa3f6070afaa50",
+    "gate_decisions.csv.gz": "5805f268a852793ac8dfe5eec24be489820a16758ff08ae6f1938e1cbf5bcd3f",
+    "manifest.json": "595c7abf57e611618df6009325f61e09df55c12e2f5af0417ed01f49788c3854",
+    "opportunities.csv": "d74aa60f54e5e5fe7a8160fbb55673fba840ce377bf178acf5d43abd1c6a4d7c",
+    "report_manifest.json": "092ee598f408c943be344649500a57b60bfbc0bdaf007c6320be218c701e3fbc",
+    "targeted_tests.txt": "e26b810d2f402b60c562343b28f5ab8ea0570a62491df9d818e3e1327086a09f",
+    "trade_cards.json": "8d47b69bc3371300434edbdcb50b71925db0dda3bf67d12419d29ecf7e4ef5af",
+    "trades.csv": "37b4ad909d6334985a729a59189652425a1f36ce443965f8f289cf2a13bc86bd"
+  },
+  "additional_code_sha256": {
+    "research/validate_early_reversal_experiment.py": "561fb320829603e754aaf88e59205d96a3513f2c0dfa043e131b18a05735697f",
+    "test_lbank_early_reversal_experiment.py": "9ba30e3eb2661d314bb7d9b916cc7fdb192c02b078b2fd8ac790ef1ba8e582b2"
+  },
+  "limits": [
+    "Reused development observations; no unseen/continuous qualification",
+    "Explanatory strata overlap; cost/delay variants not independent samples",
+    "One initial interrupted attempt before outcome inspection; causality corrections retained in attempts.json",
+    "Live ledger/P3-P5 incomplete; no profitability or whole-feature completion"
+  ]
+}
