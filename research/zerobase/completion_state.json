@@ -1,14 +1,12 @@
 {
   "schema": "zb_completion_v1",
   "started_at": "2026-10-28T03:18:00Z",
-  "status": "checkpoint_complete_feature_incomplete",
+  "status": "e5_in_progress",
   "lease": {
-    "owner": "zb-e4-20261028-sole-worker",
-    "active": false,
-    "acquired_at": "2026-10-28T09:30:48.819727+00:00",
-    "expires_at": "2026-10-28T11:30:48.819727+00:00",
-    "released_at": "2026-10-28T09:49:30.321965+00:00",
-    "release_reason": "E4 isolated implementation and sixteen-arm comparison complete; all19 uploaded artifact blob hashes and entire fetched tree verified; sole worker checkpoint ended"
+    "owner": "zb-e5-20261028-sole-worker",
+    "active": true,
+    "acquired_at": "2026-10-28T09:55:58.304189+00:00",
+    "expires_at": "2026-10-28T11:55:58.304189+00:00"
   },
   "base_heads": {
     "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
@@ -39,7 +37,7 @@
     "RAW5M_INDEPENDENCE_UNVERIFIED",
     "CANDLE_VOLUME_UNIT_UNVERIFIED"
   ],
-  "next_work": "Acquire latest heads/new sole lease, predeclare and implement E5 early-reversal route per actual design (observed support/resistance sweep/reclaim, completed1m recovery structure and small opposite high/low break; RSI/5m15m trend explanatory rather than all mandatory). Freeze hard data/cost/structural-risk/RR/targets and compare isolated E5 plus necessary E1/E3/E4/target interactions without tuning reused outcomes. Separately implement failure-isolated live EvidenceLedger migration/restart/outage/bounded retention. P3-P5 and qualified data remain incomplete; no sends/orders/deploy.",
+  "next_work": "Implement predeclared E5 research-only early reversal and32-arm E5×E1×E3×E4×target development comparison; frozen hard data/cost/risk/RR/targets; then live ledger and P3-P5 remain.",
   "outbound": false,
   "orders": false,
   "ended_at": "2026-10-28T09:49:30.321965+00:00",
@@ -2463,5 +2461,7 @@
     "exec_transport_disconnect_recovered": true,
     "standard_csv_crlf_default_check": 2,
     "crlf_aware_staged_whitespace_check": 0
-  }
+  },
+  "e5_started_at": "2026-10-28T09:55:58.304189+00:00",
+  "e5_source_checkpoint": "fc2fecb090bdc6a733d42414892554d0baeada37"
 }
