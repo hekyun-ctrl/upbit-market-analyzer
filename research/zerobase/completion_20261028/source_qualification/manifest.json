@@ -1,0 +1,109 @@
+{
+  "schema": "zb_source_qualification_manifest_v1",
+  "baseline_pr27": "518a72646ac6e40afc37fc4c49357270924fc439",
+  "baseline_tree": "34ae4c264391e677fd8f106f5a705493e5eb781f",
+  "lease_commit": "02ce89542e2aa507ace3ecb73f76d71d4af8bdab",
+  "worker": "zb-source-qualification-20261028-sole-worker",
+  "lease_acquired_at": "2026-10-28T19:15:19.939564+00:00",
+  "readback_heads": {
+    "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
+    "research": "5ea63fea7fb5a312a99702535c31d4dccd8155fd",
+    "pr21": {
+      "head": "ce33a017ff6aca0729175a8f88c3ec978f4a84a2",
+      "base": "b4c7d94efb305c19cbe44f050c806440e19351a0",
+      "state": "open",
+      "draft": true,
+      "merged": false
+    },
+    "pr22": {
+      "head": "d098f5657d823769f468846df1fac5ec04986d0e",
+      "base": "ce33a017ff6aca0729175a8f88c3ec978f4a84a2",
+      "state": "open",
+      "draft": true,
+      "merged": false
+    },
+    "pr27": {
+      "head": "02ce89542e2aa507ace3ecb73f76d71d4af8bdab",
+      "base": "d098f5657d823769f468846df1fac5ec04986d0e",
+      "state": "open",
+      "draft": true,
+      "merged": false
+    }
+  },
+  "files": {
+    "README.md": {
+      "bytes": 5222,
+      "sha256": "c586a8e7338aa1e1e8912b06bbce5f53bc8a1230b6070c51d5145709e79cb643"
+    },
+    "acquisition_request.md": {
+      "bytes": 6656,
+      "sha256": "763b403e112144ec05c8553319e9075a486286bab4d41fa98d2f8441862bd7f3"
+    },
+    "runtime_selected.json": {
+      "bytes": 55904,
+      "sha256": "223724a9f4a4d74b1c12000354cbe74072477369ed259da3ec85e217bf6b612d"
+    },
+    "source_audit.json": {
+      "bytes": 5496,
+      "sha256": "eb46d1dcfe1165e78fde5df2c5dc924a975bc3a4583a090e16ab4506303f435e"
+    },
+    "validation.json": {
+      "bytes": 6661,
+      "sha256": "17258e6c0bd0fe4bc5f3eeb10d3004358762f7469e55cefbdd688632dcfc8cfc"
+    }
+  },
+  "actions": [
+    {
+      "tool": "github_fetch_file",
+      "ref": "d098f5657d823769f468846df1fac5ec04986d0e",
+      "paths": [
+        "docs/zerobase/TRADE_EVIDENCE_ALERT_DESIGN_20261025.md",
+        "research/zerobase/trade_evidence_p0_20261025/README.md",
+        "research/zerobase/trade_evidence_p0_20261025/summary.json",
+        "research/zerobase/trade_evidence_p0_20261025/manifest.json"
+      ]
+    },
+    {
+      "tool": "railway_get_logs",
+      "args": {
+        "projectId": "e7d240ac-2468-45c9-8411-33f5e24f425b",
+        "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+        "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+        "limit": 100,
+        "logType": "deploy"
+      },
+      "note": "Two bounded read-only calls used default deploy stream (types omitted). Extra logType=deploy ignored. Retained second result:101rows returned,27selected. No raw exchange receive timestamp is inferred.",
+      "read_count": 2
+    },
+    {
+      "tool": "github_fetch",
+      "url": "https://api.github.com/repos/LBank-exchange/lbank-connector-python/git/trees/master?recursive=1"
+    },
+    {
+      "tool": "github_fetch",
+      "url": "https://raw.githubusercontent.com/LBank-exchange/lbank-connector-python/master/lbank/websocket/websocket_client.py"
+    },
+    {
+      "tool": "github_fetch",
+      "url": "https://raw.githubusercontent.com/LBank-exchange/lbank-connector-python/master/lbank/spot/_market.py"
+    },
+    {
+      "tool": "web_run",
+      "operation": "finite system1 official-doc search, open and support API-category link click",
+      "urls_in": "source_audit.json",
+      "copyright": "Only own findings, official URLs and exact SDK Git identities retained; no full external documentation copied."
+    }
+  ],
+  "validation_command": "python - <<'PY'\nimport json,hashlib,subprocess\nfrom pathlib import Path\nroot=Path('research/zerobase/completion_20261028/source_qualification')\nm=json.loads((root/'manifest.json').read_text())\nfor name,want in m['files'].items():\n p=root/name\n assert p.stat().st_size==want['bytes'] and hashlib.sha256(p.read_bytes()).hexdigest()==want['sha256'],name\n if p.suffix=='.json':json.loads(p.read_text())\nv=json.loads((root/'validation.json').read_text())\nfor path,want in v['required_pr22_four_files_exact'].items():\n assert subprocess.check_output(['git','hash-object',path],text=True).strip()==want['git_blob_sha'],path\nchanged=subprocess.check_output(['git','diff','--name-only','518a72646ac6e40afc37fc4c49357270924fc439'],text=True).splitlines()\nassert all(p in {'research/zerobase/completion_state.json','docs/zerobase/COMPLETION_PROGRESS_20261028.md'} or p.startswith('research/zerobase/completion_20261028/source_qualification/') for p in changed),changed\nsubprocess.run(['git','diff','--check'],check=True)\nprint(json.dumps({'files_sha256_verified':len(m['files']),'required_pr22_blobs_verified':4,'production_code_changed':False,'strategy_tests_or_replays':0,'identical_http_ws_probes':0,'checks_passed':True}))\nPY",
+  "qualifying_data_acquired": 0,
+  "probes_repeated": 0,
+  "strategy_tests_repeated": 0,
+  "completed_comparisons_repeated": 0,
+  "technical_implementation_changed": false,
+  "blocked": true,
+  "human_or_provider_action": "Provide official public futures native1m/independent5m final/volume specification and genuine receipt/provenance listed in acquisition_request.md; no account keys requested; no ticket sent.",
+  "outbound": false,
+  "orders": false,
+  "deployments": false,
+  "artifact_prepared_at": "2026-10-28T19:21:52.197313+00:00"
+}

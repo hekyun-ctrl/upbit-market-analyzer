@@ -1,0 +1,92 @@
+{
+  "checked_at": "2026-10-28T03:36:33.336625+00:00",
+  "commands": [
+    {
+      "command": "python -m unittest test_lbank_structural_target_plan test_lbank_fee_risk test_lbank_native_target_room test_lbank_entry_geometry test_lbank_entry_refinement test_lbank_entry_location test_lbank_paper_notifications -q",
+      "exit_code": 0,
+      "tests": 121,
+      "new_p1_tests": 17,
+      "log": "targeted_tests.txt"
+    },
+    {
+      "command": "python research/compare_structural_targets.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python research/probe_structural_target_sources.py",
+      "exit_code": 0,
+      "meaning": "successful audit execution; HTTP403, official WS empty, same-feed raw forming updates, blockers unresolved"
+    },
+    {
+      "command": "python research/probe_structural_target_sources.py --analyze-existing",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "checks": {
+    "manifest_code_input_output_hashes": true,
+    "compressed_decision_hash": true,
+    "all_retained_capture_window_outputs_exact": true,
+    "production_calls_do_not_activate_target_policy": true,
+    "raw_receipt_hashes_checked": true,
+    "all_raw_updates_forming": true,
+    "verified_flags_remain_false": true
+  },
+  "runtime": {
+    "python": "3.12.14",
+    "ccxt": "4.5.90",
+    "aiohttp": "3.14.4"
+  },
+  "old_suites_not_repeated": [
+    "P0-only15",
+    "full467"
+  ],
+  "regression_reason": "calculate_plan explicit optional target-policy hook changes risk/target path; affected risk/geometry/refinement/location and disabled-paper invariants checked",
+  "outputs_sha256": {
+    "targeted_tests.txt": "fb87da1eec14dadc4c6159a89083f736411ef96a6ea662da2889d27b75b7f98d",
+    "source_probe/http_probe.json": "01e9196f341bd0cbe65af64c615477d99619c86925fd25d288bbd690b4acc428",
+    "source_probe/http_2.txt": "2938e9f1284180959e33ab1718d0793a72ff6e4cdb8108c34dcd14e69446de5c",
+    "source_probe/http_1.txt": "2938e9f1284180959e33ab1718d0793a72ff6e4cdb8108c34dcd14e69446de5c",
+    "source_probe/audit.json": "899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690",
+    "source_probe/http_0.txt": "2938e9f1284180959e33ab1718d0793a72ff6e4cdb8108c34dcd14e69446de5c",
+    "source_probe/http_3.txt": "2938e9f1284180959e33ab1718d0793a72ff6e4cdb8108c34dcd14e69446de5c",
+    "p1/comparison.json": "401a325d6fa7a0ff7d5a137a854989131de0d97531e9aae60c8925d17ff9541c",
+    "p1/gate_decisions.csv.gz": "dc85a902a002e773f2a74fc2caae00e9b2da72a1381ecf6d96c66019951ff276",
+    "p1/trades.csv": "3d4dea554173c10c84faa083b36b06d58eb5b9121b5f1c271fa3d7f6484834eb",
+    "p1/opportunities.csv": "13cc03498f2ce274f6d9e3f87985d0ccf3841b0e1b22618a0c9a4a617b195f8e",
+    "p1/manifest.json": "adea1894e96e58241d1f9c386b91778afab943ca0944b61e912caea07ab66b10",
+    "p1/trade_cards.json": "81cb01c5552a63fed0b714941ab99da44c180e13fdec1ba118ef2e579f206fb7",
+    "p1/.gitignore": "a0092d31272057c4244284dbe5eb324ac7000d65f98337dc2b30c5d35d65c1c2"
+  },
+  "review": {
+    "checked_at": "2026-10-28T03:49:17.083Z",
+    "source_checkpoint": "82bcccd3b43d9e39ec78ecdd1bb505a851002912",
+    "fix": "Populate exact-event per-trade gate_reasons with observed policy, phase, evaluation time, input hash and structural target evidence; no synthetic reasons.",
+    "commands": [
+      {
+        "command": "python -m unittest test_lbank_structural_comparison -q",
+        "exit_code": 0,
+        "tests": 3
+      },
+      {
+        "command": "python research/compare_structural_targets.py",
+        "exit_code": 0
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ],
+    "checks": {
+      "same_inputs": true,
+      "baseline_all_window_outputs_reproduced": true,
+      "all_three_scenario_aggregates_pairing_and_candidate_timing_unchanged": true,
+      "all_six_scenario_trade_rows_have_observed_p1_rejections": true,
+      "full_decision_table_unchanged": true
+    },
+    "note": "Six scenario rows are repeated scenarios of the same events, not six independent trades. Original 121-test run preserved; not rerun for this report-only fix."
+  }
+}

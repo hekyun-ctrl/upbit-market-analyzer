@@ -1,0 +1,70 @@
+{
+  "schema": "zb_p2_validation_v1",
+  "checked_at": "2026-10-28T07:30:17.801194+00:00",
+  "source_checkpoint": "669ea78c524ba1c7e56225517594d9f82d888472",
+  "predeclared_commit": "d2859fa75c8f7c72c828b7c4250f5d5feb2e49de",
+  "lease_commit": "a52ef5ef36c2dcbb3fd2098ca33cca628ab97a67",
+  "resume_lease_commit": "6c4f498b911b789e72a6188f6924d2afd67bdd30",
+  "commands": [
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_confirmation_experiment test_lbank_confirmation_cadence test_lbank_breakout_freshness test_lbank_entry_quality test_lbank_entry_refinement test_lbank_entry_location test_lbank_structural_comparison test_lbank_paper_notifications -q",
+      "exit_code": 0,
+      "tests": 92,
+      "new_tests": 19
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/compare_confirmation_experiment.py",
+      "exit_code": 0,
+      "note": "Final rerun required by sticky invalidated-event scheduling correction; all earlier economic outputs exactly unchanged"
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/render_confirmation_report.py",
+      "exit_code": 0
+    },
+    {
+      "command": "git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --check",
+      "exit_code": 0
+    }
+  ],
+  "checks": {
+    "all_replay_and_report_hashes_match": true,
+    "decompressed_csv_hash_matches": true,
+    "all_six_baseline_arm_scenario_windows_exactly_equal": true,
+    "sticky_fix_does_not_change_observed_development_economics": true,
+    "trade_scenario_rows": 12,
+    "common_candidate_scenario_event_rows": 284,
+    "candidate_lead_all_zero": true,
+    "no_live_zero_wait_call": true,
+    "orders_sends_zero": true,
+    "blockers_preserved": true
+  },
+  "runtime_versions": {
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "ccxt": "4.5.90",
+    "requests": "2.34.2",
+    "sqlite": "3.53.1"
+  },
+  "resume_note": "Recovered preserved ccxt dependency directory after resumed default python lacked it. Final92 tests and changed-path comparison rerun after sticky-event correction; original predeclaration and outcomes preserved.",
+  "file_sha256": {
+    ".gitignore": "a0092d31272057c4244284dbe5eb324ac7000d65f98337dc2b30c5d35d65c1c2",
+    "README.md": "bc4bdb16d1a3ac0b5791df238eb5bbffaee308f891adf1449f0f5f6a2e91d12f",
+    "comparison.json": "343b704d5238d33b84760e83b557d2affaa00d56175fb398bcb31c32bc562fe9",
+    "event_accounting.json": "2d261b8c50327d82a490de25e7d83ba5183f61ae6f3fc9936e4d0ac9e557a0a9",
+    "experiment_manifest.json": "80c39d13b1694257c43f706c801b8fc27f4d80468ca48ef8fb3fb9e8618cfe4e",
+    "fixed_plan_attribution.json": "419f1749ce95f5be21674cd7dd41ea1dfc69298e854fe00c18d870d1b9c10366",
+    "gate_decisions.csv.gz": "2e30981d4fc55eda6d334c56fe77c6543eab0510f88a2c6dbc494c65827c8bf7",
+    "manifest.json": "b7d58830f43997bdc9af72e5a3ea00a4ebe498c7bd47d885fff4687118498719",
+    "opportunities.csv": "5783ee9ba71a71beb08eee56f99d6d81a7adb24a293c5bc6e1dc32683c1d2104",
+    "report_manifest.json": "65bbb3bd19a17157feccd7d2f9e9b5871ff34a271e33d3eeefd2339c0a48073b",
+    "targeted_tests.txt": "b9d3459f25744db4a55fe6c18d69ce317e556b4918c113c3f3ba1b4c5c2bfb97",
+    "targeted_tests_initial.txt": "f0a714ce368848625b63aa0ce26ed19e4f4202dda513842c24e05aae3c713e67",
+    "trade_cards.json": "5ad9eb6ad490ca4ea5ef7c8af8bde67cc45ad233921b487722097c6cd75c1672",
+    "trades.csv": "2627ef65bd397616a99d6d613b37e36ead8110e6d3b75df18a786513392c0cec"
+  },
+  "initial_test_failure": "85test run had1 intentional confirm_watch function source guard mismatch; updated guard explicitly documents opt-in argument; initial failure log retained",
+  "limits": [
+    "P2 E3 research ablation only; E1/E4/E5 and live ledger remain",
+    "Reused development observations, actual receipts and fills/funding unknown",
+    "No promotion: P1 floor0, E3 base4/5 alarms include unresolved trades; no whole feature completion"
+  ]
+}

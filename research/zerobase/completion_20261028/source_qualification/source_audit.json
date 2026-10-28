@@ -1,0 +1,105 @@
+{
+  "schema": "zb_actual_source_qualification_audit_v1",
+  "first_observed_clock_utc": "2026-10-28T19:14:30Z",
+  "sole_lease_acquired_at": "2026-10-28T19:15:19.939564+00:00",
+  "lease_commit": "02ce89542e2aa507ace3ecb73f76d71d4af8bdab",
+  "baseline_pr27": "518a72646ac6e40afc37fc4c49357270924fc439",
+  "baseline_tree": "34ae4c264391e677fd8f106f5a705493e5eb781f",
+  "scope": "finite official source discovery/validation and scoped read-only runtime evidence; no new implementation/probes/tests/comparison",
+  "documents": [
+    {
+      "id": "contract_documentation",
+      "url": "https://www.lbank.com/docs/contract.html",
+      "kind": "official_exchange_documentation",
+      "refs": [
+        "turn227view0",
+        "turn232view0"
+      ],
+      "observed": "463-line retrieved document lists getTime/instrument/marketData/marketOrder; official websocket URL but no candle subscription/final/volume schema. Instrument volumeMultiple and24h market volume do not define chart candle h units.",
+      "qualified_candle_source": false,
+      "qualification_delta": "none; no undocumented guessed subscription sent"
+    },
+    {
+      "id": "official_python_sdk",
+      "url": "https://github.com/LBank-exchange/lbank-connector-python",
+      "kind": "official_sdk_referenced_by_exchange_docs",
+      "tree_sha": "538d465fe29c7266d9076158bb2742d7b1178f15",
+      "inspected": [
+        "README.md",
+        "nontruncated recursive tree",
+        "lbank/spot/_market.py",
+        "lbank/websocket/websocket_client.py"
+      ],
+      "source_blobs": {
+        "README.md": "47c73057883d5e2d7cef64c9d4fe247630410647",
+        "lbank/spot/_market.py": "ba530b103198911f093f8fc54b70851f18218cb2",
+        "lbank/websocket/websocket_client.py": "9ff30ed6c8ac298f7a48adc54f9ba9fc1fc298d8"
+      },
+      "observed": "SDK market methods under spot and generic send(message) websocket; README Contract Call label points to v2/currencyPairs.do/spot host. No futures candle schema found in inspected files/tree. Finite inspection does not claim no such API exists anywhere.",
+      "qualified_candle_source": false
+    },
+    {
+      "id": "official_api_support_index",
+      "url": "https://www.lbank.com/support/sections/CO00000112",
+      "kind": "official_exchange_support_index",
+      "refs": [
+        "turn231view0"
+      ],
+      "observed": "Retrieved page exposes category navigation only, not a futures candle technical specification.",
+      "qualified_candle_source": false
+    },
+    {
+      "id": "official_tradingview_integration",
+      "url": "https://www.lbank.com/uk/support/articles/48083695479961",
+      "kind": "official_exchange_distribution_announcement",
+      "refs": [
+        "turn230view1"
+      ],
+      "observed": "LBank describes futures data on TradingView and BTCUSDT.P symbol. This establishes a documented chart distribution path, not independent native5m computation, final-bar semantics, candle volume units or original transport receipts.",
+      "qualified_candle_source": false,
+      "discovered_path": true
+    },
+    {
+      "id": "tradingview_symbol",
+      "url": "https://www.tradingview.com/symbols/BTCUSDT.P/?exchange=LBANK",
+      "kind": "provider_public_symbol_listing",
+      "refs": [
+        "turn230view2"
+      ],
+      "observed": "Public page identifies LBank perpetual contract but returns no raw1m/5m bars, receipt history or candle unit/final/provenance definition. Displayed unavailable fields do not establish live venue status.",
+      "qualified_candle_source": false
+    },
+    {
+      "id": "tradingview_documented_export",
+      "url": "https://www.tradingview.com/support/solutions/43000537255-how-to-export-chart-data/",
+      "kind": "official_provider_export_instructions",
+      "refs": [
+        "turn232view2"
+      ],
+      "observed": "Documented UI export yields loaded chart CSV. Historical export download time cannot stand in for each original publication/receive time. No CSV was acquired; no provider API/reverse-engineered proxy or paid access was used.",
+      "qualified_candle_source": false,
+      "permitted_future_role": "Optional historical price cross-check only if user independently supplies an export; never clear required receipt/final/volume/independence blockers from CSV alone."
+    },
+    {
+      "id": "official_support_route",
+      "url": "https://www.lbank.com/uk/support/articles/2085637005588299776",
+      "kind": "official_exchange_support_workflow",
+      "refs": [
+        "turn232view1"
+      ],
+      "observed": "Official customer service guide routes unresolved questions to online support/ticket. Exact futures public market-data specification request fields are in acquisition_request.md; no message/ticket was sent.",
+      "qualified_candle_source": false
+    }
+  ],
+  "verdict": "BLOCKED_EXTERNAL_SOURCE_SPECIFICATION_REQUIRED",
+  "all_missing_unchanged": true,
+  "verified_final_bars_new": 0,
+  "independent_native5m_new": 0,
+  "new_qualified_unseen_observations": 0,
+  "official_ws_or_rest_reprobes": 0,
+  "strategy_tests_or_replays": 0,
+  "production_changes": false,
+  "outbound": false,
+  "orders": false,
+  "limitation": "A documented chart distribution/export path was found but is not acceptable proxy substitution. Negative finite search is not proof of API nonexistence. Actual original chart6frames remain forming/unqualified. Source-derived qualification code must be reviewed only after genuine specification/raw receipts arrive; no manifest booleans can unblock it."
+}

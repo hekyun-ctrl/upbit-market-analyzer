@@ -1,0 +1,2138 @@
+[
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_vs_capture_e4",
+    "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-20T05:55:00+00:00",
+        "net_usdt_high": -9.35927984656063,
+        "net_usdt_low": -9.35927984656063,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.35927984656063
+    },
+    "policies": {
+      "capture": {
+        "candidate_evaluations": 2,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792467302.123575",
+            "reason": "risk_or_target",
+            "detail": "native_target_barrier_conflict"
+          }
+        ],
+        "simultaneous_other_event_actions": [
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "candidate",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          }
+        ]
+      },
+      "capture_e4": {
+        "candidate_evaluations": 2,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792467302.123575",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792467434.41831",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": [
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "candidate",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "alert_eligibility",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          }
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_vs_capture_e4",
+    "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-22T05:05:00+00:00",
+        "net_usdt_high": -9.35946639821021,
+        "net_usdt_low": -9.35946639821021,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.35946639821021
+    },
+    "policies": {
+      "capture": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792643743.561894",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_vs_capture_e4",
+    "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-22T03:05:00+00:00",
+        "net_usdt_high": -9.35917338017724,
+        "net_usdt_low": -9.35917338017724,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.35917338017724
+    },
+    "policies": {
+      "capture": {
+        "candidate_evaluations": 4,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637486.000857",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637608.772348",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637671.903162",
+            "reason": "rsi_direction",
+            "detail": ""
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e4": {
+        "candidate_evaluations": 4,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637486.000857",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637608.772348",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637671.903162",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637734.968047",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_vs_capture_e4",
+    "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+    "group": "added",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": {
+        "at": "2026-10-22T06:45:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      },
+      "old": null
+    },
+    "actual_policy_net_model": {
+      "new": null,
+      "old": 0
+    },
+    "policies": {
+      "capture": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "confirmation",
+            "evaluated_at": "1792650519.68896",
+            "reason": "breakout_trigger_lost_without_higher_priority",
+            "detail": ""
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 3,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "confirmation",
+            "evaluated_at": "1792650519.68896",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          },
+          {
+            "phase": "confirmation",
+            "evaluated_at": "1792650579.053357",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e3_vs_capture_e3_e4",
+    "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-20T05:55:00+00:00",
+        "net_usdt_high": -9.35927984656063,
+        "net_usdt_low": -9.35927984656063,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.35927984656063
+    },
+    "policies": {
+      "capture_e3": {
+        "candidate_evaluations": 2,
+        "confirmation_evaluations": 2,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792467302.123575",
+            "reason": "risk_or_target",
+            "detail": "native_target_barrier_conflict"
+          },
+          {
+            "phase": "confirmation",
+            "evaluated_at": "1792467434.41831",
+            "reason": "e3_frozen_trigger_not_crossed",
+            "detail": ""
+          }
+        ],
+        "simultaneous_other_event_actions": [
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "candidate",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          }
+        ]
+      },
+      "capture_e3_e4": {
+        "candidate_evaluations": 2,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792467302.123575",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792467434.41831",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": [
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "candidate",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "alert_eligibility",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "confirmation",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "alert_eligibility",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "alert_eligibility",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          }
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e3_vs_capture_e3_e4",
+    "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-22T05:05:00+00:00",
+        "net_usdt_high": -9.359357385746208,
+        "net_usdt_low": -9.359357385746208,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.359357385746208
+    },
+    "policies": {
+      "capture_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792643743.561894",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e3_vs_capture_e3_e4",
+    "event_id": "op-v1:3dd372e7bd5f0e25fc7a9391910e1121174ccf3c56bef8a0aa5da7eaac122237",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "at": "2026-10-20T01:40:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": null
+    },
+    "policies": {
+      "capture_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792458650.689466",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e3_vs_capture_e3_e4",
+    "event_id": "op-v1:8bb197dfef65bf035246c699d1557b3d04417a8c5ce2c4a7cdbfcdb2fc4e43a9",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-20T12:25:00+00:00",
+        "net_usdt_high": -9.358945420031985,
+        "net_usdt_low": -9.358945420031985,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.358945420031985
+    },
+    "policies": {
+      "capture_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792482305.995735",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e3_vs_capture_e3_e4",
+    "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+    "group": "added",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": {
+        "latest_exit_bar_end": "2026-10-20T05:55:00+00:00",
+        "net_usdt_high": -9.359422340183945,
+        "net_usdt_low": -9.359422340183945,
+        "status": "exact_in_model"
+      },
+      "old": null
+    },
+    "actual_policy_net_model": {
+      "new": -9.359422340183945,
+      "old": 0
+    },
+    "policies": {
+      "capture_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": [
+          {
+            "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+            "phase": "candidate",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+            "phase": "alert_eligibility",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+            "phase": "confirmation",
+            "state": "rejected",
+            "evaluated_at": "1792467434.41831",
+            "reason": "e3_frozen_trigger_not_crossed",
+            "detail": ""
+          }
+        ]
+      },
+      "capture_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": [
+          {
+            "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+            "phase": "candidate",
+            "state": "rejected",
+            "evaluated_at": "1792467434.41831",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e3_vs_capture_e3_e4",
+    "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+    "group": "matched",
+    "confirmation_lead_seconds": "0.0",
+    "outcomes": {
+      "new": {
+        "at": "2026-10-22T06:45:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      },
+      "old": {
+        "at": "2026-10-22T06:45:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": null,
+      "old": null
+    },
+    "policies": {
+      "capture_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e1_vs_capture_e1_e4",
+    "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-20T05:55:00+00:00",
+        "net_usdt_high": -9.35927984656063,
+        "net_usdt_low": -9.35927984656063,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.35927984656063
+    },
+    "policies": {
+      "capture_e1": {
+        "candidate_evaluations": 2,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792467302.123575",
+            "reason": "risk_or_target",
+            "detail": "native_target_barrier_conflict"
+          }
+        ],
+        "simultaneous_other_event_actions": [
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "candidate",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          }
+        ]
+      },
+      "capture_e1_e4": {
+        "candidate_evaluations": 2,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792467302.123575",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792467434.41831",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": [
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "candidate",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "alert_eligibility",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          }
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e1_vs_capture_e1_e4",
+    "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-22T05:05:00+00:00",
+        "net_usdt_high": -9.35946639821021,
+        "net_usdt_low": -9.35946639821021,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.35946639821021
+    },
+    "policies": {
+      "capture_e1": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792643743.561894",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e1_vs_capture_e1_e4",
+    "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-22T03:05:00+00:00",
+        "net_usdt_high": -9.35917338017724,
+        "net_usdt_low": -9.35917338017724,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.35917338017724
+    },
+    "policies": {
+      "capture_e1": {
+        "candidate_evaluations": 4,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637486.000857",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637608.772348",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637671.903162",
+            "reason": "rsi_direction",
+            "detail": ""
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e4": {
+        "candidate_evaluations": 4,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637486.000857",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637608.772348",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637671.903162",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637734.968047",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e1_vs_capture_e1_e4",
+    "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+    "group": "added",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": {
+        "at": "2026-10-22T06:45:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      },
+      "old": null
+    },
+    "actual_policy_net_model": {
+      "new": null,
+      "old": 0
+    },
+    "policies": {
+      "capture_e1": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "confirmation",
+            "evaluated_at": "1792650519.68896",
+            "reason": "breakout_trigger_lost_without_higher_priority",
+            "detail": ""
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 3,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "confirmation",
+            "evaluated_at": "1792650519.68896",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          },
+          {
+            "phase": "confirmation",
+            "evaluated_at": "1792650579.053357",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e1_e3_vs_capture_e1_e3_e4",
+    "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-20T05:55:00+00:00",
+        "net_usdt_high": -9.35927984656063,
+        "net_usdt_low": -9.35927984656063,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.35927984656063
+    },
+    "policies": {
+      "capture_e1_e3": {
+        "candidate_evaluations": 2,
+        "confirmation_evaluations": 2,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792467302.123575",
+            "reason": "risk_or_target",
+            "detail": "native_target_barrier_conflict"
+          },
+          {
+            "phase": "confirmation",
+            "evaluated_at": "1792467434.41831",
+            "reason": "e3_frozen_trigger_not_crossed",
+            "detail": ""
+          }
+        ],
+        "simultaneous_other_event_actions": [
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "candidate",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          }
+        ]
+      },
+      "capture_e1_e3_e4": {
+        "candidate_evaluations": 2,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792467302.123575",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792467434.41831",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": [
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "candidate",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "alert_eligibility",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "confirmation",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "alert_eligibility",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+            "phase": "alert_eligibility",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          }
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e1_e3_vs_capture_e1_e3_e4",
+    "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-22T05:05:00+00:00",
+        "net_usdt_high": -9.359357385746208,
+        "net_usdt_low": -9.359357385746208,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.359357385746208
+    },
+    "policies": {
+      "capture_e1_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792643743.561894",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e1_e3_vs_capture_e1_e3_e4",
+    "event_id": "op-v1:3dd372e7bd5f0e25fc7a9391910e1121174ccf3c56bef8a0aa5da7eaac122237",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "at": "2026-10-20T01:40:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": null
+    },
+    "policies": {
+      "capture_e1_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792458650.689466",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e1_e3_vs_capture_e1_e3_e4",
+    "event_id": "op-v1:8bb197dfef65bf035246c699d1557b3d04417a8c5ce2c4a7cdbfcdb2fc4e43a9",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-20T12:25:00+00:00",
+        "net_usdt_high": -9.358945420031985,
+        "net_usdt_low": -9.358945420031985,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.358945420031985
+    },
+    "policies": {
+      "capture_e1_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792482305.995735",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e1_e3_vs_capture_e1_e3_e4",
+    "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+    "group": "added",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": {
+        "latest_exit_bar_end": "2026-10-20T05:55:00+00:00",
+        "net_usdt_high": -9.359422340183945,
+        "net_usdt_low": -9.359422340183945,
+        "status": "exact_in_model"
+      },
+      "old": null
+    },
+    "actual_policy_net_model": {
+      "new": -9.359422340183945,
+      "old": 0
+    },
+    "policies": {
+      "capture_e1_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": [
+          {
+            "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+            "phase": "candidate",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+            "phase": "alert_eligibility",
+            "state": "qualified",
+            "evaluated_at": "1792467434.41831",
+            "reason": "",
+            "detail": ""
+          },
+          {
+            "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+            "phase": "confirmation",
+            "state": "rejected",
+            "evaluated_at": "1792467434.41831",
+            "reason": "e3_frozen_trigger_not_crossed",
+            "detail": ""
+          }
+        ]
+      },
+      "capture_e1_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": [
+          {
+            "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+            "phase": "candidate",
+            "state": "rejected",
+            "evaluated_at": "1792467434.41831",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "base_delay0",
+    "comparison": "capture_e1_e3_vs_capture_e1_e3_e4",
+    "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+    "group": "matched",
+    "confirmation_lead_seconds": "0.0",
+    "outcomes": {
+      "new": {
+        "at": "2026-10-22T06:45:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      },
+      "old": {
+        "at": "2026-10-22T06:45:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": null,
+      "old": null
+    },
+    "policies": {
+      "capture_e1_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay15",
+    "comparison": "capture_vs_capture_e4",
+    "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-22T05:05:00+00:00",
+        "net_usdt_high": -9.35946639821021,
+        "net_usdt_low": -9.35946639821021,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.35946639821021
+    },
+    "policies": {
+      "capture": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792643743.561894",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay15",
+    "comparison": "capture_vs_capture_e4",
+    "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-22T03:05:00+00:00",
+        "net_usdt_high": -9.35917338017724,
+        "net_usdt_low": -9.35917338017724,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.35917338017724
+    },
+    "policies": {
+      "capture": {
+        "candidate_evaluations": 4,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637486.000857",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637608.772348",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637671.903162",
+            "reason": "rsi_direction",
+            "detail": ""
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e4": {
+        "candidate_evaluations": 4,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637486.000857",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637608.772348",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637671.903162",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637734.968047",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay15",
+    "comparison": "capture_vs_capture_e4",
+    "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+    "group": "added",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": {
+        "at": "2026-10-22T06:45:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      },
+      "old": null
+    },
+    "actual_policy_net_model": {
+      "new": null,
+      "old": 0
+    },
+    "policies": {
+      "capture": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "confirmation",
+            "evaluated_at": "1792650519.68896",
+            "reason": "breakout_trigger_lost_without_higher_priority",
+            "detail": ""
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 3,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "confirmation",
+            "evaluated_at": "1792650519.68896",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          },
+          {
+            "phase": "confirmation",
+            "evaluated_at": "1792650579.053357",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay15",
+    "comparison": "capture_e3_vs_capture_e3_e4",
+    "event_id": "op-v1:2265552af9bec3e51697732c5112fa75e016460f820b320fb18d4bc4fcb5d8c8",
+    "group": "matched",
+    "confirmation_lead_seconds": "0.0",
+    "outcomes": {
+      "new": {
+        "latest_exit_bar_end": "2026-10-20T04:10:00+00:00",
+        "net_usdt_high": -9.358853512730962,
+        "net_usdt_low": -9.358853512730962,
+        "status": "exact_in_model"
+      },
+      "old": {
+        "latest_exit_bar_end": "2026-10-20T04:10:00+00:00",
+        "net_usdt_high": -9.358853512730962,
+        "net_usdt_low": -9.358853512730962,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": -9.358853512730962,
+      "old": -9.358853512730962
+    },
+    "policies": {
+      "capture_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay15",
+    "comparison": "capture_e3_vs_capture_e3_e4",
+    "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-22T05:05:00+00:00",
+        "net_usdt_high": -9.359357385746208,
+        "net_usdt_low": -9.359357385746208,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.359357385746208
+    },
+    "policies": {
+      "capture_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792643743.561894",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay15",
+    "comparison": "capture_e3_vs_capture_e3_e4",
+    "event_id": "op-v1:3dd372e7bd5f0e25fc7a9391910e1121174ccf3c56bef8a0aa5da7eaac122237",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "at": "2026-10-20T01:40:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": null
+    },
+    "policies": {
+      "capture_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792458650.689466",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay15",
+    "comparison": "capture_e3_vs_capture_e3_e4",
+    "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+    "group": "matched",
+    "confirmation_lead_seconds": "0.0",
+    "outcomes": {
+      "new": {
+        "at": "2026-10-22T06:45:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      },
+      "old": {
+        "at": "2026-10-22T06:45:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": null,
+      "old": null
+    },
+    "policies": {
+      "capture_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay15",
+    "comparison": "capture_e1_vs_capture_e1_e4",
+    "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-22T05:05:00+00:00",
+        "net_usdt_high": -9.35946639821021,
+        "net_usdt_low": -9.35946639821021,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.35946639821021
+    },
+    "policies": {
+      "capture_e1": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792643743.561894",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay15",
+    "comparison": "capture_e1_vs_capture_e1_e4",
+    "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-22T03:05:00+00:00",
+        "net_usdt_high": -9.35917338017724,
+        "net_usdt_low": -9.35917338017724,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.35917338017724
+    },
+    "policies": {
+      "capture_e1": {
+        "candidate_evaluations": 4,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637486.000857",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637608.772348",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637671.903162",
+            "reason": "rsi_direction",
+            "detail": ""
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e4": {
+        "candidate_evaluations": 4,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637486.000857",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637608.772348",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637671.903162",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637734.968047",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay15",
+    "comparison": "capture_e1_vs_capture_e1_e4",
+    "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+    "group": "added",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": {
+        "at": "2026-10-22T06:45:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      },
+      "old": null
+    },
+    "actual_policy_net_model": {
+      "new": null,
+      "old": 0
+    },
+    "policies": {
+      "capture_e1": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "confirmation",
+            "evaluated_at": "1792650519.68896",
+            "reason": "breakout_trigger_lost_without_higher_priority",
+            "detail": ""
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 3,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "confirmation",
+            "evaluated_at": "1792650519.68896",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          },
+          {
+            "phase": "confirmation",
+            "evaluated_at": "1792650579.053357",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay15",
+    "comparison": "capture_e1_e3_vs_capture_e1_e3_e4",
+    "event_id": "op-v1:2265552af9bec3e51697732c5112fa75e016460f820b320fb18d4bc4fcb5d8c8",
+    "group": "matched",
+    "confirmation_lead_seconds": "0.0",
+    "outcomes": {
+      "new": {
+        "latest_exit_bar_end": "2026-10-20T04:10:00+00:00",
+        "net_usdt_high": -9.358853512730962,
+        "net_usdt_low": -9.358853512730962,
+        "status": "exact_in_model"
+      },
+      "old": {
+        "latest_exit_bar_end": "2026-10-20T04:10:00+00:00",
+        "net_usdt_high": -9.358853512730962,
+        "net_usdt_low": -9.358853512730962,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": -9.358853512730962,
+      "old": -9.358853512730962
+    },
+    "policies": {
+      "capture_e1_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay15",
+    "comparison": "capture_e1_e3_vs_capture_e1_e3_e4",
+    "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-22T05:05:00+00:00",
+        "net_usdt_high": -9.359357385746208,
+        "net_usdt_low": -9.359357385746208,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.359357385746208
+    },
+    "policies": {
+      "capture_e1_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792643743.561894",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay15",
+    "comparison": "capture_e1_e3_vs_capture_e1_e3_e4",
+    "event_id": "op-v1:3dd372e7bd5f0e25fc7a9391910e1121174ccf3c56bef8a0aa5da7eaac122237",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "at": "2026-10-20T01:40:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": null
+    },
+    "policies": {
+      "capture_e1_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792458650.689466",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "base_delay15",
+    "comparison": "capture_e1_e3_vs_capture_e1_e3_e4",
+    "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+    "group": "matched",
+    "confirmation_lead_seconds": "0.0",
+    "outcomes": {
+      "new": {
+        "at": "2026-10-22T06:45:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      },
+      "old": {
+        "at": "2026-10-22T06:45:00+00:00",
+        "reason": "missing_or_invalid_outcome_bar",
+        "status": "unresolved"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": null,
+      "old": null
+    },
+    "policies": {
+      "capture_e1_e3": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e3_e4": {
+        "candidate_evaluations": 1,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "adverse_delay0",
+    "comparison": "capture_vs_capture_e4",
+    "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-22T03:05:00+00:00",
+        "net_usdt_high": -9.358642725245979,
+        "net_usdt_low": -9.358642725245979,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.358642725245979
+    },
+    "policies": {
+      "capture": {
+        "candidate_evaluations": 4,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637486.000857",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637608.772348",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637671.903162",
+            "reason": "rsi_direction",
+            "detail": ""
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e4": {
+        "candidate_evaluations": 4,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637486.000857",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637608.772348",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637671.903162",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637734.968047",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  },
+  {
+    "scenario": "adverse_delay0",
+    "comparison": "capture_e1_vs_capture_e1_e4",
+    "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+    "group": "excluded",
+    "confirmation_lead_seconds": null,
+    "outcomes": {
+      "new": null,
+      "old": {
+        "latest_exit_bar_end": "2026-10-22T03:05:00+00:00",
+        "net_usdt_high": -9.358642725245979,
+        "net_usdt_low": -9.358642725245979,
+        "status": "exact_in_model"
+      }
+    },
+    "actual_policy_net_model": {
+      "new": 0,
+      "old": -9.358642725245979
+    },
+    "policies": {
+      "capture_e1": {
+        "candidate_evaluations": 4,
+        "confirmation_evaluations": 1,
+        "confirmation_status": "evaluated",
+        "limitation": null,
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637486.000857",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637608.772348",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637671.903162",
+            "reason": "rsi_direction",
+            "detail": ""
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      },
+      "capture_e1_e4": {
+        "candidate_evaluations": 4,
+        "confirmation_evaluations": 0,
+        "confirmation_status": "no_confirmation_evaluation_observed",
+        "limitation": "No comparator confirmation evaluated for this exact anchor in retained observations; do not invent a failed gate.",
+        "recorded_rejections": [
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637486.000857",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637608.772348",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637671.903162",
+            "reason": "rsi_direction",
+            "detail": ""
+          },
+          {
+            "phase": "candidate",
+            "evaluated_at": "1792637734.968047",
+            "reason": "risk_or_target",
+            "detail": "entry_location_extended_or_lost"
+          }
+        ],
+        "simultaneous_other_event_actions": []
+      }
+    }
+  }
+]

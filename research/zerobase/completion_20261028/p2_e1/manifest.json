@@ -1,0 +1,37 @@
+{
+  "schema": "zb_p2_e1_e3_artifacts_v1",
+  "declaration_sha256": "aab6190579032c09427bdb099e2ba5a5aec6683acb4c9e2dfe10727a039c5588",
+  "code_sha256": {
+    "lbank_structural_target_plan.py": "171f685144317452d184118e768b5d5e65a160f40d4c759a7b2d57aa1c04bdb3",
+    "lbank_futures_monitor.py": "b2713e35f24cc8f00e8516f560f9439a0582397ca9621fc658e0ef8e24bed537",
+    "research/compare_structural_targets.py": "eeb410caa51e1f02f549379cd037ad8b6028865323473ec74d71d3284021ecfc",
+    "research/compare_signal_decisions.py": "32da50557e2908d5de91122c497313990f90b2c9aa7e4e4f3e5a756a768cdca1",
+    "research/compare_entry_refinement.py": "322715fe9128a65a1ffc60dee1b71145976d86a476f0308a4c63848e7ae599ab",
+    "research/evidence_confirmation.py": "6675665fe5b3b5832b7353e86539189c44adbb52f872f6b05b4ed7eee34b9f43",
+    "research/compare_confirmation_experiment.py": "b0f8a6f7a81f9821519e4511017dc660f8cdae86c88c7c975c0e7396a2a7c731",
+    "lbank_signal_evidence.py": "51aad7f26c4b514a5b59d3de2c8b435b21e9bd8fe70cadec7546a2201e4cada6",
+    "research/first_retest_experiment.py": "885debfb62b35d6c6897eee015d8755942f41182a1b9651c21531bd8646f3be9",
+    "research/compare_first_retest_experiment.py": "7b92af169d0cc309964a144d60da0225af9aaa8be844484ab4a1a370e1c197a7",
+    "lbank_entry_location.py": "8b82295723a838dd32d1920f77af1ed242f024ea6de94c503f5ea0476a85f617",
+    "lbank_structure_patterns.py": "590be2dac280e67d0035ec881175d839cb028d2a5ac13f472389d471ae40337c"
+  },
+  "input_sha256": {
+    "research/zerobase/entry_comparison_20261024/archive_chunks.json": "0d8b8db7cdccd009d2d08e7c9ece7403231bce3b4af8227b5bddff246daa8cce",
+    "research/zerobase/entry_comparison_20261024/recorded_quotes.json": "088b245a78a95453fe51d7555e3017eb413aea0ba39ff4fa729fc14a0071e88b",
+    "research/zerobase/entry_comparison_20261024/outcome_candle_logs.jsonl": "0254b28096f864b24e7b39a3d04bd464e33e03a588b4f36b0ea5e4dace9576b7",
+    "research/zerobase/completion_20261028/p1/comparison.json": "401a325d6fa7a0ff7d5a137a854989131de0d97531e9aae60c8925d17ff9541c",
+    "research/zerobase/completion_20261028/p1/manifest.json": "adea1894e96e58241d1f9c386b91778afab943ca0944b61e912caea07ab66b10",
+    "research/zerobase/completion_20261028/p2/comparison.json": "343b704d5238d33b84760e83b557d2affaa00d56175fb398bcb31c32bc562fe9",
+    "lbank_entry_location.py": "8b82295723a838dd32d1920f77af1ed242f024ea6de94c503f5ea0476a85f617"
+  },
+  "output_sha256": {
+    "comparison.json": "ced9379714adfd5fa7c00e7b3d70457ccd99273c0430e83ab8138d1fc2e953c3",
+    "trade_cards.json": "2db505a3bfcbfc33b1bdeeff6ab9e222fcf23dd2379bb32d9752a2a9a6d6e533",
+    "trades.csv": "cc9d1f9bbbe3f5ace58fc821bf461e167c860af33dbfaf83f9e6ad28e920b8d2",
+    "opportunities.csv": "61d5287378a476385103bc9d084a1921f1e9bef5f3bc13463a669e1b4eb4c310",
+    "gate_decisions.csv.gz": "65eaae465bac36827775a704c3389d3875ab6fa080754f6e8b1d2c2d629e45e9"
+  },
+  "uncompressed_decision_sha256": "e425c23983d2e1c46dc5e115b91b73afeb7097d06695b391ecb86209892fdd10",
+  "command": "python research/compare_first_retest_experiment.py",
+  "sample_class": "previously used signal-adjacent development observations; not unseen or continuous validation"
+}

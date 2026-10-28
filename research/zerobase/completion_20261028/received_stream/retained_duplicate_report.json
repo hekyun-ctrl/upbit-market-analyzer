@@ -1,0 +1,238 @@
+{
+  "actual_exchange_ingest_sequence_available": false,
+  "bars": [
+    {
+      "bar": {
+        "close": 81027.6,
+        "high": 81027.6,
+        "low": 80942.0,
+        "open": 80942.0,
+        "period": 300,
+        "start": 1793157900,
+        "turnover": 365300.24224,
+        "updated": 1793158072,
+        "volume": 4.5104
+      },
+      "bar_index": 0,
+      "final": null,
+      "final_basis": null,
+      "occurrence_seq": 2,
+      "received_at": "2026-10-28T03:27:52.560107+00:00",
+      "revision": 1,
+      "source_hash": "166adbe6f600c417b429912a9e56cd130c1d9d827c2a1bc6e22f748de7c965f7",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690"
+    },
+    {
+      "bar": {
+        "close": 81027.6,
+        "high": 81027.6,
+        "low": 81002.0,
+        "open": 81002.0,
+        "period": 60,
+        "start": 1793158020,
+        "turnover": 100962.16712,
+        "updated": 1793158073,
+        "volume": 1.2462
+      },
+      "bar_index": 0,
+      "final": null,
+      "final_basis": null,
+      "occurrence_seq": 3,
+      "received_at": "2026-10-28T03:27:53.247577+00:00",
+      "revision": 1,
+      "source_hash": "8eb8afa34f0ba7d36895fdbf2cc73a61671ecb0aeae3463e6a662ef464647159",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690"
+    },
+    {
+      "bar": {
+        "close": 81027.6,
+        "high": 81027.6,
+        "low": 81002.0,
+        "open": 81002.0,
+        "period": 60,
+        "start": 1793158020,
+        "turnover": 101205.24992,
+        "updated": 1793158073,
+        "volume": 1.2492
+      },
+      "bar_index": 0,
+      "final": null,
+      "final_basis": null,
+      "occurrence_seq": 4,
+      "received_at": "2026-10-28T03:27:53.249390+00:00",
+      "revision": 2,
+      "source_hash": "d93d04fdc3740a1a25910cad64cf52371ce53f0ea159f8514bb4ce8530aaf555",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690"
+    },
+    {
+      "bar": {
+        "close": 81027.5,
+        "high": 81027.6,
+        "low": 80942.0,
+        "open": 80942.0,
+        "period": 300,
+        "start": 1793157900,
+        "turnover": 372268.61178,
+        "updated": 1793158077,
+        "volume": 4.5964
+      },
+      "bar_index": 0,
+      "final": null,
+      "final_basis": null,
+      "occurrence_seq": 7,
+      "received_at": "2026-10-28T03:27:57.638690+00:00",
+      "revision": 2,
+      "source_hash": "8f824b0f4c3783a28138593991b9433aa517f444a15b026ff3e04c40012a1d1c",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690"
+    },
+    {
+      "bar": {
+        "close": 81027.5,
+        "high": 81027.6,
+        "low": 81002.0,
+        "open": 81002.0,
+        "period": 60,
+        "start": 1793158020,
+        "turnover": 107979.15336,
+        "updated": 1793158078,
+        "volume": 1.3328
+      },
+      "bar_index": 0,
+      "final": null,
+      "final_basis": null,
+      "occurrence_seq": 8,
+      "received_at": "2026-10-28T03:27:58.243013+00:00",
+      "revision": 3,
+      "source_hash": "6befe7c7b82fee30842c8a647ab6ba69952b6d2e5157e59ca17b6d6607943065",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690"
+    },
+    {
+      "bar": {
+        "close": 81027.5,
+        "high": 81027.6,
+        "low": 81002.0,
+        "open": 81002.0,
+        "period": 60,
+        "start": 1793158020,
+        "turnover": 108238.44136,
+        "updated": 1793158078,
+        "volume": 1.336
+      },
+      "bar_index": 0,
+      "final": null,
+      "final_basis": null,
+      "occurrence_seq": 9,
+      "received_at": "2026-10-28T03:27:58.243651+00:00",
+      "revision": 4,
+      "source_hash": "44437dbece6a985bd2d8b122dfb193a84deb227bcbf62364c17d36491cf827a6",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690"
+    }
+  ],
+  "candle_volume_unit_verified": false,
+  "exact_receipts": [
+    {
+      "received_at": "2026-10-28T03:27:52.560107+00:00",
+      "seq": 2,
+      "session": "retained-audit-attempt-2",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690",
+      "wire_sha256": "3edb5ed3fd73936d6c7f63a4924e1d02beac5df0365e5601074d4b2101354946"
+    },
+    {
+      "received_at": "2026-10-28T03:27:53.247577+00:00",
+      "seq": 3,
+      "session": "retained-audit-attempt-2",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690",
+      "wire_sha256": "d247a53170cb36658fd5f479efa1eddb8319d0feee026efc22b4987581153da7"
+    },
+    {
+      "received_at": "2026-10-28T03:27:53.249390+00:00",
+      "seq": 4,
+      "session": "retained-audit-attempt-2",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690",
+      "wire_sha256": "61f1c81fe9776753ea0c8b0e26566a7dc1f75bc454e943cce489bdb522c48191"
+    },
+    {
+      "received_at": "2026-10-28T03:27:57.638690+00:00",
+      "seq": 7,
+      "session": "retained-audit-attempt-3",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690",
+      "wire_sha256": "e21823d57104d43d191f5ba5541f767955731b39ce029373a0763878252eddb2"
+    },
+    {
+      "received_at": "2026-10-28T03:27:58.243013+00:00",
+      "seq": 8,
+      "session": "retained-audit-attempt-3",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690",
+      "wire_sha256": "fca566bdeb357cb788e27c080d55668cbaf063f727bf036984c278c375b4acc1"
+    },
+    {
+      "received_at": "2026-10-28T03:27:58.243651+00:00",
+      "seq": 9,
+      "session": "retained-audit-attempt-3",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690",
+      "wire_sha256": "45e84031b1ebc7167a806e6c9bbbe0989265dc7713b9bb116c750f5449ba38cd"
+    }
+  ],
+  "final_status_unknown_count": 6,
+  "foreign_key_errors": [],
+  "gap_provenance": [
+    {
+      "kind": "restart",
+      "lost_records": null,
+      "observed_at": "2026-10-28T03:27:47.674504+00:00",
+      "previous_session": null,
+      "seq": 1,
+      "session": "retained-audit-attempt-2",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690"
+    },
+    {
+      "kind": "gap",
+      "lost_records": null,
+      "observed_at": "2026-10-28T03:27:53.403776+00:00",
+      "reason": "finite_probe_end; transport_loss_extent_unknown",
+      "seq": 5,
+      "session": "retained-audit-attempt-2",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690"
+    },
+    {
+      "kind": "restart",
+      "lost_records": null,
+      "observed_at": "2026-10-28T03:27:53.403791+00:00",
+      "previous_session": "retained-audit-attempt-2",
+      "seq": 6,
+      "session": "retained-audit-attempt-3",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690"
+    },
+    {
+      "kind": "gap",
+      "lost_records": null,
+      "observed_at": "2026-10-28T03:27:58.398921+00:00",
+      "reason": "finite_probe_end; transport_loss_extent_unknown",
+      "seq": 10,
+      "session": "retained-audit-attempt-3",
+      "stream": "retained-source-probe-899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690"
+    }
+  ],
+  "import_result": {
+    "duplicate": true,
+    "qualified": false,
+    "records": 10,
+    "seal": "53f372ed471ecbc31e277d88eb76472d5522d3feeedfa9aa78cd803f3a7888e1"
+  },
+  "independent_5m_verified": false,
+  "integrity": "ok",
+  "new_network_requests": 0,
+  "profitability_validated": false,
+  "qualified": false,
+  "raw_to_snapshot_qualification": false,
+  "receipt_continuity_verified": false,
+  "schema": "received_stream_import_report_v1",
+  "snapshots": [],
+  "source_blockers": [
+    "RAW5M_INDEPENDENCE_UNVERIFIED",
+    "CANDLE_VOLUME_UNIT_UNVERIFIED"
+  ],
+  "unique_wire_hashes": 6,
+  "verified_final_bar_count": 0,
+  "wire_occurrences": 6
+}

@@ -1,0 +1,1837 @@
+[
+  {
+    "plan_id": "plan-v1:baa6ecddad7ed01f7b9ce1af1bf100814761be4eb1b1344cd654738ff33eddba",
+    "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+    "policy": "capture",
+    "window": "signal15",
+    "plan": {
+      "direction": 1,
+      "side": "롱",
+      "strategy": "trend_retest",
+      "level": 81899.86777285185,
+      "structure_anchor": 81815.6,
+      "barrier": null,
+      "price": 82026.9,
+      "rsi": 64.98624103695185,
+      "m5": 0.10825231699012061,
+      "m15": 0.1615491131283342,
+      "stop": 81799.19462000001,
+      "target1": 82659.74530187006,
+      "target2": 83010.50951018767,
+      "margin": 73.0,
+      "notional": 2190.0,
+      "quantity_btc": 0.02669855864356693,
+      "reference_risk_budget": 9.3595085,
+      "stop_distance_pct": 0.27759842198106344,
+      "sampled_1m_abs_move_p90_pct": 0.06961398435028077,
+      "one_minute_close_abs_move_p90_pct": 0.06961398435028077,
+      "net_loss": 9.35927984656063,
+      "net_gain1": 14.038919769841243,
+      "net_gain2": 23.3981996164016,
+      "rr1": 1.5000000000000318,
+      "rr2": 2.5000000000000027,
+      "fee_roundtrip_est": 2.63813763444257,
+      "fee_stop_est": 2.624090286263822,
+      "maker_potential_savings": 1.7587584229617135,
+      "runner_enabled": true,
+      "native_entry_geometry": {
+        "atr5": 116.58700783521688,
+        "stop_floor_fraction": 0.0006869018831786554,
+        "minimum_target_fraction": 0.004582097924905541,
+        "min_range_fraction": 0.004732097924905541,
+        "atr1": 37.562954720871495,
+        "stop_floor_basis": "1m_structure_with_1_5atr_noise_floor",
+        "refinement_mode": "capture"
+      },
+      "native_target_room": {
+        "policy": "confirmed_native_pivot_room_v1",
+        "target_room": "unknown",
+        "observed_barrier": null
+      },
+      "entry_decision_priority": {
+        "policy": "native_ranked_entry_v1",
+        "ready": true,
+        "higher_direction_intact": false,
+        "location_ok": true,
+        "may_override_minor_reaction": false,
+        "may_override_single_pivots": false,
+        "atr_target_exception": false,
+        "repeated_barrier": false,
+        "barrier_groups": [],
+        "overrides": [],
+        "bar_start": 1792467000,
+        "upper_evidence": {
+          "policy": "native_structure_priority_v2",
+          "dominant_intact": false,
+          "ready": true,
+          "order": [
+            "hard_risk",
+            "higher_structure",
+            "target_room",
+            "minute_reaction"
+          ],
+          "bar_start": 1792467000,
+          "swing_structure": false,
+          "support": 81812.1,
+          "support_intact": true,
+          "trend15_aligned": false,
+          "ema_aligned": true,
+          "target_room": "unknown",
+          "observed_barrier": null
+        },
+        "atr5": 116.58700783521688,
+        "ema9": 81850.64842460313,
+        "extension_atr": 1.5117600037044814,
+        "max_extension_atr": 2.5,
+        "target_distance_atr": 5.428094550333823,
+        "max_trend_target_atr": 6.0
+      },
+      "data_source": "lbank_native_1m_aggregated_5m",
+      "native_5m_start": 1792467000,
+      "native_5m_count": 22,
+      "rsi5": 62.19482481953315,
+      "entry_quality": {
+        "policy": "native_structure_priority_v2",
+        "watch_last_closed_1m": 1792467360,
+        "confirmed_1m_starts": [],
+        "confirmed_1m_closes": [],
+        "watch_price": 82011.8,
+        "confirmation_quote": 82026.9,
+        "signed_progress_pct": 0.01841198461682847,
+        "minute_followthrough": false,
+        "requires_two_minute_wait": false,
+        "priority": {
+          "policy": "native_structure_priority_v2",
+          "dominant_intact": false,
+          "ready": true,
+          "order": [
+            "hard_risk",
+            "higher_structure",
+            "target_room",
+            "minute_reaction"
+          ],
+          "bar_start": 1792467000,
+          "swing_structure": false,
+          "support": 81812.1,
+          "support_intact": true,
+          "trend15_aligned": false,
+          "ema_aligned": true,
+          "target_room": "unknown",
+          "observed_barrier": null
+        },
+        "frozen_breakout_level": null,
+        "ranked_entry": {
+          "policy": "native_ranked_entry_v1",
+          "ready": true,
+          "higher_direction_intact": false,
+          "location_ok": true,
+          "may_override_minor_reaction": false,
+          "may_override_single_pivots": false,
+          "atr_target_exception": false,
+          "repeated_barrier": false,
+          "barrier_groups": [],
+          "overrides": [],
+          "bar_start": 1792467000,
+          "upper_evidence": {
+            "policy": "native_structure_priority_v2",
+            "dominant_intact": false,
+            "ready": true,
+            "order": [
+              "hard_risk",
+              "higher_structure",
+              "target_room",
+              "minute_reaction"
+            ],
+            "bar_start": 1792467000,
+            "swing_structure": false,
+            "support": 81812.1,
+            "support_intact": true,
+            "trend15_aligned": false,
+            "ema_aligned": true,
+            "target_room": "unknown",
+            "observed_barrier": null
+          },
+          "atr5": 116.58700783521688,
+          "ema9": 81850.64842460313,
+          "extension_atr": 1.5117600037044814,
+          "max_extension_atr": 2.5,
+          "target_distance_atr": 5.428094550333823,
+          "max_trend_target_atr": 6.0
+        }
+      },
+      "sampled_rsi5": 62.19482481953315,
+      "sampled_context": {
+        "range5_pct": 0.15858667554752048,
+        "trend5_pct": 0.14831520524063446,
+        "trend15_pct": 0.29213645615442374,
+        "three_step_recovery": false,
+        "reversal_confirmed": false,
+        "reversal_10m_pct": 0.13253430012116763,
+        "reversal_last5_pct": 0.1588385723589214,
+        "context_type": "lbank_native_1m_aggregated_5m"
+      },
+      "rsi_direction_status": "5m_rsi_direction_aligned"
+    },
+    "provenance": {
+      "input_hash": "bc4aa24e37cfe6398fbc4b2d6956997cf9291ca3e16bacd3e2531e97bf59ed55",
+      "anchor": {
+        "bar_hash": "f29e6663b57dd57471bb1e1c56bff5cf716136a328e338232b595413fe033f32",
+        "bar_start": 1792467060,
+        "period": 60,
+        "field": "low",
+        "price": 81815.6,
+        "known_at": null,
+        "nominal_available_at": 1792467120,
+        "timing_basis": "nominal_scenario_not_observed_receipt"
+      },
+      "candidate_at": 1792467434.41831,
+      "confirm_at": 1792467495.896508,
+      "candidate_at_source_text": "2026-10-20T03:37:14.418310099Z",
+      "confirm_at_source_text": "2026-10-20T03:38:15.896508058Z",
+      "known_at": null,
+      "send_requested_at": null,
+      "telegram_ack_at": null,
+      "receipt_status": "not_available",
+      "timing_basis": "retained_quote_log_proxy_and_nominal_bar_scenario",
+      "nearest_barrier": {
+        "status": "unknown",
+        "price": null,
+        "known_at": null
+      },
+      "target1_basis": "cost_solved_required_price_not_structural_target",
+      "costs": {
+        "fee": 0.0006,
+        "funding_buffer": 0.0001,
+        "leverage": 30.0,
+        "max_margin_fraction": 0.15,
+        "reference_balance": 1871.9017,
+        "risk_fraction": 0.005,
+        "slippage": 0.0002
+      },
+      "commit": "b53efab58410484c424bd68440d4d9f0cece77698a18707d8db5431c3c94077e"
+    },
+    "outcome": {
+      "status": "exact_in_model",
+      "net_usdt_low": -9.35927984656063,
+      "net_usdt_high": -9.35927984656063,
+      "latest_exit_bar_end": "2026-10-20T05:55:00+00:00"
+    },
+    "first_contact": {
+      "status": "first_touch_in_5m_model",
+      "at": "2026-10-20T05:55:00+00:00",
+      "tp1_before_sl": false
+    },
+    "horizons": {
+      "5": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-20T03:43:25.921316890Z",
+        "price": 82002.9,
+        "net_pnl_model": -3.9249900720115347
+      },
+      "15": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-20T03:53:55.402021337Z",
+        "price": 82039.3,
+        "net_pnl_model": -2.9539398827936143
+      },
+      "30": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-20T04:08:45.575927193Z",
+        "price": 82037.1,
+        "net_pnl_model": -3.0126297293948876
+      },
+      "60": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-20T04:39:09.564479409Z",
+        "price": 82128.8,
+        "net_pnl_model": -0.5663302142508989
+      }
+    },
+    "manual_delay_scenarios": {
+      "30": {
+        "status": "no_entry",
+        "net_pnl_model": 0,
+        "reason": "fixed_plan_no_longer_permissible",
+        "observed_at": "2026-10-20T03:39:18.766728654Z",
+        "entry": 82030.7
+      },
+      "60": {
+        "status": "no_entry",
+        "net_pnl_model": 0,
+        "reason": "fixed_plan_no_longer_permissible",
+        "observed_at": "2026-10-20T03:39:18.766728654Z",
+        "entry": 82030.7
+      }
+    },
+    "scenario": "base_delay0"
+  },
+  {
+    "plan_id": "plan-v1:bcd53e27ccbad38a24c1d4733b8975794fef1af8fadada8ee9b2546fa42f85de",
+    "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+    "policy": "capture",
+    "window": "signal26",
+    "plan": {
+      "direction": -1,
+      "side": "숏",
+      "strategy": "trend_retest",
+      "level": 82883.6355691188,
+      "structure_anchor": 82935.5,
+      "barrier": null,
+      "price": 82813.9,
+      "rsi": 36.71641346401722,
+      "m5": -0.04586497111109811,
+      "m15": -0.11169208686895304,
+      "stop": 82952.06278,
+      "target1": 82312.78642643683,
+      "target2": 82050.43971998915,
+      "margin": 98.42,
+      "notional": 2952.6,
+      "quantity_btc": 0.03565343499098581,
+      "reference_risk_budget": 9.3595085,
+      "stop_distance_pct": 0.16683525350212797,
+      "sampled_1m_abs_move_p90_pct": 0.09185805765897781,
+      "one_minute_close_abs_move_p90_pct": 0.09185805765897781,
+      "net_loss": 9.35917338017724,
+      "net_gain1": 14.038760070265907,
+      "net_gain2": 23.39793345044327,
+      "rr1": 1.500000000000005,
+      "rr2": 2.500000000000018,
+      "fee_roundtrip_est": 3.5324001478691183,
+      "fee_stop_est": 3.5464304897342656,
+      "maker_potential_savings": 2.3549334319127455,
+      "runner_enabled": true,
+      "native_entry_geometry": {
+        "atr5": 165.44936998508135,
+        "stop_floor_fraction": 0.000817819177973718,
+        "minimum_target_fraction": 0.004778434591909645,
+        "min_range_fraction": 0.004928434591909645,
+        "atr1": 45.15119708186512,
+        "stop_floor_basis": "1m_structure_with_1_5atr_noise_floor",
+        "refinement_mode": "capture"
+      },
+      "native_target_room": {
+        "policy": "confirmed_native_pivot_room_v1",
+        "target_room": "conflict",
+        "observed_barrier": 82743.1
+      },
+      "entry_decision_priority": {
+        "policy": "native_ranked_entry_v1",
+        "ready": true,
+        "higher_direction_intact": true,
+        "location_ok": true,
+        "may_override_minor_reaction": true,
+        "may_override_single_pivots": true,
+        "atr_target_exception": true,
+        "repeated_barrier": false,
+        "barrier_groups": [
+          {
+            "price": 82743.1,
+            "starts": [
+              1792635900
+            ],
+            "touches": 1
+          }
+        ],
+        "overrides": [
+          "single_pivots_under_aligned_15m_5m"
+        ],
+        "bar_start": 1792637400,
+        "upper_evidence": {
+          "policy": "native_structure_priority_v2",
+          "dominant_intact": false,
+          "ready": true,
+          "order": [
+            "hard_risk",
+            "higher_structure",
+            "target_room",
+            "minute_reaction"
+          ],
+          "bar_start": 1792637400,
+          "swing_structure": false,
+          "support": 82954.3,
+          "support_intact": true,
+          "trend15_aligned": true,
+          "ema_aligned": true,
+          "target_room": "conflict",
+          "observed_barrier": 82743.1
+        },
+        "atr5": 165.44936998508135,
+        "ema9": 82983.82736346318,
+        "extension_atr": 1.0270656423684486,
+        "max_extension_atr": 2.5,
+        "target_distance_atr": 3.0288031535469395,
+        "max_trend_target_atr": 6.0
+      },
+      "data_source": "lbank_native_1m_aggregated_5m",
+      "native_5m_start": 1792637400,
+      "native_5m_count": 23,
+      "rsi5": 21.593597367191364,
+      "entry_quality": {
+        "policy": "native_structure_priority_v2",
+        "watch_last_closed_1m": 1792637640,
+        "confirmed_1m_starts": [],
+        "confirmed_1m_closes": [],
+        "watch_price": 82815.9,
+        "confirmation_quote": 82813.9,
+        "signed_progress_pct": 0.002414995188126934,
+        "minute_followthrough": false,
+        "requires_two_minute_wait": false,
+        "priority": {
+          "policy": "native_structure_priority_v2",
+          "dominant_intact": false,
+          "ready": true,
+          "order": [
+            "hard_risk",
+            "higher_structure",
+            "target_room",
+            "minute_reaction"
+          ],
+          "bar_start": 1792637400,
+          "swing_structure": false,
+          "support": 82954.3,
+          "support_intact": true,
+          "trend15_aligned": true,
+          "ema_aligned": true,
+          "target_room": "conflict",
+          "observed_barrier": 82743.1
+        },
+        "frozen_breakout_level": null,
+        "ranked_entry": {
+          "policy": "native_ranked_entry_v1",
+          "ready": true,
+          "higher_direction_intact": true,
+          "location_ok": true,
+          "may_override_minor_reaction": true,
+          "may_override_single_pivots": true,
+          "atr_target_exception": true,
+          "repeated_barrier": false,
+          "barrier_groups": [
+            {
+              "price": 82743.1,
+              "starts": [
+                1792635900
+              ],
+              "touches": 1
+            }
+          ],
+          "overrides": [
+            "single_pivots_under_aligned_15m_5m"
+          ],
+          "bar_start": 1792637400,
+          "upper_evidence": {
+            "policy": "native_structure_priority_v2",
+            "dominant_intact": false,
+            "ready": true,
+            "order": [
+              "hard_risk",
+              "higher_structure",
+              "target_room",
+              "minute_reaction"
+            ],
+            "bar_start": 1792637400,
+            "swing_structure": false,
+            "support": 82954.3,
+            "support_intact": true,
+            "trend15_aligned": true,
+            "ema_aligned": true,
+            "target_room": "conflict",
+            "observed_barrier": 82743.1
+          },
+          "atr5": 165.44936998508135,
+          "ema9": 82983.82736346318,
+          "extension_atr": 1.0270656423684486,
+          "max_extension_atr": 2.5,
+          "target_distance_atr": 3.0288031535469395,
+          "max_trend_target_atr": 6.0
+        }
+      },
+      "sampled_rsi5": 21.593597367191364,
+      "sampled_context": {
+        "range5_pct": 0.17437549661995821,
+        "trend5_pct": -0.17407195777910944,
+        "trend15_pct": -0.6081072975274937,
+        "three_step_recovery": false,
+        "reversal_confirmed": false,
+        "reversal_10m_pct": 0.04864206561006057,
+        "reversal_last5_pct": 0.08482132622910088,
+        "context_type": "lbank_native_1m_aggregated_5m"
+      },
+      "rsi_direction_status": "5m_rsi_direction_aligned"
+    },
+    "provenance": {
+      "input_hash": "7b505b78fc43e067afcf16d60ac85e66b157063d64fe700593e6cb8949895acb",
+      "anchor": {
+        "bar_hash": "9d8f9a3a6ff12a91459eab03a63fab901741a58403d85cccc6231804c70799e3",
+        "bar_start": 1792637340,
+        "period": 60,
+        "field": "high",
+        "price": 82935.5,
+        "known_at": null,
+        "nominal_available_at": 1792637400,
+        "timing_basis": "nominal_scenario_not_observed_receipt"
+      },
+      "candidate_at": 1792637734.968047,
+      "confirm_at": 1792637802.646999,
+      "candidate_at_source_text": "2026-10-22T02:55:34.968047669Z",
+      "confirm_at_source_text": "2026-10-22T02:56:42.646999868Z",
+      "known_at": null,
+      "send_requested_at": null,
+      "telegram_ack_at": null,
+      "receipt_status": "not_available",
+      "timing_basis": "retained_quote_log_proxy_and_nominal_bar_scenario",
+      "nearest_barrier": {
+        "status": "observed_pivot_not_reachability_forecast",
+        "price": 82743.1,
+        "pivot_start": 1792635900,
+        "right_confirmation_start": 1792636500,
+        "known_at": null,
+        "nominal_known_at": 1792636800,
+        "right_bar_hash": "64cb21f1acdb9ea44d702a8785623b11658bdeeb73116a1b4aadddfeb98d22c4",
+        "timing_basis": "nominal_scenario"
+      },
+      "target1_basis": "cost_solved_required_price_not_structural_target",
+      "costs": {
+        "fee": 0.0006,
+        "funding_buffer": 0.0001,
+        "leverage": 30.0,
+        "max_margin_fraction": 0.15,
+        "reference_balance": 1871.9017,
+        "risk_fraction": 0.005,
+        "slippage": 0.0002
+      },
+      "commit": "b53efab58410484c424bd68440d4d9f0cece77698a18707d8db5431c3c94077e"
+    },
+    "outcome": {
+      "status": "exact_in_model",
+      "net_usdt_low": -9.35917338017724,
+      "net_usdt_high": -9.35917338017724,
+      "latest_exit_bar_end": "2026-10-22T03:05:00+00:00"
+    },
+    "first_contact": {
+      "status": "first_touch_in_5m_model",
+      "at": "2026-10-22T03:05:00+00:00",
+      "tp1_before_sl": false
+    },
+    "horizons": {
+      "5": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T03:01:58.054471789Z",
+        "price": 82920.8,
+        "net_pnl_model": -8.243656051659334
+      },
+      "15": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T03:12:27.027448222Z",
+        "price": 82753.5,
+        "net_pnl_model": -2.2740638061495355
+      },
+      "30": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T03:27:11.087074391Z",
+        "price": 82717.6,
+        "net_pnl_model": -0.9930813697253948
+      },
+      "60": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T03:56:43.600727555Z",
+        "price": 82854.9,
+        "net_pnl_model": -5.892214754713167
+      }
+    },
+    "manual_delay_scenarios": {
+      "30": {
+        "status": "exact_in_model",
+        "outcome": {
+          "status": "exact_in_model",
+          "net_usdt_low": -8.240439183961076,
+          "net_usdt_high": -8.240439183961076,
+          "latest_exit_bar_end": "2026-10-22T03:05:00+00:00"
+        },
+        "net_pnl_model": -8.240439183961076,
+        "observed_at": "2026-10-22T02:57:46.458219534Z",
+        "entry": 82845.3,
+        "quantity_btc": 0.03565343499098581,
+        "actual_observation_delay_seconds": 63.81122016906738,
+        "assumptions": "fixed original S/T; cap Q at original and current risk/margin; modeled quote entry, no verified fill"
+      },
+      "60": {
+        "status": "exact_in_model",
+        "outcome": {
+          "status": "exact_in_model",
+          "net_usdt_low": -8.240439183961076,
+          "net_usdt_high": -8.240439183961076,
+          "latest_exit_bar_end": "2026-10-22T03:05:00+00:00"
+        },
+        "net_pnl_model": -8.240439183961076,
+        "observed_at": "2026-10-22T02:57:46.458219534Z",
+        "entry": 82845.3,
+        "quantity_btc": 0.03565343499098581,
+        "actual_observation_delay_seconds": 63.81122016906738,
+        "assumptions": "fixed original S/T; cap Q at original and current risk/margin; modeled quote entry, no verified fill"
+      }
+    },
+    "scenario": "base_delay0"
+  },
+  {
+    "plan_id": "plan-v1:5239c70e842e52e0a1d6f6b8ccab892af2f16b90508b492ae90495c81faa03fc",
+    "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+    "policy": "capture",
+    "window": "signal26",
+    "plan": {
+      "direction": -1,
+      "side": "숏",
+      "strategy": "breakout",
+      "level": 82829.3,
+      "structure_anchor": null,
+      "barrier": null,
+      "price": 82738,
+      "rsi": 26.589518102943742,
+      "m5": -0.13518406759203128,
+      "m15": -0.14735680985179522,
+      "stop": 82890.95983,
+      "target1": 82214.95570940558,
+      "target2": 81937.92278438142,
+      "margin": 93.12,
+      "notional": 2793.6000000000004,
+      "quantity_btc": 0.033764412966230756,
+      "reference_risk_budget": 9.3595085,
+      "stop_distance_pct": 0.18487252532090098,
+      "sampled_1m_abs_move_p90_pct": 0.04211603510715367,
+      "one_minute_close_abs_move_p90_pct": 0.04211603510715367,
+      "net_loss": 9.35946639821021,
+      "net_gain1": 14.039199597315623,
+      "net_gain2": 23.398665995525757,
+      "rr1": 1.5000000000000326,
+      "rr2": 2.5000000000000244,
+      "fee_roundtrip_est": 3.3417238299436445,
+      "fee_stop_est": 3.3557546110722827,
+      "maker_potential_savings": 2.2278158866290965,
+      "runner_enabled": true,
+      "native_entry_geometry": {
+        "atr5": 103.83913022246236,
+        "stop_floor_fraction": 0.0005,
+        "minimum_target_fraction": 0.00430180117070231,
+        "min_range_fraction": 0.00445180117070231,
+        "atr1": 24.326370414237367,
+        "stop_floor_basis": "1m_structure_with_1_5atr_noise_floor",
+        "refinement_mode": "capture"
+      },
+      "native_target_room": {
+        "policy": "confirmed_native_pivot_room_v1",
+        "target_room": "conflict",
+        "observed_barrier": 82625.1
+      },
+      "entry_decision_priority": {
+        "policy": "native_ranked_entry_v1",
+        "ready": true,
+        "higher_direction_intact": true,
+        "location_ok": true,
+        "may_override_minor_reaction": true,
+        "may_override_single_pivots": true,
+        "atr_target_exception": true,
+        "repeated_barrier": false,
+        "barrier_groups": [
+          {
+            "price": 82625.1,
+            "starts": [
+              1792639800
+            ],
+            "touches": 1
+          }
+        ],
+        "overrides": [
+          "historical_range_within_6atr",
+          "single_pivots_under_aligned_15m_5m"
+        ],
+        "bar_start": 1792643400,
+        "upper_evidence": {
+          "policy": "native_structure_priority_v2",
+          "dominant_intact": false,
+          "ready": true,
+          "order": [
+            "hard_risk",
+            "higher_structure",
+            "target_room",
+            "minute_reaction"
+          ],
+          "bar_start": 1792643400,
+          "swing_structure": false,
+          "support": 82876.5,
+          "support_intact": true,
+          "trend15_aligned": true,
+          "ema_aligned": true,
+          "target_room": "conflict",
+          "observed_barrier": 82625.1
+        },
+        "atr5": 103.83913022246236,
+        "ema9": 82836.57275551316,
+        "extension_atr": 0.949283331842052,
+        "max_extension_atr": 2.5,
+        "target_distance_atr": 5.037063479575232,
+        "max_trend_target_atr": 6.0
+      },
+      "data_source": "lbank_native_1m_aggregated_5m",
+      "native_5m_start": 1792643400,
+      "native_5m_count": 43,
+      "rsi5": 35.15328270966906,
+      "entry_quality": {
+        "policy": "native_structure_priority_v2",
+        "watch_last_closed_1m": 1792643640,
+        "confirmed_1m_starts": [],
+        "confirmed_1m_closes": [],
+        "watch_price": 82749.2,
+        "confirmation_quote": 82738,
+        "signed_progress_pct": 0.01353487405315601,
+        "minute_followthrough": false,
+        "requires_two_minute_wait": false,
+        "priority": {
+          "policy": "native_structure_priority_v2",
+          "dominant_intact": false,
+          "ready": true,
+          "order": [
+            "hard_risk",
+            "higher_structure",
+            "target_room",
+            "minute_reaction"
+          ],
+          "bar_start": 1792643400,
+          "swing_structure": false,
+          "support": 82876.5,
+          "support_intact": true,
+          "trend15_aligned": true,
+          "ema_aligned": true,
+          "target_room": "conflict",
+          "observed_barrier": 82625.1
+        },
+        "frozen_breakout_level": 82829.3,
+        "ranked_entry": {
+          "policy": "native_ranked_entry_v1",
+          "ready": true,
+          "higher_direction_intact": true,
+          "location_ok": true,
+          "may_override_minor_reaction": true,
+          "may_override_single_pivots": true,
+          "atr_target_exception": true,
+          "repeated_barrier": false,
+          "barrier_groups": [
+            {
+              "price": 82625.1,
+              "starts": [
+                1792639800
+              ],
+              "touches": 1
+            }
+          ],
+          "overrides": [
+            "historical_range_within_6atr",
+            "single_pivots_under_aligned_15m_5m"
+          ],
+          "bar_start": 1792643400,
+          "upper_evidence": {
+            "policy": "native_structure_priority_v2",
+            "dominant_intact": false,
+            "ready": true,
+            "order": [
+              "hard_risk",
+              "higher_structure",
+              "target_room",
+              "minute_reaction"
+            ],
+            "bar_start": 1792643400,
+            "swing_structure": false,
+            "support": 82876.5,
+            "support_intact": true,
+            "trend15_aligned": true,
+            "ema_aligned": true,
+            "target_room": "conflict",
+            "observed_barrier": 82625.1
+          },
+          "atr5": 103.83913022246236,
+          "ema9": 82836.57275551316,
+          "extension_atr": 0.949283331842052,
+          "max_extension_atr": 2.5,
+          "target_distance_atr": 5.037063479575232,
+          "max_trend_target_atr": 6.0
+        },
+        "breakout_confirmation": {
+          "policy": "native_breakout_trigger_or_higher_priority_v1",
+          "original_trigger_current": false,
+          "existing_higher_priority_support": true,
+          "priority_override_used": true,
+          "original_predicate": {
+            "momentum5_pct": -0.14978877489439935,
+            "momentum15_pct": -0.16195973695423138,
+            "breakout_long": false,
+            "breakout_short": false,
+            "prior_high": 82876.5,
+            "prior_low": 82768.1,
+            "adaptive_impulse": {
+              "long": false,
+              "short": false,
+              "atr1": 24.326370414237367,
+              "minimum_body": 45.499245
+            }
+          },
+          "extra_wait_seconds": 0
+        }
+      },
+      "sampled_rsi5": 35.15328270966906,
+      "sampled_context": {
+        "range5_pct": 0.13314292204010367,
+        "trend5_pct": -0.1065697923518405,
+        "trend15_pct": -0.055246486178728293,
+        "three_step_recovery": false,
+        "reversal_confirmed": false,
+        "reversal_10m_pct": 0.11922719538538518,
+        "reversal_last5_pct": 0.10524359305488229,
+        "context_type": "lbank_native_1m_aggregated_5m"
+      },
+      "rsi_direction_status": "5m_rsi_direction_aligned",
+      "rsi_context": {
+        "version": "rsi_context_v1",
+        "ready": true,
+        "bar_start": 1792643400,
+        "rsi": 35.15328270966906,
+        "rsi_above_50": false,
+        "divergences": [],
+        "setups": [],
+        "label": "다이버전스 미검출"
+      }
+    },
+    "provenance": {
+      "input_hash": "7188bfbe2bca93e93ea3af707d40c60c195a67a49d8d9e1e0dea8064da76744f",
+      "anchor": {
+        "bar_hash": "96d29bf17169a41a1e3aea9a8f76ef4c5de8a8ff1302c73f901e5e37c903df83",
+        "bar_start": 1792642740,
+        "period": 60,
+        "field": "low",
+        "price": 82829.3,
+        "known_at": null,
+        "nominal_available_at": 1792642800,
+        "timing_basis": "nominal_scenario_not_observed_receipt"
+      },
+      "candidate_at": 1792643743.561894,
+      "confirm_at": 1792643805.742018,
+      "candidate_at_source_text": "2026-10-22T04:35:43.561894383Z",
+      "confirm_at_source_text": "2026-10-22T04:36:45.742018702Z",
+      "known_at": null,
+      "send_requested_at": null,
+      "telegram_ack_at": null,
+      "receipt_status": "not_available",
+      "timing_basis": "retained_quote_log_proxy_and_nominal_bar_scenario",
+      "nearest_barrier": {
+        "status": "observed_pivot_not_reachability_forecast",
+        "price": 82625.1,
+        "pivot_start": 1792639800,
+        "right_confirmation_start": 1792640400,
+        "known_at": null,
+        "nominal_known_at": 1792640700,
+        "right_bar_hash": "c54912e84e1bedf5df22e5da27254c1d6d24c8b19b56e5e522f05e3ee8501c7b",
+        "timing_basis": "nominal_scenario"
+      },
+      "target1_basis": "cost_solved_required_price_not_structural_target",
+      "costs": {
+        "fee": 0.0006,
+        "funding_buffer": 0.0001,
+        "leverage": 30.0,
+        "max_margin_fraction": 0.15,
+        "reference_balance": 1871.9017,
+        "risk_fraction": 0.005,
+        "slippage": 0.0002
+      },
+      "commit": "b53efab58410484c424bd68440d4d9f0cece77698a18707d8db5431c3c94077e"
+    },
+    "outcome": {
+      "status": "exact_in_model",
+      "net_usdt_low": -9.35946639821021,
+      "net_usdt_high": -9.35946639821021,
+      "latest_exit_bar_end": "2026-10-22T05:05:00+00:00"
+    },
+    "first_contact": {
+      "status": "first_touch_in_5m_model",
+      "at": "2026-10-22T05:05:00+00:00",
+      "tp1_before_sl": false
+    },
+    "horizons": {
+      "5": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T04:42:04.508861940Z",
+        "price": 82722.7,
+        "net_pnl_model": -3.67372637521049
+      },
+      "15": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T04:52:36.218599389Z",
+        "price": 82814.8,
+        "net_pnl_model": -6.785916944511949
+      },
+      "30": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T05:07:26.103094058Z",
+        "price": 82805.4,
+        "net_pnl_model": -6.468277516157451
+      },
+      "60": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T05:36:51.993978597Z",
+        "price": 82793.7,
+        "net_pnl_model": -6.072917802141834
+      }
+    },
+    "manual_delay_scenarios": {
+      "30": {
+        "status": "no_entry",
+        "net_pnl_model": 0,
+        "reason": "fixed_plan_no_longer_permissible",
+        "observed_at": "2026-10-22T04:37:49.067015139Z",
+        "entry": 82736.1
+      },
+      "60": {
+        "status": "no_entry",
+        "net_pnl_model": 0,
+        "reason": "fixed_plan_no_longer_permissible",
+        "observed_at": "2026-10-22T04:37:49.067015139Z",
+        "entry": 82736.1
+      }
+    },
+    "scenario": "base_delay0"
+  },
+  {
+    "plan_id": "plan-v1:eb7f568fac8b9e47e923fd0c9fb18da1fff16a02ba869bc60ba09a850e595720",
+    "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+    "policy": "capture",
+    "window": "signal26",
+    "plan": {
+      "direction": -1,
+      "side": "숏",
+      "strategy": "trend_retest",
+      "level": 82883.6355691188,
+      "structure_anchor": 82935.5,
+      "barrier": null,
+      "price": 82813.9,
+      "rsi": 36.71641346401722,
+      "m5": -0.04586497111109811,
+      "m15": -0.11169208686895304,
+      "stop": 82952.06278,
+      "target1": 82312.78642643683,
+      "target2": 82050.43971998915,
+      "margin": 98.42,
+      "notional": 2952.6,
+      "quantity_btc": 0.03565343499098581,
+      "reference_risk_budget": 9.3595085,
+      "stop_distance_pct": 0.16683525350212797,
+      "sampled_1m_abs_move_p90_pct": 0.09185805765897781,
+      "one_minute_close_abs_move_p90_pct": 0.09185805765897781,
+      "net_loss": 9.35917338017724,
+      "net_gain1": 14.038760070265907,
+      "net_gain2": 23.39793345044327,
+      "rr1": 1.500000000000005,
+      "rr2": 2.500000000000018,
+      "fee_roundtrip_est": 3.5324001478691183,
+      "fee_stop_est": 3.5464304897342656,
+      "maker_potential_savings": 2.3549334319127455,
+      "runner_enabled": true,
+      "native_entry_geometry": {
+        "atr5": 165.44936998508135,
+        "stop_floor_fraction": 0.000817819177973718,
+        "minimum_target_fraction": 0.004778434591909645,
+        "min_range_fraction": 0.004928434591909645,
+        "atr1": 45.15119708186512,
+        "stop_floor_basis": "1m_structure_with_1_5atr_noise_floor",
+        "refinement_mode": "capture"
+      },
+      "native_target_room": {
+        "policy": "confirmed_native_pivot_room_v1",
+        "target_room": "conflict",
+        "observed_barrier": 82743.1
+      },
+      "entry_decision_priority": {
+        "policy": "native_ranked_entry_v1",
+        "ready": true,
+        "higher_direction_intact": true,
+        "location_ok": true,
+        "may_override_minor_reaction": true,
+        "may_override_single_pivots": true,
+        "atr_target_exception": true,
+        "repeated_barrier": false,
+        "barrier_groups": [
+          {
+            "price": 82743.1,
+            "starts": [
+              1792635900
+            ],
+            "touches": 1
+          }
+        ],
+        "overrides": [
+          "single_pivots_under_aligned_15m_5m"
+        ],
+        "bar_start": 1792637400,
+        "upper_evidence": {
+          "policy": "native_structure_priority_v2",
+          "dominant_intact": false,
+          "ready": true,
+          "order": [
+            "hard_risk",
+            "higher_structure",
+            "target_room",
+            "minute_reaction"
+          ],
+          "bar_start": 1792637400,
+          "swing_structure": false,
+          "support": 82954.3,
+          "support_intact": true,
+          "trend15_aligned": true,
+          "ema_aligned": true,
+          "target_room": "conflict",
+          "observed_barrier": 82743.1
+        },
+        "atr5": 165.44936998508135,
+        "ema9": 82983.82736346318,
+        "extension_atr": 1.0270656423684486,
+        "max_extension_atr": 2.5,
+        "target_distance_atr": 3.0288031535469395,
+        "max_trend_target_atr": 6.0
+      },
+      "data_source": "lbank_native_1m_aggregated_5m",
+      "native_5m_start": 1792637400,
+      "native_5m_count": 23,
+      "rsi5": 21.593597367191364,
+      "entry_quality": {
+        "policy": "native_structure_priority_v2",
+        "watch_last_closed_1m": 1792637640,
+        "confirmed_1m_starts": [],
+        "confirmed_1m_closes": [],
+        "watch_price": 82815.9,
+        "confirmation_quote": 82813.9,
+        "signed_progress_pct": 0.002414995188126934,
+        "minute_followthrough": false,
+        "requires_two_minute_wait": false,
+        "priority": {
+          "policy": "native_structure_priority_v2",
+          "dominant_intact": false,
+          "ready": true,
+          "order": [
+            "hard_risk",
+            "higher_structure",
+            "target_room",
+            "minute_reaction"
+          ],
+          "bar_start": 1792637400,
+          "swing_structure": false,
+          "support": 82954.3,
+          "support_intact": true,
+          "trend15_aligned": true,
+          "ema_aligned": true,
+          "target_room": "conflict",
+          "observed_barrier": 82743.1
+        },
+        "frozen_breakout_level": null,
+        "ranked_entry": {
+          "policy": "native_ranked_entry_v1",
+          "ready": true,
+          "higher_direction_intact": true,
+          "location_ok": true,
+          "may_override_minor_reaction": true,
+          "may_override_single_pivots": true,
+          "atr_target_exception": true,
+          "repeated_barrier": false,
+          "barrier_groups": [
+            {
+              "price": 82743.1,
+              "starts": [
+                1792635900
+              ],
+              "touches": 1
+            }
+          ],
+          "overrides": [
+            "single_pivots_under_aligned_15m_5m"
+          ],
+          "bar_start": 1792637400,
+          "upper_evidence": {
+            "policy": "native_structure_priority_v2",
+            "dominant_intact": false,
+            "ready": true,
+            "order": [
+              "hard_risk",
+              "higher_structure",
+              "target_room",
+              "minute_reaction"
+            ],
+            "bar_start": 1792637400,
+            "swing_structure": false,
+            "support": 82954.3,
+            "support_intact": true,
+            "trend15_aligned": true,
+            "ema_aligned": true,
+            "target_room": "conflict",
+            "observed_barrier": 82743.1
+          },
+          "atr5": 165.44936998508135,
+          "ema9": 82983.82736346318,
+          "extension_atr": 1.0270656423684486,
+          "max_extension_atr": 2.5,
+          "target_distance_atr": 3.0288031535469395,
+          "max_trend_target_atr": 6.0
+        }
+      },
+      "sampled_rsi5": 21.593597367191364,
+      "sampled_context": {
+        "range5_pct": 0.17437549661995821,
+        "trend5_pct": -0.17407195777910944,
+        "trend15_pct": -0.6081072975274937,
+        "three_step_recovery": false,
+        "reversal_confirmed": false,
+        "reversal_10m_pct": 0.04864206561006057,
+        "reversal_last5_pct": 0.08482132622910088,
+        "context_type": "lbank_native_1m_aggregated_5m"
+      },
+      "rsi_direction_status": "5m_rsi_direction_aligned"
+    },
+    "provenance": {
+      "input_hash": "7b505b78fc43e067afcf16d60ac85e66b157063d64fe700593e6cb8949895acb",
+      "anchor": {
+        "bar_hash": "9d8f9a3a6ff12a91459eab03a63fab901741a58403d85cccc6231804c70799e3",
+        "bar_start": 1792637340,
+        "period": 60,
+        "field": "high",
+        "price": 82935.5,
+        "known_at": null,
+        "nominal_available_at": 1792637415,
+        "timing_basis": "nominal_scenario_not_observed_receipt"
+      },
+      "candidate_at": 1792637734.968047,
+      "confirm_at": 1792637802.646999,
+      "candidate_at_source_text": "2026-10-22T02:55:34.968047669Z",
+      "confirm_at_source_text": "2026-10-22T02:56:42.646999868Z",
+      "known_at": null,
+      "send_requested_at": null,
+      "telegram_ack_at": null,
+      "receipt_status": "not_available",
+      "timing_basis": "retained_quote_log_proxy_and_nominal_bar_scenario",
+      "nearest_barrier": {
+        "status": "observed_pivot_not_reachability_forecast",
+        "price": 82743.1,
+        "pivot_start": 1792635900,
+        "right_confirmation_start": 1792636500,
+        "known_at": null,
+        "nominal_known_at": 1792636815,
+        "right_bar_hash": "64cb21f1acdb9ea44d702a8785623b11658bdeeb73116a1b4aadddfeb98d22c4",
+        "timing_basis": "nominal_scenario"
+      },
+      "target1_basis": "cost_solved_required_price_not_structural_target",
+      "costs": {
+        "fee": 0.0006,
+        "funding_buffer": 0.0001,
+        "leverage": 30.0,
+        "max_margin_fraction": 0.15,
+        "reference_balance": 1871.9017,
+        "risk_fraction": 0.005,
+        "slippage": 0.0002
+      },
+      "commit": "b53efab58410484c424bd68440d4d9f0cece77698a18707d8db5431c3c94077e"
+    },
+    "outcome": {
+      "status": "exact_in_model",
+      "net_usdt_low": -9.35917338017724,
+      "net_usdt_high": -9.35917338017724,
+      "latest_exit_bar_end": "2026-10-22T03:05:00+00:00"
+    },
+    "first_contact": {
+      "status": "first_touch_in_5m_model",
+      "at": "2026-10-22T03:05:00+00:00",
+      "tp1_before_sl": false
+    },
+    "horizons": {
+      "5": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T03:01:58.054471789Z",
+        "price": 82920.8,
+        "net_pnl_model": -8.243656051659334
+      },
+      "15": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T03:12:27.027448222Z",
+        "price": 82753.5,
+        "net_pnl_model": -2.2740638061495355
+      },
+      "30": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T03:27:11.087074391Z",
+        "price": 82717.6,
+        "net_pnl_model": -0.9930813697253948
+      },
+      "60": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T03:56:43.600727555Z",
+        "price": 82854.9,
+        "net_pnl_model": -5.892214754713167
+      }
+    },
+    "manual_delay_scenarios": {
+      "30": {
+        "status": "exact_in_model",
+        "outcome": {
+          "status": "exact_in_model",
+          "net_usdt_low": -8.240439183961076,
+          "net_usdt_high": -8.240439183961076,
+          "latest_exit_bar_end": "2026-10-22T03:05:00+00:00"
+        },
+        "net_pnl_model": -8.240439183961076,
+        "observed_at": "2026-10-22T02:57:46.458219534Z",
+        "entry": 82845.3,
+        "quantity_btc": 0.03565343499098581,
+        "actual_observation_delay_seconds": 63.81122016906738,
+        "assumptions": "fixed original S/T; cap Q at original and current risk/margin; modeled quote entry, no verified fill"
+      },
+      "60": {
+        "status": "exact_in_model",
+        "outcome": {
+          "status": "exact_in_model",
+          "net_usdt_low": -8.240439183961076,
+          "net_usdt_high": -8.240439183961076,
+          "latest_exit_bar_end": "2026-10-22T03:05:00+00:00"
+        },
+        "net_pnl_model": -8.240439183961076,
+        "observed_at": "2026-10-22T02:57:46.458219534Z",
+        "entry": 82845.3,
+        "quantity_btc": 0.03565343499098581,
+        "actual_observation_delay_seconds": 63.81122016906738,
+        "assumptions": "fixed original S/T; cap Q at original and current risk/margin; modeled quote entry, no verified fill"
+      }
+    },
+    "scenario": "base_delay15"
+  },
+  {
+    "plan_id": "plan-v1:70eda8ee201ca21c3abaa555ebb6f2ab842f570ed51a00dfd308410be6b812b6",
+    "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+    "policy": "capture",
+    "window": "signal26",
+    "plan": {
+      "direction": -1,
+      "side": "숏",
+      "strategy": "breakout",
+      "level": 82829.3,
+      "structure_anchor": null,
+      "barrier": null,
+      "price": 82738,
+      "rsi": 26.589518102943742,
+      "m5": -0.13518406759203128,
+      "m15": -0.14735680985179522,
+      "stop": 82890.95983,
+      "target1": 82214.95570940558,
+      "target2": 81937.92278438142,
+      "margin": 93.12,
+      "notional": 2793.6000000000004,
+      "quantity_btc": 0.033764412966230756,
+      "reference_risk_budget": 9.3595085,
+      "stop_distance_pct": 0.18487252532090098,
+      "sampled_1m_abs_move_p90_pct": 0.04211603510715367,
+      "one_minute_close_abs_move_p90_pct": 0.04211603510715367,
+      "net_loss": 9.35946639821021,
+      "net_gain1": 14.039199597315623,
+      "net_gain2": 23.398665995525757,
+      "rr1": 1.5000000000000326,
+      "rr2": 2.5000000000000244,
+      "fee_roundtrip_est": 3.3417238299436445,
+      "fee_stop_est": 3.3557546110722827,
+      "maker_potential_savings": 2.2278158866290965,
+      "runner_enabled": true,
+      "native_entry_geometry": {
+        "atr5": 103.83913022246236,
+        "stop_floor_fraction": 0.0005,
+        "minimum_target_fraction": 0.00430180117070231,
+        "min_range_fraction": 0.00445180117070231,
+        "atr1": 24.326370414237367,
+        "stop_floor_basis": "1m_structure_with_1_5atr_noise_floor",
+        "refinement_mode": "capture"
+      },
+      "native_target_room": {
+        "policy": "confirmed_native_pivot_room_v1",
+        "target_room": "conflict",
+        "observed_barrier": 82625.1
+      },
+      "entry_decision_priority": {
+        "policy": "native_ranked_entry_v1",
+        "ready": true,
+        "higher_direction_intact": true,
+        "location_ok": true,
+        "may_override_minor_reaction": true,
+        "may_override_single_pivots": true,
+        "atr_target_exception": true,
+        "repeated_barrier": false,
+        "barrier_groups": [
+          {
+            "price": 82625.1,
+            "starts": [
+              1792639800
+            ],
+            "touches": 1
+          }
+        ],
+        "overrides": [
+          "historical_range_within_6atr",
+          "single_pivots_under_aligned_15m_5m"
+        ],
+        "bar_start": 1792643400,
+        "upper_evidence": {
+          "policy": "native_structure_priority_v2",
+          "dominant_intact": false,
+          "ready": true,
+          "order": [
+            "hard_risk",
+            "higher_structure",
+            "target_room",
+            "minute_reaction"
+          ],
+          "bar_start": 1792643400,
+          "swing_structure": false,
+          "support": 82876.5,
+          "support_intact": true,
+          "trend15_aligned": true,
+          "ema_aligned": true,
+          "target_room": "conflict",
+          "observed_barrier": 82625.1
+        },
+        "atr5": 103.83913022246236,
+        "ema9": 82836.57275551316,
+        "extension_atr": 0.949283331842052,
+        "max_extension_atr": 2.5,
+        "target_distance_atr": 5.037063479575232,
+        "max_trend_target_atr": 6.0
+      },
+      "data_source": "lbank_native_1m_aggregated_5m",
+      "native_5m_start": 1792643400,
+      "native_5m_count": 43,
+      "rsi5": 35.15328270966906,
+      "entry_quality": {
+        "policy": "native_structure_priority_v2",
+        "watch_last_closed_1m": 1792643640,
+        "confirmed_1m_starts": [],
+        "confirmed_1m_closes": [],
+        "watch_price": 82749.2,
+        "confirmation_quote": 82738,
+        "signed_progress_pct": 0.01353487405315601,
+        "minute_followthrough": false,
+        "requires_two_minute_wait": false,
+        "priority": {
+          "policy": "native_structure_priority_v2",
+          "dominant_intact": false,
+          "ready": true,
+          "order": [
+            "hard_risk",
+            "higher_structure",
+            "target_room",
+            "minute_reaction"
+          ],
+          "bar_start": 1792643400,
+          "swing_structure": false,
+          "support": 82876.5,
+          "support_intact": true,
+          "trend15_aligned": true,
+          "ema_aligned": true,
+          "target_room": "conflict",
+          "observed_barrier": 82625.1
+        },
+        "frozen_breakout_level": 82829.3,
+        "ranked_entry": {
+          "policy": "native_ranked_entry_v1",
+          "ready": true,
+          "higher_direction_intact": true,
+          "location_ok": true,
+          "may_override_minor_reaction": true,
+          "may_override_single_pivots": true,
+          "atr_target_exception": true,
+          "repeated_barrier": false,
+          "barrier_groups": [
+            {
+              "price": 82625.1,
+              "starts": [
+                1792639800
+              ],
+              "touches": 1
+            }
+          ],
+          "overrides": [
+            "historical_range_within_6atr",
+            "single_pivots_under_aligned_15m_5m"
+          ],
+          "bar_start": 1792643400,
+          "upper_evidence": {
+            "policy": "native_structure_priority_v2",
+            "dominant_intact": false,
+            "ready": true,
+            "order": [
+              "hard_risk",
+              "higher_structure",
+              "target_room",
+              "minute_reaction"
+            ],
+            "bar_start": 1792643400,
+            "swing_structure": false,
+            "support": 82876.5,
+            "support_intact": true,
+            "trend15_aligned": true,
+            "ema_aligned": true,
+            "target_room": "conflict",
+            "observed_barrier": 82625.1
+          },
+          "atr5": 103.83913022246236,
+          "ema9": 82836.57275551316,
+          "extension_atr": 0.949283331842052,
+          "max_extension_atr": 2.5,
+          "target_distance_atr": 5.037063479575232,
+          "max_trend_target_atr": 6.0
+        },
+        "breakout_confirmation": {
+          "policy": "native_breakout_trigger_or_higher_priority_v1",
+          "original_trigger_current": false,
+          "existing_higher_priority_support": true,
+          "priority_override_used": true,
+          "original_predicate": {
+            "momentum5_pct": -0.14978877489439935,
+            "momentum15_pct": -0.16195973695423138,
+            "breakout_long": false,
+            "breakout_short": false,
+            "prior_high": 82876.5,
+            "prior_low": 82768.1,
+            "adaptive_impulse": {
+              "long": false,
+              "short": false,
+              "atr1": 24.326370414237367,
+              "minimum_body": 45.499245
+            }
+          },
+          "extra_wait_seconds": 0
+        }
+      },
+      "sampled_rsi5": 35.15328270966906,
+      "sampled_context": {
+        "range5_pct": 0.13314292204010367,
+        "trend5_pct": -0.1065697923518405,
+        "trend15_pct": -0.055246486178728293,
+        "three_step_recovery": false,
+        "reversal_confirmed": false,
+        "reversal_10m_pct": 0.11922719538538518,
+        "reversal_last5_pct": 0.10524359305488229,
+        "context_type": "lbank_native_1m_aggregated_5m"
+      },
+      "rsi_direction_status": "5m_rsi_direction_aligned",
+      "rsi_context": {
+        "version": "rsi_context_v1",
+        "ready": true,
+        "bar_start": 1792643400,
+        "rsi": 35.15328270966906,
+        "rsi_above_50": false,
+        "divergences": [],
+        "setups": [],
+        "label": "다이버전스 미검출"
+      }
+    },
+    "provenance": {
+      "input_hash": "7188bfbe2bca93e93ea3af707d40c60c195a67a49d8d9e1e0dea8064da76744f",
+      "anchor": {
+        "bar_hash": "96d29bf17169a41a1e3aea9a8f76ef4c5de8a8ff1302c73f901e5e37c903df83",
+        "bar_start": 1792642740,
+        "period": 60,
+        "field": "low",
+        "price": 82829.3,
+        "known_at": null,
+        "nominal_available_at": 1792642815,
+        "timing_basis": "nominal_scenario_not_observed_receipt"
+      },
+      "candidate_at": 1792643743.561894,
+      "confirm_at": 1792643805.742018,
+      "candidate_at_source_text": "2026-10-22T04:35:43.561894383Z",
+      "confirm_at_source_text": "2026-10-22T04:36:45.742018702Z",
+      "known_at": null,
+      "send_requested_at": null,
+      "telegram_ack_at": null,
+      "receipt_status": "not_available",
+      "timing_basis": "retained_quote_log_proxy_and_nominal_bar_scenario",
+      "nearest_barrier": {
+        "status": "observed_pivot_not_reachability_forecast",
+        "price": 82625.1,
+        "pivot_start": 1792639800,
+        "right_confirmation_start": 1792640400,
+        "known_at": null,
+        "nominal_known_at": 1792640715,
+        "right_bar_hash": "c54912e84e1bedf5df22e5da27254c1d6d24c8b19b56e5e522f05e3ee8501c7b",
+        "timing_basis": "nominal_scenario"
+      },
+      "target1_basis": "cost_solved_required_price_not_structural_target",
+      "costs": {
+        "fee": 0.0006,
+        "funding_buffer": 0.0001,
+        "leverage": 30.0,
+        "max_margin_fraction": 0.15,
+        "reference_balance": 1871.9017,
+        "risk_fraction": 0.005,
+        "slippage": 0.0002
+      },
+      "commit": "b53efab58410484c424bd68440d4d9f0cece77698a18707d8db5431c3c94077e"
+    },
+    "outcome": {
+      "status": "exact_in_model",
+      "net_usdt_low": -9.35946639821021,
+      "net_usdt_high": -9.35946639821021,
+      "latest_exit_bar_end": "2026-10-22T05:05:00+00:00"
+    },
+    "first_contact": {
+      "status": "first_touch_in_5m_model",
+      "at": "2026-10-22T05:05:00+00:00",
+      "tp1_before_sl": false
+    },
+    "horizons": {
+      "5": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T04:42:04.508861940Z",
+        "price": 82722.7,
+        "net_pnl_model": -3.67372637521049
+      },
+      "15": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T04:52:36.218599389Z",
+        "price": 82814.8,
+        "net_pnl_model": -6.785916944511949
+      },
+      "30": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T05:07:26.103094058Z",
+        "price": 82805.4,
+        "net_pnl_model": -6.468277516157451
+      },
+      "60": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T05:36:51.993978597Z",
+        "price": 82793.7,
+        "net_pnl_model": -6.072917802141834
+      }
+    },
+    "manual_delay_scenarios": {
+      "30": {
+        "status": "no_entry",
+        "net_pnl_model": 0,
+        "reason": "fixed_plan_no_longer_permissible",
+        "observed_at": "2026-10-22T04:37:49.067015139Z",
+        "entry": 82736.1
+      },
+      "60": {
+        "status": "no_entry",
+        "net_pnl_model": 0,
+        "reason": "fixed_plan_no_longer_permissible",
+        "observed_at": "2026-10-22T04:37:49.067015139Z",
+        "entry": 82736.1
+      }
+    },
+    "scenario": "base_delay15"
+  },
+  {
+    "plan_id": "plan-v1:584d61a4ab95fe34bec61eeea0e720d38ae469d3967d11724868055473d1b7cb",
+    "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+    "policy": "capture",
+    "window": "signal26",
+    "plan": {
+      "direction": -1,
+      "side": "숏",
+      "strategy": "trend_retest",
+      "level": 82883.6355691188,
+      "structure_anchor": 82935.5,
+      "barrier": null,
+      "price": 82813.9,
+      "rsi": 36.71641346401722,
+      "m5": -0.04586497111109811,
+      "m15": -0.11169208686895304,
+      "stop": 82952.06278,
+      "target1": 82151.39019918199,
+      "target2": 81814.5307542988,
+      "margin": 76.63,
+      "notional": 2298.8999999999996,
+      "quantity_btc": 0.027759832588490577,
+      "reference_risk_budget": 9.3595085,
+      "stop_distance_pct": 0.16683525350212797,
+      "sampled_1m_abs_move_p90_pct": 0.09185805765897781,
+      "one_minute_close_abs_move_p90_pct": 0.09185805765897781,
+      "net_loss": 9.358642725245979,
+      "net_gain1": 14.037964087869256,
+      "net_gain2": 23.396606813115028,
+      "rr1": 1.5000000000000306,
+      "rr2": 2.500000000000009,
+      "fee_roundtrip_est": 3.663527071072846,
+      "fee_stop_est": 3.682229394664465,
+      "maker_potential_savings": 2.7476453033046346,
+      "runner_enabled": true,
+      "native_entry_geometry": {
+        "atr5": 165.44936998508135,
+        "stop_floor_fraction": 0.000817819177973718,
+        "minimum_target_fraction": 0.00672991844501107,
+        "min_range_fraction": 0.00687991844501107,
+        "atr1": 45.15119708186512,
+        "stop_floor_basis": "1m_structure_with_1_5atr_noise_floor",
+        "refinement_mode": "capture"
+      },
+      "native_target_room": {
+        "policy": "confirmed_native_pivot_room_v1",
+        "target_room": "conflict",
+        "observed_barrier": 82743.1
+      },
+      "entry_decision_priority": {
+        "policy": "native_ranked_entry_v1",
+        "ready": true,
+        "higher_direction_intact": true,
+        "location_ok": true,
+        "may_override_minor_reaction": true,
+        "may_override_single_pivots": true,
+        "atr_target_exception": true,
+        "repeated_barrier": false,
+        "barrier_groups": [
+          {
+            "price": 82743.1,
+            "starts": [
+              1792635900
+            ],
+            "touches": 1
+          }
+        ],
+        "overrides": [
+          "single_pivots_under_aligned_15m_5m"
+        ],
+        "bar_start": 1792637400,
+        "upper_evidence": {
+          "policy": "native_structure_priority_v2",
+          "dominant_intact": false,
+          "ready": true,
+          "order": [
+            "hard_risk",
+            "higher_structure",
+            "target_room",
+            "minute_reaction"
+          ],
+          "bar_start": 1792637400,
+          "swing_structure": false,
+          "support": 82954.3,
+          "support_intact": true,
+          "trend15_aligned": true,
+          "ema_aligned": true,
+          "target_room": "conflict",
+          "observed_barrier": 82743.1
+        },
+        "atr5": 165.44936998508135,
+        "ema9": 82983.82736346318,
+        "extension_atr": 1.0270656423684486,
+        "max_extension_atr": 2.5,
+        "target_distance_atr": 4.004305370747229,
+        "max_trend_target_atr": 6.0
+      },
+      "data_source": "lbank_native_1m_aggregated_5m",
+      "native_5m_start": 1792637400,
+      "native_5m_count": 23,
+      "rsi5": 21.593597367191364,
+      "entry_quality": {
+        "policy": "native_structure_priority_v2",
+        "watch_last_closed_1m": 1792637640,
+        "confirmed_1m_starts": [],
+        "confirmed_1m_closes": [],
+        "watch_price": 82815.9,
+        "confirmation_quote": 82813.9,
+        "signed_progress_pct": 0.002414995188126934,
+        "minute_followthrough": false,
+        "requires_two_minute_wait": false,
+        "priority": {
+          "policy": "native_structure_priority_v2",
+          "dominant_intact": false,
+          "ready": true,
+          "order": [
+            "hard_risk",
+            "higher_structure",
+            "target_room",
+            "minute_reaction"
+          ],
+          "bar_start": 1792637400,
+          "swing_structure": false,
+          "support": 82954.3,
+          "support_intact": true,
+          "trend15_aligned": true,
+          "ema_aligned": true,
+          "target_room": "conflict",
+          "observed_barrier": 82743.1
+        },
+        "frozen_breakout_level": null,
+        "ranked_entry": {
+          "policy": "native_ranked_entry_v1",
+          "ready": true,
+          "higher_direction_intact": true,
+          "location_ok": true,
+          "may_override_minor_reaction": true,
+          "may_override_single_pivots": true,
+          "atr_target_exception": true,
+          "repeated_barrier": false,
+          "barrier_groups": [
+            {
+              "price": 82743.1,
+              "starts": [
+                1792635900
+              ],
+              "touches": 1
+            }
+          ],
+          "overrides": [
+            "single_pivots_under_aligned_15m_5m"
+          ],
+          "bar_start": 1792637400,
+          "upper_evidence": {
+            "policy": "native_structure_priority_v2",
+            "dominant_intact": false,
+            "ready": true,
+            "order": [
+              "hard_risk",
+              "higher_structure",
+              "target_room",
+              "minute_reaction"
+            ],
+            "bar_start": 1792637400,
+            "swing_structure": false,
+            "support": 82954.3,
+            "support_intact": true,
+            "trend15_aligned": true,
+            "ema_aligned": true,
+            "target_room": "conflict",
+            "observed_barrier": 82743.1
+          },
+          "atr5": 165.44936998508135,
+          "ema9": 82983.82736346318,
+          "extension_atr": 1.0270656423684486,
+          "max_extension_atr": 2.5,
+          "target_distance_atr": 4.004305370747229,
+          "max_trend_target_atr": 6.0
+        }
+      },
+      "sampled_rsi5": 21.593597367191364,
+      "sampled_context": {
+        "range5_pct": 0.17437549661995821,
+        "trend5_pct": -0.17407195777910944,
+        "trend15_pct": -0.6081072975274937,
+        "three_step_recovery": false,
+        "reversal_confirmed": false,
+        "reversal_10m_pct": 0.04864206561006057,
+        "reversal_last5_pct": 0.08482132622910088,
+        "context_type": "lbank_native_1m_aggregated_5m"
+      },
+      "rsi_direction_status": "5m_rsi_direction_aligned"
+    },
+    "provenance": {
+      "input_hash": "7b505b78fc43e067afcf16d60ac85e66b157063d64fe700593e6cb8949895acb",
+      "anchor": {
+        "bar_hash": "9d8f9a3a6ff12a91459eab03a63fab901741a58403d85cccc6231804c70799e3",
+        "bar_start": 1792637340,
+        "period": 60,
+        "field": "high",
+        "price": 82935.5,
+        "known_at": null,
+        "nominal_available_at": 1792637400,
+        "timing_basis": "nominal_scenario_not_observed_receipt"
+      },
+      "candidate_at": 1792637734.968047,
+      "confirm_at": 1792637802.646999,
+      "candidate_at_source_text": "2026-10-22T02:55:34.968047669Z",
+      "confirm_at_source_text": "2026-10-22T02:56:42.646999868Z",
+      "known_at": null,
+      "send_requested_at": null,
+      "telegram_ack_at": null,
+      "receipt_status": "not_available",
+      "timing_basis": "retained_quote_log_proxy_and_nominal_bar_scenario",
+      "nearest_barrier": {
+        "status": "observed_pivot_not_reachability_forecast",
+        "price": 82743.1,
+        "pivot_start": 1792635900,
+        "right_confirmation_start": 1792636500,
+        "known_at": null,
+        "nominal_known_at": 1792636800,
+        "right_bar_hash": "64cb21f1acdb9ea44d702a8785623b11658bdeeb73116a1b4aadddfeb98d22c4",
+        "timing_basis": "nominal_scenario"
+      },
+      "target1_basis": "cost_solved_required_price_not_structural_target",
+      "costs": {
+        "fee": 0.0008,
+        "funding_buffer": 0.0003,
+        "leverage": 30.0,
+        "max_margin_fraction": 0.15,
+        "reference_balance": 1871.9017,
+        "risk_fraction": 0.005,
+        "slippage": 0.0005
+      },
+      "commit": "b53efab58410484c424bd68440d4d9f0cece77698a18707d8db5431c3c94077e"
+    },
+    "outcome": {
+      "status": "exact_in_model",
+      "net_usdt_low": -9.358642725245979,
+      "net_usdt_high": -9.358642725245979,
+      "latest_exit_bar_end": "2026-10-22T03:05:00+00:00"
+    },
+    "first_contact": {
+      "status": "first_touch_in_5m_model",
+      "at": "2026-10-22T03:05:00+00:00",
+      "tp1_before_sl": false
+    },
+    "horizons": {
+      "5": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T03:01:58.054471789Z",
+        "price": 82920.8,
+        "net_pnl_model": -8.489664634655046
+      },
+      "15": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T03:12:27.027448222Z",
+        "price": 82753.5,
+        "net_pnl_model": -3.8394052989228102
+      },
+      "30": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T03:27:11.087074391Z",
+        "price": 82717.6,
+        "net_pnl_model": -2.8415313589782256
+      },
+      "60": {
+        "status": "unmanaged_mark_to_horizon_model",
+        "observed_at": "2026-10-22T03:56:43.600727555Z",
+        "price": 82854.9,
+        "net_pnl_model": -6.65791275046601
+      }
+    },
+    "manual_delay_scenarios": {
+      "30": {
+        "status": "exact_in_model",
+        "outcome": {
+          "status": "exact_in_model",
+          "net_usdt_low": -8.487942806584737,
+          "net_usdt_high": -8.487942806584737,
+          "latest_exit_bar_end": "2026-10-22T03:05:00+00:00"
+        },
+        "net_pnl_model": -8.487942806584737,
+        "observed_at": "2026-10-22T02:57:46.458219534Z",
+        "entry": 82845.3,
+        "quantity_btc": 0.027759832588490577,
+        "actual_observation_delay_seconds": 63.81122016906738,
+        "assumptions": "fixed original S/T; cap Q at original and current risk/margin; modeled quote entry, no verified fill"
+      },
+      "60": {
+        "status": "exact_in_model",
+        "outcome": {
+          "status": "exact_in_model",
+          "net_usdt_low": -8.487942806584737,
+          "net_usdt_high": -8.487942806584737,
+          "latest_exit_bar_end": "2026-10-22T03:05:00+00:00"
+        },
+        "net_pnl_model": -8.487942806584737,
+        "observed_at": "2026-10-22T02:57:46.458219534Z",
+        "entry": 82845.3,
+        "quantity_btc": 0.027759832588490577,
+        "actual_observation_delay_seconds": 63.81122016906738,
+        "assumptions": "fixed original S/T; cap Q at original and current risk/margin; modeled quote entry, no verified fill"
+      }
+    },
+    "scenario": "adverse_delay0"
+  }
+]

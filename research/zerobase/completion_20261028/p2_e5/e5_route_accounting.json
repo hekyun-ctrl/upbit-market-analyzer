@@ -1,0 +1,3513 @@
+{
+  "route": [
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 2,
+      "first_reject": {
+        "target_outside_observed_range": 40,
+        "sampled_context": 30,
+        "native_target_barrier_conflict": 24
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e3_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 2,
+      "first_reject": {
+        "target_outside_observed_range": 40,
+        "sampled_context": 30,
+        "native_target_barrier_conflict": 24
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 65,
+        "sampled_context": 30,
+        "room_unknown": 1
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e3_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 65,
+        "sampled_context": 30,
+        "room_unknown": 1
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 2,
+      "first_reject": {
+        "target_outside_observed_range": 40,
+        "sampled_context": 30,
+        "native_target_barrier_conflict": 24
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e3_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 2,
+      "first_reject": {
+        "target_outside_observed_range": 40,
+        "sampled_context": 30,
+        "native_target_barrier_conflict": 24
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 65,
+        "sampled_context": 30,
+        "room_unknown": 1
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e3_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 65,
+        "sampled_context": 30,
+        "room_unknown": 1
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 17,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31,
+        "native_target_barrier_conflict": 18
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 115,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e3_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 17,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31,
+        "native_target_barrier_conflict": 18
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 113,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 35,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 111,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e3_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 35,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 111,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 17,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31,
+        "native_target_barrier_conflict": 18
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 122,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e3_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 17,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31,
+        "native_target_barrier_conflict": 18
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 120,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 35,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 118,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e3_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 35,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 118,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 2,
+      "first_reject": {
+        "target_outside_observed_range": 27,
+        "sampled_context": 29,
+        "native_target_barrier_conflict": 21
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e3_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 2,
+      "first_reject": {
+        "target_outside_observed_range": 27,
+        "sampled_context": 29,
+        "native_target_barrier_conflict": 21
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 49,
+        "sampled_context": 29,
+        "room_unknown": 1
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e3_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 49,
+        "sampled_context": 29,
+        "room_unknown": 1
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 2,
+      "first_reject": {
+        "target_outside_observed_range": 27,
+        "sampled_context": 29,
+        "native_target_barrier_conflict": 21
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e3_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 2,
+      "first_reject": {
+        "target_outside_observed_range": 27,
+        "sampled_context": 29,
+        "native_target_barrier_conflict": 21
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 49,
+        "sampled_context": 29,
+        "room_unknown": 1
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e3_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 49,
+        "sampled_context": 29,
+        "room_unknown": 1
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e4_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 8,
+        "sampled_context": 29,
+        "entry_location_extended_or_lost": 27,
+        "native_target_barrier_conflict": 15
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 88,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e3_e4_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 8,
+        "sampled_context": 29,
+        "entry_location_extended_or_lost": 27,
+        "native_target_barrier_conflict": 15
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 87,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e4_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 23,
+        "sampled_context": 29,
+        "entry_location_extended_or_lost": 27
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 85,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e3_e4_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 23,
+        "sampled_context": 29,
+        "entry_location_extended_or_lost": 27
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 85,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e4_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 8,
+        "sampled_context": 29,
+        "entry_location_extended_or_lost": 27,
+        "native_target_barrier_conflict": 15
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 94,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e3_e4_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 8,
+        "sampled_context": 29,
+        "entry_location_extended_or_lost": 27,
+        "native_target_barrier_conflict": 15
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 93,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e4_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 23,
+        "sampled_context": 29,
+        "entry_location_extended_or_lost": 27
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 91,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e3_e4_e5",
+      "e5_candidate_evaluations": 79,
+      "e5_unique_events": 60,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 23,
+        "sampled_context": 29,
+        "entry_location_extended_or_lost": 27
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 91,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 39,
+        "1": 40
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 42,
+          "unique_events": 36,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 8,
+          "unique_events": 6,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 59,
+        "sampled_context": 30,
+        "native_target_barrier_conflict": 7
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e3_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 59,
+        "sampled_context": 30,
+        "native_target_barrier_conflict": 7
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 65,
+        "sampled_context": 30,
+        "room_unknown": 1
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e3_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 65,
+        "sampled_context": 30,
+        "room_unknown": 1
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 59,
+        "sampled_context": 30,
+        "native_target_barrier_conflict": 7
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e3_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 59,
+        "sampled_context": 30,
+        "native_target_barrier_conflict": 7
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 65,
+        "sampled_context": 30,
+        "room_unknown": 1
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e3_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 65,
+        "sampled_context": 30,
+        "room_unknown": 1
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 0,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 30,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31,
+        "native_target_barrier_conflict": 5
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 110,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e3_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 30,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31,
+        "native_target_barrier_conflict": 5
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 110,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 35,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 110,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e3_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 35,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 110,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 30,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31,
+        "native_target_barrier_conflict": 5
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 117,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e3_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "target_outside_observed_range": 30,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31,
+        "native_target_barrier_conflict": 5
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 117,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 35,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 117,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e3_e4_e5",
+      "e5_candidate_evaluations": 96,
+      "e5_unique_events": 72,
+      "e5_qualified_candidate_evaluations": 0,
+      "first_reject": {
+        "room_insufficient": 35,
+        "sampled_context": 30,
+        "entry_location_extended_or_lost": 31
+      },
+      "final_e5_alerts": 0,
+      "final_e5_stop_first": 0,
+      "final_e5_unresolved": 0,
+      "e4_plan_evaluations": 117,
+      "false_reclaim_evaluations": 0,
+      "direction_evaluations": {
+        "-1": 50,
+        "1": 46
+      },
+      "strata": [
+        {
+          "label": "countertrend15m",
+          "candidate_evaluations": 2,
+          "unique_events": 2,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "rsi_opposed_or_flat",
+          "candidate_evaluations": 55,
+          "unique_events": 45,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        },
+        {
+          "label": "context_and_rsi_original_gates_passed",
+          "candidate_evaluations": 11,
+          "unique_events": 9,
+          "final_alerts": 0,
+          "stop_first": 0,
+          "unresolved": 0,
+          "limitation": "overlapping explanatory groups; no summing as independent events"
+        }
+      ]
+    }
+  ],
+  "structure_scans": [
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e3_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e3_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e3_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e3_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e3_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e3_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e3_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e3_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e3_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e3_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e3_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e3_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e4_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e3_e4_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e4_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e3_e4_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e4_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e3_e4_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e4_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e3_e4_e5",
+      "scans": 571,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_reclaim_triggered": 79,
+        "e5_no_recent_sweep_reclaim": 777,
+        "e5_recovery_not_completed": 187,
+        "e5_first_reclaim_invalidated": 18,
+        "e5_small_opposite_trigger_not_crossed": 77
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e3_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e3_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e3_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e3_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e3_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e3_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e3_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e3_e4_e5",
+      "scans": 763,
+      "preempted": 2,
+      "directional_reasons": {
+        "e5_no_recent_sweep_reclaim": 1041,
+        "e5_recovery_not_completed": 250,
+        "e5_small_opposite_trigger_not_crossed": 115,
+        "e5_reclaim_triggered": 96,
+        "e5_first_reclaim_invalidated": 20
+      }
+    }
+  ],
+  "paired_entries": [
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_vs_capture_e5",
+      "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": 37.289097748781565,
+      "common_atr_input_hash": "a662787e56c79bc740d9467bd82799adff05533aeaf31438db10320adc572789",
+      "common_atr_evaluated_at": 1792467302.123575,
+      "signed_worsening_common_atr1": 0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_vs_capture_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": 0,
+      "common_discovery_atr1": 22.936091215332993,
+      "common_atr_input_hash": "a7e715ec5c0c11f1e95fec5ef0664883a9dffdc9835055fcde4fb97ad1bd3c66",
+      "common_atr_evaluated_at": 1792643743.561894,
+      "signed_worsening_common_atr1": 0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_vs_capture_e5",
+      "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 51.137769145545995,
+      "common_atr_input_hash": "f84daaefcb01cdbebe9b685931e8359a232eb62d2b646c1402ad61b9e763f505",
+      "common_atr_evaluated_at": 1792637486.000857,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": 37.289097748781565,
+      "common_atr_input_hash": "a662787e56c79bc740d9467bd82799adff05533aeaf31438db10320adc572789",
+      "common_atr_evaluated_at": 1792467302.123575,
+      "signed_worsening_common_atr1": 0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 22.936091215332993,
+      "common_atr_input_hash": "a7e715ec5c0c11f1e95fec5ef0664883a9dffdc9835055fcde4fb97ad1bd3c66",
+      "common_atr_evaluated_at": 1792643743.561894,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:3dd372e7bd5f0e25fc7a9391910e1121174ccf3c56bef8a0aa5da7eaac122237",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 66.08724665913438,
+      "common_atr_input_hash": "08e80968bdc1152f919837cc11158341e9c7644afa239a425945ee4c2a8f8d2b",
+      "common_atr_evaluated_at": 1792458650.689466,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:8bb197dfef65bf035246c699d1557b3d04417a8c5ce2c4a7cdbfcdb2fc4e43a9",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 40.50936715781389,
+      "common_atr_input_hash": "844b2ff5afa3e8a39499bc1b73b137d4b75e8865c2b0d62c4912e85671248c4b",
+      "common_atr_evaluated_at": 1792482305.995735,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_input_hash": "8db4777b8b58bfb3ef8418cdc4e1efcdebcbd9d646c94e2bb60cf92e0f882025",
+      "common_atr_evaluated_at": 1792650460.475148,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_vs_capture_e1_e5",
+      "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": 37.289097748781565,
+      "common_atr_input_hash": "a662787e56c79bc740d9467bd82799adff05533aeaf31438db10320adc572789",
+      "common_atr_evaluated_at": 1792467302.123575,
+      "signed_worsening_common_atr1": 0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_vs_capture_e1_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": 0,
+      "common_discovery_atr1": 22.936091215332993,
+      "common_atr_input_hash": "a7e715ec5c0c11f1e95fec5ef0664883a9dffdc9835055fcde4fb97ad1bd3c66",
+      "common_atr_evaluated_at": 1792643743.561894,
+      "signed_worsening_common_atr1": 0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_vs_capture_e1_e5",
+      "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 51.137769145545995,
+      "common_atr_input_hash": "f84daaefcb01cdbebe9b685931e8359a232eb62d2b646c1402ad61b9e763f505",
+      "common_atr_evaluated_at": 1792637486.000857,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": 37.289097748781565,
+      "common_atr_input_hash": "a662787e56c79bc740d9467bd82799adff05533aeaf31438db10320adc572789",
+      "common_atr_evaluated_at": 1792467302.123575,
+      "signed_worsening_common_atr1": 0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 22.936091215332993,
+      "common_atr_input_hash": "a7e715ec5c0c11f1e95fec5ef0664883a9dffdc9835055fcde4fb97ad1bd3c66",
+      "common_atr_evaluated_at": 1792643743.561894,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:3dd372e7bd5f0e25fc7a9391910e1121174ccf3c56bef8a0aa5da7eaac122237",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 66.08724665913438,
+      "common_atr_input_hash": "08e80968bdc1152f919837cc11158341e9c7644afa239a425945ee4c2a8f8d2b",
+      "common_atr_evaluated_at": 1792458650.689466,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:8bb197dfef65bf035246c699d1557b3d04417a8c5ce2c4a7cdbfcdb2fc4e43a9",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 40.50936715781389,
+      "common_atr_input_hash": "844b2ff5afa3e8a39499bc1b73b137d4b75e8865c2b0d62c4912e85671248c4b",
+      "common_atr_evaluated_at": 1792482305.995735,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_input_hash": "8db4777b8b58bfb3ef8418cdc4e1efcdebcbd9d646c94e2bb60cf92e0f882025",
+      "common_atr_evaluated_at": 1792650460.475148,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e4_vs_capture_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_input_hash": "8db4777b8b58bfb3ef8418cdc4e1efcdebcbd9d646c94e2bb60cf92e0f882025",
+      "common_atr_evaluated_at": 1792650460.475148,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e3_e4_vs_capture_e3_e4_e5",
+      "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": 38.1370281609392,
+      "common_atr_input_hash": "5b22f36da6bcc035f7bdd05ab0ed5b2d921f3b3c37d3d9fd1c8185d5bfa5db12",
+      "common_atr_evaluated_at": 1792467434.41831,
+      "signed_worsening_common_atr1": 0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e3_e4_vs_capture_e3_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_input_hash": "8db4777b8b58bfb3ef8418cdc4e1efcdebcbd9d646c94e2bb60cf92e0f882025",
+      "common_atr_evaluated_at": 1792650460.475148,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e4_vs_capture_e1_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_input_hash": "8db4777b8b58bfb3ef8418cdc4e1efcdebcbd9d646c94e2bb60cf92e0f882025",
+      "common_atr_evaluated_at": 1792650460.475148,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e3_e4_vs_capture_e1_e3_e4_e5",
+      "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": 38.1370281609392,
+      "common_atr_input_hash": "5b22f36da6bcc035f7bdd05ab0ed5b2d921f3b3c37d3d9fd1c8185d5bfa5db12",
+      "common_atr_evaluated_at": 1792467434.41831,
+      "signed_worsening_common_atr1": 0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e3_e4_vs_capture_e1_e3_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_input_hash": "8db4777b8b58bfb3ef8418cdc4e1efcdebcbd9d646c94e2bb60cf92e0f882025",
+      "common_atr_evaluated_at": 1792650460.475148,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_vs_capture_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": 0,
+      "common_discovery_atr1": 22.936091215332993,
+      "common_atr_input_hash": "a7e715ec5c0c11f1e95fec5ef0664883a9dffdc9835055fcde4fb97ad1bd3c66",
+      "common_atr_evaluated_at": 1792643743.561894,
+      "signed_worsening_common_atr1": 0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_vs_capture_e5",
+      "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 51.137769145545995,
+      "common_atr_input_hash": "f84daaefcb01cdbebe9b685931e8359a232eb62d2b646c1402ad61b9e763f505",
+      "common_atr_evaluated_at": 1792637486.000857,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:2265552af9bec3e51697732c5112fa75e016460f820b320fb18d4bc4fcb5d8c8",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": 30.54202698947299,
+      "common_atr_input_hash": "9dbdeb25714106446c1c0821db61733f0330e48427bf59badf24f2d81eee7371",
+      "common_atr_evaluated_at": 1792469068.345918,
+      "signed_worsening_common_atr1": 0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 22.936091215332993,
+      "common_atr_input_hash": "a7e715ec5c0c11f1e95fec5ef0664883a9dffdc9835055fcde4fb97ad1bd3c66",
+      "common_atr_evaluated_at": 1792643743.561894,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:3dd372e7bd5f0e25fc7a9391910e1121174ccf3c56bef8a0aa5da7eaac122237",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 66.08724665913438,
+      "common_atr_input_hash": "08e80968bdc1152f919837cc11158341e9c7644afa239a425945ee4c2a8f8d2b",
+      "common_atr_evaluated_at": 1792458650.689466,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_input_hash": "8db4777b8b58bfb3ef8418cdc4e1efcdebcbd9d646c94e2bb60cf92e0f882025",
+      "common_atr_evaluated_at": 1792650460.475148,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_vs_capture_e1_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": 0,
+      "common_discovery_atr1": 22.936091215332993,
+      "common_atr_input_hash": "a7e715ec5c0c11f1e95fec5ef0664883a9dffdc9835055fcde4fb97ad1bd3c66",
+      "common_atr_evaluated_at": 1792643743.561894,
+      "signed_worsening_common_atr1": 0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_vs_capture_e1_e5",
+      "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 51.137769145545995,
+      "common_atr_input_hash": "f84daaefcb01cdbebe9b685931e8359a232eb62d2b646c1402ad61b9e763f505",
+      "common_atr_evaluated_at": 1792637486.000857,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:2265552af9bec3e51697732c5112fa75e016460f820b320fb18d4bc4fcb5d8c8",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": 30.54202698947299,
+      "common_atr_input_hash": "9dbdeb25714106446c1c0821db61733f0330e48427bf59badf24f2d81eee7371",
+      "common_atr_evaluated_at": 1792469068.345918,
+      "signed_worsening_common_atr1": 0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 22.936091215332993,
+      "common_atr_input_hash": "a7e715ec5c0c11f1e95fec5ef0664883a9dffdc9835055fcde4fb97ad1bd3c66",
+      "common_atr_evaluated_at": 1792643743.561894,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:3dd372e7bd5f0e25fc7a9391910e1121174ccf3c56bef8a0aa5da7eaac122237",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 66.08724665913438,
+      "common_atr_input_hash": "08e80968bdc1152f919837cc11158341e9c7644afa239a425945ee4c2a8f8d2b",
+      "common_atr_evaluated_at": 1792458650.689466,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_input_hash": "8db4777b8b58bfb3ef8418cdc4e1efcdebcbd9d646c94e2bb60cf92e0f882025",
+      "common_atr_evaluated_at": 1792650460.475148,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e4_vs_capture_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_input_hash": "8db4777b8b58bfb3ef8418cdc4e1efcdebcbd9d646c94e2bb60cf92e0f882025",
+      "common_atr_evaluated_at": 1792650460.475148,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e3_e4_vs_capture_e3_e4_e5",
+      "event_id": "op-v1:2265552af9bec3e51697732c5112fa75e016460f820b320fb18d4bc4fcb5d8c8",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": 30.54202698947299,
+      "common_atr_input_hash": "9dbdeb25714106446c1c0821db61733f0330e48427bf59badf24f2d81eee7371",
+      "common_atr_evaluated_at": 1792469068.345918,
+      "signed_worsening_common_atr1": 0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e3_e4_vs_capture_e3_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_input_hash": "8db4777b8b58bfb3ef8418cdc4e1efcdebcbd9d646c94e2bb60cf92e0f882025",
+      "common_atr_evaluated_at": 1792650460.475148,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_e4_vs_capture_e1_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_input_hash": "8db4777b8b58bfb3ef8418cdc4e1efcdebcbd9d646c94e2bb60cf92e0f882025",
+      "common_atr_evaluated_at": 1792650460.475148,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_e3_e4_vs_capture_e1_e3_e4_e5",
+      "event_id": "op-v1:2265552af9bec3e51697732c5112fa75e016460f820b320fb18d4bc4fcb5d8c8",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": 30.54202698947299,
+      "common_atr_input_hash": "9dbdeb25714106446c1c0821db61733f0330e48427bf59badf24f2d81eee7371",
+      "common_atr_evaluated_at": 1792469068.345918,
+      "signed_worsening_common_atr1": 0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_e3_e4_vs_capture_e1_e3_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_input_hash": "8db4777b8b58bfb3ef8418cdc4e1efcdebcbd9d646c94e2bb60cf92e0f882025",
+      "common_atr_evaluated_at": 1792650460.475148,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "adverse_delay0",
+      "comparison": "capture_vs_capture_e5",
+      "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 51.137769145545995,
+      "common_atr_input_hash": "f84daaefcb01cdbebe9b685931e8359a232eb62d2b646c1402ad61b9e763f505",
+      "common_atr_evaluated_at": 1792637486.000857,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    },
+    {
+      "scenario": "adverse_delay0",
+      "comparison": "capture_e1_vs_capture_e1_e5",
+      "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 51.137769145545995,
+      "common_atr_input_hash": "f84daaefcb01cdbebe9b685931e8359a232eb62d2b646c1402ad61b9e763f505",
+      "common_atr_evaluated_at": 1792637486.000857,
+      "signed_worsening_common_atr1": -0.0,
+      "basis": "earliest exact-input candidate snapshot available before both entries; one common ATR for both"
+    }
+  ],
+  "limitations": [
+    "All development observations reused; no independent5m, actual receipt, fill or funding qualification",
+    "Failed RSI/trend recorded even when explanatory; hard data, flat-market and chase failures still block",
+    "Repeated evaluations and cost/delay variants are not independent market samples",
+    "New strategy family remains unmatched to capture structures without identical canonical anchors",
+    "A final closed stop is different from a reclaim invalidation before entry; both recorded, not combined"
+  ]
+}

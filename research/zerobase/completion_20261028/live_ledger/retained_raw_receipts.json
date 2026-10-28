@@ -1,0 +1,64 @@
+{
+  "actual_retained_receipts": true,
+  "candle_volume_unit_verified": false,
+  "closed_bars_verified": 0,
+  "independent_5m_verified": false,
+  "new_network_requests": 0,
+  "records": [
+    {
+      "basis": "existing_collector_same_feed_not_independent",
+      "periods": [
+        "5m"
+      ],
+      "raw_sha256": "3edb5ed3fd73936d6c7f63a4924e1d02beac5df0365e5601074d4b2101354946",
+      "received_at": "2026-10-28T03:27:52.560107+00:00",
+      "server_ms": 1793158072479
+    },
+    {
+      "basis": "existing_collector_same_feed_not_independent",
+      "periods": [
+        "1m"
+      ],
+      "raw_sha256": "d247a53170cb36658fd5f479efa1eddb8319d0feee026efc22b4987581153da7",
+      "received_at": "2026-10-28T03:27:53.247577+00:00",
+      "server_ms": 1793158073166
+    },
+    {
+      "basis": "existing_collector_same_feed_not_independent",
+      "periods": [
+        "1m"
+      ],
+      "raw_sha256": "61f1c81fe9776753ea0c8b0e26566a7dc1f75bc454e943cce489bdb522c48191",
+      "received_at": "2026-10-28T03:27:53.249390+00:00",
+      "server_ms": 1793158073168
+    },
+    {
+      "basis": "existing_collector_same_feed_not_independent",
+      "periods": [
+        "5m"
+      ],
+      "raw_sha256": "e21823d57104d43d191f5ba5541f767955731b39ce029373a0763878252eddb2",
+      "received_at": "2026-10-28T03:27:57.638690+00:00",
+      "server_ms": 1793158077558
+    },
+    {
+      "basis": "existing_collector_same_feed_not_independent",
+      "periods": [
+        "1m"
+      ],
+      "raw_sha256": "fca566bdeb357cb788e27c080d55668cbaf063f727bf036984c278c375b4acc1",
+      "received_at": "2026-10-28T03:27:58.243013+00:00",
+      "server_ms": 1793158078163
+    },
+    {
+      "basis": "existing_collector_same_feed_not_independent",
+      "periods": [
+        "1m"
+      ],
+      "raw_sha256": "45e84031b1ebc7167a806e6c9bbbe0989265dc7713b9bb116c750f5449ba38cd",
+      "received_at": "2026-10-28T03:27:58.243651+00:00",
+      "server_ms": 1793158078164
+    }
+  ],
+  "source_rows": 6
+}

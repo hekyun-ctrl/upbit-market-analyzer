@@ -1,0 +1,1 @@
+First code checkpoint43d201bd. Started one32-arm replay; inspected only DB policy/evaluation counts, no outcomes. Interrupted via ctrl-C, exit130 before artifact output. Causality fixes predeclared from code inspection, not observed performance. Full artifacts not generated.

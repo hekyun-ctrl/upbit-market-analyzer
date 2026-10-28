@@ -1,0 +1,30 @@
+[
+  {
+    "url": "https://www.lbank.com/docs/contract.html",
+    "requested_at": "2026-10-28T03:21:20.775646+00:00",
+    "error": "HTTPError",
+    "detail": "HTTP Error 403: Forbidden",
+    "received_at": "2026-10-28T03:21:26.213461+00:00"
+  },
+  {
+    "url": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/instrument?productGroup=SwapU",
+    "requested_at": "2026-10-28T03:21:20.776430+00:00",
+    "error": "HTTPError",
+    "detail": "HTTP Error 403: Forbidden",
+    "received_at": "2026-10-28T03:21:25.015083+00:00"
+  },
+  {
+    "url": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/getTime",
+    "requested_at": "2026-10-28T03:21:20.777146+00:00",
+    "error": "HTTPError",
+    "detail": "HTTP Error 403: Forbidden",
+    "received_at": "2026-10-28T03:21:25.015370+00:00"
+  },
+  {
+    "url": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketData?productGroup=SwapU",
+    "requested_at": "2026-10-28T03:21:20.777570+00:00",
+    "error": "HTTPError",
+    "detail": "HTTP Error 403: Forbidden",
+    "received_at": "2026-10-28T03:21:25.015000+00:00"
+  }
+]

@@ -1,0 +1,330 @@
+{
+  "schema": "zb_source_qualification_runtime_read_v1",
+  "requested_scope": {
+    "projectId": "e7d240ac-2468-45c9-8411-33f5e24f425b",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+    "limit": 100,
+    "logType": "deploy"
+  },
+  "tool_result_scope": {
+    "scope": "service",
+    "deploymentId": "a30cf7a6-5adb-4e1d-81e2-63bf07b926e0",
+    "serviceId": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "status": "SUCCESS"
+  },
+  "returned_count": 101,
+  "selected_count": 27,
+  "selection": "all ZB_ENGINE_STATUS/NATIVE_CANDLES_STATUS/NATIVE_ENTRY_STATUS/MARKET_CONTEXT_UNAVAILABLE rows in returned bounded100; runtime log timestamp is not raw candle receive time",
+  "entries": [
+    {
+      "timestamp": "2026-10-28T19:07:31.579195930Z",
+      "severity": "error",
+      "message": "INFO:lbank_zb_engine:ZB_ENGINE_STATUS {\"PF_model\":null,\"archived_closed\":0,\"archived_unresolved\":0,\"baseline_comparison\":null,\"blocked_reasons\":[\"RAW5M_INDEPENDENCE_UNVERIFIED\",\"CANDLE_VOLUME_UNIT_UNVERIFIED\"],\"candle_volume_unit_status\":\"UNVERIFIED_RESEARCH_ONLY\",\"classification\":\"EVIDENCE_INSUFFICIENT\",\"closed\":0,\"cost_evidence\":{\"candle_volume_unit\":\"UNVERIFIED\",\"contract_documentation\":\"https://www.lbank.com/docs/contract.html\",\"depth_volume_unit\":\"contract_units_from_instrument\",\"fee_policy\":\"public base taker; personal tier not accessed\",\"fee_source\":\"https://www.lbank.com/support/articles/21425760291097\",\"funding_history_days\":0,\"funding_settlements_verified\":false,\"instrument\":{\"baseCurrency\":\"BTC\",\"clearCurrency\":\"USDT\",\"defaultLeverage\":\"20.0\",\"exchangeID\":\"Exchange\",\"indexPrice\":\"81189.2\",\"maxLeverage\":200,\"maxOrderVolume\":\"150.0\",\"minOrderCost\":\"1.0\",\"minOrderVolume\":\"0.0001\",\"needSuspend\":0,\"priceCurrency\":\"USDT\",\"priceLimitLowerValue\":\"0.05\",\"priceLimitUpperValue\":\"0.05\",\"priceTick\":\"0.1\",\"symbol\":\"BTCUSDT\",\"symbolAlias\":\"BTC\",\"symbolName\":\"BTCUSDT\",\"volumeMultiple\":\"1.0\",\"volumeTick\":\"0.0001\"},\"instrument_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/instrument?productGroup=SwapU\",\"market\":{\"fundingRate\":\"0.0001\",\"highestPrice\":\"81798.5\",\"instrumentStatus\":\"2\",\"lastPrice\":\"81169.4\",\"lastTime\":1793214266,\"lowestPrice\":\"80358.8\",\"markedPrice\":\"81164.2\",\"nextFeeTime\":1793232000000,\"openPrice\":\"80666.5\",\"positionFeeRate\":\"0.0001\",\"positionFeeTime\":28800,\"symbol\":\"BTCUSDT\",\"turnover\":\"415945869.5040239\",\"underlyingPrice\":\"81189.2\",\"volume\":\"5137.872\"},\"market_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketData?productGroup=SwapU\",\"received\":1793214268,\"schedule_basis\":\"nextFeeTime + current positionFeeTime; future changes possible\"},\"counts\":{\"CANCELLED\":3,\"DETECTED\":10,\"EXPIRED\":5,\"REGIME\":1574,\"REJECTED\":10,\"WARMUP\":1245,\"WATCHING\":10},\"daily\":{\"20749\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792767600,\"received_at\":1792767600,\"return\":\"0\",\"start\":\"1000\"},\"20750\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792854000,\"received_at\":1792854000,\"return\":\"0\",\"start\":\"1000\"},\"20751\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792940400,\"received_at\":1792940400,\"return\":\"0\",\"start\":\"1000\"},\"20752\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793026800,\"received_at\":1793026800,\"return\":\"0\",\"start\":\"1000\"},\"20753\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793113200,\"received_at\":1793113200,\"return\":\"0\",\"start\":\"1000\"},\"20754\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793199600,\"received_at\":1793199600,\"return\":\"0\",\"start\":\"1000\"},\"20755\":{\"end\":\"1000\",\"halted\":false,\"market_cutoff\":1793214420,\"partial_observation_day\":true,\"return\":\"0\",\"start\":\"1000\"}},\"execution_mode\":\"quote\",\"funding_applied\":[],\"funding_status\":\"ASSUMED\",\"health\":[\"CANDLE_VOLUME_UNIT_UNVERIFIED\",\"DATA_DEGRADED\",\"RAW5M_INDEPENDENCE_UNVERIFIED\"],\"journal_events\":2857,\"journal_inputs\":18878,\"limitations\":[\"Quote snapshots are a paper execution estimate, not actual fills.\",\"Independent raw5m and complete funding coverage are required.\",\"Historical comparison and sealed qualification remain separate.\"],\"model_archived_closed_net\":\"0\",\"model_nav\":\"1000\",\"model_net_all_closed\":\"0\",\"model_net_excluding_unresolved\":\"0\",\"native_1m\":60,\"native_5m\":347,\"native_cursor\":[1793214420,1793214420,60],\"open_at_cutoff\":0,\"orders_enabled\":false,\"outbox\":{\"DISABLED\":8},\"paper_outbound_enabled\":false,\"performance_claim\":false,\"qualification\":{\"candle_units\":false,\"fees\":true,\"funding_plan\":true,\"independent_5m\":false,\"product\":true},\"spec_version\":\"ZB-1.0\",\"unresolved_closed\":0,\"verified_closed\":0,\"verified_net\":null}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:07:51.582478112Z",
+      "severity": "error",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 250, \"warmup_target\": 250, \"rsi14_wilder\": 66.98485826934028, \"native_history_ready\": true, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:07:55.075877671Z",
+      "severity": "error",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 250, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 191.45807016799887, \"min_range_fraction\": 0.009016162416028197, \"minimum_target_fraction\": 0.008866162416028197, \"stop_floor_fraction\": 0.00354351620012386}, \"entry_source_switched\": true, \"last5_start\": 1793214000, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 66.98485826934028, \"rsi_history_mature\": true, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:08:35.085017088Z",
+      "severity": "error",
+      "message": "INFO:lbank_zb_engine:ZB_ENGINE_STATUS {\"PF_model\":null,\"archived_closed\":0,\"archived_unresolved\":0,\"baseline_comparison\":null,\"blocked_reasons\":[\"RAW5M_INDEPENDENCE_UNVERIFIED\",\"CANDLE_VOLUME_UNIT_UNVERIFIED\"],\"candle_volume_unit_status\":\"UNVERIFIED_RESEARCH_ONLY\",\"classification\":\"EVIDENCE_INSUFFICIENT\",\"closed\":0,\"cost_evidence\":{\"candle_volume_unit\":\"UNVERIFIED\",\"contract_documentation\":\"https://www.lbank.com/docs/contract.html\",\"depth_volume_unit\":\"contract_units_from_instrument\",\"fee_policy\":\"public base taker; personal tier not accessed\",\"fee_source\":\"https://www.lbank.com/support/articles/21425760291097\",\"funding_history_days\":0,\"funding_settlements_verified\":false,\"instrument\":{\"baseCurrency\":\"BTC\",\"clearCurrency\":\"USDT\",\"defaultLeverage\":\"20.0\",\"exchangeID\":\"Exchange\",\"indexPrice\":\"81189.2\",\"maxLeverage\":200,\"maxOrderVolume\":\"150.0\",\"minOrderCost\":\"1.0\",\"minOrderVolume\":\"0.0001\",\"needSuspend\":0,\"priceCurrency\":\"USDT\",\"priceLimitLowerValue\":\"0.05\",\"priceLimitUpperValue\":\"0.05\",\"priceTick\":\"0.1\",\"symbol\":\"BTCUSDT\",\"symbolAlias\":\"BTC\",\"symbolName\":\"BTCUSDT\",\"volumeMultiple\":\"1.0\",\"volumeTick\":\"0.0001\"},\"instrument_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/instrument?productGroup=SwapU\",\"market\":{\"fundingRate\":\"0.0001\",\"highestPrice\":\"81798.5\",\"instrumentStatus\":\"2\",\"lastPrice\":\"81169.4\",\"lastTime\":1793214266,\"lowestPrice\":\"80358.8\",\"markedPrice\":\"81164.2\",\"nextFeeTime\":1793232000000,\"openPrice\":\"80666.5\",\"positionFeeRate\":\"0.0001\",\"positionFeeTime\":28800,\"symbol\":\"BTCUSDT\",\"turnover\":\"415945869.5040239\",\"underlyingPrice\":\"81189.2\",\"volume\":\"5137.872\"},\"market_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketData?productGroup=SwapU\",\"received\":1793214268,\"schedule_basis\":\"nextFeeTime + current positionFeeTime; future changes possible\"},\"counts\":{\"CANCELLED\":3,\"DETECTED\":10,\"EXPIRED\":5,\"REGIME\":1574,\"REJECTED\":10,\"WARMUP\":1245,\"WATCHING\":10},\"daily\":{\"20749\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792767600,\"received_at\":1792767600,\"return\":\"0\",\"start\":\"1000\"},\"20750\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792854000,\"received_at\":1792854000,\"return\":\"0\",\"start\":\"1000\"},\"20751\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792940400,\"received_at\":1792940400,\"return\":\"0\",\"start\":\"1000\"},\"20752\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793026800,\"received_at\":1793026800,\"return\":\"0\",\"start\":\"1000\"},\"20753\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793113200,\"received_at\":1793113200,\"return\":\"0\",\"start\":\"1000\"},\"20754\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793199600,\"received_at\":1793199600,\"return\":\"0\",\"start\":\"1000\"},\"20755\":{\"end\":\"1000\",\"halted\":false,\"market_cutoff\":1793214480,\"partial_observation_day\":true,\"return\":\"0\",\"start\":\"1000\"}},\"execution_mode\":\"quote\",\"funding_applied\":[],\"funding_status\":\"ASSUMED\",\"health\":[\"CANDLE_VOLUME_UNIT_UNVERIFIED\",\"DATA_DEGRADED\",\"RAW5M_INDEPENDENCE_UNVERIFIED\"],\"journal_events\":2857,\"journal_inputs\":18880,\"limitations\":[\"Quote snapshots are a paper execution estimate, not actual fills.\",\"Independent raw5m and complete funding coverage are required.\",\"Historical comparison and sealed qualification remain separate.\"],\"model_archived_closed_net\":\"0\",\"model_nav\":\"1000\",\"model_net_all_closed\":\"0\",\"model_net_excluding_unresolved\":\"0\",\"native_1m\":60,\"native_5m\":347,\"native_cursor\":[1793214480,1793214480,60],\"open_at_cutoff\":0,\"orders_enabled\":false,\"outbox\":{\"DISABLED\":8},\"paper_outbound_enabled\":false,\"performance_claim\":false,\"qualification\":{\"candle_units\":false,\"fees\":true,\"funding_plan\":true,\"independent_5m\":false,\"product\":true},\"spec_version\":\"ZB-1.0\",\"unresolved_closed\":0,\"verified_closed\":0,\"verified_net\":null}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:08:55.109026610Z",
+      "severity": "error",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 250, \"warmup_target\": 250, \"rsi14_wilder\": 66.98485826934028, \"native_history_ready\": true, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:08:58.127378138Z",
+      "severity": "error",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 250, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 191.45807016799887, \"min_range_fraction\": 0.009011576444033125, \"minimum_target_fraction\": 0.008861576444033124, \"stop_floor_fraction\": 0.003540458273875106}, \"entry_source_switched\": true, \"last5_start\": 1793214000, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 66.98485826934028, \"rsi_history_mature\": true, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:09:37.907098065Z",
+      "severity": "error",
+      "message": "INFO:lbank_zb_engine:ZB_ENGINE_STATUS {\"PF_model\":null,\"archived_closed\":0,\"archived_unresolved\":0,\"baseline_comparison\":null,\"blocked_reasons\":[\"RAW5M_INDEPENDENCE_UNVERIFIED\",\"CANDLE_VOLUME_UNIT_UNVERIFIED\"],\"candle_volume_unit_status\":\"UNVERIFIED_RESEARCH_ONLY\",\"classification\":\"EVIDENCE_INSUFFICIENT\",\"closed\":0,\"cost_evidence\":{\"candle_volume_unit\":\"UNVERIFIED\",\"contract_documentation\":\"https://www.lbank.com/docs/contract.html\",\"depth_volume_unit\":\"contract_units_from_instrument\",\"fee_policy\":\"public base taker; personal tier not accessed\",\"fee_source\":\"https://www.lbank.com/support/articles/21425760291097\",\"funding_history_days\":0,\"funding_settlements_verified\":false,\"instrument\":{\"baseCurrency\":\"BTC\",\"clearCurrency\":\"USDT\",\"defaultLeverage\":\"20.0\",\"exchangeID\":\"Exchange\",\"indexPrice\":\"81151.9\",\"maxLeverage\":200,\"maxOrderVolume\":\"150.0\",\"minOrderCost\":\"1.0\",\"minOrderVolume\":\"0.0001\",\"needSuspend\":0,\"priceCurrency\":\"USDT\",\"priceLimitLowerValue\":\"0.05\",\"priceLimitUpperValue\":\"0.05\",\"priceTick\":\"0.1\",\"symbol\":\"BTCUSDT\",\"symbolAlias\":\"BTC\",\"symbolName\":\"BTCUSDT\",\"volumeMultiple\":\"1.0\",\"volumeTick\":\"0.0001\"},\"instrument_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/instrument?productGroup=SwapU\",\"market\":{\"fundingRate\":\"0.0001\",\"highestPrice\":\"81798.5\",\"instrumentStatus\":\"2\",\"lastPrice\":\"81122.4\",\"lastTime\":1793214567,\"lowestPrice\":\"80358.8\",\"markedPrice\":\"81121.1\",\"nextFeeTime\":1793232000000,\"openPrice\":\"80733.3\",\"positionFeeRate\":\"0.0001\",\"positionFeeTime\":28800,\"symbol\":\"BTCUSDT\",\"turnover\":\"417106530.2871039\",\"underlyingPrice\":\"81151.9\",\"volume\":\"5152.1846\"},\"market_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketData?productGroup=SwapU\",\"received\":1793214570,\"schedule_basis\":\"nextFeeTime + current positionFeeTime; future changes possible\"},\"counts\":{\"CANCELLED\":3,\"DETECTED\":10,\"EXPIRED\":5,\"REGIME\":1574,\"REJECTED\":10,\"WARMUP\":1245,\"WATCHING\":10},\"daily\":{\"20749\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792767600,\"received_at\":1792767600,\"return\":\"0\",\"start\":\"1000\"},\"20750\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792854000,\"received_at\":1792854000,\"return\":\"0\",\"start\":\"1000\"},\"20751\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792940400,\"received_at\":1792940400,\"return\":\"0\",\"start\":\"1000\"},\"20752\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793026800,\"received_at\":1793026800,\"return\":\"0\",\"start\":\"1000\"},\"20753\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793113200,\"received_at\":1793113200,\"return\":\"0\",\"start\":\"1000\"},\"20754\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793199600,\"received_at\":1793199600,\"return\":\"0\",\"start\":\"1000\"},\"20755\":{\"end\":\"1000\",\"halted\":false,\"market_cutoff\":1793214540,\"partial_observation_day\":true,\"return\":\"0\",\"start\":\"1000\"}},\"execution_mode\":\"quote\",\"funding_applied\":[],\"funding_status\":\"ASSUMED\",\"health\":[\"CANDLE_VOLUME_UNIT_UNVERIFIED\",\"DATA_DEGRADED\",\"RAW5M_INDEPENDENCE_UNVERIFIED\"],\"journal_events\":2857,\"journal_inputs\":18883,\"limitations\":[\"Quote snapshots are a paper execution estimate, not actual fills.\",\"Independent raw5m and complete funding coverage are required.\",\"Historical comparison and sealed qualification remain separate.\"],\"model_archived_closed_net\":\"0\",\"model_nav\":\"1000\",\"model_net_all_closed\":\"0\",\"model_net_excluding_unresolved\":\"0\",\"native_1m\":60,\"native_5m\":347,\"native_cursor\":[1793214540,1793214540,60],\"open_at_cutoff\":0,\"orders_enabled\":false,\"outbox\":{\"DISABLED\":8},\"paper_outbound_enabled\":false,\"performance_claim\":false,\"qualification\":{\"candle_units\":false,\"fees\":true,\"funding_plan\":true,\"independent_5m\":false,\"product\":true},\"spec_version\":\"ZB-1.0\",\"unresolved_closed\":0,\"verified_closed\":0,\"verified_net\":null}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:09:47.372889484Z",
+      "severity": "error",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 250, \"warmup_target\": 250, \"rsi14_wilder\": 66.98485826934028, \"native_history_ready\": true, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:10:07.378951029Z",
+      "severity": "error",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 250, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 192.55392237402074, \"min_range_fraction\": 0.009042915396677256, \"minimum_target_fraction\": 0.008892915396677255, \"stop_floor_fraction\": 0.0035613550883342475}, \"entry_source_switched\": true, \"last5_start\": 1793214300, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 59.94107131531692, \"rsi_history_mature\": true, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:10:37.575431354Z",
+      "severity": "error",
+      "message": "INFO:lbank_zb_engine:ZB_ENGINE_STATUS {\"PF_model\":null,\"archived_closed\":0,\"archived_unresolved\":0,\"baseline_comparison\":null,\"blocked_reasons\":[\"RAW5M_INDEPENDENCE_UNVERIFIED\",\"CANDLE_VOLUME_UNIT_UNVERIFIED\"],\"candle_volume_unit_status\":\"UNVERIFIED_RESEARCH_ONLY\",\"classification\":\"EVIDENCE_INSUFFICIENT\",\"closed\":0,\"cost_evidence\":{\"candle_volume_unit\":\"UNVERIFIED\",\"contract_documentation\":\"https://www.lbank.com/docs/contract.html\",\"depth_volume_unit\":\"contract_units_from_instrument\",\"fee_policy\":\"public base taker; personal tier not accessed\",\"fee_source\":\"https://www.lbank.com/support/articles/21425760291097\",\"funding_history_days\":0,\"funding_settlements_verified\":false,\"instrument\":{\"baseCurrency\":\"BTC\",\"clearCurrency\":\"USDT\",\"defaultLeverage\":\"20.0\",\"exchangeID\":\"Exchange\",\"indexPrice\":\"81151.9\",\"maxLeverage\":200,\"maxOrderVolume\":\"150.0\",\"minOrderCost\":\"1.0\",\"minOrderVolume\":\"0.0001\",\"needSuspend\":0,\"priceCurrency\":\"USDT\",\"priceLimitLowerValue\":\"0.05\",\"priceLimitUpperValue\":\"0.05\",\"priceTick\":\"0.1\",\"symbol\":\"BTCUSDT\",\"symbolAlias\":\"BTC\",\"symbolName\":\"BTCUSDT\",\"volumeMultiple\":\"1.0\",\"volumeTick\":\"0.0001\"},\"instrument_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/instrument?productGroup=SwapU\",\"market\":{\"fundingRate\":\"0.0001\",\"highestPrice\":\"81798.5\",\"instrumentStatus\":\"2\",\"lastPrice\":\"81122.4\",\"lastTime\":1793214567,\"lowestPrice\":\"80358.8\",\"markedPrice\":\"81121.1\",\"nextFeeTime\":1793232000000,\"openPrice\":\"80733.3\",\"positionFeeRate\":\"0.0001\",\"positionFeeTime\":28800,\"symbol\":\"BTCUSDT\",\"turnover\":\"417106530.2871039\",\"underlyingPrice\":\"81151.9\",\"volume\":\"5152.1846\"},\"market_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketData?productGroup=SwapU\",\"received\":1793214570,\"schedule_basis\":\"nextFeeTime + current positionFeeTime; future changes possible\"},\"counts\":{\"CANCELLED\":3,\"DETECTED\":10,\"EXPIRED\":5,\"REGIME\":1575,\"REJECTED\":10,\"WARMUP\":1246,\"WATCHING\":10},\"daily\":{\"20749\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792767600,\"received_at\":1792767600,\"return\":\"0\",\"start\":\"1000\"},\"20750\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792854000,\"received_at\":1792854000,\"return\":\"0\",\"start\":\"1000\"},\"20751\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792940400,\"received_at\":1792940400,\"return\":\"0\",\"start\":\"1000\"},\"20752\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793026800,\"received_at\":1793026800,\"return\":\"0\",\"start\":\"1000\"},\"20753\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793113200,\"received_at\":1793113200,\"return\":\"0\",\"start\":\"1000\"},\"20754\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793199600,\"received_at\":1793199600,\"return\":\"0\",\"start\":\"1000\"},\"20755\":{\"end\":\"1000\",\"halted\":false,\"market_cutoff\":1793214600,\"partial_observation_day\":true,\"return\":\"0\",\"start\":\"1000\"}},\"execution_mode\":\"quote\",\"funding_applied\":[],\"funding_status\":\"ASSUMED\",\"health\":[\"CANDLE_VOLUME_UNIT_UNVERIFIED\",\"DATA_DEGRADED\",\"RAW5M_INDEPENDENCE_UNVERIFIED\"],\"journal_events\":2859,\"journal_inputs\":18886,\"limitations\":[\"Quote snapshots are a paper execution estimate, not actual fills.\",\"Independent raw5m and complete funding coverage are required.\",\"Historical comparison and sealed qualification remain separate.\"],\"model_archived_closed_net\":\"0\",\"model_nav\":\"1000\",\"model_net_all_closed\":\"0\",\"model_net_excluding_unresolved\":\"0\",\"native_1m\":60,\"native_5m\":348,\"native_cursor\":[1793214600,1793214600,300],\"open_at_cutoff\":0,\"orders_enabled\":false,\"outbox\":{\"DISABLED\":8},\"paper_outbound_enabled\":false,\"performance_claim\":false,\"qualification\":{\"candle_units\":false,\"fees\":true,\"funding_plan\":true,\"independent_5m\":false,\"product\":true},\"spec_version\":\"ZB-1.0\",\"unresolved_closed\":0,\"verified_closed\":0,\"verified_net\":null}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:10:57.353215226Z",
+      "severity": "error",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 250, \"warmup_target\": 250, \"rsi14_wilder\": 59.94107131531692, \"native_history_ready\": true, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:11:04.268047300Z",
+      "severity": "error",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 250, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 192.55392237402074, \"min_range_fraction\": 0.009049013975857117, \"minimum_target_fraction\": 0.008899013975857116, \"stop_floor_fraction\": 0.003565421621093869}, \"entry_source_switched\": true, \"last5_start\": 1793214300, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 59.94107131531692, \"rsi_history_mature\": true, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:11:38.247702830Z",
+      "severity": "error",
+      "message": "INFO:lbank_zb_engine:ZB_ENGINE_STATUS {\"PF_model\":null,\"archived_closed\":0,\"archived_unresolved\":0,\"baseline_comparison\":null,\"blocked_reasons\":[\"RAW5M_INDEPENDENCE_UNVERIFIED\",\"CANDLE_VOLUME_UNIT_UNVERIFIED\"],\"candle_volume_unit_status\":\"UNVERIFIED_RESEARCH_ONLY\",\"classification\":\"EVIDENCE_INSUFFICIENT\",\"closed\":0,\"cost_evidence\":{\"candle_volume_unit\":\"UNVERIFIED\",\"contract_documentation\":\"https://www.lbank.com/docs/contract.html\",\"depth_volume_unit\":\"contract_units_from_instrument\",\"fee_policy\":\"public base taker; personal tier not accessed\",\"fee_source\":\"https://www.lbank.com/support/articles/21425760291097\",\"funding_history_days\":0,\"funding_settlements_verified\":false,\"instrument\":{\"baseCurrency\":\"BTC\",\"clearCurrency\":\"USDT\",\"defaultLeverage\":\"20.0\",\"exchangeID\":\"Exchange\",\"indexPrice\":\"81151.9\",\"maxLeverage\":200,\"maxOrderVolume\":\"150.0\",\"minOrderCost\":\"1.0\",\"minOrderVolume\":\"0.0001\",\"needSuspend\":0,\"priceCurrency\":\"USDT\",\"priceLimitLowerValue\":\"0.05\",\"priceLimitUpperValue\":\"0.05\",\"priceTick\":\"0.1\",\"symbol\":\"BTCUSDT\",\"symbolAlias\":\"BTC\",\"symbolName\":\"BTCUSDT\",\"volumeMultiple\":\"1.0\",\"volumeTick\":\"0.0001\"},\"instrument_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/instrument?productGroup=SwapU\",\"market\":{\"fundingRate\":\"0.0001\",\"highestPrice\":\"81798.5\",\"instrumentStatus\":\"2\",\"lastPrice\":\"81122.4\",\"lastTime\":1793214567,\"lowestPrice\":\"80358.8\",\"markedPrice\":\"81121.1\",\"nextFeeTime\":1793232000000,\"openPrice\":\"80733.3\",\"positionFeeRate\":\"0.0001\",\"positionFeeTime\":28800,\"symbol\":\"BTCUSDT\",\"turnover\":\"417106530.2871039\",\"underlyingPrice\":\"81151.9\",\"volume\":\"5152.1846\"},\"market_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketData?productGroup=SwapU\",\"received\":1793214570,\"schedule_basis\":\"nextFeeTime + current positionFeeTime; future changes possible\"},\"counts\":{\"CANCELLED\":3,\"DETECTED\":10,\"EXPIRED\":5,\"REGIME\":1575,\"REJECTED\":10,\"WARMUP\":1246,\"WATCHING\":10},\"daily\":{\"20749\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792767600,\"received_at\":1792767600,\"return\":\"0\",\"start\":\"1000\"},\"20750\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792854000,\"received_at\":1792854000,\"return\":\"0\",\"start\":\"1000\"},\"20751\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792940400,\"received_at\":1792940400,\"return\":\"0\",\"start\":\"1000\"},\"20752\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793026800,\"received_at\":1793026800,\"return\":\"0\",\"start\":\"1000\"},\"20753\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793113200,\"received_at\":1793113200,\"return\":\"0\",\"start\":\"1000\"},\"20754\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793199600,\"received_at\":1793199600,\"return\":\"0\",\"start\":\"1000\"},\"20755\":{\"end\":\"1000\",\"halted\":false,\"market_cutoff\":1793214660,\"partial_observation_day\":true,\"return\":\"0\",\"start\":\"1000\"}},\"execution_mode\":\"quote\",\"funding_applied\":[],\"funding_status\":\"ASSUMED\",\"health\":[\"CANDLE_VOLUME_UNIT_UNVERIFIED\",\"DATA_DEGRADED\",\"RAW5M_INDEPENDENCE_UNVERIFIED\"],\"journal_events\":2859,\"journal_inputs\":18888,\"limitations\":[\"Quote snapshots are a paper execution estimate, not actual fills.\",\"Independent raw5m and complete funding coverage are required.\",\"Historical comparison and sealed qualification remain separate.\"],\"model_archived_closed_net\":\"0\",\"model_nav\":\"1000\",\"model_net_all_closed\":\"0\",\"model_net_excluding_unresolved\":\"0\",\"native_1m\":60,\"native_5m\":348,\"native_cursor\":[1793214660,1793214660,60],\"open_at_cutoff\":0,\"orders_enabled\":false,\"outbox\":{\"DISABLED\":8},\"paper_outbound_enabled\":false,\"performance_claim\":false,\"qualification\":{\"candle_units\":false,\"fees\":true,\"funding_plan\":true,\"independent_5m\":false,\"product\":true},\"spec_version\":\"ZB-1.0\",\"unresolved_closed\":0,\"verified_closed\":0,\"verified_net\":null}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:11:58.408494755Z",
+      "severity": "error",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 250, \"warmup_target\": 250, \"rsi14_wilder\": 59.94107131531692, \"native_history_ready\": true, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:12:07.534712827Z",
+      "severity": "error",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 250, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 192.55392237402074, \"min_range_fraction\": 0.009048749965418592, \"minimum_target_fraction\": 0.008898749965418591, \"stop_floor_fraction\": 0.0035652455789267033}, \"entry_source_switched\": true, \"last5_start\": 1793214300, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 59.94107131531692, \"rsi_history_mature\": true, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:12:38.037000362Z",
+      "severity": "error",
+      "message": "INFO:lbank_zb_engine:ZB_ENGINE_STATUS {\"PF_model\":null,\"archived_closed\":0,\"archived_unresolved\":0,\"baseline_comparison\":null,\"blocked_reasons\":[\"RAW5M_INDEPENDENCE_UNVERIFIED\",\"CANDLE_VOLUME_UNIT_UNVERIFIED\"],\"candle_volume_unit_status\":\"UNVERIFIED_RESEARCH_ONLY\",\"classification\":\"EVIDENCE_INSUFFICIENT\",\"closed\":0,\"cost_evidence\":{\"candle_volume_unit\":\"UNVERIFIED\",\"contract_documentation\":\"https://www.lbank.com/docs/contract.html\",\"depth_volume_unit\":\"contract_units_from_instrument\",\"fee_policy\":\"public base taker; personal tier not accessed\",\"fee_source\":\"https://www.lbank.com/support/articles/21425760291097\",\"funding_history_days\":0,\"funding_settlements_verified\":false,\"instrument\":{\"baseCurrency\":\"BTC\",\"clearCurrency\":\"USDT\",\"defaultLeverage\":\"20.0\",\"exchangeID\":\"Exchange\",\"indexPrice\":\"81151.9\",\"maxLeverage\":200,\"maxOrderVolume\":\"150.0\",\"minOrderCost\":\"1.0\",\"minOrderVolume\":\"0.0001\",\"needSuspend\":0,\"priceCurrency\":\"USDT\",\"priceLimitLowerValue\":\"0.05\",\"priceLimitUpperValue\":\"0.05\",\"priceTick\":\"0.1\",\"symbol\":\"BTCUSDT\",\"symbolAlias\":\"BTC\",\"symbolName\":\"BTCUSDT\",\"volumeMultiple\":\"1.0\",\"volumeTick\":\"0.0001\"},\"instrument_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/instrument?productGroup=SwapU\",\"market\":{\"fundingRate\":\"0.0001\",\"highestPrice\":\"81798.5\",\"instrumentStatus\":\"2\",\"lastPrice\":\"81122.4\",\"lastTime\":1793214567,\"lowestPrice\":\"80358.8\",\"markedPrice\":\"81121.1\",\"nextFeeTime\":1793232000000,\"openPrice\":\"80733.3\",\"positionFeeRate\":\"0.0001\",\"positionFeeTime\":28800,\"symbol\":\"BTCUSDT\",\"turnover\":\"417106530.2871039\",\"underlyingPrice\":\"81151.9\",\"volume\":\"5152.1846\"},\"market_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketData?productGroup=SwapU\",\"received\":1793214570,\"schedule_basis\":\"nextFeeTime + current positionFeeTime; future changes possible\"},\"counts\":{\"CANCELLED\":3,\"DETECTED\":10,\"EXPIRED\":5,\"REGIME\":1575,\"REJECTED\":10,\"WARMUP\":1246,\"WATCHING\":10},\"daily\":{\"20749\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792767600,\"received_at\":1792767600,\"return\":\"0\",\"start\":\"1000\"},\"20750\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792854000,\"received_at\":1792854000,\"return\":\"0\",\"start\":\"1000\"},\"20751\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792940400,\"received_at\":1792940400,\"return\":\"0\",\"start\":\"1000\"},\"20752\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793026800,\"received_at\":1793026800,\"return\":\"0\",\"start\":\"1000\"},\"20753\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793113200,\"received_at\":1793113200,\"return\":\"0\",\"start\":\"1000\"},\"20754\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793199600,\"received_at\":1793199600,\"return\":\"0\",\"start\":\"1000\"},\"20755\":{\"end\":\"1000\",\"halted\":false,\"market_cutoff\":1793214720,\"partial_observation_day\":true,\"return\":\"0\",\"start\":\"1000\"}},\"execution_mode\":\"quote\",\"funding_applied\":[],\"funding_status\":\"ASSUMED\",\"health\":[\"CANDLE_VOLUME_UNIT_UNVERIFIED\",\"DATA_DEGRADED\",\"RAW5M_INDEPENDENCE_UNVERIFIED\"],\"journal_events\":2859,\"journal_inputs\":18890,\"limitations\":[\"Quote snapshots are a paper execution estimate, not actual fills.\",\"Independent raw5m and complete funding coverage are required.\",\"Historical comparison and sealed qualification remain separate.\"],\"model_archived_closed_net\":\"0\",\"model_nav\":\"1000\",\"model_net_all_closed\":\"0\",\"model_net_excluding_unresolved\":\"0\",\"native_1m\":60,\"native_5m\":348,\"native_cursor\":[1793214720,1793214720,60],\"open_at_cutoff\":0,\"orders_enabled\":false,\"outbox\":{\"DISABLED\":8},\"paper_outbound_enabled\":false,\"performance_claim\":false,\"qualification\":{\"candle_units\":false,\"fees\":true,\"funding_plan\":true,\"independent_5m\":false,\"product\":true},\"spec_version\":\"ZB-1.0\",\"unresolved_closed\":0,\"verified_closed\":0,\"verified_net\":null}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:12:58.034360660Z",
+      "severity": "error",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 250, \"warmup_target\": 250, \"rsi14_wilder\": 59.94107131531692, \"native_history_ready\": true, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:13:17.767929408Z",
+      "severity": "error",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 250, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 192.55392237402074, \"min_range_fraction\": 0.009048288009880109, \"minimum_target_fraction\": 0.008898288009880108, \"stop_floor_fraction\": 0.003564937546961069}, \"entry_source_switched\": true, \"last5_start\": 1793214300, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 59.94107131531692, \"rsi_history_mature\": true, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:13:37.766260399Z",
+      "severity": "error",
+      "message": "INFO:lbank_zb_engine:ZB_ENGINE_STATUS {\"PF_model\":null,\"archived_closed\":0,\"archived_unresolved\":0,\"baseline_comparison\":null,\"blocked_reasons\":[\"RAW5M_INDEPENDENCE_UNVERIFIED\",\"CANDLE_VOLUME_UNIT_UNVERIFIED\"],\"candle_volume_unit_status\":\"UNVERIFIED_RESEARCH_ONLY\",\"classification\":\"EVIDENCE_INSUFFICIENT\",\"closed\":0,\"cost_evidence\":{\"candle_volume_unit\":\"UNVERIFIED\",\"contract_documentation\":\"https://www.lbank.com/docs/contract.html\",\"depth_volume_unit\":\"contract_units_from_instrument\",\"fee_policy\":\"public base taker; personal tier not accessed\",\"fee_source\":\"https://www.lbank.com/support/articles/21425760291097\",\"funding_history_days\":0,\"funding_settlements_verified\":false,\"instrument\":{\"baseCurrency\":\"BTC\",\"clearCurrency\":\"USDT\",\"defaultLeverage\":\"20.0\",\"exchangeID\":\"Exchange\",\"indexPrice\":\"81151.9\",\"maxLeverage\":200,\"maxOrderVolume\":\"150.0\",\"minOrderCost\":\"1.0\",\"minOrderVolume\":\"0.0001\",\"needSuspend\":0,\"priceCurrency\":\"USDT\",\"priceLimitLowerValue\":\"0.05\",\"priceLimitUpperValue\":\"0.05\",\"priceTick\":\"0.1\",\"symbol\":\"BTCUSDT\",\"symbolAlias\":\"BTC\",\"symbolName\":\"BTCUSDT\",\"volumeMultiple\":\"1.0\",\"volumeTick\":\"0.0001\"},\"instrument_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/instrument?productGroup=SwapU\",\"market\":{\"fundingRate\":\"0.0001\",\"highestPrice\":\"81798.5\",\"instrumentStatus\":\"2\",\"lastPrice\":\"81122.4\",\"lastTime\":1793214567,\"lowestPrice\":\"80358.8\",\"markedPrice\":\"81121.1\",\"nextFeeTime\":1793232000000,\"openPrice\":\"80733.3\",\"positionFeeRate\":\"0.0001\",\"positionFeeTime\":28800,\"symbol\":\"BTCUSDT\",\"turnover\":\"417106530.2871039\",\"underlyingPrice\":\"81151.9\",\"volume\":\"5152.1846\"},\"market_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketData?productGroup=SwapU\",\"received\":1793214570,\"schedule_basis\":\"nextFeeTime + current positionFeeTime; future changes possible\"},\"counts\":{\"CANCELLED\":3,\"DETECTED\":10,\"EXPIRED\":5,\"REGIME\":1575,\"REJECTED\":10,\"WARMUP\":1246,\"WATCHING\":10},\"daily\":{\"20749\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792767600,\"received_at\":1792767600,\"return\":\"0\",\"start\":\"1000\"},\"20750\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792854000,\"received_at\":1792854000,\"return\":\"0\",\"start\":\"1000\"},\"20751\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792940400,\"received_at\":1792940400,\"return\":\"0\",\"start\":\"1000\"},\"20752\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793026800,\"received_at\":1793026800,\"return\":\"0\",\"start\":\"1000\"},\"20753\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793113200,\"received_at\":1793113200,\"return\":\"0\",\"start\":\"1000\"},\"20754\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793199600,\"received_at\":1793199600,\"return\":\"0\",\"start\":\"1000\"},\"20755\":{\"end\":\"1000\",\"halted\":false,\"market_cutoff\":1793214780,\"partial_observation_day\":true,\"return\":\"0\",\"start\":\"1000\"}},\"execution_mode\":\"quote\",\"funding_applied\":[],\"funding_status\":\"ASSUMED\",\"health\":[\"CANDLE_VOLUME_UNIT_UNVERIFIED\",\"DATA_DEGRADED\",\"RAW5M_INDEPENDENCE_UNVERIFIED\"],\"journal_events\":2859,\"journal_inputs\":18892,\"limitations\":[\"Quote snapshots are a paper execution estimate, not actual fills.\",\"Independent raw5m and complete funding coverage are required.\",\"Historical comparison and sealed qualification remain separate.\"],\"model_archived_closed_net\":\"0\",\"model_nav\":\"1000\",\"model_net_all_closed\":\"0\",\"model_net_excluding_unresolved\":\"0\",\"native_1m\":60,\"native_5m\":348,\"native_cursor\":[1793214780,1793214780,60],\"open_at_cutoff\":0,\"orders_enabled\":false,\"outbox\":{\"DISABLED\":8},\"paper_outbound_enabled\":false,\"performance_claim\":false,\"qualification\":{\"candle_units\":false,\"fees\":true,\"funding_plan\":true,\"independent_5m\":false,\"product\":true},\"spec_version\":\"ZB-1.0\",\"unresolved_closed\":0,\"verified_closed\":0,\"verified_net\":null}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:13:58.026985288Z",
+      "severity": "error",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 250, \"warmup_target\": 250, \"rsi14_wilder\": 59.94107131531692, \"native_history_ready\": true, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:13:58.026990615Z",
+      "severity": "error",
+      "message": "WARNING:lbank_market_context:MARKET_CONTEXT_UNAVAILABLE exception=HTTPError existing_alerts_unchanged=true",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:14:13.512220912Z",
+      "severity": "error",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 250, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 192.55392237402074, \"min_range_fraction\": 0.009045557504137302, \"minimum_target_fraction\": 0.008895557504137301, \"stop_floor_fraction\": 0.0035631168456591628}, \"entry_source_switched\": true, \"last5_start\": 1793214300, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 59.94107131531692, \"rsi_history_mature\": true, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:14:33.490178471Z",
+      "severity": "error",
+      "message": "INFO:lbank_zb_engine:ZB_ENGINE_STATUS {\"PF_model\":null,\"archived_closed\":0,\"archived_unresolved\":0,\"baseline_comparison\":null,\"blocked_reasons\":[\"RAW5M_INDEPENDENCE_UNVERIFIED\",\"CANDLE_VOLUME_UNIT_UNVERIFIED\"],\"candle_volume_unit_status\":\"UNVERIFIED_RESEARCH_ONLY\",\"classification\":\"EVIDENCE_INSUFFICIENT\",\"closed\":0,\"cost_evidence\":{\"candle_volume_unit\":\"UNVERIFIED\",\"contract_documentation\":\"https://www.lbank.com/docs/contract.html\",\"depth_volume_unit\":\"contract_units_from_instrument\",\"fee_policy\":\"public base taker; personal tier not accessed\",\"fee_source\":\"https://www.lbank.com/support/articles/21425760291097\",\"funding_history_days\":0,\"funding_settlements_verified\":false,\"instrument\":{\"baseCurrency\":\"BTC\",\"clearCurrency\":\"USDT\",\"defaultLeverage\":\"20.0\",\"exchangeID\":\"Exchange\",\"indexPrice\":\"81099.6\",\"maxLeverage\":200,\"maxOrderVolume\":\"150.0\",\"minOrderCost\":\"1.0\",\"minOrderVolume\":\"0.0001\",\"needSuspend\":0,\"priceCurrency\":\"USDT\",\"priceLimitLowerValue\":\"0.05\",\"priceLimitUpperValue\":\"0.05\",\"priceTick\":\"0.1\",\"symbol\":\"BTCUSDT\",\"symbolAlias\":\"BTC\",\"symbolName\":\"BTCUSDT\",\"volumeMultiple\":\"1.0\",\"volumeTick\":\"0.0001\"},\"instrument_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/instrument?productGroup=SwapU\",\"market\":{\"fundingRate\":\"0.0001\",\"highestPrice\":\"81798.5\",\"instrumentStatus\":\"2\",\"lastPrice\":\"81084.3\",\"lastTime\":1793214868,\"lowestPrice\":\"80358.8\",\"markedPrice\":\"81084.2\",\"nextFeeTime\":1793232000000,\"openPrice\":\"80633.7\",\"positionFeeRate\":\"0.0001\",\"positionFeeTime\":28800,\"symbol\":\"BTCUSDT\",\"turnover\":\"418066535.8816639\",\"underlyingPrice\":\"81099.6\",\"volume\":\"5164.0308\"},\"market_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketData?productGroup=SwapU\",\"received\":1793214871,\"schedule_basis\":\"nextFeeTime + current positionFeeTime; future changes possible\"},\"counts\":{\"CANCELLED\":3,\"DETECTED\":10,\"EXPIRED\":5,\"REGIME\":1575,\"REJECTED\":10,\"WARMUP\":1246,\"WATCHING\":10},\"daily\":{\"20749\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792767600,\"received_at\":1792767600,\"return\":\"0\",\"start\":\"1000\"},\"20750\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792854000,\"received_at\":1792854000,\"return\":\"0\",\"start\":\"1000\"},\"20751\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792940400,\"received_at\":1792940400,\"return\":\"0\",\"start\":\"1000\"},\"20752\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793026800,\"received_at\":1793026800,\"return\":\"0\",\"start\":\"1000\"},\"20753\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793113200,\"received_at\":1793113200,\"return\":\"0\",\"start\":\"1000\"},\"20754\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793199600,\"received_at\":1793199600,\"return\":\"0\",\"start\":\"1000\"},\"20755\":{\"end\":\"1000\",\"halted\":false,\"market_cutoff\":1793214840,\"partial_observation_day\":true,\"return\":\"0\",\"start\":\"1000\"}},\"execution_mode\":\"quote\",\"funding_applied\":[],\"funding_status\":\"ASSUMED\",\"health\":[\"CANDLE_VOLUME_UNIT_UNVERIFIED\",\"DATA_DEGRADED\",\"RAW5M_INDEPENDENCE_UNVERIFIED\"],\"journal_events\":2859,\"journal_inputs\":18895,\"limitations\":[\"Quote snapshots are a paper execution estimate, not actual fills.\",\"Independent raw5m and complete funding coverage are required.\",\"Historical comparison and sealed qualification remain separate.\"],\"model_archived_closed_net\":\"0\",\"model_nav\":\"1000\",\"model_net_all_closed\":\"0\",\"model_net_excluding_unresolved\":\"0\",\"native_1m\":60,\"native_5m\":348,\"native_cursor\":[1793214840,1793214840,60],\"open_at_cutoff\":0,\"orders_enabled\":false,\"outbox\":{\"DISABLED\":8},\"paper_outbound_enabled\":false,\"performance_claim\":false,\"qualification\":{\"candle_units\":false,\"fees\":true,\"funding_plan\":true,\"independent_5m\":false,\"product\":true},\"spec_version\":\"ZB-1.0\",\"unresolved_closed\":0,\"verified_closed\":0,\"verified_net\":null}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:14:53.564629823Z",
+      "severity": "error",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 250, \"warmup_target\": 250, \"rsi14_wilder\": 59.94107131531692, \"native_history_ready\": true, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:15:16.797680267Z",
+      "severity": "error",
+      "message": "INFO:lbank_monitor:NATIVE_ENTRY_STATUS {\"closed_1m\": 360, \"closed_5m\": 250, \"closure\": \"stream_inferred_not_rest_verified\", \"entry_geometry\": {\"atr5\": 189.77864228955315, \"min_range_fraction\": 0.008966520288924012, \"minimum_target_fraction\": 0.008816520288924011, \"stop_floor_fraction\": 0.0035104148284466827}, \"entry_source_switched\": true, \"last5_start\": 1793214600, \"reason\": \"native_ready\", \"required_5m\": 20, \"rsi14_wilder\": 60.62040445378227, \"rsi_history_mature\": true, \"rsi_warmup_target\": 250, \"source\": \"lbank_native_1m_aggregated_5m\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:15:36.584270733Z",
+      "severity": "error",
+      "message": "INFO:lbank_zb_engine:ZB_ENGINE_STATUS {\"PF_model\":null,\"archived_closed\":0,\"archived_unresolved\":0,\"baseline_comparison\":null,\"blocked_reasons\":[\"RAW5M_INDEPENDENCE_UNVERIFIED\",\"CANDLE_VOLUME_UNIT_UNVERIFIED\"],\"candle_volume_unit_status\":\"UNVERIFIED_RESEARCH_ONLY\",\"classification\":\"EVIDENCE_INSUFFICIENT\",\"closed\":0,\"cost_evidence\":{\"candle_volume_unit\":\"UNVERIFIED\",\"contract_documentation\":\"https://www.lbank.com/docs/contract.html\",\"depth_volume_unit\":\"contract_units_from_instrument\",\"fee_policy\":\"public base taker; personal tier not accessed\",\"fee_source\":\"https://www.lbank.com/support/articles/21425760291097\",\"funding_history_days\":0,\"funding_settlements_verified\":false,\"instrument\":{\"baseCurrency\":\"BTC\",\"clearCurrency\":\"USDT\",\"defaultLeverage\":\"20.0\",\"exchangeID\":\"Exchange\",\"indexPrice\":\"81099.6\",\"maxLeverage\":200,\"maxOrderVolume\":\"150.0\",\"minOrderCost\":\"1.0\",\"minOrderVolume\":\"0.0001\",\"needSuspend\":0,\"priceCurrency\":\"USDT\",\"priceLimitLowerValue\":\"0.05\",\"priceLimitUpperValue\":\"0.05\",\"priceTick\":\"0.1\",\"symbol\":\"BTCUSDT\",\"symbolAlias\":\"BTC\",\"symbolName\":\"BTCUSDT\",\"volumeMultiple\":\"1.0\",\"volumeTick\":\"0.0001\"},\"instrument_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/instrument?productGroup=SwapU\",\"market\":{\"fundingRate\":\"0.0001\",\"highestPrice\":\"81798.5\",\"instrumentStatus\":\"2\",\"lastPrice\":\"81084.3\",\"lastTime\":1793214868,\"lowestPrice\":\"80358.8\",\"markedPrice\":\"81084.2\",\"nextFeeTime\":1793232000000,\"openPrice\":\"80633.7\",\"positionFeeRate\":\"0.0001\",\"positionFeeTime\":28800,\"symbol\":\"BTCUSDT\",\"turnover\":\"418066535.8816639\",\"underlyingPrice\":\"81099.6\",\"volume\":\"5164.0308\"},\"market_url\":\"https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketData?productGroup=SwapU\",\"received\":1793214871,\"schedule_basis\":\"nextFeeTime + current positionFeeTime; future changes possible\"},\"counts\":{\"CANCELLED\":3,\"DETECTED\":10,\"EXPIRED\":5,\"REGIME\":1576,\"REJECTED\":10,\"WARMUP\":1247,\"WATCHING\":10},\"daily\":{\"20749\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792767600,\"received_at\":1792767600,\"return\":\"0\",\"start\":\"1000\"},\"20750\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792854000,\"received_at\":1792854000,\"return\":\"0\",\"start\":\"1000\"},\"20751\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1792940400,\"received_at\":1792940400,\"return\":\"0\",\"start\":\"1000\"},\"20752\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793026800,\"received_at\":1793026800,\"return\":\"0\",\"start\":\"1000\"},\"20753\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793113200,\"received_at\":1793113200,\"return\":\"0\",\"start\":\"1000\"},\"20754\":{\"boundary_verified\":true,\"end\":\"1000\",\"halt_at\":null,\"halt_received_at\":null,\"halted\":false,\"market_cutoff\":1793199600,\"received_at\":1793199600,\"return\":\"0\",\"start\":\"1000\"},\"20755\":{\"end\":\"1000\",\"halted\":false,\"market_cutoff\":1793214900,\"partial_observation_day\":true,\"return\":\"0\",\"start\":\"1000\"}},\"execution_mode\":\"quote\",\"funding_applied\":[],\"funding_status\":\"ASSUMED\",\"health\":[\"CANDLE_VOLUME_UNIT_UNVERIFIED\",\"DATA_DEGRADED\",\"RAW5M_INDEPENDENCE_UNVERIFIED\"],\"journal_events\":2861,\"journal_inputs\":18898,\"limitations\":[\"Quote snapshots are a paper execution estimate, not actual fills.\",\"Independent raw5m and complete funding coverage are required.\",\"Historical comparison and sealed qualification remain separate.\"],\"model_archived_closed_net\":\"0\",\"model_nav\":\"1000\",\"model_net_all_closed\":\"0\",\"model_net_excluding_unresolved\":\"0\",\"native_1m\":60,\"native_5m\":349,\"native_cursor\":[1793214900,1793214900,300],\"open_at_cutoff\":0,\"orders_enabled\":false,\"outbox\":{\"DISABLED\":8},\"paper_outbound_enabled\":false,\"performance_claim\":false,\"qualification\":{\"candle_units\":false,\"fees\":true,\"funding_plan\":true,\"independent_5m\":false,\"product\":true},\"spec_version\":\"ZB-1.0\",\"unresolved_closed\":0,\"verified_closed\":0,\"verified_net\":null}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-28T19:15:56.558555178Z",
+      "severity": "error",
+      "message": "INFO:lbank_native_candles:NATIVE_CANDLES_STATUS {\"consecutive_closed_5m\": 250, \"warmup_target\": 250, \"rsi14_wilder\": 60.62040445378227, \"native_history_ready\": true, \"entry_source_status\": \"see_NATIVE_ENTRY_STATUS\", \"source\": \"lbank_native_1m_aggregated_5m\", \"closure\": \"stream_inferred_not_rest_verified\"}",
+      "attributes": [
+        {
+          "key": "level",
+          "value": "\"error\""
+        }
+      ]
+    }
+  ],
+  "exact_tool_call_started_at": null,
+  "exact_tool_call_received_at": null,
+  "observed_retrieval_bounds_utc": [
+    "2026-10-28T19:14:30Z",
+    "2026-10-28T19:16:52Z"
+  ],
+  "time_note": "Bounds are observed clock samples around this read, not inferred transport timestamps. Entries retain exact provider log timestamp strings. Railway log timestamps are not original exchange transport receipt timestamps.",
+  "effective_streams": [
+    "deploy"
+  ],
+  "request_argument_note": "Submitted extra logType=deploy is not part of advertised schema; it is ignored. types omitted, so default deploy stream applies. Two bounded read-only calls occurred; this is the retained second result."
+}

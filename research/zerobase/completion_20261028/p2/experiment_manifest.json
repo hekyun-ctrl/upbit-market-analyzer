@@ -1,0 +1,88 @@
+{
+  "schema": "zb_p2_predeclared_v1",
+  "declared_at": "2026-10-28T04:22:14.197941+00:00",
+  "source_checkpoint": "669ea78c524ba1c7e56225517594d9f82d888472",
+  "scope": "E3 only implementation; P2 partial",
+  "sample_class": "previously used signal-adjacent development observations; not unseen or continuous validation",
+  "independent_experiments": {
+    "E1": {
+      "factor": "first-retest detection only",
+      "status": "not_implemented_in_this_checkpoint"
+    },
+    "E2": {
+      "factor": "structural target and inverse entry only",
+      "status": "P1 implemented; frozen, no tuning"
+    },
+    "E3": {
+      "factor": "replace fixed 30s wait with evidence readiness",
+      "status": "predeclared_before_execution"
+    },
+    "E4": {
+      "factor": "nearby barrier exception and chase rules only",
+      "status": "not_implemented_in_this_checkpoint"
+    },
+    "E5": {
+      "factor": "early reversal route only",
+      "status": "not_implemented_in_this_checkpoint"
+    }
+  },
+  "arms": {
+    "capture": "existing detection, target, 30s confirm",
+    "capture_e3": "same capture, E3 only",
+    "structural_p1": "existing P1 structural target, 30s confirm",
+    "structural_p1_e3": "same P1, E3 only"
+  },
+  "comparison_pairs": [
+    [
+      "capture",
+      "capture_e3"
+    ],
+    [
+      "structural_p1",
+      "structural_p1_e3"
+    ]
+  ],
+  "e3_definition": {
+    "minimum_fixed_wait_seconds": 0,
+    "first_evaluation": "including discovery if all evidence already present; no synthetic tick",
+    "trigger": "frozen original breakout level; other strategies freeze last completed directional high/low at discovery",
+    "condition": "real observed quote strictly crosses frozen trigger; current structure intact; all post-watch closed bars including first retain original stop; retain every existing cost/RR/context/RSI/structure/quote/chase/TTL/cooldown check",
+    "age_argument": "actual observation minus watch timestamp; never spoof 30s",
+    "bar_availability": "original nominal+0/15s scenarios; actual receipts remain null",
+    "same_observation_confirmation": "permitted only after full second-stage checks; no claim of separate independent market evidence"
+  },
+  "frozen": {
+    "minimum_net_rr": 1.5,
+    "target_policy": "P1 byte-identical; no synthesized extension or threshold lowering",
+    "fees_and_risk": "existing retained model, same in both arms per scenario",
+    "confirmation_ttl": "existing maximum unchanged",
+    "one_four_hour": "reference only; no added gate",
+    "source_blockers": [
+      "RAW5M_INDEPENDENCE_UNVERIFIED",
+      "CANDLE_VOLUME_UNIT_UNVERIFIED"
+    ]
+  },
+  "scenarios": [
+    "base_delay0",
+    "base_delay15",
+    "adverse_delay0"
+  ],
+  "required_outputs": [
+    "per-event first-candidate and confirmation lead, matching/excluded/added/unmatched",
+    "all rejections with input hashes",
+    "fixed model outcomes, horizons, same-event 30/60s manual delay",
+    "alarm/stops/emergency/net/drawdown/unresolved, zero entry versus unknown",
+    "baseline full economic window outputs equal saved results",
+    "no external sends/orders/production activation"
+  ],
+  "inference": "diagnostic ablation only; do not select or promote a winner from these reused outcomes; P1 no-entry floor may make E3 unidentifiable",
+  "input_sha256": {
+    "research/zerobase/entry_comparison_20261024/archive_chunks.json": "0d8b8db7cdccd009d2d08e7c9ece7403231bce3b4af8227b5bddff246daa8cce",
+    "research/zerobase/entry_comparison_20261024/recorded_quotes.json": "088b245a78a95453fe51d7555e3017eb413aea0ba39ff4fa729fc14a0071e88b",
+    "research/zerobase/entry_comparison_20261024/outcome_candle_logs.jsonl": "0254b28096f864b24e7b39a3d04bd464e33e03a588b4f36b0ea5e4dace9576b7",
+    "research/zerobase/completion_20261028/p1/comparison.json": "401a325d6fa7a0ff7d5a137a854989131de0d97531e9aae60c8925d17ff9541c",
+    "research/zerobase/completion_20261028/p1/manifest.json": "adea1894e96e58241d1f9c386b91778afab943ca0944b61e912caea07ab66b10"
+  },
+  "sends": false,
+  "orders": false
+}

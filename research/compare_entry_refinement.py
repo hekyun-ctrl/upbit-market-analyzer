@@ -110,7 +110,8 @@ def compact_plan(plan):
     return result
 
 
-def replay_window(points, feed, nominal_delay):
+def replay_window(points, feed, nominal_delay, *, confirmation_delay_seconds=30,
+                  confirm_on_discovery=False, watch_observer=None, proposal_filter=None):
     evaluations, blocks, confirm_reasons, gate_reasons = Counter(), Counter(), Counter(), Counter()
     initial_bars, raw_bars, opportunities, signals = set(), set(), [], []
     alert = dict(day=None, count=0, last_time=None, last_side=None)
@@ -138,7 +139,7 @@ def replay_window(points, feed, nominal_delay):
             if age > monitor.ENTRY_CONFIRM_MAX_AGE_SECONDS:
                 expired += 1
                 watch = None
-            elif age >= 30:
+            elif age >= confirmation_delay_seconds:
                 diagnostic = {}
                 plan = monitor.confirm_watch(state['prices'], watch['plan'], age,
                     native_state=state, diagnostics=diagnostic)
@@ -150,14 +151,34 @@ def replay_window(points, feed, nominal_delay):
                         signals.append(dict(at=iso(ts), watch_at=iso(watch['time']), **compact_plan(plan)))
                         monitor.record_alert(ts, plan['side'], alert, plan=plan)
                     watch = None
-                elif diagnostic.get('reason') == monitor.BREAKOUT_CONFIRMATION_REJECT:
+                elif (diagnostic.get('reason') == monitor.BREAKOUT_CONFIRMATION_REJECT
+                      or diagnostic.get('cancel_watch') is True):
                     watch = None
+        if watch is not None and proposal and watch_observer is not None:
+            watch_observer(proposal, watch)
+        if proposal is not None and proposal_filter is not None:
+            proposal = proposal_filter(proposal)
         if watch is None and proposal:
             gate = monitor.alert_gate(ts, proposal['side'], alert, plan=proposal)
             gate_reasons['discovery:'+gate] += 1
             if gate == 'ok':
                 watched += 1
                 watch = dict(plan=copy.deepcopy(proposal), time=ts)
+                if confirm_on_discovery:
+                    diagnostic = {}
+                    plan = monitor.confirm_watch(state['prices'], watch['plan'], 0,
+                        native_state=state, diagnostics=diagnostic)
+                    confirm_reasons[diagnostic.get('reason', 'unknown')] += 1
+                    if plan:
+                        gate = monitor.alert_gate(ts, plan['side'], alert, plan=plan)
+                        gate_reasons['confirm:'+gate] += 1
+                        if gate == 'ok':
+                            signals.append(dict(at=iso(ts), watch_at=iso(ts), **compact_plan(plan)))
+                            monitor.record_alert(ts, plan['side'], alert, plan=plan)
+                        watch = None
+                    elif (diagnostic.get('reason') == monitor.BREAKOUT_CONFIRMATION_REJECT
+                          or diagnostic.get('cancel_watch') is True):
+                        watch = None
     distances = [x['target1_distance_pct'] for x in opportunities]
     return dict(quote_observations=len(points), ready_observations=ready, unavailable=dict(blocks),
         raw_candidate_bar_families=len(raw_bars), qualified_candidate_bars=len(initial_bars),
