@@ -1,0 +1,14 @@
+[
+  {
+    "url": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/instrument?productGroup=SwapU",
+    "requested_at": "2026-10-21T07:19:34.349177+00:00",
+    "error": "HTTPError",
+    "detail": "HTTP Error 403: Forbidden"
+  },
+  {
+    "url": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketOrder?symbol=BTCUSDT&depth=5",
+    "requested_at": "2026-10-21T07:19:34.351460+00:00",
+    "error": "HTTPError",
+    "detail": "HTTP Error 403: Forbidden"
+  }
+]

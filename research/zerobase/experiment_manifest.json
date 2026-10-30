@@ -1,0 +1,28 @@
+{
+  "spec_version": "ZB-1.0",
+  "baseline_commit": "25388b431c9c9d38df6a434670586c65f382d604",
+  "frozen_at_UTC": "2026-10-21T07:22:31.576547+00:00",
+  "mode": "research_only",
+  "strategy_variants": [
+    "A_default",
+    "B_default",
+    "C_default"
+  ],
+  "changed_variants": [],
+  "max_total_variants": 6,
+  "sealed_test_performed": false,
+  "outbound_notifications": false,
+  "orders": false,
+  "files": {
+    "docs/zerobase/spec_ZB-1.0.md": "ee8f26bf627644ebc511bdf7de0799d67169da50bc7523a7e50b6f1f5abd8a4a",
+    "lbank_zb/__init__.py": "7e2aea2e9beb842bbb6f899fe03760b5103c67219c56154fb2163d1f56b7e2cc",
+    "lbank_zb/adapter.py": "195c70bd367624a1d8698263b12f6c8a231c2661cb14a2fe34e201d4f07cf942",
+    "lbank_zb/config.json": "74943c7c343f1dd024c4c115adab19a6fc12c5a846d6dcb6a4cc59fd61e9d0fe",
+    "lbank_zb/core.py": "90ae689230513cb9b154388449b2949ee904969265454712c2dfce35ea3c1370",
+    "lbank_zb/engine.py": "723e3e026468027337cd3efaea20ba61cef714fdd4c60e753f504bfc1927957f",
+    "lbank_zb/evaluation.py": "e5615e4b2fe303143399cfae484c0ea7a95cbbabba2ca39e8447476160b9f0a1",
+    "lbank_zb/replay.py": "ad4ac21c7e04079e7a411052882c575a59c9d4bb726b16389c07a9aa880cb8ea",
+    "lbank_zb/store.py": "a730b3ee4a0c1ae8bd3fa50308717c158341af09e140dc4362a4dffd0ba49a97"
+  },
+  "classification": "EVIDENCE_INSUFFICIENT"
+}

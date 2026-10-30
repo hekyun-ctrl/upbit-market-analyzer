@@ -1,0 +1,24 @@
+{
+  "implementation": "persistent_quote_funding_pipeline",
+  "unit_tests": 425,
+  "unit_result": "OK",
+  "engineering_ready": false,
+  "entry_publication_enabled": false,
+  "paper_outbound_enabled": false,
+  "connection_status_outbound_enabled": false,
+  "orders_enabled": false,
+  "required_flags": {
+    "LBANK_ZB_ENGINE_ENABLED": "true",
+    "LBANK_PAPER_NOTIFICATIONS_ENABLED": "false",
+    "LBANK_ZB_RUNTIME_ENABLED": "false"
+  },
+  "unresolved": [
+    "independent_raw_5m_source",
+    "candle_volume_provenance",
+    "confirmed_funding_history_and_coverage",
+    "matched_baseline_evaluation",
+    "favorable_intrabar_bounds_and_sealed_qualification"
+  ],
+  "forward_acceptance": "failed_public_api_timeout_after_two_closed_1m_arrivals",
+  "deployment": "not_yet_attempted"
+}

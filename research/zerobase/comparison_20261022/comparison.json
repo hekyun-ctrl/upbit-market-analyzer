@@ -1,0 +1,763 @@
+{
+  "protocol": "same_data_existing_ZB_development_v1",
+  "entry_window_UTC": [
+    "2025-01-08",
+    "2025-01-15 exclusive"
+  ],
+  "followup_end_UTC": "2025-01-16 exclusive",
+  "historical_seen": true,
+  "native_LBank_performance": false,
+  "independent_holdout": false,
+  "messages_sent": 0,
+  "orders": 0,
+  "input_manifest": [
+    {
+      "file": "btc202501.zip",
+      "SHA256": "b69ca5b2c2d1ae00d68d2790d09138cb2a44085ff19e0da5dc98b569ea7e489e",
+      "rows": 44640
+    },
+    {
+      "file": "BTCUSDT-5m-2025-01.zip",
+      "SHA256": "0c99422d64fa3cc58564cf77969fc5a96d6f44783c79ecfcf94b103753bf7570",
+      "rows": 8928
+    },
+    {
+      "file": "BTCUSDT-fundingRate-2025-01.zip",
+      "SHA256": "df725010d55458866eb5a47e9ee708c6796c9d7e77b14c38342cea11f381815e",
+      "rows": 93
+    }
+  ],
+  "crosschecked_5m": 3168,
+  "existing": {
+    "entries": 22,
+    "closed": 9,
+    "censored_or_open": 13,
+    "net_USDT": -21.41490596201438,
+    "PF": 0.10379238343925701,
+    "mean_net": -2.3794339957793755,
+    "realized_drawdown_USDT": 21.41490596201438,
+    "TP1_states": 3,
+    "doublecost_net_USDT": -28.33627040070703,
+    "statuses": {
+      "censored_intrabar_stop": 4,
+      "structure_exit": 4,
+      "censored_intrabar_profit_guard": 9,
+      "stop": 4,
+      "trailing_stop": 1
+    }
+  },
+  "ZB": {
+    "entries": 0,
+    "closed": 0,
+    "censored_or_open": 0,
+    "net_USDT": 0,
+    "PF": null,
+    "mean_net": null,
+    "realized_drawdown_USDT": 0,
+    "TP1_states": 0,
+    "doublecost_net_USDT": 0,
+    "statuses": {}
+  },
+  "paired_realized_daily_difference": {
+    "lower": "2.036945886917595533333333333",
+    "upper": "4.0711953300040383",
+    "iterations": 2000,
+    "seed": 20261021,
+    "unit": "KST3_consecutive_day_blocks",
+    "limitation": "Does not remove all regime/episode dependence."
+  },
+  "ZB_event_counts": {
+    "REGIME": 3168,
+    "WARMUP": 449,
+    "WATCHING": 114,
+    "EXPIRED": 50,
+    "DETECTED": 136,
+    "REJECTED": 136,
+    "CANCELLED": 31,
+    "BAR_MISMATCH_OR_UNIT_UNKNOWN": 2
+  },
+  "ZB_health": [
+    "DATA_DEGRADED"
+  ],
+  "rows": [
+    {
+      "system": "existing",
+      "id": "1736319360000:1",
+      "entry_at": 1736319360.0,
+      "exit_at": 1736322660.0,
+      "direction": -1,
+      "strategy": "breakout",
+      "entry": 95339.8,
+      "stop": 95739.31318,
+      "TP1": 94402.13988717532,
+      "partial": false,
+      "status": "censored_intrabar_stop",
+      "quantity": 0.004605289996032888,
+      "net": null,
+      "double_net": null,
+      "known_leg_net": -2.3202580314752983,
+      "legs": [
+        {
+          "id": "1736319360000:1",
+          "policy": "trend_runner",
+          "at": 1736322660,
+          "price": 95690.8,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "censored_intrabar_stop"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736355420000:2",
+      "entry_at": 1736355420.0,
+      "exit_at": 1736358120.0,
+      "direction": -1,
+      "strategy": "trend_retest",
+      "entry": 94643.6,
+      "stop": 95107.40512824051,
+      "TP1": 93611.95283045416,
+      "partial": true,
+      "status": "censored_intrabar_stop",
+      "quantity": 0.0041243713400905555,
+      "net": null,
+      "double_net": null,
+      "known_leg_net": 3.8142361549702626,
+      "legs": [
+        {
+          "id": "1736355420000:2",
+          "policy": "trend_runner",
+          "at": 1736357040,
+          "price": 93611.95283045416,
+          "fraction": 0.5,
+          "kind": "partial",
+          "reason": "TP1"
+        },
+        {
+          "id": "1736355420000:2",
+          "policy": "trend_runner",
+          "at": 1736358120,
+          "price": 93524.5,
+          "fraction": 0.5,
+          "kind": "exit",
+          "reason": "censored_intrabar_stop"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736371020000:3",
+      "entry_at": 1736371020.0,
+      "exit_at": 1736371500.0,
+      "direction": -1,
+      "strategy": "trend_retest",
+      "entry": 93711.3,
+      "stop": 94130.04495289146,
+      "TP1": 92750.56445963545,
+      "partial": false,
+      "status": "structure_exit",
+      "quantity": 0.004467012231306462,
+      "net": -2.4226921557724226,
+      "double_net": -3.0938692360132745,
+      "known_leg_net": -2.4226921557724226,
+      "legs": [
+        {
+          "id": "1736371020000:3",
+          "policy": "trend_runner",
+          "at": 1736371500,
+          "price": 94103.4,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "structure_exit"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736409000000:4",
+      "entry_at": 1736409000.0,
+      "exit_at": 1736409480.0,
+      "direction": -1,
+      "strategy": "trend_retest",
+      "entry": 93507.9,
+      "stop": 93784.12058021784,
+      "TP1": 92761.7154495655,
+      "partial": false,
+      "status": "censored_intrabar_profit_guard",
+      "quantity": 0.005999308964415948,
+      "net": null,
+      "double_net": null,
+      "known_leg_net": 0.860430701362548,
+      "legs": [
+        {
+          "id": "1736409000000:4",
+          "policy": "trend_runner",
+          "at": 1736409480,
+          "price": 93215.1,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "censored_intrabar_profit_guard"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736429760000:5",
+      "entry_at": 1736429760.0,
+      "exit_at": 1736430240.0,
+      "direction": -1,
+      "strategy": "trend_retest",
+      "entry": 92541.2,
+      "stop": 92897.90823999999,
+      "TP1": 91677.68971465973,
+      "partial": false,
+      "status": "censored_intrabar_profit_guard",
+      "quantity": 0.005042187434267742,
+      "net": null,
+      "double_net": null,
+      "known_leg_net": 0.4705725743065249,
+      "legs": [
+        {
+          "id": "1736429760000:5",
+          "policy": "trend_runner",
+          "at": 1736430240,
+          "price": 92300.0,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "censored_intrabar_profit_guard"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736454000000:6",
+      "entry_at": 1736454000.0,
+      "exit_at": 1736456340.0,
+      "direction": -1,
+      "strategy": "trend_retest",
+      "entry": 91634.4,
+      "stop": 92121.3637505332,
+      "TP1": 90578.68474500705,
+      "partial": false,
+      "status": "censored_intrabar_stop",
+      "quantity": 0.004001178099855009,
+      "net": null,
+      "double_net": null,
+      "known_leg_net": -1.9857630923105942,
+      "legs": [
+        {
+          "id": "1736454000000:6",
+          "policy": "trend_runner",
+          "at": 1736456340,
+          "price": 91983.8,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "censored_intrabar_stop"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736460900000:7",
+      "entry_at": 1736460900.0,
+      "exit_at": 1736461800.0,
+      "direction": -1,
+      "strategy": "breakout",
+      "entry": 91647.4,
+      "stop": 92092.60687500941,
+      "TP1": 90654.2864606902,
+      "partial": false,
+      "status": "stop",
+      "quantity": 0.004287832291428485,
+      "net": -2.8078532776935394,
+      "double_net": -3.438345840366379,
+      "known_leg_net": -2.8078532776935394,
+      "legs": [
+        {
+          "id": "1736460900000:7",
+          "policy": "trend_runner",
+          "at": 1736461800,
+          "price": 92155.2,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "stop"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736500740000:8",
+      "entry_at": 1736500740.0,
+      "exit_at": 1736507220.0,
+      "direction": 1,
+      "strategy": "breakout",
+      "entry": 94818.0,
+      "stop": 94584.48183631702,
+      "TP1": 95504.99609617902,
+      "partial": false,
+      "status": "censored_intrabar_profit_guard",
+      "quantity": 0.006656956403758742,
+      "net": null,
+      "double_net": null,
+      "known_leg_net": 0.20134325351689655,
+      "legs": [
+        {
+          "id": "1736500740000:8",
+          "policy": "trend_runner",
+          "at": 1736507220,
+          "price": 95000.1,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "censored_intrabar_profit_guard"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736539020000:9",
+      "entry_at": 1736539020.0,
+      "exit_at": 1736540700.0,
+      "direction": 1,
+      "strategy": "trend_retest",
+      "entry": 95271.7,
+      "stop": 94799.71545305074,
+      "TP1": 96317.93565140961,
+      "partial": false,
+      "status": "structure_exit",
+      "quantity": 0.0040683275061398246,
+      "net": -2.3860222198326904,
+      "double_net": -3.004763395145757,
+      "known_leg_net": -2.3860222198326904,
+      "legs": [
+        {
+          "id": "1736539020000:9",
+          "policy": "trend_runner",
+          "at": 1736540700,
+          "price": 94837.3,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "structure_exit"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736675160000:10",
+      "entry_at": 1736675160.0,
+      "exit_at": 1736677080.0,
+      "direction": -1,
+      "strategy": "breakout",
+      "entry": 93800.0,
+      "stop": 93967.48179,
+      "TP1": 93215.91987078279,
+      "partial": false,
+      "status": "stop",
+      "quantity": 0.00810827330133948,
+      "net": -2.677546617800206,
+      "double_net": -3.8956043916365948,
+      "known_leg_net": -2.677546617800206,
+      "legs": [
+        {
+          "id": "1736675160000:10",
+          "policy": "trend_runner",
+          "at": 1736677080,
+          "price": 93980.0,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "stop"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736729520000:11",
+      "entry_at": 1736729520.0,
+      "exit_at": 1736730000.0,
+      "direction": 1,
+      "strategy": "trend_retest",
+      "entry": 95571.0,
+      "stop": 95194.82741154994,
+      "TP1": 96474.60955623377,
+      "partial": false,
+      "status": "structure_exit",
+      "quantity": 0.00481494503161479,
+      "net": -2.16179762808369,
+      "double_net": -2.8969273857002054,
+      "known_leg_net": -2.16179762808369,
+      "legs": [
+        {
+          "id": "1736729520000:11",
+          "policy": "trend_runner",
+          "at": 1736730000,
+          "price": 95274.7,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "structure_exit"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736752980000:12",
+      "entry_at": 1736752980.0,
+      "exit_at": 1736753400.0,
+      "direction": -1,
+      "strategy": "trend_retest",
+      "entry": 93558.4,
+      "stop": 93838.13261566331,
+      "TP1": 92806.76716620263,
+      "partial": false,
+      "status": "structure_exit",
+      "quantity": 0.00594805781429087,
+      "net": -1.5505526379909451,
+      "double_net": -2.441465822690661,
+      "known_leg_net": -1.5505526379909451,
+      "legs": [
+        {
+          "id": "1736752980000:12",
+          "policy": "trend_runner",
+          "at": 1736753400,
+          "price": 93669.3,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "structure_exit"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736756460000:13",
+      "entry_at": 1736756460.0,
+      "exit_at": 1736760420.0,
+      "direction": -1,
+      "strategy": "trend_retest",
+      "entry": 93180.1,
+      "stop": 93516.53602,
+      "TP1": 92344.73727643368,
+      "partial": false,
+      "status": "censored_intrabar_profit_guard",
+      "quantity": 0.0052467379158307225,
+      "net": null,
+      "double_net": null,
+      "known_leg_net": 0.5441599155026272,
+      "legs": [
+        {
+          "id": "1736756460000:13",
+          "policy": "trend_runner",
+          "at": 1736760420,
+          "price": 92927.5,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "censored_intrabar_profit_guard"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736759760000:14",
+      "entry_at": 1736759760.0,
+      "exit_at": 1736760960.0,
+      "direction": -1,
+      "strategy": "trend_retest",
+      "entry": 92986.3,
+      "stop": 93294.80662715087,
+      "TP1": 92193.5273568418,
+      "partial": false,
+      "status": "censored_intrabar_profit_guard",
+      "quantity": 0.005577318527232294,
+      "net": null,
+      "double_net": null,
+      "known_leg_net": -0.18676156491652737,
+      "legs": [
+        {
+          "id": "1736759760000:14",
+          "policy": "trend_runner",
+          "at": 1736760960,
+          "price": 92871.1,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "censored_intrabar_profit_guard"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736763960000:15",
+      "entry_at": 1736763960.0,
+      "exit_at": 1736764620.0,
+      "direction": -1,
+      "strategy": "trend_retest",
+      "entry": 92076.0,
+      "stop": 92435.998441319,
+      "TP1": 91209.2039790248,
+      "partial": false,
+      "status": "censored_intrabar_profit_guard",
+      "quantity": 0.005015935301501946,
+      "net": null,
+      "double_net": null,
+      "known_leg_net": 0.6796818748440518,
+      "legs": [
+        {
+          "id": "1736763960000:15",
+          "policy": "trend_runner",
+          "at": 1736764620,
+          "price": 91793.4,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "censored_intrabar_profit_guard"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736768280000:16",
+      "entry_at": 1736768280.0,
+      "exit_at": 1736770080.0,
+      "direction": -1,
+      "strategy": "trend_retest",
+      "entry": 91195.6,
+      "stop": 91600.9269690214,
+      "TP1": 90263.92129316233,
+      "partial": false,
+      "status": "censored_intrabar_profit_guard",
+      "quantity": 0.004608671926968713,
+      "net": null,
+      "double_net": null,
+      "known_leg_net": -0.3472936235955523,
+      "legs": [
+        {
+          "id": "1736768280000:16",
+          "policy": "trend_runner",
+          "at": 1736770080,
+          "price": 91125.1,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "censored_intrabar_profit_guard"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736772000000:17",
+      "entry_at": 1736772000.0,
+      "exit_at": 1736772840.0,
+      "direction": -1,
+      "strategy": "trend_retest",
+      "entry": 90397.5,
+      "stop": 90867.5795,
+      "TP1": 89371.50477057333,
+      "partial": false,
+      "status": "stop",
+      "quantity": 0.004124985627639508,
+      "net": -2.74828414236531,
+      "double_net": -3.346626291591243,
+      "known_leg_net": -2.74828414236531,
+      "legs": [
+        {
+          "id": "1736772000000:17",
+          "policy": "trend_runner",
+          "at": 1736772840,
+          "price": 90918.7,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "stop"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736777400000:18",
+      "entry_at": 1736777400.0,
+      "exit_at": 1736779140.0,
+      "direction": -1,
+      "strategy": "trend_retest",
+      "entry": 90802.8,
+      "stop": 91292.03021370305,
+      "TP1": 89746.63492966576,
+      "partial": true,
+      "status": "trailing_stop",
+      "quantity": 0.003994651941333082,
+      "net": 2.480121893467949,
+      "double_net": 1.9022084931056318,
+      "known_leg_net": 2.480121893467949,
+      "legs": [
+        {
+          "id": "1736777400000:18",
+          "policy": "trend_runner",
+          "at": 1736778960,
+          "price": 89746.63492966576,
+          "fraction": 0.5,
+          "kind": "partial",
+          "reason": "TP1"
+        },
+        {
+          "id": "1736777400000:18",
+          "policy": "trend_runner",
+          "at": 1736779140,
+          "price": 90327.9,
+          "fraction": 0.5,
+          "kind": "exit",
+          "reason": "trailing_stop"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736821260000:19",
+      "entry_at": 1736821260.0,
+      "exit_at": 1736832060.0,
+      "direction": 1,
+      "strategy": "breakout",
+      "entry": 95055.4,
+      "stop": 94761.51373819739,
+      "TP1": 95833.77336613696,
+      "partial": false,
+      "status": "censored_intrabar_profit_guard",
+      "quantity": 0.005731015282624798,
+      "net": null,
+      "double_net": null,
+      "known_leg_net": 0.18547687163550944,
+      "legs": [
+        {
+          "id": "1736821260000:19",
+          "policy": "trend_runner",
+          "at": 1736832060,
+          "price": 95240.0,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "censored_intrabar_profit_guard"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736846160000:20",
+      "entry_at": 1736846160.0,
+      "exit_at": 1736849220.0,
+      "direction": 1,
+      "strategy": "trend_retest",
+      "entry": 95825.5,
+      "stop": 95542.0349,
+      "TP1": 96590.98010737816,
+      "partial": true,
+      "status": "censored_intrabar_stop",
+      "quantity": 0.005855279329876208,
+      "net": null,
+      "double_net": null,
+      "known_leg_net": 4.443799670733775,
+      "legs": [
+        {
+          "id": "1736846160000:20",
+          "policy": "trend_runner",
+          "at": 1736847420,
+          "price": 96590.98010737816,
+          "fraction": 0.5,
+          "kind": "partial",
+          "reason": "TP1"
+        },
+        {
+          "id": "1736846160000:20",
+          "policy": "trend_runner",
+          "at": 1736849220,
+          "price": 96886.0,
+          "fraction": 0.5,
+          "kind": "exit",
+          "reason": "censored_intrabar_stop"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736857320000:21",
+      "entry_at": 1736857320.0,
+      "exit_at": 1736859840.0,
+      "direction": -1,
+      "strategy": "breakout",
+      "entry": 96138.5,
+      "stop": 96386.7584592237,
+      "TP1": 95424.9335162871,
+      "partial": false,
+      "status": "censored_intrabar_profit_guard",
+      "quantity": 0.0063665657320844515,
+      "net": null,
+      "double_net": null,
+      "known_leg_net": 0.19880456011241543,
+      "legs": [
+        {
+          "id": "1736857320000:21",
+          "policy": "trend_runner",
+          "at": 1736859840,
+          "price": 95953.6,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "censored_intrabar_profit_guard"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    },
+    {
+      "system": "existing",
+      "id": "1736860260000:22",
+      "entry_at": 1736860260.0,
+      "exit_at": 1736861460.0,
+      "direction": -1,
+      "strategy": "trend_retest",
+      "entry": 95928.4,
+      "stop": 96177.5797215644,
+      "TP1": 95214.196791948,
+      "partial": false,
+      "status": "stop",
+      "quantity": 0.006356742311189271,
+      "net": -7.140279175943524,
+      "double_net": -8.120876530668545,
+      "known_leg_net": -7.140279175943524,
+      "legs": [
+        {
+          "id": "1736860260000:22",
+          "policy": "trend_runner",
+          "at": 1736861460,
+          "price": 96897.4,
+          "fraction": 1.0,
+          "kind": "exit",
+          "reason": "stop"
+        }
+      ],
+      "limitation": "existing plan at signal quote; 60s sampled management; overlapping references preserved; funding censor retained"
+    }
+  ],
+  "limitations": [
+    "Binance proxy, not LBank fills or latency",
+    "Existing management sampled at minute opens; intraminute events censored by existing engine",
+    "Existing entry at alert quote; ZB uses design 60-second latency; no common entry-latency proof",
+    "Declared same 6bp fee and 2bp slip; tick/step/minimum-notional assumptions not LBank verified",
+    "Risk normalization: existing fixed2.5USDT planned loss per reference; ZB design0.25% current model equity; overlap preserved, not matched portfolio risk",
+    "Funding actual Binance settlement history; ZB planning reserve uses only prior rates, first7days history not30days",
+    "No-trade/censored rows are not wins; open positions never forced closed",
+    "Double-cost figure fixed-path repricing, not full doubled-cost gate rerun",
+    "3day block bootstrap on realized cash only; excludes unresolved; insufficient for promotion"
+  ],
+  "promotion": false,
+  "inference_admissible": false,
+  "inference_reason": "ZB has zero trades; baseline13/22 censored; noncommon execution latency. Positive conditional realized-cash bootstrap is not improvement evidence."
+}
