@@ -81,7 +81,7 @@ class NativeTargetRoomTests(unittest.TestCase):
                     if stage == 'watch' else
                     monitor.confirm_watch(s['prices'],watch,60,native_state=s,diagnostics=diag))
             self.assertIsNone(plan,stage)
-            self.assertEqual(diag['reason'],'risk_or_target')
+            self.assertEqual(diag['reason'],'native_target_barrier_conflict')
         self.assertEqual(s,original)
 
 

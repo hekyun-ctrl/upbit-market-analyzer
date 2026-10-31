@@ -10,6 +10,7 @@ import math
 from lbank_native_entry import wilder_rsi_series, SOURCE
 from lbank_performance import PerformanceBook
 from lbank_trend_runner import atr_wilder
+import lbank_performance_audit as audit
 
 VERSION = "rsi_context_v1"
 
@@ -165,12 +166,14 @@ class DivergenceStudy:
     def report_line(self):
         stats = self.book.summary()["levels"]
         mean = "미집계" if stats["expectancy_usdt"] is None else f"{stats['expectancy_usdt']:+.2f} USDT"
+        reasons=audit.study_diagnostics(self.book.db)
         return (f"\n[RSI 별도 모의검증·누적] 후보진입 {stats['signals']} · 완료 {stats['closed']} · "
                 f"자료공백 {stats['censored']} · 완료당 평균 순손익 {mean}\n"
+                f"자료상태 {' · '.join(f'{k} {v}' for k,v in sorted(reasons.items())) or '기록 없음'}\n"
                 "중복 포지션 가능·계좌수익 아님·기존 알람 차단 없음")
 
     def step(self, now, price, state, calculate_plan, context_gate, *, baseline_reason):
-        outcomes = self.book.observe(now, price)
+        outcomes = self.book.observe(now, price, native_state=state)
         context = analyze(state)
         decisions = []
         if context["ready"]:
@@ -218,6 +221,9 @@ class DivergenceStudy:
                 decisions.append({"id":setup["id"],"strategy":setup["strategy"],"direction":d,"reason":reason})
         self.book.sample(now,price,decision={"reason":"rsi_shadow", "context":context,
                          "candidates":decisions,"baseline_reason":baseline_reason,
+                         "study_context":{"ready":context.get("ready",False),
+                           "reason":context.get("reason") if not context.get("ready") else
+                           "ready_no_setup" if not context.get("setups") else "setup_evaluated"},
                          "minute_bar":state["minute_bars"][-1] if state else None})
         with self.book.db:
             self.book.db.execute("DELETE FROM rsi_candidates WHERE first_at<?",(now-7*86400,))

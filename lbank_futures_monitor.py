@@ -53,6 +53,7 @@ from lbank_breakout_freshness import (evidence as breakout_evidence,
     confirmation_allowed as breakout_confirmation_allowed, POLICY as BREAKOUT_CONFIRMATION_POLICY,
     REJECT_REASON as BREAKOUT_CONFIRMATION_REJECT)
 from lbank_entry_refinement import MODES as ENTRY_REFINEMENT_MODES, local_stop_floor, pullback_floor
+from lbank_performance_audit import split_report
 
 ENTRY_REFINEMENT_MODE = os.getenv('LBANK_ENTRY_REFINEMENT_MODE', 'legacy')
 if ENTRY_REFINEMENT_MODE not in ENTRY_REFINEMENT_MODES:
@@ -275,6 +276,16 @@ def telegram(message):
     return TELEGRAM_DELIVERY.send(message)
 
 
+def telegram_report(message):
+    """Send a reserved daily report in bounded chunks; never used for entries."""
+    chunks=split_report(message)
+    for index,chunk in enumerate(chunks,1):
+        prefix=f"[보고 {index}/{len(chunks)}]\n" if len(chunks)>1 else ""
+        if not TELEGRAM_DELIVERY.send(prefix+chunk):
+            return False
+    return True
+
+
 def get_perpetual_snapshot(exchange):
     ticker = exchange.fetch_ticker(SYMBOL)
     if not ticker or ticker.get("symbol") != SYMBOL:
@@ -384,28 +395,32 @@ def trend_retest_momentum_gate(prices, direction):
     return True, "retest_momentum_confirmed", momentum5, momentum15
 
 
-def calculate_plan(prices, direction, setup=None, native_state=None):
-    """Cost-aware hypothetical levels with optional structure-anchored stop."""
+def calculate_plan(prices, direction, setup=None, native_state=None, diagnostics=None, target_policy=None):
+    """Cost-aware levels; optional P1 policy is offline/research injection only."""
+    def reject(reason, **fields):
+        if diagnostics is not None:
+            diagnostics.clear(); diagnostics.update(reason=reason, **fields)
+        return None
     setup = setup or {"strategy": "breakout"}
     strategy = setup.get("strategy", "breakout")
     if len(prices) < MIN_SAMPLES:
-        return None
+        return reject("insufficient_samples")
     curr = native_state["quote"] if native_state is not None else prices[-1]
     geometry = native_entry_geometry(native_state, strategy) if native_state is not None else None
     if native_state is not None and geometry is None:
-        return None
+        return reject("native_volatility_unavailable")
     ranked = (ranked_entry_evidence(native_state,direction,curr)
               if native_state is not None else None)
     if ranked and ranked['ready'] and not ranked['location_ok']:
         LOG.info("PLAN REJECT reason=entry_extended_from_native_ema strategy=%s direction=%s "
                  "price=%.1f extension_atr=%.3f limit_atr=%.1f",
                  strategy,direction,curr,ranked['extension_atr'],ranked['max_extension_atr'])
-        return None
+        return reject('entry_extended_from_native_ema')
     if (ranked and ranked['ready'] and strategy == 'trend_retest'
             and direction*(curr-setup['structure_anchor']) > ranked['max_extension_atr']*ranked['atr5']):
         LOG.info("PLAN REJECT reason=retest_recovery_already_extended strategy=%s direction=%s price=%.1f",
                  strategy,direction,curr)
-        return None
+        return reject('retest_recovery_already_extended')
     momentum5 = (curr / prices[-6] - 1) * 100
     momentum15 = (curr / prices[-16] - 1) * 100
     strength = rsi(prices)
@@ -428,14 +443,21 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     if not (minimum_stop - 1e-10 <= stop_distance <= .0060):
         LOG.info("PLAN REJECT reason=stop_distance strategy=%s direction=%s price=%.1f stop=%.1f dist_pct=%.3f min_pct=%.3f max_pct=0.600",
                  strategy, direction, curr, stop, stop_distance * 100, minimum_stop * 100)
-        return None
+        return reject("stop_distance", stop=stop, stop_distance_pct=stop_distance*100)
     unit_loss = -net_pnl_per_btc(direction, curr, stop)
     if unit_loss <= 0:
-        return None
-    t1 = minimum_net_rr_target(direction, curr, unit_loss, MIN_NET_RR)
-    t2 = minimum_net_rr_target(direction, curr, unit_loss, 2.5)
+        return reject("invalid_net_loss")
+    structural = target_policy(direction,curr,stop,setup,native_state) if target_policy is not None else None
+    if structural is not None and structural.get("status") != "qualified":
+        return reject(structural.get("status","structural_target_unavailable"), structural_target_plan=structural)
+    if structural is not None:
+        stop, t1, t2 = structural["stop"], structural["target1"], structural["target2"]
+        unit_loss = -target_policy.pnl(direction,curr,stop)
+    else:
+        t1 = minimum_net_rr_target(direction, curr, unit_loss, MIN_NET_RR)
+        t2 = minimum_net_rr_target(direction, curr, unit_loss, 2.5)
     if t1 is None or t2 is None or t1 <= 0 or t2 <= 0:
-        return None
+        return reject("cost_target_unsolvable")
     if native_state is not None:
         ranked = ranked_entry_evidence(native_state,direction,curr,t1)
     # A bounded ATR alternative is available only under aligned larger
@@ -447,14 +469,14 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     if abs(t1 - curr) > 1.5 * observed_range and not (ranked and ranked['atr_target_exception']):
         LOG.info("PLAN REJECT reason=target_outside_observed_range strategy=%s direction=%s price=%.1f target1=%.1f observed_range=%.1f",
                  strategy, direction, curr, t1, observed_range)
-        return None
+        return reject("target_outside_observed_range", target1=t1, observed_range=observed_range)
     if abs(t1-curr) > 1.5*observed_range and ranked:
         ranked['overrides'].append('historical_range_within_6atr')
     barrier = setup.get("barrier")
     if barrier is not None and direction * (barrier - t1) < curr * .00015:
         LOG.info("PLAN REJECT reason=target_barrier_conflict strategy=%s direction=%s price=%.1f target1=%.1f barrier=%.1f",
                  strategy, direction, curr, t1, barrier)
-        return None
+        return reject("target_barrier_conflict", target1=t1, barrier=barrier)
     native_target_room = None
     if native_state is not None:
         native_target_room = observed_target_room(native_state['five_bars'], direction, curr, t1)
@@ -463,7 +485,7 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
             LOG.info("PLAN REJECT reason=native_target_barrier_conflict strategy=%s direction=%s "
                      "price=%.1f target1=%.1f barrier=%.1f",
                      strategy, direction, curr, t1, native_target_room['observed_barrier'])
-            return None
+            return reject("native_target_barrier_conflict", target1=t1, barrier=native_target_room["observed_barrier"])
         if native_target_room['target_room'] == 'conflict':
             ranked['overrides'].append('single_pivots_under_aligned_15m_5m')
     permitted_loss = REF_BALANCE * RISK_FRACTION
@@ -475,13 +497,16 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     # This is still only an estimate: live venue contract steps are unverified.
     margin = math.floor(raw_qty * effective_entry / LEVERAGE * 100) / 100
     qty = margin * LEVERAGE / effective_entry
+    if target_policy is not None:
+        qty = target_policy.quantity(qty,curr)
     if qty <= 0:
-        return None
-    net_loss = -qty * net_pnl_per_btc(direction, curr, stop)
-    net_gain1 = qty * net_pnl_per_btc(direction, curr, t1, exit_kind="take_profit")
-    net_gain2 = qty * net_pnl_per_btc(direction, curr, t2, exit_kind="take_profit")
+        return reject("quantity_below_minimum")
+    pnl = target_policy.pnl if target_policy is not None else net_pnl_per_btc
+    net_loss = -qty * pnl(direction, curr, stop)
+    net_gain1 = qty * pnl(direction, curr, t1, exit_kind="take_profit")
+    net_gain2 = qty * pnl(direction, curr, t2, exit_kind="take_profit")
     if net_loss <= 0 or net_gain1 / net_loss < MIN_NET_RR - 1e-7:
-        return None
+        return reject("net_rr_insufficient", net_loss=net_loss, net_gain1=net_gain1)
     # Alert risk fields always use the same reference balance, fee model and
     # position size that generated the displayed fee-inclusive loss.
     observed_abs_moves = sorted(abs(prices[i] / prices[i-1] - 1) * 100
@@ -509,6 +534,8 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
         "native_entry_geometry": geometry,
         "native_target_room": native_target_room,
         "entry_decision_priority": ranked,
+        "structural_target_plan": structural,
+        "plan_diagnostics": dict(diagnostics or {}, reason="qualified") if diagnostics is not None else None,
     }
 
 
@@ -573,7 +600,8 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
                                 observations=observations, diagnostics=detail,
                                 native_state=native_state)
         decisions.append({"strategy": key[0], "direction": key[1],
-                          "reason": detail.get("reason", "unknown")})
+                          "reason": detail.get("reason", "unknown"),
+                          "plan_diagnostics": detail.get("plan_diagnostics")})
         if plan is not None:
             qualified.append(plan)
     conflict = len({p["direction"] for p in qualified}) > 1
@@ -629,9 +657,12 @@ def assess_candidate(prices, direction, setup, observations=None, diagnostics=No
             return None
     else:
         sampled_rsi5 = None
-    plan = calculate_plan(prices, direction, setup=setup, native_state=native_state)
+    plan_diag = {}
+    plan = calculate_plan(prices, direction, setup=setup, native_state=native_state, diagnostics=plan_diag)
     if plan is None:
-        mark("risk_or_target")
+        if diagnostics is not None:
+            diagnostics["plan_diagnostics"] = plan_diag
+        mark(plan_diag.get("reason", "risk_or_target"))
         LOG.info("PREWATCH candidate cost/risk/target rejected strategy=%s direction=%s",
                  (setup or {}).get("strategy", "breakout"), direction)
     if plan is not None:
@@ -735,9 +766,13 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
             return None
     else:
         sampled_rsi5 = None
-    plan = calculate_plan(prices, direction, setup=watch, native_state=native_state)
+    plan_diag={}
+    plan = calculate_plan(prices, direction, setup=watch, native_state=native_state,
+                          diagnostics=plan_diag)
     if plan is None:
-        mark("risk_or_target")
+        if diagnostics is not None:
+            diagnostics["plan_diagnostics"]=plan_diag
+        mark(plan_diag.get("reason","risk_or_target"))
         LOG.info("CONFIRM candidate cost/risk/target rejected strategy=%s direction=%s",
                  watch.get("strategy", "breakout"), direction)
     if plan is not None:
@@ -1304,6 +1339,11 @@ def run():
                         plan = confirm_watch(prices, watch["plan"], age,
                                              native_state=native_state,
                                              diagnostics=confirm_diag)
+                        try:
+                            performance.record_evaluation(now,"confirmation",
+                                confirm_diag.get("reason","qualified"),confirm_diag)
+                        except Exception as exc:
+                            LOG.warning("PERFORMANCE confirmation_audit_failed exception=%s gate_unchanged=true",type(exc).__name__)
                         if plan is None:
                             count_event("confirm_reject")
                             if confirm_diag.get("reason") == "await_two_post_watch_closed_minutes":
@@ -1326,6 +1366,11 @@ def run():
                                 watch, plan, native_state, now, time.time())
                             side = plan["side"]
                             gate_reason = alert_gate(now, side, alert_state, plan=plan)
+                            try:
+                                performance.record_evaluation(now,"dispatch_gate",gate_reason,
+                                    {"side":side,"strategy":plan.get("strategy")})
+                            except Exception as exc:
+                                LOG.warning("PERFORMANCE dispatch_audit_failed exception=%s gate_unchanged=true",type(exc).__name__)
                             if gate_reason == "ok":
                                 # The next reference ID is assigned only after
                                 # Telegram delivery succeeds. This same ID is
@@ -1537,7 +1582,7 @@ def run():
                                     digest += technique_study.report_line()
                                 except Exception as exc:
                                     LOG.error("PUBLIC_TECHNIQUES report_failed exception=%s",type(exc).__name__)
-                            delivered = telegram(digest)
+                            delivered = telegram_report(digest)
                             performance.report_delivery(now, delivered)
                             LOG.info("PERFORMANCE_DAILY_REPORT delivered=%s actual_pnl=false", delivered)
                     except Exception as exc:
