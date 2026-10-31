@@ -124,7 +124,7 @@ class StrategyIndependenceTests(unittest.TestCase):
              patch.object(monitor, "detect_structures", return_value=[]):
             result = monitor.classify(prices, diagnostics=diag)
         self.assertEqual(result["strategy"], "breakout")
-        self.assertEqual([c["reason"] for c in diag["candidates"]], ["risk_or_target", "qualified"])
+        self.assertEqual([c["reason"] for c in diag["candidates"]], ["stop_distance", "qualified"])
 
     def test_opposing_qualified_strategies_abstain(self):
         setups = [{"direction": 1, "strategy": "range_rebound"},

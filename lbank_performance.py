@@ -15,6 +15,7 @@ from datetime import datetime, timedelta, timezone
 from lbank_profit_protection import enabled as profit_enabled, observe as profit_observe, acknowledge as profit_ack
 from lbank_trend_runner import runner_decision, RUNNER_TTL, POLICY_VERSION
 from lbank_signal_thesis import POLICY as THESIS_POLICY,REVIEW_SECONDS,TRACKING_SECONDS,assess_thesis,observed_stop_touch
+import lbank_performance_audit as audit
 
 KST = timezone(timedelta(hours=9))
 POLICIES = ("levels", "warning_exit", "trend_runner")
@@ -63,6 +64,7 @@ class PerformanceBook:
           CREATE TABLE IF NOT EXISTS risk_cautions(
             id TEXT, ts REAL, detail TEXT NOT NULL, PRIMARY KEY(id,ts));
             ''')
+            audit.schema(self.db)
         except Exception:
             self.db.close()
             raise
@@ -76,6 +78,8 @@ class PerformanceBook:
             if decision is not None:
                 self.db.execute("INSERT OR REPLACE INTO decisions VALUES(?,?)",
                                 (ts, json.dumps(decision, ensure_ascii=False, allow_nan=False)))
+                audit.record_evaluation(self.db, ts, decision.get("stage", "classification"),
+                                        decision.get("reason", "unknown"), decision)
             if ts - self.last_prune >= 3600:
                 self.db.execute("DELETE FROM samples WHERE ts<?", (ts - 30 * 86400,))
                 self.db.execute("DELETE FROM decisions WHERE ts<?", (ts - 7 * 86400,))
@@ -84,7 +88,16 @@ class PerformanceBook:
                 self.db.execute("DELETE FROM reports WHERE at<?", (ts - 90 * 86400,))
                 self.db.execute("DELETE FROM runner_adjustments WHERE ts<?", (ts - 90 * 86400,))
                 self.db.execute("DELETE FROM risk_cautions WHERE ts<?", (ts - 90 * 86400,))
+                self.db.execute("DELETE FROM evaluation_events WHERE ts<?", (ts - 7 * 86400,))
+                self.db.execute("DELETE FROM warning_applications WHERE id NOT IN (SELECT DISTINCT id FROM signals)")
+                self.db.execute("DELETE FROM model_legs WHERE id NOT IN (SELECT DISTINCT id FROM signals)")
+                self.db.execute("DELETE FROM trade_evidence WHERE id NOT IN (SELECT DISTINCT id FROM signals)")
                 self.last_prune = ts
+
+    def record_evaluation(self, ts, stage, reason, detail=None):
+        """Additive audit event. Callers must treat failures as non-gating."""
+        with self.db:
+            audit.record_evaluation(self.db,ts,stage,reason,detail)
 
     def add(self, reference, plan, ts, fee=.0006, slippage=.0002, funding=.0001):
         fields = ("price", "stop", "target1", "target2", "quantity_btc", "net_loss")
@@ -93,9 +106,11 @@ class PerformanceBook:
                 or not all(math.isfinite(x) and 0 <= x <= .01 for x in (fee, slippage, funding))):
             raise ValueError("invalid plan")
         d = plan["direction"]
+        same_structural_target=(plan.get("structural_target_plan") or {}).get("policy")=="structural_target_inverse_entry_p1_v1"
         if not (d * (plan["price"] - plan["stop"]) > 0
                 and d * (plan["target1"] - plan["price"]) > 0
-                and d * (plan["target2"] - plan["target1"]) > 0):
+                and (d * (plan["target2"] - plan["target1"]) > 0
+                     or same_structural_target and plan["target2"]==plan["target1"])):
             raise ValueError("invalid target geometry")
         p = {k: plan[k] for k in fields}
         p.update(direction=d, strategy=plan.get("strategy", "unknown"),
@@ -107,6 +122,8 @@ class PerformanceBook:
                  profit_policy=plan.get("profit_policy"),
                  entry_quality=plan.get("entry_quality"),
                  entry_timing=plan.get("entry_timing"),
+                 plan_diagnostics=plan.get("plan_diagnostics"),
+                 structural_target_plan=plan.get("structural_target_plan"),
                  followup_thesis=plan.get("followup_thesis"),stop_active_since=ts,
                  runner_last_bar=-1, barrier=plan.get("barrier"),
                  policy_version=POLICY_VERSION if plan.get("runner_enabled") else "fixed_levels_v2",
@@ -118,6 +135,7 @@ class PerformanceBook:
         # Timestamp in identity prevents collisions with an older reset signal ID.
         identity = f"{int(ts * 1000)}:{reference}"
         with self.db:
+            existed = self.db.execute("SELECT 1 FROM signals WHERE id=?",(identity,)).fetchone() is not None
             for policy in POLICIES:
                 if policy == "trend_runner" and not p["runner_enabled"] and not profit_enabled(p.get("profit_policy")):
                     continue
@@ -129,6 +147,8 @@ class PerformanceBook:
                 self.db.execute('''INSERT OR IGNORE INTO signals
                     (id,policy,opened,last_at,last_price,plan) VALUES(?,?,?,?,?,?)''',
                     (identity, policy, ts, ts, plan["price"], json.dumps(row_plan)))
+            if not existed:
+                audit.freeze_plan(self.db, identity, ts, p)
         return identity
 
     def _close(self, row, ts, price, reason, p):
@@ -145,6 +165,11 @@ class PerformanceBook:
                             (json.dumps(p),row['id'],row['policy']))
             reason='censored_funding_unverified'
         net = None if reason.startswith("censored_") else row["partial"] + leg_pnl(p, price, remain)
+        if net is not None:
+            audit.record_leg(self.db,row["id"],row["policy"],ts,reason,remain,
+                {"observed_price":price,"modeled_net_usdt":leg_pnl(p,price,remain),
+                 "fee_rate":p["fee"],"slippage_rate":p["slippage"],
+                 "funding_reserve_rate":p["funding_reserve"],"fill_verified":False})
         self.db.execute('''UPDATE signals SET status=?,closed=?,last_at=?,last_price=?,net=?
             WHERE id=? AND policy=?''', (reason, ts, ts, price, net, row["id"], row["policy"]))
         return {"id": row["id"], "policy": row["policy"], "status": reason,
@@ -155,16 +180,29 @@ class PerformanceBook:
             raise ValueError("invalid observation")
         events = []
         with self.db:
+            audited_ids=set()
             for raw in self.db.execute("SELECT * FROM signals WHERE status='open'").fetchall():
                 row, p = dict(raw), json.loads(raw["plan"])
                 if ts <= row["last_at"]:
                     continue
+                if row["id"] not in audited_ids:
+                    audit.observe_quote(self.db,row["id"],p["direction"],p["price"],ts,price,row["last_at"])
+                    audited_ids.add(row["id"])
                 if ts - row["last_at"] > 150:
                     events.append(self._close(row, ts, price, "censored_gap", p))
                     continue
                 is_runner = row["policy"] == "trend_runner"
                 coherent=is_runner and (p.get('followup_thesis') or {}).get('policy')==THESIS_POLICY
                 stop = p.get("runner_stop", p["price"]) if row["stage"] else p["stop"]
+                target = p["target2"] if row["stage"] else p["target1"]
+                ambiguity=audit.intrabar_uncertainty(native_state,p["direction"],stop,target,
+                    p.get("stop_active_since",row["opened"]),ts)
+                if ambiguity=="both":
+                    events.append(self._close(row,ts,price,"censored_intrabar_order",p));continue
+                if ambiguity=="stop":
+                    events.append(self._close(row,ts,price,"censored_intrabar_stop",p));continue
+                if ambiguity=="target":
+                    events.append(self._close(row,ts,price,"censored_intrabar_target",p));continue
                 if p["direction"] * (price - stop) <= 0:
                     # Use observed adverse price, not an optimistic stop fill.
                     events.append(self._close(row, ts, price,
@@ -205,6 +243,9 @@ class PerformanceBook:
                     p['runner_stop']=max(p['price'],guard) if p['direction']==1 else min(p['price'],guard)
                     self.db.execute("UPDATE signals SET stage=1,partial=?,plan=? WHERE id=? AND policy=?",
                                     (row["partial"],json.dumps(p), row["id"], row["policy"]))
+                    audit.record_leg(self.db,row["id"],row["policy"],ts,"target1",.5,
+                        {"modeled_price":p["target1"],"modeled_net_usdt":row["partial"],
+                         "fill_verified":False})
                 if is_runner and row["stage"] and p["runner_enabled"]:
                     proposal = runner_decision(
                         direction=p["direction"], entry=p["price"],
@@ -243,8 +284,19 @@ class PerformanceBook:
         rows = self.db.execute("SELECT * FROM signals WHERE id=? AND policy IN ('warning_exit','trend_runner') AND status='open'",
                                (identity,)).fetchall()
         with self.db:
+            if not rows:
+                result=("already_closed" if self.db.execute("SELECT 1 FROM signals WHERE id=?",(identity,)).fetchone()
+                        else "missing_signal")
+                audit.record_warning(self.db,identity,ts,result,{"price":price})
             for row in rows:
                 p = json.loads(row["plan"])
+                if ts < row["last_at"]:
+                    audit.record_warning(self.db,identity,ts,"out_of_order",
+                                         {"price":price,"last_at":row["last_at"]})
+                    continue
+                audit.record_warning(self.db,identity,ts,
+                    "gap_censored" if ts-row["last_at"]>150 else "applied",
+                    {"price":price,"policy":row["policy"]})
                 self._close(row, ts, price,
                             "censored_gap" if ts - row["last_at"] > 150 else "early_warning", p)
 
@@ -289,15 +341,20 @@ class PerformanceBook:
 
     def paired_runner_comparison(self, day=None):
         """Compare ONLY common completed entries; exclude censored/open pairs."""
-        pairs = self.db.execute('''SELECT a.opened,a.net AS baseline,b.net AS runner
+        all_pairs = self.db.execute('''SELECT a.opened,a.net AS baseline,b.net AS runner
           FROM signals a JOIN signals b ON a.id=b.id
-          WHERE a.policy='warning_exit' AND b.policy='trend_runner'
-          AND a.net IS NOT NULL AND b.net IS NOT NULL''').fetchall()
-        pairs = [p for p in pairs if day is None or day_key(p["opened"]) == day]
+          WHERE a.policy='warning_exit' AND b.policy='trend_runner' ''').fetchall()
+        all_pairs = [p for p in all_pairs if day is None or day_key(p["opened"]) == day]
+        pairs=[p for p in all_pairs if p["baseline"] is not None and p["runner"] is not None]
+        differences=[p["runner"]-p["baseline"] for p in pairs]
         return {"completed_pairs": len(pairs),
                 "baseline_net": sum(p["baseline"] for p in pairs),
                 "runner_net": sum(p["runner"] for p in pairs),
-                "difference_usdt": sum(p["runner"]-p["baseline"] for p in pairs),
+                "difference_usdt": sum(differences),
+                "improved":sum(x>1e-9 for x in differences),
+                "worsened":sum(x<-1e-9 for x in differences),
+                "unchanged":sum(abs(x)<=1e-9 for x in differences),
+                "excluded":len(all_pairs)-len(pairs),
                 "actual_account_pnl": False}
 
     def market_context_summary(self, day=None):
@@ -321,7 +378,7 @@ class PerformanceBook:
                 group["completed"] += 1
                 group["net_usdt_model"] += row["net"]
                 group["mean_net_usdt"] = group["net_usdt_model"]/group["completed"]
-            elif row["status"]=="censored_gap":
+            elif row["status"].startswith("censored_"):
                 group["censored"] += 1
         return {"policies":groups,"actual_account_pnl":False,
                 "filter_effect_measured":False,"causal_improvement_verified":False}
@@ -346,9 +403,9 @@ class PerformanceBook:
         rate = "미집계" if runner["win_rate_pct"] is None else f"{runner['win_rate_pct']:.1f}%"
         decisions = self.decision_summary(day)
         market = decisions["last_market"]
-        diagnostic = (f"진입심사 기록 {decisions['checks']}회: 패턴 없음 {decisions['reasons'].get('market_no_setup',0)} · "
-                      f"비용/목표 탈락 {decisions['reasons'].get('risk_or_target',0)} · "
-                      f"데이터 대기 {decisions['reasons'].get('native_data_unavailable',0)}\n")
+        reason_total=sum(decisions['reasons'].values())
+        reason_text=" · ".join(f"{k} {v}" for k,v in sorted(decisions['reasons'].items())) or "기록 없음"
+        diagnostic=(f"진입심사 기록 {decisions['checks']}회 / 사유합계 {reason_total}: {reason_text}\n")
         if market:
             diagnostic += (f"최근 심사 1시간 고저폭 {market['range60_pct']:.3f}% / "
                            f"비용 반영 최소 1차 목표 거리 {market['minimum_target_pct']:.3f}%\n")
@@ -358,10 +415,11 @@ class PerformanceBook:
                 f"조기경고 청산 모형: {b['net_usdt_model']:+.2f} USDT | 완료 {b['closed']}건\n"
                 f"추세연장 모형: {runner['net_usdt_model']:+.2f} USDT | 완료 {runner['closed']} · 관찰중 {runner['open']} · 공백 {runner['censored']}\n"
                 f"추세연장 최종 순익 승률 {rate} | 동일신호 완료 {paired['completed_pairs']}쌍, 기존 대비 {paired['difference_usdt']:+.2f} USDT\n"
+                f"쌍별 개선 {paired['improved']} · 악화 {paired['worsened']} · 동일 {paired['unchanged']} · 미확정 제외 {paired['excluded']}\n"
                 f"목표 {self.goal_pct:g}% = 기준자금의 {self.balance*self.goal_pct/100:.2f} USDT\n"
                 f"{diagnostic}"
                 "미완료·자료공백·봉내 체결/연장 펀딩 미확정·추적기한 종료·이전 날짜 신호는 순이익에서 제외됩니다.\n"
-                "비용 추정 반영·가격표본 모의계산이며 실제 체결·계좌 순수익이 아닙니다.\n"
+                "비용 추정 반영·가격표본 모의계산이며 실제 체결·계좌 순수익이 아닙니다. 거래별 체결경로 미검증.\n"
                 "모형별 결과는 비교용으로 서로 합산하지 않습니다.\n"
                 "목표 미달을 이유로 위험이나 매매 횟수를 늘리지 않습니다.")
 

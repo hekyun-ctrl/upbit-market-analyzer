@@ -9,10 +9,14 @@ import copy
 import json
 import math
 import statistics
+from datetime import datetime, timedelta, timezone
 
 from lbank_native_entry import SOURCE
 from lbank_performance import PerformanceBook
 from lbank_trend_runner import atr_wilder
+import lbank_performance_audit as audit
+
+KST=timezone(timedelta(hours=9))
 
 VERSION = "public_techniques_v1"
 LABELS = {"grouped_decline_5m":"5분 3단하락 반등 실험",
@@ -221,7 +225,11 @@ class TechniqueStudy:
                 else:reason='already_recorded'
             decisions.append(dict(id=e['id'],strategy=e['strategy'],reason=reason))
         # Only compact decisions; no full candles/history copied each minute.
-        self.book.sample(now,price,decision=dict(reason='public_technique_paper',decisions=decisions,baseline_reason=baseline_reason))
+        study_reason=(ctx.get('reason') if not ctx.get('ready') else
+                      'ready_no_setup' if not ctx.get('setups') else 'setup_evaluated')
+        self.book.sample(now,price,decision=dict(reason='public_technique_paper',decisions=decisions,
+            baseline_reason=baseline_reason,study_context=dict(ready=ctx.get('ready',False),
+            hourly_ready=ctx.get('hourly_ready',False),reason=study_reason)))
         with self.book.db:
             self.book.db.execute('DELETE FROM technique_candidates WHERE first_at<?',(now-7*86400,))
         return dict(version=VERSION,ready=ctx['ready'],hourly_ready=ctx.get('hourly_ready',False),
@@ -234,12 +242,18 @@ class TechniqueStudy:
             selected=[r for r in self.book.db.execute("SELECT * FROM signals WHERE policy='levels'") if json.loads(r['plan'])['strategy']==strategy]
             done=[r for r in selected if r['net'] is not None]
             result[strategy]=dict(entries=len(selected),completed=len(done),wins=sum(r['net']>0 for r in done),
-                censored=sum(r['status']=='censored_gap' for r in selected),
+                censored=sum(r['status'].startswith('censored_') for r in selected),
                 mean_net_usdt=sum(r['net'] for r in done)/len(done) if done else None)
         return result
 
     def report_line(self):
-        lines=['\n[공개기법 모의검증·최근 90일·분할목표 모형]']
+        coverage=self.book.db.execute('SELECT MIN(ts),MAX(ts),COUNT(*) FROM samples').fetchone()
+        span=('자료 없음' if not coverage[2] else
+              f"{datetime.fromtimestamp(coverage[0],KST):%m-%d %H:%M}~{datetime.fromtimestamp(coverage[1],KST):%m-%d %H:%M} KST")
+        reasons=audit.study_diagnostics(self.book.db)
+        lines=['\n[공개기법 모의검증·최대 90일 보관·90일 백테스트 아님]',
+               f'실제 보관 평가범위 {span} · 연속성 미검증',
+               '자료상태 '+(' · '.join(f'{k} {v}' for k,v in sorted(reasons.items())) or '기록 없음')]
         for name,row in self.summary().items():
             mean='미집계' if row['mean_net_usdt'] is None else f"{row['mean_net_usdt']:+.2f} USDT"
             lines.append(f"{LABELS[name]}: 진입 {row['entries']} · 완료 {row['completed']} · 공백 {row['censored']} · 평균 {mean}")
