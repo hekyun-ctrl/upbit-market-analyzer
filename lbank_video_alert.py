@@ -2,6 +2,9 @@
 from collections import Counter
 from contextlib import closing
 from datetime import datetime, timedelta, timezone
+from dataclasses import asdict
+import hashlib
+import json
 import logging
 import math
 import os
@@ -13,6 +16,7 @@ import time
 from lbank_native_candles import NativeCandleThread
 from lbank_telegram_transport import TelegramTransport
 from research.zerobase.video_entry import Costs, WARMUP, evaluate_latest, judge_entry
+from research.zerobase.rsi_sequence import POLICY
 
 LOG = logging.getLogger("lbank_video_alert")
 SYMBOL = "BTCUSDT"
@@ -56,12 +60,33 @@ class DeliveryLedger:
         with self.db:
             self.db.execute("""CREATE TABLE IF NOT EXISTS video_alert_delivery
                 (bar_start INTEGER PRIMARY KEY, lane TEXT, status TEXT)""")
+            self.db.execute("""CREATE TABLE IF NOT EXISTS video_alert_decisions
+                (bar_start INTEGER, policy TEXT, evaluated_at REAL, status TEXT,
+                 evidence TEXT NOT NULL, PRIMARY KEY (bar_start, policy))""")
+            self.db.execute("""CREATE TABLE IF NOT EXISTS video_alert_patterns
+                (setup_id TEXT PRIMARY KEY, bar_start INTEGER NOT NULL)""")
 
-    def claim(self, start, lane):
+    def record_decision(self, start, evaluated_at, status, evidence):
+        # Freeze the first evaluation, including rejected candidates. Delivery
+        # reservations remain separate: a diagnostic row never authorizes send.
+        payload = json.dumps(evidence, sort_keys=True, ensure_ascii=False, allow_nan=False)
+        with self.db:
+            self.db.execute("DELETE FROM video_alert_decisions WHERE bar_start<?", (start-32*86400,))
+            self.db.execute("INSERT OR IGNORE INTO video_alert_decisions VALUES(?,?,?,?,?)",
+                            (start, POLICY, evaluated_at, status, payload))
+
+    def claim(self, start, lane, setup_id=None):
         with self.db:
             self.db.execute("DELETE FROM video_alert_delivery WHERE bar_start<?", (start-32*86400,))
-            return self.db.execute("INSERT OR IGNORE INTO video_alert_delivery VALUES(?,?,'reserved')",
-                                   (start, lane)).rowcount == 1
+            self.db.execute("DELETE FROM video_alert_patterns WHERE bar_start<?", (start-32*86400,))
+            if setup_id and self.db.execute("SELECT 1 FROM video_alert_patterns WHERE setup_id=?",
+                                           (setup_id,)).fetchone():
+                return False
+            claimed = self.db.execute("INSERT OR IGNORE INTO video_alert_delivery VALUES(?,?,'reserved')",
+                                      (start, lane)).rowcount == 1
+            if claimed and setup_id:
+                self.db.execute("INSERT INTO video_alert_patterns VALUES(?,?)", (setup_id, start))
+            return claimed
 
     def finish(self, start, status):
         with self.db:
@@ -142,43 +167,64 @@ def format_alert(plan, price, rr, bid, ask, lanes):
     close = datetime.fromtimestamp(plan["signal_start"]+300, KST).strftime("%m-%d %H:%M:%S KST")
     kind = "롱 상한" if d == 1 else "숏 하한"
     kinds = " / ".join(STRATEGIES[lane] for lane in sorted(lanes))
+    evidence = ""
+    if plan.get("policy") == POLICY:
+        first = datetime.fromtimestamp(plan["first_confirmation_start"]+300, KST).strftime("%H:%M")
+        second = datetime.fromtimestamp(plan["second_start"], KST).strftime("%H:%M")
+        evidence = (f"근거: 준비 RSI {plan['exhaustion_rsi']:.1f} → 첫 반전 {first} 마감"
+                    f" → 두 번째 극점 {second}봉 {plan['second_price']:,.1f} → 장악형 마감\n")
+    target_basis = {"confirmed_pivot": "확정 지지·저항 앞", "signal_bar_bb_center": "신호 시점 중심선 앞"}
     return (f"[별도 영상 전략 알람 | 엘뱅크 BTCUSDT 5분봉]\n"
             f"{'롱' if d == 1 else '숏'} · {kinds} · {close} 마감\n"
+            f"{evidence}"
             f"발송 전 {'매도' if d == 1 else '매수'} 1호가: {price:,.1f} USDT\n"
             f"허용 진입가({kind}): {plan['entry_bound']:,.1f}\n"
             f"목표 {plan['target']:,.1f} / 손절 {plan['stop']:,.1f} USDT\n"
+            f"목표 근거: {target_basis.get(plan.get('target_basis'), '구조 목표')}\n"
             f"가정 비용 후 손익비 {rr:.2f} · 스프레드 {(ask-bid)/((ask+bid)/2):.3%}\n"
             "봉은 엘뱅크 1분 스트림에서 합산했습니다. 호가가 달라지면 다시 확인하세요.")
 
 
 def process(bars, *, now, started, clock, get_book, ledger, send, costs=Costs()):
     """Process one newest candle; signal-close and live-book gates both apply."""
+    evidence = dict(events=[], reasons={}, costs=asdict(costs),
+                    input_sha256=hashlib.sha256(json.dumps(bars, sort_keys=True,
+                        separators=(',', ':'), allow_nan=False).encode()).hexdigest())
+
+    def done(status, counts):
+        evidence["reasons"] = counts
+        if bars:
+            ledger.record_decision(bars[-1]["start"], now, status, evidence)
+        return status, counts
+
     if len(bars) < WARMUP:
-        return "warmup", {}
+        return done("warmup", {})
     newest = bars[-1]
     start = newest["start"]
     end = start+300
     if end <= started or not end <= newest["received_at"] <= now <= end+MAX_CLOSE_AGE:
-        return "stale_or_before_start", {}
+        return done("stale_or_before_start", {})
     events, rejected = evaluate_latest(bars, costs=costs)
-    counts = dict(Counter(event["status"] for event in events)) | rejected
+    evidence["events"] = events
+    counts = dict(Counter(event["status"] for event in events) + Counter(rejected))
     qualified = [event for event in events if event["status"] == "qualified"]
     if not qualified:
-        return "no_qualified_entry", counts
+        return done("no_qualified_entry", counts)
     if len({event["direction"] for event in qualified}) != 1:
-        return "conflicting_directions", counts
+        return done("conflicting_directions", counts)
     try:
         bid, ask = get_book()
     except Exception as exc:
         LOG.warning("VIDEO_ALERT_BOOK_FAILURE reason=%s", book_error_code(exc))
-        return "book_unavailable", counts
+        return done("book_unavailable", counts)
     received = clock()
     if not now <= received <= min(now+MAX_BOOK_LATENCY, end+MAX_CLOSE_AGE):
-        return "book_too_slow", counts
+        return done("book_too_slow", counts)
     if not all(math.isfinite(x) for x in (bid, ask)) or not 0 < bid < ask:
-        return "invalid_book", counts
+        return done("invalid_book", counts)
+    evidence["book"] = dict(bid=bid, ask=ask, requested_at=now, received_at=received)
     if (ask-bid)/((ask+bid)/2) > MAX_SPREAD:
-        return "spread_too_wide", counts
+        return done("spread_too_wide", counts)
     valid = []
     for event in qualified:
         d = event["direction"]
@@ -191,20 +237,22 @@ def process(bars, *, now, started, clock, get_book, ledger, send, costs=Costs())
             continue
         valid.append((rr, event, price))
     if not valid:
-        return "book_rejected", counts
+        return done("book_rejected", counts)
     rr, event, price = max(valid, key=lambda pair: pair[0])
+    evidence["selected"] = dict(lane=event["lane"], direction=event["direction"],
+                                quote_price=price, net_rr=rr)
     msg = format_alert(event, price, rr, bid, ask, {v[1]["lane"] for v in valid})
     if send is None:
-        return "send_disabled", counts
-    if not ledger.claim(start, event["lane"]):
-        return "already_reserved", counts
+        return done("send_disabled", counts)
+    if not ledger.claim(start, event["lane"], event.get("setup_id")):
+        return done("already_reserved", counts)
     if not received <= clock() <= min(received+MAX_BOOK_LATENCY, end+MAX_CLOSE_AGE):
         ledger.finish(start, "stale_after_reservation")
-        return "stale_after_reservation", counts
+        return done("stale_after_reservation", counts)
     sent = send(msg)
     status = "telegram_accepted" if sent else "telegram_unconfirmed_no_retry"
     ledger.finish(start, status)
-    return status, counts
+    return done(status, counts)
 
 
 def run():

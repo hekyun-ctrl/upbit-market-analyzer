@@ -12,6 +12,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from statistics import mean, median, pstdev
 
+from research.zerobase.rsi_sequence import POLICY, sequence_series
 from lbank_native_entry import wilder_rsi_series
 from lbank_structural_target_plan import available_barriers, entry_bound, rounded
 
@@ -97,39 +98,6 @@ def _series(bars):
     return indicators
 
 
-def _reversal(bars, series, i, d):
-    """Confirm an engulfing body at close, without a future second pivot."""
-    prev, cur = bars[i-1:i+1]
-    if not (d*(prev["close"]-prev["open"]) < 0 < d*(cur["close"]-cur["open"])
-            and d*(cur["open"]-prev["close"]) <= 0
-            and d*(cur["close"]-prev["open"]) >= 0):
-        return None
-    key, opposite, band = (("low", "high", "lower") if d == 1
-                           else ("high", "low", "upper"))
-    j = min((i-1, i), key=lambda k: d*bars[k][key])
-    second = bars[j][key]
-    atr = series[i]["atr"]
-    if not (series[j]["lower"] <= second <= series[j]["upper"] and atr > 0):
-        return None
-    for a in range(j-3, max(19, j-18)-1, -1):
-        first = bars[a][key]
-        if (d*(first-bars[a-1][key]) >= 0 or d*(first-bars[a+1][key]) >= 0
-                or d*(series[a]["rsi"]-50) >= -20
-                or d*(first-series[a][band]) > 0):
-            continue
-        if abs(second-first) > atr:
-            continue
-        between = bars[a+1:j]
-        if (min(d*b[key] for b in between) < min(d*first, d*second)
-                or max(d*b[opposite] for b in between)
-                   - max(d*first, d*second) < .5*atr):
-            continue
-        return dict(lane="rsi_reversal", direction=d, anchor=second,
-                    first_start=bars[a]["start"], second_start=bars[j]["start"],
-                    first_rsi=series[a]["rsi"], second_rsi=series[j]["rsi"],
-                    second_inside_band=True, trigger=cur["close"])
-    return None
-
 
 def _trend(bars, series, i, d):
     cur, prev, bb = bars[i], bars[i-1], series[i]
@@ -178,9 +146,11 @@ def _plan(setup, bars, series, ready, i, costs, nominal):
                                   nominal_delay=0 if nominal else None)
     levels = [(x["price"], "confirmed_pivot", x["available_at"]) for x in barriers]
     if setup["lane"] == "rsi_reversal":
-        if d*(bb["center"]-price) <= 0:
-            return dict(setup, status="center_already_reached")
-        levels.append((bb["center"], "signal_bar_bb_center", ready[i]))
+        # A reclaimed center is not a failed reversal. If already behind price,
+        # use the nearest still-unbreached structural barrier ahead. Never invent
+        # a 3R target or ignore a closer barrier to make the economics pass.
+        if d*(bb["center"]-price) > 0:
+            levels.append((bb["center"], "signal_bar_bb_center", ready[i]))
     if not levels:
         return dict(setup, status="no_known_target")
     level, basis, known = min(levels, key=lambda x: d*x[0])
@@ -233,9 +203,12 @@ def _outcome(plan, later, detected_at, costs):
     return dict(row, status="horizon_unresolved" if len(later) >= HORIZON else "no_followup")
 
 
-def _detect(bars, series, ready, i, costs, nominal, rejected):
+def _detect(bars, series, ready, i, costs, nominal, rejected, sequences):
     for d in (1, -1):
-        reversal = _reversal(bars, series, i, d)
+        state = sequences[d][i]
+        reversal = state["event"]
+        if reversal is None:
+            rejected[f"rsi_{'long' if d == 1 else 'short'}_{state['stage']}"] += 1
         trend, reason = _trend(bars, series, i, d)
         if reason:
             rejected[reason] += 1
@@ -254,7 +227,9 @@ def evaluate_latest(bars, *, costs=Costs()):
     if any(b["start"] - a["start"] != BAR_SECONDS for a, b in zip(bars, bars[1:])):
         raise ValueError("latest-bar input must be contiguous")
     rejected = Counter()
-    events = list(_detect(bars, _series(bars), ready, len(bars)-1, costs, False, rejected))
+    indicators = _series(bars)
+    sequences = {d: sequence_series(bars, indicators, d) for d in (1, -1)}
+    events = list(_detect(bars, indicators, ready, len(bars)-1, costs, False, rejected, sequences))
     return events, dict(rejected)
 
 
@@ -269,13 +244,14 @@ def replay(bars, *, nominal=False, costs=Costs(), with_outcomes=True):
         if len(run) < WARMUP:
             continue
         indicators = _series(run)
+        sequences = {d: sequence_series(run, indicators, d) for d in (1, -1)}
         for i in range(WARMUP-1, len(run)):
             evaluated += 1
-            for plan in _detect(run, indicators, at, i, costs, nominal, rejected):
+            for plan in _detect(run, indicators, at, i, costs, nominal, rejected, sequences):
                 if with_outcomes:
                     plan["outcome"] = _outcome(plan, run[i+1:i+1+HORIZON], at[i], costs)
                 events.append(plan)
-    return dict(scope="offline_research_only", sources=SOURCES, production_ready=False,
+    return dict(scope="offline_research_only", sources=SOURCES, policy=POLICY, production_ready=False,
                 receipt_mode="nominal_if_missing" if nominal else "recorded",
                 assumptions=asdict(costs), bars=len(bars), evaluated_bars=evaluated,
                 contiguous_runs=len(starts),
