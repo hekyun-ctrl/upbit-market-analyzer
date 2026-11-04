@@ -1,0 +1,689 @@
+{
+  "scope": "offline_research_only",
+  "sources": [
+    "lxz7Csyg9bk",
+    "tQadAOEVbFA"
+  ],
+  "production_ready": false,
+  "receipt_mode": "nominal_if_missing",
+  "assumptions": {
+    "fee": 0.0006,
+    "stop_slippage": 0.0002,
+    "funding_reserve": 0.0001,
+    "min_rr": 1.5,
+    "max_stop_fraction": 0.006,
+    "tick": 0.1
+  },
+  "bars": 581,
+  "evaluated_bars": 361,
+  "contiguous_runs": 6,
+  "candidate_counts": {
+    "bb_cci_breakout": 26,
+    "rsi_reversal": 5
+  },
+  "plan_counts": {
+    "no_known_target": 13,
+    "insufficient_net_rr": 18
+  },
+  "pre_candidate_rejections": {
+    "center_or_cci_not_aligned": 19,
+    "volume_below_threshold": 47
+  },
+  "outcome_counts": {
+    "no_model_entry": 31
+  },
+  "events": [
+    {
+      "lane": "bb_cci_breakout",
+      "direction": 1,
+      "trigger": 82868.9,
+      "anchor": 82761.7,
+      "cci": 308.43501556417334,
+      "volume_multiple": 6.634090299850649,
+      "retest_required": false,
+      "status": "no_known_target",
+      "signal_start": 1792395000,
+      "detected_at": 1792395300,
+      "signal_close": 83099.9,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": 1,
+      "trigger": 82959.0,
+      "anchor": 82770.4,
+      "cci": 183.5226735468604,
+      "volume_multiple": 1.6757255758449103,
+      "retest_required": false,
+      "stop": 82760.3,
+      "target": 83123.3,
+      "target_basis": "confirmed_pivot",
+      "barrier": 83135.8,
+      "barrier_available_at": 1792395900,
+      "entry_bound": 82787.8,
+      "bound_kind": "max_long",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": -0.008590963604296054,
+      "signal_start": 1792402200,
+      "detected_at": 1792402500,
+      "signal_close": 83018.6,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": 1,
+      "trigger": 83018.7,
+      "anchor": 82855.7,
+      "cci": 193.38623288752876,
+      "volume_multiple": 13.66885821718866,
+      "retest_required": false,
+      "stop": 82845.4,
+      "target": 83123.3,
+      "target_basis": "confirmed_pivot",
+      "barrier": 83135.8,
+      "barrier_available_at": 1792395900,
+      "entry_bound": null,
+      "bound_kind": "max_long",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": -0.09168418056548744,
+      "signal_start": 1792402500,
+      "detected_at": 1792402800,
+      "signal_close": 83045.0,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": -1,
+      "trigger": 82637.7,
+      "anchor": 82856.1,
+      "cci": -176.4086207859027,
+      "volume_multiple": 12.055935515388374,
+      "retest_required": false,
+      "stop": 82866.6,
+      "target": 82520.9,
+      "target_basis": "confirmed_pivot",
+      "barrier": 82508.5,
+      "barrier_available_at": 1792386900,
+      "entry_bound": 82845.9,
+      "bound_kind": "min_short",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": -0.10543191407698124,
+      "signal_start": 1792404900,
+      "detected_at": 1792405200,
+      "signal_close": 82585.5,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": -1,
+      "trigger": 82535.8,
+      "anchor": 82856.1,
+      "cci": -209.43229771015868,
+      "volume_multiple": 2.3722964870986365,
+      "retest_required": false,
+      "status": "no_known_target",
+      "signal_start": 1792405200,
+      "detected_at": 1792405500,
+      "signal_close": 82487.6,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": -1,
+      "trigger": 82411.6,
+      "anchor": 82745.5,
+      "cci": -248.81000841271276,
+      "volume_multiple": 3.3567021507712367,
+      "retest_required": false,
+      "status": "no_known_target",
+      "signal_start": 1792405500,
+      "detected_at": 1792405800,
+      "signal_close": 82299.5,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": -1,
+      "trigger": 82236.4,
+      "anchor": 82675.6,
+      "cci": -256.9186462026153,
+      "volume_multiple": 3.1886899627627128,
+      "retest_required": false,
+      "status": "no_known_target",
+      "signal_start": 1792405800,
+      "detected_at": 1792406100,
+      "signal_close": 82118.4,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "rsi_reversal",
+      "direction": 1,
+      "anchor": 82089.0,
+      "first_start": 1792405800,
+      "second_start": 1792409400,
+      "first_rsi": 24.814281233266442,
+      "second_rsi": 32.419914215794236,
+      "second_inside_band": true,
+      "trigger": 82197.6,
+      "stop": 82075.9,
+      "target": 82351.1,
+      "target_basis": "signal_bar_bb_center",
+      "barrier": 82363.455,
+      "barrier_available_at": 1792410000,
+      "entry_bound": null,
+      "bound_kind": "max_long",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": 0.19009013762689195,
+      "signal_start": 1792409700,
+      "detected_at": 1792410000,
+      "signal_close": 82197.6,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": 1,
+      "trigger": 82485.3,
+      "anchor": 82281.7,
+      "cci": 179.85438835107124,
+      "volume_multiple": 1.9534123263996819,
+      "retest_required": false,
+      "stop": 82272.2,
+      "target": 83060.3,
+      "target_basis": "confirmed_pivot",
+      "barrier": 83072.7,
+      "barrier_available_at": 1792403400,
+      "entry_bound": 82470.2,
+      "bound_kind": "max_long",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": 1.2487602041376162,
+      "signal_start": 1792412100,
+      "detected_at": 1792412400,
+      "signal_close": 82506.2,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": 1,
+      "trigger": 82653.9,
+      "anchor": 82446.2,
+      "cci": 120.10408323741733,
+      "volume_multiple": 6.791206607628976,
+      "retest_required": false,
+      "stop": 82436.1,
+      "target": 83060.2,
+      "target_basis": "confirmed_pivot",
+      "barrier": 83072.7,
+      "barrier_available_at": 1792403400,
+      "entry_bound": 82568.4,
+      "bound_kind": "max_long",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": 0.6214483461585008,
+      "signal_start": 1792414800,
+      "detected_at": 1792415100,
+      "signal_close": 82707.1,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": -1,
+      "trigger": 82138.9,
+      "anchor": 82419.5,
+      "cci": -191.17292567116962,
+      "volume_multiple": 1.986113371913537,
+      "retest_required": false,
+      "stop": 82434.4,
+      "target": 82101.4,
+      "target_basis": "confirmed_pivot",
+      "barrier": 82089.0,
+      "barrier_available_at": 1792410300,
+      "entry_bound": 82418.2,
+      "bound_kind": "min_short",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": -0.16570961220115266,
+      "signal_start": 1792417800,
+      "detected_at": 1792418100,
+      "signal_close": 82138.7,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": -1,
+      "trigger": 82010.0,
+      "anchor": 82419.5,
+      "cci": -224.67122180589536,
+      "volume_multiple": 3.645800036600988,
+      "retest_required": false,
+      "status": "no_known_target",
+      "signal_start": 1792418400,
+      "detected_at": 1792418700,
+      "signal_close": 81860.0,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": -1,
+      "trigger": 81860.4,
+      "anchor": 82046.4,
+      "cci": -151.0087759619384,
+      "volume_multiple": 1.9482587455891172,
+      "retest_required": false,
+      "stop": 82055.4,
+      "target": 81728.4,
+      "target_basis": "confirmed_pivot",
+      "barrier": 81716.1,
+      "barrier_available_at": 1792426500,
+      "entry_bound": 82041.1,
+      "bound_kind": "min_short",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": -0.16046066163361958,
+      "signal_start": 1792439400,
+      "detected_at": 1792439700,
+      "signal_close": 81769.0,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": 1,
+      "trigger": 82045.3,
+      "anchor": 81946.6,
+      "cci": 175.5960205731826,
+      "volume_multiple": 2.0440216481615803,
+      "retest_required": false,
+      "stop": 81940.3,
+      "target": 82505.6,
+      "target_basis": "confirmed_pivot",
+      "barrier": 82518.0,
+      "barrier_available_at": 1792424400,
+      "entry_bound": 82049.8,
+      "bound_kind": "max_long",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": 0.7775592372571289,
+      "signal_start": 1792444200,
+      "detected_at": 1792444500,
+      "signal_close": 82144.3,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": 1,
+      "trigger": 82096.5,
+      "anchor": 81975.3,
+      "cci": 154.3238962840543,
+      "volume_multiple": 1.8553359085056427,
+      "retest_required": false,
+      "stop": 81968.5,
+      "target": 82168.6,
+      "target_basis": "confirmed_pivot",
+      "barrier": 82181.0,
+      "barrier_available_at": 1792445400,
+      "entry_bound": null,
+      "bound_kind": "max_long",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": -0.20555957248642642,
+      "signal_start": 1792447500,
+      "detected_at": 1792447800,
+      "signal_close": 82117.8,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": 1,
+      "trigger": 82145.9,
+      "anchor": 82004.8,
+      "cci": 226.3637700338317,
+      "volume_multiple": 1.733075825490394,
+      "retest_required": false,
+      "stop": 81997.2,
+      "target": 82505.6,
+      "target_basis": "confirmed_pivot",
+      "barrier": 82518.0,
+      "barrier_available_at": 1792424400,
+      "entry_bound": 82083.9,
+      "bound_kind": "max_long",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": 0.49662416376164675,
+      "signal_start": 1792448100,
+      "detected_at": 1792448400,
+      "signal_close": 82224.5,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": -1,
+      "trigger": 81843.6,
+      "anchor": 81973.7,
+      "cci": -248.3137646764763,
+      "volume_multiple": 4.360011005082611,
+      "retest_required": false,
+      "stop": 81980.4,
+      "target": 81728.4,
+      "target_basis": "confirmed_pivot",
+      "barrier": 81716.1,
+      "barrier_available_at": 1792426500,
+      "entry_bound": null,
+      "bound_kind": "min_short",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": -0.1304616771767669,
+      "signal_start": 1792454700,
+      "detected_at": 1792455000,
+      "signal_close": 81794.4,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": -1,
+      "trigger": 81728.2,
+      "anchor": 81973.7,
+      "cci": -263.1718294943115,
+      "volume_multiple": 5.188259660979997,
+      "retest_required": false,
+      "status": "no_known_target",
+      "signal_start": 1792455300,
+      "detected_at": 1792455600,
+      "signal_close": 81575.3,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "rsi_reversal",
+      "direction": 1,
+      "anchor": 81568.9,
+      "first_start": 1792456200,
+      "second_start": 1792457400,
+      "first_rsi": 27.685934062253267,
+      "second_rsi": 32.67646720150205,
+      "second_inside_band": true,
+      "trigger": 81699.4,
+      "stop": 81557.4,
+      "target": 81705.2,
+      "target_basis": "confirmed_pivot",
+      "barrier": 81717.5,
+      "barrier_available_at": 1792457400,
+      "entry_bound": null,
+      "bound_kind": "max_long",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": -0.3797387887064706,
+      "signal_start": 1792457700,
+      "detected_at": 1792458000,
+      "signal_close": 81699.4,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": -1,
+      "trigger": 81529.3,
+      "anchor": 81714.0,
+      "cci": -154.79150533288814,
+      "volume_multiple": 10.780381877521652,
+      "retest_required": false,
+      "status": "no_known_target",
+      "signal_start": 1792458300,
+      "detected_at": 1792458600,
+      "signal_close": 81267.6,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": -1,
+      "trigger": 81770.3,
+      "anchor": 81982.7,
+      "cci": -206.58129687259554,
+      "volume_multiple": 1.5145848915482425,
+      "retest_required": false,
+      "stop": 81990.7,
+      "target": 81542.3,
+      "target_basis": "confirmed_pivot",
+      "barrier": 81530.0,
+      "barrier_available_at": 1792464600,
+      "entry_bound": 81927.7,
+      "bound_kind": "min_short",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": 0.07836460023493953,
+      "signal_start": 1792475700,
+      "detected_at": 1792476000,
+      "signal_close": 81682.2,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": -1,
+      "trigger": 81680.7,
+      "anchor": 81982.7,
+      "cci": -234.11017718723306,
+      "volume_multiple": 3.1948391922213912,
+      "retest_required": false,
+      "stop": 81991.2,
+      "target": 81542.3,
+      "target_basis": "confirmed_pivot",
+      "barrier": 81530.0,
+      "barrier_available_at": 1792464600,
+      "entry_bound": 81928.0,
+      "bound_kind": "min_short",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": -0.01725277847095108,
+      "signal_start": 1792476000,
+      "detected_at": 1792476300,
+      "signal_close": 81640.2,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "rsi_reversal",
+      "direction": 1,
+      "anchor": 81590.0,
+      "first_start": 1792476000,
+      "second_start": 1792476900,
+      "first_rsi": 29.009516103036816,
+      "second_rsi": 36.840953952753566,
+      "second_inside_band": true,
+      "trigger": 81686.8,
+      "stop": 81580.4,
+      "target": 81879.5,
+      "target_basis": "signal_bar_bb_center",
+      "barrier": 81891.83499999999,
+      "barrier_available_at": 1792477200,
+      "entry_bound": 81584.1,
+      "bound_kind": "max_long",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": 0.37752717191086516,
+      "signal_start": 1792476900,
+      "detected_at": 1792477200,
+      "signal_close": 81686.8,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": 1,
+      "trigger": 83620.5,
+      "anchor": 83414.8,
+      "cci": 303.3808574031442,
+      "volume_multiple": 5.194344103838719,
+      "retest_required": false,
+      "status": "no_known_target",
+      "signal_start": 1792587600,
+      "detected_at": 1792587900,
+      "signal_close": 83817.0,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": 1,
+      "trigger": 83929.0,
+      "anchor": 83564.4,
+      "cci": 144.98832459273007,
+      "volume_multiple": 2.218221078783549,
+      "retest_required": false,
+      "status": "no_known_target",
+      "signal_start": 1792592400,
+      "detected_at": 1792592700,
+      "signal_close": 84016.8,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": 1,
+      "trigger": 84266.6,
+      "anchor": 83815.0,
+      "cci": 209.4205542601876,
+      "volume_multiple": 2.904188727596906,
+      "retest_required": false,
+      "status": "no_known_target",
+      "signal_start": 1792593900,
+      "detected_at": 1792594200,
+      "signal_close": 84279.1,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": 1,
+      "trigger": 84464.9,
+      "anchor": 84004.7,
+      "cci": 227.00313347437324,
+      "volume_multiple": 3.4766176036652885,
+      "retest_required": false,
+      "status": "no_known_target",
+      "signal_start": 1792594200,
+      "detected_at": 1792594500,
+      "signal_close": 84549.9,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "rsi_reversal",
+      "direction": -1,
+      "anchor": 84638.0,
+      "first_start": 1792595400,
+      "second_start": 1792596900,
+      "first_rsi": 70.35433450116756,
+      "second_rsi": 63.01826621686959,
+      "second_inside_band": true,
+      "trigger": 84452.6,
+      "stop": 84663.1,
+      "target": 84345.7,
+      "target_basis": "confirmed_pivot",
+      "barrier": 84333.0,
+      "barrier_available_at": 1792596900,
+      "entry_bound": 84656.3,
+      "bound_kind": "min_short",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": -0.008371654219753707,
+      "signal_start": 1792597200,
+      "detected_at": 1792597500,
+      "signal_close": 84452.6,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "rsi_reversal",
+      "direction": -1,
+      "anchor": 84694.6,
+      "first_start": 1792595400,
+      "second_start": 1792600200,
+      "first_rsi": 70.35433450116756,
+      "second_rsi": 56.832878299234814,
+      "second_inside_band": true,
+      "trigger": 84554.8,
+      "stop": 84708.6,
+      "target": 84551.6,
+      "target_basis": "signal_bar_bb_center",
+      "barrier": 84538.845,
+      "barrier_available_at": 1792600500,
+      "entry_bound": null,
+      "bound_kind": "min_short",
+      "status": "insufficient_net_rr",
+      "net_rr_at_signal_close": -0.38010138744777894,
+      "signal_start": 1792600200,
+      "detected_at": 1792600500,
+      "signal_close": 84554.8,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": 1,
+      "trigger": 84694.6,
+      "anchor": 84552.6,
+      "cci": 185.69152813904395,
+      "volume_multiple": 1.7659552519370962,
+      "retest_required": false,
+      "status": "no_known_target",
+      "signal_start": 1792600500,
+      "detected_at": 1792600800,
+      "signal_close": 84846.2,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    },
+    {
+      "lane": "bb_cci_breakout",
+      "direction": -1,
+      "trigger": 82609.3,
+      "anchor": 82780.0,
+      "cci": -249.13522972368588,
+      "volume_multiple": 3.723557802203544,
+      "retest_required": false,
+      "status": "no_known_target",
+      "signal_start": 1792650300,
+      "detected_at": 1792650600,
+      "signal_close": 82533.0,
+      "outcome": {
+        "status": "no_model_entry"
+      }
+    }
+  ],
+  "input_sha256": "0d8b8db7cdccd009d2d08e7c9ece7403231bce3b4af8227b5bddff246daa8cce",
+  "source_quality": "retained_lbank_derived_5m_not_independently_verified"
+}
