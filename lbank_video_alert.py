@@ -68,6 +68,10 @@ class DeliveryLedger:
             self.db.execute("UPDATE video_alert_delivery SET status=? WHERE bar_start=?", (status, start))
 
 
+class BookDataError(ValueError):
+    """A fixed diagnostic code, safe to write without the response body."""
+
+
 class PublicBook:
     def __init__(self, fetch=None):
         if fetch is None:
@@ -77,17 +81,41 @@ class PublicBook:
         self.fetch = fetch
 
     def __call__(self):
-        data = self.fetch({"symbol": SYMBOL, "depth": 20})["data"]
-        if data.get("symbol") != SYMBOL:
-            raise ValueError("wrong order book symbol")
+        response = self.fetch({"symbol": SYMBOL, "depth": 20})
+        data = response.get("data") if isinstance(response, dict) else None
+        if not isinstance(data, dict):
+            raise BookDataError("response_missing_data")
+        symbol = data.get("symbol")
+        if not isinstance(symbol, str) or symbol.strip().upper() != SYMBOL:
+            raise BookDataError("response_symbol_mismatch" if symbol else "response_missing_symbol")
+
         def prices(side):
-            for level in data[side]:
-                price, size = float(level["price"]), float(level["volume"])
-                if not (math.isfinite(price) and math.isfinite(size) and price > 0 and size >= 0):
-                    raise ValueError("invalid order book level")
-                if size > 0:
-                    yield price
+            raw = data.get(side)
+            if not isinstance(raw, list):
+                raise BookDataError("response_missing_"+side)
+            result = []
+            for level in raw:
+                try:
+                    size = float(level["volume"])
+                    price = float(level["price"])
+                except (KeyError, TypeError, ValueError, OverflowError):
+                    raise BookDataError("invalid_level_fields") from None
+                if not (math.isfinite(size) and size >= 0):
+                    raise BookDataError("invalid_level_size")
+                if size == 0:
+                    continue  # The API includes zero-volume placeholders.
+                if not (math.isfinite(price) and price > 0):
+                    raise BookDataError("invalid_level_price")
+                result.append(price)
+            if not result:
+                raise BookDataError("no_live_"+side)
+            return result
+
         return max(prices("bids")), min(prices("asks"))
+
+
+def book_error_code(exc):
+    return str(exc) if isinstance(exc, BookDataError) else type(exc).__name__
 
 
 def format_alert(plan, price, rr, bid, ask, lanes):
@@ -123,7 +151,7 @@ def process(bars, *, now, started, clock, get_book, ledger, send, costs=Costs())
     try:
         bid, ask = get_book()
     except Exception as exc:
-        LOG.warning("VIDEO_ALERT_BOOK_FAILURE type=%s", type(exc).__name__)
+        LOG.warning("VIDEO_ALERT_BOOK_FAILURE reason=%s", book_error_code(exc))
         return "book_unavailable", counts
     received = clock()
     if not now <= received <= min(now+MAX_BOOK_LATENCY, end+MAX_CLOSE_AGE):
@@ -183,7 +211,7 @@ def run():
         bid, ask = get_book()
         LOG.info("VIDEO_ALERT_BOOK_CHECK usable=%s", math.isfinite(bid) and math.isfinite(ask) and 0 < bid <= ask)
     except Exception as exc:
-        LOG.warning("VIDEO_ALERT_BOOK_CHECK usable=false type=%s", type(exc).__name__)
+        LOG.warning("VIDEO_ALERT_BOOK_CHECK usable=false reason=%s", book_error_code(exc))
     seen, next_health = None, 0
     while True:
         now = time.time()

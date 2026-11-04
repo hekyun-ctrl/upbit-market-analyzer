@@ -72,7 +72,7 @@ class VideoAlertTest(unittest.TestCase):
         send.assert_called_once()
 
     def test_public_book_requires_exact_symbol_and_positive_size(self):
-        data = dict(symbol="BTCUSDT", bids=[dict(price="100", volume="0"),
+        data = dict(symbol="BTCUSDT", bids=[dict(price="0", volume="0"),
                     dict(price="99.5", volume="1")], asks=[dict(price="101", volume="1"),
                     dict(price="100.5", volume="3")])
         fetch = Mock(return_value={"data": data})

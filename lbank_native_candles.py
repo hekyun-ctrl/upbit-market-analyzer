@@ -219,8 +219,12 @@ class NativeCandleThread(threading.Thread):
                             elif msg.type == aiohttp.WSMsgType.ERROR:
                                 raise RuntimeError("websocket error")
             except Exception as exc:
-                LOG.warning("NATIVE_CANDLES_RECONNECT exception=%s retry_seconds=%s",
-                            type(exc).__name__, delay)
+                safe_reason = str(exc) if str(exc) in (
+                    "oversized or incomplete compressed frame", "oversized frame",
+                    "wrong instrument or period", "invalid candle geometry or timestamp",
+                    "candle ahead of server clock", "websocket error") else "unclassified"
+                LOG.warning("NATIVE_CANDLES_RECONNECT exception=%s reason=%s retry_seconds=%s",
+                            type(exc).__name__, safe_reason, delay)
             finally:
                 if heartbeat:
                     heartbeat.cancel()
