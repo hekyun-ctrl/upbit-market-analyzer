@@ -1,5 +1,8 @@
 # 별도 엘뱅크 BTCUSDT 5분봉 영상 전략 알람
 
+> 검토 브랜치의 RSI 순서 보완은 [RSI_SEQUENCE_REVIEW_20261104.md](RSI_SEQUENCE_REVIEW_20261104.md)를
+> 따른다. 이번 보완의 실제 배포는 하지 않았다. 아래는 원래 배포 구조의 설명이다.
+
 배포용 브랜치 `feature/lbank-video-alert-20261104`의 시작 명령은 `python -u lbank_video_alert.py`다.
 운영 브랜치에 병합하지 않는다. ZB, 모의 알람, 업비트, 계정 및 자동주문과 연결하지 않는다.
 

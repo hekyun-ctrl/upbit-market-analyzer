@@ -22,7 +22,7 @@ def mirror(bars):
                  high=2000-b["low"], low=2000-b["high"]) for b in bars]
 
 
-def reversal():
+def incomplete_reversal():
     first, second = 997, 997.7
     closes = [1020]*34 + [1019, 1018, 1017, 1016, 1015, 1014, 1013,
                           first, first+6, first+8, second, second+1.6]
@@ -30,6 +30,20 @@ def reversal():
     for i, close in enumerate(closes):
         opening = {42: first+.3, 44: second+1.5, 45: second-.05}.get(
             i, closes[max(0, i-1)])
+        rows.append(dict(start=300*(i+1), open=opening, close=close,
+                         high=max(opening, close)+.15, low=min(opening, close)-.15,
+                         volume=100, quality="stream_closed"))
+    return rows
+
+
+def reversal():
+    # Two separate body-engulfing reversals, unlike the old fixture whose
+    # first rebound never engulfed its preceding large bearish body.
+    closes = [1020]*34 + [1019, 1018, 1017, 1016, 1015, 1014, 1013,
+                          997, 1013.2, 1010, 1008, 1007, 1006, 1005, 999, 1000.6]
+    rows = []
+    for i, close in enumerate(closes):
+        opening = {42: 996.9, 48: 1000.5, 49: 998.95}.get(i, closes[max(0, i-1)])
         rows.append(dict(start=300*(i+1), open=opening, close=close,
                          high=max(opening, close)+.15, low=min(opening, close)-.15,
                          volume=100, quality="stream_closed"))
@@ -46,7 +60,7 @@ class VideoEntryTest(unittest.TestCase):
                                  ("rsi_reversal", d, "qualified"))
                 self.assertEqual(e["detected_at"], rows[-1]["start"]+300)
                 self.assertTrue(e["second_inside_band"])
-                self.assertLess(d*(e["first_rsi"]-50), -20)
+                self.assertLess(d*(e["exhaustion_rsi"]-50), -20)
                 self.assertGreater(d*(e["signal_close"]-e["stop"]), 0)
 
     def test_confirmed_breakout_can_qualify_without_retest_in_both_directions(self):
@@ -126,8 +140,8 @@ class VideoEntryTest(unittest.TestCase):
         bars = read_retained_archive(ARCHIVE)
         report = replay(bars, nominal=True, with_outcomes=False)
         self.assertEqual(report["bars"], 581)
-        self.assertEqual(report["candidate_counts"], {"rsi_reversal": 5, "bb_cci_breakout": 26})
-        self.assertEqual(report["plan_counts"], {"no_known_target": 13, "insufficient_net_rr": 18})
+        self.assertEqual(report["candidate_counts"], {"rsi_reversal": 3, "bb_cci_breakout": 26})
+        self.assertEqual(report["plan_counts"], {"no_known_target": 13, "insufficient_net_rr": 16})
         for i, b in enumerate(bars):
             if any(e["signal_start"] == b["start"] for e in report["events"]):
                 with self.subTest(signal=b["start"]):

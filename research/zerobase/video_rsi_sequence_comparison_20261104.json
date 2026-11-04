@@ -1,0 +1,446 @@
+{
+  "policy": "rsi_two_turn_v2",
+  "baseline_revision": "d13a6eefb7ee479444b1822b71acf6042572c7ea",
+  "input_sha256": "0d8b8db7cdccd009d2d08e7c9ece7403231bce3b4af8227b5bddff246daa8cce",
+  "baseline_report_sha256": "5b3f85c90c23c5d7ff31b588425e2062b56c337bc0ef07bd4f178a555de6860b",
+  "source_quality": "retained_lbank_derived_5m_not_independently_verified",
+  "sample_role": "previously_used_development_not_out_of_sample",
+  "receipt_mode": "nominal_if_missing",
+  "bars": 581,
+  "evaluated_bars": 361,
+  "contiguous_runs": 6,
+  "costs": {
+    "fee": 0.0006,
+    "stop_slippage": 0.0002,
+    "funding_reserve": 0.0001,
+    "min_rr": 1.5,
+    "max_stop_fraction": 0.006,
+    "tick": 0.1
+  },
+  "trend_lane_identical": true,
+  "before_candidate_counts": {
+    "bb_cci_breakout": 26,
+    "rsi_reversal": 5
+  },
+  "after_candidate_counts": {
+    "bb_cci_breakout": 26,
+    "rsi_reversal": 3
+  },
+  "before_plan_counts": {
+    "no_known_target": 13,
+    "insufficient_net_rr": 18
+  },
+  "after_plan_counts": {
+    "no_known_target": 13,
+    "insufficient_net_rr": 16
+  },
+  "rsi_signal_changes": {
+    "added": 1,
+    "removed": 3,
+    "retained": 2
+  },
+  "same_extreme_timing": [
+    {
+      "direction": -1,
+      "first_start": 1792595400,
+      "before_candidates": [
+        1792597200,
+        1792600200
+      ],
+      "after_candidates": [
+        1792600200
+      ],
+      "earliest_candidate_change_minutes": 50.0,
+      "interpretation": "same_extreme_timestamp_not_confirmed_trade_match"
+    },
+    {
+      "direction": 1,
+      "first_start": 1792405800,
+      "before_candidates": [
+        1792409700
+      ],
+      "after_candidates": [
+        1792407000
+      ],
+      "earliest_candidate_change_minutes": -45.0,
+      "interpretation": "same_extreme_timestamp_not_confirmed_trade_match"
+    }
+  ],
+  "rsi_events": [
+    {
+      "change": "added",
+      "signal_close_kst": "2026-10-19T19:55:00+09:00",
+      "direction": 1,
+      "before": null,
+      "after": {
+        "lane": "rsi_reversal",
+        "policy": "rsi_two_turn_v2",
+        "direction": 1,
+        "anchor": 82292.4,
+        "trigger": 82436.0,
+        "exhaustion_start": 1792405500,
+        "exhaustion_rsi": 29.01477626386476,
+        "exhaustion_close": 82299.5,
+        "exhaustion_band": 82432.17423155608,
+        "first_start": 1792405800,
+        "first_price": 82069.7,
+        "first_rsi": 24.814281233266442,
+        "first_confirmation_start": 1792406100,
+        "pullback_start": 1792406700,
+        "second_start": 1792406700,
+        "second_price": 82292.4,
+        "second_rsi": 37.53881865432398,
+        "second_inside_band": true,
+        "second_confirmation_start": 1792407000,
+        "bars_since_exhaustion": 5,
+        "bars_since_first_confirmation": 3,
+        "setup_id": "rsi_two_turn_v2:1:1792405500",
+        "stop": 82276.5,
+        "target": 82667.3,
+        "target_basis": "signal_bar_bb_center",
+        "barrier": 82679.715,
+        "barrier_available_at": 1792407300,
+        "entry_bound": 82315.8,
+        "bound_kind": "max_long",
+        "status": "insufficient_net_rr",
+        "net_rr_at_signal_close": 0.43811724139651875,
+        "signal_start": 1792407000,
+        "detected_at": 1792407300,
+        "signal_close": 82436.0,
+        "outcome": {
+          "status": "no_model_entry"
+        }
+      },
+      "forward_path": {
+        "kind": "price_observation_not_trade_pnl",
+        "continuous_followup_bars": 12,
+        "directional_close_change_pct": {
+          "1": -0.06865932359649829,
+          "3": -0.19615216652918432,
+          "6": -0.28191566791206935,
+          "12": -0.10444466009996711
+        },
+        "favorable_excursion_pct": 0.00012130622544237468,
+        "adverse_excursion_pct": 0.42093260226114815
+      }
+    },
+    {
+      "change": "removed",
+      "signal_close_kst": "2026-10-19T20:40:00+09:00",
+      "direction": 1,
+      "before": {
+        "lane": "rsi_reversal",
+        "direction": 1,
+        "anchor": 82089.0,
+        "first_start": 1792405800,
+        "second_start": 1792409400,
+        "first_rsi": 24.814281233266442,
+        "second_rsi": 32.419914215794236,
+        "second_inside_band": true,
+        "trigger": 82197.6,
+        "stop": 82075.9,
+        "target": 82351.1,
+        "target_basis": "signal_bar_bb_center",
+        "barrier": 82363.455,
+        "barrier_available_at": 1792410000,
+        "entry_bound": null,
+        "bound_kind": "max_long",
+        "status": "insufficient_net_rr",
+        "net_rr_at_signal_close": 0.19009013762689195,
+        "signal_start": 1792409700,
+        "detected_at": 1792410000,
+        "signal_close": 82197.6,
+        "outcome": {
+          "status": "no_model_entry"
+        }
+      },
+      "after": null,
+      "forward_path": {
+        "kind": "price_observation_not_trade_pnl",
+        "continuous_followup_bars": 12,
+        "directional_close_change_pct": {
+          "1": 0.08455234702715586,
+          "3": 0.18528521514009633,
+          "6": 0.2302986948523822,
+          "12": 0.4547578031475208
+        },
+        "favorable_excursion_pct": 0.5551256971006335,
+        "adverse_excursion_pct": 0.03357762270431719
+      }
+    },
+    {
+      "change": "retained",
+      "signal_close_kst": "2026-10-20T10:00:00+09:00",
+      "direction": 1,
+      "before": {
+        "lane": "rsi_reversal",
+        "direction": 1,
+        "anchor": 81568.9,
+        "first_start": 1792456200,
+        "second_start": 1792457400,
+        "first_rsi": 27.685934062253267,
+        "second_rsi": 32.67646720150205,
+        "second_inside_band": true,
+        "trigger": 81699.4,
+        "stop": 81557.4,
+        "target": 81705.2,
+        "target_basis": "confirmed_pivot",
+        "barrier": 81717.5,
+        "barrier_available_at": 1792457400,
+        "entry_bound": null,
+        "bound_kind": "max_long",
+        "status": "insufficient_net_rr",
+        "net_rr_at_signal_close": -0.3797387887064706,
+        "signal_start": 1792457700,
+        "detected_at": 1792458000,
+        "signal_close": 81699.4,
+        "outcome": {
+          "status": "no_model_entry"
+        }
+      },
+      "after": {
+        "lane": "rsi_reversal",
+        "policy": "rsi_two_turn_v2",
+        "direction": 1,
+        "anchor": 81557.1,
+        "trigger": 81699.4,
+        "exhaustion_start": 1792454700,
+        "exhaustion_rsi": 29.900502393064414,
+        "exhaustion_close": 81794.4,
+        "exhaustion_band": 81842.94909312238,
+        "first_start": 1792455600,
+        "first_price": 81416.6,
+        "first_rsi": 20.999599106066213,
+        "first_confirmation_start": 1792456200,
+        "pullback_start": 1792456800,
+        "second_start": 1792457100,
+        "second_price": 81557.1,
+        "second_rsi": 32.82426275176746,
+        "second_inside_band": true,
+        "second_confirmation_start": 1792457700,
+        "bars_since_exhaustion": 10,
+        "bars_since_first_confirmation": 5,
+        "setup_id": "rsi_two_turn_v2:1:1792454700",
+        "stop": 81545.6,
+        "target": 81705.2,
+        "target_basis": "confirmed_pivot",
+        "barrier": 81717.5,
+        "barrier_available_at": 1792457400,
+        "entry_bound": null,
+        "bound_kind": "max_long",
+        "status": "insufficient_net_rr",
+        "net_rr_at_signal_close": -0.36352926767832616,
+        "signal_start": 1792457700,
+        "detected_at": 1792458000,
+        "signal_close": 81699.4,
+        "outcome": {
+          "status": "no_model_entry"
+        }
+      },
+      "forward_path": {
+        "kind": "price_observation_not_trade_pnl",
+        "continuous_followup_bars": 8,
+        "directional_close_change_pct": {
+          "1": -0.2080798634996106,
+          "3": -0.5657324288795285,
+          "6": -0.33243818192054686,
+          "12": null
+        },
+        "favorable_excursion_pct": 0.004283997189702404,
+        "adverse_excursion_pct": 0.6566755692208215
+      }
+    },
+    {
+      "change": "removed",
+      "signal_close_kst": "2026-10-20T15:20:00+09:00",
+      "direction": 1,
+      "before": {
+        "lane": "rsi_reversal",
+        "direction": 1,
+        "anchor": 81590.0,
+        "first_start": 1792476000,
+        "second_start": 1792476900,
+        "first_rsi": 29.009516103036816,
+        "second_rsi": 36.840953952753566,
+        "second_inside_band": true,
+        "trigger": 81686.8,
+        "stop": 81580.4,
+        "target": 81879.5,
+        "target_basis": "signal_bar_bb_center",
+        "barrier": 81891.83499999999,
+        "barrier_available_at": 1792477200,
+        "entry_bound": 81584.1,
+        "bound_kind": "max_long",
+        "status": "insufficient_net_rr",
+        "net_rr_at_signal_close": 0.37752717191086516,
+        "signal_start": 1792476900,
+        "detected_at": 1792477200,
+        "signal_close": 81686.8,
+        "outcome": {
+          "status": "no_model_entry"
+        }
+      },
+      "after": null,
+      "forward_path": {
+        "kind": "price_observation_not_trade_pnl",
+        "continuous_followup_bars": 12,
+        "directional_close_change_pct": {
+          "1": 0.035746289486171534,
+          "3": 0.11776688522502354,
+          "6": 0.1449438587384888,
+          "12": -0.03268581949592564
+        },
+        "favorable_excursion_pct": 0.19721668617205257,
+        "adverse_excursion_pct": 0.04566221225461575
+      }
+    },
+    {
+      "change": "removed",
+      "signal_close_kst": "2026-10-22T00:45:00+09:00",
+      "direction": -1,
+      "before": {
+        "lane": "rsi_reversal",
+        "direction": -1,
+        "anchor": 84638.0,
+        "first_start": 1792595400,
+        "second_start": 1792596900,
+        "first_rsi": 70.35433450116756,
+        "second_rsi": 63.01826621686959,
+        "second_inside_band": true,
+        "trigger": 84452.6,
+        "stop": 84663.1,
+        "target": 84345.7,
+        "target_basis": "confirmed_pivot",
+        "barrier": 84333.0,
+        "barrier_available_at": 1792596900,
+        "entry_bound": 84656.3,
+        "bound_kind": "min_short",
+        "status": "insufficient_net_rr",
+        "net_rr_at_signal_close": -0.008371654219753707,
+        "signal_start": 1792597200,
+        "detected_at": 1792597500,
+        "signal_close": 84452.6,
+        "outcome": {
+          "status": "no_model_entry"
+        }
+      },
+      "after": null,
+      "forward_path": {
+        "kind": "price_observation_not_trade_pnl",
+        "continuous_followup_bars": 12,
+        "directional_close_change_pct": {
+          "1": 0.022971465650567513,
+          "3": -0.055060471791268384,
+          "6": -0.12219872449159563,
+          "12": -0.21029547935764725
+        },
+        "favorable_excursion_pct": 0.095082922254619,
+        "adverse_excursion_pct": 0.4886764883496708
+      }
+    },
+    {
+      "change": "retained",
+      "signal_close_kst": "2026-10-22T01:35:00+09:00",
+      "direction": -1,
+      "before": {
+        "lane": "rsi_reversal",
+        "direction": -1,
+        "anchor": 84694.6,
+        "first_start": 1792595400,
+        "second_start": 1792600200,
+        "first_rsi": 70.35433450116756,
+        "second_rsi": 56.832878299234814,
+        "second_inside_band": true,
+        "trigger": 84554.8,
+        "stop": 84708.6,
+        "target": 84551.6,
+        "target_basis": "signal_bar_bb_center",
+        "barrier": 84538.845,
+        "barrier_available_at": 1792600500,
+        "entry_bound": null,
+        "bound_kind": "min_short",
+        "status": "insufficient_net_rr",
+        "net_rr_at_signal_close": -0.38010138744777894,
+        "signal_start": 1792600200,
+        "detected_at": 1792600500,
+        "signal_close": 84554.8,
+        "outcome": {
+          "status": "no_model_entry"
+        }
+      },
+      "after": {
+        "lane": "rsi_reversal",
+        "policy": "rsi_two_turn_v2",
+        "direction": -1,
+        "anchor": 84694.6,
+        "trigger": 84554.8,
+        "exhaustion_start": 1792594200,
+        "exhaustion_rsi": 71.79244720879706,
+        "exhaustion_close": 84549.9,
+        "exhaustion_band": 84383.33155314394,
+        "first_start": 1792595400,
+        "first_price": 84786.9,
+        "first_rsi": 70.35433450116756,
+        "first_confirmation_start": 1792597200,
+        "pullback_start": 1792597800,
+        "second_start": 1792600200,
+        "second_price": 84694.6,
+        "second_rsi": 56.832878299234814,
+        "second_inside_band": true,
+        "second_confirmation_start": 1792600200,
+        "bars_since_exhaustion": 20,
+        "bars_since_first_confirmation": 10,
+        "setup_id": "rsi_two_turn_v2:-1:1792594200",
+        "stop": 84708.6,
+        "target": 84551.6,
+        "target_basis": "signal_bar_bb_center",
+        "barrier": 84538.845,
+        "barrier_available_at": 1792600500,
+        "entry_bound": null,
+        "bound_kind": "min_short",
+        "status": "insufficient_net_rr",
+        "net_rr_at_signal_close": -0.38010138744777894,
+        "signal_start": 1792600200,
+        "detected_at": 1792600500,
+        "signal_close": 84554.8,
+        "outcome": {
+          "status": "no_model_entry"
+        }
+      },
+      "forward_path": {
+        "kind": "price_observation_not_trade_pnl",
+        "continuous_followup_bars": 12,
+        "directional_close_change_pct": {
+          "1": -0.3446285722395359,
+          "3": -0.0018922639518859086,
+          "6": 0.1630894993542742,
+          "12": -0.021169702961865156
+        },
+        "favorable_excursion_pct": 0.2541547020393997,
+        "adverse_excursion_pct": 0.3672174731653266
+      }
+    }
+  ],
+  "after_stage_counts": {
+    "rsi_long_waiting_extreme": 308,
+    "rsi_short_waiting_extreme": 340,
+    "center_or_cci_not_aligned": 19,
+    "volume_below_threshold": 47,
+    "rsi_long_waiting_first_engulfing": 23,
+    "rsi_long_waiting_pullback": 15,
+    "rsi_long_waiting_second_engulfing": 12,
+    "rsi_long_second_extreme_outside_band": 1,
+    "rsi_short_waiting_first_engulfing": 10,
+    "rsi_short_waiting_pullback": 2,
+    "rsi_short_waiting_second_engulfing": 8
+  },
+  "actual_profitability_verified": false,
+  "screenshot_candles_available": false,
+  "qualified_trade_accuracy": null,
+  "net_profit_improvement": null,
+  "limitations": [
+    "No qualified trade in either policy; no win-rate or net-profit conclusion.",
+    "Forward excursions use future OHLC only for evaluation, never entry decisions.",
+    "Neither actual spread/fills/funding nor the attached screenshot's exact candles are present."
+  ]
+}
