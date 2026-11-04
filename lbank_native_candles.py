@@ -107,9 +107,25 @@ class NativeCandleStore:
         observed_end_by = min(wall_received, int(frame["w"]) / 1000)
         parsed = []
         for raw in raw_rows:
-            active = (raw.get("b") == "1m" and self.current is not None
-                      and int(raw["c"]) == self.current)
-            parsed.append((raw, parse_bar(raw, observed_end_by=observed_end_by if active else None)))
+            active = False
+            if raw.get("a") == "BTCUSDT" and raw.get("b") == "1m":
+                start = int(raw["c"])
+                if self.current is not None and start < self.current:
+                    # A revision to an older minute cannot change a sealed bar.
+                    continue
+                if self.current is None and start+60 <= min(observed_end_by, int(raw["k"])):
+                    # A late row on reconnect is not a fresh contiguous start.
+                    continue
+                active = start == self.current
+            try:
+                parsed.append((raw, parse_bar(raw, observed_end_by=observed_end_by if active else None)))
+            except ValueError as exc:
+                if str(exc) in {"candle_update_after_end", "candle_update_at_end"}:
+                    # Relative timing only; no market prices or payload logged.
+                    LOG.info("NATIVE_CANDLES_LATE_ROW active=%s period=%s offset_s=%s receipt_offset_s=%s",
+                             active, "1m" if raw.get("b") == "1m" else "5m",
+                             int(raw["k"])-int(raw["c"]), wall_received-int(raw["c"]))
+                raise
         closed = []
         with self.db:
             for raw, bar in parsed:

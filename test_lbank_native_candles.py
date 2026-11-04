@@ -80,8 +80,17 @@ class NativeCandlesTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "candle_update_after_end"):
             store.ingest(frame(raw(3300, updated=3376)), 3376, wall_received=3376)
         store.disconnected()
-        with self.assertRaisesRegex(ValueError, "candle_update_after_end"):
-            store.ingest(frame(raw(3300, updated=3361)), 3361, wall_received=3361)
+        self.assertEqual(store.ingest(frame(raw(3300, updated=3361)), 3361, wall_received=3361), [])
+        self.assertIsNone(store.current)
+
+    def test_late_revision_to_an_older_bar_is_ignored_without_resetting_stream(self):
+        store = self.make_store()
+        store.ingest(frame(raw(3000, updated=3059)), 3059, wall_received=3060)
+        store.ingest(frame(raw(3060, updated=3061)), 3061, wall_received=3062)
+        self.assertEqual(store.ingest(frame(raw(3000, updated=3067, close=102)), 3067, wall_received=3068), [])
+        row = store.db.execute("SELECT quality,close FROM native_bars WHERE period=60 AND start=3000").fetchone()
+        self.assertEqual(tuple(row), ("stream_closed", 101))
+        self.assertEqual(store.current, 3060)
 
     def test_gap_at_boundary_prevents_closure(self):
         store = self.make_store()
