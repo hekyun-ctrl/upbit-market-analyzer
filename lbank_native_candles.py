@@ -20,6 +20,7 @@ import aiohttp
 
 LOG = logging.getLogger("lbank_native_candles")
 WS_URL = "wss://uuws.rerrkvifj.com/ws/v3"
+MAX_BOUNDARY_DELAY = 15
 
 
 def decode_frame(data):
@@ -44,9 +45,9 @@ def parse_bar(raw, *, observed_end_by=None):
     o, h, l, c, v, turnover = values
     if start <= 0 or start % period:
         raise ValueError("candle_start_unaligned")
-    # The web stream can send the closing update at the exact minute boundary.
-    # It remains an update of the original minute, never proof of closure by itself.
-    at_minute_end = (period == 60 and updated == start+period
+    # A closing update of the minute already in flight can arrive just after
+    # the boundary. Retain its actual update timestamp; never close it here.
+    at_minute_end = (period == 60 and start+period <= updated <= start+period+MAX_BOUNDARY_DELAY
                      and observed_end_by is not None and updated <= observed_end_by)
     if not (start <= updated < start + period or at_minute_end):
         if updated == start+period:
@@ -104,7 +105,11 @@ class NativeCandleStore:
             raw_rows = [raw_rows]
         wall_received = int(time.time() if wall_received is None else wall_received)
         observed_end_by = min(wall_received, int(frame["w"]) / 1000)
-        parsed = [(raw, parse_bar(raw, observed_end_by=observed_end_by)) for raw in raw_rows]
+        parsed = []
+        for raw in raw_rows:
+            active = (raw.get("b") == "1m" and self.current is not None
+                      and int(raw["c"]) == self.current)
+            parsed.append((raw, parse_bar(raw, observed_end_by=observed_end_by if active else None)))
         closed = []
         with self.db:
             for raw, bar in parsed:
