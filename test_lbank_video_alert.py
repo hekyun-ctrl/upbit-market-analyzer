@@ -50,6 +50,7 @@ class VideoAlertTest(unittest.TestCase):
     def test_missing_stale_or_wide_book_never_sends(self):
         rows = breakout()[:46]
         for quote, delay, status in ((Mock(side_effect=TimeoutError), 0, "book_unavailable"),
+                                     (lambda: (1003., 1003.), 0, "invalid_book"),
                                      (lambda: (1002., 1004.), 0, "spread_too_wide"),
                                      (lambda: (1002.9, 1003.1), 6, "book_too_slow"),
                                      (lambda: (1006., 1006.1), 0, "book_rejected"),

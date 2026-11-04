@@ -60,6 +60,23 @@ class NativeCandlesTests(unittest.TestCase):
         store.ingest(frame(raw(3000, volume=2, updated=3059)), 3)
         self.assertEqual(store.db.execute("SELECT volume FROM native_bars").fetchone()[0], 2)
 
+    def test_exact_end_update_stays_forming_until_next_minute_and_retains_final_volume(self):
+        store = self.make_store()
+        for i in range(5):
+            t = 3000+i*60
+            store.ingest(frame(raw(t, updated=t+1, volume=1)), t+1, wall_received=t+2)
+            store.ingest(frame(raw(t, updated=t+58, volume=1)), t+58, wall_received=t+59)
+            result = store.ingest(frame(raw(t, updated=t+60, volume=3)), t+60, wall_received=t+60)
+            self.assertEqual(result, [])
+            row = store.db.execute("SELECT quality, updated FROM native_bars WHERE period=60 AND start=?",
+                                   (t,)).fetchone()
+            self.assertEqual(tuple(row), ("forming", t+60))
+        result, = store.ingest(frame(raw(3300, updated=3301)), 3301, wall_received=3302)
+        self.assertEqual((result["start"], result["volume"], result["updated"]), (3000, 15, 3300))
+        self.assertEqual(store.db.execute("SELECT received FROM native_arrivals WHERE period=300 AND start=3000").fetchone()[0], 3302)
+        with self.assertRaisesRegex(ValueError, "candle_update_at_end"):
+            store.ingest(frame(raw(3300, updated=3360)), 3360, wall_received=3359)
+
     def test_gap_at_boundary_prevents_closure(self):
         store = self.make_store()
         store.ingest(frame(raw(3000)), 1)

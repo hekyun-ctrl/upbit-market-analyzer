@@ -121,7 +121,7 @@ def book_error_code(exc):
 
 def check_book(get_book):
     """Try a bounded set of public depths at startup and keep a valid depth."""
-    for depth in (20, 5, 60, 1):
+    for depth in (20, 10, 50, 5, 60, 1):
         get_book.depth = depth
         try:
             requested = time.monotonic()
@@ -130,7 +130,8 @@ def check_book(get_book):
                     and time.monotonic()-requested <= MAX_BOOK_LATENCY):
                 LOG.info("VIDEO_ALERT_BOOK_CHECK usable=true depth=%s", depth)
                 return
-            LOG.warning("VIDEO_ALERT_BOOK_CHECK usable=false depth=%s reason=invalid_or_slow_book", depth)
+            reason = ("locked_or_crossed_book" if bid >= ask else "invalid_or_slow_book")
+            LOG.warning("VIDEO_ALERT_BOOK_CHECK usable=false depth=%s reason=%s", depth, reason)
         except Exception as exc:
             LOG.warning("VIDEO_ALERT_BOOK_CHECK usable=false depth=%s reason=%s", depth, book_error_code(exc))
     get_book.depth = 20
@@ -174,7 +175,7 @@ def process(bars, *, now, started, clock, get_book, ledger, send, costs=Costs())
     received = clock()
     if not now <= received <= min(now+MAX_BOOK_LATENCY, end+MAX_CLOSE_AGE):
         return "book_too_slow", counts
-    if not all(math.isfinite(x) for x in (bid, ask)) or not 0 < bid <= ask:
+    if not all(math.isfinite(x) for x in (bid, ask)) or not 0 < bid < ask:
         return "invalid_book", counts
     if (ask-bid)/((ask+bid)/2) > MAX_SPREAD:
         return "spread_too_wide", counts

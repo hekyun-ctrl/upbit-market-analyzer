@@ -35,7 +35,7 @@ def decode_frame(data):
     return json.loads(data)
 
 
-def parse_bar(raw):
+def parse_bar(raw, *, observed_end_by=None):
     if raw.get("a") != "BTCUSDT" or raw.get("b") not in ("1m", "5m"):
         raise ValueError("wrong instrument or period")
     period = 60 if raw["b"] == "1m" else 300
@@ -44,7 +44,11 @@ def parse_bar(raw):
     o, h, l, c, v, turnover = values
     if start <= 0 or start % period:
         raise ValueError("candle_start_unaligned")
-    if not start <= updated < start + period:
+    # The web stream can send the closing update at the exact minute boundary.
+    # It remains an update of the original minute, never proof of closure by itself.
+    at_minute_end = (period == 60 and updated == start+period
+                     and observed_end_by is not None and updated <= observed_end_by)
+    if not (start <= updated < start + period or at_minute_end):
         if updated == start+period:
             raise ValueError("candle_update_at_end")
         if updated < start:
@@ -98,8 +102,9 @@ class NativeCandleStore:
         raw_rows = frame.get("d", [])
         if isinstance(raw_rows, dict):
             raw_rows = [raw_rows]
-        parsed = [(raw, parse_bar(raw)) for raw in raw_rows]
         wall_received = int(time.time() if wall_received is None else wall_received)
+        observed_end_by = min(wall_received, int(frame["w"]) / 1000)
+        parsed = [(raw, parse_bar(raw, observed_end_by=observed_end_by)) for raw in raw_rows]
         closed = []
         with self.db:
             for raw, bar in parsed:
