@@ -42,11 +42,20 @@ def parse_bar(raw):
     start, updated = int(raw["c"]), int(raw["k"])
     values = [float(raw[k]) for k in ("d", "f", "g", "e", "h", "i")]
     o, h, l, c, v, turnover = values
-    if (start <= 0 or start % period or not start <= updated < start + period
-            or not all(math.isfinite(x) for x in values)
-            or min(o, h, l, c) <= 0 or min(v, turnover) < 0
-            or h < max(o, c, l) or l > min(o, c, h)):
-        raise ValueError("invalid candle geometry or timestamp")
+    if start <= 0 or start % period:
+        raise ValueError("candle_start_unaligned")
+    if not start <= updated < start + period:
+        if updated == start+period:
+            raise ValueError("candle_update_at_end")
+        if updated < start:
+            raise ValueError("candle_update_before_start")
+        raise ValueError("candle_update_after_end")
+    if not all(math.isfinite(x) for x in values):
+        raise ValueError("candle_nonfinite_values")
+    if min(o, h, l, c) <= 0 or min(v, turnover) < 0:
+        raise ValueError("candle_nonpositive_price_or_negative_volume")
+    if h < max(o, c, l) or l > min(o, c, h):
+        raise ValueError("candle_invalid_ohlc_geometry")
     return (period, start, o, h, l, c, v, turnover, updated)
 
 
@@ -221,7 +230,10 @@ class NativeCandleThread(threading.Thread):
             except Exception as exc:
                 safe_reason = str(exc) if str(exc) in (
                     "oversized or incomplete compressed frame", "oversized frame",
-                    "wrong instrument or period", "invalid candle geometry or timestamp",
+                    "wrong instrument or period", "candle_start_unaligned",
+                    "candle_update_at_end", "candle_update_before_start", "candle_update_after_end",
+                    "candle_nonfinite_values", "candle_nonpositive_price_or_negative_volume",
+                    "candle_invalid_ohlc_geometry",
                     "candle ahead of server clock", "websocket error") else "unclassified"
                 LOG.warning("NATIVE_CANDLES_RECONNECT exception=%s reason=%s retry_seconds=%s",
                             type(exc).__name__, safe_reason, delay)

@@ -79,9 +79,10 @@ class PublicBook:
             exchange = ccxt.lbank({"enableRateLimit": True, "timeout": 4500})
             fetch = exchange.contractPublicGetCfdOpenApiV1PubMarketOrder
         self.fetch = fetch
+        self.depth = 20
 
     def __call__(self):
-        response = self.fetch({"symbol": SYMBOL, "depth": 20})
+        response = self.fetch({"symbol": SYMBOL, "depth": self.depth})
         data = response.get("data") if isinstance(response, dict) else None
         if not isinstance(data, dict):
             raise BookDataError("response_missing_data")
@@ -116,6 +117,23 @@ class PublicBook:
 
 def book_error_code(exc):
     return str(exc) if isinstance(exc, BookDataError) else type(exc).__name__
+
+
+def check_book(get_book):
+    """Try a bounded set of public depths at startup and keep a valid depth."""
+    for depth in (20, 5, 60, 1):
+        get_book.depth = depth
+        try:
+            requested = time.monotonic()
+            bid, ask = get_book()
+            if (math.isfinite(bid) and math.isfinite(ask) and 0 < bid < ask
+                    and time.monotonic()-requested <= MAX_BOOK_LATENCY):
+                LOG.info("VIDEO_ALERT_BOOK_CHECK usable=true depth=%s", depth)
+                return
+            LOG.warning("VIDEO_ALERT_BOOK_CHECK usable=false depth=%s reason=invalid_or_slow_book", depth)
+        except Exception as exc:
+            LOG.warning("VIDEO_ALERT_BOOK_CHECK usable=false depth=%s reason=%s", depth, book_error_code(exc))
+    get_book.depth = 20
 
 
 def format_alert(plan, price, rr, bid, ask, lanes):
@@ -207,11 +225,7 @@ def run():
     if enabled:
         token_ok, chat_ok = telegram.health()
         LOG.info("VIDEO_ALERT_TELEGRAM_CHECK token_ok=%s chat_ok=%s no_test_message=true", token_ok, chat_ok)
-    try:
-        bid, ask = get_book()
-        LOG.info("VIDEO_ALERT_BOOK_CHECK usable=%s", math.isfinite(bid) and math.isfinite(ask) and 0 < bid <= ask)
-    except Exception as exc:
-        LOG.warning("VIDEO_ALERT_BOOK_CHECK usable=false reason=%s", book_error_code(exc))
+    check_book(get_book)
     seen, next_health = None, 0
     while True:
         now = time.time()
