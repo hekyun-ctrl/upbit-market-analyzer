@@ -51,6 +51,12 @@ async def scan(session, url):
         hosts = sorted(set(URL_RE.findall(js)))
         hosts = [h for h in hosts if re.search(r"(?:^wss://|rerrkvifj|lbkperp|marketOrder)", h, re.I)]
         paths = sorted({m for m in METHOD_RE.findall(js) if BOOK_WORDS.search(m)})
+        for marker in ("SendQryMarketOrder", "getFuturesDepth", "getContractDepth", "subscribeDepth", "marketDepth"):
+            for pos in [m.start() for m in re.finditer(re.escape(marker), js)][:3]:
+                sample = js[max(0, pos-360):pos+500]
+                sample = re.sub(r"[A-Za-z0-9_-]{45,}", "<long>", sample)
+                LOG.info("VIDEO_BOOK_PROTOCOL_HINT asset=%s marker=%s context=%r",
+                         urlparse(url).path, marker, sample)
         symbols = sorted({m.group(0) for m in re.finditer(
             r"[A-Za-z_$][A-Za-z0-9_$]{2,40}", js)
             if BOOK_WORDS.search(m.group(0))})
