@@ -60,6 +60,12 @@ async def scan(session, url):
                          urlparse(url).path, marker, sample)
                 if marker == "subscribeDepth":
                     earlier = js[max(0, pos-7200):pos]
+                    if "[k]=y()" in earlier:
+                        end = earlier.rfind("return t.current=l,i.current=o")
+                        if end != -1:
+                            context = earlier[max(0, end-3800):end+120]
+                            for i in range(0, len(context), 1000):
+                                LOG.info("VIDEO_BOOK_PROTOCOL_HOOK block=%d %r", i, re.sub(r"[A-Za-z0-9_-]{45,}", "<long>", context[i:i+1000]))
                     matches = list(re.finditer(r"(?:\bk\s*=|\[k,|\[k\]|\.A\.subscribe\w+|\bk:)", earlier))[-9:]
                     for m in matches:
                         sample = earlier[max(0, m.start()-160):m.start()+430]
