@@ -52,7 +52,7 @@ async def scan(session, url):
         hosts = sorted(set(URL_RE.findall(js)))
         hosts = [h for h in hosts if re.search(r"(?:^wss://|rerrkvifj|lbkperp|marketOrder)", h, re.I)]
         paths = sorted({m for m in METHOD_RE.findall(js) if BOOK_WORDS.search(m)})
-        for marker in ("subscribeDepth", "subscribeMarketDepth", "subscribeOrderBook", "32941:", "17148:"):
+        for marker in ("activateOrderBook", "subscribeMarketOrder", "subscribeMarketDepth", "subscribeOrderBook", "38040:", "57292:", "32941:", "17148:"):
             for pos in [m.start() for m in re.finditer(re.escape(marker), js)][:3]:
                 sample = js[max(0, pos-360):pos+1300]
                 sample = re.sub(r"[A-Za-z0-9_-]{45,}", "<long>", sample)
@@ -70,9 +70,9 @@ async def scan(session, url):
                     for m in matches:
                         sample = earlier[max(0, m.start()-160):m.start()+430]
                         LOG.info("VIDEO_BOOK_PROTOCOL_BINDING %r", re.sub(r"[A-Za-z0-9_-]{45,}", "<long>", sample))
-                if marker in ("32941:", "17148:"):
+                if marker in ("32941:", "17148:", "38040:", "57292:"):
                     module = re.split(r"\},\d+:\(\w+,\w+,\w+\)=>", js[pos:pos+30000], maxsplit=1)[0]
-                    for m in list(re.finditer(r"(?:[Dd]epth|[Oo]rder[Bb]ook|[Mm]arket[Oo]rder|/ws/v3)", module))[:16]:
+                    for m in list(re.finditer(r"(?:[Dd]epth|[Oo]rder[Bb]ook|[Mm]arket[Oo]rder|/ws/v3|[Bb]idList|[Aa]skList)", module))[:16]:
                         sample = module[max(0, m.start()-100):m.start()+230]
                         LOG.info("VIDEO_BOOK_PROTOCOL_WS module=%s %r", marker, re.sub(r"[A-Za-z0-9_-]{45,}", "<long>", sample))
         symbols = sorted({m.group(0) for m in re.finditer(
@@ -112,14 +112,14 @@ async def check_frontend_depth(session):
 
 
 async def run():
-    timeout = aiohttp.ClientTimeout(total=3)
-    async with aiohttp.ClientSession(timeout=timeout, connector=aiohttp.TCPConnector(limit=6),
+    timeout = aiohttp.ClientTimeout(total=9)
+    async with aiohttp.ClientSession(timeout=timeout, connector=aiohttp.TCPConnector(limit=10),
                                     headers={"User-Agent": "Mozilla/5.0"}) as session:
         html = await read(session, URL, 1_600_000)
         parser = ScriptPaths()
         parser.feed(html)
-        paths = sorted(parser.urls, key=lambda u: (not bool(re.search(r"futures|_app|perp", u)), u))[:32]
-        LOG.info("VIDEO_BOOK_SOURCE_ASSETS count=%d", len(paths))
+        paths = sorted(parser.urls, key=lambda u: (not bool(re.search(r"futures|_app|perp", u)), u))[:80]
+        LOG.info("VIDEO_BOOK_SOURCE_ASSETS count=%d total=%d", len(paths), len(parser.urls))
         results = await asyncio.gather(*(scan(session, u) for u in paths))
         for url, (hosts, routes, symbols) in zip(paths, results):
             if hosts or routes:
@@ -129,7 +129,7 @@ async def run():
 
 def probe_once():
     try:
-        asyncio.run(asyncio.wait_for(run(), timeout=13))
+        asyncio.run(asyncio.wait_for(run(), timeout=16))
     except (OSError, asyncio.TimeoutError, aiohttp.ClientError, ValueError) as exc:
         LOG.info("VIDEO_BOOK_SOURCE_UNVERIFIED reason=%s", type(exc).__name__)
 
