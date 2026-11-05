@@ -14,6 +14,7 @@ from statistics import mean, median, pstdev
 
 from lbank_native_entry import wilder_rsi_series
 from lbank_structural_target_plan import available_barriers, entry_bound, rounded
+from research.zerobase.rsi_sequence import POLICY as RSI_SEQUENCE_POLICY, sequence_series
 
 BAR_SECONDS = 300
 WARMUP = 40
@@ -178,9 +179,11 @@ def _plan(setup, bars, series, ready, i, costs, nominal):
                                   nominal_delay=0 if nominal else None)
     levels = [(x["price"], "confirmed_pivot", x["available_at"]) for x in barriers]
     if setup["lane"] == "rsi_reversal":
-        if d*(bb["center"]-price) <= 0:
+        center_ahead = d*(bb["center"]-price) > 0
+        if not center_ahead and setup.get("policy") != RSI_SEQUENCE_POLICY:
             return dict(setup, status="center_already_reached")
-        levels.append((bb["center"], "signal_bar_bb_center", ready[i]))
+        if center_ahead:
+            levels.append((bb["center"], "signal_bar_bb_center", ready[i]))
     if not levels:
         return dict(setup, status="no_known_target")
     level, basis, known = min(levels, key=lambda x: d*x[0])
@@ -233,17 +236,28 @@ def _outcome(plan, later, detected_at, costs):
     return dict(row, status="horizon_unresolved" if len(later) >= HORIZON else "no_followup")
 
 
-def _detect(bars, series, ready, i, costs, nominal, rejected):
+def _sequence_setup(state, direction, rejected):
+    if state["event"] is None:
+        side = "long" if direction == 1 else "short"
+        rejected[f"rsi_{side}_{state['stage']}"] += 1
+    return state["event"]
+
+
+def _plan_at(setup, bars, series, ready, i, costs, nominal):
+    return dict(_plan(setup, bars, series, ready, i, costs, nominal),
+                signal_start=bars[i]["start"], detected_at=ready[i], signal_close=bars[i]["close"])
+
+
+def _detect(bars, series, ready, i, costs, nominal, rejected, sequences=None):
     for d in (1, -1):
-        reversal = _reversal(bars, series, i, d)
+        reversal = (_reversal(bars, series, i, d) if sequences is None
+                    else _sequence_setup(sequences[d][i], d, rejected))
         trend, reason = _trend(bars, series, i, d)
         if reason:
             rejected[reason] += 1
         for setup in (reversal, trend):
             if setup is not None:
-                plan = _plan(setup, bars, series, ready, i, costs, nominal)
-                yield dict(plan, signal_start=bars[i]["start"], detected_at=ready[i],
-                           signal_close=bars[i]["close"])
+                yield _plan_at(setup, bars, series, ready, i, costs, nominal)
 
 
 def evaluate_latest(bars, *, costs=Costs()):
@@ -258,7 +272,25 @@ def evaluate_latest(bars, *, costs=Costs()):
     return events, dict(rejected)
 
 
-def replay(bars, *, nominal=False, costs=Costs(), with_outcomes=True):
+def evaluate_rsi_shadow(bars, *, costs=Costs()):
+    """Evaluate only the experimental RSI rule; it has no delivery entry point."""
+    ready = _validate(bars, nominal=False)
+    if len(bars) < WARMUP:
+        return [], {"warmup": 1}, {}
+    if any(b["start"] - a["start"] != BAR_SECONDS for a, b in zip(bars, bars[1:])):
+        raise ValueError("shadow input must be contiguous")
+    indicators = _series(bars)
+    events, rejected, states = [], Counter(), {}
+    for d, side in ((1, "long"), (-1, "short")):
+        state = sequence_series(bars, indicators, d)[-1]
+        states[side] = {k: v for k, v in state.items() if k != "event"}
+        setup = _sequence_setup(state, d, rejected)
+        if setup is not None:
+            events.append(_plan_at(setup, bars, indicators, ready, len(bars)-1, costs, False))
+    return events, dict(rejected), states
+
+
+def replay(bars, *, nominal=False, costs=Costs(), with_outcomes=True, rsi_sequence=False):
     ready = _validate(bars, nominal)
     starts = [0] if bars else []
     starts.extend(i for i in range(1, len(bars))
@@ -269,13 +301,16 @@ def replay(bars, *, nominal=False, costs=Costs(), with_outcomes=True):
         if len(run) < WARMUP:
             continue
         indicators = _series(run)
+        sequences = ({d: sequence_series(run, indicators, d) for d in (1, -1)}
+                     if rsi_sequence else None)
         for i in range(WARMUP-1, len(run)):
             evaluated += 1
-            for plan in _detect(run, indicators, at, i, costs, nominal, rejected):
+            for plan in _detect(run, indicators, at, i, costs, nominal, rejected, sequences):
                 if with_outcomes:
                     plan["outcome"] = _outcome(plan, run[i+1:i+1+HORIZON], at[i], costs)
                 events.append(plan)
     return dict(scope="offline_research_only", sources=SOURCES, production_ready=False,
+                **({"policy": RSI_SEQUENCE_POLICY} if rsi_sequence else {}),
                 receipt_mode="nominal_if_missing" if nominal else "recorded",
                 assumptions=asdict(costs), bars=len(bars), evaluated_bars=evaluated,
                 contiguous_runs=len(starts),
