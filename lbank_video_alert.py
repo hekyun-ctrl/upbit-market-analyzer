@@ -8,9 +8,9 @@ import os
 from pathlib import Path
 import sqlite3
 import sys
-import threading
 import time
 
+from lbank_native_book import NativeBookError, fetch_native_book
 from lbank_native_candles import NativeCandleThread
 from lbank_telegram_transport import TelegramTransport
 from research.zerobase.video_entry import Costs, WARMUP, evaluate_latest, judge_entry
@@ -78,15 +78,17 @@ class PublicBook:
     MAX_ATTEMPTS = 4
     BUDGET = 4.0
 
-    def __init__(self, fetch=None, *, clock=time.monotonic):
+    def __init__(self, fetch=None, *, alternate=None, clock=time.monotonic):
         self.exchange = None
         if fetch is None:
             import ccxt
             self.exchange = ccxt.lbank({"enableRateLimit": True, "timeout": 1000})
             fetch = self.exchange.contractPublicGetCfdOpenApiV1PubMarketOrder
         self.fetch = fetch
+        self.alternate = alternate
         self.clock = clock
         self.depth = self.DEPTHS[0]
+        self.last_source = None
 
     @staticmethod
     def parse(response):
@@ -130,6 +132,19 @@ class PublicBook:
         i = self.DEPTHS.index(self.depth)
         depths = self.DEPTHS[i:] + self.DEPTHS[:i]
         tried = []
+        self.last_source = None
+        if self.alternate is not None:
+            try:
+                bid, ask = self.alternate(min(2.0, end - self.clock()))
+                if not all(math.isfinite(x) for x in (bid, ask)) or not 0 < bid < ask:
+                    raise BookDataError("invalid_book")
+                if self.clock() > end:
+                    raise BookDataError("deadline")
+            except Exception as exc:
+                tried.append("ws:" + book_error_code(exc))
+            else:
+                self.last_source = "websocket"
+                return bid, ask
         for depth in depths[:self.MAX_ATTEMPTS]:
             remaining = end - self.clock()
             if remaining < .12:
@@ -145,15 +160,16 @@ class PublicBook:
                 tried.append(f"{depth}:deadline")
                 break
             self.depth = depth
+            self.last_source = "rest"
             if tried:
                 LOG.info("VIDEO_ALERT_BOOK_RECOVERED depth=%s earlier=%s", depth, ",".join(tried))
             return quote
-        self.depth = self.DEPTHS[(i+max(1, len(tried))) % len(self.DEPTHS)]
+        self.depth = self.DEPTHS[(i+max(1, len(tried) - int(self.alternate is not None))) % len(self.DEPTHS)]
         raise BookDataError("snapshot_attempts=" + (",".join(tried) or "deadline"))
 
 
 def book_error_code(exc):
-    return str(exc) if isinstance(exc, BookDataError) else type(exc).__name__
+    return str(exc) if isinstance(exc, (BookDataError, NativeBookError)) else type(exc).__name__
 
 
 def check_book(get_book):
@@ -163,7 +179,8 @@ def check_book(get_book):
     except Exception as exc:
         LOG.warning("VIDEO_ALERT_BOOK_CHECK usable=false reason=%s", book_error_code(exc))
     else:
-        LOG.info("VIDEO_ALERT_BOOK_CHECK usable=true depth=%s", get_book.depth)
+        LOG.info("VIDEO_ALERT_BOOK_CHECK usable=true source=%s depth=%s", get_book.last_source,
+                 get_book.depth if get_book.last_source == "rest" else "native")
 
 
 def format_alert(plan, price, rr, bid, ask, lanes):
@@ -237,8 +254,6 @@ def process(bars, *, now, started, clock, get_book, ledger, send, costs=Costs())
 
 
 def run():
-    from lbank_public_book_probe import probe_once
-    threading.Thread(target=probe_once, name="public-book-probe", daemon=True).start()
     started = time.time()
     data = Path(os.environ.get("VIDEO_ALERT_STATE_DIR", "/data")).resolve()
     enabled = os.getenv("VIDEO_ALERT_SEND_ENABLED", "0") == "1"
@@ -250,7 +265,7 @@ def run():
     ledger = DeliveryLedger(data / "video_alert_delivery.sqlite3")
     telegram = TelegramTransport(token=os.getenv("VIDEO_ALERT_TELEGRAM_BOT_TOKEN", ""),
                                  chat_id=os.getenv("VIDEO_ALERT_TELEGRAM_CHAT_ID", ""))
-    get_book = PublicBook()
+    get_book = PublicBook(alternate=fetch_native_book)
     NativeCandleThread(path=str(source_path)).start()
     LOG.info("VIDEO_ALERT_START revision=%s source=%s send_enabled=%s warmup=%d separate=true",
              os.getenv("RAILWAY_GIT_COMMIT_SHA", "local"), SOURCE, enabled, WARMUP)

@@ -4,6 +4,7 @@ import tempfile
 import unittest
 from unittest.mock import Mock
 
+from lbank_native_book import NativeBookError, parse_snapshot
 from lbank_native_candles import NativeCandleStore
 from lbank_video_alert import BookDataError, DeliveryLedger, PublicBook, process, read_window
 from test_lbank_video_entry import ARCHIVE, breakout, mirror, reversal
@@ -116,6 +117,55 @@ class VideoAlertTest(unittest.TestCase):
                 book()
         self.assertEqual([c.args[0]["depth"] for c in fetch.call_args_list],
                          [20, 10, 50, 5, 60, 1, 20, 10])
+
+    def test_native_snapshot_requires_full_correlated_fresh_usdt_book(self):
+        snapshot = dict(x=3, z=3, y="3000000001", w=1793839611527,
+                        e='{"bvc":"202","isUsd":1}',
+                        b=[["80708.9", "0.25"], ["80709.1", "20.8977"]],
+                        s=[["80709.2", "14.7039"], ["80709.3", "0.3784"]])
+        now = 1793839612.59
+        self.assertEqual(parse_snapshot(snapshot, now), (80709.1, 80709.2))
+        for change in (dict(z=4), dict(y="3000000002"), dict(x=2),
+                       dict(e='{"bvc":"202","isUsd":0}'),
+                       dict(w=1793839610000), dict(w=1793839613000),
+                       dict(b=[["80710", "1"]]), dict(s=[["80709.2", "0"]]),
+                       dict(s=[["80709.2", "nan"]]), dict(b=[])):
+            with self.subTest(change=change), self.assertRaises(NativeBookError):
+                parse_snapshot(snapshot | change, now)
+
+    def test_live_qualified_candidate_uses_native_book_without_rest(self):
+        fetch = Mock(side_effect=AssertionError("REST should not be needed"))
+        alternate = Mock(return_value=(1002.9, 1003.1))
+        send = Mock(return_value=True)
+        book = PublicBook(fetch, alternate=alternate)
+        self.assertEqual(self.decision(breakout()[:46], quote=book, send=send)[0],
+                         "telegram_accepted")
+        self.assertEqual(book.last_source, "websocket")
+        self.assertLessEqual(alternate.call_args.args[0], 2)
+        fetch.assert_not_called()
+        send.assert_called_once()
+
+    def test_native_book_failure_falls_back_within_original_time_budget(self):
+        now = [0.]
+        def unavailable(_):
+            now[0] = 1.5
+            raise NativeBookError("stale_snapshot")
+        valid = {"data": {"symbol": "BTCUSDT", "bids": [{"price": 100, "volume": 1}],
+                          "asks": [{"price": 100.1, "volume": 1}]}}
+        def rest(_):
+            now[0] += 1
+            return valid
+        book = PublicBook(rest, alternate=unavailable, clock=lambda: now[0])
+        with self.assertLogs("lbank_video_alert", "INFO"):
+            self.assertEqual(book(), (100, 100.1))
+        self.assertEqual(book.last_source, "rest")
+        def too_late(_):
+            now[0] += 3
+            return valid
+        now[0] = 0.
+        book.fetch = too_late
+        with self.assertRaisesRegex(BookDataError, "deadline"):
+            book()
 
     def test_no_history_or_delayed_alert_and_disabled_is_observation_only(self):
         rows = breakout()[:46]
