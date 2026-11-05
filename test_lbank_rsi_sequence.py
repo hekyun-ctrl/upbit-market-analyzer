@@ -5,7 +5,7 @@ import sqlite3
 import unittest
 from unittest.mock import Mock, patch
 
-from lbank_video_alert import LIVE_POLICY, SHADOW_POLICY, PublicBook, process
+from lbank_video_alert import LIVE_POLICY, LIVE_SEQUENCE_POLICY, SHADOW_POLICY, PublicBook, process
 from research.zerobase.rsi_sequence import MAX_SETUP_BARS, POLICY, sequence_series
 from research.zerobase.video_entry import Costs, _plan, _series, replay
 from test_lbank_video_entry import ARCHIVE, breakout, mirror, reversal as incomplete_reversal
@@ -271,6 +271,74 @@ class DecisionEvidenceTest(unittest.TestCase):
         self.assertIn("볼린저밴드·CCI", send.call_args.args[0])
         self.assertNotIn("RSI 반전형", send.call_args.args[0])
         self.assertEqual(self.evidence(LIVE_POLICY)[1]["selected"]["lane"], "bb_cci_breakout")
+
+
+class LiveSequenceTest(unittest.TestCase):
+    setUp = alert_tests.VideoAlertTest.setUp
+
+    def live(self, rows, send, *, quote=None, delay=0):
+        rows = alert_tests.with_receipts(rows)
+        now = rows[-1]["start"]+302
+        return process(rows, now=now, started=now-3, clock=lambda: now+delay,
+                       get_book=quote or (lambda: (rows[-1]["close"]-.1, rows[-1]["close"]+.1)),
+                       ledger=self.ledger, send=send, rsi_sequence=True)
+
+    def test_new_rsi_can_deliver_both_directions_with_test_label_and_full_evidence(self):
+        for index, rows in enumerate((sequence_reversal(), mirror(sequence_reversal()))):
+            rows = [dict(b, start=b["start"]+index*86400) for b in rows]
+            send = Mock(return_value=True)
+            self.assertEqual(self.live(rows, send)[0], "telegram_accepted")
+            send.assert_called_once()
+            msg = send.call_args.args[0]
+            for text in ("직접 테스트용 RSI", "수익성 미검증", "첫 반전 마감", "두 번째 반전 마감",
+                         "극점", "목표 근거", "손절", "손익비", "롱" if index == 0 else "숏"):
+                self.assertIn(text, msg)
+            payload = self.ledger.db.execute(
+                "SELECT evidence FROM video_alert_decisions WHERE bar_start=? AND policy=?",
+                (rows[-1]["start"], LIVE_SEQUENCE_POLICY)).fetchone()[0]
+            record = json.loads(payload)
+            self.assertEqual(record["events"][0]["policy"], POLICY)
+            self.assertTrue(record["selected"]["setup_id"].startswith(POLICY+":"))
+            self.assertEqual(record["book"]["status"], "usable")
+            self.assertEqual(record["costs"]["min_rr"], 1.5)
+
+    def test_new_mode_never_falls_back_to_old_incomplete_rsi_and_cci_stays_independent(self):
+        send = Mock(return_value=True)
+        self.assertEqual(self.live(incomplete_reversal(), send)[0], "no_qualified_entry")
+        send.assert_not_called()
+        self.assertEqual(self.live(breakout()[:46], send)[0], "telegram_accepted")
+        send.assert_called_once()
+        self.assertIn("볼린저밴드·CCI", send.call_args.args[0])
+        self.assertNotIn("직접 테스트용 RSI", send.call_args.args[0])
+
+    def test_same_sequence_on_later_bar_is_reserved_after_restart(self):
+        rows = sequence_reversal()
+        send = Mock(return_value=True)
+        self.assertEqual(self.live(rows, send)[0], "telegram_accepted")
+        payload = self.ledger.db.execute(
+            "SELECT evidence FROM video_alert_decisions WHERE policy=?", (LIVE_SEQUENCE_POLICY,)).fetchone()[0]
+        event = json.loads(payload)["events"][0]
+        self.ledger = alert_tests.DeliveryLedger(self.path)
+        self.addCleanup(self.ledger.db.close)
+        later = rows+[dict(rows[-1], start=rows[-1]["start"]+300)]
+        event["signal_start"] = later[-1]["start"]
+        with patch("lbank_video_alert.evaluate_latest", return_value=([event], {})):
+            self.assertEqual(self.live(later, send)[0], "already_reserved")
+        send.assert_called_once()
+
+    def test_new_live_rsi_keeps_missing_wide_and_late_quote_blocks(self):
+        rows = sequence_reversal()
+        close = rows[-1]["close"]
+        for quote, delay, expected in (
+            (Mock(side_effect=TimeoutError), 0, "book_unavailable"),
+            (lambda: (close-2, close+2), 0, "spread_too_wide"),
+            (lambda: (close-.1, close+.1), 6, "book_too_slow"),
+        ):
+            send = Mock(return_value=True)
+            logs = self.assertLogs("lbank_video_alert", "WARNING") if expected == "book_unavailable" else alert_tests.nullcontext()
+            with self.subTest(status=expected), logs:
+                self.assertEqual(self.live(rows, send, quote=quote, delay=delay)[0], expected)
+                send.assert_not_called()
 
 
 if __name__ == "__main__":

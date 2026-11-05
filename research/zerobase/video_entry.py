@@ -260,7 +260,7 @@ def _detect(bars, series, ready, i, costs, nominal, rejected, sequences=None):
                 yield _plan_at(setup, bars, series, ready, i, costs, nominal)
 
 
-def evaluate_latest(bars, *, costs=Costs()):
+def evaluate_latest(bars, *, costs=Costs(), rsi_sequence=False):
     """Decide on the newest completed bar using recorded receipts only."""
     ready = _validate(bars, nominal=False)
     if len(bars) < WARMUP:
@@ -268,7 +268,10 @@ def evaluate_latest(bars, *, costs=Costs()):
     if any(b["start"] - a["start"] != BAR_SECONDS for a, b in zip(bars, bars[1:])):
         raise ValueError("latest-bar input must be contiguous")
     rejected = Counter()
-    events = list(_detect(bars, _series(bars), ready, len(bars)-1, costs, False, rejected))
+    indicators = _series(bars)
+    sequences = ({d: sequence_series(bars, indicators, d) for d in (1, -1)}
+                 if rsi_sequence else None)
+    events = list(_detect(bars, indicators, ready, len(bars)-1, costs, False, rejected, sequences))
     return events, dict(rejected)
 
 

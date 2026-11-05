@@ -29,6 +29,7 @@ MAX_SPREAD = .0005
 STRATEGIES = {"rsi_reversal": "RSI 반전형", "bb_cci_breakout": "볼린저밴드·CCI 추세 지속형"}
 KST = timezone(timedelta(hours=9))
 LIVE_POLICY = "video_live_legacy_v1"
+LIVE_SEQUENCE_POLICY = "video_live_" + RSI_SEQUENCE_POLICY
 SHADOW_POLICY = RSI_SEQUENCE_POLICY + "_shadow"
 RETENTION_SECONDS = 32 * 86400
 
@@ -228,7 +229,8 @@ def format_alert(plan, price, rr, bid, ask, lanes):
         first = bar_time(plan["first_confirmation_start"], closed=True)
         second = bar_time(plan["second_confirmation_start"], closed=True)
         extreme = bar_time(plan["second_start"])
-        evidence = (f"첫 반전 마감 {first} → 두 번째 반전 마감 {second} (KST)\n"
+        evidence = ("[우주심 직접 테스트용 RSI · 수익성 미검증]\n"
+                    f"첫 반전 마감 {first} → 두 번째 반전 마감 {second} (KST)\n"
                     f"두 번째 극점 {extreme} 시작봉 · {plan['second_price']:,.1f} USDT\n")
     elif plan["lane"] == "rsi_reversal":
         evidence = (f"첫 극점 {bar_time(plan['first_start'])} 시작봉 (KST)\n"
@@ -306,6 +308,8 @@ def _record(ledger, start, policy, now, status, evidence):
 
 def _legacy_setup_id(event):
     if event["lane"] == "rsi_reversal":
+        if event.get("policy") == RSI_SEQUENCE_POLICY:
+            return event["setup_id"]
         return f"rsi_legacy:{event['direction']}:{event['first_start']}"
     return None
 
@@ -319,9 +323,10 @@ def _finish(ledger, start, status):
         LOG.warning("VIDEO_ALERT_DELIVERY_STATUS_FAILURE type=%s", type(exc).__name__)
 
 
-def _live_decision(bars, *, now, end, clock, get_book, ledger, send, costs, evidence):
+def _live_decision(bars, *, now, end, clock, get_book, ledger, send, costs, evidence,
+                   rsi_sequence=False):
     start = bars[-1]["start"]
-    events, rejected = evaluate_latest(bars, costs=costs)
+    events, rejected = evaluate_latest(bars, costs=costs, rsi_sequence=rsi_sequence)
     evidence["events"] = events
     counts = dict(Counter(event["status"] for event in events) + Counter(rejected))
     qualified = [event for event in events if event["status"] == "qualified"]
@@ -389,8 +394,9 @@ def _shadow_decision(bars, *, now, end, clock, get_book, costs, live_book, evide
     return "shadow_eligible"
 
 
-def process(bars, *, now, started, clock, get_book, ledger, send, costs=Costs(), shadow=False):
-    """Evaluate one completed bar. The experimental policy cannot send."""
+def process(bars, *, now, started, clock, get_book, ledger, send, costs=Costs(), shadow=False,
+            rsi_sequence=False):
+    """Evaluate one completed bar; sequence mode is enabled explicitly by run()."""
     if not bars:
         return "warmup", {}
     newest = bars[-1]
@@ -402,12 +408,16 @@ def process(bars, *, now, started, clock, get_book, ledger, send, costs=Costs(),
         return "stale_or_before_start", {}
     live = {"events": [], "book": {"status": "not_requested"}}
     status, counts = _live_decision(bars, now=now, end=end, clock=clock, get_book=get_book,
-                                    ledger=ledger, send=send, costs=costs, evidence=live)
+                                    ledger=ledger, send=send, costs=costs, evidence=live,
+                                    rsi_sequence=rsi_sequence)
     # Evidence and research run after the live decision, so they cannot spend
     # its quote or delivery budget.
     try:
         base = _evidence(bars, costs)
-        live_saved = _record(ledger, start, LIVE_POLICY, now, status, dict(base, **live, reasons=counts))
+        policy = LIVE_SEQUENCE_POLICY if rsi_sequence else LIVE_POLICY
+        live_saved = _record(ledger, start, policy, now, status, dict(base, **live, reasons=counts))
+        if rsi_sequence:
+            LOG.info("VIDEO_ALERT_LEDGER bar=%d policy=%s stored=%s", start, policy, live_saved)
         if shadow:
             observed = dict(base, delivery="shadow_only")
             result = _shadow_decision(bars, now=now, end=end, clock=clock, get_book=get_book,
@@ -436,7 +446,7 @@ def run():
     NativeCandleThread(path=str(source_path)).start()
     LOG.info("VIDEO_ALERT_START revision=%s source=%s send_enabled=%s warmup=%d separate=true",
              os.getenv("RAILWAY_GIT_COMMIT_SHA", "local"), SOURCE, enabled, WARMUP)
-    LOG.info("VIDEO_ALERT_POLICIES live=%s shadow=%s shadow_send=false", LIVE_POLICY, SHADOW_POLICY)
+    LOG.info("VIDEO_ALERT_POLICIES live=%s shadow=disabled experimental_rsi=true", LIVE_SEQUENCE_POLICY)
     if enabled:
         token_ok, chat_ok = telegram.health()
         LOG.info("VIDEO_ALERT_TELEGRAM_CHECK token_ok=%s chat_ok=%s no_test_message=true", token_ok, chat_ok)
@@ -454,7 +464,7 @@ def run():
                 seen = bars[-1]["start"]
                 status, counts = process(bars, now=now, started=started, clock=time.time,
                                          get_book=get_book, ledger=ledger,
-                                         send=telegram.send if enabled else None, shadow=True)
+                                         send=telegram.send if enabled else None, rsi_sequence=True)
                 LOG.info("VIDEO_ALERT_DECISION bar=%d status=%s reasons=%s", seen, status, counts)
         except (OSError, sqlite3.Error, ValueError, KeyError) as exc:
             LOG.warning("VIDEO_ALERT_POLL_FAILURE type=%s", type(exc).__name__)
