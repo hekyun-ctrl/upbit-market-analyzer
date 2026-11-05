@@ -51,9 +51,12 @@ async def scan(session, url):
         hosts = sorted(set(URL_RE.findall(js)))
         hosts = [h for h in hosts if re.search(r"(?:^wss://|rerrkvifj|lbkperp|marketOrder)", h, re.I)]
         paths = sorted({m for m in METHOD_RE.findall(js) if BOOK_WORDS.search(m)})
-        return hosts[:16], paths[:16]
+        symbols = sorted({m.group(0) for m in re.finditer(
+            r"[A-Za-z_$][A-Za-z0-9_$]{2,40}", js)
+            if BOOK_WORDS.search(m.group(0))})
+        return hosts[:16], paths[:16], symbols[:14] if hosts or paths else []
     except (OSError, asyncio.TimeoutError, aiohttp.ClientError, ValueError):
-        return [], []
+        return [], [], []
 
 
 async def run():
@@ -65,15 +68,19 @@ async def run():
         parser.feed(html)
         paths = sorted(parser.urls, key=lambda u: (not bool(re.search(r"futures|_app|perp", u)), u))[:18]
         LOG.info("VIDEO_BOOK_SOURCE_ASSETS count=%d", len(paths))
-        for url, (hosts, routes) in zip(paths, await asyncio.gather(*(scan(session, u) for u in paths))):
+        for url, (hosts, routes, symbols) in zip(paths, await asyncio.gather(*(scan(session, u) for u in paths))):
             if hosts or routes:
-                LOG.info("VIDEO_BOOK_SOURCE_CLUES asset=%s sockets=%s depth_paths=%s",
-                         urlparse(url).path, hosts, routes)
+                LOG.info("VIDEO_BOOK_SOURCE_CLUES asset=%s sockets=%s depth_paths=%s symbols=%s",
+                         urlparse(url).path, hosts, routes, symbols)
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+def probe_once():
     try:
         asyncio.run(asyncio.wait_for(run(), timeout=13))
     except (OSError, asyncio.TimeoutError, aiohttp.ClientError, ValueError) as exc:
         LOG.info("VIDEO_BOOK_SOURCE_UNVERIFIED reason=%s", type(exc).__name__)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    probe_once()

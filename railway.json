@@ -5,8 +5,7 @@
     "startCommand": "python -u lbank_video_alert.py",
     "restartPolicyType": "ALWAYS",
     "preDeployCommand": [
-      "python -m unittest test_lbank_video_entry test_lbank_video_alert",
-      "python -m lbank_public_book_probe"
+      "python -m unittest test_lbank_video_entry test_lbank_video_alert"
     ]
   }
 }

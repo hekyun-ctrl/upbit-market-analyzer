@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 import sqlite3
 import sys
+import threading
 import time
 
 from lbank_native_candles import NativeCandleThread
@@ -236,6 +237,8 @@ def process(bars, *, now, started, clock, get_book, ledger, send, costs=Costs())
 
 
 def run():
+    from lbank_public_book_probe import probe_once
+    threading.Thread(target=probe_once, name="public-book-probe", daemon=True).start()
     started = time.time()
     data = Path(os.environ.get("VIDEO_ALERT_STATE_DIR", "/data")).resolve()
     enabled = os.getenv("VIDEO_ALERT_SEND_ENABLED", "0") == "1"
