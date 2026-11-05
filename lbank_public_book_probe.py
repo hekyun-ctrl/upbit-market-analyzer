@@ -52,22 +52,23 @@ async def scan(session, url):
         hosts = sorted(set(URL_RE.findall(js)))
         hosts = [h for h in hosts if re.search(r"(?:^wss://|rerrkvifj|lbkperp|marketOrder)", h, re.I)]
         paths = sorted({m for m in METHOD_RE.findall(js) if BOOK_WORDS.search(m)})
-        for marker in ("SendQryMarketOrder", "getFuturesDepth", "getContractDepth", "subscribeDepth", "marketDepth"):
+        for marker in ("subscribeDepth", "subscribeMarketDepth", "subscribeOrderBook", "32941:", "17148:"):
             for pos in [m.start() for m in re.finditer(re.escape(marker), js)][:3]:
-                sample = js[max(0, pos-360):pos+500]
+                sample = js[max(0, pos-360):pos+1300]
                 sample = re.sub(r"[A-Za-z0-9_-]{45,}", "<long>", sample)
                 LOG.info("VIDEO_BOOK_PROTOCOL_HINT asset=%s marker=%s context=%r",
                          urlparse(url).path, marker, sample)
                 if marker == "subscribeDepth":
-                    earlier = js[max(0, pos-12000):pos]
-                    for m in list(re.finditer(r"\bk\s*=", earlier))[-2:]:
-                        sample = earlier[max(0, m.start()-260):m.start()+560]
+                    earlier = js[max(0, pos-7200):pos]
+                    matches = list(re.finditer(r"(?:\bk\s*=|\[k,|\[k\]|\.A\.subscribe\w+|\bk:)", earlier))[-9:]
+                    for m in matches:
+                        sample = earlier[max(0, m.start()-160):m.start()+430]
                         LOG.info("VIDEO_BOOK_PROTOCOL_BINDING %r", re.sub(r"[A-Za-z0-9_-]{45,}", "<long>", sample))
-                if marker == "SendQryMarketOrder":
-                    earlier = js[max(0, pos-23000):pos]
-                    for m in list(re.finditer(r"(?:function y\(|\w+:\(\)=>eh\b)", earlier))[-3:]:
-                        sample = earlier[max(0, m.start()-150):m.start()+500]
-                        LOG.info("VIDEO_BOOK_PROTOCOL_HTTP %r", re.sub(r"[A-Za-z0-9_-]{45,}", "<long>", sample))
+                if marker in ("32941:", "17148:"):
+                    module = re.split(r"\},\d+:\(\w+,\w+,\w+\)=>", js[pos:pos+30000], maxsplit=1)[0]
+                    for m in list(re.finditer(r"(?:[Dd]epth|[Oo]rder[Bb]ook|[Mm]arket[Oo]rder|/ws/v3)", module))[:16]:
+                        sample = module[max(0, m.start()-100):m.start()+230]
+                        LOG.info("VIDEO_BOOK_PROTOCOL_WS module=%s %r", marker, re.sub(r"[A-Za-z0-9_-]{45,}", "<long>", sample))
         symbols = sorted({m.group(0) for m in re.finditer(
             r"[A-Za-z_$][A-Za-z0-9_$]{2,40}", js)
             if BOOK_WORDS.search(m.group(0))})
@@ -111,10 +112,10 @@ async def run():
         html = await read(session, URL, 1_600_000)
         parser = ScriptPaths()
         parser.feed(html)
-        paths = sorted(parser.urls, key=lambda u: (not bool(re.search(r"futures|_app|perp", u)), u))[:18]
+        paths = sorted(parser.urls, key=lambda u: (not bool(re.search(r"futures|_app|perp", u)), u))[:32]
         LOG.info("VIDEO_BOOK_SOURCE_ASSETS count=%d", len(paths))
-        results = await asyncio.gather(*(scan(session, u) for u in paths), check_frontend_depth(session))
-        for url, (hosts, routes, symbols) in zip(paths, results[:-1]):
+        results = await asyncio.gather(*(scan(session, u) for u in paths))
+        for url, (hosts, routes, symbols) in zip(paths, results):
             if hosts or routes:
                 LOG.info("VIDEO_BOOK_SOURCE_CLUES asset=%s sockets=%s depth_paths=%s symbols=%s",
                          urlparse(url).path, hosts, routes, symbols)
