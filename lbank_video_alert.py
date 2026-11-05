@@ -73,16 +73,22 @@ class BookDataError(ValueError):
 
 
 class PublicBook:
-    def __init__(self, fetch=None):
+    DEPTHS = (20, 10, 50, 5, 60, 1)
+    MAX_ATTEMPTS = 4
+    BUDGET = 4.0
+
+    def __init__(self, fetch=None, *, clock=time.monotonic):
+        self.exchange = None
         if fetch is None:
             import ccxt
-            exchange = ccxt.lbank({"enableRateLimit": True, "timeout": 4500})
-            fetch = exchange.contractPublicGetCfdOpenApiV1PubMarketOrder
+            self.exchange = ccxt.lbank({"enableRateLimit": True, "timeout": 1000})
+            fetch = self.exchange.contractPublicGetCfdOpenApiV1PubMarketOrder
         self.fetch = fetch
-        self.depth = 20
+        self.clock = clock
+        self.depth = self.DEPTHS[0]
 
-    def __call__(self):
-        response = self.fetch({"symbol": SYMBOL, "depth": self.depth})
+    @staticmethod
+    def parse(response):
         data = response.get("data") if isinstance(response, dict) else None
         if not isinstance(data, dict):
             raise BookDataError("response_missing_data")
@@ -112,7 +118,37 @@ class PublicBook:
                 raise BookDataError("no_live_"+side)
             return result
 
-        return max(prices("bids")), min(prices("asks"))
+        bid, ask = max(prices("bids")), min(prices("asks"))
+        if bid >= ask:
+            raise BookDataError("locked_or_crossed_book")
+        return bid, ask
+
+    def __call__(self):
+        """Retry only same-market public snapshots; never carry an old quote."""
+        end = self.clock() + self.BUDGET
+        i = self.DEPTHS.index(self.depth)
+        depths = self.DEPTHS[i:] + self.DEPTHS[:i]
+        tried = []
+        for depth in depths[:self.MAX_ATTEMPTS]:
+            remaining = end - self.clock()
+            if remaining < .12:
+                break
+            if self.exchange is not None:
+                self.exchange.timeout = max(1, int(1000 * min(1., remaining)))
+            try:
+                quote = self.parse(self.fetch({"symbol": SYMBOL, "depth": depth}))
+            except Exception as exc:
+                tried.append(f"{depth}:{book_error_code(exc)}")
+                continue
+            if self.clock() > end:
+                tried.append(f"{depth}:deadline")
+                break
+            self.depth = depth
+            if tried:
+                LOG.info("VIDEO_ALERT_BOOK_RECOVERED depth=%s earlier=%s", depth, ",".join(tried))
+            return quote
+        self.depth = self.DEPTHS[(i+max(1, len(tried))) % len(self.DEPTHS)]
+        raise BookDataError("snapshot_attempts=" + (",".join(tried) or "deadline"))
 
 
 def book_error_code(exc):
@@ -120,21 +156,13 @@ def book_error_code(exc):
 
 
 def check_book(get_book):
-    """Try a bounded set of public depths at startup and keep a valid depth."""
-    for depth in (20, 10, 50, 5, 60, 1):
-        get_book.depth = depth
-        try:
-            requested = time.monotonic()
-            bid, ask = get_book()
-            if (math.isfinite(bid) and math.isfinite(ask) and 0 < bid < ask
-                    and time.monotonic()-requested <= MAX_BOOK_LATENCY):
-                LOG.info("VIDEO_ALERT_BOOK_CHECK usable=true depth=%s", depth)
-                return
-            reason = ("locked_or_crossed_book" if bid >= ask else "invalid_or_slow_book")
-            LOG.warning("VIDEO_ALERT_BOOK_CHECK usable=false depth=%s reason=%s", depth, reason)
-        except Exception as exc:
-            LOG.warning("VIDEO_ALERT_BOOK_CHECK usable=false depth=%s reason=%s", depth, book_error_code(exc))
-    get_book.depth = 20
+    """Exercise the same live quote path at startup without sending."""
+    try:
+        get_book()
+    except Exception as exc:
+        LOG.warning("VIDEO_ALERT_BOOK_CHECK usable=false reason=%s", book_error_code(exc))
+    else:
+        LOG.info("VIDEO_ALERT_BOOK_CHECK usable=true depth=%s", get_book.depth)
 
 
 def format_alert(plan, price, rr, bid, ask, lanes):

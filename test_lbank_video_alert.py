@@ -5,7 +5,7 @@ import unittest
 from unittest.mock import Mock
 
 from lbank_native_candles import NativeCandleStore
-from lbank_video_alert import DeliveryLedger, PublicBook, process, read_window
+from lbank_video_alert import BookDataError, DeliveryLedger, PublicBook, process, read_window
 from test_lbank_video_entry import ARCHIVE, breakout, mirror, reversal
 from research.zerobase.video_entry import read_retained_archive
 
@@ -82,6 +82,40 @@ class VideoAlertTest(unittest.TestCase):
         data["symbol"] = "ETHUSDT"
         with self.assertRaises(ValueError):
             PublicBook(fetch)()
+
+    def test_live_candidate_uses_alternate_depth_after_empty_and_crossed_snapshots(self):
+        def payload(bid, ask):
+            return {"data": dict(symbol="BTCUSDT", bids=[dict(price=bid, volume=bool(bid))],
+                                 asks=[dict(price=ask, volume=1)])}
+        fetch = Mock(side_effect=[payload(0, 1003.1), payload(1003.2, 1003.1),
+                                  payload(1002.9, 1003.1), payload(1002.8, 1003.2)])
+        book = PublicBook(fetch)
+        sent = Mock(return_value=True)
+        self.assertEqual(self.decision(breakout()[:46], quote=book, send=sent)[0],
+                         "telegram_accepted")
+        sent.assert_called_once()
+        self.assertEqual(book(), (1002.8, 1003.2))
+        self.assertEqual([c.args[0]["depth"] for c in fetch.call_args_list], [20, 10, 50, 50])
+
+    def test_book_does_not_return_valid_quote_after_deadline(self):
+        now = [0.]
+        def slow(_):
+            now[0] = 4.01
+            return {"data": {"symbol": "BTCUSDT", "bids": [{"price": 100, "volume": 1}],
+                             "asks": [{"price": 100.1, "volume": 1}]}}
+        fetch = Mock(side_effect=slow)
+        with self.assertRaisesRegex(BookDataError, "deadline"):
+            PublicBook(fetch, clock=lambda: now[0])()
+        fetch.assert_called_once()
+
+    def test_book_bounds_attempts_and_rotates_after_total_failure(self):
+        fetch = Mock(side_effect=TimeoutError)
+        book = PublicBook(fetch)
+        for _ in range(2):
+            with self.assertRaisesRegex(BookDataError, "snapshot_attempts"):
+                book()
+        self.assertEqual([c.args[0]["depth"] for c in fetch.call_args_list],
+                         [20, 10, 50, 5, 60, 1, 20, 10])
 
     def test_no_history_or_delayed_alert_and_disabled_is_observation_only(self):
         rows = breakout()[:46]
