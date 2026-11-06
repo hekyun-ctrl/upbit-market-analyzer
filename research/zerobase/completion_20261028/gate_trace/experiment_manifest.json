@@ -1,0 +1,26 @@
+{
+  "schema": "gate_trace_orchestration_declaration_v1",
+  "declared_at": "2026-10-28T15:12:41.546027+00:00",
+  "source_head": "580afb266d70f2b9d7c9ffd84f2f1bc36bcc8a2a",
+  "purpose": "mechanics_regression_on_reused_development_inputs",
+  "trace_cases": "same first6 available plus6 original candidate observations selected by prior live-ledger test; no new outcomes selection",
+  "continuous_interval": {
+    "window": "signal15",
+    "start_inclusive": "2026-10-20T03:25:00Z",
+    "end_exclusive": "2026-10-20T03:46:00Z",
+    "observations": 20,
+    "selection_basis": "finite retained interval containing previously reported capture event; development mechanics only"
+  },
+  "policies": [
+    "Trace (capture)",
+    "P1Trace (structural_p1)"
+  ],
+  "schedule": "existing retained_replay classify_then_confirm_then_arm; not deployed live scheduling",
+  "comparison": "new incremental runner vs unchanged replay_window on only this interval; uninterrupted vs reopened after10 observations",
+  "followups": "original retained 5m six-hour fixed benchmark and original first-contact routine",
+  "unseen": "same retained forming frames or observations tested only as fail-closed blockers; no fabricated receipts",
+  "profitability_validated": false,
+  "orders": false,
+  "outbound": false,
+  "full96arm_replay_repeated": false
+}

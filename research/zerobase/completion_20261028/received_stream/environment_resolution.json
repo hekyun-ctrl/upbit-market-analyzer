@@ -1,0 +1,6 @@
+{
+  "initial_command": "python -m unittest test_lbank_live_evidence test_lbank_native_candles test_lbank_signal_evidence -q",
+  "initial_result": "36 tests, 2 errors: ModuleNotFoundError: ccxt in retained policy integration and signal evidence import",
+  "resolution": "Used unchanged previously installed dependency directory /workspace/scratch/44f97b78c955/zb-test-deps via PYTHONPATH; no stub/mock replacement or package install",
+  "final_result": "76 related tests, 26 new importer tests; all pass"
+}

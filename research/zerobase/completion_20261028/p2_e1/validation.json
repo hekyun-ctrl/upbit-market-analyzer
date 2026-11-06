@@ -1,0 +1,81 @@
+{
+  "schema": "zb_p2_e1_validation_v1",
+  "checked_at": "2026-10-28T08:22:15.433318+00:00",
+  "started_at": "2026-10-28T08:08:26.034318+00:00",
+  "source_checkpoint": "f2599841c0d400bd10e1527508f9dc03ad207ce4",
+  "predeclared_lease_commit": "be8191e9f9280acd207ce9c95ae966c754b6b2d8",
+  "initial_code_checkpoint": "546bd05a573761fd9adedd76f2bd45da81370663",
+  "checks": {
+    "all_code_input_output_hashes_match": true,
+    "decompressed_csv_hash_matches": true,
+    "original_arm_scenario_windows_exactly_equal": 12,
+    "e1_final_alert_arm_scenario_outputs_exactly_equal": 12,
+    "frozen_original_code_unchanged": [
+      "lbank_futures_monitor.py",
+      "lbank_entry_location.py",
+      "lbank_structural_target_plan.py",
+      "research/evidence_confirmation.py",
+      "research/compare_confirmation_experiment.py"
+    ],
+    "first_retest_qualified_alerts_zero": true,
+    "no_entry_zero_unresolved_null": true,
+    "per_event_recorded_rejections_or_explicit_no_confirmation": true,
+    "orders_sends_zero": true,
+    "blockers_preserved": true,
+    "trade_comparison_scenario_rows": 27
+  },
+  "commands": [
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_first_retest_experiment test_lbank_confirmation_experiment test_lbank_entry_location test_lbank_structural_comparison -q",
+      "exit_code": 0,
+      "tests": 44,
+      "new_tests": 10
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/compare_first_retest_experiment.py",
+      "exit_code": 0
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/render_first_retest_report.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python research/validate_first_retest_experiment.py",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "runtime": {
+    "python": "3.12.14",
+    "sqlite": "3.53.1"
+  },
+  "file_sha256": {
+    ".gitignore": "a0092d31272057c4244284dbe5eb324ac7000d65f98337dc2b30c5d35d65c1c2",
+    "README.md": "4aa19f389f2add7418723f04bae61af19b359232388eb5151cd797cca3105fc4",
+    "candidate_accounting.json": "b835de5ca690ba35cd46f81a52638ba71f46d3274ff85d3677362a0d5d069b8e",
+    "comparison.json": "ced9379714adfd5fa7c00e7b3d70457ccd99273c0430e83ab8138d1fc2e953c3",
+    "event_accounting.json": "7b7933e00ac05ee1227f3ae5093f3662208ab6bc7e109ecf57c29f6479f74f0d",
+    "experiment_manifest.json": "aab6190579032c09427bdb099e2ba5a5aec6683acb4c9e2dfe10727a039c5588",
+    "fixed_plan_attribution.json": "81d0e23a82e1e3de1238c6e22ac8408a316bc0ccffc8fe0d245bb7d523659741",
+    "gate_decisions.csv.gz": "65eaae465bac36827775a704c3389d3875ab6fa080754f6e8b1d2c2d629e45e9",
+    "manifest.json": "da0c1bc81d0b28302b9230630dce9842851f6b4c3046185ae6dfdfa22dc18360",
+    "opportunities.csv": "61d5287378a476385103bc9d084a1921f1e9bef5f3bc13463a669e1b4eb4c310",
+    "replay_stdout.json": "c746f3d43abd0cdd94580b8baba1beb34441d3c22660c5a4901e8c6e084da35c",
+    "report_manifest.json": "c893a2bdd07a43167a0e6a6a970aa00dd2d62455da9283e90dcf7e81aee3f74e",
+    "targeted_tests.txt": "8c7bc1784ec6c6ddc379b1fa78f11c282c28aaa96f57091289bd5e06e7d4e8b3",
+    "trade_cards.json": "2db505a3bfcbfc33b1bdeeff6ab9e222fcf23dd2379bb32d9752a2a9a6d6e533",
+    "trades.csv": "cc9d1f9bbbe3f5ace58fc821bf461e167c860af33dbfaf83f9e6ad28e920b8d2"
+  },
+  "additional_code_sha256": {
+    "research/validate_first_retest_experiment.py": "0878f4e7bcac817368688273f040b9918f1e8fab4a77760bb8b6d19664863160",
+    "test_lbank_first_retest_experiment.py": "0474013e6d2f5258687d77b89ca4a1222678993aed4d9823e89e3b95b8295e98"
+  },
+  "limits": [
+    "Reused development observations; no unseen/continuous qualification",
+    "Detection-only keeps original momentum and qualification; bundled location route not enabled",
+    "E4/E5/live ledger/P3-P5 incomplete; no profitability or whole-feature completion"
+  ]
+}

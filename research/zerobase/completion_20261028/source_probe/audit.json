@@ -1,0 +1,323 @@
+{
+  "started_at": "2026-10-28T03:27:28.099740+00:00",
+  "ended_at": "2026-10-28T03:27:58.399770+00:00",
+  "http": [
+    {
+      "url": "https://www.lbank.com/docs/contract.html",
+      "requested_at": "2026-10-28T03:27:28.099740+00:00",
+      "kind": "keyless_public_GET",
+      "http_status": 403,
+      "error": "HTTPError",
+      "received_at": "2026-10-28T03:27:32.805513+00:00",
+      "bytes": 17,
+      "sha256": "2938e9f1284180959e33ab1718d0793a72ff6e4cdb8108c34dcd14e69446de5c"
+    },
+    {
+      "url": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/instrument?productGroup=SwapU",
+      "requested_at": "2026-10-28T03:27:28.100227+00:00",
+      "kind": "keyless_public_GET",
+      "http_status": 403,
+      "error": "HTTPError",
+      "received_at": "2026-10-28T03:27:33.316785+00:00",
+      "bytes": 17,
+      "sha256": "2938e9f1284180959e33ab1718d0793a72ff6e4cdb8108c34dcd14e69446de5c"
+    },
+    {
+      "url": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/getTime",
+      "requested_at": "2026-10-28T03:27:28.100655+00:00",
+      "kind": "keyless_public_GET",
+      "http_status": 403,
+      "error": "HTTPError",
+      "received_at": "2026-10-28T03:27:33.318742+00:00",
+      "bytes": 17,
+      "sha256": "2938e9f1284180959e33ab1718d0793a72ff6e4cdb8108c34dcd14e69446de5c"
+    },
+    {
+      "url": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketData?productGroup=SwapU",
+      "requested_at": "2026-10-28T03:27:28.101252+00:00",
+      "kind": "keyless_public_GET",
+      "http_status": 403,
+      "error": "HTTPError",
+      "received_at": "2026-10-28T03:27:33.317448+00:00",
+      "bytes": 17,
+      "sha256": "2938e9f1284180959e33ab1718d0793a72ff6e4cdb8108c34dcd14e69446de5c"
+    }
+  ],
+  "websocket": [
+    {
+      "url": "wss://lbkperpws.lbank.com/ws",
+      "attempt": 1,
+      "requested_at": "2026-10-28T03:27:33.400370+00:00",
+      "basis": "official_docs_no_candle_subscription_schema",
+      "subscription": null,
+      "handshake": "connected",
+      "error": "TimeoutError",
+      "detail": "",
+      "ended_at": "2026-10-28T03:27:40.536312+00:00",
+      "frames": []
+    },
+    {
+      "url": "wss://lbkperpws.lbank.com/ws",
+      "attempt": 2,
+      "requested_at": "2026-10-28T03:27:40.536325+00:00",
+      "basis": "official_docs_no_candle_subscription_schema",
+      "subscription": null,
+      "handshake": "connected",
+      "error": "TimeoutError",
+      "detail": "",
+      "ended_at": "2026-10-28T03:27:47.674491+00:00",
+      "frames": []
+    },
+    {
+      "url": "wss://uuws.rerrkvifj.com/ws/v3",
+      "attempt": 1,
+      "requested_at": "2026-10-28T03:27:47.674504+00:00",
+      "basis": "existing_collector_same_feed_not_independent",
+      "subscription": {
+        "x": 2,
+        "y": "2000000001",
+        "z": 1,
+        "a": {
+          "i": "BTCUSDT_5m"
+        },
+        "e": "{\"bvc\": \"202\", \"isUsd\": 1}"
+      },
+      "handshake": "connected",
+      "ended_at": "2026-10-28T03:27:53.403776+00:00",
+      "frames": [
+        {
+          "received_at": "2026-10-28T03:27:52.560107+00:00",
+          "sha256": "3edb5ed3fd73936d6c7f63a4924e1d02beac5df0365e5601074d4b2101354946",
+          "bytes": 257,
+          "hex": "7b2264223a5b7b2261223a2242544355534454222c2262223a22356d222c2263223a313739333135373930302c2264223a223830393432222c2265223a2238313032372e36222c2266223a2238313032372e36222c2267223a223830393432222c2268223a22342e35313034222c2269223a223336353330302e3234323234222c226a223a2230222c226b223a313739333135383037322c22747261646554696d65223a747275657d5d2c2265223a227b5c226276635c223a205c223230325c222c205c2269735573645c223a20317d222c2277223a313739333135383037323437392c2278223a322c2279223a2232303030303030303031222c227a223a337d"
+        },
+        {
+          "received_at": "2026-10-28T03:27:53.247577+00:00",
+          "sha256": "d247a53170cb36658fd5f479efa1eddb8319d0feee026efc22b4987581153da7",
+          "bytes": 255,
+          "hex": "7b2264223a7b2261223a2242544355534454222c2262223a22316d222c2263223a313739333135383032302c2264223a223831303032222c2265223a2238313032372e36222c2266223a2238313032372e36222c2267223a223831303032222c2268223a22312e32343632222c2269223a223130303936322e3136373132222c226a223a2230222c226b223a313739333135383037332c22747261646554696d65223a747275657d2c2265223a227b5c226276635c223a205c223230325c222c205c2269735573645c223a20317d222c2277223a313739333135383037333136362c2278223a322c2279223a2232303030303030303031222c227a223a347d"
+        },
+        {
+          "received_at": "2026-10-28T03:27:53.249390+00:00",
+          "sha256": "61f1c81fe9776753ea0c8b0e26566a7dc1f75bc454e943cce489bdb522c48191",
+          "bytes": 255,
+          "hex": "7b2264223a7b2261223a2242544355534454222c2262223a22316d222c2263223a313739333135383032302c2264223a223831303032222c2265223a2238313032372e36222c2266223a2238313032372e36222c2267223a223831303032222c2268223a22312e32343932222c2269223a223130313230352e3234393932222c226a223a2230222c226b223a313739333135383037332c22747261646554696d65223a747275657d2c2265223a227b5c226276635c223a205c223230325c222c205c2269735573645c223a20317d222c2277223a313739333135383037333136382c2278223a322c2279223a2232303030303030303031222c227a223a347d"
+        }
+      ]
+    },
+    {
+      "url": "wss://uuws.rerrkvifj.com/ws/v3",
+      "attempt": 2,
+      "requested_at": "2026-10-28T03:27:53.403791+00:00",
+      "basis": "existing_collector_same_feed_not_independent",
+      "subscription": {
+        "x": 2,
+        "y": "2000000001",
+        "z": 1,
+        "a": {
+          "i": "BTCUSDT_5m"
+        },
+        "e": "{\"bvc\": \"202\", \"isUsd\": 1}"
+      },
+      "handshake": "connected",
+      "ended_at": "2026-10-28T03:27:58.398921+00:00",
+      "frames": [
+        {
+          "received_at": "2026-10-28T03:27:57.638690+00:00",
+          "sha256": "e21823d57104d43d191f5ba5541f767955731b39ce029373a0763878252eddb2",
+          "bytes": 257,
+          "hex": "7b2264223a5b7b2261223a2242544355534454222c2262223a22356d222c2263223a313739333135373930302c2264223a223830393432222c2265223a2238313032372e35222c2266223a2238313032372e36222c2267223a223830393432222c2268223a22342e35393634222c2269223a223337323236382e3631313738222c226a223a2230222c226b223a313739333135383037372c22747261646554696d65223a747275657d5d2c2265223a227b5c226276635c223a205c223230325c222c205c2269735573645c223a20317d222c2277223a313739333135383037373535382c2278223a322c2279223a2232303030303030303031222c227a223a337d"
+        },
+        {
+          "received_at": "2026-10-28T03:27:58.243013+00:00",
+          "sha256": "fca566bdeb357cb788e27c080d55668cbaf063f727bf036984c278c375b4acc1",
+          "bytes": 255,
+          "hex": "7b2264223a7b2261223a2242544355534454222c2262223a22316d222c2263223a313739333135383032302c2264223a223831303032222c2265223a2238313032372e35222c2266223a2238313032372e36222c2267223a223831303032222c2268223a22312e33333238222c2269223a223130373937392e3135333336222c226a223a2230222c226b223a313739333135383037382c22747261646554696d65223a747275657d2c2265223a227b5c226276635c223a205c223230325c222c205c2269735573645c223a20317d222c2277223a313739333135383037383136332c2278223a322c2279223a2232303030303030303031222c227a223a347d"
+        },
+        {
+          "received_at": "2026-10-28T03:27:58.243651+00:00",
+          "sha256": "45e84031b1ebc7167a806e6c9bbbe0989265dc7713b9bb116c750f5449ba38cd",
+          "bytes": 254,
+          "hex": "7b2264223a7b2261223a2242544355534454222c2262223a22316d222c2263223a313739333135383032302c2264223a223831303032222c2265223a2238313032372e35222c2266223a2238313032372e36222c2267223a223831303032222c2268223a22312e333336222c2269223a223130383233382e3434313336222c226a223a2230222c226b223a313739333135383037382c22747261646554696d65223a747275657d2c2265223a227b5c226276635c223a205c223230325c222c205c2269735573645c223a20317d222c2277223a313739333135383037383136342c2278223a322c2279223a2232303030303030303031222c227a223a347d"
+        }
+      ]
+    }
+  ],
+  "blockers": [
+    "RAW5M_INDEPENDENCE_UNVERIFIED",
+    "CANDLE_VOLUME_UNIT_UNVERIFIED"
+  ],
+  "verified": false,
+  "independent_5m": false,
+  "candle_volume_unit": "UNVERIFIED",
+  "observations": {
+    "raw_1m_messages": 4,
+    "raw_5m_messages": 2,
+    "independent_5m": 0,
+    "usable_verified_closed_bars": 0,
+    "closed_flag": null,
+    "volume_unit": null,
+    "exact_duplicate_raw_frames": 0,
+    "repeated_bar_key_updates": 4,
+    "unique_bar_keys": 2,
+    "gaps": null,
+    "restart_attempts": {
+      "wss://lbkperpws.lbank.com/ws": 2,
+      "wss://uuws.rerrkvifj.com/ws/v3": 2
+    },
+    "restart_continuity": "same forming bar reappeared with later cumulative update; no closed-bar rollover or durable recovery demonstrated",
+    "source_timestamp_range": [
+      1793158072,
+      1793158078
+    ]
+  },
+  "limitation": "Raw chart-feed candle updates obtained, all forming. Same-feed 5m is not independent. No official final-flag or candle-volume-unit schema; gaps and restart closure continuity unmeasured.",
+  "official_documentation": {
+    "url": "https://www.lbank.com/docs/contract.html",
+    "checked_via": "web retrieval, because local request 403",
+    "documented_public_routes": [
+      "getTime",
+      "instrument",
+      "marketData",
+      "marketOrder"
+    ],
+    "futures_kline_schema_found": false,
+    "candle_volume_unit_schema_found": false,
+    "next_evidence_needed": "Official futures candle subscription/schema or authenticated-free official REST route; independently published native 5m with raw receipt records, overlap, final flags and volume-unit definition. Do not use spot kline."
+  },
+  "same_feed_warning": "Existing collector aggregates 1m into 5m. Raw 5m channel on that same feed alone does not certify independent publication.",
+  "raw_candle_records": [
+    {
+      "route": "wss://uuws.rerrkvifj.com/ws/v3",
+      "connection_attempt": 1,
+      "received_at": "2026-10-28T03:27:52.560107+00:00",
+      "raw_sha256": "3edb5ed3fd73936d6c7f63a4924e1d02beac5df0365e5601074d4b2101354946",
+      "interval": "5m",
+      "source_bar_start": 1793157900,
+      "source_update_at": 1793158072,
+      "source_frame_ms": 1793158072479,
+      "source_bar_start_utc": "2026-10-28T03:25:00+00:00",
+      "source_update_utc": "2026-10-28T03:27:52+00:00",
+      "nominal_bar_close": 1793158200,
+      "volume_field_h": "4.5104",
+      "turnover_field_i": "365300.24224",
+      "j_raw": "0",
+      "tradeTime_raw": true,
+      "closed_flag": null,
+      "closure_basis": "not documented; these updates precede nominal close",
+      "volume_unit": "UNVERIFIED",
+      "independent_source": false,
+      "received_minus_source_update_seconds": 0.5601069927215576
+    },
+    {
+      "route": "wss://uuws.rerrkvifj.com/ws/v3",
+      "connection_attempt": 1,
+      "received_at": "2026-10-28T03:27:53.247577+00:00",
+      "raw_sha256": "d247a53170cb36658fd5f479efa1eddb8319d0feee026efc22b4987581153da7",
+      "interval": "1m",
+      "source_bar_start": 1793158020,
+      "source_update_at": 1793158073,
+      "source_frame_ms": 1793158073166,
+      "source_bar_start_utc": "2026-10-28T03:27:00+00:00",
+      "source_update_utc": "2026-10-28T03:27:53+00:00",
+      "nominal_bar_close": 1793158080,
+      "volume_field_h": "1.2462",
+      "turnover_field_i": "100962.16712",
+      "j_raw": "0",
+      "tradeTime_raw": true,
+      "closed_flag": null,
+      "closure_basis": "not documented; these updates precede nominal close",
+      "volume_unit": "UNVERIFIED",
+      "independent_source": false,
+      "received_minus_source_update_seconds": 0.24757695198059082
+    },
+    {
+      "route": "wss://uuws.rerrkvifj.com/ws/v3",
+      "connection_attempt": 1,
+      "received_at": "2026-10-28T03:27:53.249390+00:00",
+      "raw_sha256": "61f1c81fe9776753ea0c8b0e26566a7dc1f75bc454e943cce489bdb522c48191",
+      "interval": "1m",
+      "source_bar_start": 1793158020,
+      "source_update_at": 1793158073,
+      "source_frame_ms": 1793158073168,
+      "source_bar_start_utc": "2026-10-28T03:27:00+00:00",
+      "source_update_utc": "2026-10-28T03:27:53+00:00",
+      "nominal_bar_close": 1793158080,
+      "volume_field_h": "1.2492",
+      "turnover_field_i": "101205.24992",
+      "j_raw": "0",
+      "tradeTime_raw": true,
+      "closed_flag": null,
+      "closure_basis": "not documented; these updates precede nominal close",
+      "volume_unit": "UNVERIFIED",
+      "independent_source": false,
+      "received_minus_source_update_seconds": 0.2493898868560791
+    },
+    {
+      "route": "wss://uuws.rerrkvifj.com/ws/v3",
+      "connection_attempt": 2,
+      "received_at": "2026-10-28T03:27:57.638690+00:00",
+      "raw_sha256": "e21823d57104d43d191f5ba5541f767955731b39ce029373a0763878252eddb2",
+      "interval": "5m",
+      "source_bar_start": 1793157900,
+      "source_update_at": 1793158077,
+      "source_frame_ms": 1793158077558,
+      "source_bar_start_utc": "2026-10-28T03:25:00+00:00",
+      "source_update_utc": "2026-10-28T03:27:57+00:00",
+      "nominal_bar_close": 1793158200,
+      "volume_field_h": "4.5964",
+      "turnover_field_i": "372268.61178",
+      "j_raw": "0",
+      "tradeTime_raw": true,
+      "closed_flag": null,
+      "closure_basis": "not documented; these updates precede nominal close",
+      "volume_unit": "UNVERIFIED",
+      "independent_source": false,
+      "received_minus_source_update_seconds": 0.6386899948120117
+    },
+    {
+      "route": "wss://uuws.rerrkvifj.com/ws/v3",
+      "connection_attempt": 2,
+      "received_at": "2026-10-28T03:27:58.243013+00:00",
+      "raw_sha256": "fca566bdeb357cb788e27c080d55668cbaf063f727bf036984c278c375b4acc1",
+      "interval": "1m",
+      "source_bar_start": 1793158020,
+      "source_update_at": 1793158078,
+      "source_frame_ms": 1793158078163,
+      "source_bar_start_utc": "2026-10-28T03:27:00+00:00",
+      "source_update_utc": "2026-10-28T03:27:58+00:00",
+      "nominal_bar_close": 1793158080,
+      "volume_field_h": "1.3328",
+      "turnover_field_i": "107979.15336",
+      "j_raw": "0",
+      "tradeTime_raw": true,
+      "closed_flag": null,
+      "closure_basis": "not documented; these updates precede nominal close",
+      "volume_unit": "UNVERIFIED",
+      "independent_source": false,
+      "received_minus_source_update_seconds": 0.2430129051208496
+    },
+    {
+      "route": "wss://uuws.rerrkvifj.com/ws/v3",
+      "connection_attempt": 2,
+      "received_at": "2026-10-28T03:27:58.243651+00:00",
+      "raw_sha256": "45e84031b1ebc7167a806e6c9bbbe0989265dc7713b9bb116c750f5449ba38cd",
+      "interval": "1m",
+      "source_bar_start": 1793158020,
+      "source_update_at": 1793158078,
+      "source_frame_ms": 1793158078164,
+      "source_bar_start_utc": "2026-10-28T03:27:00+00:00",
+      "source_update_utc": "2026-10-28T03:27:58+00:00",
+      "nominal_bar_close": 1793158080,
+      "volume_field_h": "1.336",
+      "turnover_field_i": "108238.44136",
+      "j_raw": "0",
+      "tradeTime_raw": true,
+      "closed_flag": null,
+      "closure_basis": "not documented; these updates precede nominal close",
+      "volume_unit": "UNVERIFIED",
+      "independent_source": false,
+      "received_minus_source_update_seconds": 0.2436509132385254
+    }
+  ]
+}

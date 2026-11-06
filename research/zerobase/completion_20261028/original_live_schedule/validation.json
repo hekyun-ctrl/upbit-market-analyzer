@@ -1,0 +1,14 @@
+{
+  "validated_at": "2026-10-28T18:25:02.516613+00:00",
+  "sha256_checks": 30,
+  "all_hashes_match": true,
+  "manifest_sha256": "ee261a85d29b09f1eba030ba8f18339a007857864c916025b10f9ffc33abd60d",
+  "tests_passed": 86,
+  "new_tests": 26,
+  "original_helper_asts_unchanged": 23,
+  "frozen_blobs_unchanged": 24,
+  "pr22_required_files_unchanged": 4,
+  "qualified_unseen": 0,
+  "whole_feature_complete": false,
+  "profitability_validated": false
+}

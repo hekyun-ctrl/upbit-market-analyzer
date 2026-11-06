@@ -1,0 +1,15 @@
+{
+  "schema": "gate_trace_orchestration_validation_v1",
+  "passed": true,
+  "files_verified": 34,
+  "decompressed_files_verified": 2,
+  "original_actual_policy_outputs_equal": 12,
+  "complete_execution_traces": 12,
+  "finite_continuous_observations": 20,
+  "independent_policy_states": 2,
+  "restart_and_original_finite_replay_exact": true,
+  "qualified_unseen_observations": 0,
+  "source_blockers_unchanged": true,
+  "profitability_validated": false,
+  "deployment_performed": false
+}

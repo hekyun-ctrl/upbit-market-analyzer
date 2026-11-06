@@ -1,0 +1,22 @@
+{
+  "schema": "e5_attempts_v1",
+  "recorded_at": "2026-10-28T10:03:00.304530+00:00",
+  "first_attempt": {
+    "code_checkpoint": "43d201bd48ab5bd0486dbbf1d469fa7709c95c4d",
+    "status": "interrupted_exit130_before_outcome_reading",
+    "reason": "Code inspection found appended fresh breakout priority could be changed and canonical event identity ignores extra sweep fields. Also reset preempted readiness to null. No parameters changed, no outcome inspection/tuning. Any completed artifact of this execution is retained separately as invalid.",
+    "full_comparison_artifacts_created": false,
+    "full_comparison_completed": false,
+    "log": "first_attempt.log"
+  },
+  "final_attempt": {
+    "status": "completed",
+    "code_review_fixes": "Keep original fresh breakout before E5, composite exact level+sweep anchor hash, clear readiness before preempted confirmation, malformed availability fails closed. Added regression tests.",
+    "performance_only": "Research ledger memoizes identical immutable source/input SQL imports; original decision availability validation preserved; two integrity tests. No strategy/output change.",
+    "completed_full_comparisons": 1,
+    "report_completed": true,
+    "code_checkpoint": "826c930a3c5efa9165dc902427bbabbf9f1fdf69",
+    "resume": "On resume both comparison/report were already complete. Artifact upload had not committed, so only persistence/validation resumed; neither calculation rerun."
+  },
+  "strategy_parameter_versions": 1
+}

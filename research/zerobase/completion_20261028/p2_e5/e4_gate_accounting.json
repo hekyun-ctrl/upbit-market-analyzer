@@ -1,0 +1,5345 @@
+{
+  "flow": [
+    {
+      "scenario": "base_delay0",
+      "policy": "capture",
+      "detected_unique_events": 52,
+      "candidate_qualified_unique_events": 9,
+      "confirmation_qualified_unique_events": 3,
+      "alert_eligible_unique_events": 3,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 10,
+            "unique_events": 9
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 20,
+            "unique_events": 16
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 2,
+            "unique_events": 1
+          },
+          "breakout_trigger_lost_without_higher_priority": {
+            "evaluations": 1,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 1,
+            "unique_events": 1
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e3",
+      "detected_unique_events": 52,
+      "candidate_qualified_unique_events": 9,
+      "confirmation_qualified_unique_events": 5,
+      "alert_eligible_unique_events": 5,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 10,
+            "unique_events": 9
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 20,
+            "unique_events": 16
+          }
+        },
+        "confirmation": {
+          "e3_frozen_trigger_not_crossed": {
+            "evaluations": 5,
+            "unique_events": 2
+          }
+        },
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 2,
+            "unique_events": 2
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1",
+      "detected_unique_events": 52,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 33,
+            "unique_events": 28
+          },
+          "room_unknown": {
+            "evaluations": 7,
+            "unique_events": 6
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e3",
+      "detected_unique_events": 52,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 33,
+            "unique_events": 28
+          },
+          "room_unknown": {
+            "evaluations": 7,
+            "unique_events": 6
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1",
+      "detected_unique_events": 61,
+      "candidate_qualified_unique_events": 9,
+      "confirmation_qualified_unique_events": 3,
+      "alert_eligible_unique_events": 3,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 14,
+            "unique_events": 14
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 21,
+            "unique_events": 18
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 2,
+            "unique_events": 1
+          },
+          "breakout_trigger_lost_without_higher_priority": {
+            "evaluations": 1,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 1,
+            "unique_events": 1
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e3",
+      "detected_unique_events": 61,
+      "candidate_qualified_unique_events": 9,
+      "confirmation_qualified_unique_events": 5,
+      "alert_eligible_unique_events": 5,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 14,
+            "unique_events": 14
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 21,
+            "unique_events": 18
+          }
+        },
+        "confirmation": {
+          "e3_frozen_trigger_not_crossed": {
+            "evaluations": 5,
+            "unique_events": 2
+          }
+        },
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 2,
+            "unique_events": 2
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1",
+      "detected_unique_events": 61,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 38,
+            "unique_events": 35
+          },
+          "room_unknown": {
+            "evaluations": 7,
+            "unique_events": 6
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e3",
+      "detected_unique_events": 61,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 38,
+            "unique_events": 35
+          },
+          "room_unknown": {
+            "evaluations": 7,
+            "unique_events": 6
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e4",
+      "detected_unique_events": 52,
+      "candidate_qualified_unique_events": 3,
+      "confirmation_qualified_unique_events": 1,
+      "alert_eligible_unique_events": 1,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 28,
+            "unique_events": 23
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "breakout_trigger_lost_without_higher_priority": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 2,
+            "unique_events": 1
+          },
+          "price_deviation": {
+            "evaluations": 2,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e3_e4",
+      "detected_unique_events": 52,
+      "candidate_qualified_unique_events": 3,
+      "confirmation_qualified_unique_events": 2,
+      "alert_eligible_unique_events": 2,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 28,
+            "unique_events": 23
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 1,
+            "unique_events": 1
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e4",
+      "detected_unique_events": 52,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 28,
+            "unique_events": 23
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 12,
+            "unique_events": 12
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e3_e4",
+      "detected_unique_events": 52,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 28,
+            "unique_events": 23
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 12,
+            "unique_events": 12
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e4",
+      "detected_unique_events": 61,
+      "candidate_qualified_unique_events": 3,
+      "confirmation_qualified_unique_events": 1,
+      "alert_eligible_unique_events": 1,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 27,
+            "unique_events": 24
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 9,
+            "unique_events": 9
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 8,
+            "unique_events": 8
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "breakout_trigger_lost_without_higher_priority": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 2,
+            "unique_events": 1
+          },
+          "price_deviation": {
+            "evaluations": 2,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e3_e4",
+      "detected_unique_events": 61,
+      "candidate_qualified_unique_events": 3,
+      "confirmation_qualified_unique_events": 2,
+      "alert_eligible_unique_events": 2,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 27,
+            "unique_events": 24
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 9,
+            "unique_events": 9
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 8,
+            "unique_events": 8
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 1,
+            "unique_events": 1
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e4",
+      "detected_unique_events": 61,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 27,
+            "unique_events": 24
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 18,
+            "unique_events": 18
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e3_e4",
+      "detected_unique_events": 61,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 27,
+            "unique_events": 24
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 18,
+            "unique_events": 18
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 7,
+            "unique_events": 7
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e5",
+      "detected_unique_events": 124,
+      "candidate_qualified_unique_events": 11,
+      "confirmation_qualified_unique_events": 3,
+      "alert_eligible_unique_events": 3,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 34,
+            "unique_events": 27
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 60,
+            "unique_events": 49
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 2,
+            "unique_events": 1
+          },
+          "breakout_trigger_lost_without_higher_priority": {
+            "evaluations": 1,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 3,
+            "unique_events": 3
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e3_e5",
+      "detected_unique_events": 124,
+      "candidate_qualified_unique_events": 11,
+      "confirmation_qualified_unique_events": 5,
+      "alert_eligible_unique_events": 5,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 34,
+            "unique_events": 27
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 60,
+            "unique_events": 49
+          }
+        },
+        "confirmation": {
+          "e3_frozen_trigger_not_crossed": {
+            "evaluations": 5,
+            "unique_events": 2
+          }
+        },
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 4,
+            "unique_events": 4
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e5",
+      "detected_unique_events": 124,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 98,
+            "unique_events": 79
+          },
+          "room_unknown": {
+            "evaluations": 8,
+            "unique_events": 7
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e3_e5",
+      "detected_unique_events": 124,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 98,
+            "unique_events": 79
+          },
+          "room_unknown": {
+            "evaluations": 8,
+            "unique_events": 7
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e5",
+      "detected_unique_events": 133,
+      "candidate_qualified_unique_events": 11,
+      "confirmation_qualified_unique_events": 3,
+      "alert_eligible_unique_events": 3,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 38,
+            "unique_events": 32
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 61,
+            "unique_events": 51
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 2,
+            "unique_events": 1
+          },
+          "breakout_trigger_lost_without_higher_priority": {
+            "evaluations": 1,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 3,
+            "unique_events": 3
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e3_e5",
+      "detected_unique_events": 133,
+      "candidate_qualified_unique_events": 11,
+      "confirmation_qualified_unique_events": 5,
+      "alert_eligible_unique_events": 5,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 38,
+            "unique_events": 32
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 61,
+            "unique_events": 51
+          }
+        },
+        "confirmation": {
+          "e3_frozen_trigger_not_crossed": {
+            "evaluations": 5,
+            "unique_events": 2
+          }
+        },
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 4,
+            "unique_events": 4
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e5",
+      "detected_unique_events": 133,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 103,
+            "unique_events": 86
+          },
+          "room_unknown": {
+            "evaluations": 8,
+            "unique_events": 7
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e3_e5",
+      "detected_unique_events": 133,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 103,
+            "unique_events": 86
+          },
+          "room_unknown": {
+            "evaluations": 8,
+            "unique_events": 7
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e4_e5",
+      "detected_unique_events": 124,
+      "candidate_qualified_unique_events": 3,
+      "confirmation_qualified_unique_events": 1,
+      "alert_eligible_unique_events": 1,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 59,
+            "unique_events": 48
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 23,
+            "unique_events": 19
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 23,
+            "unique_events": 21
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "breakout_trigger_lost_without_higher_priority": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 2,
+            "unique_events": 1
+          },
+          "price_deviation": {
+            "evaluations": 2,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e3_e4_e5",
+      "detected_unique_events": 124,
+      "candidate_qualified_unique_events": 3,
+      "confirmation_qualified_unique_events": 2,
+      "alert_eligible_unique_events": 2,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 59,
+            "unique_events": 48
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 23,
+            "unique_events": 19
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 23,
+            "unique_events": 21
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 1,
+            "unique_events": 1
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e4_e5",
+      "detected_unique_events": 124,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 59,
+            "unique_events": 48
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 47,
+            "unique_events": 41
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e3_e4_e5",
+      "detected_unique_events": 124,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 59,
+            "unique_events": 48
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 47,
+            "unique_events": 41
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e4_e5",
+      "detected_unique_events": 133,
+      "candidate_qualified_unique_events": 3,
+      "confirmation_qualified_unique_events": 1,
+      "alert_eligible_unique_events": 1,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 58,
+            "unique_events": 49
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 27,
+            "unique_events": 23
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 25,
+            "unique_events": 23
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "breakout_trigger_lost_without_higher_priority": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 2,
+            "unique_events": 1
+          },
+          "price_deviation": {
+            "evaluations": 2,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e3_e4_e5",
+      "detected_unique_events": 133,
+      "candidate_qualified_unique_events": 3,
+      "confirmation_qualified_unique_events": 2,
+      "alert_eligible_unique_events": 2,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 58,
+            "unique_events": 49
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 27,
+            "unique_events": 23
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 25,
+            "unique_events": 23
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 1,
+            "unique_events": 1
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e4_e5",
+      "detected_unique_events": 133,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 58,
+            "unique_events": 49
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 53,
+            "unique_events": 47
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e3_e4_e5",
+      "detected_unique_events": 133,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 58,
+            "unique_events": 49
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 53,
+            "unique_events": 47
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 37,
+            "unique_events": 28
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture",
+      "detected_unique_events": 40,
+      "candidate_qualified_unique_events": 6,
+      "confirmation_qualified_unique_events": 2,
+      "alert_eligible_unique_events": 2,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 7,
+            "unique_events": 6
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 18,
+            "unique_events": 14
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "breakout_trigger_lost_without_higher_priority": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "price_deviation": {
+            "evaluations": 2,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e3",
+      "detected_unique_events": 40,
+      "candidate_qualified_unique_events": 6,
+      "confirmation_qualified_unique_events": 4,
+      "alert_eligible_unique_events": 4,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 7,
+            "unique_events": 6
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 18,
+            "unique_events": 14
+          }
+        },
+        "confirmation": {
+          "e3_frozen_trigger_not_crossed": {
+            "evaluations": 4,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 1,
+            "unique_events": 1
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1",
+      "detected_unique_events": 40,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 28,
+            "unique_events": 23
+          },
+          "room_unknown": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e3",
+      "detected_unique_events": 40,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 28,
+            "unique_events": 23
+          },
+          "room_unknown": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1",
+      "detected_unique_events": 46,
+      "candidate_qualified_unique_events": 6,
+      "confirmation_qualified_unique_events": 2,
+      "alert_eligible_unique_events": 2,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 11,
+            "unique_events": 11
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 19,
+            "unique_events": 16
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "breakout_trigger_lost_without_higher_priority": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "price_deviation": {
+            "evaluations": 2,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e3",
+      "detected_unique_events": 46,
+      "candidate_qualified_unique_events": 6,
+      "confirmation_qualified_unique_events": 4,
+      "alert_eligible_unique_events": 4,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 11,
+            "unique_events": 11
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 19,
+            "unique_events": 16
+          }
+        },
+        "confirmation": {
+          "e3_frozen_trigger_not_crossed": {
+            "evaluations": 4,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 1,
+            "unique_events": 1
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1",
+      "detected_unique_events": 46,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 33,
+            "unique_events": 30
+          },
+          "room_unknown": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e3",
+      "detected_unique_events": 46,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 33,
+            "unique_events": 30
+          },
+          "room_unknown": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e4",
+      "detected_unique_events": 40,
+      "candidate_qualified_unique_events": 2,
+      "confirmation_qualified_unique_events": 1,
+      "alert_eligible_unique_events": 1,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 22,
+            "unique_events": 18
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 5,
+            "unique_events": 5
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 2,
+            "unique_events": 1
+          },
+          "price_deviation": {
+            "evaluations": 2,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e3_e4",
+      "detected_unique_events": 40,
+      "candidate_qualified_unique_events": 2,
+      "confirmation_qualified_unique_events": 2,
+      "alert_eligible_unique_events": 2,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 22,
+            "unique_events": 18
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 5,
+            "unique_events": 5
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e4",
+      "detected_unique_events": 40,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 22,
+            "unique_events": 18
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 9,
+            "unique_events": 9
+          },
+          "room_unknown": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e3_e4",
+      "detected_unique_events": 40,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 22,
+            "unique_events": 18
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 9,
+            "unique_events": 9
+          },
+          "room_unknown": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e4",
+      "detected_unique_events": 46,
+      "candidate_qualified_unique_events": 2,
+      "confirmation_qualified_unique_events": 1,
+      "alert_eligible_unique_events": 1,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 21,
+            "unique_events": 19
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 7,
+            "unique_events": 7
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 2,
+            "unique_events": 1
+          },
+          "price_deviation": {
+            "evaluations": 2,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e3_e4",
+      "detected_unique_events": 46,
+      "candidate_qualified_unique_events": 2,
+      "confirmation_qualified_unique_events": 2,
+      "alert_eligible_unique_events": 2,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 21,
+            "unique_events": 19
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 7,
+            "unique_events": 7
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e4",
+      "detected_unique_events": 46,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 21,
+            "unique_events": 19
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 15,
+            "unique_events": 15
+          },
+          "room_unknown": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e3_e4",
+      "detected_unique_events": 46,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 21,
+            "unique_events": 19
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 15,
+            "unique_events": 15
+          },
+          "room_unknown": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e5",
+      "detected_unique_events": 100,
+      "candidate_qualified_unique_events": 8,
+      "confirmation_qualified_unique_events": 2,
+      "alert_eligible_unique_events": 2,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 28,
+            "unique_events": 23
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 45,
+            "unique_events": 35
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "breakout_trigger_lost_without_higher_priority": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "e5_small_opposite_trigger_not_crossed": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "e5_sweep_expired": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "price_deviation": {
+            "evaluations": 2,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 1,
+            "unique_events": 1
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e3_e5",
+      "detected_unique_events": 100,
+      "candidate_qualified_unique_events": 8,
+      "confirmation_qualified_unique_events": 4,
+      "alert_eligible_unique_events": 4,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 28,
+            "unique_events": 23
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 45,
+            "unique_events": 35
+          }
+        },
+        "confirmation": {
+          "e3_frozen_trigger_not_crossed": {
+            "evaluations": 4,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 3,
+            "unique_events": 3
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e5",
+      "detected_unique_events": 100,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 77,
+            "unique_events": 62
+          },
+          "room_unknown": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e3_e5",
+      "detected_unique_events": 100,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 77,
+            "unique_events": 62
+          },
+          "room_unknown": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e5",
+      "detected_unique_events": 106,
+      "candidate_qualified_unique_events": 8,
+      "confirmation_qualified_unique_events": 2,
+      "alert_eligible_unique_events": 2,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 32,
+            "unique_events": 28
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 46,
+            "unique_events": 37
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "breakout_trigger_lost_without_higher_priority": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "e5_small_opposite_trigger_not_crossed": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "e5_sweep_expired": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "price_deviation": {
+            "evaluations": 2,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 1,
+            "unique_events": 1
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e3_e5",
+      "detected_unique_events": 106,
+      "candidate_qualified_unique_events": 8,
+      "confirmation_qualified_unique_events": 4,
+      "alert_eligible_unique_events": 4,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 32,
+            "unique_events": 28
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 46,
+            "unique_events": 37
+          }
+        },
+        "confirmation": {
+          "e3_frozen_trigger_not_crossed": {
+            "evaluations": 4,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {
+          "global_cooldown": {
+            "evaluations": 3,
+            "unique_events": 3
+          }
+        },
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e5",
+      "detected_unique_events": 106,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 82,
+            "unique_events": 69
+          },
+          "room_unknown": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e3_e5",
+      "detected_unique_events": 106,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 82,
+            "unique_events": 69
+          },
+          "room_unknown": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e4_e5",
+      "detected_unique_events": 100,
+      "candidate_qualified_unique_events": 2,
+      "confirmation_qualified_unique_events": 1,
+      "alert_eligible_unique_events": 1,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 49,
+            "unique_events": 39
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 18,
+            "unique_events": 16
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 13,
+            "unique_events": 12
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 2,
+            "unique_events": 1
+          },
+          "price_deviation": {
+            "evaluations": 2,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e3_e4_e5",
+      "detected_unique_events": 100,
+      "candidate_qualified_unique_events": 2,
+      "confirmation_qualified_unique_events": 2,
+      "alert_eligible_unique_events": 2,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 49,
+            "unique_events": 39
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 18,
+            "unique_events": 16
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 13,
+            "unique_events": 12
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e4_e5",
+      "detected_unique_events": 100,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 49,
+            "unique_events": 39
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 32,
+            "unique_events": 29
+          },
+          "room_unknown": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e3_e4_e5",
+      "detected_unique_events": 100,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 49,
+            "unique_events": 39
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 32,
+            "unique_events": 29
+          },
+          "room_unknown": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e4_e5",
+      "detected_unique_events": 106,
+      "candidate_qualified_unique_events": 2,
+      "confirmation_qualified_unique_events": 1,
+      "alert_eligible_unique_events": 1,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 48,
+            "unique_events": 40
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 22,
+            "unique_events": 20
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 15,
+            "unique_events": 14
+          }
+        },
+        "confirmation": {
+          "breakout_level_not_held": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 2,
+            "unique_events": 1
+          },
+          "price_deviation": {
+            "evaluations": 2,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e3_e4_e5",
+      "detected_unique_events": 106,
+      "candidate_qualified_unique_events": 2,
+      "confirmation_qualified_unique_events": 2,
+      "alert_eligible_unique_events": 2,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 48,
+            "unique_events": 40
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 22,
+            "unique_events": 20
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 15,
+            "unique_events": 14
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e4_e5",
+      "detected_unique_events": 106,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 48,
+            "unique_events": 40
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 38,
+            "unique_events": 35
+          },
+          "room_unknown": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e3_e4_e5",
+      "detected_unique_events": 106,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 48,
+            "unique_events": 40
+          },
+          "retest_momentum": {
+            "evaluations": 3,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 38,
+            "unique_events": 35
+          },
+          "room_unknown": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 9,
+            "unique_events": 5
+          },
+          "sampled_context": {
+            "evaluations": 35,
+            "unique_events": 26
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture",
+      "detected_unique_events": 50,
+      "candidate_qualified_unique_events": 1,
+      "confirmation_qualified_unique_events": 1,
+      "alert_eligible_unique_events": 1,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 36,
+            "unique_events": 30
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e3",
+      "detected_unique_events": 50,
+      "candidate_qualified_unique_events": 1,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 36,
+            "unique_events": 30
+          }
+        },
+        "confirmation": {
+          "e3_frozen_trigger_not_crossed": {
+            "evaluations": 4,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1",
+      "detected_unique_events": 50,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 32,
+            "unique_events": 27
+          },
+          "room_unknown": {
+            "evaluations": 7,
+            "unique_events": 6
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e3",
+      "detected_unique_events": 50,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 32,
+            "unique_events": 27
+          },
+          "room_unknown": {
+            "evaluations": 7,
+            "unique_events": 6
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1",
+      "detected_unique_events": 59,
+      "candidate_qualified_unique_events": 1,
+      "confirmation_qualified_unique_events": 1,
+      "alert_eligible_unique_events": 1,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 40,
+            "unique_events": 36
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e3",
+      "detected_unique_events": 59,
+      "candidate_qualified_unique_events": 1,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 40,
+            "unique_events": 36
+          }
+        },
+        "confirmation": {
+          "e3_frozen_trigger_not_crossed": {
+            "evaluations": 4,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1",
+      "detected_unique_events": 59,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 37,
+            "unique_events": 34
+          },
+          "room_unknown": {
+            "evaluations": 7,
+            "unique_events": 6
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e3",
+      "detected_unique_events": 59,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 37,
+            "unique_events": 34
+          },
+          "room_unknown": {
+            "evaluations": 7,
+            "unique_events": 6
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e4",
+      "detected_unique_events": 50,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 28,
+            "unique_events": 23
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 12,
+            "unique_events": 12
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e3_e4",
+      "detected_unique_events": 50,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 28,
+            "unique_events": 23
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 12,
+            "unique_events": 12
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e4",
+      "detected_unique_events": 50,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 28,
+            "unique_events": 23
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 11,
+            "unique_events": 11
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e3_e4",
+      "detected_unique_events": 50,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 28,
+            "unique_events": 23
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 11,
+            "unique_events": 11
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e4",
+      "detected_unique_events": 59,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 27,
+            "unique_events": 24
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 18,
+            "unique_events": 18
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e3_e4",
+      "detected_unique_events": 59,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 27,
+            "unique_events": 24
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 18,
+            "unique_events": 18
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e4",
+      "detected_unique_events": 59,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 27,
+            "unique_events": 24
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 17,
+            "unique_events": 17
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e3_e4",
+      "detected_unique_events": 59,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 27,
+            "unique_events": 24
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 17,
+            "unique_events": 17
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 6,
+            "unique_events": 6
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e5",
+      "detected_unique_events": 122,
+      "candidate_qualified_unique_events": 1,
+      "confirmation_qualified_unique_events": 1,
+      "alert_eligible_unique_events": 1,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 8,
+            "unique_events": 7
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 95,
+            "unique_events": 77
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e3_e5",
+      "detected_unique_events": 122,
+      "candidate_qualified_unique_events": 1,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 8,
+            "unique_events": 7
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 95,
+            "unique_events": 77
+          }
+        },
+        "confirmation": {
+          "e3_frozen_trigger_not_crossed": {
+            "evaluations": 4,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e5",
+      "detected_unique_events": 122,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 97,
+            "unique_events": 78
+          },
+          "room_unknown": {
+            "evaluations": 8,
+            "unique_events": 7
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e3_e5",
+      "detected_unique_events": 122,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 5,
+            "unique_events": 5
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 97,
+            "unique_events": 78
+          },
+          "room_unknown": {
+            "evaluations": 8,
+            "unique_events": 7
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e5",
+      "detected_unique_events": 131,
+      "candidate_qualified_unique_events": 1,
+      "confirmation_qualified_unique_events": 1,
+      "alert_eligible_unique_events": 1,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 9,
+            "unique_events": 8
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 99,
+            "unique_events": 83
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e3_e5",
+      "detected_unique_events": 131,
+      "candidate_qualified_unique_events": 1,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 9,
+            "unique_events": 8
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 99,
+            "unique_events": 83
+          }
+        },
+        "confirmation": {
+          "e3_frozen_trigger_not_crossed": {
+            "evaluations": 4,
+            "unique_events": 1
+          }
+        },
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e5",
+      "detected_unique_events": 131,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 102,
+            "unique_events": 85
+          },
+          "room_unknown": {
+            "evaluations": 8,
+            "unique_events": 7
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e3_e5",
+      "detected_unique_events": 131,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 7,
+            "unique_events": 7
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 102,
+            "unique_events": 85
+          },
+          "room_unknown": {
+            "evaluations": 8,
+            "unique_events": 7
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e4_e5",
+      "detected_unique_events": 122,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 59,
+            "unique_events": 48
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 42,
+            "unique_events": 36
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e3_e4_e5",
+      "detected_unique_events": 122,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 59,
+            "unique_events": 48
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 42,
+            "unique_events": 36
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e4_e5",
+      "detected_unique_events": 122,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 59,
+            "unique_events": 48
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 46,
+            "unique_events": 40
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e3_e4_e5",
+      "detected_unique_events": 122,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 2,
+            "unique_events": 2
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 59,
+            "unique_events": 48
+          },
+          "retest_momentum": {
+            "evaluations": 4,
+            "unique_events": 2
+          },
+          "room_insufficient": {
+            "evaluations": 46,
+            "unique_events": 40
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e4_e5",
+      "detected_unique_events": 131,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 58,
+            "unique_events": 49
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 48,
+            "unique_events": 42
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e3_e4_e5",
+      "detected_unique_events": 131,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 58,
+            "unique_events": 49
+          },
+          "native_target_barrier_conflict": {
+            "evaluations": 6,
+            "unique_events": 6
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          },
+          "target_barrier_conflict": {
+            "evaluations": 1,
+            "unique_events": 1
+          },
+          "target_outside_observed_range": {
+            "evaluations": 48,
+            "unique_events": 42
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e4_e5",
+      "detected_unique_events": 131,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 58,
+            "unique_events": 49
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 52,
+            "unique_events": 46
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e3_e4_e5",
+      "detected_unique_events": 131,
+      "candidate_qualified_unique_events": 0,
+      "confirmation_qualified_unique_events": 0,
+      "alert_eligible_unique_events": 0,
+      "no_canonical_anchor_candidates": 0,
+      "phase_rejections": {
+        "candidate": {
+          "entry_extended_from_native_ema": {
+            "evaluations": 4,
+            "unique_events": 4
+          },
+          "entry_location_extended_or_lost": {
+            "evaluations": 58,
+            "unique_events": 49
+          },
+          "retest_momentum": {
+            "evaluations": 7,
+            "unique_events": 5
+          },
+          "room_insufficient": {
+            "evaluations": 52,
+            "unique_events": 46
+          },
+          "room_unknown": {
+            "evaluations": 3,
+            "unique_events": 3
+          },
+          "rsi_direction": {
+            "evaluations": 12,
+            "unique_events": 7
+          },
+          "sampled_context": {
+            "evaluations": 36,
+            "unique_events": 27
+          }
+        },
+        "confirmation": {},
+        "alert_eligibility": {},
+        "watch_scheduling": {}
+      }
+    }
+  ],
+  "evaluations": [
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e4",
+      "assessments": 75,
+      "e4_evaluations": 49,
+      "e4_not_evaluated": 26,
+      "location_failed_evaluations": 30,
+      "location_failed_events": 24,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 30
+      },
+      "native_barrier_rejected_evaluations": 5,
+      "native_barrier_rejected_events": 5,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e3_e4",
+      "assessments": 70,
+      "e4_evaluations": 47,
+      "e4_not_evaluated": 23,
+      "location_failed_evaluations": 28,
+      "location_failed_events": 23,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 28
+      },
+      "native_barrier_rejected_evaluations": 5,
+      "native_barrier_rejected_events": 5,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e4",
+      "assessments": 68,
+      "e4_evaluations": 45,
+      "e4_not_evaluated": 23,
+      "location_failed_evaluations": 28,
+      "location_failed_events": 23,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 28
+      },
+      "native_barrier_rejected_evaluations": 0,
+      "native_barrier_rejected_events": 0,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e3_e4",
+      "assessments": 68,
+      "e4_evaluations": 45,
+      "e4_not_evaluated": 23,
+      "location_failed_evaluations": 28,
+      "location_failed_events": 23,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 28
+      },
+      "native_barrier_rejected_evaluations": 0,
+      "native_barrier_rejected_events": 0,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e4",
+      "assessments": 85,
+      "e4_evaluations": 56,
+      "e4_not_evaluated": 29,
+      "location_failed_evaluations": 29,
+      "location_failed_events": 25,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 29
+      },
+      "native_barrier_rejected_evaluations": 9,
+      "native_barrier_rejected_events": 9,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "capture_e1_e3_e4",
+      "assessments": 80,
+      "e4_evaluations": 54,
+      "e4_not_evaluated": 26,
+      "location_failed_evaluations": 27,
+      "location_failed_events": 24,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 27
+      },
+      "native_barrier_rejected_evaluations": 9,
+      "native_barrier_rejected_events": 9,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e4",
+      "assessments": 78,
+      "e4_evaluations": 52,
+      "e4_not_evaluated": 26,
+      "location_failed_evaluations": 27,
+      "location_failed_events": 24,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 27
+      },
+      "native_barrier_rejected_evaluations": 0,
+      "native_barrier_rejected_events": 0,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay0",
+      "policy": "structural_p1_e1_e3_e4",
+      "assessments": 78,
+      "e4_evaluations": 52,
+      "e4_not_evaluated": 26,
+      "location_failed_evaluations": 27,
+      "location_failed_events": 24,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 27
+      },
+      "native_barrier_rejected_evaluations": 0,
+      "native_barrier_rejected_events": 0,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e4",
+      "assessments": 59,
+      "e4_evaluations": 38,
+      "e4_not_evaluated": 21,
+      "location_failed_evaluations": 24,
+      "location_failed_events": 19,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 24
+      },
+      "native_barrier_rejected_evaluations": 3,
+      "native_barrier_rejected_events": 3,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e3_e4",
+      "assessments": 55,
+      "e4_evaluations": 37,
+      "e4_not_evaluated": 18,
+      "location_failed_evaluations": 22,
+      "location_failed_events": 18,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 22
+      },
+      "native_barrier_rejected_evaluations": 3,
+      "native_barrier_rejected_events": 3,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e4",
+      "assessments": 53,
+      "e4_evaluations": 35,
+      "e4_not_evaluated": 18,
+      "location_failed_evaluations": 22,
+      "location_failed_events": 18,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 22
+      },
+      "native_barrier_rejected_evaluations": 0,
+      "native_barrier_rejected_events": 0,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e3_e4",
+      "assessments": 53,
+      "e4_evaluations": 35,
+      "e4_not_evaluated": 18,
+      "location_failed_evaluations": 22,
+      "location_failed_events": 18,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 22
+      },
+      "native_barrier_rejected_evaluations": 0,
+      "native_barrier_rejected_events": 0,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e4",
+      "assessments": 65,
+      "e4_evaluations": 44,
+      "e4_not_evaluated": 21,
+      "location_failed_evaluations": 23,
+      "location_failed_events": 20,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 23
+      },
+      "native_barrier_rejected_evaluations": 7,
+      "native_barrier_rejected_events": 7,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "capture_e1_e3_e4",
+      "assessments": 61,
+      "e4_evaluations": 43,
+      "e4_not_evaluated": 18,
+      "location_failed_evaluations": 21,
+      "location_failed_events": 19,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 21
+      },
+      "native_barrier_rejected_evaluations": 7,
+      "native_barrier_rejected_events": 7,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e4",
+      "assessments": 59,
+      "e4_evaluations": 41,
+      "e4_not_evaluated": 18,
+      "location_failed_evaluations": 21,
+      "location_failed_events": 19,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 21
+      },
+      "native_barrier_rejected_evaluations": 0,
+      "native_barrier_rejected_events": 0,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "base_delay15",
+      "policy": "structural_p1_e1_e3_e4",
+      "assessments": 59,
+      "e4_evaluations": 41,
+      "e4_not_evaluated": 18,
+      "location_failed_evaluations": 21,
+      "location_failed_events": 19,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 21
+      },
+      "native_barrier_rejected_evaluations": 0,
+      "native_barrier_rejected_events": 0,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e4",
+      "assessments": 66,
+      "e4_evaluations": 44,
+      "e4_not_evaluated": 22,
+      "location_failed_evaluations": 28,
+      "location_failed_events": 23,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 28
+      },
+      "native_barrier_rejected_evaluations": 1,
+      "native_barrier_rejected_events": 1,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e3_e4",
+      "assessments": 66,
+      "e4_evaluations": 44,
+      "e4_not_evaluated": 22,
+      "location_failed_evaluations": 28,
+      "location_failed_events": 23,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 28
+      },
+      "native_barrier_rejected_evaluations": 1,
+      "native_barrier_rejected_events": 1,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e4",
+      "assessments": 66,
+      "e4_evaluations": 44,
+      "e4_not_evaluated": 22,
+      "location_failed_evaluations": 28,
+      "location_failed_events": 23,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 28
+      },
+      "native_barrier_rejected_evaluations": 0,
+      "native_barrier_rejected_events": 0,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e3_e4",
+      "assessments": 66,
+      "e4_evaluations": 44,
+      "e4_not_evaluated": 22,
+      "location_failed_evaluations": 28,
+      "location_failed_events": 23,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 28
+      },
+      "native_barrier_rejected_evaluations": 0,
+      "native_barrier_rejected_events": 0,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e4",
+      "assessments": 76,
+      "e4_evaluations": 51,
+      "e4_not_evaluated": 25,
+      "location_failed_evaluations": 27,
+      "location_failed_events": 24,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 27
+      },
+      "native_barrier_rejected_evaluations": 1,
+      "native_barrier_rejected_events": 1,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "capture_e1_e3_e4",
+      "assessments": 76,
+      "e4_evaluations": 51,
+      "e4_not_evaluated": 25,
+      "location_failed_evaluations": 27,
+      "location_failed_events": 24,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 27
+      },
+      "native_barrier_rejected_evaluations": 1,
+      "native_barrier_rejected_events": 1,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e4",
+      "assessments": 76,
+      "e4_evaluations": 51,
+      "e4_not_evaluated": 25,
+      "location_failed_evaluations": 27,
+      "location_failed_events": 24,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 27
+      },
+      "native_barrier_rejected_evaluations": 0,
+      "native_barrier_rejected_events": 0,
+      "evaluations_with_aligned_exception_removed": 0
+    },
+    {
+      "scenario": "adverse_delay0",
+      "policy": "structural_p1_e1_e3_e4",
+      "assessments": 76,
+      "e4_evaluations": 51,
+      "e4_not_evaluated": 25,
+      "location_failed_evaluations": 27,
+      "location_failed_events": 24,
+      "location_failure_reasons": {
+        "entry_location_extended_or_lost": 27
+      },
+      "native_barrier_rejected_evaluations": 0,
+      "native_barrier_rejected_events": 0,
+      "evaluations_with_aligned_exception_removed": 0
+    }
+  ],
+  "paired_entries": [
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_vs_capture_e5",
+      "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_vs_capture_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": 0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_vs_capture_e5",
+      "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:3dd372e7bd5f0e25fc7a9391910e1121174ccf3c56bef8a0aa5da7eaac122237",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:8bb197dfef65bf035246c699d1557b3d04417a8c5ce2c4a7cdbfcdb2fc4e43a9",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_vs_capture_e1_e5",
+      "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_vs_capture_e1_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": 0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_vs_capture_e1_e5",
+      "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:2ae0c382139b656f1c3b23a1fda5a0a79d1b5e027d65a57270132cb144d0ff46",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:3dd372e7bd5f0e25fc7a9391910e1121174ccf3c56bef8a0aa5da7eaac122237",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:8bb197dfef65bf035246c699d1557b3d04417a8c5ce2c4a7cdbfcdb2fc4e43a9",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e4_vs_capture_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_basis": "earliest E4 plan assessment known before both entries",
+      "signed_worsening_common_atr1": -0.0
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e3_e4_vs_capture_e3_e4_e5",
+      "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": 38.1370281609392,
+      "common_atr_basis": "earliest E4 plan assessment known before both entries",
+      "signed_worsening_common_atr1": 0.0
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e3_e4_vs_capture_e3_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_basis": "earliest E4 plan assessment known before both entries",
+      "signed_worsening_common_atr1": -0.0
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e4_vs_capture_e1_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_basis": "earliest E4 plan assessment known before both entries",
+      "signed_worsening_common_atr1": -0.0
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e3_e4_vs_capture_e1_e3_e4_e5",
+      "event_id": "op-v1:b4fb6535aef3df2ab8f09e02f3ff8a91e1be19928a6b4fceaf0a16f381396bf1",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": 38.1370281609392,
+      "common_atr_basis": "earliest E4 plan assessment known before both entries",
+      "signed_worsening_common_atr1": 0.0
+    },
+    {
+      "scenario": "base_delay0",
+      "comparison": "capture_e1_e3_e4_vs_capture_e1_e3_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_basis": "earliest E4 plan assessment known before both entries",
+      "signed_worsening_common_atr1": -0.0
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_vs_capture_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": 0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_vs_capture_e5",
+      "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:2265552af9bec3e51697732c5112fa75e016460f820b320fb18d4bc4fcb5d8c8",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:3dd372e7bd5f0e25fc7a9391910e1121174ccf3c56bef8a0aa5da7eaac122237",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e3_vs_capture_e3_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_vs_capture_e1_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": 0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_vs_capture_e1_e5",
+      "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:2265552af9bec3e51697732c5112fa75e016460f820b320fb18d4bc4fcb5d8c8",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:3338fa8032b3236feef978d3971174cc5eedfc23f36a239edbfd3d93b569d24e",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:3dd372e7bd5f0e25fc7a9391910e1121174ccf3c56bef8a0aa5da7eaac122237",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_e3_vs_capture_e1_e3_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e4_vs_capture_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_basis": "earliest E4 plan assessment known before both entries",
+      "signed_worsening_common_atr1": -0.0
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e3_e4_vs_capture_e3_e4_e5",
+      "event_id": "op-v1:2265552af9bec3e51697732c5112fa75e016460f820b320fb18d4bc4fcb5d8c8",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": 30.54202698947299,
+      "common_atr_basis": "earliest E4 plan assessment known before both entries",
+      "signed_worsening_common_atr1": 0.0
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e3_e4_vs_capture_e3_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_basis": "earliest E4 plan assessment known before both entries",
+      "signed_worsening_common_atr1": -0.0
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_e4_vs_capture_e1_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_basis": "earliest E4 plan assessment known before both entries",
+      "signed_worsening_common_atr1": -0.0
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_e3_e4_vs_capture_e1_e3_e4_e5",
+      "event_id": "op-v1:2265552af9bec3e51697732c5112fa75e016460f820b320fb18d4bc4fcb5d8c8",
+      "signed_new_entry_worsening": 0.0,
+      "common_discovery_atr1": 30.54202698947299,
+      "common_atr_basis": "earliest E4 plan assessment known before both entries",
+      "signed_worsening_common_atr1": 0.0
+    },
+    {
+      "scenario": "base_delay15",
+      "comparison": "capture_e1_e3_e4_vs_capture_e1_e3_e4_e5",
+      "event_id": "op-v1:c26e16a24e6cf40dcefe9c1775f8e8a4e2604d9f91d9ce86afa03d9606b55013",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": 35.387713537415166,
+      "common_atr_basis": "earliest E4 plan assessment known before both entries",
+      "signed_worsening_common_atr1": -0.0
+    },
+    {
+      "scenario": "adverse_delay0",
+      "comparison": "capture_vs_capture_e5",
+      "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    },
+    {
+      "scenario": "adverse_delay0",
+      "comparison": "capture_e1_vs_capture_e1_e5",
+      "event_id": "op-v1:86d5a409fd288265824fbc87afae8177aedcd5c336a83155d07f4562b64b2f80",
+      "signed_new_entry_worsening": -0.0,
+      "common_discovery_atr1": null,
+      "common_atr_basis": "unavailable",
+      "signed_worsening_common_atr1": null
+    }
+  ],
+  "limitations": "Execution counts are repeated gate evaluations, not independent trades. Other gates may preempt E4; unexecuted E4 checks remain null. Current-ATR location check is unchanged PR21, common ATR attribution is separate."
+}

@@ -1,0 +1,17 @@
+EVIDENCE_LOSS producer=true exception=Full risk_and_collector_unblocked=true
+EVIDENCE_LOSS producer=true exception=ValueError risk_and_collector_unblocked=true
+EVIDENCE_LOSS producer=true exception=ValueError risk_and_collector_unblocked=true
+EVIDENCE_UNAVAILABLE exception=OperationalError risk_and_collector_unblocked=true
+EVIDENCE_LOSS writer=true exception=OperationalError risk_and_collector_unblocked=true
+======================================================================
+FAIL: test_production_has_no_e3_activation_call_or_import (test_lbank_confirmation_experiment.E3ReadinessTests.test_production_has_no_e3_activation_call_or_import)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/test_lbank_confirmation_experiment.py", line 116, in test_production_has_no_e3_activation_call_or_import
+    self.assertTrue(calls)
+AssertionError: [] is not true
+
+----------------------------------------------------------------------
+Ran 112 tests in 4.276s
+
+FAILED (failures=1)

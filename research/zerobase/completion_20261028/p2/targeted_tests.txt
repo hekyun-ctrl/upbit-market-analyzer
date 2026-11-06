@@ -1,0 +1,17 @@
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+ENTRY_JOURNAL_OPEN_FAILED exception=OSError retry_seconds=60
+PAPER_SOURCE_UNAVAILABLE source=techniques
+----------------------------------------------------------------------
+Ran 92 tests in 2.103s
+
+OK

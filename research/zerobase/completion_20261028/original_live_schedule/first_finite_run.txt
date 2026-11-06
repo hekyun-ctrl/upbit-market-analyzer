@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/capture_original_live_schedule.py", line 88, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/capture_original_live_schedule.py", line 51, in main
+    before=digest(p);runner.step(p);assert digest(p)==before
+                     ^^^^^^^^^^^^^^
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/continuous_comparison.py", line 161, in step
+    result=self._step_policy(spec,current,point)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/original_live_schedule.py", line 181, in _step_policy
+    exec(self.code,namespace,namespace)
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/lbank_futures_monitor.py", line 1628, in <module>
+    if bucket not in counter_template:
+                     ^^^^^^^^^^^^^^^^
+NameError: name 'counter_template' is not defined

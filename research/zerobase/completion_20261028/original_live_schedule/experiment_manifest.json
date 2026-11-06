@@ -1,0 +1,30 @@
+{
+  "schema": "original_live_schedule_finite_declaration_v1",
+  "declared_at": "2026-10-28T18:15:17.342245+00:00",
+  "baseline": "60b70e73ab6891d63bbf7851f466fb00e7db26d2",
+  "code_checkpoint": "237b40486687d3cf9883b73fe8922a98ab207034",
+  "interval": {
+    "window": "signal15",
+    "start_inclusive": "2026-10-20T03:25:00Z",
+    "end_exclusive": "2026-10-20T03:46:00Z",
+    "observations": 20
+  },
+  "policies": [
+    "Trace",
+    "P1Trace"
+  ],
+  "poll_seconds": 60,
+  "delivery_model": "modeled_success",
+  "purpose": "changed_schedule_mechanics_reused_development_only",
+  "comparisons": [
+    "uninterrupted vs restart_after10",
+    "entire entry AST vs independent unchanged original entry block control",
+    "previous retained schedule result as diagnostic only; expect scheduler differences"
+  ],
+  "unseen": "same inputs fail-closed only, not holdout",
+  "retained_input_receipts": null,
+  "official_source_qualification": false,
+  "orders": false,
+  "outbound": false,
+  "full96arm_replay_repeated": false
+}

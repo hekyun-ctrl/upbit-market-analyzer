@@ -1,0 +1,60 @@
+======================================================================
+ERROR: test_modeled_success_advances_only_offline_cooldown_and_unresolved_entry (test_lbank_original_live_schedule.OriginalScheduleTests.test_modeled_success_advances_only_offline_cooldown_and_unresolved_entry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/test_lbank_original_live_schedule.py", line 184, in test_modeled_success_advances_only_offline_cooldown_and_unresolved_entry
+    rows=self.delivery_case('modeled_success')
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/test_lbank_original_live_schedule.py", line 181, in delivery_case
+    return self.runner.step(self.point())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/continuous_comparison.py", line 161, in step
+    result=self._step_policy(spec,current,point)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/original_live_schedule.py", line 186, in _step_policy
+    exec(self.code,namespace,namespace)
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/lbank_futures_monitor.py", line 1478, in <module>
+    frozen_record = observe_evidence(live_evidence, 'frozen_plan', at=now,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/original_live_schedule.py", line 145, in observe
+    replay.compact_plan(data['plan'])
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/compare_signal_decisions.py", line 218, in <lambda>
+    stack.enter_context(patch.object(replay,'compact_plan',lambda plan:self.compact(compact,plan)))
+                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/compare_structural_targets.py", line 69, in compact
+    proof=plan['structural_target_plan']
+          ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'structural_target_plan'
+
+======================================================================
+ERROR: test_modeled_failure_retains_qualified_plan_but_no_position_or_cooldown (test_lbank_original_live_schedule.OriginalScheduleTests.test_modeled_failure_retains_qualified_plan_but_no_position_or_cooldown)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/test_lbank_original_live_schedule.py", line 194, in test_modeled_failure_retains_qualified_plan_but_no_position_or_cooldown
+    rows=self.delivery_case('modeled_failure')
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/test_lbank_original_live_schedule.py", line 181, in delivery_case
+    return self.runner.step(self.point())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/continuous_comparison.py", line 161, in step
+    result=self._step_policy(spec,current,point)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/original_live_schedule.py", line 186, in _step_policy
+    exec(self.code,namespace,namespace)
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/lbank_futures_monitor.py", line 1478, in <module>
+    frozen_record = observe_evidence(live_evidence, 'frozen_plan', at=now,
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/original_live_schedule.py", line 145, in observe
+    replay.compact_plan(data['plan'])
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/compare_signal_decisions.py", line 218, in <lambda>
+    stack.enter_context(patch.object(replay,'compact_plan',lambda plan:self.compact(compact,plan)))
+                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/fc80326ac0b9/trace_repo/research/compare_structural_targets.py", line 69, in compact
+    proof=plan['structural_target_plan']
+          ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'structural_target_plan'
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.201s
+
+FAILED (errors=2)

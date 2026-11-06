@@ -1,0 +1,262 @@
+[
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792466745.556549,
+    "point_sha256": "391ba2391ef5d24aa4ac663d68e6c7583c2ab31ef5d365ce99cbd0acf51ddb33",
+    "seq": 0,
+    "source": {
+      "logged_at": "2026-10-20T03:25:45.556549867Z",
+      "price": 81879.9,
+      "window": "signal15"
+    },
+    "state_sha256": "e1d90942f587637eea61930b8b1f1f33cee6493e2151038d6f4be37a19e4c78a"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792466808.534515,
+    "point_sha256": "d466ef1de3d07577a5e2f6d7d51367c93c58658489809e8b9e4d3db039b0c1c7",
+    "seq": 1,
+    "source": {
+      "logged_at": "2026-10-20T03:26:48.534515388Z",
+      "price": 81842,
+      "window": "signal15"
+    },
+    "state_sha256": "a790ba7a4ec49fd2df63499e84a9e885d558670b8381196649f1a65a1ce9dcd2"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792466872.22692,
+    "point_sha256": "e051bd6cf97683842b26cb717d2cbdc397eb875ba0daeac70e86df0c7cef1339",
+    "seq": 2,
+    "source": {
+      "logged_at": "2026-10-20T03:27:52.226920388Z",
+      "price": 81832.4,
+      "window": "signal15"
+    },
+    "state_sha256": "5c4482db1b7291519aefa4299d8a05c6f7297801e7a3eaf0ecb0ed2e9f3adc09"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792466933.290566,
+    "point_sha256": "4195d10c079d7141d2977185d269b196226df68154c42054a3326da3f8070df1",
+    "seq": 3,
+    "source": {
+      "logged_at": "2026-10-20T03:28:53.290566605Z",
+      "price": 81856.3,
+      "window": "signal15"
+    },
+    "state_sha256": "17e9b9165bb999539852dc8d19e4e69cb50b50297dd05ef3f858c1f2467ecb6c"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792466993.540414,
+    "point_sha256": "b8c0a8aa3110dda78a059dda8d1334e8bc9efd0578e684da336b31d578e28fbf",
+    "seq": 4,
+    "source": {
+      "logged_at": "2026-10-20T03:29:53.540414729Z",
+      "price": 81840.1,
+      "window": "signal15"
+    },
+    "state_sha256": "e10192d67f888aa4cb41f4b5d714935824096bf0e504b175aee21afe414ad008"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467054.071358,
+    "point_sha256": "9f1cbd25b93e91635f695602a40d54be1131869e1205d57fecc158298ef3dc56",
+    "seq": 5,
+    "source": {
+      "logged_at": "2026-10-20T03:30:54.071358903Z",
+      "price": 81825.1,
+      "window": "signal15"
+    },
+    "state_sha256": "e2402fcfdbca8b307506e309ff79e750a79d0cda825de3d65a42f6935328e5ba"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467118.224487,
+    "point_sha256": "422955baa4392b9de7cea7cd50ee0153afae96a99c76c03f439041901e3969dc",
+    "seq": 6,
+    "source": {
+      "logged_at": "2026-10-20T03:31:58.224487943Z",
+      "price": 81855.4,
+      "window": "signal15"
+    },
+    "state_sha256": "800c09e4ff85ca9584632603994d82b78b8f011eb1fbb09ef187a0dfaab33987"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467177.849012,
+    "point_sha256": "9bac9ccc90adae7d7f90912c37c096b0bc50cc0e94c6855d84e30cbdf803bb03",
+    "seq": 7,
+    "source": {
+      "logged_at": "2026-10-20T03:32:57.849012549Z",
+      "price": 81926.9,
+      "window": "signal15"
+    },
+    "state_sha256": "7e146c4b9ff38c83f13dca82e5c5e1cb116916362b6637301db626bfb180b21e"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467239.343184,
+    "point_sha256": "de62f7d5c5a1a8478af65477257647baec494d6f5e260286a8b27d5b59346c34",
+    "seq": 8,
+    "source": {
+      "logged_at": "2026-10-20T03:33:59.343184311Z",
+      "price": 81965.5,
+      "window": "signal15"
+    },
+    "state_sha256": "5c5d4a07396b1ad26bb7ac321878f4ab3a8b2399158abceaf455b8106e3c6bb8"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467302.123575,
+    "point_sha256": "dcb4a2f3de8ebc3177eb4e36365b99d0cddd3ad929049b7f2b6680bb9fc63d97",
+    "seq": 9,
+    "source": {
+      "logged_at": "2026-10-20T03:35:02.123575452Z",
+      "price": 81971,
+      "window": "signal15"
+    },
+    "state_sha256": "8c58d5e95b9b78684cf1082dc01df6a0cd346cb4b90455dceb6ed49ee1e2b84d"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467374.461983,
+    "point_sha256": "d1881236b25077545ec9d0804384cdc780144acabdb00a1f7dc0a2f2728bd63a",
+    "seq": 10,
+    "source": {
+      "logged_at": "2026-10-20T03:36:14.461983474Z",
+      "price": 81974.1,
+      "window": "signal15"
+    },
+    "state_sha256": "7921d249dfbb62e9bdcd84756b17ed27f05d17b1b44d59063fc5c03253d2c574"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467434.41831,
+    "point_sha256": "4a8d4edb0a2dc364ffb591a7fcef0687fc4ff5767ca3074f00272cb78c7be371",
+    "seq": 11,
+    "source": {
+      "logged_at": "2026-10-20T03:37:14.418310099Z",
+      "price": 82011.8,
+      "window": "signal15"
+    },
+    "state_sha256": "d5a2b05985d9aace6475c9906b71c97ca143fea9beefb9a411a64a49b84c2d0b"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467495.896508,
+    "point_sha256": "1711d3725c43d6bf11d30150743366370fe3c0fcc02c7d9793bb31fca6324e7e",
+    "seq": 12,
+    "source": {
+      "logged_at": "2026-10-20T03:38:15.896508058Z",
+      "price": 82026.9,
+      "window": "signal15"
+    },
+    "state_sha256": "3c94fc2458a8e641d18c9a43b57080fa3f38ff559cd562c6dba89fae8896f2c3"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467558.766728,
+    "point_sha256": "b9bc0418822e2e1d7263863ded69cf783b85a7e4279adab21a6dafc764497319",
+    "seq": 13,
+    "source": {
+      "logged_at": "2026-10-20T03:39:18.766728654Z",
+      "price": 82030.7,
+      "window": "signal15"
+    },
+    "state_sha256": "1162056486168b5706456b312a0f3cfd1a5424aad1c4caa69ea306d85de1ec19"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467621.109031,
+    "point_sha256": "f04203af5f485e481c6afced2b71077a7c93e57e8871d6d12d5c3ca416b1e6ef",
+    "seq": 14,
+    "source": {
+      "logged_at": "2026-10-20T03:40:21.109031021Z",
+      "price": 81982.7,
+      "window": "signal15"
+    },
+    "state_sha256": "279f2b01c22f71dde064ed8800693ac789d896a9f5f32412ab142e642b5f0c82"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467684.206657,
+    "point_sha256": "9d782e6117fc3ad656393d546968111ad365e9b039699d2c6bc1fcc7d2078770",
+    "seq": 15,
+    "source": {
+      "logged_at": "2026-10-20T03:41:24.206657070Z",
+      "price": 81985.3,
+      "window": "signal15"
+    },
+    "state_sha256": "504ea0c760e726c89cf46a8556946f8194a740bb3859acff83321f1f38ef4ac4"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467743.332222,
+    "point_sha256": "872f3dcfae3998e018868ed03de04244d18310d5f2e11b8f185c183dc3ddacb2",
+    "seq": 16,
+    "source": {
+      "logged_at": "2026-10-20T03:42:23.332222154Z",
+      "price": 81995,
+      "window": "signal15"
+    },
+    "state_sha256": "5915111c8a201ee7a1a2df746d43a05614b0ded3dcd205e4582aa81cb579f881"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467805.921316,
+    "point_sha256": "e2618430ea1b70b849357a84bf1b9f3f670d9c298ca30dff453e0a6a5f5925c1",
+    "seq": 17,
+    "source": {
+      "logged_at": "2026-10-20T03:43:25.921316890Z",
+      "price": 82002.9,
+      "window": "signal15"
+    },
+    "state_sha256": "2db01e4c89c981122257c93ad733c550b8c113e9e7e5f63eb90a6a248ff02c4b"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467878.444635,
+    "point_sha256": "36a02d3af421511033b6ae55f32970900a2a761c529742cde0ea4d9623a72247",
+    "seq": 18,
+    "source": {
+      "logged_at": "2026-10-20T03:44:38.444635976Z",
+      "price": 81986.6,
+      "window": "signal15"
+    },
+    "state_sha256": "b00acb9f62429cac1b3effebe1cb4979aa2d5c2e67ea90f28d00832831819f2e"
+  },
+  {
+    "actual_historical_quote_receipt": null,
+    "all_original_poll_inputs_available": false,
+    "observed_at": 1792467940.728202,
+    "point_sha256": "b292e5c932ca0723b62ea644504f18376948e05aabeb3ef7c4c7a656d7d29992",
+    "seq": 19,
+    "source": {
+      "logged_at": "2026-10-20T03:45:40.728202672Z",
+      "price": 81976.5,
+      "window": "signal15"
+    },
+    "state_sha256": "0dd6552dd9408e6b56f29eca3eb1ef9e92b7c763db5f532f322159d42883de8d"
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "command": "python research/render_early_reversal_report.py",
+  "code_sha256": {
+    "research/render_barrier_chase_report.py": "18139c07d58599d1347a09bbf391ec2c01137e4e55b84641637a5551dc7eabad",
+    "research/render_confirmation_report.py": "810b8603aeb2ffc7a76fdbd06d4362d3ab642f71666023a00d778429da82b4c9",
+    "research/render_early_reversal_report.py": "ee3dc26947eab37183aa7f42989846ebe1f2ca4dc5b8839478deb9ac43ed05bd",
+    "research/compare_entry_refinement.py": "322715fe9128a65a1ffc60dee1b71145976d86a476f0308a4c63848e7ae599ab",
+    "lbank_native_entry.py": "c4ae4075d8dd3a05679e36771a2fee3d74b6f6912e83d2e7a89e5054636c8d91",
+    "lbank_sampled_context.py": "c1ff98446211d43cd3f9c28a01e8cb160ccd7296061a0961a14163be1dbc0bc2"
+  },
+  "input_sha256": {
+    "comparison.json": "13c7442fd6f1f0d523d5381217ddf9703742027e9c691e29e78a82c6a80e2a32",
+    "trade_cards.json": "8d47b69bc3371300434edbdcb50b71925db0dda3bf67d12419d29ecf7e4ef5af",
+    "trades.csv": "37b4ad909d6334985a729a59189652425a1f36ce443965f8f289cf2a13bc86bd",
+    "opportunities.csv": "d74aa60f54e5e5fe7a8160fbb55673fba840ce377bf178acf5d43abd1c6a4d7c",
+    "gate_decisions.csv.gz": "5805f268a852793ac8dfe5eec24be489820a16758ff08ae6f1938e1cbf5bcd3f",
+    "manifest.json": "595c7abf57e611618df6009325f61e09df55c12e2f5af0417ed01f49788c3854",
+    "experiment_manifest.json": "2069deee8e5b0de1c7305f96e889fffc37134c4fb0bcb0ed4f0d924b7057e01d"
+  },
+  "output_sha256": {
+    "fixed_plan_attribution.json": "9ddab6f9f85314a9ad7c4d1654f9e75fded1b6704baa6b1c55fa3f6070afaa50",
+    "event_accounting.json": "ea04ba054338d475da59bdd8f5e32f88f8001993741e34a5b1be06e3315224d7",
+    "candidate_accounting.json": "e8b81d8f9d6bdcf8df17f9da9788cbe753f5b8a894e117dd9370b35042295333",
+    "e4_gate_accounting.json": "a00369a868e57f1b8e52cef255dd51a7dfe9683d89f007db894cba24e5b861e7",
+    "candidate_selection_accounting.json": "97d32609a687a557765a2c078d14ebfc1615db855380a069b0eafc7a39c51099",
+    "explanatory_variables.json": "6a82527698ef25688646c496c611c7ff1e471dcdbf435535bb16d163ac7cabc5",
+    "e5_route_accounting.json": "2262bc4d117fed5095ce879bd89ad17ac73bd31c1dbb4a253d64d645c31ee007"
+  }
+}

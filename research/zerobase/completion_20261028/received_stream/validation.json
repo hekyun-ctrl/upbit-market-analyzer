@@ -1,0 +1,17 @@
+{
+  "duplicate_import_identical": true,
+  "exact_raw_bytes_and_original_receipts_preserved": 6,
+  "explicit_gap_restart_records": 4,
+  "file_hashes_verified": 15,
+  "new_independent_samples": 0,
+  "new_network_requests": 0,
+  "passed": true,
+  "profitability_validated": false,
+  "raw_to_snapshot_bindings": 0,
+  "real_binding_rejections": 6,
+  "schema": "received_stream_validation_v1",
+  "source_blockers_unchanged": true,
+  "storage_integrity": "ok",
+  "transport_attempts": 2,
+  "verified_final_bars": 0
+}

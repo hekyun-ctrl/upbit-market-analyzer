@@ -1,0 +1,95 @@
+{
+  "schema": "zb_p2_e4_validation_v1",
+  "checked_at": "2026-10-28T09:46:05.667955+00:00",
+  "started_at": "2026-10-28T09:30:48.819727+00:00",
+  "source_checkpoint": "7c8fb9b2f1c6a0b74f7b2de41a0f0141c73844c3",
+  "predeclared_lease_commit": "116f43b7a89a5c6a6080b23062f703a3f656010e",
+  "initial_code_checkpoint": "9b7aa8a441455d07cf60c3477dc6ed223745e706",
+  "checks": {
+    "all_code_input_output_hashes_match": true,
+    "decompressed_csv_hash_matches": true,
+    "original_arm_scenario_windows_exactly_equal": 24,
+    "frozen_original_code_unchanged": [
+      "lbank_futures_monitor.py",
+      "lbank_entry_location.py",
+      "lbank_structural_target_plan.py",
+      "research/evidence_confirmation.py",
+      "research/compare_confirmation_experiment.py",
+      "research/first_retest_experiment.py",
+      "lbank_entry_priority.py",
+      "lbank_entry_quality.py"
+    ],
+    "no_entry_zero_unresolved_null": true,
+    "per_event_recorded_rejections_or_explicit_no_confirmation": true,
+    "orders_sends_zero": true,
+    "blockers_preserved": true,
+    "trade_comparison_scenario_rows": 36,
+    "e4_executed_evaluations": 1094
+  },
+  "commands": [
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_barrier_chase_experiment test_lbank_first_retest_experiment test_lbank_confirmation_experiment test_lbank_entry_location test_lbank_structural_comparison -q",
+      "exit_code": 0,
+      "tests": 58,
+      "new_tests": 14
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_barrier_chase_experiment.E4Tests.test_exact_location_limit_is_inclusive -q",
+      "exit_code": 0,
+      "tests": 1,
+      "new_tests": 1
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/compare_barrier_chase_experiment.py",
+      "exit_code": 0
+    },
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/render_barrier_chase_report.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python research/validate_barrier_chase_experiment.py",
+      "exit_code": 0
+    },
+    {
+      "command": "git -c core.whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol diff --cached --check",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --cached --check",
+      "exit_code": 2,
+      "reason": "Standard csv.DictWriter CRLF treated as trailing whitespace by default; CRLF-aware check passes with original artifact bytes unchanged"
+    }
+  ],
+  "runtime": {
+    "python": "3.12.14",
+    "sqlite": "3.53.1"
+  },
+  "file_sha256": {
+    ".gitignore": "a0092d31272057c4244284dbe5eb324ac7000d65f98337dc2b30c5d35d65c1c2",
+    "README.md": "1aae9a54fe01e2ce61f389a2ea0ba84d747ac35bf9ab11e6c381a58fb188219c",
+    "candidate_accounting.json": "faddfc5e0b16f918bf6301215b3be90b5424aeb74f6a50c59182f2de0f932539",
+    "comparison.json": "59b1c795a2345b51cecb7cd5cd6800a5a56f9f6a9262b1c2851f9be50b3ed26c",
+    "e4_gate_accounting.json": "e9cc7ba6cea2b599a2a636d0f2c52e25f3a69bb43c84aa98d78d5eda1d0f963c",
+    "event_accounting.json": "d6d1c3604358feee676bbd29bcbdd4f190bc51f4939c55c43be3b58251f27098",
+    "experiment_manifest.json": "52759e85328935db9d34518a8751a0941a64b48b0e254e65fbd4aae32e903683",
+    "fixed_plan_attribution.json": "878d6d1ac73a6cb522b79893cc993fcea5d6572e9b43d0be5483c0e96deba46f",
+    "gate_decisions.csv.gz": "a82fe3b269aa0be680e0c3324b87b83e4f7de807fde0abdb90858150dc60afff",
+    "manifest.json": "f6d4fb05dfe9e854520b8e20b290298ec8f1a319668627101c726be70e537ed5",
+    "opportunities.csv": "de45960208c6f498625adfa20a3e766920178f925d8946e7d36dbcbedaf6b6c4",
+    "replay_stdout.json": "e8adf2be207d9d98bfdacc13c8b76e10a3be9a7b2c73b1d6f678565a5e929728",
+    "report_manifest.json": "9cbf6df5c9b7581591af4746ab6e87b6031bfc0f3724ff9fb196c4115e5e529e",
+    "targeted_tests.txt": "2e814f89219665b14cc0341fb4034eb58c28c339c89b15c2e2d2ff960df2f788",
+    "trade_cards.json": "d587256c7b8b2db9e22da7a7d2de1ac141069ecf86a9f5dc8c0589c60fca16e4",
+    "trades.csv": "76078c2ec5ed95de2369b20cc81ffa04e98614d54c83c0637915b52aacd8cbae"
+  },
+  "additional_code_sha256": {
+    "research/validate_barrier_chase_experiment.py": "d041bcf8b4bb034ba65b6e275a0d9ce362559587f926d535539a7d629e4f65d6",
+    "test_lbank_barrier_chase_experiment.py": "56b85574aac0ba422660c415484171339755e06a66e878f5a96165fabbc97bbd"
+  },
+  "limits": [
+    "Reused development observations; no unseen/continuous qualification",
+    "E4 location bound unchanged PR21/current ATR; shared fixed-plan/common-ATR attribution is separate",
+    "E5/live ledger/P3-P5 incomplete; no profitability or whole-feature completion"
+  ]
+}

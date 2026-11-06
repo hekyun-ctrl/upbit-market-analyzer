@@ -4,6 +4,7 @@ Known receipt times and nominal availability scenarios are distinct. Immutable
 anchors identify opportunities independently of policy, display IDs or prices
 observed later. A send intent is recorded atomically but is always disabled.
 """
+from contextlib import contextmanager
 import hashlib
 import json
 import math
@@ -45,8 +46,12 @@ def event_id(direction, family, anchor, product=PRODUCT):
 
 
 class EvidenceLedger:
-    def __init__(self, path):
-        self.db = sqlite3.connect(str(path))
+    def __init__(self, path, *, timeout=5):
+        self.db = sqlite3.connect(str(path), timeout=timeout)
+        self._transaction_depth = 0
+        # Reject a newer store before issuing DDL or changing journal settings.
+        if self.db.execute('PRAGMA user_version').fetchone()[0] > 2:
+            self.db.close();raise ValueError('EVIDENCE_DATABASE_VERSION_UNSUPPORTED')
         self.db.execute('PRAGMA foreign_keys=ON')
         self.db.execute('PRAGMA journal_mode=WAL')
         self.db.execute('PRAGMA synchronous=FULL')
@@ -72,7 +77,20 @@ class EvidenceLedger:
         row=self.db.execute("SELECT payload FROM meta WHERE key='schema'").fetchone()
         if row and row[0] != SCHEMA:
             self.db.close();raise ValueError('EVIDENCE_SCHEMA_MISMATCH')
-        with self.db:self.db.execute("INSERT OR IGNORE INTO meta VALUES('schema',?)",(SCHEMA,))
+        with self.transaction():self.db.execute("INSERT OR IGNORE INTO meta VALUES('schema',?)",(SCHEMA,))
+
+    @contextmanager
+    def transaction(self):
+        """Allow a live envelope and its derived rows to commit atomically."""
+        if self._transaction_depth:
+            yield
+            return
+        self._transaction_depth += 1
+        try:
+            with self.db:
+                yield
+        finally:
+            self._transaction_depth -= 1
 
     def source(self, raw, *, event_time, received_at=None, quality=None):
         for time in (event_time,received_at):
@@ -83,13 +101,13 @@ class EvidenceLedger:
                      received_at=received_at,quality=quality,raw=raw)
         old=self.db.execute('SELECT payload FROM source_events WHERE raw_hash=?',(key,)).fetchone()
         if old and old[0] != canonical(payload):raise ValueError('SOURCE_RECEIPT_REVISION_REQUIRES_VERSION')
-        with self.db:self.db.execute('INSERT OR IGNORE INTO source_events(raw_hash,payload) VALUES(?,?)',
+        with self.transaction():self.db.execute('INSERT OR IGNORE INTO source_events(raw_hash,payload) VALUES(?,?)',
                                      (key,canonical(payload)))
         return key
 
     def inputs(self, hashes):
         hashes=sorted(set(hashes));key=digest(hashes)
-        with self.db:self.db.execute('INSERT OR IGNORE INTO input_sets VALUES(?,?)',(key,canonical(hashes)))
+        with self.transaction():self.db.execute('INSERT OR IGNORE INTO input_sets VALUES(?,?)',(key,canonical(hashes)))
         return key
 
     def opportunity(self, direction, family, anchor, *, first_observed_at):
@@ -102,7 +120,7 @@ class EvidenceLedger:
         old=self.db.execute('SELECT payload FROM opportunity_events WHERE event_id=?',(key,)).fetchone()
         if old and json.loads(old[0])['first_observed_at'] < first_observed_at:
             return key
-        with self.db:self.db.execute('INSERT OR REPLACE INTO opportunity_events VALUES(?,?)',(key,canonical(payload)))
+        with self.transaction():self.db.execute('INSERT OR REPLACE INTO opportunity_events VALUES(?,?)',(key,canonical(payload)))
         return key
 
     def decision(self, *, event, policy, evaluated_at, input_hash, state,
@@ -128,7 +146,7 @@ class EvidenceLedger:
                      first_reject=first_reject,available_at=available_at,
                      availability_basis=availability_basis,**detail)
         key=digest(payload)
-        with self.db:self.db.execute('INSERT OR IGNORE INTO decision_events '
+        with self.transaction():self.db.execute('INSERT OR IGNORE INTO decision_events '
             '(decision_hash,event_id,policy,evaluated_at,state,first_reject,payload) VALUES(?,?,?,?,?,?,?)',
             (key,event,policy,evaluated_at,state,first_reject,canonical(payload)))
         return key
@@ -136,7 +154,7 @@ class EvidenceLedger:
     def freeze(self, *, event, policy, plan, provenance, intent=False):
         payload=dict(event_id=event,policy=policy,plan=plan,provenance=provenance)
         key='plan-v1:'+digest(payload)
-        with self.db:
+        with self.transaction():
             self.db.execute('INSERT OR IGNORE INTO frozen_plans VALUES(?,?,?,?)',
                             (key,event,policy,canonical(payload)))
             if intent:self.db.execute('INSERT OR IGNORE INTO dispatch_events VALUES(?,?,?,?)',
@@ -145,7 +163,7 @@ class EvidenceLedger:
 
     def outcome(self, plan_id, value):
         key=digest(dict(plan_id=plan_id,value=value))
-        with self.db:self.db.execute('INSERT OR IGNORE INTO outcome_events VALUES(?,?,?)',
+        with self.transaction():self.db.execute('INSERT OR IGNORE INTO outcome_events VALUES(?,?,?)',
                                      (key,plan_id,canonical(value)))
 
     def delivery(self, key, status, **receipt):
@@ -159,7 +177,7 @@ class EvidenceLedger:
         value=canonical(receipt)
         if old[0]=='acknowledged' and old != (status,value):
             raise ValueError('ACK_IS_IMMUTABLE')
-        with self.db:self.db.execute('UPDATE dispatch_events SET status=?,payload=? WHERE dedupe_key=?',
+        with self.transaction():self.db.execute('UPDATE dispatch_events SET status=?,payload=? WHERE dedupe_key=?',
                                      (status,value,key))
 
     def close(self):

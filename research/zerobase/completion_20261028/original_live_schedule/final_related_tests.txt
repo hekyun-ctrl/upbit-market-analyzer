@@ -1,0 +1,9 @@
+EVIDENCE_LOSS producer=true exception=Full risk_and_collector_unblocked=true
+EVIDENCE_LOSS producer=true exception=ValueError risk_and_collector_unblocked=true
+EVIDENCE_LOSS producer=true exception=ValueError risk_and_collector_unblocked=true
+EVIDENCE_UNAVAILABLE exception=OperationalError risk_and_collector_unblocked=true
+EVIDENCE_LOSS writer=true exception=OperationalError risk_and_collector_unblocked=true
+----------------------------------------------------------------------
+Ran 86 tests in 22.357s
+
+OK

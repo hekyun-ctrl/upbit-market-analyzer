@@ -1,0 +1,18 @@
+EVIDENCE_LOSS producer=true exception=Full risk_and_collector_unblocked=true
+EVIDENCE_LOSS producer=true exception=ValueError risk_and_collector_unblocked=true
+EVIDENCE_LOSS producer=true exception=ValueError risk_and_collector_unblocked=true
+EVIDENCE_UNAVAILABLE exception=OperationalError risk_and_collector_unblocked=true
+EVIDENCE_LOSS writer=true exception=OperationalError risk_and_collector_unblocked=true
+======================================================================
+ERROR: test_retained_raw_frames_keep_actual_receipts_without_upgrading_source_quality (test_lbank_live_evidence.RetainedDataTests.test_retained_raw_frames_keep_actual_receipts_without_upgrading_source_quality)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/fc80326ac0b9/repo/test_lbank_live_evidence.py", line 345, in test_retained_raw_frames_keep_actual_receipts_without_upgrading_source_quality
+    basis=attempt['basis'], periods=[b.get('b') for b in frame.get('d', [])]))
+                                     ^^^^^
+AttributeError: 'str' object has no attribute 'get'
+
+----------------------------------------------------------------------
+Ran 22 tests in 3.803s
+
+FAILED (errors=1)

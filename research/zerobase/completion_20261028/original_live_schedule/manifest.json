@@ -1,0 +1,52 @@
+{
+  "artifact_command": "PYTHONPYCACHEPREFIX=/tmp/zb-original-schedule-pycache PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python research/capture_original_live_schedule.py",
+  "baseline": "60b70e73ab6891d63bbf7851f466fb00e7db26d2",
+  "code_sha256": {
+    "lbank_futures_monitor.py": "28e1380eb85d854dff2abbcc732a83032b314f5866c00f1ff43e4ea0481eeeb3",
+    "lbank_live_evidence.py": "b6348d3f7e67a9f54a7bcc26d5ff5fa0f22bf98acbdd8ccfd500a6079d321631",
+    "research/capture_original_live_schedule.py": "8e91fdd1e22d966ad49bad37e3ab4446ff08dce17fd2a2bc28ce69adfc6e6294",
+    "research/continuous_comparison.py": "0675ab9b730e3c12bfa8b451edbace7b8053784dcc59646990853089b42a3dc2",
+    "research/original_live_schedule.py": "0996ed19e60326ae1552853dcb6bbf1ac0ad16e63ce5a441b88859cab3736717",
+    "test_lbank_original_live_schedule.py": "28bba75a7c8a9b98493705b910b35b84aafbe8f8cfc8bc857b266e722894c2e2"
+  },
+  "created_at": "2026-10-28T18:25:02.510696+00:00",
+  "decompressed_sha256": {
+    "final_policy_states.json.gz": "f49f5c546722b55740bfb3f673ae1f60c4069cdac31bb63768003b63d4c20e23",
+    "steps.json.gz": "40846a0428ea0c5cf965ff2542cfe7459e18292e12cfd5fe09708f8bceb1ab89"
+  },
+  "implementation": "43211060ad3dc4fdaafa925e4556ebf69da76890",
+  "initial_failures_preserved": true,
+  "input_sha256": {
+    "research/zerobase/entry_comparison_20261024/archive_chunks.json": "0d8b8db7cdccd009d2d08e7c9ece7403231bce3b4af8227b5bddff246daa8cce",
+    "research/zerobase/entry_comparison_20261024/outcome_candle_logs.jsonl": "0254b28096f864b24e7b39a3d04bd464e33e03a588b4f36b0ea5e4dace9576b7",
+    "research/zerobase/entry_comparison_20261024/recorded_quotes.json": "088b245a78a95453fe51d7555e3017eb413aea0ba39ff4fa729fc14a0071e88b"
+  },
+  "new_network_requests": 0,
+  "new_tests": 26,
+  "orders": 0,
+  "output_sha256": {
+    "README.md": "5f1aa008acdb53c8b2ddf837c0d1e56235d5c1a4d9e0efafa4062a875953bed5",
+    "checks.json": "326a32df46d1357032aaa174f0d8c232410bffb5569f6bd0bddb7020d30ca339",
+    "comparison_report.json": "6f55ee6f2258172fc3273c2d370b5472a226a778d266b71f1d2ccc8b7f53b501",
+    "delivery_boundary_tests.txt": "5ba13cbb36138760b1dde7b85f790155b4c5dd4b2a3abd98147b733179f2f561",
+    "experiment_manifest.json": "a4ff4410b800e811333eceb76f1a5bf715c362f84e638cc7ca27dccf257dde7c",
+    "final_finite_run.txt": "31fd65da71fd67de1cc51df116b9479377d4e52876889e1e8ace61d99fe08d39",
+    "final_policy_states.json.gz": "2a1d562a405303bcc98a47a44763eedefc4a3507ed242a4c1a3155de2ea6bba5",
+    "final_related_tests.txt": "d9cfd3213acd16c5cf9d35a6e26f3bcd2bb8e126e6d51403ae9a70f9b4346ea7",
+    "first_finite_run.txt": "3013a0a75e4a6d4faedc09d2060746adfae510b11d4ded8850a9bf1aa660d04e",
+    "frozen_strategy_verification.json": "1550f59ddea0a086453109fa00f9a81fec1c747ab34106720dbf72a9ba68af73",
+    "initial_delivery_fixture_failure.txt": "1e03a260db2b46a492714af4ad3b57fd078b9826161d91bd2ac93b30b35df4a5",
+    "initial_environment_and_boundary_failures.txt": "068d88152cfaf025e0c9cf91224368b7867777a718a95090b5e25ac2716025f5",
+    "initial_targeted_tests.txt": "e17f6d952514c7f935d1daed4b51e6d685e21747435f93647e96b186a5035736",
+    "input_index.json": "4736c3136336fb6c5e2a6a580dba19529b8ed2698eacbd5139c1b4a6d61ec6f5",
+    "related_tests.txt": "338e37b765c2fd3e95811115ac7f1140664b4e4e24f311b907e053f34d7fc0cc",
+    "schedule_comparison.json": "2505a716860ce615f022f11b07db0de143676061d325e5e053635efc9c9a422c",
+    "second_finite_run.txt": "898e2b1f3edaffebe9bdd7179609dbe3ebc298b49c9cfd4cab63d42573c5395d",
+    "steps.json.gz": "7c6993defd7b78593a3ecb2c8921a69a08912172de704475bee027aff1d8b4f3",
+    "unseen_blocked_report.json": "758b8744f0d8366d0c481c54f74ff19bc619098fd8396bbde50ace584179d040"
+  },
+  "schema": "original_live_schedule_manifest_v1",
+  "sends": 0,
+  "test_command": "PYTHONPYCACHEPREFIX=/tmp/zb-original-schedule-pycache PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_original_live_schedule test_lbank_continuous_comparison test_lbank_live_evidence test_lbank_entry_timing test_lbank_gate_trace -q",
+  "tests": 86
+}

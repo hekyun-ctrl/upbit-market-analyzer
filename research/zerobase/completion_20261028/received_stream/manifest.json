@@ -1,0 +1,87 @@
+{
+  "artifact_evaluation_ended_at": "2026-10-28T14:49:59.618758+00:00",
+  "base_heads": {
+    "pr21": "ce33a017ff6aca0729175a8f88c3ec978f4a84a2",
+    "pr22": "d098f5657d823769f468846df1fac5ec04986d0e",
+    "production": "b4c7d94efb305c19cbe44f050c806440e19351a0",
+    "research": "5ea63fea7fb5a312a99702535c31d4dccd8155fd"
+  },
+  "commands": [
+    {
+      "command": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps python -m unittest test_lbank_received_stream test_lbank_live_evidence test_lbank_native_candles test_lbank_signal_evidence -q",
+      "exit_code": 0,
+      "new_tests": 26,
+      "tests": 76
+    },
+    {
+      "command": "python research/import_received_stream.py --retained-audit research/zerobase/completion_20261028/source_probe/audit.json --sealed-output research/zerobase/completion_20261028/received_stream/retained_sealed.json --database /workspace/scratch/fc80326ac0b9/received-stream-evaluation.sqlite3 --report research/zerobase/completion_20261028/received_stream/retained_report.json",
+      "exit_code": 0
+    },
+    {
+      "command": "python research/import_received_stream.py --sealed-input research/zerobase/completion_20261028/received_stream/retained_sealed.json --database /workspace/scratch/fc80326ac0b9/received-stream-final.sqlite3 --report research/zerobase/completion_20261028/received_stream/retained_report.json",
+      "exit_code": 0
+    },
+    {
+      "command": "python research/import_received_stream.py --sealed-input research/zerobase/completion_20261028/received_stream/retained_sealed.json --database /workspace/scratch/fc80326ac0b9/received-stream-final.sqlite3 --report research/zerobase/completion_20261028/received_stream/retained_duplicate_report.json",
+      "exit_code": 0
+    },
+    {
+      "command": "python research/evaluate_received_stream_retained.py",
+      "exit_code": 0
+    },
+    {
+      "command": "python research/validate_received_stream_artifacts.py",
+      "exit_code": 0
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "deployment": false,
+  "file_sha256": {
+    "docs/zerobase/TRADE_EVIDENCE_ALERT_DESIGN_20261025.md": "9a58c22803dba4624951b661ea34d02cb480534bab2897c8e69d6681c1595ef5",
+    "lbank_live_evidence.py": "b896ab53ae688d6a18a8ffe34ec7f6d175d6f837d958d8864bb9b881b0ded706",
+    "lbank_received_stream.py": "c697ab507f83ffc0dfd5287b52720d5781f8de8986ea1388b6024a93a2410abc",
+    "research/evaluate_received_stream_retained.py": "b7232cd55835cab43fbfdf034611c3550593f5d6e763de01109a92187ef6e235",
+    "research/import_received_stream.py": "008e6b7fae1664b88df14ce06e4f39becc8b8f78d1af64b3be7b9215c892f4bc",
+    "research/validate_received_stream_artifacts.py": "1ed86e7a4e1434d0866338117b9afa4861c8b8a590c139a03ea2e292ec4021a8",
+    "research/zerobase/completion_20261028/received_stream/README.md": "f70c19ab1e7f184ae9d3206ec00ca0edba9229ec1e30dc7db5fe7e8286a87d61",
+    "research/zerobase/completion_20261028/received_stream/environment_resolution.json": "e0bfd28b8385d187bca54e70f5cfea31b99b8c52c85878defebd6d19d5e9c02e",
+    "research/zerobase/completion_20261028/received_stream/retained_binding_attempts.json": "7ffe9db84495438a6f055b97af38c8590098dbec672cb4971768b80c439a3b38",
+    "research/zerobase/completion_20261028/received_stream/retained_duplicate_report.json": "1608e1a76799c3f88965fd9a1cadb47f4dfd62f186409130e1288082d2f2a075",
+    "research/zerobase/completion_20261028/received_stream/retained_report.json": "b15c3ebce517fad778d10b4871d65654fabee5e6b7afae5f53c501c3985d1bb6",
+    "research/zerobase/completion_20261028/received_stream/retained_sealed.json": "d95c36783a1da7bd3123d555202bdb0969b30e7717e682ff27c851f864a1c199",
+    "research/zerobase/completion_20261028/received_stream/targeted_tests.txt": "dfbe2e0c4903553bd7ee0d91be6154a697a6cd43aa528b0f41a2710d9498844b",
+    "research/zerobase/completion_20261028/source_probe/audit.json": "899260ed89f36981e34f6584c662bf6fe6d46aae0155950b414de4cae3316690",
+    "test_lbank_received_stream.py": "4843c32051ae9d219255ad63be45af0772ab1378730d18910f3d044226ff6824"
+  },
+  "full_actual_gate_vector_available": false,
+  "initial_code_commit": "2603092abbcba078f3095e27e5241912950d8fad",
+  "lease_commit": "56393786ddb63bc1b09dd24c6c82e6d22ac70207",
+  "orders": false,
+  "outbound": false,
+  "production_merge": false,
+  "python": "3.12.14",
+  "result": {
+    "actual_snapshot_bindings": 0,
+    "new_independent_samples": 0,
+    "new_network_requests": 0,
+    "new_tests": 26,
+    "profitability_validated": false,
+    "qualified": false,
+    "real_binding_rejections": 6,
+    "related_tests": 76,
+    "retained_wire_occurrences": 6,
+    "stored_records": 10,
+    "verified_final_bars": 0
+  },
+  "schema": "received_stream_artifacts_v1",
+  "source_blockers": [
+    "RAW5M_INDEPENDENCE_UNVERIFIED",
+    "CANDLE_VOLUME_UNIT_UNVERIFIED"
+  ],
+  "started_at": "2026-10-28T14:38:39.904347+00:00",
+  "starting_pr27_head": "8e2f3009d76de94f26269fa5ad1f3b2412e26f92",
+  "test_dependencies": "PYTHONPATH=/workspace/scratch/44f97b78c955/zb-test-deps; reused unchanged ccxt4.5.90 and dependencies"
+}

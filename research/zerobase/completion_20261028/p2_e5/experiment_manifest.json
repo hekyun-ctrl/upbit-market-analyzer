@@ -1,0 +1,208 @@
+{
+  "schema": "zb_p2_e5_predeclared_v1",
+  "declared_at": "2026-10-28T09:55:58.304189+00:00",
+  "source_checkpoint": "fc2fecb090bdc6a733d42414892554d0baeada37",
+  "scope": "E5 early reversal only plus full necessary E1/E3/E4/target interactions; no winner selection; P2 research completion only",
+  "sample_class": "previously used signal-adjacent development observations; not unseen or continuous validation",
+  "independent_experiments": {
+    "E1": {
+      "factor": "first-retest detection only",
+      "status": "implemented_and_frozen"
+    },
+    "E2": {
+      "factor": "structural target and inverse entry only",
+      "status": "P1 implemented; frozen, no tuning"
+    },
+    "E3": {
+      "factor": "replace fixed 30s wait with evidence readiness",
+      "status": "implemented_and_frozen"
+    },
+    "E4": {
+      "factor": "nearby barrier exception and chase rules only",
+      "status": "implemented_and_frozen"
+    },
+    "E5": {
+      "factor": "early reversal route only",
+      "status": "predeclared_before_execution"
+    }
+  },
+  "arms": {
+    "capture": "existing detection, target, 30s confirm",
+    "capture_e3": "same capture, E3 only",
+    "structural_p1": "existing P1 structural target, 30s confirm",
+    "structural_p1_e3": "same P1, E3 only",
+    "capture_e1": "capture plus PR21 first_retests proposals only; original target/rules/30s confirm",
+    "capture_e1_e3": "capture_e1 plus frozen E3 confirmation",
+    "structural_p1_e1": "P1 plus PR21 first_retests proposals only; original rules/30s confirm",
+    "structural_p1_e1_e3": "structural_p1_e1 plus frozen E3 confirmation",
+    "capture_e4": "existing detection, target, 30s confirm plus isolated E4",
+    "capture_e3_e4": "same capture, E3 only plus isolated E4",
+    "structural_p1_e4": "existing P1 structural target, 30s confirm plus isolated E4",
+    "structural_p1_e3_e4": "same P1, E3 only plus isolated E4",
+    "capture_e1_e4": "capture plus PR21 first_retests proposals only; original target/rules/30s confirm plus isolated E4",
+    "capture_e1_e3_e4": "capture_e1 plus frozen E3 confirmation plus isolated E4",
+    "structural_p1_e1_e4": "P1 plus PR21 first_retests proposals only; original rules/30s confirm plus isolated E4",
+    "structural_p1_e1_e3_e4": "structural_p1_e1 plus frozen E3 confirmation plus isolated E4",
+    "capture_e5": "existing detection, target, 30s confirm plus independent E5 early reversal proposals",
+    "capture_e3_e5": "same capture, E3 only plus independent E5 early reversal proposals",
+    "structural_p1_e5": "existing P1 structural target, 30s confirm plus independent E5 early reversal proposals",
+    "structural_p1_e3_e5": "same P1, E3 only plus independent E5 early reversal proposals",
+    "capture_e1_e5": "capture plus PR21 first_retests proposals only; original target/rules/30s confirm plus independent E5 early reversal proposals",
+    "capture_e1_e3_e5": "capture_e1 plus frozen E3 confirmation plus independent E5 early reversal proposals",
+    "structural_p1_e1_e5": "P1 plus PR21 first_retests proposals only; original rules/30s confirm plus independent E5 early reversal proposals",
+    "structural_p1_e1_e3_e5": "structural_p1_e1 plus frozen E3 confirmation plus independent E5 early reversal proposals",
+    "capture_e4_e5": "existing detection, target, 30s confirm plus isolated E4 plus independent E5 early reversal proposals",
+    "capture_e3_e4_e5": "same capture, E3 only plus isolated E4 plus independent E5 early reversal proposals",
+    "structural_p1_e4_e5": "existing P1 structural target, 30s confirm plus isolated E4 plus independent E5 early reversal proposals",
+    "structural_p1_e3_e4_e5": "same P1, E3 only plus isolated E4 plus independent E5 early reversal proposals",
+    "capture_e1_e4_e5": "capture plus PR21 first_retests proposals only; original target/rules/30s confirm plus isolated E4 plus independent E5 early reversal proposals",
+    "capture_e1_e3_e4_e5": "capture_e1 plus frozen E3 confirmation plus isolated E4 plus independent E5 early reversal proposals",
+    "structural_p1_e1_e4_e5": "P1 plus PR21 first_retests proposals only; original rules/30s confirm plus isolated E4 plus independent E5 early reversal proposals",
+    "structural_p1_e1_e3_e4_e5": "structural_p1_e1 plus frozen E3 confirmation plus isolated E4 plus independent E5 early reversal proposals"
+  },
+  "comparison_pairs": [
+    [
+      "capture",
+      "capture_e5"
+    ],
+    [
+      "capture_e3",
+      "capture_e3_e5"
+    ],
+    [
+      "structural_p1",
+      "structural_p1_e5"
+    ],
+    [
+      "structural_p1_e3",
+      "structural_p1_e3_e5"
+    ],
+    [
+      "capture_e1",
+      "capture_e1_e5"
+    ],
+    [
+      "capture_e1_e3",
+      "capture_e1_e3_e5"
+    ],
+    [
+      "structural_p1_e1",
+      "structural_p1_e1_e5"
+    ],
+    [
+      "structural_p1_e1_e3",
+      "structural_p1_e1_e3_e5"
+    ],
+    [
+      "capture_e4",
+      "capture_e4_e5"
+    ],
+    [
+      "capture_e3_e4",
+      "capture_e3_e4_e5"
+    ],
+    [
+      "structural_p1_e4",
+      "structural_p1_e4_e5"
+    ],
+    [
+      "structural_p1_e3_e4",
+      "structural_p1_e3_e4_e5"
+    ],
+    [
+      "capture_e1_e4",
+      "capture_e1_e4_e5"
+    ],
+    [
+      "capture_e1_e3_e4",
+      "capture_e1_e3_e4_e5"
+    ],
+    [
+      "structural_p1_e1_e4",
+      "structural_p1_e1_e4_e5"
+    ],
+    [
+      "structural_p1_e1_e3_e4",
+      "structural_p1_e1_e3_e4_e5"
+    ]
+  ],
+  "e3_definition": {
+    "minimum_fixed_wait_seconds": 0,
+    "first_evaluation": "including discovery if all evidence already present; no synthetic tick",
+    "trigger": "frozen original breakout level; other strategies freeze last completed directional high/low at discovery",
+    "condition": "real observed quote strictly crosses frozen trigger; current structure intact; all post-watch closed bars including first retain original stop; retain every existing cost/RR/context/RSI/structure/quote/chase/TTL/cooldown check",
+    "age_argument": "actual observation minus watch timestamp; never spoof 30s",
+    "bar_availability": "original nominal+0/15s scenarios; actual receipts remain null",
+    "same_observation_confirmation": "permitted only after full second-stage checks; no claim of separate independent market evidence"
+  },
+  "frozen": {
+    "minimum_net_rr": 1.5,
+    "target_policy": "P1 byte-identical; no synthesized extension or threshold lowering",
+    "fees_and_risk": "existing retained model, same in both arms per scenario",
+    "confirmation_ttl": "existing maximum unchanged",
+    "one_four_hour": "reference only; no added gate",
+    "source_blockers": [
+      "RAW5M_INDEPENDENCE_UNVERIFIED",
+      "CANDLE_VOLUME_UNIT_UNVERIFIED"
+    ]
+  },
+  "scenarios": [
+    "base_delay0",
+    "base_delay15",
+    "adverse_delay0"
+  ],
+  "required_outputs": [
+    "per-event first-candidate and confirmation lead, matching/excluded/added/unmatched",
+    "all rejections with input hashes",
+    "fixed model outcomes, horizons, same-event 30/60s manual delay",
+    "alarm/stops/emergency/net/drawdown/unresolved, zero entry versus unknown",
+    "baseline full economic window outputs equal saved results",
+    "no external sends/orders/production activation"
+  ],
+  "inference": "Previously reused development data; all32 arms and16 paired E5 effects. No tuning, selection, new profit threshold, or100paper/30day prerequisites.",
+  "input_sha256": {
+    "research/zerobase/entry_comparison_20261024/archive_chunks.json": "0d8b8db7cdccd009d2d08e7c9ece7403231bce3b4af8227b5bddff246daa8cce",
+    "research/zerobase/entry_comparison_20261024/recorded_quotes.json": "088b245a78a95453fe51d7555e3017eb413aea0ba39ff4fa729fc14a0071e88b",
+    "research/zerobase/entry_comparison_20261024/outcome_candle_logs.jsonl": "0254b28096f864b24e7b39a3d04bd464e33e03a588b4f36b0ea5e4dace9576b7",
+    "research/zerobase/completion_20261028/p1/comparison.json": "401a325d6fa7a0ff7d5a137a854989131de0d97531e9aae60c8925d17ff9541c",
+    "research/zerobase/completion_20261028/p1/manifest.json": "adea1894e96e58241d1f9c386b91778afab943ca0944b61e912caea07ab66b10",
+    "research/zerobase/completion_20261028/p2/comparison.json": "343b704d5238d33b84760e83b557d2affaa00d56175fb398bcb31c32bc562fe9",
+    "lbank_entry_location.py": "8b82295723a838dd32d1920f77af1ed242f024ea6de94c503f5ea0476a85f617",
+    "research/zerobase/completion_20261028/p2_e1/comparison.json": "ced9379714adfd5fa7c00e7b3d70457ccd99273c0430e83ab8138d1fc2e953c3",
+    "research/zerobase/completion_20261028/p2_e1/manifest.json": "da0c1bc81d0b28302b9230630dce9842851f6b4c3046185ae6dfdfa22dc18360",
+    "research/first_retest_experiment.py": "885debfb62b35d6c6897eee015d8755942f41182a1b9651c21531bd8646f3be9",
+    "research/evidence_confirmation.py": "6675665fe5b3b5832b7353e86539189c44adbb52f872f6b05b4ed7eee34b9f43",
+    "research/zerobase/completion_20261028/p2_e4/comparison.json": "59b1c795a2345b51cecb7cd5cd6800a5a56f9f6a9262b1c2851f9be50b3ed26c",
+    "research/zerobase/completion_20261028/p2_e4/manifest.json": "f6d4fb05dfe9e854520b8e20b290298ec8f1a319668627101c726be70e537ed5",
+    "research/barrier_chase_experiment.py": "8632f8123448799740fa73a4d13d3a80e9ae7a4011d664b2c9a3deafa51f3d99",
+    "research/compare_barrier_chase_experiment.py": "2c0908ec84a312c5415849b7fedbff7c4516a2287bf9f1f0a19f818a0c8d7179",
+    "lbank_futures_monitor.py": "b2713e35f24cc8f00e8516f560f9439a0582397ca9621fc658e0ef8e24bed537",
+    "lbank_structural_target_plan.py": "171f685144317452d184118e768b5d5e65a160f40d4c759a7b2d57aa1c04bdb3"
+  },
+  "sends": false,
+  "orders": false,
+  "e1_definition": {
+    "detector": "Reuse lbank_entry_location.first_retests unchanged, merge only missing (strategy,direction) proposals ahead of capture fallback. Native bars and current real quote; no fake completed bar.",
+    "isolation": "Do not enable location mode; keep capture candidate/confirmation/target barrier exceptions and chase checks. E4 and location confirmation progress remain excluded.",
+    "thresholds": "PR21 first_retests byte-identical: 10-bar break, 0.5 ATR impulse/retest lower bound, 0.25 ATR upper bound, <=3 subsequent bars, 1.5 ATR resumption limit; no tuning.",
+    "event_matching": "existing source-anchored canonical structure identity; no proximity/time matching",
+    "target_freeze": "target algorithms, RR, costs, risk frozen per panel; discovery-dependent actual plans preserved; shared earliest observed S/T fixed separately for timing attribution"
+  },
+  "e4_definition": {
+    "chase": "Reuse PR21 location_check unchanged at calculate_plan only, each candidate and confirmation. Breakout: directional anchor distance (0,1.5] native ATR1; trend_retest (0,2]; range_rebound unchanged. Existing capture EMA, +/-0.1% watch quote chase, TTL and all other gates retained.",
+    "nearby_barrier": "During plan calculation only set ranked may_override_single_pivots=False. Known unbreached conflict cannot be overridden by aligned15m/5m. Preserve original target-room algorithm and buffer; unknown barrier remains original behavior per target panel (P1 room_unknown already rejects).",
+    "first_retest": "E1 only: retain original PR21 frozen first-retest proof for location validation at confirmation; no extra detector or momentum bypass.",
+    "isolation": "No location mode, new confirmation progress, fixed wait removal, detector, RSI/context/risk/target/RR/cost change. E3 only in declared E3 arms. No production call or env activation.",
+    "volatility": "PR21 location_check current native ATR1 unchanged; paired-entry attribution uses common original discovery ATR separately; not a new tune.",
+    "failure_recording": "Actual gate execution logs and E4 evidence per evaluation. No invented failure reasons for not-evaluated gates."
+  },
+  "e5_definition": {
+    "detector": "For each direction use10 completed 1m bars preceding a sweep as already observed support=min low/resistance=max high; exact original extreme source anchor. Sweep strictly beyond that level in latest3 completed bars; first reclaim closes directionally beyond level and prior close with directional body. First reclaim must occur within those3 bars; all subsequent closes retain level. Freeze opposite reclaim high/low; only real observed quote strictly breaks it. No synthetic candle, final pivot hindsight or macro trend prerequisite.",
+    "invalidation": "Freeze sweep-through-first-reclaim extreme, first reclaim trigger and3-minute expiry from sweep end. Reject quote touching original extreme, later completed close losing reclaimed level or later post-reclaim bar touching original stop. Same event invalidation sticky across proposed watches; no recovery rearm. Existing plan stop buffer/floor, hard data/risk/cost, price deviation/TTL/cooldowns remain.",
+    "gate_scope": "Only early_reversal strategy: RSI and closed5m15m trend gates executed for explanation, not mandatory; original failures retained in explanatory gate vector. Replace trend structure confirmation with frozen reclaim/trigger integrity only. All capture/E1 strategy gates unchanged. Existing EMA extension bound remains a hard chase check. E3 changes fixed wait only in E3 arms. No production mode/env flag. Code-review clarification before any outcome replay: only avoid_15m_strong_countertrend,5m_15m_opposed_to_entry,5m_rsi_direction_mismatch_or_flat become explanatory; native/missing macro data, flat market and late5m impulse chase remain hard. This narrows the explanatory rule and retains original chase constraints.",
+    "geometry": "Reuse existing native geometry default5m floor for new early_reversal strategy; no stop reduction or target/RR change. E4 unchanged location_check treats new nonrange strategy as structural-anchor distance (0,2] ATR1.",
+    "priority": "Keep original capture/E1 proposals first, append E5 as distinct strategy; same-side qualified original wins existing priority, opposite qualified directions abstain. All32 arms and16 E5 contrasts, not independent sample counts.",
+    "identity": "Dedicated early_reversal family with exact pre-sweep level source hash plus sweep source hash; first reclaim trigger frozen at discovery; not proximity matched to other strategy families.",
+    "explanatory": "Retain raw failed/passed context/RSI results,5/15m returns and sampledRSI; stratify countertrend/false reclaim. No tuning from reused outcomes."
+  }
+}

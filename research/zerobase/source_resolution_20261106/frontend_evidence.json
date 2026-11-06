@@ -1,0 +1,664 @@
+{
+  "schema": "official_deployed_code_excerpts_v1",
+  "limitation": "Version-pinned implementation evidence, not a published final/revision or independence guarantee.",
+  "assets": [
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:07.772Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/3946-b5e6e2a7369781b3.js",
+      "requested_at": "2026-11-06T00:39:07.562Z",
+      "received_at": "2026-11-06T00:39:07.772Z",
+      "status": 200,
+      "bytes": 23764,
+      "sha256": "620d307a28bec596186b1c906f88644c70bc5a95d345463587a0c0321d156e27"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:07.782Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/7447.302abd34b2ee8792.js",
+      "requested_at": "2026-11-06T00:39:07.562Z",
+      "received_at": "2026-11-06T00:39:07.782Z",
+      "status": 200,
+      "bytes": 4284,
+      "sha256": "5d99652a04fb8b831e26c18abc30bb93f9c14743346dc08de339be9a899b9eaf"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:07.796Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/2607-0b2afdaf5e7e29a6.js",
+      "requested_at": "2026-11-06T00:39:07.562Z",
+      "received_at": "2026-11-06T00:39:07.796Z",
+      "status": 200,
+      "bytes": 207229,
+      "sha256": "a83669cab891f258be502c3f636f4ab721c8cd769201a3d37ed92cd6804ddfb1"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:07.827Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/3914.98838f84653d2a13.js",
+      "requested_at": "2026-11-06T00:39:07.561Z",
+      "received_at": "2026-11-06T00:39:07.826Z",
+      "status": 200,
+      "bytes": 33639,
+      "sha256": "db2e265424ddc7ac5bf53d4e0209690addaaeb25926d6f515b6f5c9fb705def7"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:07.977Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/7195-20de8bed128dbabc.js",
+      "requested_at": "2026-11-06T00:39:07.773Z",
+      "received_at": "2026-11-06T00:39:07.975Z",
+      "status": 200,
+      "bytes": 76052,
+      "sha256": "48300793b235c00c2b2d0e16e067365bb6d01e4be8d90f26cda7623c5b1cdf21"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:07.996Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/5701-89d1dd787e32b6b6.js",
+      "requested_at": "2026-11-06T00:39:07.797Z",
+      "received_at": "2026-11-06T00:39:07.996Z",
+      "status": 200,
+      "bytes": 8519,
+      "sha256": "b6b6b5c37d29ed60fe15041cae76511d59ae2220b797bd7b6c97d0a3bee072db"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.022Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/5310-facae9d4ee7c6660.js",
+      "requested_at": "2026-11-06T00:39:07.827Z",
+      "received_at": "2026-11-06T00:39:08.022Z",
+      "status": 200,
+      "bytes": 67306,
+      "sha256": "667a1f2fd743b63720d332407a3a4bf0d13ecd5a5a5f13d31301e19bb355d2ab"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.060Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/7446.425bf532f3eed1f2.js",
+      "requested_at": "2026-11-06T00:39:07.782Z",
+      "received_at": "2026-11-06T00:39:08.060Z",
+      "status": 200,
+      "bytes": 28404,
+      "sha256": "a4d576945f050dca301c6d6dbcdbe78235c2690497be2b9156a1f268c0577eda"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.168Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/6322-34af0751ba4ca40a.js",
+      "requested_at": "2026-11-06T00:39:07.977Z",
+      "received_at": "2026-11-06T00:39:08.168Z",
+      "status": 200,
+      "bytes": 46607,
+      "sha256": "ed63e9e5b3b2ef2ce484a6d84fa301fe318ed4f394363477b543f77f2472aea3"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.185Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/9677-564f0e3cf36f8ebc.js",
+      "requested_at": "2026-11-06T00:39:07.996Z",
+      "received_at": "2026-11-06T00:39:08.185Z",
+      "status": 200,
+      "bytes": 63004,
+      "sha256": "64138c06d7342bd4030bc017d3ec46d4dd298a76d7fb988b91766b2ae71f8e8f"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.210Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/9468-1f35d1a93c6aff00.js",
+      "requested_at": "2026-11-06T00:39:08.023Z",
+      "received_at": "2026-11-06T00:39:08.210Z",
+      "status": 200,
+      "bytes": 57940,
+      "sha256": "181162efcc9acb798e1fbb837ff9ccc5552d0a16e23a264980c5cea092af3508"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.259Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/9766.ea0b97a9a76829d7.js",
+      "requested_at": "2026-11-06T00:39:08.060Z",
+      "received_at": "2026-11-06T00:39:08.259Z",
+      "status": 200,
+      "bytes": 9374,
+      "sha256": "0f89a22bce550c35250d95c93b475698c59a999bac79c0316647b5a2e3268183"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.401Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/9715-37d2892439f0c0d8.js",
+      "requested_at": "2026-11-06T00:39:08.169Z",
+      "received_at": "2026-11-06T00:39:08.401Z",
+      "status": 200,
+      "bytes": 5301,
+      "sha256": "735b60936d88f348b2f1edd662fba600011b97ef79f1849713d82b5c443e4c16"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.439Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/5394.a846cbbaa404b727.js",
+      "requested_at": "2026-11-06T00:39:08.211Z",
+      "received_at": "2026-11-06T00:39:08.439Z",
+      "status": 200,
+      "bytes": 37724,
+      "sha256": "9bc47446e5cc47f6906605ba6e256d9be7dfe95c23fa3ab3e8df4283ec6bbf08"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.442Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/3904.4fa843d5cba9778d.js",
+      "requested_at": "2026-11-06T00:39:08.259Z",
+      "received_at": "2026-11-06T00:39:08.442Z",
+      "status": 200,
+      "bytes": 22342,
+      "sha256": "5dc86a0d11c472c21fee569269d1fe773e24369b57844d0b3168122ea666f280"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.463Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/9671.f8861ecd3589c93f.js",
+      "requested_at": "2026-11-06T00:39:08.185Z",
+      "received_at": "2026-11-06T00:39:08.463Z",
+      "status": 200,
+      "bytes": 130025,
+      "sha256": "6e4cb2ab31c3b4ac900bc0545f19bcf6430e112362872b0fb66946a990c49f42"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.840Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/5547-b4c550aef328741f.js",
+      "requested_at": "2026-11-06T00:39:08.649Z",
+      "received_at": "2026-11-06T00:39:08.840Z",
+      "status": 200,
+      "bytes": 15053,
+      "sha256": "3ab15fefd5ed8735f52119aaa5cb3f397bbbe40d03f0d61c7c9dcf84fb57e76b"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.914Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/7410-241709626cc4aa32.js",
+      "requested_at": "2026-11-06T00:39:08.686Z",
+      "received_at": "2026-11-06T00:39:08.914Z",
+      "status": 200,
+      "bytes": 24134,
+      "sha256": "84bf74cdd2b140e4aeff8070b87fefbb23f94f5f7b56010a770a2b64ae212e2f"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.649Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/e37e4020-d9d6fcb4a4470a00.js",
+      "requested_at": "2026-11-06T00:39:08.443Z",
+      "received_at": "2026-11-06T00:39:08.646Z",
+      "status": 200,
+      "bytes": 70013,
+      "sha256": "38e50fcbd8c81b1579992a47b9f4a5476c7fe511585fb6664c890c81aa75c596"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.653Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/1256-b45d691f6d089e6f.js",
+      "requested_at": "2026-11-06T00:39:08.464Z",
+      "received_at": "2026-11-06T00:39:08.653Z",
+      "status": 200,
+      "bytes": 8281,
+      "sha256": "5bb2a7f115c4013f4c02497670394b2299f1d2b7248c14a71cb7da33fc24f550"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.686Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/2192.61178f4f982a6f00.js",
+      "requested_at": "2026-11-06T00:39:08.401Z",
+      "received_at": "2026-11-06T00:39:08.686Z",
+      "status": 200,
+      "bytes": 9159,
+      "sha256": "e72d0c8efb6669f5992b823a4d83b59bb452423ffa8cf9d77decc9849ad52813"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:08.839Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/386-44390999f27f2108.js",
+      "requested_at": "2026-11-06T00:39:08.653Z",
+      "received_at": "2026-11-06T00:39:08.839Z",
+      "status": 200,
+      "bytes": 59332,
+      "sha256": "1041c41c62dd3035a001242766acfa0578f74916212d3c2d16e8c45bc6d5fbc7"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.042Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/1041-65ac09732f30d298.js",
+      "requested_at": "2026-11-06T00:39:08.840Z",
+      "received_at": "2026-11-06T00:39:09.042Z",
+      "status": 200,
+      "bytes": 26731,
+      "sha256": "035d64be05eb7f236bff9fa1f55870f0aa7f8dbc0855502d64ceef353ec40b6e"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.094Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/pages/_app-dd35e0ebacb61017.js",
+      "requested_at": "2026-11-06T00:39:08.439Z",
+      "received_at": "2026-11-06T00:39:09.090Z",
+      "status": 200,
+      "bytes": 1325672,
+      "sha256": "ed5a69a8a8653506f8ed480e19c93c0333ea24d4169d1fa14a10bb0a61347368"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.132Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/923-e431d23292ca2386.js",
+      "requested_at": "2026-11-06T00:39:08.839Z",
+      "received_at": "2026-11-06T00:39:09.131Z",
+      "status": 200,
+      "bytes": 203834,
+      "sha256": "75973264fa7deeba34ced353019815b8652f65c273ae068efd4777f67eede13a"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.175Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/3952-d5800b89fcc163e1.js",
+      "requested_at": "2026-11-06T00:39:08.914Z",
+      "received_at": "2026-11-06T00:39:09.175Z",
+      "status": 200,
+      "bytes": 16447,
+      "sha256": "d68c9bb99f0883c2507299d9b94b169400451226d3a9f3cc7f34295ba55cdafe"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.252Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/9336-25e5e61982a1a183.js",
+      "requested_at": "2026-11-06T00:39:09.042Z",
+      "received_at": "2026-11-06T00:39:09.251Z",
+      "status": 200,
+      "bytes": 11068,
+      "sha256": "12b7cfe1c74ea2ae9f55722c7789b6458acbfaf37818ebcdaab0b617f5f4322d"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.306Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/3563-a1d438393566044e.js",
+      "requested_at": "2026-11-06T00:39:09.099Z",
+      "received_at": "2026-11-06T00:39:09.306Z",
+      "status": 200,
+      "bytes": 51026,
+      "sha256": "1e93f98182fff9f86d164e277b673711c2c351b32ee7c86f3324014b0d70d6b1"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.327Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/2122-adbb4af4f858d4dc.js",
+      "requested_at": "2026-11-06T00:39:09.132Z",
+      "received_at": "2026-11-06T00:39:09.327Z",
+      "status": 200,
+      "bytes": 235948,
+      "sha256": "d24ea9f791509c30338aa73d3a4e5d3776ae199153c5f32fe0922a70080590c1"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.391Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/9299-70994a6e91cc8437.js",
+      "requested_at": "2026-11-06T00:39:09.175Z",
+      "received_at": "2026-11-06T00:39:09.390Z",
+      "status": 200,
+      "bytes": 84305,
+      "sha256": "a9c944779422acd4e979b1fb5153e626eeafc02d184a76420cece92bf67301ff"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.514Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/7072-3dbe731d45b34b23.js",
+      "requested_at": "2026-11-06T00:39:09.328Z",
+      "received_at": "2026-11-06T00:39:09.514Z",
+      "status": 200,
+      "bytes": 10272,
+      "sha256": "542125f8a8d9b525d4955064e39ca881b40134a16789c5e3d9ef684ffd1d7933"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.518Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/6533-4e6c3ae26c2ef7cc.js",
+      "requested_at": "2026-11-06T00:39:09.307Z",
+      "received_at": "2026-11-06T00:39:09.518Z",
+      "status": 200,
+      "bytes": 26829,
+      "sha256": "79b70a3ebd4fcf80a83665ab47e6d80826fdb0e3b6141b73acb1ddf329bc2dce"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.528Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/5166-c37f917a67019479.js",
+      "requested_at": "2026-11-06T00:39:09.252Z",
+      "received_at": "2026-11-06T00:39:09.527Z",
+      "status": 200,
+      "bytes": 50451,
+      "sha256": "eadbdc57404dabe33099060c23eb47e4fafd7f315fabc833af225d34c78c489c"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.589Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/9133-918610f749e04a4e.js",
+      "requested_at": "2026-11-06T00:39:09.391Z",
+      "received_at": "2026-11-06T00:39:09.589Z",
+      "status": 200,
+      "bytes": 19979,
+      "sha256": "667c78d90ed23827fce899e9df3109e7b63950dec6a8a951555fbd782624b67b"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.702Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/9664-272e654d2d9a1aa5.js",
+      "requested_at": "2026-11-06T00:39:09.514Z",
+      "received_at": "2026-11-06T00:39:09.702Z",
+      "status": 200,
+      "bytes": 9318,
+      "sha256": "e0ebc9497449cb4e0e566a4b6e7af6ef1630f7922ad6af362cc233dabff2aba4"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.726Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/2863-e973deec98a05ce2.js",
+      "requested_at": "2026-11-06T00:39:09.528Z",
+      "received_at": "2026-11-06T00:39:09.726Z",
+      "status": 200,
+      "bytes": 22902,
+      "sha256": "b224d1bf4831b8b18e4025de61df02539810bec47e575b2601e3794ae6a933f0"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.726Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/5489-0ca591e9ba2e33d6.js",
+      "requested_at": "2026-11-06T00:39:09.518Z",
+      "received_at": "2026-11-06T00:39:09.726Z",
+      "status": 200,
+      "bytes": 2641,
+      "sha256": "cfdba7b2e45eb78b830dd58237413771b9865b3581778a8daa2a10cb22360d11"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.861Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/6070-4e2aa57d304f08dd.js",
+      "requested_at": "2026-11-06T00:39:09.589Z",
+      "received_at": "2026-11-06T00:39:09.861Z",
+      "status": 200,
+      "bytes": 21651,
+      "sha256": "dc7d8a0d658ab9b7f002058004c8b6b165ab0d02a49b53af450f7727ee8d41c7"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.934Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/4823-659896d6dc5c6ff2.js",
+      "requested_at": "2026-11-06T00:39:09.726Z",
+      "received_at": "2026-11-06T00:39:09.934Z",
+      "status": 200,
+      "bytes": 11868,
+      "sha256": "c0569958fc65cc039b28799aa0d99b25c6cdd00f5cb2c08ac8ce3429d3d6d0e1"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:09.965Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/30-b9fde27b2791d766.js",
+      "requested_at": "2026-11-06T00:39:09.702Z",
+      "received_at": "2026-11-06T00:39:09.965Z",
+      "status": 200,
+      "bytes": 6227,
+      "sha256": "b09ce61188772ff44f13b8b3d338469bb3bae321b052c0d3051be1cf04752e4b"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.164Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/610-83ff329fd165a593.js",
+      "requested_at": "2026-11-06T00:39:09.965Z",
+      "received_at": "2026-11-06T00:39:10.164Z",
+      "status": 200,
+      "bytes": 27251,
+      "sha256": "9f2e5a84da5f2bc8fcd5407ee75d1ff00a1e2c6a80bd58929d525ecd6db1924b"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.051Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/8227-97812f4b8f59ceca.js",
+      "requested_at": "2026-11-06T00:39:09.861Z",
+      "received_at": "2026-11-06T00:39:10.051Z",
+      "status": 200,
+      "bytes": 64365,
+      "sha256": "0d5073f8acf67364debbab30058c928a84bcd54bf257c1ea548473a30d2ed738"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.193Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/7996-e25823ae3bcd3fae.js",
+      "requested_at": "2026-11-06T00:39:10.000Z",
+      "received_at": "2026-11-06T00:39:10.193Z",
+      "status": 200,
+      "bytes": 113794,
+      "sha256": "bb48bed768b62ff46897f2cc3e0405e12523af375f51381c101bddec9108b604"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.127Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/1768-3a1144d27291fa94.js",
+      "requested_at": "2026-11-06T00:39:09.934Z",
+      "received_at": "2026-11-06T00:39:10.126Z",
+      "status": 200,
+      "bytes": 155792,
+      "sha256": "1fe5211b7cfc751d4e1e4d63d4cd2e6809805e989befcc29847bea1cdf2cd861"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.246Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/3075-98609090d21c6222.js",
+      "requested_at": "2026-11-06T00:39:10.053Z",
+      "received_at": "2026-11-06T00:39:10.245Z",
+      "status": 200,
+      "bytes": 43571,
+      "sha256": "efb5ef6cf78ee62d48310c697cf3b9a30dea8ec40de39d45925488d525e2abfc"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.000Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/1692-1266e0e5123677d0.js",
+      "requested_at": "2026-11-06T00:39:09.726Z",
+      "received_at": "2026-11-06T00:39:10.000Z",
+      "status": 200,
+      "bytes": 13987,
+      "sha256": "47228c5dbd9f22501710b41f87faa0ec5444ae78d0af0e547130e9e3bfa155a2"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.327Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/6824-1ba8e6e158dedf8c.js",
+      "requested_at": "2026-11-06T00:39:10.130Z",
+      "received_at": "2026-11-06T00:39:10.327Z",
+      "status": 200,
+      "bytes": 20352,
+      "sha256": "82f9c2f1ac4b9ea00b19cb21b86dd825d9e66dd3819a9b1a5ec850d1a1655f8f"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.365Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/6130-75d5355988cda31b.js",
+      "requested_at": "2026-11-06T00:39:10.164Z",
+      "received_at": "2026-11-06T00:39:10.365Z",
+      "status": 200,
+      "bytes": 18505,
+      "sha256": "e5864e281963f224d5fe6c9d00e2d2e139e25f6309b7a8a61362034e40bc2b40"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.387Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/1212-954339a09af15ab8.js",
+      "requested_at": "2026-11-06T00:39:10.194Z",
+      "received_at": "2026-11-06T00:39:10.387Z",
+      "status": 200,
+      "bytes": 20601,
+      "sha256": "507284cd44ddf253a9a3439b45fd91e1d2c6f65e34eb9e32cadb7afb08937f01"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.464Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/7430-3db777100aba4123.js",
+      "requested_at": "2026-11-06T00:39:10.246Z",
+      "received_at": "2026-11-06T00:39:10.463Z",
+      "status": 200,
+      "bytes": 108231,
+      "sha256": "b99b732a489d039f4544cfd7e65e7ea61b8bcad775f45263f20e350b2c71622e"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.539Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/3846-1a04f423098b3b19.js",
+      "requested_at": "2026-11-06T00:39:10.327Z",
+      "received_at": "2026-11-06T00:39:10.539Z",
+      "status": 200,
+      "bytes": 25177,
+      "sha256": "6b0d291f624abcc9db5a0aa942d633c437bef1d4f7e7e911db3668df0a945b4f"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.662Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/3107-ea1e1868347f1cdb.js",
+      "requested_at": "2026-11-06T00:39:10.464Z",
+      "received_at": "2026-11-06T00:39:10.661Z",
+      "status": 200,
+      "bytes": 296452,
+      "sha256": "4a9e7730003b6cf910e03aeafef24d71a4c74fa76c83ea50491cc51be63f5e07"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.745Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/8917-af6e4c2448c8e9ca.js",
+      "requested_at": "2026-11-06T00:39:10.539Z",
+      "received_at": "2026-11-06T00:39:10.745Z",
+      "status": 200,
+      "bytes": 74953,
+      "sha256": "21eb11f145377d5e646be476a2d1d3b63589fca928f8e0bdeb8891f2af0c6130"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.556Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/4157-abdf6b2fe377ab61.js",
+      "requested_at": "2026-11-06T00:39:10.365Z",
+      "received_at": "2026-11-06T00:39:10.556Z",
+      "status": 200,
+      "bytes": 95867,
+      "sha256": "bde65df9aa447a7a0c79070e097753efb40f33acd78e3e5b8b57cc7852e92556"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.571Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/7937-5df8cef3b56ebfe6.js",
+      "requested_at": "2026-11-06T00:39:10.387Z",
+      "received_at": "2026-11-06T00:39:10.571Z",
+      "status": 200,
+      "bytes": 17748,
+      "sha256": "e28649ef9c0c557ee7a62ec352cd2b818f657acc63c9c0100b83a7d90d891f4f"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.888Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/9137-ea0a7dcdc9bfd642.js",
+      "requested_at": "2026-11-06T00:39:10.663Z",
+      "received_at": "2026-11-06T00:39:10.888Z",
+      "status": 200,
+      "bytes": 21373,
+      "sha256": "64f6ae56b3833af786258e209976075f1dcf345b26b986c1776204efe9f6983c"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.959Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/2811-6cc79380aa348cc6.js",
+      "requested_at": "2026-11-06T00:39:10.762Z",
+      "received_at": "2026-11-06T00:39:10.958Z",
+      "status": 200,
+      "bytes": 40834,
+      "sha256": "4960daecfd53b62d05e131f603139cbaea60a81934237537c441ee95b898a6f2"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.987Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/9377-aabc60470b1827b6.js",
+      "requested_at": "2026-11-06T00:39:10.779Z",
+      "received_at": "2026-11-06T00:39:10.987Z",
+      "status": 200,
+      "bytes": 26871,
+      "sha256": "d917ff86d436c58ac82aac511ee3ad3033bbea1661316d132e1358293cf20539"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:11.002Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/7571-0873a31864667dea.js",
+      "requested_at": "2026-11-06T00:39:10.746Z",
+      "received_at": "2026-11-06T00:39:11.002Z",
+      "status": 200,
+      "bytes": 36110,
+      "sha256": "5f66328039d71e0ce9e059db2ebf20129e93cff98c7d026888a8325f0af5270a"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.762Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/9985-b2810f5ba3c8c872.js",
+      "requested_at": "2026-11-06T00:39:10.557Z",
+      "received_at": "2026-11-06T00:39:10.762Z",
+      "status": 200,
+      "bytes": 40425,
+      "sha256": "8a27a9ec8037c293c642d196ff546177f7f73f2d894fc394cfead4cd2633ad40"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:10.778Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/187-6d74e4ce4be37351.js",
+      "requested_at": "2026-11-06T00:39:10.572Z",
+      "received_at": "2026-11-06T00:39:10.778Z",
+      "status": 200,
+      "bytes": 33163,
+      "sha256": "7da675b65f4fb63560f7ed1d6ca75f8c7a330ce7ac7c15d0b7b758302634a520"
+    },
+    {
+      "kind": "ASSET",
+      "at": "2026-11-06T00:39:11.111Z",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/pages/futures/%5Bid%5D-a488462798ba2006.js",
+      "requested_at": "2026-11-06T00:39:10.888Z",
+      "received_at": "2026-11-06T00:39:11.111Z",
+      "status": 200,
+      "bytes": 193323,
+      "sha256": "384099470fe7c04367c388ff573e8d09271dfb33cba0b9c21c80fc03b528629e"
+    }
+  ],
+  "excerpts": [
+    {
+      "id": 1,
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/pages/_app-dd35e0ebacb61017.js",
+      "offset": 527894,
+      "sha256": "d279bd43c3e65f8f9fd6ef2d00e9a4e259aa8799952fa87347960ad34d2219d6",
+      "received_at": "2026-11-06T00:39:09.095Z",
+      "text": "rams:t?JSON.stringify(t):\"\",responseCode:\"200\"}),n)).catch(n=>{throw u.A.customTrack(\"futures_order_api\",{requestPath:e,requestParams:t?JSON.stringify(t):\"\",responseCode:n.code,errorMessage:n.message}),n}),x=(e,t)=>m(e,t,\"GET\",{responseType:\"blob\"});function k(e,t,n,r,o,i){return b(\"/cfd/query/v1.0/KLinelst\",{instrumentID:e,exchangeID:t,startDatetime:r,count:o,type:n,isUsd:1},i)}function A(e){return b(\"/cfd/query/v1.0/Account\",e)}function C(e){return b(\"/cfd/user/v1/assetBalance\",e)}function O(e,t){return b(\"/cfd/pevent/v1/prediction/Position\",e,t)}function S(e){return b(\"/cfd/pevent/v1/prediction/Order\",{productGroup:\"SwapU\",exchangeId:\"Exchange\",...e})}function _(e){return y(\"/cfd/action/v1.0/SendOrderAction\",{ActionFlag:\"1\",OrderSysID:e})}function E(e){return y(\"/cfd/pevent/v1/prediction/order/cancelAll\",e||{})}function j(e){return b(\"/cfd/pevent/v1/home/events\",e)}function P(e){return y(\"/cfd/pevent/v1/favorite\",e)}function T(){let e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{};return b(\"/cfd/pevent/v1/tabs\",e)}function L(){let e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{};return b(\"/cfd/pevent/v1/banners\",e)}function I(){let e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{};return b(\"/cfd/pevent/v1/favorites\",e)}function R(e){return y(\"/cfd/pevent/v1/events/detailBatch\",e)}function N(e){return w(\"/cfd/cff/v1/SendOrderInsert\",e)}function M(e){let{isGuaranteedPriceOrder:t,...n}=e;return w(\"/cfd/cff/v1/SendTriggerOrderInsert\",{IsGuaranteedPriceOrder:t,...n})}function D(e){return y(\"/cfd/order/v1/sendCouponTriggerOrderInsert\",o()({...(0,i.A)(e),tptriggerPriceType:e.TPTriggerPriceType,sltriggerPriceType:e.SLTriggerPriceType,tpprice:e.TPPrice,tptriggerPrice:e.TPTriggerPrice,slprice:e.SLPrice,sltriggerPrice:e.SLTriggerPrice},[\"tPPrice\",\"tPTriggerPrice\",\"sLTriggerPrice\",\"sLPrice\",\"sLTriggerPriceType\",\"tPTriggerPriceType\"]))}function z(e){return y(\"/cfd/order/v1/sendTriggerOrderBatch\",e)}function B(e){return w(\"/cfd/action/v1.0/SendCloseOrderInsert\",e)}let U=e=>{let{instrumentID:t,exchangeID:n}=e;return y(\"/cfd/action/v1.0/SendQryLeverage\",{InstrumentID:t,ExchangeID:n}).then(e=>{var t,n;return(null===(t=e[0])||void 0===t?void 0:t.data)?(0,i.A)(null===(n=e[0])||void 0===n?void 0:n.data):void 0})};function F(e,t){return new Promise((n,r)=>{b(\"/cfd/query/v1.0/Position\",e,t).then(e=>{let t=(null==e?void 0:e.data)||[];t.forEach(e=>{Object.assign(e,function(e){let t;let n={...e};return t=n.PosiDirection===a.V9.NET?+n.Position>=0:n.PosiDirection===a.V9.LONG,n.Position=Math.abs(n.Position),t?n.ClosePosition=n.Position-n.ShortFroz",
+      "role": "history_request_definition"
+    },
+    {
+      "id": 4,
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/3846-1a04f423098b3b19.js",
+      "offset": 13891,
+      "sha256": "418f03db8a84efe0f7f6bf456fb7328b32006122f39861951fd430be7475aa7e",
+      "received_at": "2026-11-06T00:39:10.539Z",
+      "text": "==r.qq.SELL?i*(t-n):i*(n-t):0}},58591:(e,n,t)=>{t.d(n,{U9:()=>r,wh:()=>i});var r=function(e){return e.Normal=\"0\",e.Enabled=\"1\",e.Ratio=\"2\",e}({}),i=function(e){return e[e.Open=1]=\"Open\",e[e.Deduct=2]=\"Deduct\",e[e.Fee=4]=\"Fee\",e[e.Funding=8]=\"Funding\",e}({})},97202:(e,n,t)=>{t.d(n,{am:()=>m,Ay:()=>h,B_:()=>b});var r=t(96657),i=t(6192),l=t(54350),o=t(72565),u=t(49519),a=t(52249);let s=(e,n)=>(0,a.UB)([e,n])?(0,r.A)(e).times(n||0).toNumber():\"--\";var c=t(92816);let d=e=>!!(\"--\"!==e&&null!=e&&\"\"!==e&&Number(e)),m=e=>{let{volume:n=\"--\",price:t=1,symbol:r}=e;if(\"--\"===n)return n;let i=(null==r?void 0:r.volumeMultiple)||1;return(null==r?void 0:r.isInverse)?n*t/i:n/i},p=e=>{let{volume:n,price:t=1,symbol:r}=e;if(null==n)return\"--\";if(\"--\"===n)return n;let i=(null==r?void 0:r.volumeMultiple)||1;return(null==r?void 0:r.isInverse)?n*i/t:n*i},b=(e,n)=>{if(e===u.Td.SHEET){var t;return null!==(t=n.volume)&&void 0!==t?t:\"--\"}return p(n)},v=e=>Math.max((null==e?void 0:e.pricePrecision)||0,4),f={convertAmount:b,convertAmountByType:e=>{let n,{instrumentID:t,coinAmount:r,amountUnitType:l,symbol:a,price:s,lever:c,isMaxOpen:d,notThousands:m}=e;if(!a||null==r||l!==u.Z9.B&&null==s)return{value:\"--\",unit:\"\"};let p=a.volumePrecision||0,{priceCurrency:b}=a,v=(0,o.d)(a);n=l===u.Z9.B?(0,i.zJ)(r,p,void 0,m):l===u.Z9.COST&&c?d?f.computeCostMaxOpen({coinAmount:r,price:s,lever:c,symbol:a}):f.coin2cost({coinAmount:r,price:s,lever:c,symbol:a}):f.coin2usdt({coinAmount:r,price:s,symbol:a,isFloor:d});let h=l===u.Z9.B?v:b;if(\"undefined\"===h||null==h||\"null\"===h){var g;h=l===u.Z9.B?null!==(g=null==t?void 0:t.replace(\"USDT\",\"\"))&&void 0!==g?g:\"\":\"USDT\"}return{value:Number.isNaN(n)?\"--\":n,unit:h}},getBufferedAmount:e=>{let{amount:n,slippage:t,symbol:i}=e,l=(\"number\"==typeof n?n:Number(n))||0;return Number(t)&&Number(n)?Math.max((0,r.A)(l).minus(Math.max((0,r.A)(l).times((Number(t)||0)/100).toNumber(),(0,r.A)(.1).pow(i.volumePrecision).toNumber())).toNumber(),0):n},getAmountUnitTypeName:function(e){let n=arguments.length>1&&void 0!==arguments[1]?arguments[1]:l.t;return n(e===u.Z9.U?\"L0012554名义价值\":e===u.Z9.COST?\"L0012552成本价值\":\"L0000283数量\")},getAmountPricision:(e,n)=>{var t;let r=(null==e?void 0:e.coinPrecision)||0;return n===u.Z9.COST?v(e):n===u.Z9.B?r:null!==(t=null==e?void 0:e.pricePrecision)&&void 0!==t?t:4},formatPrice:e=>{var n;let{price:t,symbol:r}=e;if(!d(t)||!r)return\"--\";let l=null!==(n=r.pricePrecision)&&void 0!==n?n:4;return(0,i.zJ)(t,l,\"ceil\",!0)},input2coin:(e,n)=>{let{symbol:t,price:r,amountUnitType:i,lever:l}=n;return\"--\"!==e&&d(r)&&t?i===u.Z9.COST?f.cost2coin({cost:e,price:r,lever:",
+      "role": "volume_converter"
+    },
+    {
+      "id": 5,
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/pages/futures/%5Bid%5D-a488462798ba2006.js",
+      "offset": 153755,
+      "sha256": "4ffb04d129653f91b71eecb328502964df9d967dc5d3194763f1c90bb18cec3a",
+      "received_at": "2026-11-06T00:39:11.112Z",
+      "text": "},lT=e=>(0,t.jsx)(s.A,{...e,bizType:\"futures\"});ly.createLayout=()=>lT;var lL=!0;let lP=ly},7686:(e,n,r)=>{\"use strict\";let t,i,l;r.d(n,{Q:()=>E});var o=r(53115),s=r(34434),a=r(8589),u=r(39182),d=r(93127),c=r(53886),p=r(65687),m=r(72565),f=r(52249),g=r(38040),v=r(49519),h=r(72239),b=r(97202);let x={adaptKLineData:(e,n)=>{let{symbol:r,volumeUnitType:t=v.Td.COIN}=n,i=1e3*e.beginTime,l=+e.volume;return{symbol:r.instrumentID,timestamp:1e3*e.beginTime,time:i,close:+e.closePrice,open:+e.openPrice,high:+e.highestPrice,low:+e.lowestPrice,turnover:+e.turnover,volume:r.isInverse?t===v.Td.SHEET?l:+e.turnover:(0,b.B_)(t,{symbol:r,volume:l})}}};var A=r(57292);let y=()=>{let e=(0,g.Ay)(e=>e.helpers.activateOrderBook),[n,r]=(0,c.useState)(!1),t=(0,c.useRef)(),i=(0,c.useRef)(),l=(0,A.A)(e=>n?e.askList:null),o=(0,A.A)(e=>n?e.bidList:null);return(0,c.useEffect)(()=>{n&&(t.current&&(t.current(),t.current=void 0),i.current&&i.current({asks:l||[],bids:o||[]}))},[l,o,n]),[n=>{let{onSubscribeSuccess:l,onMessage:o}=n,s=e();return t.current=l,i.current=o,r(!0),()=>{t.current=void 0,i.current=void 0,s(),r(!1)}}]};var T=r(17148),L=r(32941);let P=e=>(t=e,i||(i=setTimeout(()=>{i=null,l=L.A.subscribeKLine(t).unsubscribe},100)),()=>{i&&(clearTimeout(i),i=null),l&&(l(),l=null)}),_=0,S={},N=\"\",k=()=>{let e=(0,c.useRef)(),n=(0,c.useCallback)(function(r){let t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:++_,i=!(arguments.length>2)||void 0===arguments[2]||arguments[2],l=r?[\"\".concat(r.kLinePriceBase||\"\").concat(r.symbolId,\"_\").concat(r.period)]:[];S[t]=l;let o=[];Object.keys(S).forEach(e=>{let n=S[e];null==n||n.forEach(e=>{o.includes(e)||o.push(e)})});let s=o.sort().join(\",\");if(s!==N||i){if(s)e.current=P(s);else{var a;null===(a=e.current)||void 0===a||a.call(e)}N=s}return()=>{n(void 0,t)}},[]);return[n]};var w=r(7290);let j=e=>{let{volumeUnitType:n,getSymbol:r}=e,t=(0,p.A)(n),i=(0,p.A)(r),l=(0,c.useCallback)(e=>{let{symbolId:n,period:r,kLinePriceBase:l,onSubscribeSuccess:o,onMessage:s,onMarketMessage:a}=e,u=!1;return L.A.onMessage(e=>{if(e.topic===T.KK.KLine){var d;let a=e.type===T.Go.Resp,c=l+n,p=null===(d=e.data)||void 0===d?void 0:d.filter(a?e=>e.instrumentID===c&&e.periodID===r:e=>e.instrumentID===c);if(a&&(null==p?void 0:p.length)&&!u&&(null==o||o()),e.data&&(null==p?void 0:p.length)){if(a&&u)return;u=!0;let e=i.current(n);e&&s(p.map(n=>x.adaptKLineData(n,{symbol:e,volumeUnitType:t.current})),a)}}else if(e.topic===T.KK.Market&&e.data){let r=e.data.find(e=>e.instrumentID===n);if(r){let e=\"lastPrice\";\"m\"===l?e=\"markedPrice\":\"i\"===l&&(e=\"underlyingPrice\"),a({symbolId:n,price:",
+      "role": "chart_volume_adapter"
+    },
+    {
+      "id": "kline_keys",
+      "url": "https://www.lbank.com/static-client/lbank-front-trade/_next/static/chunks/7996-e25823ae3bcd3fae.js",
+      "offset": 106529,
+      "sha256": "77483b9729d59d330996bd326cfe5630a04225b2fc06ba144dc97ae437707b06",
+      "received_at": "2026-11-06T00:37:16.887Z",
+      "text": "[r.KK.KLine]:{a:\"instrumentID\",b:\"periodID\",c:\"beginTime\",d:\"openPrice\",e:\"closePrice\",f:\"highestPrice\",g:\"lowestPrice\",h:\"volume\",i:\"turnover\",j:\"timeZone\",k:\"updateTime\"}",
+      "role": "wire_key_map"
+    }
+  ]
+}
