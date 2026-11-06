@@ -1,0 +1,67 @@
+{
+  "schema": "zb_source_resolution_artifact_manifest_v1",
+  "baseline": "64385c0d2cb2128d29d3400a4cecc462af4dc362",
+  "created_at": "2026-11-06T01:35:54.933919+00:00",
+  "validation_command": "python research/audit_source_resolution_20261106.py",
+  "global_qualification_changed": false,
+  "required_comparison_executed": false,
+  "profitability_validated": false,
+  "files": {
+    "research/audit_source_resolution_20261106.py": {
+      "bytes": 8521,
+      "sha256": "abf3747649e047a75c48841c53d7dee6a2b86b1ed10826ee2432458502106db0"
+    },
+    "research/zerobase/source_resolution_20261106/PROVIDER_REQUEST.md": {
+      "bytes": 3629,
+      "sha256": "16c2729164564d6a51db3f85292243656679bc039eda22714e0589a783fba5bc"
+    },
+    "research/zerobase/source_resolution_20261106/README.md": {
+      "bytes": 5356,
+      "sha256": "9e3d018d5f9c8d38103b272d4cd5fea48e4d7b98cecf96008496598fbbdb025b"
+    },
+    "research/zerobase/source_resolution_20261106/acquisition.json": {
+      "bytes": 1149,
+      "sha256": "07bdb3f007130702abdc168a697592b47c4394730ca8c1c81e233890e4e74de2"
+    },
+    "research/zerobase/source_resolution_20261106/cleanup.json": {
+      "bytes": 547,
+      "sha256": "756eca55db50f2b75c3db0baeaed48ba891f08c2b965422200f308c9e43e6aa5"
+    },
+    "research/zerobase/source_resolution_20261106/frontend_evidence.json": {
+      "bytes": 35642,
+      "sha256": "4aec891fba5c750c59ec064eb70f141466985712a7f01efa7d0301ecbf138441"
+    },
+    "research/zerobase/source_resolution_20261106/frontend_once.ts": {
+      "bytes": 2248,
+      "sha256": "0510bf3458010f361c3ccc34c41ffb33ba15c99d01a7043289709a7682587046"
+    },
+    "research/zerobase/source_resolution_20261106/frontend_routes_once.ts": {
+      "bytes": 2106,
+      "sha256": "379c7b84f61a852cc1a3fab883e8c7650efdcd57ba1d421b95ce6296f3007e29"
+    },
+    "research/zerobase/source_resolution_20261106/instrument.raw.json.gz.b64": {
+      "bytes": 34333,
+      "sha256": "4a48c7781fde44a233c44fe73142de2b0e04039e56348c6a096046c44b65fc30"
+    },
+    "research/zerobase/source_resolution_20261106/instrument_receipt.json": {
+      "bytes": 315,
+      "sha256": "17328dada9d24035325343d9a26feb4dc37b72d6bd507b919c5d5037801aacc6"
+    },
+    "research/zerobase/source_resolution_20261106/metadata_wire_once.ts": {
+      "bytes": 3042,
+      "sha256": "386cfd09184843d77c47728e914f2d53783de64f351471d667618208251d8d9c"
+    },
+    "research/zerobase/source_resolution_20261106/raw_capture.json": {
+      "bytes": 12343,
+      "sha256": "011ccd178ccdcb0017fce5b070ba3dd9b9d347e3f78ca1c8544802f9d8ef2136"
+    },
+    "research/zerobase/source_resolution_20261106/sealed_received.json": {
+      "bytes": 13172,
+      "sha256": "ca1f0b7791fe9f6ea65a7d484cca6fe750208d74789e9574a87a3a55c30fcb54"
+    },
+    "research/zerobase/source_resolution_20261106/validation.json": {
+      "bytes": 5475,
+      "sha256": "8249dc08c8e68353f6b371e269b6737df1221b1c1a936ee3fa16d14e6a86c8f4"
+    }
+  }
+}

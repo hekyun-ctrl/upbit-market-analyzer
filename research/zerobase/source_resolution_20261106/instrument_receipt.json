@@ -1,0 +1,9 @@
+{
+  "kind": "HTTP",
+  "url": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/instrument?productGroup=SwapU",
+  "requested_at": "2026-11-06T00:41:26.940Z",
+  "received_at": "2026-11-06T00:41:27.130Z",
+  "status": 200,
+  "bytes": 361002,
+  "sha256": "3922a08d6cf5e2ea680ab659b5093c9661f05509a0ac6a0032d2b5e7545edfae"
+}

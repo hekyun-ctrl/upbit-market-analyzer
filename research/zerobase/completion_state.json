@@ -41,13 +41,14 @@
     "Disabled-by-default live EvidenceLedger sidecar connected to native wire receipts and monitor stages/frozen plan/delivery/followups; v0/v1-to-v2 additive migration, atomic envelopes, immutable candidate-anchor/restart links, explicit outage/crash gaps, bounded nondeleting recording and integrity/hash archive.140 distinct targeted tests/25 new;12 real policy input/output pairs unchanged under healthy/failed storage,6 retained raw frames preserve actual original bytes/receipts; no live deployment or qualification.",
     "Sealed received-stream importer: bounded atomic append-only seal chains, exact raw occurrence/revision/original UTC receipt, explicit restart/gaps and latest-final-bar snapshot coverage; optional live binding retains immutable original candidate source across restart. Archive inventories seals/snapshots.76 focused tests/26 new, original6 real frames/10 archived records,6 fail-closed final binding rejections, zero verified final bars/snapshots; production decoder remains chart-final-unknown, no live qualification.",
     "Original direct policy execution trace with actual helper returns, source/return/control-flow coverage, argument/config/snapshot hashes, explicit unrun/incomplete checks, normalized quote response receipt and immutable decision-chain binding. Disabled-by-default; bounded failure-isolated mechanics;117 related tests/28new. Independent restartable/capped policy-state retained-replay orchestration, atomic cursor/observations/decisions/plans, frozen followups and zero/null report;12 retained actual outputs unchanged and finite20-observation capture/P1 uninterrupted/restart/original-runner outputs equal. No new independent data or qualified unseen execution.",
-    "Original live entry-slice AST adapter plus disabled per-quote-poll sidecar envelope/export port: confirm-before-classify, due boundaries, original expiry/rearm, independent persistent sample/ready/watch/cooldown state and declared in-memory delivery/journal boundaries.86 related tests/26new;20 retained development observations exact across restart after10; capture1SL net-9.35927984656063/P1noentry0; unseen20 all blocked/null. No original missing polls fabricated;23 helper ASTs/24 frozen blobs unchanged."
+    "Original live entry-slice AST adapter plus disabled per-quote-poll sidecar envelope/export port: confirm-before-classify, due boundaries, original expiry/rearm, independent persistent sample/ready/watch/cooldown state and declared in-memory delivery/journal boundaries.86 related tests/26new;20 retained development observations exact across restart after10; capture1SL net-9.35927984656063/P1noentry0; unseen20 all blocked/null. No original missing polls fabricated;23 helper ASTs/24 frozen blobs unchanged.",
+    "2026-11-06 interactive finite source investigation: official deployed chart volume conversion and fresh public BTCUSDT instrument response preserved;15 actual wire receipts sealed and imported with5integrity/fail-closed checks. This is not15closedbars or a completed unseen/profit comparison."
   ],
   "blockers": [
     "RAW5M_INDEPENDENCE_UNVERIFIED",
     "CANDLE_VOLUME_UNIT_UNVERIFIED"
   ],
-  "next_work": "External-source blocker: obtain official public futures BTCUSDT SwapU candle1m/independently published5m subscription/REST, documented final/revision and volume/turnover units plus genuine original raw receipts per source_qualification/acquisition_request.md. Do not rerun identical HTTP/WS probes, completed tests/comparisons or expand engineering while unchanged. On actual new documentation/receipts, review only existing source-dependent decoder/derived-input qualification, then predeclare one unused continuous comparison and original P4 verdict. Existing unseen path must stay blocked until reviewed qualification exists; no boolean bypass. P5/runtime rollout separate authorization.",
+  "next_work": "Read source_resolution_20261106/README.md and the unsent PROVIDER_REQUEST.md. New official chart h→volume→coin conversion and15actual receipts narrow the unit issue, but no final/native-independent5m/continuous comparison qualification exists. Obtain provider public futures history/final/revision/independence/unit contract confirmation and then prospective all-input/quote receipt coverage; use existing source-dependent decoder/importer and predeclared unused continuous original-policy comparison. Do not repeat the same failed REST probes,15forming-frame capture, prior development comparisons/tests or blindly reactivate the worker. No global boolean override; operational rollout separate authorization.",
   "outbound": false,
   "orders": false,
   "ended_at": "2026-10-28T19:23:10.158645+00:00",
@@ -4053,5 +4054,45 @@
     "source_qualification_manifest_sha256": "aadc2ef806afc274f3931c5a0c1974d31479107656f3c60be5657d447b210d5c",
     "source_qualification_validation_sha256": "17258e6c0bd0fe4bc5f3eeb10d3004358762f7469e55cefbdd688632dcfc8cfc",
     "sole_lease_released": true
+  },
+  "interactive_source_resolution_20261106": {
+    "started_at": "2026-11-06T00:37:16.270Z",
+    "ended_at": "2026-11-06T01:35:54.933919+00:00",
+    "authorization": "Explicit interactive resolve request; not a scheduled status run",
+    "artifact_directory": "research/zerobase/source_resolution_20261106",
+    "audit_command": "python research/audit_source_resolution_20261106.py",
+    "checks": {
+      "actual_packet_imported": true,
+      "duplicate_import_idempotent": true,
+      "all_final_flags_remain_unknown": true,
+      "wire_tamper_rejected_atomically": true,
+      "manufactured_final_rejected_atomically": true
+    },
+    "actual_wire_frames": 15,
+    "unique_forming_1m_bars": 1,
+    "unique_forming_5m_bars": 1,
+    "source_unit_evidence": "Official deployed adapter/converter + actual BTCUSDT metadata multiplier1 +15/15 OHLC price-range-consistent turnover/volume; scoped implementation evidence, not formal provider contract",
+    "qualified_final_bars": 0,
+    "qualified_unseen_observations": 0,
+    "required_comparison_executed": false,
+    "profitability_validated": false,
+    "net_profit": null,
+    "source_blockers_unchanged": true,
+    "existing_live_service_changes": false,
+    "temporary_acquisition_service_cleaned_up": true,
+    "implementation_automation_enabled": false,
+    "status_monitor_enabled": true,
+    "outbound": false,
+    "orders": false,
+    "provider_request_sent": false,
+    "provider_request": "research/zerobase/source_resolution_20261106/PROVIDER_REQUEST.md",
+    "status_monitor_latest_recorded_run": {
+      "id": "881895eb-b964-832d-a773-3dc83f923d2f",
+      "recorded_status": "failed",
+      "completed_at": "2026-11-06T01:20:15.381054Z",
+      "latest_result": null,
+      "failure_reason": "not provided by automation record",
+      "enabled": true
+    }
   }
 }

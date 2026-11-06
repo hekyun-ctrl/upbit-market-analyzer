@@ -1,0 +1,195 @@
+{
+  "schema": "zb_source_resolution_audit_v1",
+  "checks": {
+    "actual_packet_imported": true,
+    "duplicate_import_idempotent": true,
+    "all_final_flags_remain_unknown": true,
+    "wire_tamper_rejected_atomically": true,
+    "manufactured_final_rejected_atomically": true
+  },
+  "received_frames": 15,
+  "native_5m_forming_snapshots": 1,
+  "native_1m_forming_revisions": 14,
+  "original_receipt_start": "2026-11-06T00:41:27.810Z",
+  "original_receipt_end": "2026-11-06T00:41:40.154Z",
+  "verified_final_bars": 0,
+  "qualified_unseen_observations": 0,
+  "independent_closed_5m": 0,
+  "unit_evidence": {
+    "pinned_frontend_conversion_verified": true,
+    "btc_instrument_volume_multiple": 1,
+    "observed_price_range_checks": 15,
+    "h_BTC_i_USDT_consistent_for_this_capture": true,
+    "formal_provider_candle_unit_contract_confirmed": false,
+    "inference": "Official chart transformation + instrument metadata + arithmetic consistency; scoped to this version/capture."
+  },
+  "bars": [
+    {
+      "seq": 1,
+      "period": 300,
+      "start": 1793925600,
+      "volume_original": 0.2017,
+      "turnover_original": 15386.78531,
+      "turnover_div_volume": "76285.49980168567178978681210",
+      "range_consistent": true,
+      "final": null
+    },
+    {
+      "seq": 2,
+      "period": 60,
+      "start": 1793925660,
+      "volume_original": 0.0728,
+      "turnover_original": 5554.34854,
+      "turnover_div_volume": "76295.99642857142857142857143",
+      "range_consistent": true,
+      "final": null
+    },
+    {
+      "seq": 3,
+      "period": 60,
+      "start": 1793925660,
+      "volume_original": 0.0739,
+      "turnover_original": 5638.29364,
+      "turnover_div_volume": "76296.26035182679296346414073",
+      "range_consistent": true,
+      "final": null
+    },
+    {
+      "seq": 4,
+      "period": 60,
+      "start": 1793925660,
+      "volume_original": 0.0935,
+      "turnover_original": 7134.12835,
+      "turnover_div_volume": "76300.83796791443850267379679",
+      "range_consistent": true,
+      "final": null
+    },
+    {
+      "seq": 5,
+      "period": 60,
+      "start": 1793925660,
+      "volume_original": 0.0941,
+      "turnover_original": 7179.91917,
+      "turnover_div_volume": "76300.94760892667375132837407",
+      "range_consistent": true,
+      "final": null
+    },
+    {
+      "seq": 6,
+      "period": 60,
+      "start": 1793925660,
+      "volume_original": 0.0948,
+      "turnover_original": 7233.3418,
+      "turnover_div_volume": "76301.07383966244725738396624",
+      "range_consistent": true,
+      "final": null
+    },
+    {
+      "seq": 7,
+      "period": 60,
+      "start": 1793925660,
+      "volume_original": 0.0959,
+      "turnover_original": 7317.29204,
+      "turnover_div_volume": "76301.27257559958289885297185",
+      "range_consistent": true,
+      "final": null
+    },
+    {
+      "seq": 8,
+      "period": 60,
+      "start": 1793925660,
+      "volume_original": 0.1442,
+      "turnover_original": 11003.54794,
+      "turnover_div_volume": "76307.54466019417475728155340",
+      "range_consistent": true,
+      "final": null
+    },
+    {
+      "seq": 9,
+      "period": 60,
+      "start": 1793925660,
+      "volume_original": 0.1452,
+      "turnover_original": 11079.8696,
+      "turnover_div_volume": "76307.64187327823691460055096",
+      "range_consistent": true,
+      "final": null
+    },
+    {
+      "seq": 10,
+      "period": 60,
+      "start": 1793925660,
+      "volume_original": 0.1526,
+      "turnover_original": 11644.65901,
+      "turnover_div_volume": "76308.38145478374836173001311",
+      "range_consistent": true,
+      "final": null
+    },
+    {
+      "seq": 11,
+      "period": 60,
+      "start": 1793925660,
+      "volume_original": 0.1537,
+      "turnover_original": 11728.61415,
+      "turnover_div_volume": "76308.48503578399479505530254",
+      "range_consistent": true,
+      "final": null
+    },
+    {
+      "seq": 12,
+      "period": 60,
+      "start": 1793925660,
+      "volume_original": 0.1546,
+      "turnover_original": 11797.30469,
+      "turnover_div_volume": "76308.56849935316946959896507",
+      "range_consistent": true,
+      "final": null
+    },
+    {
+      "seq": 13,
+      "period": 60,
+      "start": 1793925660,
+      "volume_original": 0.1557,
+      "turnover_original": 11881.25983,
+      "turnover_div_volume": "76308.66942838792549775208735",
+      "range_consistent": true,
+      "final": null
+    },
+    {
+      "seq": 14,
+      "period": 60,
+      "start": 1793925660,
+      "volume_original": 0.1566,
+      "turnover_original": 11949.9504,
+      "turnover_div_volume": "76308.75095785440613026819923",
+      "range_consistent": true,
+      "final": null
+    },
+    {
+      "seq": 15,
+      "period": 60,
+      "start": 1793925660,
+      "volume_original": 0.1578,
+      "turnover_original": 12041.53783,
+      "turnover_div_volume": "76308.85823827629911280101394",
+      "range_consistent": true,
+      "final": null
+    }
+  ],
+  "global_source_blockers_unchanged": true,
+  "source_blockers": [
+    "RAW5M_INDEPENDENCE_UNVERIFIED",
+    "CANDLE_VOLUME_UNIT_UNVERIFIED"
+  ],
+  "additional_required": [
+    "DOCUMENTED_FINAL_AND_REVISION_SEMANTICS",
+    "INDEPENDENT_CLOSED_NATIVE_5M_AND_OVERLAPPING_1M",
+    "CONTINUOUS_ALL_INPUT_AND_QUOTE_RECEIPTS",
+    "SETTLED_FUNDING_HISTORY"
+  ],
+  "required_comparison_executed": false,
+  "profitability_validated": false,
+  "net_profit": null,
+  "outbound": false,
+  "orders": false,
+  "live_strategy_changes": false
+}

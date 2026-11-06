@@ -1,0 +1,17 @@
+{
+  "schema": "zb_temporary_acquisition_cleanup_v1",
+  "cleaned_at": "2026-11-06T01:34:57.876Z",
+  "service_id": "010c0eff-ad6b-42dd-869c-75054728e20b",
+  "result": {
+    "service": {
+      "id": "010c0eff-ad6b-42dd-869c-75054728e20b",
+      "name": "zb-source-evidence-once-20261106"
+    },
+    "environmentId": "677e12e4-aff7-4880-bc11-ff30de315e68",
+    "detachedVolumes": [],
+    "staged": null
+  },
+  "original_receipt_and_source_artifacts_preserved": true,
+  "active_research_monitor_created": false,
+  "existing_services_modified": false
+}

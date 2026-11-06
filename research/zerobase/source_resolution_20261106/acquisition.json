@@ -1,0 +1,28 @@
+{
+  "schema": "zb_finite_source_acquisition_v1",
+  "original_research_head": "64385c0d2cb2128d29d3400a4cecc462af4dc362",
+  "temporary_service": "010c0eff-ad6b-42dd-869c-75054728e20b",
+  "deployments": [
+    "cab0e3f5-c487-4ac6-a8fe-171d198a450a",
+    "576c51e1-228a-404d-8e85-09e250129326",
+    "2aebc2c8-8cdf-40ed-b863-859c5970eecb"
+  ],
+  "source": "Official LBank frontend assets, documented public instrument metadata and exact native chart WebSocket receipts.",
+  "source_reinspection_reason": "New 2026-11-05 working public transport and current official candle-to-coin conversion; no retry of old failed historical candle endpoints.",
+  "transport_implementation": "No credentials, account queries, orders, messages, periodic schedule or public server.",
+  "fixed_caps": {
+    "discovery_seconds": [
+      90,
+      120
+    ],
+    "metadata_wire_seconds": 55,
+    "wire_frames": 15
+  },
+  "local_page_fetch": "HTTP403; no claim that this implies provider API absence.",
+  "production_services_modified": [],
+  "strategy_changed": false,
+  "comparison_reruns": 0,
+  "worker_automation_changed": false,
+  "outbound": false,
+  "orders": false
+}
