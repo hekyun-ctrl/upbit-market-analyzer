@@ -109,7 +109,8 @@ class EarlyDeliveryTests(unittest.TestCase):
         self.assertEqual(send_feed_warning(self.ledger, now=1001,
              last_fresh=0, send=send, enabled=True), "already_reserved")
         send.assert_called_once()
-        self.assertIn("누락될 수", send.call_args.args[0])
+        self.assertIn("연속 완료봉", send.call_args.args[0])
+        self.assertIn("40개", send.call_args.args[0])
 
 
 if __name__ == "__main__":
