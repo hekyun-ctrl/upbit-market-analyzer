@@ -13,6 +13,7 @@ import sqlite3
 import sys
 import time
 
+from lbank_early_breakout_audit import persist_early_audit
 from lbank_native_book import NativeBookError, fetch_native_book
 from lbank_native_candles import NativeCandleThread
 from lbank_telegram_transport import TelegramTransport
@@ -466,6 +467,18 @@ def run():
                                          get_book=get_book, ledger=ledger,
                                          send=telegram.send if enabled else None, rsi_sequence=True)
                 LOG.info("VIDEO_ALERT_DECISION bar=%d status=%s reasons=%s", seen, status, counts)
+                # A research-only observation, never an alert or entry override.
+                # Journal failure cannot interrupt Telegram delivery or live evaluation.
+                try:
+                    observed = persist_early_audit(
+                        ledger, bars, now=now, final_status=status, final_reasons=counts)
+                except (sqlite3.Error, OSError, ValueError, TypeError, KeyError) as exc:
+                    LOG.warning("VIDEO_EARLY_AUDIT_FAILURE type=%s", type(exc).__name__)
+                else:
+                    LOG.info(
+                        "VIDEO_EARLY_AUDIT bar=%d status=%s direction=%s volume_multiple=%s final_status=%s",
+                        seen, observed["status"], observed.get("direction"),
+                        observed.get("volume_multiple"), status)
         except (OSError, sqlite3.Error, ValueError, KeyError) as exc:
             LOG.warning("VIDEO_ALERT_POLL_FAILURE type=%s", type(exc).__name__)
         time.sleep(2)
