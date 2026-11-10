@@ -14,6 +14,7 @@ import sys
 import time
 
 from lbank_early_breakout_audit import persist_early_audit
+from lbank_early_alert_delivery import activation_check, send_early_candidate, send_feed_warning
 from lbank_native_book import NativeBookError, fetch_native_book
 from lbank_native_candles import NativeCandleThread
 from lbank_telegram_transport import TelegramTransport
@@ -435,6 +436,8 @@ def run():
     started = time.time()
     data = Path(os.environ.get("VIDEO_ALERT_STATE_DIR", "/data")).resolve()
     enabled = os.getenv("VIDEO_ALERT_SEND_ENABLED", "0") == "1"
+    early_enabled = enabled and os.getenv("VIDEO_EARLY_ALERT_SEND_ENABLED", "0") == "1"
+    system_enabled = enabled and os.getenv("VIDEO_ALERT_SYSTEM_NOTICES_ENABLED", "0") == "1"
     volume = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
     if enabled and os.getenv("RAILWAY_SERVICE_ID") and (not volume or Path(volume).resolve() != data):
         raise RuntimeError("Refusing Telegram delivery without a dedicated persistent state mount")
@@ -452,7 +455,14 @@ def run():
         token_ok, chat_ok = telegram.health()
         LOG.info("VIDEO_ALERT_TELEGRAM_CHECK token_ok=%s chat_ok=%s no_test_message=true", token_ok, chat_ok)
     check_book(get_book)
+    revision = os.getenv("RAILWAY_GIT_COMMIT_SHA", "local")
+    activation = activation_check(ledger, now=time.time(), revision=revision,
+                                  send=telegram.send if enabled else None,
+                                  enabled=system_enabled and early_enabled)
+    LOG.info("VIDEO_ACTIVATION_CHECK status=%s early_enabled=%s system_enabled=%s",
+             activation, early_enabled, system_enabled)
     seen, next_health = None, 0
+    last_fresh = started
     while True:
         now = time.time()
         try:
@@ -479,6 +489,19 @@ def run():
                         "VIDEO_EARLY_AUDIT bar=%d status=%s direction=%s volume_multiple=%s final_status=%s",
                         seen, observed["status"], observed.get("direction"),
                         observed.get("volume_multiple"), status)
+                if (len(bars) >= WARMUP and
+                        bars[-1]["start"] + 300 <= now <= bars[-1]["start"] + 300 + MAX_CLOSE_AGE):
+                    last_fresh = now
+                early_status = send_early_candidate(
+                    ledger, bars, now=now, final_status=status,
+                    send=telegram.send if enabled else None, enabled=early_enabled)
+                LOG.info("VIDEO_EARLY_DELIVERY bar=%d status=%s", seen, early_status)
+            warning = send_feed_warning(
+                ledger, now=now, last_fresh=last_fresh,
+                send=telegram.send if enabled else None, enabled=system_enabled,
+                consecutive=len(bars), required=WARMUP)
+            if warning not in ("healthy_or_grace", "disabled", "already_reserved"):
+                LOG.warning("VIDEO_FEED_WARNING status=%s last_fresh_at=%s", warning, last_fresh)
         except (OSError, sqlite3.Error, ValueError, KeyError) as exc:
             LOG.warning("VIDEO_ALERT_POLL_FAILURE type=%s", type(exc).__name__)
         time.sleep(2)
