@@ -489,7 +489,8 @@ def run():
                         "VIDEO_EARLY_AUDIT bar=%d status=%s direction=%s volume_multiple=%s final_status=%s",
                         seen, observed["status"], observed.get("direction"),
                         observed.get("volume_multiple"), status)
-                if (bars[-1]["start"] + 300 <= now <= bars[-1]["start"] + 300 + MAX_CLOSE_AGE):
+                if (len(bars) >= WARMUP and
+                        bars[-1]["start"] + 300 <= now <= bars[-1]["start"] + 300 + MAX_CLOSE_AGE):
                     last_fresh = now
                 early_status = send_early_candidate(
                     ledger, bars, now=now, final_status=status,
@@ -497,7 +498,8 @@ def run():
                 LOG.info("VIDEO_EARLY_DELIVERY bar=%d status=%s", seen, early_status)
             warning = send_feed_warning(
                 ledger, now=now, last_fresh=last_fresh,
-                send=telegram.send if enabled else None, enabled=system_enabled)
+                send=telegram.send if enabled else None, enabled=system_enabled,
+                consecutive=len(bars), required=WARMUP)
             if warning not in ("healthy_or_grace", "disabled", "already_reserved"):
                 LOG.warning("VIDEO_FEED_WARNING status=%s last_fresh_at=%s", warning, last_fresh)
         except (OSError, sqlite3.Error, ValueError, KeyError) as exc:
