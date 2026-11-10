@@ -139,8 +139,8 @@ def activation_check(ledger, *, now, revision, send, enabled):
     return result
 
 
-def send_feed_warning(ledger, *, now, last_fresh, send, enabled):
-    """Notify of missing usable completed candles, at most every 6h."""
+def send_feed_warning(ledger, *, now, last_fresh, send, enabled, consecutive=0, required=40):
+    """Warn when no fresh *fully analyzable* 5m window for >=15 minutes."""
     if not enabled or send is None:
         return "disabled"
     if now - last_fresh < FEED_STALE_SECONDS:
@@ -160,9 +160,11 @@ def send_feed_warning(ledger, *, now, last_fresh, send, enabled):
         return "reservation_failed"
     result = _attempt(send, (
         "[BTCUSDT 5분봉 감시 주의]\n"
-        "최근 15분 이상 신규 완료 5분봉을 정상 판정하지 못했습니다.\n"
-        "이 동안 진입/조기 포착 알림이 누락될 수 있습니다.\n"
-        "거래소 차트에서 직접 확인해 주십시오. 수신 복구가 확인되기 전 알람을 신뢰하지 마십시오."
+        "15분 이상 기존 진입 분석이 가능한 연속 5분봉 자료가 확보되지 않았습니다.\n"
+        f"현재 연속 완료봉: {consecutive}개 / 기존 진입 분석 필요: {required}개\n"
+        "새 봉 수신이 있어도 이력이 부족하면 기존 최종 진입 알림은 차단됩니다.\n"
+        "관찰 알림 역시 연속 21개 봉이 없으면 발송하지 않습니다.\n"
+        "이는 거래 추천이 아니라 감시 품질 경고입니다. 거래소 차트를 직접 확인하십시오."
     ))
     try:
         with ledger.db:
