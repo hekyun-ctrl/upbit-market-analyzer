@@ -18,6 +18,7 @@ from lbank_early_alert_delivery import activation_check, send_early_candidate, s
 from lbank_scenario_alerts import send_scenario_candidate
 from lbank_b_retest_research import persist_b_retest_shadow
 from lbank_b_early_1m_shadow import read_closed_1m_window, persist_first_minute_shadow
+from lbank_b_momentum_trial import evaluate_trial, deliver_trial
 from lbank_native_book import NativeBookError, fetch_native_book
 from lbank_native_candles import NativeCandleThread
 from lbank_telegram_transport import TelegramTransport
@@ -441,6 +442,7 @@ def run():
     enabled = os.getenv("VIDEO_ALERT_SEND_ENABLED", "0") == "1"
     early_enabled = enabled and os.getenv("VIDEO_EARLY_ALERT_SEND_ENABLED", "0") == "1"
     scenario_enabled = enabled and os.getenv("VIDEO_SCENARIO_ALERT_SEND_ENABLED", "0") == "1"
+    momentum_trial_enabled = enabled and os.getenv("VIDEO_B_MOMENTUM_TEST_SEND_ENABLED", "0") == "1"
     system_enabled = enabled and os.getenv("VIDEO_ALERT_SYSTEM_NOTICES_ENABLED", "0") == "1"
     volume = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
     if enabled and os.getenv("RAILWAY_SERVICE_ID") and (not volume or Path(volume).resolve() != data):
@@ -456,6 +458,7 @@ def run():
              os.getenv("RAILWAY_GIT_COMMIT_SHA", "local"), SOURCE, enabled, WARMUP)
     LOG.info("VIDEO_ALERT_POLICIES live=%s shadow=disabled experimental_rsi=true", LIVE_SEQUENCE_POLICY)
     LOG.info("VIDEO_SCENARIO_CONFIG enabled=%s events_only=true warmup=21", scenario_enabled)
+    LOG.info("VIDEO_B_MOMENTUM_TEST_CONFIG enabled=%s test_only=true no_orders=true", momentum_trial_enabled)
     if enabled:
         token_ok, chat_ok = telegram.health()
         LOG.info("VIDEO_ALERT_TELEGRAM_CHECK token_ok=%s chat_ok=%s no_test_message=true", token_ok, chat_ok)
@@ -549,6 +552,21 @@ def run():
                             first.get("priority", "관망"),
                             first.get("broken_support"),
                             first.get("close"), first.get("net_rr"))
+                        # Independent cost-checked 1m test-only entry candidate.
+                        # A projected 2R exit is NOT a known market support:
+                        # never describe this lane as historically verified.
+                        # Disabled by default; no broker/account/order calls.
+                        trial = evaluate_trial(minutes, bars)
+                        trial_status = deliver_trial(
+                            ledger, trial, now=now, get_book=get_book,
+                            clock=time.time,
+                            send=telegram.send if enabled else None,
+                            enabled=momentum_trial_enabled, started=started)
+                        LOG.info(
+                            "VIDEO_B_MOMENTUM_TEST_DECISION minute=%d "
+                            "candidate=%s delivery=%s trend=%s rr=%s",
+                            minute_seen, trial["status"], trial_status,
+                            trial.get("trend","unknown"),trial.get("net_rr"))
             except (OSError, sqlite3.Error, ValueError, TypeError,
                     KeyError, ArithmeticError) as exc:
                 LOG.warning("VIDEO_B_FIRST_MINUTE_ERROR type=%s",
