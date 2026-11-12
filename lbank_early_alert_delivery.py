@@ -106,7 +106,7 @@ def send_early_candidate(ledger, bars, *, now, final_status, send, enabled):
     return result
 
 
-def activation_check(ledger, *, now, revision, send, enabled):
+def activation_check(ledger, *, now, revision, send, enabled, scenario_enabled=False):
     """One labeled test per revision, never repeated across worker restarts."""
     if not enabled or send is None:
         return "disabled"
@@ -125,6 +125,7 @@ def activation_check(ledger, *, now, revision, send, enabled):
         "[BTCUSDT 5분봉 알림 연결 확인 · 시험 메시지]\n"
         "기존 조건부 진입 알람: 활성\n"
         "조기 돌파 관찰 알림: 활성 (매매 진입 권유 아님)\n"
+        f"저항 실패/미도달 하락/돌파 관찰: {'활성' if scenario_enabled else '비활성'}\n"
         "데이터 중단 경고: 활성\n"
         "자동 주문: 비활성\n"
         "이 메시지는 수신 경로 시험이며, 진입 신호나 봉 수신 품질 보증이 아닙니다."
