@@ -96,15 +96,37 @@ def trend_priority(bars):
     d5 = -1 if c5[-1] < _ema(c5, 21) else 1 if c5[-1] > _ema(c5, 21) else 0
     d15 = -1 if _ema(q15, 4) < _ema(q15, 9) else 1
     d1h = -1 if _ema(q1h, 3) < _ema(q1h, 6) else 1
+    phase = "no_qualified_entry_implied"
     if d15 == d1h == -1:
         trend = "bearish"
-        prev_support = min(float(x["low"]) for x in rows[-7:-1])
-        # A fresh support break or lower 5m position gives B priority.
-        b_first = c5[-1] <= prev_support or (
-            c5[-1] < _ema(c5, 9) and d5 == -1)
-        priorities = (["1순위 B-숏 (지지 이탈·재회복 실패)", "2순위 A-숏 (반등 저항 실패)",
-                       "C-롱은 별도 추세 전환 확인 후"] if b_first else
-                      ["1순위 A-숏 (반등 저항 실패)", "2순위 B-숏 (지지 이탈·재회복 실패)",
+        cur = rows[-1]
+        close = float(cur["close"])
+        # Do NOT promote A just because one small bounce crosses the 5m EMA9.
+        # A can be primary only after an ACTUAL completed resistance test
+        # and bearish rejection with volume; otherwise B continuation
+        # is the prevailing bearish hypothesis, not an entry recommendation.
+        resistance = max(float(x["high"]) for x in rows[-13:-1])
+        support = min(float(x["low"]) for x in rows[-7:-1])
+        atr = _atr(rows[-16:]) or 0
+        buffer = max(.25 * atr, close * .00035)
+        vol_baseline = median(float(x["volume"]) for x in rows[-21:-1])
+        rejected_resistance = (cur["high"] >= resistance-buffer
+                               and close < resistance-buffer
+                               and close < cur["open"]
+                               and vol_baseline > 0
+                               and cur["volume"] >= vol_baseline*1.2)
+        breakout = (close < support - .1*buffer
+                    and close < cur["open"]
+                    and vol_baseline > 0
+                    and cur["volume"] >= 1.5*vol_baseline)
+        phase = ("A_completed_resistance_rejection" if rejected_resistance else
+                 "B_completed_support_break" if breakout else
+                 "B_direction_only_no_entry")
+        priorities = (["1순위 A-숏 (실제 저항 접근 후 매도 전환)",
+                       "2순위 B-숏 (지지 이탈 감시)",
+                       "C-롱은 별도 추세 전환 확인 후"] if rejected_resistance else
+                      ["1순위 B-숏 (하락 추세 지속 우세 · 진입은 별도 검증)",
+                       "2순위 A-숏 (실제 저항 실패 시만)",
                        "C-롱은 별도 추세 전환 확인 후"])
     elif d15 == d1h == 1:
         trend = "bullish"
@@ -115,6 +137,7 @@ def trend_priority(bars):
         priorities = ["1순위 관망 (15분·1시간 방향 충돌)",
                       "A/B-숏 또는 C-롱은 추세 합의 뒤 재평가"]
     return dict(status="ready", trend=trend, priorities=priorities,
+                phase=phase, entry_qualified=False,
                 directions={"5m": d5, "15m": d15, "1h": d1h},
                 four_hour_reference=(
                     "down" if q4h[-1] < q4h[-2] else "up"
