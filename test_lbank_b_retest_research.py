@@ -52,6 +52,50 @@ class BRetestTests(unittest.TestCase):
         self.assertEqual(z["trend"],"bullish")
         self.assertIn("C-롱",z["priorities"][0])
 
+    def test_small_bearish_market_bounce_cannot_promote_A(self):
+        rows=self.rows(130)
+        # Last candle bounces above short 5m EMA but stays a lower high
+        # in the same bearish 15m and 1h regime.
+        prev=rows[-2]["close"]
+        rows[-1].update(open=prev,close=prev+3,
+                        high=prev+4,low=prev-1,volume=20)
+        rank=trend_priority(rows)
+        self.assertEqual(rank["trend"],"bearish")
+        self.assertIn("B-숏",rank["priorities"][0])
+        self.assertEqual(rank["phase"],"B_direction_only_no_entry")
+        self.assertFalse(rank["entry_qualified"])
+
+    def test_real_completed_resistance_rejection_can_promote_A(self):
+        rows=self.rows(130)
+        resistance=max(r["high"] for r in rows[-13:-1])
+        cur=rows[-1]
+        cur.update(open=cur["close"]+1,high=resistance+.25,
+                   low=cur["close"]-1,volume=20)
+        rank=trend_priority(rows)
+        self.assertEqual(rank["trend"],"bearish")
+        self.assertIn("A-숏",rank["priorities"][0])
+        self.assertEqual(rank["phase"],"A_completed_resistance_rejection")
+        self.assertFalse(rank["entry_qualified"])
+
+    def test_nov12_actual_closed_bars_keep_B_during_shallow_bounces(self):
+        from pathlib import Path
+        import json
+        path=(Path(__file__).parent / "research/zerobase/audits/2026-11-12"
+              / "lbank_native_5m_177bars.json")
+        real=json.loads(path.read_text())
+        self.assertEqual(len(real),177)
+        self.assertTrue(all(b["start"]-a["start"]==300
+                            for a,b in zip(real,real[1:])))
+        from datetime import datetime, timezone, timedelta
+        k=timezone(timedelta(hours=9))
+        for hour,minute in ((21,15),(21,20),(21,50),(21,55)):
+            cutoff=int(datetime(2026,11,12,hour,minute,tzinfo=k).timestamp())
+            relevant=[b for b in real if b["start"]+300<=cutoff]
+            rank=trend_priority(relevant)
+            self.assertEqual(rank["trend"],"bearish")
+            self.assertIn("B-숏",rank["priorities"][0])
+            self.assertFalse(rank["entry_qualified"])
+
     def test_mixed_regime_does_not_force_direction(self):
         rows=self.rows(120)
         # 15m trend bullish but 1h trend bearish in late recovery.
