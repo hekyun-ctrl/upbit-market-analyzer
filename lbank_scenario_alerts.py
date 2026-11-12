@@ -9,6 +9,7 @@ import logging
 import math
 import sqlite3
 from statistics import median
+from lbank_b_retest_research import trend_priority
 
 LOG = logging.getLogger("lbank_scenario_alerts")
 KST = timezone(timedelta(hours=9))
@@ -139,6 +140,13 @@ def evaluate_scenario(bars):
 
 def format_scenario(event):
     kind = event["scenario"]
+    rank = event.get("ranking") or {}
+    regime = {"bearish": "하락 우세", "bullish": "상승 우세",
+              "mixed": "방향 충돌", "unknown": "판단 자료 부족"}.get(
+                  rank.get("trend"), "판단 자료 부족")
+    priorities = rank.get("priorities") or ["1순위 판단 보류 (연속 5분봉 96개 필요)"]
+    ranked = "\n".join(priorities)
+    direction = "숏(매도)" if kind in ("A", "B") else "롱(매수)"
     close_time = datetime.fromtimestamp(event["start"] + 300, KST).strftime("%m-%d %H:%M KST")
     stop = event["stop"]
     target = event["structural_target"]
@@ -154,7 +162,9 @@ def format_scenario(event):
     return (
         "[ZB 엘뱅크 BTCUSDT · 5분봉 시나리오 관찰]\n"
         "⚠️ 움직임 감지 전용 · 매매 진입 신호 아님 · 자동 주문 없음\n"
-        f"시나리오 {kind}: {NAMES[kind]}\n"
+        f"시나리오 {kind} / {direction}: {NAMES[kind]}\n"
+        f"상위 추세 판단: {regime} (완료 15분·1시간봉 기준)\n"
+        f"매매 검토 우선순위:\n{ranked}\n"
         f"완료봉: {close_time}\n"
         f"완료봉 종가(체결가 아님): {event['close']:,.1f} USDT\n"
         f"이전 12봉 저항: {event['resistance']:,.1f} / 이전 6봉 지지: "
@@ -188,6 +198,7 @@ def send_scenario_candidate(ledger, bars, *, now, started, final_status, send, e
     event = evaluate_scenario(bars)
     if event["status"] != "candidate":
         return event["status"]
+    event["ranking"] = trend_priority(bars)
     scenario = event["scenario"]
     try:
         with ledger.db:
