@@ -15,6 +15,7 @@ import time
 
 from lbank_early_breakout_audit import persist_early_audit
 from lbank_early_alert_delivery import activation_check, send_early_candidate, send_feed_warning
+from lbank_scenario_alerts import send_scenario_candidate
 from lbank_native_book import NativeBookError, fetch_native_book
 from lbank_native_candles import NativeCandleThread
 from lbank_telegram_transport import TelegramTransport
@@ -437,6 +438,7 @@ def run():
     data = Path(os.environ.get("VIDEO_ALERT_STATE_DIR", "/data")).resolve()
     enabled = os.getenv("VIDEO_ALERT_SEND_ENABLED", "0") == "1"
     early_enabled = enabled and os.getenv("VIDEO_EARLY_ALERT_SEND_ENABLED", "0") == "1"
+    scenario_enabled = enabled and os.getenv("VIDEO_SCENARIO_ALERT_SEND_ENABLED", "0") == "1"
     system_enabled = enabled and os.getenv("VIDEO_ALERT_SYSTEM_NOTICES_ENABLED", "0") == "1"
     volume = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
     if enabled and os.getenv("RAILWAY_SERVICE_ID") and (not volume or Path(volume).resolve() != data):
@@ -451,6 +453,7 @@ def run():
     LOG.info("VIDEO_ALERT_START revision=%s source=%s send_enabled=%s warmup=%d separate=true",
              os.getenv("RAILWAY_GIT_COMMIT_SHA", "local"), SOURCE, enabled, WARMUP)
     LOG.info("VIDEO_ALERT_POLICIES live=%s shadow=disabled experimental_rsi=true", LIVE_SEQUENCE_POLICY)
+    LOG.info("VIDEO_SCENARIO_CONFIG enabled=%s events_only=true warmup=21", scenario_enabled)
     if enabled:
         token_ok, chat_ok = telegram.health()
         LOG.info("VIDEO_ALERT_TELEGRAM_CHECK token_ok=%s chat_ok=%s no_test_message=true", token_ok, chat_ok)
@@ -458,7 +461,8 @@ def run():
     revision = os.getenv("RAILWAY_GIT_COMMIT_SHA", "local")
     activation = activation_check(ledger, now=time.time(), revision=revision,
                                   send=telegram.send if enabled else None,
-                                  enabled=system_enabled and early_enabled)
+                                  enabled=system_enabled and early_enabled,
+                                  scenario_enabled=scenario_enabled)
     LOG.info("VIDEO_ACTIVATION_CHECK status=%s early_enabled=%s system_enabled=%s",
              activation, early_enabled, system_enabled)
     seen, next_health = None, 0
@@ -492,9 +496,23 @@ def run():
                 if (len(bars) >= WARMUP and
                         bars[-1]["start"] + 300 <= now <= bars[-1]["start"] + 300 + MAX_CLOSE_AGE):
                     last_fresh = now
+                # Evaluate the A/B/C observational lane before the generic
+                # early-breakout lane, to avoid duplicate low-confidence alerts.
+                # Never change the qualified RSI/CCI entry decision.
+                try:
+                    scenario_status = send_scenario_candidate(
+                        ledger, bars, now=now, started=started, final_status=status,
+                        send=telegram.send if enabled else None,
+                        enabled=scenario_enabled)
+                except (sqlite3.Error, OSError, ValueError, KeyError, TypeError) as exc:
+                    LOG.warning("VIDEO_SCENARIO_FAILURE type=%s", type(exc).__name__)
+                    scenario_status = "evaluation_failed"
+                LOG.info("VIDEO_SCENARIO_DELIVERY bar=%d status=%s", seen, scenario_status)
+                observed = scenario_status.split(":")[-1] in ("accepted", "unconfirmed")
                 early_status = send_early_candidate(
                     ledger, bars, now=now, final_status=status,
-                    send=telegram.send if enabled else None, enabled=early_enabled)
+                    send=telegram.send if enabled else None,
+                    enabled=early_enabled and not observed)
                 LOG.info("VIDEO_EARLY_DELIVERY bar=%d status=%s", seen, early_status)
             warning = send_feed_warning(
                 ledger, now=now, last_fresh=last_fresh,
