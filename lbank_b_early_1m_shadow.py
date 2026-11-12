@@ -81,13 +81,22 @@ def evaluate_first_minute_break(minute_bars,five_bars):
     if not _valid_minutes(minute_bars[-HISTORY:]):
         return out
     now_bar=minute_bars[-1]
-    if len(five_bars)<96:
+    # A just-sealed 5m candle may contain the 1m decision candle itself
+    # (especially at xx:00/05/10 boundaries). It is NOT historical evidence
+    # until after that minute opened. Trim by candle close AND arrival time,
+    # rather than incorrectly rejecting every fifth minute or leaking future
+    # information into the support/target calculations.
+    prior_fives=[b for b in five_bars
+                 if b["start"]+300<=now_bar["start"]
+                 and b.get("received_at",float("inf"))<=now_bar["received_at"]]
+    if len(prior_fives)<96:
         return dict(out,status="insufficient_5m_history")
     from lbank_b_retest_research import _valid
-    if not _valid(five_bars[-min(240,len(five_bars)):]):
+    if not _valid(prior_fives[-min(240,len(prior_fives)):]):
         return dict(out,status="invalid_5m_source")
-    if not five_bars[-1]["start"]+300<=now_bar["start"]<five_bars[-1]["start"]+600:
+    if not prior_fives[-1]["start"]+300<=now_bar["start"]<prior_fives[-1]["start"]+600:
         return dict(out,status="misaligned_5m_clock")
+    five_bars=prior_fives
     rank=trend_priority(five_bars)
     out.update(trend=rank["trend"],priority=(rank["priorities"] or ["관망"])[0])
     if rank["trend"]!="bearish":
