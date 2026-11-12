@@ -67,13 +67,36 @@ class FirstMinuteTests(unittest.TestCase):
         broken=deepcopy(one);broken[-1]["quality"]="forming"
         self.assertFalse(_valid_minutes(broken))
 
-    def test_future_5m_bar_rejected_not_lookahead(self):
+    def test_future_5m_bar_is_ignored_not_used_as_lookahead(self):
         five=self.five();one=self.one(five)
+        before=evaluate_first_minute_break(one,five)
         extra=deepcopy(five[-1]);extra["start"]+=300
         extra["received_at"]+=300
+        extra["low"]=1.0  # catastrophic future low must not move support
+        extra["open"]=extra["close"]=extra["high"]=10.0
         five.append(extra)
-        self.assertEqual(evaluate_first_minute_break(one,five)["status"],
-                         "misaligned_5m_clock")
+        after=evaluate_first_minute_break(one,five)
+        self.assertEqual(before,after)
+
+    def test_5m_boundary_uses_only_earlier_five_candles(self):
+        five=self.five();one=self.one(five)
+        expected=evaluate_first_minute_break(one,five)
+        # Last 1m candle is 4th minute INSIDE a new completed five,
+        # so that five cannot be known at this 1m start.
+        new5=deepcopy(five[-1]);new5["start"]+=300
+        new5["received_at"]+=300
+        # Clone OHLC still valid, but should be ignored entirely.
+        five.append(new5)
+        one[-1]["start"]+=240
+        one[-1]["received_at"]+=240
+        # keep prior 1m contiguous by moving ALL minutes and original 5m
+        # context to end of the newly closed 5m period.
+        for minute in one[:-1]:
+            minute["start"]+=240
+            minute["received_at"]+=240
+        out=evaluate_first_minute_break(one,five)
+        self.assertIn(out["status"],("no_known_lower_target","qualified_shadow",
+                      "stop_too_far","insufficient_net_rr"))
 
     def test_stale_on_restart_no_retroactive_advice(self):
         f=self.five();one=self.one(f)
