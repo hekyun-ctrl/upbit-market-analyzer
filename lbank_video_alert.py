@@ -16,6 +16,7 @@ import time
 from lbank_early_breakout_audit import persist_early_audit
 from lbank_early_alert_delivery import activation_check, send_early_candidate, send_feed_warning
 from lbank_scenario_alerts import send_scenario_candidate
+from lbank_b_retest_research import persist_b_retest_shadow
 from lbank_native_book import NativeBookError, fetch_native_book
 from lbank_native_candles import NativeCandleThread
 from lbank_telegram_transport import TelegramTransport
@@ -493,6 +494,19 @@ def run():
                         "VIDEO_EARLY_AUDIT bar=%d status=%s direction=%s volume_multiple=%s final_status=%s",
                         seen, observed["status"], observed.get("direction"),
                         observed.get("volume_multiple"), status)
+                # Research-only independent failed-reclaim B-short path.
+                # Never overrides the existing qualified entry decision.
+                try:
+                    b_shadow = persist_b_retest_shadow(
+                        ledger, bars, now=now, started=started)
+                except (sqlite3.Error, OSError, ValueError, TypeError,
+                        KeyError, ArithmeticError) as exc:
+                    LOG.warning("VIDEO_B_RETEST_SHADOW_ERROR type=%s", type(exc).__name__)
+                else:
+                    LOG.info("VIDEO_B_RETEST_SHADOW bar=%d status=%s trend=%s rank=%s rr=%s",
+                             seen, b_shadow["status"], b_shadow.get("trend", "unknown"),
+                             (b_shadow.get("priorities") or ["관망"])[0],
+                             b_shadow.get("net_rr_at_close"))
                 if (len(bars) >= WARMUP and
                         bars[-1]["start"] + 300 <= now <= bars[-1]["start"] + 300 + MAX_CLOSE_AGE):
                     last_fresh = now
