@@ -21,14 +21,14 @@ class MomentumTests(unittest.TestCase):
 
     def test_fails_closed_early_without_valid_context(self):
         one,five=self.synthetic()
-        self.assertEqual(evaluate_trial(one,five)["status"],"insufficient_history")
+        self.assertEqual(evaluate_trial(one[:20],five)["status"],"insufficient_history")
 
     def test_no_negative_price_or_future_five_as_history(self):
         # Once the test has enough consecutive minute rows, adding a
         # just-completed overlapping 5m cannot change prior context.
         one,five=self.synthetic()
         one=one[:1]*0+one
-        self.assertEqual(evaluate_trial(one,five)["status"],"insufficient_history")
+        self.assertEqual(evaluate_trial(one[:20],five)["status"],"insufficient_history")
 
     def valid_candidate(self):
         fives=[]
