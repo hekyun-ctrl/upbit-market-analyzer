@@ -174,8 +174,8 @@ def evaluate_trial(minutes, fives, *, allow_small_gaps=False):
                     projected_target=projection.get("target"),
                     distance_atr=projection.get("distance_atr"))
     target=projection["target"]
-    # If a previously confirmed lower 5m support lies BEFORE the projection,
-    # the signal is blocked rather than knowingly targeting through it.
+    # If known lower 5m support lies before the projected exit, use a
+    # conservative exit above it only when the original 2R gate still passes.
     try:
         obstacles=available_barriers(_contiguous_tail(fives)[-240:],-1,price,curr["received_at"])
     except (KeyError,TypeError,ValueError,OverflowError):
