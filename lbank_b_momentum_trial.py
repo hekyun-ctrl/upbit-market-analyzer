@@ -113,6 +113,69 @@ def evaluate_trial(minutes, fives):
                 costs_assumptions=asdict(TEST_RR))
 
 
+def evaluate_five_break(fives):
+    """Independent 5m first-break short, entirely separate from RSI.
+
+    Only prior completed 5m bars set support. Projected exits are test-only.
+    """
+    out={"policy":POLICY+"_five","status":"insufficient_five_history",
+         "kind":"test_only"}
+    if len(fives)<MIN_HISTORY or not _valid(fives[-min(240,len(fives)):]):
+        return out
+    rank=trend_priority(fives)
+    out.update(trend=rank["trend"],trend_priority=rank["priorities"][0])
+    if rank["trend"]!="bearish":
+        return dict(out,status="not_bearish")
+    cur=fives[-1]
+    atr=_atr(fives[-16:])
+    base=median(x["volume"] for x in fives[-21:-1])
+    if not atr or atr<=0 or not base or base<=0:
+        return dict(out,status="invalid_atr_or_volume")
+    price=float(cur["close"])
+    support=min(x["low"] for x in fives[-7:-1])
+    buffer=max(.10*atr,price*.00010)
+    multiple=cur["volume"]/base
+    out.update(signal_start=cur["start"],bar_seconds=300,
+               signal_close=price,break_threshold=support-buffer,
+               atr1=atr,volume_multiple=round(multiple,3),
+               broken_support=support)
+    if not (price<support-buffer and price<cur["open"]):
+        return dict(out,status="no_five_support_break")
+    if multiple<MIN_VOL_MULTIPLE:
+        return dict(out,status="volume_below_threshold")
+    if (cur["open"]-price)/atr>MAX_CANDLE_BODY_ATR:
+        return dict(out,status="already_extended")
+    stop=rounded(max(support,max(b["high"] for b in fives[-3:]))
+                 +.2*atr,.1,up=True)
+    if stop<=price or (stop-price)/price>TEST_RR.max_stop_fraction:
+        return dict(out,status="invalid_or_wide_stop",stop=stop)
+    projection=project_short_target(
+        price,stop,atr,costs=TEST_RR,
+        desired_rr=MODEL_TARGET_RR,max_atr=ATR_MULTIPLE_CAP)
+    if projection["status"]!="projected_target_candidate":
+        return dict(out,status=projection["status"],stop=stop,
+                    projected_target=projection.get("target"),
+                    distance_atr=projection.get("distance_atr"))
+    target=projection["target"]
+    try:
+        barriers=available_barriers(fives[-240:],-1,price,cur["received_at"])
+    except (ValueError,KeyError,TypeError,OverflowError):
+        return dict(out,status="invalid_target_evidence")
+    if barriers and barriers[0]["price"]>target:
+        return dict(out,status="known_support_before_projection",
+                    stop=stop,estimated_target=target,
+                    prior_known_support=barriers[0]["price"])
+    verdict,rr=judge_entry(dict(lane="b_native_first_5m_break_test",
+                       direction=-1,stop=stop,target=target),price,TEST_RR)
+    if verdict!="qualified":
+        return dict(out,status=verdict,stop=stop,target=target,net_rr=rr)
+    return dict(out,status="test_candidate",direction="short",
+                stop=stop,target=target,net_rr=rr,
+                target_basis=projection["target_basis"],
+                stop_basis="causal_3x_5m_high_plus_20pct_ATR",
+                costs_assumptions=asdict(TEST_RR))
+
+
 def quote_check(plan, *, now, get_book, clock):
     """Fail-closed live sell bid quote. Do not use historical signal close."""
     if plan.get("status")!="test_candidate":
