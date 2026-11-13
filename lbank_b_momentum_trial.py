@@ -5,6 +5,8 @@ proxy viability is unproven, and the target is a 2.05R VOLATILITY PROJECTION,
 not a confirmed support. Cannot be represented as a verified formal signal.
 Native exchange-derived 1m receipts are mandatory. No account API or orders.
 """
+from contextlib import closing
+from pathlib import Path
 from dataclasses import asdict
 from hashlib import sha256
 import json
@@ -29,6 +31,60 @@ MAX_CANDLE_BODY_ATR = 1.8
 MODEL_TARGET_RR = 2.05
 TEST_RR = Costs(min_rr=2.0)
 RETENTION = 7 * 86400
+FIVE_SOURCE = "lbank_native_1m_derived_5m"
+MAX_CONTEXT_GAPS = 2
+
+
+def read_b_5m_context(path, now):
+    """Read real completed 5m bars across <=2 missing slots, test only.
+
+    No interpolation. Latest bar MUST be fresh, and every row must carry
+    its own source-matched arrival within 30 seconds of actual close.
+    """
+    expected=int(now//300)*300-300
+    path=Path(path)
+    if not path.is_file():
+        return []
+    with closing(sqlite3.connect(path.resolve().as_uri()+"?mode=ro",
+                                 uri=True,timeout=1)) as db:
+        db.row_factory=sqlite3.Row
+        raw=db.execute("""SELECT b.*, a.received AS received_at
+              FROM native_bars b JOIN native_arrivals a
+              ON a.period=b.period AND a.start=b.start
+              WHERE b.period=300 AND b.quality='stream_closed'
+                AND a.source=? AND b.start<=?
+              ORDER BY b.start DESC LIMIT 240""",
+              (FIVE_SOURCE,expected)).fetchall()
+    if not raw or raw[0]["start"]!=expected:
+        return []
+    rows=[]
+    missing_total=0
+    for record in raw:
+        start=record["start"]
+        if type(start) is not int or start>expected or (expected-start)%300:
+            break
+        missing=(expected-start)//300
+        if missing_total+missing>MAX_CONTEXT_GAPS:
+            break
+        row=dict(record)
+        at=row.get("received_at")
+        if (type(at) not in (float,int) or not
+                start+300<=at<=min(now,start+330) or not _valid([row])):
+            break
+        missing_total+=missing
+        rows.append(row)
+        expected=start-300
+    return rows[::-1]
+
+
+def _contiguous_tail(fives):
+    """Keep only actually adjacent five-minute bars for pivot geometry."""
+    if not fives:
+        return []
+    i=len(fives)-1
+    while i>0 and fives[i]["start"]==fives[i-1]["start"]+300:
+        i-=1
+    return fives[i:]
 
 
 def _atr_minute(rows):
@@ -47,19 +103,20 @@ def _prior_five(minute, fives):
             b.get("received_at",float("inf"))<=minute["received_at"]]
 
 
-def evaluate_trial(minutes, fives):
+def evaluate_trial(minutes, fives, *, allow_small_gaps=False):
     """Return a test-only plan at the last completed minute; no live quote."""
     out={"policy":POLICY,"status":"insufficient_history","kind":"test_only"}
     if len(minutes)<61 or not _valid_minutes(minutes[-61:]):
         return out
     curr=minutes[-1]
     fives=_prior_five(curr,fives)
-    if len(fives)<MIN_HISTORY or not _valid(fives[-min(240,len(fives)):]):
+    if len(fives)<MIN_HISTORY or not _valid(fives[-min(240,len(fives)):], allow_gaps=allow_small_gaps):
         return dict(out,status="insufficient_or_invalid_five_history")
     if not fives[-1]["start"]+300<=curr["start"]<fives[-1]["start"]+600:
         return dict(out,status="five_clock_mismatch")
-    regime=trend_priority(fives)
-    out.update(trend=regime["trend"],trend_priority=regime["priorities"][0])
+    regime=trend_priority(fives,allow_small_gaps=allow_small_gaps)
+    out.update(trend=regime["trend"],trend_priority=regime["priorities"][0],
+               observed_missing_five_bars=regime.get("observed_missing_five_bars",0))
     if regime["trend"]!="bearish":
         return dict(out,status="not_bearish")
     atr=_atr_minute(minutes)
@@ -94,7 +151,7 @@ def evaluate_trial(minutes, fives):
     # If a previously confirmed lower 5m support lies BEFORE the projection,
     # the signal is blocked rather than knowingly targeting through it.
     try:
-        obstacles=available_barriers(fives[-240:],-1,price,curr["received_at"])
+        obstacles=available_barriers(_contiguous_tail(fives)[-240:],-1,price,curr["received_at"])
     except (KeyError,TypeError,ValueError,OverflowError):
         return dict(out,status="invalid_target_evidence")
     if obstacles and obstacles[0]["price"]>target:
@@ -113,20 +170,23 @@ def evaluate_trial(minutes, fives):
                 costs_assumptions=asdict(TEST_RR))
 
 
-def evaluate_five_break(fives):
+def evaluate_five_break(fives, *, allow_small_gaps=False):
     """Independent 5m first-break short, entirely separate from RSI.
 
     Only prior completed 5m bars set support. Projected exits are test-only.
     """
     out={"policy":POLICY+"_five","status":"insufficient_five_history",
          "kind":"test_only"}
-    if len(fives)<MIN_HISTORY or not _valid(fives[-min(240,len(fives)):]):
+    if len(fives)<MIN_HISTORY or not _valid(fives[-min(240,len(fives)):], allow_gaps=allow_small_gaps):
         return out
-    rank=trend_priority(fives)
-    out.update(trend=rank["trend"],trend_priority=rank["priorities"][0])
+    rank=trend_priority(fives,allow_small_gaps=allow_small_gaps)
+    out.update(trend=rank["trend"],trend_priority=rank["priorities"][0],
+               observed_missing_five_bars=rank.get("observed_missing_five_bars",0))
     if rank["trend"]!="bearish":
         return dict(out,status="not_bearish")
     cur=fives[-1]
+    if len(_contiguous_tail(fives))<7:
+        return dict(out,status="insufficient_recent_five_continuity")
     atr=_atr(fives[-16:])
     base=median(x["volume"] for x in fives[-21:-1])
     if not atr or atr<=0 or not base or base<=0:
@@ -158,7 +218,7 @@ def evaluate_five_break(fives):
                     distance_atr=projection.get("distance_atr"))
     target=projection["target"]
     try:
-        barriers=available_barriers(fives[-240:],-1,price,cur["received_at"])
+        barriers=available_barriers(_contiguous_tail(fives)[-240:],-1,price,cur["received_at"])
     except (ValueError,KeyError,TypeError,OverflowError):
         return dict(out,status="invalid_target_evidence")
     if barriers and barriers[0]["price"]>target:
