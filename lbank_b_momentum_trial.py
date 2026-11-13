@@ -181,14 +181,17 @@ def quote_check(plan, *, now, get_book, clock):
     if plan.get("status")!="test_candidate":
         return dict(status="not_a_candidate")
     start=plan["signal_start"]
-    if not start+60<=now<=start+60+MAX_CLOSE_AGE:
+    seconds=plan.get("bar_seconds",60)
+    if seconds not in (60,300):
+        return dict(status="invalid_bar_period")
+    if not start+seconds<=now<=start+seconds+MAX_CLOSE_AGE:
         return dict(status="stale_quote_window")
     try:
         bid,ask=get_book()
     except Exception as exc:
         return dict(status="book_unavailable",error_type=type(exc).__name__)
     observed_at=clock()
-    if not now<=observed_at<=min(now+5,start+60+MAX_CLOSE_AGE):
+    if not now<=observed_at<=min(now+5,start+seconds+MAX_CLOSE_AGE):
         return dict(status="book_too_slow")
     if (not all(type(x) in (float,int) and math.isfinite(x)
                 for x in (bid,ask)) or not 0<bid<ask):
@@ -214,17 +217,18 @@ def quote_check(plan, *, now, get_book, clock):
 def _message(plan,book):
     from datetime import datetime,timedelta,timezone
     kst=timezone(timedelta(hours=9))
-    stamp=datetime.fromtimestamp(plan["signal_start"]+60,kst).strftime("%m-%d %H:%M KST")
+    stamp=datetime.fromtimestamp(plan["signal_start"]+plan.get("bar_seconds",60),kst).strftime("%m-%d %H:%M KST")
+    candle_label="5분" if plan.get("bar_seconds",60)==300 else "1분"
     return (
         "[ZB BTCUSDT · 실험 진입 후보 / 실거래 검증 전]\n"
         "⚠️ 정식 수익성 검증을 통과한 알림이 아닙니다. 자동 주문 없음\n"
-        f"방향: 숏(매도) | 1분봉 종료: {stamp}\n"
+        f"방향: 숏(매도) | {candle_label}봉 종료: {stamp}\n"
         f"실시간 매도 호가(주문가 보장 안 됨): {book['bid']:,.1f} USDT\n"
         f"구조 손절 후보: {plan['stop']:,.1f} USDT\n"
         f"변동성 기반 목표 *가설*: {plan['target']:,.1f} USDT\n"
         f"가정 비용 후 손익비: {book['net_rr']:.2f}:1 "
         "(목표 도달 확률 검증되지 않음)\n"
-        f"첫 1분봉 저점 이탈: {plan['break_threshold']:,.1f}, "
+        f"첫 {candle_label}봉 지지 이탈: {plan['break_threshold']:,.1f}, "
         f"거래량 {plan['volume_multiple']:.2f}배\n"
         "목표는 확인된 하단 지지선이 아닙니다. 모의 테스트 목적으로만 판단하세요. "
         "50배 레버리지에서는 변동·슬리피지에 특히 주의하세요."
@@ -237,7 +241,7 @@ def deliver_trial(ledger, plan, *, now, get_book, clock, send, enabled,
     if plan.get("status")!="test_candidate":
         return plan.get("status","not_a_candidate")
     bar=plan["signal_start"]
-    if bar+60<=started:return "before_worker_start"
+    if bar+plan.get("bar_seconds",60)<=started:return "before_worker_start"
     if not enabled or send is None:return "test_delivery_disabled"
     book=quote_check(plan,now=now,get_book=get_book,clock=clock)
     if book["status"]!="quote_qualified_test":
