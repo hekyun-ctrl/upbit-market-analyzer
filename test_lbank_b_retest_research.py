@@ -39,6 +39,14 @@ class BRetestTests(unittest.TestCase):
         self.assertEqual(len(_aggregate(r,900)),31)
         self.assertEqual(len(_aggregate(r,3600)),7)
 
+    def test_72_valid_bars_are_sufficient_for_five_full_hours(self):
+        x=self.rows(72)
+        self.assertEqual(len(_aggregate(x,3600)),5)
+        self.assertEqual(trend_priority(x)["status"],"ready")
+        self.assertEqual(trend_priority(x[:-1])["status"],"insufficient_history")
+        x[10]["start"]+=300
+        self.assertEqual(trend_priority(x)["status"],"invalid_source")
+
     def test_bearish_rank_shows_side_and_B_first_when_breaking(self):
         r=self.rows(130)
         z=trend_priority(r)
@@ -121,7 +129,10 @@ class BRetestTests(unittest.TestCase):
         x[-1].update(open=s-.1,high=s+.5,low=s-1.2,close=s-.6,volume=12)
         z=evaluate_b_failed_reclaim(x)
         self.assertEqual(z["trend"],"bearish")
-        self.assertEqual(z["status"],"no_known_target")
+        self.assertEqual(z["status"],"projected_target_shadow")
+        self.assertEqual(z["target_basis"],"NO_CONFIRMED_LOWER_PIVOT")
+        self.assertEqual(z["projection"]["evidence_grade"],
+                         "UNVALIDATED_research_only")
         self.assertEqual(z["broken_support"],s)
 
     def qualified_fixture(self):
@@ -147,7 +158,10 @@ class BRetestTests(unittest.TestCase):
         x=self.qualified_fixture()
         x[50]["low"]=x[50]["close"]-1
         z=evaluate_b_failed_reclaim(x)
-        self.assertEqual(z["status"],"no_known_target")
+        self.assertEqual(z["status"],"projected_target_shadow")
+        self.assertEqual(z["target_basis"],"NO_CONFIRMED_LOWER_PIVOT")
+        self.assertEqual(z["projection"]["evidence_grade"],
+                         "UNVALIDATED_research_only")
 
     def test_no_future_data_in_B_candidate(self):
         rows=self.qualified_fixture()
