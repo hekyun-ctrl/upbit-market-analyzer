@@ -25,7 +25,7 @@ MAX_CONFIRM_BARS = 3
 KST = timezone(timedelta(hours=9))
 
 
-def _valid(bars):
+def _valid(bars, *, allow_gaps=False):
     if not bars:
         return False
     prev = None
@@ -33,7 +33,8 @@ def _valid(bars):
         try:
             start = b["start"]
             if (type(start) is not int or start % 300
-                    or prev is not None and start != prev + 300
+                    or prev is not None and (start <= prev or
+                        not allow_gaps and start != prev + 300)
                     or b.get("quality") != "stream_closed"
                     or b.get("period", 300) != 300):
                 return False
@@ -76,7 +77,7 @@ def _aggregate(bars, period):
     return blocks
 
 
-def trend_priority(bars):
+def trend_priority(bars, *, allow_small_gaps=False):
     """15m/1h consensus first; completed 5m defines market phase.
 
     4h direction is a weak reference only; never claim 4h EMA warmup from
@@ -86,7 +87,19 @@ def trend_priority(bars):
         return dict(status="insufficient_history", trend="unknown",
                     priorities=["관망"], reason="need_72_contiguous_5m_for_5h_regime")
     rows = bars[-min(len(bars), 240):]
-    if not _valid(rows):
+    if allow_small_gaps:
+        # For test-only B trend context after rolling deployment: a tiny
+        # *documented* gap is allowed, never interpolated. Each 15m/1h
+        # aggregate still must contain every real aligned 5m constituent.
+        missing=sum((b["start"]-a["start"])//300-1
+                    for a,b in zip(rows,rows[1:]))
+        valid=(_valid(rows,allow_gaps=True) and 0<=missing<=2
+               and all(300<=b["start"]-a["start"]<=900
+                       for a,b in zip(rows,rows[1:])))
+    else:
+        missing=0
+        valid=_valid(rows)
+    if not valid:
         return dict(status="invalid_source", trend="unknown",
                     priorities=["관망"], reason="invalid_or_gap")
     q15, q1h, q4h = (_aggregate(rows, p) for p in (900, 3600, 14400))
@@ -138,6 +151,7 @@ def trend_priority(bars):
         priorities = ["1순위 관망 (15분·1시간 방향 충돌)",
                       "A/B-숏 또는 C-롱은 추세 합의 뒤 재평가"]
     return dict(status="ready", trend=trend, priorities=priorities,
+                observed_missing_five_bars=missing,
                 phase=phase, entry_qualified=False,
                 directions={"5m": d5, "15m": d15, "1h": d1h},
                 four_hour_reference=(

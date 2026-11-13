@@ -1,11 +1,14 @@
 """Three-cause B-short release: independent entry, provenance and projections."""
 from copy import deepcopy
+from pathlib import Path
+from tempfile import TemporaryDirectory
+import sqlite3
 import unittest
 
 from lbank_b_target_projection import project_short_target
 from lbank_b_retest_research import trend_priority
 from lbank_b_momentum_trial import (
-    evaluate_five_break, evaluate_trial, quote_check, TEST_RR,
+    evaluate_five_break, evaluate_trial, quote_check, read_b_5m_context, TEST_RR,
 )
 from test_lbank_b_momentum_trial import MomentumTests
 
@@ -85,6 +88,57 @@ class ThreeCauseTests(unittest.TestCase):
                          clock=lambda:start+330,
                          get_book=lambda:(bid,bid+.1))["status"],
                          "stale_quote_window")
+
+    def test_21_real_minutes_and_74_fives_after_restart(self):
+        m,f=MomentumTests().valid_candidate()
+        z=evaluate_trial(m[-21:],f[-74:])
+        self.assertEqual(z["status"],"test_candidate")
+        self.assertEqual(evaluate_trial(m[-20:],f[-74:])["status"],
+                         "insufficient_history")
+
+    def test_tiny_missing_5m_never_fabricated_or_used_as_15m_hour(self):
+        # Ten recent fives after the gap; older valid buckets preserved.
+        f=self.five_break()[-90:]
+        removed=f.pop(-10)
+        with TemporaryDirectory() as tmp:
+            p=Path(tmp)/"native.sqlite"
+            db=sqlite3.connect(p)
+            db.execute("""CREATE TABLE native_bars(period INTEGER,start INTEGER,
+                open REAL,high REAL,low REAL,close REAL,volume REAL,
+                turnover REAL,updated INTEGER,quality TEXT)""")
+            db.execute("""CREATE TABLE native_arrivals(period INTEGER,
+                start INTEGER, received INTEGER,source TEXT)""")
+            for row in f:
+                db.execute("INSERT INTO native_bars VALUES(?,?,?,?,?,?,?,?,?,?)",
+                           (300,row["start"],row["open"],row["high"],row["low"],
+                            row["close"],row["volume"],0,row["start"]+299,
+                            "stream_closed"))
+                db.execute("INSERT INTO native_arrivals VALUES(?,?,?,?)",
+                           (300,row["start"],row["received_at"],
+                            "lbank_native_1m_derived_5m"))
+            db.commit()
+            now=f[-1]["start"]+302
+            got=read_b_5m_context(p,now)
+            self.assertEqual(len(got),len(f))
+            self.assertNotIn(removed["start"],[r["start"] for r in got])
+            self.assertEqual(trend_priority(got)["status"],"invalid_source")
+            self.assertEqual(trend_priority(got,allow_small_gaps=True)["status"],
+                             "ready")
+            self.assertEqual(evaluate_five_break(got,allow_small_gaps=True)
+                             ["status"],"test_candidate")
+            # Latest 5m arrival in the future must be rejected.
+            db.execute("UPDATE native_arrivals SET received=? WHERE start=?",
+                       (now+400,f[-1]["start"]))
+            db.commit()
+            self.assertEqual(read_b_5m_context(p,now),[])
+            db.close()
+
+    def test_three_missing_5m_cannot_bypass_gap_limit(self):
+        f=self.five_break()[-95:]
+        for index in (-10,-22,-34):
+            f[index]["start"]+=300
+        self.assertEqual(trend_priority(f,allow_small_gaps=True)["status"],
+                         "invalid_source")
 
     def test_strong_bearish_candle_with_too_wide_risk_is_not_forced(self):
         f=self.five_break()
