@@ -14,8 +14,9 @@ import sqlite3
 from statistics import median
 
 from lbank_b_early_1m_shadow import _valid_minutes
-from lbank_b_retest_research import _valid, trend_priority
+from lbank_b_retest_research import _valid, trend_priority, MIN_HISTORY, _atr
 from lbank_structural_target_plan import available_barriers, rounded
+from lbank_b_target_projection import project_short_target
 from research.zerobase.video_entry import Costs, judge_entry
 
 POLICY = "b_native_first_microbreak_test_v1"
@@ -53,7 +54,7 @@ def evaluate_trial(minutes, fives):
         return out
     curr=minutes[-1]
     fives=_prior_five(curr,fives)
-    if len(fives)<96 or not _valid(fives[-min(240,len(fives)):]):
+    if len(fives)<MIN_HISTORY or not _valid(fives[-min(240,len(fives)):]):
         return dict(out,status="insufficient_or_invalid_five_history")
     if not fives[-1]["start"]+300<=curr["start"]<fives[-1]["start"]+600:
         return dict(out,status="five_clock_mismatch")
@@ -82,22 +83,14 @@ def evaluate_trial(minutes, fives):
     risk=stop-price
     if risk<=0 or risk/price>TEST_RR.max_stop_fraction:
         return dict(out,status="invalid_or_wide_stop",stop=stop)
-    # 2.05R model target, solved with actual cost function. This is a
-    # projected exit, NOT a known lower support or a guaranteed trade price.
-    # Bound it to prior observed 1m volatility instead of extending it freely.
-    loss=-TEST_RR.pnl(-1,price,stop)
-    if loss<=0:return dict(out,status="no_positive_risk")
-    low,high=0.,price
-    for _ in range(52):
-        mid=(low+high)/2
-        if TEST_RR.pnl(-1,price,mid,exit_kind="take_profit")>=MODEL_TARGET_RR*loss:
-            low=mid
-        else:
-            high=mid
-    target=rounded(low,.1,up=False)
-    if target<=0 or price-target>ATR_MULTIPLE_CAP*atr:
-        return dict(out,status="unreachable_volatility_projection",
-                    stop=stop,estimated_target=target)
+    projection=project_short_target(
+        price,stop,atr,costs=TEST_RR,
+        desired_rr=MODEL_TARGET_RR,max_atr=ATR_MULTIPLE_CAP)
+    if projection["status"]!="projected_target_candidate":
+        return dict(out,status=projection["status"],stop=stop,
+                    projected_target=projection.get("target"),
+                    distance_atr=projection.get("distance_atr"))
+    target=projection["target"]
     # If a previously confirmed lower 5m support lies BEFORE the projection,
     # the signal is blocked rather than knowingly targeting through it.
     try:
