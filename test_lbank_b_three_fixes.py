@@ -2,6 +2,7 @@
 from copy import deepcopy
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from unittest.mock import patch
 import sqlite3
 import unittest
 
@@ -9,6 +10,7 @@ from lbank_b_target_projection import project_short_target
 from lbank_b_retest_research import trend_priority
 from lbank_b_momentum_trial import (
     evaluate_five_break, evaluate_trial, quote_check, read_b_5m_context, TEST_RR,
+    _known_support_target,
 )
 from test_lbank_b_momentum_trial import MomentumTests
 
@@ -65,6 +67,41 @@ class ThreeCauseTests(unittest.TestCase):
         forming[-1]["quality"]="forming"
         self.assertEqual(evaluate_five_break(forming)["status"],
                          "insufficient_five_history")
+
+
+    def test_nearer_known_support_may_be_used_only_with_costed_2r(self):
+        # A confirmed closer pivot replaces projection only if 2R survives.
+        price,stop,atr=100000.,100550.,350.
+        projected=project_short_target(price,stop,atr,costs=TEST_RR,
+                                      desired_rr=2.05,max_atr=8.)
+        self.assertEqual(projected["status"],"projected_target_candidate")
+        near=_known_support_target(price,stop,atr,projected["target"]+1.)
+        self.assertEqual(near["status"],"qualified")
+        self.assertGreater(near["target"],projected["target"])
+        self.assertGreaterEqual(near["net_rr"],TEST_RR.min_rr)
+        self.assertEqual(near["target_basis"],
+                         "nearest_observed_support_with_entry_side_buffer")
+        blocked=_known_support_target(price,stop,atr,price-30.)
+        self.assertEqual(blocked["status"],"known_support_insufficient_net_rr")
+        self.assertLess(blocked["net_rr"],TEST_RR.min_rr)
+
+    def test_5m_barrier_path_uses_nearer_target_and_keeps_risk_checks(self):
+        f=self.five_break()
+        baseline=evaluate_five_break(f)
+        self.assertEqual(baseline["status"],"test_candidate")
+        barrier={"price":baseline["target"]+1.}
+        with patch("lbank_b_momentum_trial.available_barriers",
+                   return_value=[barrier]), patch(
+                   "lbank_b_momentum_trial._known_support_target",
+                   return_value=dict(status="qualified",
+                       target=baseline["target"]+1.,
+                       target_basis="nearest_observed_support_with_entry_side_buffer")):
+            newer=evaluate_five_break(f)
+        self.assertEqual(newer["status"],"test_candidate")
+        self.assertEqual(newer["target_basis"],
+                         "nearest_observed_support_with_entry_side_buffer")
+        self.assertGreater(newer["target"],baseline["target"])
+        self.assertGreaterEqual(newer["net_rr"],TEST_RR.min_rr)
 
     def test_invalid_wide_or_unbounded_target_fails_closed(self):
         self.assertEqual(project_short_target(100000.,100050.,100.)["status"],
