@@ -18,7 +18,7 @@ from lbank_early_alert_delivery import activation_check, send_early_candidate, s
 from lbank_scenario_alerts import send_scenario_candidate
 from lbank_b_retest_research import persist_b_retest_shadow
 from lbank_b_early_1m_shadow import read_closed_1m_window, persist_first_minute_shadow
-from lbank_b_momentum_trial import evaluate_trial, deliver_trial
+from lbank_b_momentum_trial import evaluate_trial, evaluate_five_break, deliver_trial
 from lbank_native_book import NativeBookError, fetch_native_book
 from lbank_native_candles import NativeCandleThread
 from lbank_telegram_transport import TelegramTransport
@@ -533,6 +533,26 @@ def run():
                     send=telegram.send if enabled else None,
                     enabled=early_enabled and not observed)
                 LOG.info("VIDEO_EARLY_DELIVERY bar=%d status=%s", seen, early_status)
+                # NEW: dedicated RSI-independent first-support-break B test.
+                # Cost/quote checked; explicitly unverified, never an order
+                # and never an override of legacy formal signal approval.
+                try:
+                    five_trial = evaluate_five_break(bars)
+                    five_trial_delivery = deliver_trial(
+                        ledger, five_trial, now=now, get_book=get_book,
+                        clock=time.time,
+                        send=telegram.send if enabled else None,
+                        enabled=momentum_trial_enabled, started=started)
+                    LOG.info(
+                        "VIDEO_B_FIVE_TEST_DECISION bar=%d candidate=%s "
+                        "delivery=%s trend=%s rr=%s available=%d required=%d",
+                        seen, five_trial["status"], five_trial_delivery,
+                        five_trial.get("trend", "unknown"),
+                        five_trial.get("net_rr"), len(bars), 72)
+                except (sqlite3.Error, OSError, ValueError, TypeError,
+                        KeyError, ArithmeticError) as exc:
+                    LOG.warning("VIDEO_B_FIVE_TEST_FAILURE type=%s",
+                                type(exc).__name__)
             # Observe the FIRST completed 1m B-support break, without
             # waiting for 1-3 future 5m confirmations. Diagnostics only.
             # Absolutely no Telegram or order calls in this path.
