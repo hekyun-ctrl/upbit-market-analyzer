@@ -13,11 +13,12 @@ import math
 from statistics import median
 
 from lbank_structural_target_plan import available_barriers, entry_bound, rounded
+from lbank_b_target_projection import project_short_target
 from research.zerobase.video_entry import Costs, judge_entry
 
 LOG = logging.getLogger("lbank_b_retest_research")
 POLICY = "b_failed_reclaim_shadow_v1"
-MIN_HISTORY = 96
+MIN_HISTORY = 72  # 6h of 5m => at least 5 aligned full hours
 MIN_RR = 2.0
 LOOKBACK_BREAK = 6
 MAX_CONFIRM_BARS = 3
@@ -83,19 +84,19 @@ def trend_priority(bars):
     """
     if len(bars) < MIN_HISTORY:
         return dict(status="insufficient_history", trend="unknown",
-                    priorities=["관망"], reason="need_96_contiguous_5m")
+                    priorities=["관망"], reason="need_72_contiguous_5m_for_5h_regime")
     rows = bars[-min(len(bars), 240):]
     if not _valid(rows):
         return dict(status="invalid_source", trend="unknown",
                     priorities=["관망"], reason="invalid_or_gap")
     q15, q1h, q4h = (_aggregate(rows, p) for p in (900, 3600, 14400))
-    if len(q15) < 12 or len(q1h) < 6:
+    if len(q15) < 12 or len(q1h) < 5:
         return dict(status="insufficient_higher_timeframe", trend="unknown",
                     priorities=["관망"], reason="closed_groups_missing")
     c5 = [b["close"] for b in rows]
     d5 = -1 if c5[-1] < _ema(c5, 21) else 1 if c5[-1] > _ema(c5, 21) else 0
     d15 = -1 if _ema(q15, 4) < _ema(q15, 9) else 1
-    d1h = -1 if _ema(q1h, 3) < _ema(q1h, 6) else 1
+    d1h = -1 if _ema(q1h, 3) < _ema(q1h, 5) else 1
     phase = "no_qualified_entry_implied"
     if d15 == d1h == -1:
         trend = "bearish"
@@ -204,9 +205,18 @@ def evaluate_b_failed_reclaim(bars):
         except (TypeError, ValueError, KeyError, OverflowError):
             return dict(out, status="target_source_invalid")
         if not barriers:
-            return dict(out, status="no_known_target",
-                        breakout_at=br["start"], broken_support=support,
-                        provisional_stop=stop)
+            # Never invent a confirmed pivot in price discovery.
+            # Hypothetical bounded exit is research-only: cannot qualify
+            # an unverified trade or be relabeled as known support.
+            estimate = project_short_target(
+                cur["close"], stop, atr, costs=Costs(min_rr=MIN_RR),
+                desired_rr=2.05, max_atr=8.0)
+            out.update(breakout_at=br["start"], broken_support=support,
+                       provisional_stop=stop, projection=estimate,
+                       target_basis="NO_CONFIRMED_LOWER_PIVOT")
+            return dict(out, status=("projected_target_shadow" if
+                        estimate["status"]=="projected_target_candidate"
+                        else "projected_target_rejected"))
         barrier = barriers[0]
         target = rounded(barrier["price"]+max(.1,cur["close"]*.00015), .1, up=True)
         if target >= cur["close"]:
