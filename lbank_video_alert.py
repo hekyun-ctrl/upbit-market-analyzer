@@ -18,7 +18,7 @@ from lbank_early_alert_delivery import activation_check, send_early_candidate, s
 from lbank_scenario_alerts import send_scenario_candidate
 from lbank_b_retest_research import persist_b_retest_shadow
 from lbank_b_early_1m_shadow import read_closed_1m_window, persist_first_minute_shadow
-from lbank_b_momentum_trial import evaluate_trial, evaluate_five_break, deliver_trial
+from lbank_b_momentum_trial import evaluate_trial, evaluate_five_break, read_b_5m_context, deliver_trial
 from lbank_native_book import NativeBookError, fetch_native_book
 from lbank_native_candles import NativeCandleThread
 from lbank_telegram_transport import TelegramTransport
@@ -477,6 +477,9 @@ def run():
         now = time.time()
         try:
             bars = read_window(source_path, now)
+            # B TEST only: preserve real older receipts across <=2 missing
+            # 5m slots after deploy. Formal read_window stays fail-closed.
+            b_context = read_b_5m_context(source_path, now)
             if now >= next_health:
                 LOG.info("VIDEO_ALERT_FEED ready=%s consecutive=%d required=%d latest=%s",
                          len(bars) >= WARMUP, len(bars), WARMUP, bars[-1]["start"] if bars else None)
@@ -537,7 +540,7 @@ def run():
                 # Cost/quote checked; explicitly unverified, never an order
                 # and never an override of legacy formal signal approval.
                 try:
-                    five_trial = evaluate_five_break(bars)
+                    five_trial = evaluate_five_break(b_context, allow_small_gaps=True)
                     five_trial_delivery = deliver_trial(
                         ledger, five_trial, now=now, get_book=get_book,
                         clock=time.time,
@@ -548,7 +551,7 @@ def run():
                         "delivery=%s trend=%s rr=%s available=%d required=%d",
                         seen, five_trial["status"], five_trial_delivery,
                         five_trial.get("trend", "unknown"),
-                        five_trial.get("net_rr"), len(bars), 72)
+                        five_trial.get("net_rr"), len(b_context), 72)
                 except (sqlite3.Error, OSError, ValueError, TypeError,
                         KeyError, ArithmeticError) as exc:
                     LOG.warning("VIDEO_B_FIVE_TEST_FAILURE type=%s",
@@ -576,7 +579,7 @@ def run():
                         # A projected 2R exit is NOT a known market support:
                         # never describe this lane as historically verified.
                         # Disabled by default; no broker/account/order calls.
-                        trial = evaluate_trial(minutes, bars)
+                        trial = evaluate_trial(minutes, b_context, allow_small_gaps=True)
                         trial_status = deliver_trial(
                             ledger, trial, now=now, get_book=get_book,
                             clock=time.time,
