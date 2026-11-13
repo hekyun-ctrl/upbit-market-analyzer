@@ -80,3 +80,32 @@ chronologically held-out sample: report count, win/loss/unresolved,
 max adverse excursion, fee-adjusted P&L, drawdown, and missed breakouts.
 Do not promote the projected-target trial into a "formal qualified"
 position recommendation until objective held-out evidence supports it.
+
+## Follow-up: restart continuity / PR #38
+
+The first production release succeeded but a fresh deployment briefly left
+the strict last-5m window empty (new process missed a 5m closing span).
+The old 78 stream-derived candles remained on persistent storage. Requiring
+another continuous 72 would have reset the new B strategy for hours.
+
+The follow-up adds a **test-only** B context reader:
+- Reads the same LBank-native persisted 5m bars and source-matched
+  individual arrival timestamps; all must be stream-closed and on time.
+- Tolerates at most two **missing** 5m slots across the archival B regime.
+  Never interpolates, backfills, or invents missing OHLCV. Fully aligned
+  15m/1h aggregates exclude every incomplete group.
+- Requires at least seven truly consecutive recent 5m candles for
+  **five-minute** support-break geometry. The **one-minute** break path
+  instead needs 21 contiguous real finished 1m bars, with at least 72
+  recorded true 5m bars for its separately validated higher-timeframe context.
+- Preserves the existing strict `read_window` and formal RSI qualification
+  completely unchanged. The after-gap reader NEVER feeds formal alerts.
+- Rejects stale latest 5m, missing receipts, more than two missing slots,
+  future receipts, and out-of-date quote windows.
+- Tested with an actual SQLite fixture containing a deliberately missing
+  middle 5m candle: the gap is not synthesized or counted as an observed bar.
+
+Full regression suite after this follow-up: **607 tests passed** in a
+non-production isolated sandbox. This establishes software functionality,
+not out-of-sample trading profitability. No automatic orders or "formal"
+promotion of experimental target projections.
