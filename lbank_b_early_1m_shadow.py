@@ -12,7 +12,7 @@ from pathlib import Path
 import sqlite3
 from statistics import median
 
-from lbank_b_retest_research import _atr, trend_priority
+from lbank_b_retest_research import _atr, trend_priority, MIN_HISTORY
 from lbank_structural_target_plan import available_barriers, entry_bound, rounded
 from research.zerobase.video_entry import Costs, judge_entry
 
@@ -89,7 +89,7 @@ def evaluate_first_minute_break(minute_bars,five_bars):
     prior_fives=[b for b in five_bars
                  if b["start"]+300<=now_bar["start"]
                  and b.get("received_at",float("inf"))<=now_bar["received_at"]]
-    if len(prior_fives)<96:
+    if len(prior_fives)<MIN_HISTORY:
         return dict(out,status="insufficient_5m_history")
     from lbank_b_retest_research import _valid
     if not _valid(prior_fives[-min(240,len(prior_fives)):]):
