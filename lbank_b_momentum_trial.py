@@ -103,6 +103,30 @@ def _prior_five(minute, fives):
             b.get("received_at",float("inf"))<=minute["received_at"]]
 
 
+
+def _known_support_target(price, stop, atr, support):
+    """Try a nearer, *observed* pivot before discarding a projected 2R B.
+
+    Never project through known support to manufacture RR. Target is buffered
+    toward entry, risk/volatility is unchanged, and a full cost check applies.
+    This remains research-only until independent forward validation.
+    """
+    buffered = rounded(support + max(TEST_RR.tick, price * .00015),
+                       TEST_RR.tick, up=True)
+    if not (0 < buffered < price):
+        return {"status": "known_support_too_close", "target": buffered}
+    if (price - buffered) / atr > ATR_MULTIPLE_CAP:
+        return {"status": "known_support_outside_volatility_cap",
+                "target": buffered}
+    check, rr = judge_entry(dict(lane="b_known_support_test", direction=-1,
+                                 stop=stop, target=buffered), price, TEST_RR)
+    if check != "qualified":
+        return {"status": "known_support_insufficient_net_rr",
+                "target": buffered, "net_rr": rr}
+    return {"status": "qualified", "target": buffered, "net_rr": rr,
+            "target_basis": "nearest_observed_support_with_entry_side_buffer"}
+
+
 def evaluate_trial(minutes, fives, *, allow_small_gaps=False):
     """Return a test-only plan at the last completed minute; no live quote."""
     out={"policy":POLICY,"status":"insufficient_history","kind":"test_only"}
@@ -150,16 +174,22 @@ def evaluate_trial(minutes, fives, *, allow_small_gaps=False):
                     projected_target=projection.get("target"),
                     distance_atr=projection.get("distance_atr"))
     target=projection["target"]
-    # If a previously confirmed lower 5m support lies BEFORE the projection,
-    # the signal is blocked rather than knowingly targeting through it.
+    # If known lower 5m support lies before the projected exit, use a
+    # conservative exit above it only when the original 2R gate still passes.
     try:
         obstacles=available_barriers(_contiguous_tail(fives)[-240:],-1,price,curr["received_at"])
     except (KeyError,TypeError,ValueError,OverflowError):
         return dict(out,status="invalid_target_evidence")
+    target_basis="bounded_volatility_projection_NOT_support"
     if obstacles and obstacles[0]["price"]>target:
-        return dict(out,status="known_support_before_projection",
-                    stop=stop,estimated_target=target,
-                    prior_known_support=obstacles[0]["price"])
+        near=_known_support_target(price,stop,atr,obstacles[0]["price"])
+        if near["status"]!="qualified":
+            return dict(out,status=near["status"],stop=stop,
+                        estimated_target=target,
+                        prior_known_support=obstacles[0]["price"],
+                        structural_net_rr=near.get("net_rr"))
+        target=near["target"]
+        target_basis=near["target_basis"]
     plan=dict(lane="b_native_first_microbreak_test",direction=-1,
               stop=stop,target=target)
     verdict,rr=judge_entry(plan,price,TEST_RR)
@@ -167,7 +197,7 @@ def evaluate_trial(minutes, fives, *, allow_small_gaps=False):
         return dict(out,status=verdict,stop=stop,target=target,net_rr=rr)
     return dict(out,status="test_candidate",direction="short",stop=stop,
                 target=target,net_rr=rr,
-                target_basis="bounded_volatility_projection_NOT_support",
+                target_basis=target_basis,
                 stop_basis="known_4x_1m_high_plus_20pct_atr1",
                 costs_assumptions=asdict(TEST_RR))
 
@@ -223,17 +253,23 @@ def evaluate_five_break(fives, *, allow_small_gaps=False):
         barriers=available_barriers(_contiguous_tail(fives)[-240:],-1,price,cur["received_at"])
     except (ValueError,KeyError,TypeError,OverflowError):
         return dict(out,status="invalid_target_evidence")
+    target_basis=projection["target_basis"]
     if barriers and barriers[0]["price"]>target:
-        return dict(out,status="known_support_before_projection",
-                    stop=stop,estimated_target=target,
-                    prior_known_support=barriers[0]["price"])
+        near=_known_support_target(price,stop,atr,barriers[0]["price"])
+        if near["status"]!="qualified":
+            return dict(out,status=near["status"],stop=stop,
+                        estimated_target=target,
+                        prior_known_support=barriers[0]["price"],
+                        structural_net_rr=near.get("net_rr"))
+        target=near["target"]
+        target_basis=near["target_basis"]
     verdict,rr=judge_entry(dict(lane="b_native_first_5m_break_test",
                        direction=-1,stop=stop,target=target),price,TEST_RR)
     if verdict!="qualified":
         return dict(out,status=verdict,stop=stop,target=target,net_rr=rr)
     return dict(out,status="test_candidate",direction="short",
                 stop=stop,target=target,net_rr=rr,
-                target_basis=projection["target_basis"],
+                target_basis=target_basis,
                 stop_basis="causal_3x_5m_high_plus_20pct_ATR",
                 costs_assumptions=asdict(TEST_RR))
 
@@ -281,18 +317,23 @@ def _message(plan,book):
     kst=timezone(timedelta(hours=9))
     stamp=datetime.fromtimestamp(plan["signal_start"]+plan.get("bar_seconds",60),kst).strftime("%m-%d %H:%M KST")
     candle_label="5분" if plan.get("bar_seconds",60)==300 else "1분"
+    structural=plan.get("target_basis")=="nearest_observed_support_with_entry_side_buffer"
+    target_line=("과거 확인 지지선 위 목표 후보" if structural
+                 else "변동성 기반 목표 *가설*")
+    target_note=("과거 지지선은 목표가 도달을 보장하지 않습니다."
+                 if structural else "목표는 확인된 하단 지지선이 아닙니다.")
     return (
         "[ZB BTCUSDT · 실험 진입 후보 / 실거래 검증 전]\n"
         "⚠️ 정식 수익성 검증을 통과한 알림이 아닙니다. 자동 주문 없음\n"
         f"방향: 숏(매도) | {candle_label}봉 종료: {stamp}\n"
         f"실시간 매도 호가(주문가 보장 안 됨): {book['bid']:,.1f} USDT\n"
         f"구조 손절 후보: {plan['stop']:,.1f} USDT\n"
-        f"변동성 기반 목표 *가설*: {plan['target']:,.1f} USDT\n"
+        f"{target_line}: {plan['target']:,.1f} USDT\n"
         f"가정 비용 후 손익비: {book['net_rr']:.2f}:1 "
         "(목표 도달 확률 검증되지 않음)\n"
         f"첫 {candle_label}봉 지지 이탈: {plan['break_threshold']:,.1f}, "
         f"거래량 {plan['volume_multiple']:.2f}배\n"
-        "목표는 확인된 하단 지지선이 아닙니다. 모의 테스트 목적으로만 판단하세요. "
+        f"{target_note} 모의 테스트 목적으로만 판단하세요. "
         "50배 레버리지에서는 변동·슬리피지에 특히 주의하세요."
     )
 
