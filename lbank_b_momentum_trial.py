@@ -106,7 +106,9 @@ def _prior_five(minute, fives):
 def evaluate_trial(minutes, fives, *, allow_small_gaps=False):
     """Return a test-only plan at the last completed minute; no live quote."""
     out={"policy":POLICY,"status":"insufficient_history","kind":"test_only"}
-    if len(minutes)<61 or not _valid_minutes(minutes[-61:]):
+    # Twenty prior 1m bars cover baseline volume; 14 cover volatility.
+    # Never wait 61 minutes solely for an oversized history cache.
+    if len(minutes)<21 or not _valid_minutes(minutes[-61:]):
         return out
     curr=minutes[-1]
     fives=_prior_five(curr,fives)
