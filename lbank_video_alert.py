@@ -16,6 +16,7 @@ import time
 from lbank_early_breakout_audit import persist_early_audit
 from lbank_early_alert_delivery import activation_check, send_early_candidate, send_feed_warning
 from lbank_scenario_alerts import send_scenario_candidate
+from lbank_double_bottom_alerts import send_double_bottom_candidate
 from lbank_b_retest_research import persist_b_retest_shadow
 from lbank_b_early_1m_shadow import read_closed_1m_window, persist_first_minute_shadow
 from lbank_b_momentum_trial import evaluate_trial, evaluate_five_break, read_b_5m_context, deliver_trial
@@ -442,6 +443,8 @@ def run():
     enabled = os.getenv("VIDEO_ALERT_SEND_ENABLED", "0") == "1"
     early_enabled = enabled and os.getenv("VIDEO_EARLY_ALERT_SEND_ENABLED", "0") == "1"
     scenario_enabled = enabled and os.getenv("VIDEO_SCENARIO_ALERT_SEND_ENABLED", "0") == "1"
+    double_bottom_enabled = (scenario_enabled and
+        os.getenv("VIDEO_DOUBLE_BOTTOM_SEND_ENABLED", "1") == "1")
     momentum_trial_enabled = enabled and os.getenv("VIDEO_B_MOMENTUM_TEST_SEND_ENABLED", "0") == "1"
     system_enabled = enabled and os.getenv("VIDEO_ALERT_SYSTEM_NOTICES_ENABLED", "0") == "1"
     volume = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
@@ -458,6 +461,7 @@ def run():
              os.getenv("RAILWAY_GIT_COMMIT_SHA", "local"), SOURCE, enabled, WARMUP)
     LOG.info("VIDEO_ALERT_POLICIES live=%s shadow=disabled experimental_rsi=true", LIVE_SEQUENCE_POLICY)
     LOG.info("VIDEO_SCENARIO_CONFIG enabled=%s events_only=true warmup=21", scenario_enabled)
+    LOG.info("VIDEO_DOUBLE_BOTTOM_CONFIG enabled=%s observational=true no_orders=true min_bars=32", double_bottom_enabled)
     LOG.info("VIDEO_B_MOMENTUM_TEST_CONFIG enabled=%s test_only=true no_orders=true", momentum_trial_enabled)
     if enabled:
         token_ok, chat_ok = telegram.health()
@@ -518,19 +522,32 @@ def run():
                 if (len(bars) >= WARMUP and
                         bars[-1]["start"] + 300 <= now <= bars[-1]["start"] + 300 + MAX_CLOSE_AGE):
                     last_fresh = now
-                # Evaluate the A/B/C observational lane before the generic
-                # early-breakout lane, to avoid duplicate low-confidence alerts.
-                # Never change the qualified RSI/CCI entry decision.
+                # W-bottom lifecycle: separate observational path, with
+                # frozen pattern anchors and stage-by-stage deduplication.
+                # Always subordinate to a qualified formal entry alert.
+                try:
+                    db_status = send_double_bottom_candidate(
+                        ledger, bars, now=now, started=started, final_status=status,
+                        send=telegram.send if enabled else None,
+                        enabled=double_bottom_enabled)
+                except (sqlite3.Error, OSError, ValueError, KeyError, TypeError,
+                        ArithmeticError) as exc:
+                    LOG.warning("VIDEO_DOUBLE_BOTTOM_FAILURE type=%s", type(exc).__name__)
+                    db_status = "evaluation_failed"
+                LOG.info("VIDEO_DOUBLE_BOTTOM_DECISION bar=%d status=%s", seen, db_status)
+                db_observed = db_status.split(":")[-1] in ("accepted", "unconfirmed")
+                # Prefer the more specific W event to a generic A/B/C event
+                # on the same candle; retain all existing independent paths.
                 try:
                     scenario_status = send_scenario_candidate(
                         ledger, bars, now=now, started=started, final_status=status,
                         send=telegram.send if enabled else None,
-                        enabled=scenario_enabled)
+                        enabled=scenario_enabled and not db_observed)
                 except (sqlite3.Error, OSError, ValueError, KeyError, TypeError) as exc:
                     LOG.warning("VIDEO_SCENARIO_FAILURE type=%s", type(exc).__name__)
                     scenario_status = "evaluation_failed"
                 LOG.info("VIDEO_SCENARIO_DELIVERY bar=%d status=%s", seen, scenario_status)
-                observed = scenario_status.split(":")[-1] in ("accepted", "unconfirmed")
+                observed = db_observed or scenario_status.split(":")[-1] in ("accepted", "unconfirmed")
                 early_status = send_early_candidate(
                     ledger, bars, now=now, final_status=status,
                     send=telegram.send if enabled else None,

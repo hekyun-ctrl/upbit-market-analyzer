@@ -7,7 +7,7 @@
     "startCommand": "python -u lbank_video_alert.py",
     "restartPolicyType": "ALWAYS",
     "preDeployCommand": [
-      "python -m unittest test_lbank_video_entry test_lbank_video_alert test_lbank_early_breakout_audit test_lbank_early_alert_delivery test_lbank_scenario_alerts test_lbank_b_retest_research test_lbank_b_early_1m_shadow test_lbank_b_momentum_trial test_lbank_b_three_fixes"
+      "python -m unittest test_lbank_video_entry test_lbank_video_alert test_lbank_early_breakout_audit test_lbank_early_alert_delivery test_lbank_scenario_alerts test_lbank_double_bottom_alerts test_lbank_b_retest_research test_lbank_b_early_1m_shadow test_lbank_b_momentum_trial test_lbank_b_three_fixes"
     ]
   }
 }
