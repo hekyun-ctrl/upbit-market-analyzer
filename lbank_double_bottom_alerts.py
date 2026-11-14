@@ -79,10 +79,10 @@ def detect_double_bottom(bars):
     last = len(rows)-1
     # Most recent confirmed second bottom wins. Both pivots must be observed
     # before the present bar; no later-price labels or look-ahead.
-    for j in range(last-1, max(3, last-18), -1):
+    # A *new* defense alert must be close in time to the second bottom.
+    # Later stages use frozen persisted state instead of redetecting old W's.
+    for j in range(last-1, max(3, last-4), -1):
         if not _pivot(rows, j):
-            continue
-        if last - j > 18:
             continue
         for i in range(j-4, max(2, j-25)-1, -1):
             if not _pivot(rows, i):
@@ -172,6 +172,11 @@ def format_double_bottom(state, phase, bar):
         "hold": "돌파 후 두 개 이상의 완료봉이 넥라인 위를 지켰습니다.",
         "invalidated": "이전 바닥/넥라인 방어 기준이 깨졌습니다. 이전 후보를 취소하세요.",
     }[phase]
+    if phase in ("breakout", "hold"):
+        rr_line = (f"가정 비용 후 손익비: {rr:.2f}:1 · "
+                   f"{'2:1 이상, 실제 체결 검증 필요' if rr>=2 else '2:1 미달, 진입 부적격'}")
+    else:
+        rr_line = "가정 비용 후 손익비: 진입 전 단계/무효 후보이므로 평가하지 않음"
     return (
         "[ZB BTCUSDT · W 쌍바닥 단계 관찰 / 실험]\n"
         "⚠️ 정식 진입 알람 아님 · 수익성 검증 전 · 자동 주문 없음\n"
@@ -182,8 +187,7 @@ def format_double_bottom(state, phase, bar):
         f"두 번째 저점 거래량 감소: {'예' if state['volume_softened'] else '아니오/미확인'}\n"
         f"관찰 무효화 가격대: {stop:,.1f} USDT (확정 손절가 아님)\n"
         f"측정폭 목표 *가설*: {target:,.1f} USDT\n"
-        f"가정 비용 후 손익비: {rr:.2f}:1 · "
-        f"{'2:1 이상, 실제 체결 검증 필요' if rr>=2 else '2:1 미달, 진입 부적격'}\n"
+        f"{rr_line}\n"
         f"다음 판단: {note}\n"
         "왕복 비용 0.12% 가정. 목표 도달 확률과 실제 수익성은 검증되지 않았습니다.\n"
         "LBank 1분 스트림 합성 5분봉으로 독립 REST 원본 대조 전입니다."
