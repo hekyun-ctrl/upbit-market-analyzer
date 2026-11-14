@@ -19,6 +19,7 @@ from lbank_scenario_alerts import send_scenario_candidate
 from lbank_double_bottom_alerts import send_double_bottom_candidate
 from lbank_b_retest_research import persist_b_retest_shadow
 from lbank_b_early_1m_shadow import read_closed_1m_window, persist_first_minute_shadow
+from lbank_one_minute_prealert import send_one_minute_prealert
 from lbank_b_momentum_trial import evaluate_trial, evaluate_five_break, read_b_5m_context, deliver_trial
 from lbank_native_book import NativeBookError, fetch_native_book
 from lbank_native_candles import NativeCandleThread
@@ -442,6 +443,8 @@ def run():
     data = Path(os.environ.get("VIDEO_ALERT_STATE_DIR", "/data")).resolve()
     enabled = os.getenv("VIDEO_ALERT_SEND_ENABLED", "0") == "1"
     early_enabled = enabled and os.getenv("VIDEO_EARLY_ALERT_SEND_ENABLED", "0") == "1"
+    minute_prealert_enabled = (early_enabled and
+        os.getenv("VIDEO_ONE_MINUTE_PREALERT_SEND_ENABLED", "1") == "1")
     scenario_enabled = enabled and os.getenv("VIDEO_SCENARIO_ALERT_SEND_ENABLED", "0") == "1"
     double_bottom_enabled = (scenario_enabled and
         os.getenv("VIDEO_DOUBLE_BOTTOM_SEND_ENABLED", "1") == "1")
@@ -463,6 +466,8 @@ def run():
     LOG.info("VIDEO_SCENARIO_CONFIG enabled=%s events_only=true warmup=21", scenario_enabled)
     LOG.info("VIDEO_DOUBLE_BOTTOM_CONFIG enabled=%s observational=true no_orders=true min_bars=32", double_bottom_enabled)
     LOG.info("VIDEO_B_MOMENTUM_TEST_CONFIG enabled=%s test_only=true no_orders=true", momentum_trial_enabled)
+    LOG.info("VIDEO_1M_PREALERT_CONFIG enabled=%s source=native_closed_1m independent_5m=true no_orders=true",
+             minute_prealert_enabled)
     if enabled:
         token_ok, chat_ok = telegram.health()
         LOG.info("VIDEO_ALERT_TELEGRAM_CHECK token_ok=%s chat_ok=%s no_test_message=true", token_ok, chat_ok)
@@ -582,6 +587,29 @@ def run():
                     minutes = read_closed_1m_window(source_path, now)
                     if minutes and minutes[-1]["start"] == expected_minute:
                         minute_seen = expected_minute
+                        # A first-minute heads-up is checked BEFORE B backtest,
+                        # never waits for 5m RSI/CCI or its larger warmup.
+                        # At the exact 5m close, avoid duplicating an already
+                        # accepted higher-priority notification for that candle.
+                        same_five = seen is not None and minute_seen == seen + 240
+                        suppress = bool(same_five and (
+                            status == "telegram_accepted" or
+                            db_status.split(":")[-1] in ("accepted", "unconfirmed") or
+                            scenario_status.split(":")[-1] in ("accepted", "unconfirmed") or
+                            early_status in ("accepted", "unconfirmed")))
+                        try:
+                            pre_status = send_one_minute_prealert(
+                                ledger, minutes, now=time.time(), started=started,
+                                send=telegram.send if enabled else None,
+                                enabled=minute_prealert_enabled,
+                                suppress=suppress, clock=time.time)
+                        except (sqlite3.Error, OSError, ValueError, TypeError,
+                                KeyError, ArithmeticError) as exc:
+                            LOG.warning("VIDEO_1M_PREALERT_FAILURE type=%s",
+                                        type(exc).__name__)
+                            pre_status = "evaluation_failed"
+                        LOG.info("VIDEO_1M_PREALERT_DECISION minute=%d status=%s",
+                                 minute_seen, pre_status)
                         first = persist_first_minute_shadow(
                             ledger, minutes, bars, now=now, started=started)
                         LOG.info(
