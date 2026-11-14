@@ -1,5 +1,6 @@
 """Double-bottom research notifications: causal geometry and delivery tests."""
 import sqlite3
+from copy import deepcopy
 import unittest
 from types import SimpleNamespace
 from unittest.mock import Mock
@@ -83,7 +84,7 @@ class DoubleBottomTests(unittest.TestCase):
         sender.assert_called_once()
 
     def test_missing_bar_or_future_receipt_blocks_every_stage(self):
-        broken=self.rows[:32]
+        broken=deepcopy(self.rows[:32])
         broken[22]["start"] += 300
         self.assertEqual(detect_double_bottom(broken)["status"],"invalid_source")
         sender=Mock()
@@ -91,7 +92,7 @@ class DoubleBottomTests(unittest.TestCase):
             now=broken[-1]["start"]+302,started=self.start-300,
             final_status="no_qualified_entry",send=sender,enabled=True),
             "invalid_source")
-        future=self.rows[:32]
+        future=deepcopy(self.rows[:32])
         future[20]["received_at"]=future[-1]["start"]+600
         self.assertEqual(send_double_bottom_candidate(self.ledger,future,
             now=future[-1]["start"]+302,started=self.start-300,
