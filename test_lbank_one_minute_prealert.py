@@ -61,9 +61,10 @@ class OneMinutePrealertTests(unittest.TestCase):
         message=sender.call_args.args[0]
         self.assertIn("1분봉 조기",message)
         self.assertIn("정식 진입 신호 아님",message)
-        self.assertIn("서버 판정",message)
-        self.assertNotIn("손절가:",message)
-        self.assertNotIn("목표가:",message)
+        self.assertIn("진입가: 미확정",message)
+        self.assertIn("손절가: 미확정",message)
+        self.assertIn("목표가: 미확정",message)
+        self.assertIn("진입 미승인",message)
 
     def test_quiet_candle_and_low_volume_do_not_page(self):
         sender=Mock(return_value=True)
