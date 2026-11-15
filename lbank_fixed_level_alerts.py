@@ -63,26 +63,16 @@ def evaluate_level_cross(bars, period, now):
 
 def format_level_alert(event):
     period = event["period"]
-    side = event["direction"]
-    end = event["start"] + period
-    at = datetime.fromtimestamp(end, KST).strftime("%m-%d %H:%M KST")
-    phase = "1분봉 조기 경보" if period == 60 else "5분봉 마감 확인"
-    meaning = "62,525 하향 이탈" if side == "down" else "63,060 상향 회복"
-    next_step = ("5분봉 마감까지 지지 이탈 유지 여부 확인" if period == 60 else
-                 "후속 봉의 재회복·재이탈과 실제 손익비 검증 필요")
+    at = datetime.fromtimestamp(event["start"] + period, KST).strftime("%m-%d %H:%M KST")
+    kind = "1분 조기" if period == 60 else "5분 마감"
+    crossed = "62,525 하향" if event["direction"] == "down" else "63,060 상향"
     return (
-        f"[ZB LBank BTCUSDT · 지정 가격선 {phase}]\n"
-        "⚠️ 가격 변화 관찰 전용 · 진입 신호 아님 · 자동 주문 없음\n"
-        f"감시 사건: {meaning}\n"
-        f"확인 시각: {at} (스트림 추정 완료봉)\n"
-        f"직전 {period // 60}분봉 종가: {event['previous_close']:,.1f} USDT\n"
-        f"이번 {period // 60}분봉 종가: {event['close']:,.1f} USDT\n"
-        f"감시 기준선: {event['level']:,.1f} USDT\n"
-        f"다음 확인: {next_step}\n"
-        "실시간 호가·체결가 아님. LBank 1분봉 스트림 기반이며 독립 REST 검증 전.\n"
-        "손절·목표·수수료 검증 전이므로 50배 선물 진입 권유가 아닙니다."
+        f"[BTCUSDT {kind} · {crossed} · {at}]\n"
+        f"진입가: 미확정 (관찰 종가 {event['close']:,.1f})\n"
+        "손절가: 미확정\n"
+        "목표가: 미확정\n"
+        "※ 가격선 통과 감지 · 진입 미승인 · 자동주문 없음"
     )
-
 
 def send_level_alert(ledger, bars, period, *, now, started, send, enabled):
     """Persistent reserve-before-send dedupe; never backfill old crossings."""
