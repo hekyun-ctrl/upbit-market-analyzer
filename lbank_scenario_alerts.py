@@ -146,6 +146,15 @@ def format_scenario(event):
                   rank.get("trend"), "판단 자료 부족")
     priorities = rank.get("priorities") or ["1순위 판단 보류 (연속 5분봉 96개 필요)"]
     ranked = "\n".join(priorities)
+    # Directional observation is NOT proof of a tradable entry or trend reversal.
+    contradictory = ((kind == "C" and rank.get("trend") == "bearish") or
+                     (kind in ("A", "B") and rank.get("trend") == "bullish"))
+    if contradictory:
+        risk_header = "⛔ 상위 추세 역행 관찰 · 진입 부적격 · 추세 전환 미확인\n"
+    elif not event.get("target_qualified", False):
+        risk_header = "⛔ 비용 반영 손익비 미충족 · 진입 부적격\n"
+    else:
+        risk_header = "⚠️ 가정 손익비 충족은 진입 승인 아님 · 실시간 호가/저항 확인 필요\n"
     direction = "숏(매도)" if kind in ("A", "B") else "롱(매수)"
     close_time = datetime.fromtimestamp(event["start"] + 300, KST).strftime("%m-%d %H:%M KST")
     stop = event["stop"]
@@ -161,6 +170,7 @@ def format_scenario(event):
         )
     return (
         "[ZB 엘뱅크 BTCUSDT · 5분봉 시나리오 관찰]\n"
+        f"{risk_header}"
         "⚠️ 움직임 감지 전용 · 매매 진입 신호 아님 · 자동 주문 없음\n"
         f"시나리오 {kind} / {direction}: {NAMES[kind]}\n"
         f"상위 추세 판단: {regime} (완료 15분·1시간봉 기준)\n"
