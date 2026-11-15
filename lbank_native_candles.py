@@ -120,6 +120,16 @@ class NativeCandleStore:
             try:
                 parsed.append((raw, parse_bar(raw, observed_end_by=observed_end_by if active else None)))
             except ValueError as exc:
+                # Late boundary updates must not restart the entire feed.
+                # Drop without certifying missing or incomplete candles.
+                if (raw.get("a") == "BTCUSDT" and raw.get("b") == "1m"
+                        and str(exc) in {"candle_update_after_end", "candle_update_at_end"}
+                        and self.current is not None
+                        and int(raw["c"]) <= self.current
+                        and int(raw["k"]) >= int(raw["c"]) + 60):
+                    LOG.warning("NATIVE_CANDLES_STALE_BOUNDARY_ROW dropped=true minute=%s active=%s",
+                                int(raw["c"]), self.current)
+                    continue
                 if str(exc) in {"candle_update_after_end", "candle_update_at_end"}:
                     # Relative timing only; no market prices or payload logged.
                     LOG.info("NATIVE_CANDLES_LATE_ROW active=%s period=%s offset_s=%s receipt_offset_s=%s",
