@@ -61,20 +61,26 @@ def evaluate_level_cross(bars, period, now):
             "previous_close": before, "volume": float(current["volume"])}
 
 
-def format_level_alert(event):
+def format_level_alert(event, market_trend=None):
     period = event["period"]
     at = datetime.fromtimestamp(event["start"] + period, KST).strftime("%m-%d %H:%M KST")
     kind = "1분 조기" if period == 60 else "5분 마감"
     crossed = "62,525 하향" if event["direction"] == "down" else "63,060 상향"
     return (
         f"[BTCUSDT {kind} · {crossed} · {at}]\n"
+        "판정: 진입대기 (가격선 이탈·회복 관찰)\n"
         f"진입가: 미확정 (관찰 종가 {event['close']:,.1f})\n"
         "손절가: 미확정\n"
         "목표가: 미확정\n"
-        "※ 가격선 통과 감지 · 진입 미승인 · 자동주문 없음"
+        f"근거: {event['previous_close']:,.1f} → {event['close']:,.1f}, "
+        f"기준선 {event['level']:,.1f} 교차\n"
+        f"상위 추세: {market_trend or '미확인'}\n"
+        "대응: 목표 지지/저항·손절·호가·비용 손익비 확인 전 대기\n"
+        "※ 정식 진입 신호 아님 · 진입 미승인 · 자동주문 없음"
     )
 
-def send_level_alert(ledger, bars, period, *, now, started, send, enabled):
+def send_level_alert(ledger, bars, period, *, now, started, send, enabled,
+                     market_trend=None):
     """Persistent reserve-before-send dedupe; never backfill old crossings."""
     if not enabled or send is None:
         return "disabled"
@@ -125,7 +131,7 @@ def send_level_alert(ledger, bars, period, *, now, started, send, enabled):
         return "reservation_failed"
     accepted = False
     try:
-        accepted = bool(send(format_level_alert(event)))
+        accepted = bool(send(format_level_alert(event, market_trend=market_trend)))
     except Exception as exc:
         LOG.warning("VIDEO_FIXED_LEVEL_SEND_FAILURE type=%s", type(exc).__name__)
     status = "accepted" if accepted else "unconfirmed"
