@@ -106,6 +106,21 @@ class ScenarioAlertTests(unittest.TestCase):
         self.assertFalse(z["target_qualified"])
         self.assertIn("손익비 검증 안 됨", format_scenario(z))
 
+    def test_countertrend_C_is_explicitly_non_actionable(self):
+        event = evaluate_scenario(self.history(case="C"))
+        event["ranking"] = {"trend": "bearish", "priorities": ["B-short first"]}
+        body = format_scenario(event)
+        self.assertIn("상위 추세 역행 관찰", body)
+        self.assertIn("진입 부적격", body)
+
+    def test_nonqualified_B_warns_before_price_levels(self):
+        event = evaluate_scenario(self.history(case="B"))
+        event["ranking"] = {"trend": "bearish", "priorities": ["B-short first"]}
+        self.assertFalse(event["target_qualified"])
+        body = format_scenario(event)
+        self.assertIn("손익비 미충족", body)
+        self.assertLess(body.index("진입 부적격"), body.index("완료봉 종가"))
+
     def test_send_and_cooldown(self):
         sender = Mock(return_value=True)
         rows = self.history(case="B")
