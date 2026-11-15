@@ -549,7 +549,8 @@ def run():
                     db_status = send_double_bottom_candidate(
                         ledger, bars, now=now, started=started, final_status=status,
                         send=telegram.send if enabled else None,
-                        enabled=double_bottom_enabled)
+                        enabled=double_bottom_enabled,
+                        market_trend=compact_trend(bars))
                 except (sqlite3.Error, OSError, ValueError, KeyError, TypeError,
                         ArithmeticError) as exc:
                     LOG.warning("VIDEO_DOUBLE_BOTTOM_FAILURE type=%s", type(exc).__name__)
