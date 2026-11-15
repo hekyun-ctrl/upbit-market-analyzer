@@ -155,47 +155,58 @@ def _next_stage(state, bars):
     return "monitoring_rebound"
 
 
-def format_double_bottom(state, phase, bar):
-    stamp = datetime.fromtimestamp(bar["start"]+300, KST).strftime("%m-%d %H:%M KST")
-    neck, low = state["neckline"], min(state["low1"], state["low2"])
-    close = bar["close"]
-    atr = state["atr"]
-    stop = low-max(.35*atr,low*.00035)
-    target = neck + (neck - (state["low1"]+state["low2"])/2)
-    risk = close-stop + close*ROUND_TRIP_COST
-    gain = target-close-close*ROUND_TRIP_COST
-    rr = max(0,gain)/risk if risk > 0 else 0
-    note = {
-        "defense": "첫 반등 고점(넥라인)을 아직 넘지 않았습니다. 조기 관찰 단계입니다.",
-        "rebound": "두 번째 저점에서 반등했습니다. 넥라인 접근을 확인하세요.",
-        "breakout": "돌파봉이 나왔습니다. 다음 완료봉들의 넥라인 지지를 확인하세요.",
-        "hold": "돌파 후 두 개 이상의 완료봉이 넥라인 위를 지켰습니다.",
-        "invalidated": "이전 바닥/넥라인 방어 기준이 깨졌습니다. 이전 후보를 취소하세요.",
-    }[phase]
-    if phase in ("breakout", "hold"):
-        rr_line = (f"가정 비용 후 손익비: {rr:.2f}:1 · "
-                   f"{'2:1 이상, 실제 체결 검증 필요' if rr>=2 else '2:1 미달, 진입 부적격'}")
+def format_double_bottom(state, phase, bar, market_trend=None):
+    """Short contextual observation. Obsolete W targets are never trade levels."""
+    stamp = datetime.fromtimestamp(bar["start"] + 300, KST).strftime("%m-%d %H:%M KST")
+    close = float(bar["close"])
+    low = min(float(state["low1"]), float(state["low2"]))
+    neckline = float(state["neckline"])
+    atr = float(state["atr"])
+    buffer = max(neckline * .00035, atr * .20)
+    trend = market_trend or "미확인 (상위봉 자료 부족)"
+
+    if phase == "invalidated":
+        broken = ("쌍바닥 저점" if close < low - buffer
+                  else "돌파 후 넥라인")
+        decision = "진입대기 · 기존 롱 후보 취소"
+        evidence = f"{broken} 방어 실패 · 완료봉 {close:,.1f}"
+        response = "기존 롱 목표/손절 가설 폐기 · 새 숏은 별도 손익비 검증"
+    elif phase == "defense":
+        decision = "진입대기 · 저점 재방어 관찰"
+        evidence = f"두 번째 저점 {state['low2']:,.1f} · 넥라인 {neckline:,.1f}"
+        response = "넥라인 돌파와 수수료·손절·호가 확인 전 진입 보류"
+    elif phase == "rebound":
+        decision = "진입대기 · 반등 관찰"
+        evidence = f"쌍바닥 저점 {low:,.1f} · 넥라인 {neckline:,.1f}"
+        response = "상승 추세 전환 미확인 · 넥라인 회복 여부 관찰"
+    elif phase == "breakout":
+        decision = "진입대기 · 넥라인 돌파 관찰"
+        evidence = f"넥라인 {neckline:,.1f} 돌파 · 완료봉 {close:,.1f}"
+        response = "지지 유지·호가·목표 저항 및 비용 후 손익비 재확인"
+    elif phase == "hold":
+        decision = "진입대기 · 돌파 유지 관찰"
+        evidence = f"넥라인 {neckline:,.1f} 상단 유지 · 완료봉 {close:,.1f}"
+        response = "비용 반영 손익비 및 실제 체결 확인 전 진입 보류"
     else:
-        rr_line = "가정 비용 후 손익비: 진입 전 단계/무효 후보이므로 평가하지 않음"
+        raise ValueError("unknown_W_phase")
+
     return (
-        "[ZB BTCUSDT · W 쌍바닥 단계 관찰 / 실험]\n"
-        "⚠️ 정식 진입 알람 아님 · 수익성 검증 전 · 자동 주문 없음\n"
-        f"단계: {PHASES[phase]} | {stamp}\n"
-        f"LBank 5분 완료봉 종가: {close:,.1f} USDT\n"
-        f"1차 저점: {state['low1']:,.1f} / 2차 저점: {state['low2']:,.1f}\n"
-        f"넥라인(두 저점 사이 고점): {neck:,.1f} USDT\n"
-        f"두 번째 저점 거래량 감소: {'예' if state['volume_softened'] else '아니오/미확인'}\n"
-        f"관찰 무효화 가격대: {stop:,.1f} USDT (확정 손절가 아님)\n"
-        f"측정폭 목표 *가설*: {target:,.1f} USDT\n"
-        f"{rr_line}\n"
-        f"다음 판단: {note}\n"
-        "왕복 비용 0.12% 가정. 목표 도달 확률과 실제 수익성은 검증되지 않았습니다.\n"
-        "LBank 1분 스트림 합성 5분봉으로 독립 REST 원본 대조 전입니다."
+        f"[BTCUSDT 5분봉 W형 · {PHASES[phase]} | {stamp}]\n"
+        f"판정: {decision}\n"
+        f"진입가: 미확정 (관찰 종가 {close:,.1f})\n"
+        "손절가: 미확정\n"
+        "목표가: 미확정\n"
+        f"근거: {evidence}\n"
+        f"상위 추세: {trend}\n"
+        f"대응: {response}\n"
+        "※ 정식 진입 알람 아님 · 매매가격 미검증 · 자동주문 없음"
     )
 
 
+
 def send_double_bottom_candidate(ledger, bars, *, now, started,
-                                 final_status, send, enabled):
+                                 final_status, send, enabled,
+                                 market_trend=None):
     """Emit each phase once, reserve before sending; fail closed on gaps/stale."""
     if not enabled or send is None:
         return "disabled"
@@ -285,7 +296,7 @@ def send_double_bottom_candidate(ledger, bars, *, now, started,
         LOG.warning("VIDEO_DB_LEDGER_ERROR type=%s",type(exc).__name__)
         return "ledger_error"
     try:
-        ok=bool(send(format_double_bottom(active,phase,last)))
+        ok=bool(send(format_double_bottom(active,phase,last,market_trend=market_trend)))
     except Exception as exc:
         LOG.warning("VIDEO_DB_SEND_ERROR type=%s",type(exc).__name__)
         ok=False
