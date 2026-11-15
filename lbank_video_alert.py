@@ -21,6 +21,7 @@ from lbank_b_retest_research import persist_b_retest_shadow
 from lbank_b_early_1m_shadow import read_closed_1m_window, persist_first_minute_shadow
 from lbank_one_minute_prealert import send_one_minute_prealert
 from lbank_fixed_level_alerts import send_level_alert
+from lbank_telegram_context import compact_trend
 from lbank_b_momentum_trial import evaluate_trial, evaluate_five_break, read_b_5m_context, deliver_trial
 from lbank_native_book import NativeBookError, fetch_native_book
 from lbank_native_candles import NativeCandleThread
@@ -503,7 +504,8 @@ def run():
                 try:
                     fixed5 = send_level_alert(
                         ledger, bars, 300, now=now, started=started,
-                        send=telegram.send if enabled else None, enabled=fixed_level_enabled)
+                        send=telegram.send if enabled else None, enabled=fixed_level_enabled,
+                        market_trend=compact_trend(bars))
                 except (sqlite3.Error, OSError, ValueError, TypeError, KeyError) as exc:
                     LOG.warning("VIDEO_FIXED_LEVEL_5M_FAILURE type=%s", type(exc).__name__)
                     fixed5 = "evaluation_failed"
@@ -604,7 +606,8 @@ def run():
                         try:
                             fixed1 = send_level_alert(
                                 ledger, minutes, 60, now=now, started=started,
-                                send=telegram.send if enabled else None, enabled=fixed_level_enabled)
+                                send=telegram.send if enabled else None, enabled=fixed_level_enabled,
+                                market_trend=compact_trend(bars))
                         except (sqlite3.Error, OSError, ValueError, TypeError, KeyError) as exc:
                             LOG.warning("VIDEO_FIXED_LEVEL_1M_FAILURE type=%s", type(exc).__name__)
                             fixed1 = "evaluation_failed"
@@ -624,7 +627,8 @@ def run():
                                 ledger, minutes, now=time.time(), started=started,
                                 send=telegram.send if enabled else None,
                                 enabled=minute_prealert_enabled,
-                                suppress=suppress, clock=time.time)
+                                suppress=suppress, clock=time.time,
+                                market_trend=compact_trend(bars))
                         except (sqlite3.Error, OSError, ValueError, TypeError,
                                 KeyError, ArithmeticError) as exc:
                             LOG.warning("VIDEO_1M_PREALERT_FAILURE type=%s",
