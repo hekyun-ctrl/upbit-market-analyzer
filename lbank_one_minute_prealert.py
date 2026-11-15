@@ -79,7 +79,7 @@ def format_one_minute_prealert(event, *, checked_at):
     side = "하락" if event["direction"] == "down" else "상승"
     # This is not an entry strategy: never label a 1m close as an executable entry.
     return (
-        f"[BTCUSDT 1분봉 {side} 경보 · {bar_time}]\n"
+        f"[BTCUSDT 1분봉 조기 {side} 경보 · {bar_time}]\n"
         f"진입가: 미확정 (관찰 종가 {event['close']:,.1f})\n"
         "손절가: 미확정\n"
         "목표가: 미확정\n"
