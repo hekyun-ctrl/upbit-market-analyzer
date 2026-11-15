@@ -92,6 +92,18 @@ class NativeCandlesTests(unittest.TestCase):
         self.assertEqual(tuple(row), ("stream_closed", 101))
         self.assertEqual(store.current, 3060)
 
+    def test_late_boundary_row_does_not_restart_stream(self):
+        store = self.make_store()
+        store.ingest(frame(raw(3000, updated=3059)), 3059, wall_received=3060)
+        store.ingest(frame(raw(3060, updated=3061)), 3061, wall_received=3062)
+        # A delayed final update to the previous minute is ignored.
+        self.assertEqual(
+            store.ingest(frame(raw(3000, updated=3076)), 3076, wall_received=3076), [])
+        self.assertEqual(store.current, 3060)
+        self.assertEqual(
+            store.db.execute("SELECT quality FROM native_bars WHERE start=3000").fetchone()[0],
+            "stream_closed")
+
     def test_gap_at_boundary_prevents_closure(self):
         store = self.make_store()
         store.ingest(frame(raw(3000)), 1)
