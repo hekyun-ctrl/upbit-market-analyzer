@@ -225,6 +225,10 @@ def send_double_bottom_candidate(ledger, bars, *, now, started,
                                   (active["pattern_key"],))
                 active = None
             if active is not None:
+                # An identical closed bar has already been reserved for this
+                # pattern; do not recalculate its phase on a retry/restart.
+                if active["stage_at"] == last["start"]:
+                    return "already_reserved"
                 phase = _next_stage(active, tail)
                 if phase == "expired":
                     ledger.db.execute(
@@ -233,8 +237,6 @@ def send_double_bottom_candidate(ledger, bars, *, now, started,
                     return "expired"
                 if phase not in PHASES:
                     return phase
-                if active["stage_at"] == last["start"]:
-                    return "already_reserved"
                 if phase == "invalidated" and active["stage"] == "invalidated":
                     return "already_invalidated"
                 if phase == active["stage"]:
