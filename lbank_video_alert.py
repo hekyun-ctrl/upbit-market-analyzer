@@ -20,6 +20,7 @@ from lbank_double_bottom_alerts import send_double_bottom_candidate
 from lbank_b_retest_research import persist_b_retest_shadow
 from lbank_b_early_1m_shadow import read_closed_1m_window, persist_first_minute_shadow
 from lbank_one_minute_prealert import send_one_minute_prealert
+from lbank_fixed_level_alerts import send_level_alert
 from lbank_b_momentum_trial import evaluate_trial, evaluate_five_break, read_b_5m_context, deliver_trial
 from lbank_native_book import NativeBookError, fetch_native_book
 from lbank_native_candles import NativeCandleThread
@@ -445,6 +446,7 @@ def run():
     early_enabled = enabled and os.getenv("VIDEO_EARLY_ALERT_SEND_ENABLED", "0") == "1"
     minute_prealert_enabled = (early_enabled and
         os.getenv("VIDEO_ONE_MINUTE_PREALERT_SEND_ENABLED", "1") == "1")
+    fixed_level_enabled = enabled and os.getenv("VIDEO_FIXED_LEVELS_SEND_ENABLED", "1") == "1"
     scenario_enabled = enabled and os.getenv("VIDEO_SCENARIO_ALERT_SEND_ENABLED", "0") == "1"
     double_bottom_enabled = (scenario_enabled and
         os.getenv("VIDEO_DOUBLE_BOTTOM_SEND_ENABLED", "1") == "1")
@@ -468,6 +470,8 @@ def run():
     LOG.info("VIDEO_B_MOMENTUM_TEST_CONFIG enabled=%s test_only=true no_orders=true", momentum_trial_enabled)
     LOG.info("VIDEO_1M_PREALERT_CONFIG enabled=%s source=native_closed_1m independent_5m=true no_orders=true",
              minute_prealert_enabled)
+    LOG.info("VIDEO_FIXED_LEVEL_CONFIG enabled=%s down=62525 up=63060 periods=60,300 no_orders=true",
+             fixed_level_enabled)
     if enabled:
         token_ok, chat_ok = telegram.health()
         LOG.info("VIDEO_ALERT_TELEGRAM_CHECK token_ok=%s chat_ok=%s no_test_message=true", token_ok, chat_ok)
@@ -495,6 +499,15 @@ def run():
                 next_health = now+60
             if bars and bars[-1]["start"] != seen:
                 seen = bars[-1]["start"]
+                # Independent user-authorized 5m closed-threshold observation.
+                try:
+                    fixed5 = send_level_alert(
+                        ledger, bars, 300, now=now, started=started,
+                        send=telegram.send if enabled else None, enabled=fixed_level_enabled)
+                except (sqlite3.Error, OSError, ValueError, TypeError, KeyError) as exc:
+                    LOG.warning("VIDEO_FIXED_LEVEL_5M_FAILURE type=%s", type(exc).__name__)
+                    fixed5 = "evaluation_failed"
+                LOG.info("VIDEO_FIXED_LEVEL_5M bar=%d status=%s", seen, fixed5)
                 status, counts = process(bars, now=now, started=started, clock=time.time,
                                          get_book=get_book, ledger=ledger,
                                          send=telegram.send if enabled else None, rsi_sequence=True)
@@ -587,6 +600,15 @@ def run():
                     minutes = read_closed_1m_window(source_path, now)
                     if minutes and minutes[-1]["start"] == expected_minute:
                         minute_seen = expected_minute
+                        # Independent 1m close threshold; no RSI/formal-entry prerequisites.
+                        try:
+                            fixed1 = send_level_alert(
+                                ledger, minutes, 60, now=now, started=started,
+                                send=telegram.send if enabled else None, enabled=fixed_level_enabled)
+                        except (sqlite3.Error, OSError, ValueError, TypeError, KeyError) as exc:
+                            LOG.warning("VIDEO_FIXED_LEVEL_1M_FAILURE type=%s", type(exc).__name__)
+                            fixed1 = "evaluation_failed"
+                        LOG.info("VIDEO_FIXED_LEVEL_1M minute=%d status=%s", minute_seen, fixed1)
                         # A first-minute heads-up is checked BEFORE B backtest,
                         # never waits for 5m RSI/CCI or its larger warmup.
                         # At the exact 5m close, avoid duplicating an already
