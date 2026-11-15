@@ -57,6 +57,20 @@ class TelegramTransport:
                 obj = json.load(reply)
             if isinstance(obj, dict) and obj.get("ok") is True:
                 self.last_class = "success"
+                # Telegram confirms acceptance by its API, not notification
+                # delivery to a particular phone. Record the returned message
+                # ID without logging a bot token, chat ID, or message body.
+                if method == "sendMessage":
+                    result = obj.get("result")
+                    message_id = result.get("message_id") if isinstance(result, dict) else None
+                    if type(message_id) is int and message_id > 0:
+                        LOG.info(
+                            "TELEGRAM_SEND_ACK telegram_api_ok=true message_id=%d "
+                            "handset_delivery_unverified=true", message_id)
+                    else:
+                        LOG.info(
+                            "TELEGRAM_SEND_ACK telegram_api_ok=true "
+                            "message_id_unavailable=true handset_delivery_unverified=true")
                 return obj
             self.last_class = classify_telegram_status(
                 obj.get("error_code") if isinstance(obj, dict) else None)
