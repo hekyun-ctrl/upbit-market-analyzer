@@ -75,24 +75,16 @@ def evaluate_one_minute_move(minutes):
 
 def format_one_minute_prealert(event, *, checked_at):
     end = event["start"] + 60
-    bar_time = datetime.fromtimestamp(end, KST).strftime("%m-%d %H:%M:%S KST")
-    checked_time = datetime.fromtimestamp(checked_at, KST).strftime("%H:%M:%S KST")
-    down = event["direction"] == "down"
+    bar_time = datetime.fromtimestamp(end, KST).strftime("%m-%d %H:%M KST")
+    side = "하락" if event["direction"] == "down" else "상승"
+    # This is not an entry strategy: never label a 1m close as an executable entry.
     return (
-        "[ZB BTCUSDT · 1분봉 조기 시장변화 경보]\n"
-        "⚠️ 조기 관찰 전용 · 정식 진입 신호 아님 · 자동주문 없음\n"
-        f"방향: {'하방 지지 이탈' if down else '상방 저항 돌파'}\n"
-        f"봉 종료: {bar_time} / 서버 판정: {checked_time}\n"
-        f"LBank 1분봉 종가: {event['close']:,.1f} USDT (시장가 아님)\n"
-        f"이전 12분 {'지지' if down else '저항'}: {event['prior_level']:,.1f} USDT\n"
-        f"분봉 몸통 변화: {event['movement_pct']:.2f}%\n"
-        f"거래량: 직전 20분 중앙값 대비 {event['volume_multiple']:.2f}배\n"
-        f"{'⚠️ 이미 큰 변동 발생, 추격 금지' if event['large_move_warning'] else '후속 5분봉에서 방향과 손익비 재확인 필요'}\n"
-        "1분봉도 마감 후 감지하므로 첫 움직임보다 최대 약 1분 늦을 수 있습니다.\n"
-        "연속 LBank 스트림 마감 추정이며 독립 REST 원본 확인 전입니다.\n"
-        "진입가·손절·목표·호가·비용 검증 전. 50배 선물 진입 권유 아님."
+        f"[BTCUSDT 1분봉 {side} 경보 · {bar_time}]\n"
+        f"진입가: 미확정 (관찰 종가 {event['close']:,.1f})\n"
+        "손절가: 미확정\n"
+        "목표가: 미확정\n"
+        "※ 움직임 감지 전용 · 진입 미승인 · 자동주문 없음"
     )
-
 
 def send_one_minute_prealert(ledger, minutes, *, now, started,
                              send, enabled, suppress=False, clock=time.time):
