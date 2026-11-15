@@ -83,7 +83,7 @@ def format_one_minute_prealert(event, *, checked_at):
         f"진입가: 미확정 (관찰 종가 {event['close']:,.1f})\n"
         "손절가: 미확정\n"
         "목표가: 미확정\n"
-        "※ 움직임 감지 전용 · 진입 미승인 · 자동주문 없음"
+        "※ 움직임 감지 전용 · 정식 진입 신호 아님 · 진입 미승인 · 자동주문 없음"
     )
 
 def send_one_minute_prealert(ledger, minutes, *, now, started,
