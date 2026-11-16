@@ -6,7 +6,7 @@ import sqlite3
 import tempfile
 import unittest
 from research.zb_trade_review import (
-    fill_csv,group_fills,entry_context,model_summary,load_native,
+    fill_csv,group_fills,entry_context,model_summary,load_native,candidate_funnel,
 )
 
 
@@ -73,6 +73,36 @@ class TradeForensicsTests(unittest.TestCase):
                 db.execute("""INSERT INTO native_bars VALUES
                    (300,1794810300,10,11,9,10,5,50,1794810600,'forming')""")
             self.assertEqual(len(load_native(path)),1)
+
+    def test_fixed_split_excludes_training_future_outcomes(self):
+        series={"events":[
+            {"status":"qualified","signal_start":300,
+             "outcome":{"status":"target","entry_start":600,"at":1200,
+                        "entry":1000.,"model_pnl_per_btc":50.}},
+            {"status":"qualified","signal_start":1500,
+             "outcome":{"status":"stop","entry_start":1800,"at":2100,
+                        "entry":1000.,"model_pnl_per_btc":-30.}},
+        ]}
+        train=model_summary(series,signal_until=900,resolve_before=900)
+        test=model_summary(series,signal_from=900)
+        self.assertEqual(train["resolved_nonoverlap"],0)
+        self.assertEqual(train["skipped"]["split_boundary_censored"],1)
+        self.assertEqual(test["resolved_nonoverlap"],1)
+        self.assertEqual(test["losing"],1)
+        self.assertGreater(test["max_model_drawdown_unlevered"],0.)
+        self.assertEqual(test["max_consecutive_model_losses"],1)
+
+    def test_research_candidate_funnel_counts_first_stage_without_entry(self):
+        start=1794700800
+        rows=[dict(start=start+i*300,period=300,open=1000.,high=1010.,
+                   low=990.,close=1000.,volume=10.,quality="stream_closed",
+                   received_at=start+i*300+301) for i in range(24)]
+        rows[20].update(open=992.,high=995.,low=982.,close=985.,volume=10.)
+        report=candidate_funnel(rows)
+        self.assertEqual(report["completed_bars_checked"],4)
+        self.assertGreaterEqual(
+            report["lanes"]["B"]["structure_seen_low_volume"],1)
+        self.assertFalse(report["entry_approved"])
 
     def test_ambiguous_model_outcome_excluded_from_win_rate(self):
         data={"events":[

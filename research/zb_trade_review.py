@@ -19,6 +19,7 @@ from pathlib import Path
 import sqlite3
 from collections import defaultdict
 from research.zerobase.video_entry import Costs,replay
+from lbank_loss_review_guard import parallel_observation
 
 KST=timezone(timedelta(hours=9))
 SOURCE="lbank_native_1m_derived_5m"
@@ -162,15 +163,24 @@ def entry_context(trade,fives,minutes):
     return result
 
 
-def model_summary(replay_result):
-    """Nonoverlapping next-open model entries, not exchange executions."""
+def model_summary(replay_result, *, signal_from=None, signal_until=None,
+                  resolve_before=None):
+    """Unlevered, cost-adjusted next-open MODEL outcome, not verified live fills.
+
+    Out-of-sample cohorts are assigned by signal time. Training outcomes that
+    resolve after the cutoff are censored rather than borrowing future results.
+    """
     candidates=[x for x in replay_result["events"]
                 if x["status"]=="qualified" and
-                x.get("outcome",{}).get("entry_start") is not None]
+                x.get("outcome",{}).get("entry_start") is not None
+                and (signal_from is None or
+                     x.get("signal_start",float("-inf"))>=signal_from)
+                and (signal_until is None or
+                     x.get("signal_start",float("inf"))<signal_until)]
     candidates.sort(key=lambda e:e["outcome"]["entry_start"])
     accepted=[]
     occupied_until=0
-    rejected={"overlap":0,"unknown_outcome":0}
+    rejected={"overlap":0,"unknown_outcome":0,"split_boundary_censored":0}
     for e in candidates:
         out=e["outcome"]
         start=out["entry_start"]
@@ -178,6 +188,10 @@ def model_summary(replay_result):
             rejected["overlap"]+=1
             continue
         resolved=out["status"] in ("stop","target")
+        if (resolve_before is not None and
+                (not resolved or out.get("at",float("inf"))>=resolve_before)):
+            rejected["split_boundary_censored"]+=1
+            continue
         if not resolved:
             rejected["unknown_outcome"]+=1
             occupied_until=start+12*300
@@ -188,24 +202,87 @@ def model_summary(replay_result):
     losses=[x for x in accepted if x<0]
     gross_win=sum(wins)
     gross_loss=-sum(losses)
+    # Equity is an illustrative, unlevered one-unit position per model trade.
+    # Never label it 50x account equity or realized account drawdown.
+    equity,peak,max_drawdown=1.,1.,0.
+    losing_streak,max_losing_streak=0,0
+    for change in accepted:
+        equity*=1+change
+        peak=max(peak,equity)
+        if peak>0:
+            max_drawdown=max(max_drawdown,(peak-equity)/peak)
+        losing_streak=losing_streak+1 if change<0 else 0
+        max_losing_streak=max(max_losing_streak,losing_streak)
     return dict(qualified_candidates=len(candidates),resolved_nonoverlap=len(accepted),
         profitable=len(wins),losing=len(losses),win_rate=(len(wins)/len(accepted)
         if accepted else None),net_return_sum=sum(accepted),
+        compounded_model_return_unlevered=equity-1.,
+        max_model_drawdown_unlevered=max_drawdown,
+        max_consecutive_model_losses=max_losing_streak,
         profit_factor=gross_win/gross_loss if gross_loss>0 else None,
-        skipped=rejected,qualification_note="Next-5m-open model, no live quote; not realized PnL")
+        skipped=rejected,
+        qualification_note="Next-5m-open model with assumed fees; no live quotes, fills or leverage")
+
+
+def candidate_funnel(fives, *, start_at=None, end_before=None):
+    """5m A/B/C pre-screen counts using only data RECEIVED at each bar close."""
+    counters={key:{"no_touch":0,"level_touched":0,
+                    "structure_seen_low_volume":0,
+                    "confirmed_but_extended":0,"confirmed_reversal_risk":0,
+                    "confirmed_observation":0}
+              for key in ("A","B","C")}
+    checked=0
+    invalid=0
+    for i in range(20,len(fives)):
+        bar=fives[i]
+        if start_at is not None and bar["start"]<start_at:continue
+        if end_before is not None and bar["start"]>=end_before:continue
+        obs=parallel_observation(fives[i-20:i+1])
+        if obs["status"]!="observed":
+            invalid+=1
+            continue
+        checked+=1
+        for lane in ("A","B","C"):
+            counters[lane][obs["lanes"][lane]["phase"]]+=1
+    return dict(completed_bars_checked=checked,missing_or_invalid_windows=invalid,
+                lanes=counters,entry_approved=False,
+                note="All stages are observed at 5m close, before RSI/volume trade approval. Not win-rate or fills.")
 
 
 def compare_policies(fives):
-    """Strict same native 5m input/receipts. No fabricated or nominal candles."""
+    """Same native 5m receipts; fixed chronological 70/30 split, no future training labels."""
+    cutoff=(fives[int(len(fives)*.70)]["start"] if len(fives)>=100 else None)
+    old=replay(fives,nominal=False,costs=Costs(min_rr=1.5),rsi_sequence=True)
+    new=replay(fives,nominal=False,costs=Costs(min_rr=2.0),rsi_sequence=True)
+    train={}
+    test={}
+    if cutoff is not None:
+        train={
+          "baseline_1p5":model_summary(old,signal_until=cutoff,resolve_before=cutoff),
+          "research_2p0":model_summary(new,signal_until=cutoff,resolve_before=cutoff),
+        }
+        test={
+          "baseline_1p5":model_summary(old,signal_from=cutoff),
+          "research_2p0":model_summary(new,signal_from=cutoff),
+        }
+    minimum=30
+    test_ready=bool(test) and all(
+        obj["resolved_nonoverlap"]>=minimum for obj in test.values())
     return {
-      "baseline_1p5":model_summary(replay(fives,nominal=False,costs=Costs(min_rr=1.5),
-                                           rsi_sequence=True)),
-      "research_2p0":model_summary(replay(fives,nominal=False,costs=Costs(min_rr=2.0),
-                                           rsi_sequence=True)),
+      "baseline_1p5":model_summary(old),
+      "research_2p0":model_summary(new),
+      "chronological_split_70_30":{"cutoff_bar_start":cutoff,
+                                   "training":train,"out_of_sample":test,
+                                   "minimum_resolved_model_trades_per_policy":minimum,
+                                   "minimum_sample_met":test_ready,
+                                   "causal_label_censoring":"Training outcomes at/after cutoff excluded"},
       "input_completed_fives":len(fives),
       "data_source":"LBank native stream inferred, NOT independent REST certified",
       "result_type":"OFFLINE_MODEL_ONLY_NOT_LIVE_FILL",
+      "live_quote_verified":False,
+      "actual_fills_verified":False,
       "strategy_approved":False,
+      "unlock_authorized":False,
     }
 
 
@@ -214,7 +291,8 @@ def make_report(native_db,fills_csv=None):
     minutes=load_native(native_db,60)
     r={"scope":"privacy_preserving_internal_audit","live_trading_approved":False,
        "complete_native_fives":len(fives),"complete_native_minutes":len(minutes),
-       "policy_comparison":compare_policies(fives)}
+       "policy_comparison":compare_policies(fives),
+       "candidate_funnel":candidate_funnel(fives)}
     if fills_csv is not None:
         positions=group_fills(fill_csv(fills_csv))
         for pos in positions:

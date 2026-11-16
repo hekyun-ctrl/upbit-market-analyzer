@@ -10,7 +10,7 @@ import json
 import math
 from statistics import median
 
-POLICY = "zb_loss_review_v1"
+POLICY = "zb_loss_review_v2_candidate_funnel"
 MIN_NET_RR = 2.0
 FORMAL_ENTRY_LOCKED = True
 LOCK_REASON = "seven_real_trades_loss_review_and_out_of_sample_replay_pending"
@@ -72,11 +72,33 @@ def parallel_observation(bars):
     extended=abs(c-o)>1.8*atr
     # Distinguishes a downtrend bounce from a fresh, actionable short.
     rebound_risk=(c-min(float(b["low"]) for b in rows[-7:])) >= 1.4*atr
-    a_hit=h>=resistance-buf and c<resistance-buf and c<o and multiple>=1.2
-    b_hit=c<support-.1*buf and c<o and multiple>=1.5
-    c_hit=c>resistance+.1*buf and c>o and multiple>=1.5
+    # Candidate recognition MUST precede volume, RSI and execution screening.
+    # Each independent lane records a stage even when no formal setup qualifies.
+    # All stages are evaluated at the 5m close, never backdated to an intrabar touch.
+    setups={
+        "A": (h>=resistance-buf,
+              h>=resistance-buf and c<resistance-buf and c<o,1.2),
+        "B": (l<=support+buf,
+              c<support-.1*buf and c<o,1.5),
+        "C": (h>=resistance-buf,
+              c>resistance+.1*buf and c>o,1.5),
+    }
     lanes={}
-    for lane,hit in (("A",a_hit),("B",b_hit),("C",c_hit)):
+    for lane,(touched,structure,volume_threshold) in setups.items():
+        volume_ok=multiple>=volume_threshold
+        hit=structure and volume_ok
+        if not touched:
+            phase="no_touch"
+        elif not structure:
+            phase="level_touched"
+        elif not volume_ok:
+            phase="structure_seen_low_volume"
+        elif extended:
+            phase="confirmed_but_extended"
+        elif lane in ("A","B") and rebound_risk:
+            phase="confirmed_reversal_risk"
+        else:
+            phase="confirmed_observation"
         if not hit:
             status="no_event"
         elif extended:
@@ -85,13 +107,17 @@ def parallel_observation(bars):
             status="reversal_risk"
         else:
             status="observed_not_entry"
-        # Do not project a theoretical 2R target where none is historically
-        # visible, and never represent any observation as a qualified trade.
+        # A target must be a previously observed barrier, never extrapolated
+        # from current momentum. This observation does not approve a trade.
         known_barrier=(prior_low if lane in ("A","B") else prior_high)
         if (lane in ("A","B") and known_barrier>=c or
                 lane=="C" and known_barrier<=c):
             known_barrier=None
         lanes[lane]={"triggered":hit,"status":status,
+                     "phase":phase,"touched":touched,"structure_seen":structure,
+                     "volume_passed":volume_ok,
+                     "first_observable_at":int(now["start"]+300) if touched else None,
+                     "required_volume_multiple":volume_threshold,
                      "known_barrier":known_barrier}
     sample=dict(start=now["start"],close=c,support=support,
                 resistance=resistance,volume_multiple=round(multiple,3),

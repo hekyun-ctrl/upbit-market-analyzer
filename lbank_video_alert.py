@@ -478,6 +478,31 @@ def _start_review_replay_snapshot(native_path, state_dir):
                      baseline["resolved_nonoverlap"],baseline["profitable"],
                      baseline["net_return_sum"],revised["resolved_nonoverlap"],
                      revised["profitable"],revised["net_return_sum"])
+            split=report["policy_comparison"]["chronological_split_70_30"]
+            holdout=split["out_of_sample"]
+            funnel=report["candidate_funnel"]
+            if holdout:
+                old=holdout["baseline_1p5"]
+                new=holdout["research_2p0"]
+                LOG.info("VIDEO_REVIEW_HOLDOUT cutoff=%s old_n=%d old_net=%.8f "
+                         "old_dd=%.6f new_n=%d new_net=%.8f new_dd=%.6f "
+                         "minimum_sample_met=%s unlock_authorized=false",
+                         split["cutoff_bar_start"],old["resolved_nonoverlap"],
+                         old["net_return_sum"],old["max_model_drawdown_unlevered"],
+                         new["resolved_nonoverlap"],new["net_return_sum"],
+                         new["max_model_drawdown_unlevered"],split["minimum_sample_met"])
+            LOG.info("VIDEO_REVIEW_FUNNEL checked=%d invalid=%d "
+                     "A_structure_weak_volume=%d B_structure_weak_volume=%d "
+                     "C_structure_weak_volume=%d A_confirmed=%d B_confirmed=%d "
+                     "C_confirmed=%d entry_approved=false",
+                     funnel["completed_bars_checked"],
+                     funnel["missing_or_invalid_windows"],
+                     funnel["lanes"]["A"]["structure_seen_low_volume"],
+                     funnel["lanes"]["B"]["structure_seen_low_volume"],
+                     funnel["lanes"]["C"]["structure_seen_low_volume"],
+                     sum(v for k,v in funnel["lanes"]["A"].items() if k.startswith("confirmed_")),
+                     sum(v for k,v in funnel["lanes"]["B"].items() if k.startswith("confirmed_")),
+                     sum(v for k,v in funnel["lanes"]["C"].items() if k.startswith("confirmed_")))
         except (OSError,ValueError,TypeError,KeyError,sqlite3.Error,
                 ArithmeticError,RuntimeError) as exc:
             LOG.warning("VIDEO_REVIEW_MODEL_REPLAY_ERROR type=%s",
@@ -575,11 +600,15 @@ def run():
                 try:
                     row = persist_parallel_review(ledger, bars)
                     if row["status"] == "observed":
-                        LOG.info("VIDEO_PARALLEL_AUDIT bar=%d A=%s B=%s C=%s "
+                        LOG.info("VIDEO_PARALLEL_AUDIT bar=%d "
+                                 "A=%s phaseA=%s B=%s phaseB=%s C=%s phaseC=%s "
                                  "reversal_risk=%s no_entry_approval=true",
                                  seen, row["lanes"]["A"]["status"],
+                                 row["lanes"]["A"]["phase"],
                                  row["lanes"]["B"]["status"],
-                                 row["lanes"]["C"]["status"], row["rebound_risk"])
+                                 row["lanes"]["B"]["phase"],
+                                 row["lanes"]["C"]["status"],
+                                 row["lanes"]["C"]["phase"], row["rebound_risk"])
                     else:
                         LOG.info("VIDEO_PARALLEL_AUDIT bar=%d status=%s",
                                  seen,row["status"])
