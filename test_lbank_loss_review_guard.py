@@ -1,6 +1,11 @@
 """Fail-closed no-live-entry gate and causal independent lane tests."""
 import sqlite3
 import unittest
+from unittest.mock import Mock
+from tempfile import TemporaryDirectory
+from pathlib import Path
+from lbank_video_alert import process, DeliveryLedger
+from test_lbank_video_entry import breakout
 from copy import deepcopy
 from types import SimpleNamespace
 from lbank_loss_review_guard import (
@@ -22,6 +27,25 @@ class LossReviewGuardTests(unittest.TestCase):
     def test_review_lock_is_not_a_runtime_environment_switch(self):
         self.assertFalse(entry_delivery_allowed())
         self.assertEqual(MIN_NET_RR,2.)
+
+    def test_formal_signal_blocked_before_quote_or_send(self):
+        fixture=breakout()[:46]
+        rows=[dict(x,received_at=x["start"]+301) for x in fixture]
+        end=rows[-1]["start"]+300
+        with TemporaryDirectory() as tmp:
+            ledger=DeliveryLedger(Path(tmp)/"delivery.db")
+            self.addCleanup(ledger.db.close)
+            quote=Mock(side_effect=AssertionError("quote should not be needed"))
+            send=Mock(side_effect=AssertionError("formal send must stay locked"))
+            state,reasons=process(rows,now=end+2,started=end-1,
+                clock=lambda:end+2,get_book=quote,ledger=ledger,send=send,
+                review_locked=True)
+            self.assertEqual(state,"review_lock_unverified_live_performance")
+            quote.assert_not_called()
+            send.assert_not_called()
+            event=ledger.db.execute(
+              "SELECT evidence FROM video_alert_decisions").fetchone()[0]
+            self.assertIn("review_blocked",event)
 
     def test_b_support_break_not_gated_on_a_retest(self):
         rows=self.rows()
