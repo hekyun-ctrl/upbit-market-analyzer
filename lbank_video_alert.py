@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import sqlite3
 import sys
+import threading
 import time
 
 from lbank_early_breakout_audit import persist_early_audit
@@ -24,6 +25,7 @@ from lbank_fixed_level_alerts import send_level_alert
 from lbank_telegram_context import compact_trend
 from lbank_loss_review_guard import (entry_delivery_allowed, persist_parallel_review,
                                     MIN_NET_RR, LOCK_REASON)
+from research.zb_trade_review import make_report
 from lbank_b_momentum_trial import evaluate_trial, evaluate_five_break, read_b_5m_context, deliver_trial
 from lbank_native_book import NativeBookError, fetch_native_book
 from lbank_native_candles import NativeCandleThread
@@ -451,6 +453,38 @@ def process(bars, *, now, started, clock, get_book, ledger, send, costs=Costs(),
     return status, counts
 
 
+def _start_review_replay_snapshot(native_path, state_dir):
+    """Single read-only startup comparison; never used to unlock trading.
+
+    This is an asynchronous *service* research job (not assistant follow-up).
+    It cannot delay trade-event monitoring or write orders. Native history may
+    be incomplete, and model wins must never be called actual fill outcomes.
+    """
+    def worker():
+        try:
+            report=make_report(native_path)
+            baseline=report["policy_comparison"]["baseline_1p5"]
+            revised=report["policy_comparison"]["research_2p0"]
+            target=state_dir/"zb_unverified_model_replay.json"
+            payload=json.dumps(report,ensure_ascii=False,sort_keys=True,allow_nan=False)
+            fd=os.open(target,os.O_WRONLY|os.O_CREAT|os.O_TRUNC,0o600)
+            with os.fdopen(fd,"w",encoding="utf-8") as fh:
+                fh.write(payload+"\n")
+            LOG.info("VIDEO_REVIEW_MODEL_REPLAY input_fives=%d "
+                     "old_model_resolved=%d old_model_wins=%d old_model_net=%.8f "
+                     "new_model_resolved=%d new_model_wins=%d new_model_net=%.8f "
+                     "strict_receipts=true same_data=true real_fills=false strategy_approved=false",
+                     report["complete_native_fives"],
+                     baseline["resolved_nonoverlap"],baseline["profitable"],
+                     baseline["net_return_sum"],revised["resolved_nonoverlap"],
+                     revised["profitable"],revised["net_return_sum"])
+        except (OSError,ValueError,TypeError,KeyError,sqlite3.Error,
+                ArithmeticError,RuntimeError) as exc:
+            LOG.warning("VIDEO_REVIEW_MODEL_REPLAY_ERROR type=%s",
+                        type(exc).__name__)
+    threading.Thread(target=worker,daemon=True,name="zb-replay-audit").start()
+
+
 def run():
     started = time.time()
     data = Path(os.environ.get("VIDEO_ALERT_STATE_DIR", "/data")).resolve()
@@ -479,6 +513,7 @@ def run():
                                  chat_id=os.getenv("VIDEO_ALERT_TELEGRAM_CHAT_ID", ""))
     get_book = PublicBook(alternate=fetch_native_book)
     NativeCandleThread(path=str(source_path)).start()
+    _start_review_replay_snapshot(source_path, data)
     LOG.info("VIDEO_ALERT_START revision=%s source=%s send_enabled=%s warmup=%d separate=true",
              os.getenv("RAILWAY_GIT_COMMIT_SHA", "local"), SOURCE, enabled, WARMUP)
     LOG.info("VIDEO_ALERT_POLICIES live=%s shadow=disabled experimental_rsi=true", LIVE_SEQUENCE_POLICY)
