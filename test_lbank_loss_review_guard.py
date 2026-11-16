@@ -104,6 +104,27 @@ class LossReviewGuardTests(unittest.TestCase):
                    high=1500.,low=900.,open=1000.,close=1020.)
         self.assertEqual(first,parallel_observation(rows+[later][:-1]))
 
+    def test_early_b_break_is_journaled_even_below_volume_threshold(self):
+        rows=self.rows()
+        rows[-1].update(open=992.,high=995.,low=982.,close=985.,volume=10.)
+        seen=parallel_observation(rows)
+        lane=seen["lanes"]["B"]
+        self.assertEqual(lane["phase"],"structure_seen_low_volume")
+        self.assertTrue(lane["structure_seen"])
+        self.assertFalse(lane["triggered"])
+        self.assertFalse(seen["entry_approved"])
+        self.assertEqual(lane["first_observable_at"],rows[-1]["start"]+300)
+
+    def test_a_b_c_each_have_independent_pre_screen_stage(self):
+        rows=self.rows()
+        rows[-1].update(open=1005.,high=1013.,low=989.,close=997.,volume=10.)
+        obs=parallel_observation(rows)
+        self.assertEqual(obs["lanes"]["A"]["phase"],"structure_seen_low_volume")
+        self.assertEqual(obs["lanes"]["B"]["phase"],"level_touched")
+        self.assertEqual(obs["lanes"]["C"]["phase"],"level_touched")
+        self.assertFalse(any(v["triggered"] for v in obs["lanes"].values()))
+        self.assertFalse(entry_delivery_allowed())
+
     def test_ledger_one_record_per_completed_bar_and_no_send(self):
         db=sqlite3.connect(":memory:");self.addCleanup(db.close)
         x=SimpleNamespace(db=db)
