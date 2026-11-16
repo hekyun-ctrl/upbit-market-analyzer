@@ -139,44 +139,31 @@ def evaluate_scenario(bars):
 
 
 def format_scenario(event):
-    kind = event["scenario"]
-    rank = event.get("ranking") or {}
-    regime = {"bearish": "하락 우세", "bullish": "상승 우세",
-              "mixed": "방향 충돌", "unknown": "판단 자료 부족"}.get(
-                  rank.get("trend"), "판단 자료 부족")
-    priorities = rank.get("priorities") or ["1순위 판단 보류 (연속 5분봉 96개 필요)"]
-    ranked = "\n".join(priorities)
-    direction = "숏(매도)" if kind in ("A", "B") else "롱(매수)"
-    close_time = datetime.fromtimestamp(event["start"] + 300, KST).strftime("%m-%d %H:%M KST")
-    stop = event["stop"]
-    target = event["structural_target"]
-    if target is None:
-        target_line = "구조 목표 후보: 확인 불가 (손익비 검증 안 됨)"
-    else:
-        rr = event["assumed_net_rr"]
-        target_line = (
-            f"구조 목표 후보: {target:,.1f} USDT\n"
-            f"가정 비용 후 손익비: {rr:.2f}:1 · "
-            f"{'2:1 이상이나 진입 신호 아님' if event['target_qualified'] else '2:1 미달, 진입 부적격'}"
-        )
+    """Short observation-only notice; no model price is an order instruction."""
+    kind=event["scenario"]
+    rank=event.get("ranking") or {}
+    regime={"bearish":"하락 우세","bullish":"상승 우세",
+            "mixed":"방향 충돌","unknown":"자료 부족"}.get(
+                rank.get("trend"),"자료 부족")
+    completed=datetime.fromtimestamp(event["start"]+300,KST).strftime("%m-%d %H:%M KST")
+    direction="숏" if kind in ("A","B") else "롱"
+    # Stop and measured target are research features, never proven fills.
+    # Remove RR-based sales language to prevent 2R hypotheses being mistaken
+    # for validated, executable recommendations.
     return (
-        "[ZB 엘뱅크 BTCUSDT · 5분봉 시나리오 관찰]\n"
-        "⚠️ 움직임 감지 전용 · 매매 진입 신호 아님 · 자동 주문 없음\n"
+        "[ZB BTCUSDT 5분봉 · 관찰 전용]\n"
+        "판정: 매매 진입 미승인 · 자동주문 없음\n"
         f"시나리오 {kind} / {direction}: {NAMES[kind]}\n"
-        f"상위 추세 판단: {regime} (완료 15분·1시간봉 기준)\n"
-        f"매매 검토 우선순위:\n{ranked}\n"
-        f"완료봉: {close_time}\n"
-        f"완료봉 종가(체결가 아님): {event['close']:,.1f} USDT\n"
-        f"이전 12봉 저항: {event['resistance']:,.1f} / 이전 6봉 지지: "
-        f"{event['support']:,.1f} USDT\n"
-        f"거래량: 앞선 20봉 중앙값 대비 {event['volume_multiple']:.2f}배\n"
-        f"참고 무효 관찰선: {stop:,.1f} USDT (확정 손절 주문가 아님)\n"
-        f"{target_line}\n"
-        f"다음 확인: {NEXT[kind]}\n"
-        "가정 비용: 왕복 수수료·슬리피지 합계 0.12%, 실제 비용과 다름.\n"
-        "가격·지지·저항은 매 완료봉마다 새로 산정됩니다. 이전 수치를 고정 적용하지 마세요.\n"
-        "봉은 엘뱅크 1분 스트림 합산 추정으로, 독립 REST 검증·체결 검증은 없습니다.\n"
-        "주문 전 실제 호가와 손익비를 별도로 확인하세요."
+        f"진입가: 미확정 (관찰 종가 {event['close']:,.1f})\n"
+        "손절가: 미확정\n"
+        "목표가: 미확정\n"
+        f"시간: {completed} · 상위 추세: {regime}\n"
+        f"이전 저항 {event['resistance']:,.1f} / 지지 {event['support']:,.1f}\n"
+        f"거래량: 평소 중앙값 대비 {event['volume_multiple']:.2f}배\n"
+        f"무효 관찰선: {event['stop']:,.1f} (실제 손절가 아님)\n"
+        "손익비 검증 안 됨: 구조 목표 가설이 실제 체결·수익성을 입증하지 않음\n"
+        "대응: 차트·호가·비용·추세 재검증 전 진입 보류\n"
+        "※ 매매 진입 신호 아님 · LBank 1분 스트림 합산 5분봉, REST 원본 미대조"
     )
 
 
