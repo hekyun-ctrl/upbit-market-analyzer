@@ -22,6 +22,8 @@ from lbank_b_early_1m_shadow import read_closed_1m_window, persist_first_minute_
 from lbank_one_minute_prealert import send_one_minute_prealert
 from lbank_fixed_level_alerts import send_level_alert
 from lbank_telegram_context import compact_trend
+from lbank_loss_review_guard import (entry_delivery_allowed, persist_parallel_review,
+                                    MIN_NET_RR, LOCK_REASON)
 from lbank_b_momentum_trial import evaluate_trial, evaluate_five_break, read_b_5m_context, deliver_trial
 from lbank_native_book import NativeBookError, fetch_native_book
 from lbank_native_candles import NativeCandleThread
@@ -334,7 +336,7 @@ def _finish(ledger, start, status):
 
 
 def _live_decision(bars, *, now, end, clock, get_book, ledger, send, costs, evidence,
-                   rsi_sequence=False):
+                   rsi_sequence=False, review_locked=False):
     start = bars[-1]["start"]
     events, rejected = evaluate_latest(bars, costs=costs, rsi_sequence=rsi_sequence)
     evidence["events"] = events
@@ -344,6 +346,15 @@ def _live_decision(bars, *, now, end, clock, get_book, ledger, send, costs, evid
         return "no_qualified_entry", counts
     if len({event["direction"] for event in qualified}) != 1:
         return "conflicting_directions", counts
+    # No Telegram price-level advice while observed real trading losses are
+    # under investigation. Keep causal evidence, do not fetch a stale quote
+    # or accidentally call a trade-like send hook.
+    if review_locked:
+        evidence["review_blocked"] = [
+            dict(lane=e["lane"], direction=e["direction"], stop=e.get("stop"),
+                 target=e.get("target"), signal_start=e.get("signal_start"))
+            for e in qualified]
+        return "review_lock_unverified_live_performance", counts
     book = evidence["book"] = _read_quote(get_book, now, end, clock)
     if book["status"] != "usable":
         return book["status"], counts
@@ -405,7 +416,7 @@ def _shadow_decision(bars, *, now, end, clock, get_book, costs, live_book, evide
 
 
 def process(bars, *, now, started, clock, get_book, ledger, send, costs=Costs(), shadow=False,
-            rsi_sequence=False):
+            rsi_sequence=False, review_locked=False):
     """Evaluate one completed bar; sequence mode is enabled explicitly by run()."""
     if not bars:
         return "warmup", {}
@@ -419,7 +430,7 @@ def process(bars, *, now, started, clock, get_book, ledger, send, costs=Costs(),
     live = {"events": [], "book": {"status": "not_requested"}}
     status, counts = _live_decision(bars, now=now, end=end, clock=clock, get_book=get_book,
                                     ledger=ledger, send=send, costs=costs, evidence=live,
-                                    rsi_sequence=rsi_sequence)
+                                    rsi_sequence=rsi_sequence, review_locked=review_locked)
     # Evidence and research run after the live decision, so they cannot spend
     # its quote or delivery budget.
     try:
@@ -444,6 +455,9 @@ def run():
     started = time.time()
     data = Path(os.environ.get("VIDEO_ALERT_STATE_DIR", "/data")).resolve()
     enabled = os.getenv("VIDEO_ALERT_SEND_ENABLED", "0") == "1"
+    # Research lock is intentionally NOT overridable by Railway environment
+    # variables. Explicit reviewed code change required for resumption.
+    formal_enabled = enabled and entry_delivery_allowed()
     early_enabled = enabled and os.getenv("VIDEO_EARLY_ALERT_SEND_ENABLED", "0") == "1"
     minute_prealert_enabled = (early_enabled and
         os.getenv("VIDEO_ONE_MINUTE_PREALERT_SEND_ENABLED", "1") == "1")
@@ -451,7 +465,9 @@ def run():
     scenario_enabled = enabled and os.getenv("VIDEO_SCENARIO_ALERT_SEND_ENABLED", "0") == "1"
     double_bottom_enabled = (scenario_enabled and
         os.getenv("VIDEO_DOUBLE_BOTTOM_SEND_ENABLED", "1") == "1")
-    momentum_trial_enabled = enabled and os.getenv("VIDEO_B_MOMENTUM_TEST_SEND_ENABLED", "0") == "1"
+    # Test-only 1m/5m projected-price advice cannot be sent during the review.
+    # The evaluator remains on for observability and replay comparisons.
+    momentum_trial_enabled = False
     system_enabled = enabled and os.getenv("VIDEO_ALERT_SYSTEM_NOTICES_ENABLED", "0") == "1"
     volume = os.getenv("RAILWAY_VOLUME_MOUNT_PATH")
     if enabled and os.getenv("RAILWAY_SERVICE_ID") and (not volume or Path(volume).resolve() != data):
@@ -466,6 +482,9 @@ def run():
     LOG.info("VIDEO_ALERT_START revision=%s source=%s send_enabled=%s warmup=%d separate=true",
              os.getenv("RAILWAY_GIT_COMMIT_SHA", "local"), SOURCE, enabled, WARMUP)
     LOG.info("VIDEO_ALERT_POLICIES live=%s shadow=disabled experimental_rsi=true", LIVE_SEQUENCE_POLICY)
+    LOG.warning("VIDEO_LIVE_REVIEW_LOCK locked=%s reason=%s min_net_rr=%.1f "
+                "formal_entry_messages=false observational_notices_unchanged=true",
+                not formal_enabled, LOCK_REASON, MIN_NET_RR)
     LOG.info("VIDEO_SCENARIO_CONFIG enabled=%s events_only=true warmup=21", scenario_enabled)
     LOG.info("VIDEO_DOUBLE_BOTTOM_CONFIG enabled=%s observational=true no_orders=true min_bars=32", double_bottom_enabled)
     LOG.info("VIDEO_B_MOMENTUM_TEST_CONFIG enabled=%s test_only=true no_orders=true", momentum_trial_enabled)
@@ -512,8 +531,27 @@ def run():
                 LOG.info("VIDEO_FIXED_LEVEL_5M bar=%d status=%s", seen, fixed5)
                 status, counts = process(bars, now=now, started=started, clock=time.time,
                                          get_book=get_book, ledger=ledger,
-                                         send=telegram.send if enabled else None, rsi_sequence=True)
+                                         send=telegram.send if formal_enabled else None,
+                                         costs=Costs(min_rr=MIN_NET_RR), rsi_sequence=True,
+                                         review_locked=not formal_enabled)
                 LOG.info("VIDEO_ALERT_DECISION bar=%d status=%s reasons=%s", seen, status, counts)
+                # All three A/B/C lanes evaluated independently, in parallel
+                # and recorded with no Telegram or exchange-account action.
+                try:
+                    row = persist_parallel_review(ledger, bars)
+                    if row["status"] == "observed":
+                        LOG.info("VIDEO_PARALLEL_AUDIT bar=%d A=%s B=%s C=%s "
+                                 "reversal_risk=%s no_entry_approval=true",
+                                 seen, row["lanes"]["A"]["status"],
+                                 row["lanes"]["B"]["status"],
+                                 row["lanes"]["C"]["status"], row["rebound_risk"])
+                    else:
+                        LOG.info("VIDEO_PARALLEL_AUDIT bar=%d status=%s",
+                                 seen,row["status"])
+                except (sqlite3.Error, OSError, ValueError, TypeError,
+                        KeyError, ArithmeticError) as exc:
+                    LOG.warning("VIDEO_PARALLEL_AUDIT_ERROR type=%s",
+                                type(exc).__name__)
                 # A research-only observation, never an alert or entry override.
                 # Journal failure cannot interrupt Telegram delivery or live evaluation.
                 try:
