@@ -17,7 +17,7 @@ import json
 import os
 from pathlib import Path
 import sqlite3
-from collections import defaultdict
+from collections import Counter,defaultdict
 from research.zerobase.video_entry import Costs,replay
 from lbank_loss_review_guard import parallel_observation
 
@@ -170,20 +170,28 @@ def model_summary(replay_result, *, signal_from=None, signal_until=None,
     Out-of-sample cohorts are assigned by signal time. Training outcomes that
     resolve after the cutoff are censored rather than borrowing future results.
     """
-    candidates=[x for x in replay_result["events"]
+    qualified=[x for x in replay_result["events"]
                 if x["status"]=="qualified" and
-                x.get("outcome",{}).get("entry_start") is not None
-                and (signal_from is None or
+                (signal_from is None or
                      x.get("signal_start",float("-inf"))>=signal_from)
                 and (signal_until is None or
                      x.get("signal_start",float("inf"))<signal_until)]
+    candidates=[x for x in qualified
+                if x.get("outcome",{}).get("entry_start") is not None]
+    no_entry=Counter(x.get("outcome",{}).get("status","missing_outcome")
+                     for x in qualified if x.get("outcome",{}).get("entry_start") is None)
     candidates.sort(key=lambda e:e["outcome"]["entry_start"])
     accepted=[]
     occupied_until=0
-    rejected={"overlap":0,"unknown_outcome":0,"split_boundary_censored":0}
+    rejected={"overlap":0,"unknown_outcome":0,"split_boundary_censored":0,"duplicate_setup":0}
+    seen_setups=set()
     for e in candidates:
         out=e["outcome"]
         start=out["entry_start"]
+        setup=e.get("setup_id")
+        if setup and setup in seen_setups:
+            rejected["duplicate_setup"]+=1
+            continue
         if start<occupied_until:
             rejected["overlap"]+=1
             continue
@@ -192,6 +200,8 @@ def model_summary(replay_result, *, signal_from=None, signal_until=None,
                 (not resolved or out.get("at",float("inf"))>=resolve_before)):
             rejected["split_boundary_censored"]+=1
             continue
+        if setup:
+            seen_setups.add(setup)
         if not resolved:
             rejected["unknown_outcome"]+=1
             occupied_until=start+12*300
@@ -213,7 +223,8 @@ def model_summary(replay_result, *, signal_from=None, signal_until=None,
             max_drawdown=max(max_drawdown,(peak-equity)/peak)
         losing_streak=losing_streak+1 if change<0 else 0
         max_losing_streak=max(max_losing_streak,losing_streak)
-    return dict(qualified_candidates=len(candidates),resolved_nonoverlap=len(accepted),
+    return dict(qualified_candidates=len(qualified),model_entries=len(candidates),
+        no_entry_reasons=dict(no_entry),resolved_nonoverlap=len(accepted),
         profitable=len(wins),losing=len(losses),win_rate=(len(wins)/len(accepted)
         if accepted else None),net_return_sum=sum(accepted),
         compounded_model_return_unlevered=equity-1.,
@@ -250,7 +261,7 @@ def candidate_funnel(fives, *, start_at=None, end_before=None):
 
 
 def compare_policies(fives):
-    """Same native 5m receipts; fixed chronological 70/30 split, no future training labels."""
+    """Descriptive same-data 70/30 split; NOT a frozen prospective holdout."""
     cutoff=(fives[int(len(fives)*.70)]["start"] if len(fives)>=100 else None)
     old=replay(fives,nominal=False,costs=Costs(min_rr=1.5),rsi_sequence=True)
     new=replay(fives,nominal=False,costs=Costs(min_rr=2.0),rsi_sequence=True)
@@ -271,10 +282,17 @@ def compare_policies(fives):
     return {
       "baseline_1p5":model_summary(old),
       "research_2p0":model_summary(new),
+      "diagnostics":{
+          name:{k:result[k] for k in ("candidate_counts","plan_counts",
+                "pre_candidate_rejections","outcome_counts","evaluated_bars",
+                "contiguous_runs","events")}
+          for name,result in (("baseline_1p5",old),("research_2p0",new))},
       "chronological_split_70_30":{"cutoff_bar_start":cutoff,
                                    "training":train,"out_of_sample":test,
                                    "minimum_resolved_model_trades_per_policy":minimum,
                                    "minimum_sample_met":test_ready,
+                                   "prospective_holdout":False,
+                                   "split_note":"Recomputed per snapshot; descriptive comparison only, not proof of generalization",
                                    "causal_label_censoring":"Training outcomes at/after cutoff excluded"},
       "input_completed_fives":len(fives),
       "data_source":"LBank native stream inferred, NOT independent REST certified",

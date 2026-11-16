@@ -11,6 +11,22 @@ from research.zb_trade_review import (
 
 
 class TradeForensicsTests(unittest.TestCase):
+    def test_same_rsi_setup_cannot_inflate_sequential_wins(self):
+        events=[dict(status="qualified",setup_id="same-pattern",signal_start=t-300,
+                     outcome=dict(status="target",entry_start=t,at=t,
+                                  entry=1000.,model_pnl_per_btc=10.)) for t in (600,1200)]
+        result=model_summary({"events":events})
+        self.assertEqual(result["resolved_nonoverlap"],1)
+        self.assertEqual(result["skipped"]["duplicate_setup"],1)
+
+    def test_qualified_but_unfillable_candidates_are_not_silently_lost(self):
+        report=model_summary({"events":[dict(status="qualified",signal_start=300,
+            outcome={"status":"open_precedes_receipt"})]})
+        self.assertEqual(report["qualified_candidates"],1)
+        self.assertEqual(report["model_entries"],0)
+        self.assertEqual(report["no_entry_reasons"],{"open_precedes_receipt":1})
+        self.assertIsNone(report["win_rate"])
+
     def test_partial_fills_reconcile_gross_and_separate_fees(self):
         with tempfile.TemporaryDirectory() as d:
             path=Path(d)/"fills.csv"
