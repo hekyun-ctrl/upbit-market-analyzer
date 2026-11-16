@@ -1,5 +1,6 @@
 """Fail-closed no-live-entry gate and causal independent lane tests."""
 import sqlite3
+import json
 import unittest
 from unittest.mock import Mock
 from tempfile import TemporaryDirectory
@@ -28,24 +29,48 @@ class LossReviewGuardTests(unittest.TestCase):
         self.assertFalse(entry_delivery_allowed())
         self.assertEqual(MIN_NET_RR,2.)
 
-    def test_formal_signal_blocked_before_quote_or_send(self):
+    def test_locked_signal_records_quote_without_reservation_or_send(self):
         fixture=breakout()[:46]
         rows=[dict(x,received_at=x["start"]+301) for x in fixture]
         end=rows[-1]["start"]+300
         with TemporaryDirectory() as tmp:
             ledger=DeliveryLedger(Path(tmp)/"delivery.db")
             self.addCleanup(ledger.db.close)
-            quote=Mock(side_effect=AssertionError("quote should not be needed"))
+            close=rows[-1]["close"]
+            quote=Mock(return_value=(close-.1,close+.1))
+            quote.last_source="websocket"
             send=Mock(side_effect=AssertionError("formal send must stay locked"))
             state,reasons=process(rows,now=end+2,started=end-1,
                 clock=lambda:end+2,get_book=quote,ledger=ledger,send=send,
                 review_locked=True)
             self.assertEqual(state,"review_lock_unverified_live_performance")
-            quote.assert_not_called()
+            quote.assert_called_once()
             send.assert_not_called()
             event=ledger.db.execute(
               "SELECT evidence FROM video_alert_decisions").fetchone()[0]
             self.assertIn("review_blocked",event)
+            evidence=json.loads(event)
+            self.assertEqual(evidence["review_quote_status"],"eligible")
+            self.assertEqual(evidence["forward_model"]["entry"],close+.1)
+            self.assertFalse(evidence["forward_model"]["actual_fill"])
+            self.assertEqual(ledger.db.execute("SELECT count(*) FROM video_alert_delivery").fetchone()[0],0)
+
+    def test_locked_bad_quote_is_recorded_and_never_promoted_to_forward_entry(self):
+        rows=[dict(x,received_at=x["start"]+301) for x in breakout()[:46]]
+        end=rows[-1]["start"]+300
+        for quote in (Mock(side_effect=TimeoutError),Mock(return_value=(1002.,1004.)),
+                      Mock(return_value=(1006.,1006.1))):
+            with TemporaryDirectory() as tmp:
+                ledger=DeliveryLedger(Path(tmp)/"delivery.db")
+                send=Mock()
+                process(rows,now=end+2,started=end-1,clock=lambda:end+2,
+                        get_book=quote,ledger=ledger,send=send,review_locked=True)
+                evidence=json.loads(ledger.db.execute("SELECT evidence FROM video_alert_decisions").fetchone()[0])
+                self.assertNotIn("forward_model",evidence)
+                self.assertNotEqual(evidence["book"]["status"],"not_requested")
+                send.assert_not_called()
+                self.assertEqual(ledger.db.execute("SELECT count(*) FROM video_alert_delivery").fetchone()[0],0)
+                ledger.db.close()
 
     def test_b_support_break_not_gated_on_a_retest(self):
         rows=self.rows()

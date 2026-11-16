@@ -348,14 +348,25 @@ def _live_decision(bars, *, now, end, clock, get_book, ledger, send, costs, evid
         return "no_qualified_entry", counts
     if len({event["direction"] for event in qualified}) != 1:
         return "conflicting_directions", counts
-    # No Telegram price-level advice while observed real trading losses are
-    # under investigation. Keep causal evidence, do not fetch a stale quote
-    # or accidentally call a trade-like send hook.
+    # Keep delivery locked, but collect the same fresh execution-side quote
+    # required by live screening. Otherwise validation cannot progress.
     if review_locked:
         evidence["review_blocked"] = [
             dict(lane=e["lane"], direction=e["direction"], stop=e.get("stop"),
                  target=e.get("target"), signal_start=e.get("signal_start"))
             for e in qualified]
+        book = evidence["book"] = _read_quote(get_book, now, end, clock)
+        evidence["review_quote_status"] = book["status"]
+        if book["status"] == "usable":
+            valid, evidence["book_checks"] = _screen_quote(qualified, book, costs, counts)
+            evidence["review_quote_status"] = "eligible" if valid else "book_rejected"
+            if valid:
+                rr, event, price = max(valid, key=lambda item: item[0])
+                evidence["forward_model"] = dict(
+                    policy="locked_quote_forward_v1", plan=event, entry=price,
+                    entered_at=book["received_at"], net_rr=rr,
+                    revision=os.getenv("RAILWAY_GIT_COMMIT_SHA", "local"),
+                    actual_fill=False, delivery_authorized=False)
         return "review_lock_unverified_live_performance", counts
     book = evidence["book"] = _read_quote(get_book, now, end, clock)
     if book["status"] != "usable":
@@ -454,7 +465,7 @@ def process(bars, *, now, started, clock, get_book, ledger, send, costs=Costs(),
 
 
 def _start_review_replay_snapshot(native_path, state_dir):
-    """Single read-only startup comparison; never used to unlock trading.
+    """Read-only snapshot comparison; never used to unlock trading.
 
     This is an asynchronous *service* research job (not assistant follow-up).
     It cannot delay trade-event monitoring or write orders. Native history may
@@ -463,13 +474,27 @@ def _start_review_replay_snapshot(native_path, state_dir):
     def worker():
         try:
             report=make_report(native_path)
+            from research.zb_forward_review import forward_report
+            report["forward_quote_model"] = forward_report(
+                state_dir/"video_alert_delivery.sqlite3", native_path)
             baseline=report["policy_comparison"]["baseline_1p5"]
             revised=report["policy_comparison"]["research_2p0"]
             target=state_dir/"zb_unverified_model_replay.json"
             payload=json.dumps(report,ensure_ascii=False,sort_keys=True,allow_nan=False)
-            fd=os.open(target,os.O_WRONLY|os.O_CREAT|os.O_TRUNC,0o600)
+            temporary=target.with_suffix(".tmp")
+            fd=os.open(temporary,os.O_WRONLY|os.O_CREAT|os.O_TRUNC,0o600)
             with os.fdopen(fd,"w",encoding="utf-8") as fh:
                 fh.write(payload+"\n")
+            os.replace(temporary,target)
+            LOG.info("VIDEO_REVIEW_FORWARD cohorts=%d real_fills=false unlock_authorized=false",
+                     len(report["forward_quote_model"]["cohorts"]))
+            for cohort in report["forward_quote_model"]["cohorts"]:
+                stats=cohort["summary"]
+                LOG.info("VIDEO_REVIEW_FORWARD_COHORT revision=%s n=%d net=%.8f dd=%.6f "
+                         "unknown=%s blockers=%s real_fills=false unlock_authorized=false",
+                         cohort["cohort"][1],stats["resolved_nonoverlap"],
+                         stats["net_return_sum"],stats["max_model_drawdown_unlevered"],
+                         cohort["unresolved_reasons"],cohort["blockers"])
             LOG.info("VIDEO_REVIEW_MODEL_REPLAY input_fives=%d "
                      "old_model_resolved=%d old_model_wins=%d old_model_net=%.8f "
                      "new_model_resolved=%d new_model_wins=%d new_model_net=%.8f "
@@ -507,7 +532,9 @@ def _start_review_replay_snapshot(native_path, state_dir):
                 ArithmeticError,RuntimeError) as exc:
             LOG.warning("VIDEO_REVIEW_MODEL_REPLAY_ERROR type=%s",
                         type(exc).__name__)
-    threading.Thread(target=worker,daemon=True,name="zb-replay-audit").start()
+    thread = threading.Thread(target=worker,daemon=True,name="zb-replay-audit")
+    thread.start()
+    return thread
 
 
 def run():
@@ -538,7 +565,8 @@ def run():
                                  chat_id=os.getenv("VIDEO_ALERT_TELEGRAM_CHAT_ID", ""))
     get_book = PublicBook(alternate=fetch_native_book)
     NativeCandleThread(path=str(source_path)).start()
-    _start_review_replay_snapshot(source_path, data)
+    review_worker = _start_review_replay_snapshot(source_path, data)
+    next_review = time.time()+3600
     LOG.info("VIDEO_ALERT_START revision=%s source=%s send_enabled=%s warmup=%d separate=true",
              os.getenv("RAILWAY_GIT_COMMIT_SHA", "local"), SOURCE, enabled, WARMUP)
     LOG.info("VIDEO_ALERT_POLICIES live=%s shadow=disabled experimental_rsi=true", LIVE_SEQUENCE_POLICY)
@@ -568,6 +596,9 @@ def run():
     last_fresh = started
     while True:
         now = time.time()
+        if now >= next_review and not review_worker.is_alive():
+            review_worker = _start_review_replay_snapshot(source_path, data)
+            next_review = now+3600
         try:
             bars = read_window(source_path, now)
             # B TEST only: preserve real older receipts across <=2 missing
