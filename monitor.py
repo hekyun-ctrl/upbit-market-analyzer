@@ -42,6 +42,7 @@ from trade_flow import TradeFlow, buying_persistent
 from audit_store import AuditStore, configured_audit_path
 from alert_limits import early_watch_daily_limits, restored_early_watch_usage
 from minute_surge import MinuteSurgeEngine, enabled as minute_surge_enabled, dispatch_guard as surge_dispatch_guard
+from five_minute_watch import FiveMinuteWatch, enabled as five_minute_watch_enabled
 from volume_history import build_72h_turnover_snapshot, summarize_72h_ranked_outcomes
 
 LOGGER = logging.getLogger("upbit-monitor")
@@ -357,6 +358,7 @@ class MonitorState:
         self.last_candidate_delivery_at: str | None = None
         self.audit_store = None
         self.audit_error = None
+        self._last_audit_error_log_at = 0.0
         self.collection_started_at = None
         path = configured_audit_path()
         if path:
@@ -396,9 +398,17 @@ class MonitorState:
         if self.audit_store:
             try:
                 self.audit_store.append(field, payload)
+                if self.audit_error:
+                    LOGGER.info("AUDIT_STORAGE_RECOVERED (new writes persisted)")
+                    self.audit_error = None
             except Exception as exc:
-                self.audit_error = type(exc).__name__ + ": " + str(exc)
-                LOGGER.error("AUDIT_STORAGE_WRITE_FAILED %s", self.audit_error)
+                error = type(exc).__name__ + ": " + str(exc)
+                # Keep screening running; a full volume must not flood logs.
+                current = time.monotonic()
+                if error != self.audit_error or current - self._last_audit_error_log_at >= 300:
+                    LOGGER.error("AUDIT_STORAGE_WRITE_FAILED %s", error)
+                    self._last_audit_error_log_at = current
+                self.audit_error = error
 
     def _audit_rows(self, field):
         if self.audit_store:
@@ -998,6 +1008,7 @@ class SignalEngine:
     def __init__(self, config: MonitorConfig) -> None:
         self.config = config
         self.minute_surge = MinuteSurgeEngine()
+        self.five_minute_watch = FiveMinuteWatch()
         self.active_markets: set[str] | None = None
         self._windows: dict[str, deque[_SecondBucket]] = defaultdict(deque)
         self._last_evaluated_second: dict[str, int] = {}
@@ -1056,6 +1067,8 @@ class SignalEngine:
         boundary = current_second - current_second % 60
         if minute_surge_enabled():
             self.minute_surge.warm(market, candles, current_second)
+        if five_minute_watch_enabled():
+            self.five_minute_watch.warm(market, candles, current_second)
         historical_prices: dict[int, float] = {}
         historical_buckets: dict[int, _SecondBucket] = {}
         for candle in candles:
@@ -1241,6 +1254,12 @@ class SignalEngine:
         second = int(timestamp_ms / 1000)
         minute_alert = (self.minute_surge.update(market, price, volume, timestamp_ms, sequential_id)
                         if minute_surge_enabled() else None)
+        five_alert = (self.five_minute_watch.update(market, price, volume, timestamp_ms, sequential_id)
+                      if five_minute_watch_enabled() else None)
+        if five_alert:
+            five_alert.update(self.relative_strength_snapshot(market, second))
+            LOGGER.info("FIVE_MINUTE_WATCH %s", json.dumps(five_alert, ensure_ascii=False))
+        discovered = [alert for alert in (minute_alert, five_alert) if alert]
         self.trade_flow.observe(market, price, volume, timestamp_ms, ask_bid, sequential_id)
         self._update_momentum_price(market, second, price)
         window = self._windows[market]
@@ -1272,11 +1291,11 @@ class SignalEngine:
             window.popleft()
 
         if self._last_evaluated_second.get(market) == second:
-            return [minute_alert] if minute_alert else []
+            return discovered
         self._last_evaluated_second[market] = second
         if minute_alert:
             minute_alert.update(self.relative_strength_snapshot(market, second))
-        return ([minute_alert] if minute_alert else []) + self._evaluate(market, window, second)
+        return discovered + self._evaluate(market, window, second)
 
     def _evaluate(
         self, market: str, window: deque[_SecondBucket], now: int
@@ -1980,6 +1999,16 @@ def _qualifies_for_early_watch_priority_reserve(alert: dict[str, Any]) -> bool:
 
 def _early_watch_text(alert: dict[str, Any]) -> str:
     """Clearly separate fast discovery from a verified entry candidate."""
+    if alert.get("completed_5m_watch"):
+        return (
+            f"[완료 5분봉 급등 초기 관찰 | 매수 검증 전] {alert['market']}\n"
+            f"관찰 종가: {_format_price(float(alert['price']))}\n"
+            f"5분봉 상승: {float(alert.get('observed_5m_change_pct') or 0):+.2f}%\n"
+            f"5분 거래대금: {float(alert.get('trade_value_5m_krw') or 0):,.0f}원\n"
+            f"직전 20봉 평균 대비: {float(alert.get('five_minute_turnover_ratio') or 0):.1f}배\n"
+            f"돌파 기준: {_format_price(float(alert['breakout_level']))}\n"
+            "이것은 초기 감시 신호이며, 실제 진입 전 호가·손절·목표·손익비 검증이 필요합니다."
+        )
     rank = int(alert.get("relative_strength_rank") or 0)
     universe = int(alert.get("relative_strength_universe") or 0)
     rank_line = f"상대강도: {rank}/{universe}위\n" if rank and universe else ""
@@ -5145,7 +5174,7 @@ async def _warm_signal_engine(
         try:
             async with semaphore:
                 requested_at = int(time.time())
-                candles = await client.candles(market, "minute1", 65)
+                candles = await client.candles(market, "minute1", 125 if five_minute_watch_enabled() else 65)
             return engine.warm_market(market, candles, now=requested_at)
         except asyncio.CancelledError:
             raise
@@ -5260,6 +5289,7 @@ async def _refresh_market_subscriptions(websocket, config, engine, markets, warm
 
 async def run_monitor_forever() -> None:
     LOGGER.info("UPBIT_MINUTE_SURGE_RUNTIME version=%s commit=%s enabled=%s completed_only=true outbound=validated_candidate_only", STRATEGY_VERSION, os.getenv("RAILWAY_GIT_COMMIT_SHA", "unknown"), minute_surge_enabled())
+    LOGGER.info("UPBIT_FIVE_MINUTE_WATCH enabled=%s observational_only=true", five_minute_watch_enabled())
     config = MonitorConfig.from_env()
     dispatcher = AlertDispatcher()
     zil_watch_task = asyncio.create_task(run_zil_watch(dispatcher, MONITOR_STATE.audit_store))
