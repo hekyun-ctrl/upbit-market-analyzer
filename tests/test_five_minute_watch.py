@@ -52,7 +52,7 @@ def test_false_impulses_stay_silent():
                      close=103, value=50_000_000)
     assert proof(past + [candidate], "KRW-X")
     for column, value in (("value", 9_000_000), ("close", 100.0),
-                          ("high", 110.0), ("low", 96.0)):
+                          ("high", 110.0), ("open", 104.0)):
         mutated = dict(candidate, **{column: value})
         assert proof(past + [mutated], "KRW-X") is None
 
