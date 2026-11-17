@@ -76,7 +76,7 @@ class FiveMinuteWatch:
                                  low=b["low"], close=b["close"], value=b["value"],
                                  last=b["start"])
             else:
-                if b["start"] < x.get("first", x["start"]):
+                if b["start"] < x["first"]:
                     x["open"] = b["open"]
                 if b["start"] > x["last"]:
                     x["close"], x["last"] = b["close"], b["start"]
