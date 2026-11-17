@@ -28,6 +28,6 @@ jobs:
       - name: Compile modified components
         run: |
           python -m py_compile audit_store.py five_minute_watch.py monitor.py minute_surge.py
-      - name: Run focused regressions
+      - name: Run complete regression suite
         run: |
-          python -m pytest -q tests/test_audit_store.py tests/test_minute_surge.py tests/test_five_minute_watch.py
+          python -m pytest -q tests
