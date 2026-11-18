@@ -17,6 +17,7 @@ import time
 from lbank_early_breakout_audit import persist_early_audit
 from lbank_early_alert_delivery import activation_check, send_early_candidate, send_feed_warning
 from lbank_scenario_alerts import send_scenario_candidate
+from lbank_opportunity_review import send_review, announce_release
 from lbank_double_bottom_alerts import send_double_bottom_candidate
 from lbank_b_retest_research import persist_b_retest_shadow
 from lbank_b_early_1m_shadow import read_closed_1m_window, persist_first_minute_shadow
@@ -544,6 +545,7 @@ def run():
     # Research lock is intentionally NOT overridable by Railway environment
     # variables. Explicit reviewed code change required for resumption.
     formal_enabled = enabled and entry_delivery_allowed()
+    opportunity_enabled = enabled and os.getenv("VIDEO_OPPORTUNITY_REVIEW_SEND_ENABLED", "0") == "1"
     early_enabled = enabled and os.getenv("VIDEO_EARLY_ALERT_SEND_ENABLED", "0") == "1"
     minute_prealert_enabled = (early_enabled and
         os.getenv("VIDEO_ONE_MINUTE_PREALERT_SEND_ENABLED", "1") == "1")
@@ -591,6 +593,10 @@ def run():
                                   scenario_enabled=scenario_enabled)
     LOG.info("VIDEO_ACTIVATION_CHECK status=%s early_enabled=%s system_enabled=%s",
              activation, early_enabled, system_enabled)
+    opportunity_release = announce_release(ledger, revision=revision, now=time.time(),
+                                           send=telegram.send if enabled else None,
+                                           enabled=opportunity_enabled)
+    LOG.info("VIDEO_OPPORTUNITY_ACTIVATION status=%s enabled=%s", opportunity_release, opportunity_enabled)
     seen, next_health = None, 0
     minute_seen = None
     last_fresh = started
@@ -626,6 +632,12 @@ def run():
                                          costs=Costs(min_rr=MIN_NET_RR), rsi_sequence=True,
                                          review_locked=not formal_enabled)
                 LOG.info("VIDEO_ALERT_DECISION bar=%d status=%s reasons=%s", seen, status, counts)
+                opportunity_status = send_review(
+                    ledger, bars, now=now, started=started,
+                    get_book=get_book, send=telegram.send if enabled else None,
+                    enabled=opportunity_enabled, final_status=status,
+                    clock=time.time)
+                LOG.info("VIDEO_OPPORTUNITY_REVIEW bar=%d status=%s", seen, opportunity_status)
                 # All three A/B/C lanes evaluated independently, in parallel
                 # and recorded with no Telegram or exchange-account action.
                 try:
@@ -696,7 +708,8 @@ def run():
                     scenario_status = send_scenario_candidate(
                         ledger, bars, now=now, started=started, final_status=status,
                         send=telegram.send if enabled else None,
-                        enabled=scenario_enabled and not db_observed)
+                        enabled=scenario_enabled and not db_observed and
+                                not opportunity_status.endswith(":accepted"))
                 except (sqlite3.Error, OSError, ValueError, KeyError, TypeError) as exc:
                     LOG.warning("VIDEO_SCENARIO_FAILURE type=%s", type(exc).__name__)
                     scenario_status = "evaluation_failed"
@@ -705,7 +718,8 @@ def run():
                 early_status = send_early_candidate(
                     ledger, bars, now=now, final_status=status,
                     send=telegram.send if enabled else None,
-                    enabled=early_enabled and not observed)
+                    enabled=early_enabled and not observed and
+                            not opportunity_status.endswith(":accepted"))
                 LOG.info("VIDEO_EARLY_DELIVERY bar=%d status=%s", seen, early_status)
                 # NEW: dedicated RSI-independent first-support-break B test.
                 # Cost/quote checked; explicitly unverified, never an order
