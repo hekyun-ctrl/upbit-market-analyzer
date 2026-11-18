@@ -75,13 +75,33 @@ class NativeCandlesTests(unittest.TestCase):
         result, = store.ingest(frame(raw(3300, updated=3307)), 3307, wall_received=3308)
         self.assertEqual((result["start"], result["volume"], result["updated"]), (3000, 15, 3304))
         self.assertEqual(store.db.execute("SELECT received FROM native_arrivals WHERE period=300 AND start=3000").fetchone()[0], 3308)
-        with self.assertRaisesRegex(ValueError, "candle_update_at_end"):
-            store.ingest(frame(raw(3300, updated=3360)), 3360, wall_received=3359)
-        with self.assertRaisesRegex(ValueError, "candle_update_after_end"):
-            store.ingest(frame(raw(3300, updated=3376)), 3376, wall_received=3376)
+        self.assertEqual(store.ingest(frame(raw(3300, updated=3360)), 3360, wall_received=3359), [])
+        self.assertEqual(store.ingest(frame(raw(3300, updated=3376)), 3376, wall_received=3376), [])
+        self.assertEqual(store.current, 3300)  # late rows never force a reconnect
         store.disconnected()
         self.assertEqual(store.ingest(frame(raw(3300, updated=3361)), 3361, wall_received=3361), [])
         self.assertIsNone(store.current)
+
+    def test_late_row_in_batch_does_not_discard_valid_new_minute(self):
+        store = self.make_store()
+        store.ingest(frame(raw(3000, updated=3059)), 3059, wall_received=3060)
+        mixed = {"x": 2, "z": 4, "w": 3062000,
+                 "d": [raw(3000, updated=3061), raw(3060, updated=3061)]}
+        self.assertEqual(store.ingest(mixed, 3061, wall_received=3062), [])
+        self.assertEqual(store.current, 3060)
+        self.assertEqual(store.db.execute(
+            "SELECT quality FROM native_bars WHERE period=60 AND start=3000"
+        ).fetchone()[0], "stream_closed")
+
+    def test_stored_history_survives_new_gap(self):
+        store = self.make_store()
+        with store.db:
+            store.db.execute("INSERT INTO native_bars VALUES(?,?,?,?,?,?,?,?,?,?)",
+                             (300, 3000, 100, 103, 98, 101, 2, 200, 3299, "stream_closed"))
+        store.server_time = 3900
+        status = store.status()
+        self.assertEqual(status["stored_closed_5m"], 1)
+        self.assertEqual(status["consecutive_closed_5m"], 0)
 
     def test_late_revision_to_an_older_bar_is_ignored_without_resetting_stream(self):
         store = self.make_store()
