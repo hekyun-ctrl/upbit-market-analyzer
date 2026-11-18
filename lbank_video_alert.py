@@ -592,7 +592,12 @@ def run():
              price_watch_enabled)
     if enabled:
         token_ok, chat_ok = telegram.health()
-        LOG.info("VIDEO_ALERT_TELEGRAM_CHECK token_ok=%s chat_ok=%s no_test_message=true", token_ok, chat_ok)
+        LOG.info("VIDEO_ALERT_TELEGRAM_CHECK token_ok=%s chat_ok=%s no_test_message=false", token_ok, chat_ok)
+        # One clearly labeled non-trade message verifies sendMessage, not just
+        # getMe/getChat. The marker survives Railway restarts and deployments.
+        probe_ok = telegram.startup_probe_once(
+            marker_path=str(data / "video_telegram_delivery_probe_v1"))
+        LOG.info("VIDEO_ALERT_DELIVERY_PROBE attempted=true result=%s not_trade_signal=true", probe_ok)
     check_book(get_book)
     revision = os.getenv("RAILWAY_GIT_COMMIT_SHA", "local")
     activation = activation_check(ledger, now=time.time(), revision=revision,
