@@ -82,9 +82,20 @@ class NativeEntryFeed:
             # read is ONLY for an independent 1h public-technique paper study.
             five = recent_contiguous(rows5[:250], expected5, 300)
             research_five = recent_contiguous(rows5, expected5, 300)
+            # Only candle timestamps/quality are logged; never expose quote or
+            # trading data in operational health diagnostics.
+            latest_one = rows1[0] if rows1 else None
+            latest_five = rows5[0] if rows5 else None
             diag = {"source": SOURCE, "closed_1m": len(minutes), "closed_5m": len(five),
                     "required_5m": MIN_FIVE_BARS, "rsi_warmup_target": 250,
                     "rsi_history_mature": len(five) >= 250,
+                    "expected_1m_start": expected1,
+                    "latest_1m_start": latest_one["start"] if latest_one else None,
+                    "latest_1m_quality": latest_one["quality"] if latest_one else None,
+                    "latest_1m_update_offset": latest_one["updated"] - latest_one["start"] if latest_one else None,
+                    "expected_5m_start": expected5,
+                    "latest_5m_start": latest_five["start"] if latest_five else None,
+                    "latest_5m_quality": latest_five["quality"] if latest_five else None,
                     "closure": "stream_inferred_not_rest_verified"}
             if len(minutes) < 65 or len(five) < MIN_FIVE_BARS:
                 return None, dict(diag, reason="native_history_missing_stale_or_gapped", entry_source_switched=False)
