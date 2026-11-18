@@ -169,6 +169,11 @@ def send_review(ledger, bars, *, now, started, get_book, send, enabled,
         return "before_start"
     event = evaluate_review(bars, now=now, get_book=get_book, clock=clock)
     if event["status"] != "review_candidate":
+        # Preserve the exact qualification reason for missed-opportunity
+        # replay without logging prices, tokens or Telegram identifiers.
+        LOG.info("VIDEO_OPPORTUNITY_SCREEN_DETAIL bar=%d status=%s reasons=%s",
+                 last["start"],event["status"],
+                 ",".join(str(x) for x in event.get("reasons", [])) or "none")
         return event["status"]
     start, direction = event["start"], event["direction"]
     try:

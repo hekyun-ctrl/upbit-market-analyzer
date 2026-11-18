@@ -23,6 +23,7 @@ from lbank_double_bottom_alerts import send_double_bottom_candidate
 from lbank_b_retest_research import persist_b_retest_shadow
 from lbank_b_early_1m_shadow import read_closed_1m_window, persist_first_minute_shadow
 from lbank_one_minute_prealert import send_one_minute_prealert
+from lbank_price_momentum_watch import send_price_watch
 from lbank_fixed_level_alerts import send_level_alert
 from lbank_telegram_context import compact_trend
 from lbank_loss_review_guard import (entry_delivery_allowed, persist_parallel_review,
@@ -548,6 +549,7 @@ def run():
     formal_enabled = enabled and entry_delivery_allowed()
     opportunity_enabled = enabled and os.getenv("VIDEO_OPPORTUNITY_REVIEW_SEND_ENABLED", "0") == "1"
     five_bar_checkin_enabled = enabled and os.getenv("VIDEO_FIVE_BAR_CHECKIN_ENABLED", "0") == "1"
+    price_watch_enabled = enabled and os.getenv("VIDEO_PRICE_MOMENTUM_WATCH_ENABLED", "0") == "1"
     early_enabled = enabled and os.getenv("VIDEO_EARLY_ALERT_SEND_ENABLED", "0") == "1"
     minute_prealert_enabled = (early_enabled and
         os.getenv("VIDEO_ONE_MINUTE_PREALERT_SEND_ENABLED", "1") == "1")
@@ -586,6 +588,8 @@ def run():
              fixed_level_enabled)
     LOG.info("VIDEO_FIVE_BAR_CHECKIN_CONFIG enabled=%s interval=5x5m no_orders=true",
              five_bar_checkin_enabled)
+    LOG.info("VIDEO_PRICE_MOMENTUM_CONFIG enabled=%s sources=1m,5m formal_lock_unchanged=true",
+             price_watch_enabled)
     if enabled:
         token_ok, chat_ok = telegram.health()
         LOG.info("VIDEO_ALERT_TELEGRAM_CHECK token_ok=%s chat_ok=%s no_test_message=true", token_ok, chat_ok)
@@ -655,6 +659,19 @@ def run():
                     enabled=opportunity_enabled, final_status=status,
                     clock=time.time)
                 LOG.info("VIDEO_OPPORTUNITY_REVIEW bar=%d status=%s", seen, opportunity_status)
+                # Independent, lower-confidence price-movement heads-up.
+                # This does not alter the formal entry/quote/2R review.
+                try:
+                    move_status = send_price_watch(
+                        ledger, bars, period=300, now=time.time(), started=started,
+                        send=telegram.send if enabled else None,
+                        enabled=price_watch_enabled)
+                    LOG.info("VIDEO_PRICE_MOMENTUM_5M bar=%d status=%s entry_approved=false",
+                             seen, move_status)
+                except (sqlite3.Error, OSError, ValueError, TypeError,
+                        KeyError, ArithmeticError) as exc:
+                    LOG.warning("VIDEO_PRICE_MOMENTUM_5M_FAILURE type=%s",
+                                type(exc).__name__)
                 # All three A/B/C lanes evaluated independently, in parallel
                 # and recorded with no Telegram or exchange-account action.
                 try:
@@ -801,6 +818,23 @@ def run():
                             pre_status = "evaluation_failed"
                         LOG.info("VIDEO_1M_PREALERT_DECISION minute=%d status=%s",
                                  minute_seen, pre_status)
+                        # When a conventional high-volume 1m prealert fired,
+                        # do not duplicate it with a lower-confidence watch.
+                        try:
+                            price_minute_status = send_price_watch(
+                                ledger, minutes, period=60, now=time.time(),
+                                started=started,
+                                send=telegram.send if enabled else None,
+                                enabled=price_watch_enabled and
+                                        not pre_status.endswith(":accepted") and
+                                        not pre_status.endswith(":unconfirmed") and
+                                        not suppress)
+                            LOG.info("VIDEO_PRICE_MOMENTUM_1M minute=%d status=%s",
+                                     minute_seen, price_minute_status)
+                        except (sqlite3.Error, OSError, ValueError, TypeError,
+                                KeyError, ArithmeticError) as exc:
+                            LOG.warning("VIDEO_PRICE_MOMENTUM_1M_FAILURE type=%s",
+                                        type(exc).__name__)
                         first = persist_first_minute_shadow(
                             ledger, minutes, bars, now=now, started=started)
                         LOG.info(

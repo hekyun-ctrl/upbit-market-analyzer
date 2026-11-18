@@ -152,6 +152,8 @@ def format_checkin(slot, data):
         )
     else:
         message += "진입가·손절가·목표가: 검증 미통과로 제시하지 않음\n"
+    if data.get("recent_fast_watch"):
+        message += f"최근 25분 조기 가격 움직임: {data['recent_fast_watch']} · 진입 승인은 별도\n"
     message += (
         f"주요 사유: {data['reason']}\n"
         "※ 실전 신호 검증 잠금 유지 · 자동주문 없음 · 레버리지 위험 주의"
@@ -179,6 +181,19 @@ def send_five_bar_checkin(ledger, bars, *, now, started, get_book,
         return "waiting_for_fresh_bar"
     data = (_observe(bars, now=now, get_book=get_book, clock=clock)
             if valid else {"source": "unavailable"})
+    if valid:
+        try:
+            last_watch = ledger.db.execute(
+                """SELECT direction,period FROM video_price_momentum_notice
+                WHERE bar_start>=? AND bar_start<? AND status='accepted'
+                ORDER BY bar_start DESC LIMIT 1""",
+                (slot-25*60,slot)).fetchone()
+            if last_watch:
+                data["recent_fast_watch"] = (
+                    ("상승" if last_watch[0]=="up" else "하락")
+                    +f"({last_watch[1]//60}분봉)")
+        except sqlite3.OperationalError:
+            pass
     try:
         with ledger.db:
             ledger.db.execute("""CREATE TABLE IF NOT EXISTS video_five_bar_checkins(
