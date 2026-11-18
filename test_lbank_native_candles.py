@@ -93,6 +93,37 @@ class NativeCandlesTests(unittest.TestCase):
             "SELECT quality FROM native_bars WHERE period=60 AND start=3000"
         ).fetchone()[0], "stream_closed")
 
+    def test_restart_recovers_only_complete_certified_1m_groups(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = os.path.join(directory, "repair.sqlite3")
+            first = NativeCandleStore(path)
+            with first.db:
+                for i in range(5):
+                    t = 3000 + i*60
+                    first.db.execute("INSERT INTO native_bars VALUES(?,?,?,?,?,?,?,?,?,?)",
+                                     (60,t,100,103,98,101,2,200,t+59,"stream_closed"))
+                for i in range(4):
+                    t = 3600 + i*60
+                    first.db.execute("INSERT INTO native_bars VALUES(?,?,?,?,?,?,?,?,?,?)",
+                                     (60,t,100,103,98,101,2,200,t+59,"stream_closed"))
+            first.db.close()
+            restored = NativeCandleStore(path)
+            try:
+                self.assertEqual(restored.recovered_derived_5m, 1)
+                self.assertEqual(restored.db.execute(
+                    "SELECT COUNT(*) FROM native_bars WHERE period=300 AND quality='stream_closed'"
+                ).fetchone()[0], 1)
+                self.assertEqual(restored.db.execute(
+                    "SELECT COUNT(*) FROM native_bars WHERE period=300 AND start=3600"
+                ).fetchone()[0], 0)
+            finally:
+                restored.db.close()
+            again = NativeCandleStore(path)
+            try:
+                self.assertEqual(again.recovered_derived_5m, 0)
+            finally:
+                again.db.close()
+
     def test_stored_history_survives_new_gap(self):
         store = self.make_store()
         with store.db:
