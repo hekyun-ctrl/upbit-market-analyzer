@@ -48,6 +48,32 @@ class NativeEntryTests(unittest.TestCase):
         self.assertEqual(state["source"], SOURCE)
         self.assertFalse(diag["rsi_history_mature"])
 
+    def test_certified_boundary_revision_is_valid_not_missing_history(self):
+        # The writer permits a final 1m revision up to 15 seconds after
+        # minute end; derived 5m copies the same final revision timestamp.
+        latest_minute = int(self.now // 60) * 60 - 60
+        latest_five = int(self.now // 300) * 300 - 300
+        with self.writer.db:
+            self.writer.db.execute(
+                "UPDATE native_bars SET updated=? WHERE period=60 AND start=?",
+                (latest_minute + 65, latest_minute))
+            self.writer.db.execute(
+                "UPDATE native_bars SET updated=? WHERE period=300 AND start=?",
+                (latest_five + 305, latest_five))
+        state, diag = self.snapshot()
+        self.assertIsNotNone(state, diag)
+        self.assertTrue(diag["entry_source_switched"])
+
+    def test_uncertified_or_excessive_boundary_revision_is_rejected(self):
+        latest_minute = int(self.now // 60) * 60 - 60
+        with self.writer.db:
+            self.writer.db.execute(
+                "UPDATE native_bars SET updated=? WHERE period=60 AND start=?",
+                (latest_minute + 76, latest_minute))
+        state, diag = self.snapshot()
+        self.assertIsNone(state)
+        self.assertEqual(diag["closed_1m"], 0)
+
     def test_rsi_known_wilder_seed_and_flat_series(self):
         prices = [44.34,44.09,44.15,43.61,44.33,44.83,45.10,45.42,
                   45.84,46.08,45.89,46.03,45.61,46.28,46.28]
