@@ -45,7 +45,11 @@ def recent_contiguous(rows, expected, period):
                 or not all(math.isfinite(v) for v in values)
                 or min(o, h, l, c) <= 0 or min(v, turnover) < 0
                 or h < max(o, c, l) or l > min(o, c, h)
-                or not expected <= row["updated"] < expected + period):
+                # The native feed can report a sealed minute's last revision
+                # just after its boundary (up to MAX_BOUNDARY_DELAY).
+                # A derived 5m inherits that final minute timestamp.
+                # Only writer-certified stream_closed bars are accepted.
+                or not expected <= row["updated"] <= expected + period + 15):
             break
         result.append(dict(row))
         expected -= period
