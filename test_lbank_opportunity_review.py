@@ -155,6 +155,20 @@ class OpportunityReviewTests(unittest.TestCase):
         self.assertIn("상위봉 미확인", sender.call_args.args[0])
         self.assertIn("정식 진입 승인 아님", sender.call_args.args[0])
 
+    def test_failed_screen_reports_reason_without_crashing_worker(self):
+        sender=Mock()
+        with patch("lbank_opportunity_review.evaluate_review",
+                   return_value={"status":"screen_rejected",
+                                 "reasons":["no_known_target"]}):
+            with self.assertLogs("lbank_opportunity_review","INFO") as logs:
+                outcome=send_review(
+                    self.ledger,self.bars,now=self.now,started=self.now-1000,
+                    get_book=Mock(),send=sender,enabled=True,
+                    final_status="no_qualified_entry")
+        self.assertEqual(outcome,"screen_rejected")
+        self.assertTrue(any("no_known_target" in line for line in logs.output))
+        sender.assert_not_called()
+
     def test_release_notice_dedupes_across_restarts(self):
         sender=Mock(return_value=True)
         self.assertEqual(announce_release(self.ledger,revision="abc",

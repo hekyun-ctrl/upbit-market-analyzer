@@ -172,7 +172,7 @@ def send_review(ledger, bars, *, now, started, get_book, send, enabled,
         # Preserve the exact qualification reason for missed-opportunity
         # replay without logging prices, tokens or Telegram identifiers.
         LOG.info("VIDEO_OPPORTUNITY_SCREEN_DETAIL bar=%d status=%s reasons=%s",
-                 last["start"],event["status"],
+                 bars[-1]["start"],event["status"],
                  ",".join(str(x) for x in event.get("reasons", [])) or "none")
         return event["status"]
     start, direction = event["start"], event["direction"]
