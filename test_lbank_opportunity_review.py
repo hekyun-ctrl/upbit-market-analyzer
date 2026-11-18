@@ -134,6 +134,27 @@ class OpportunityReviewTests(unittest.TestCase):
             enabled=True,final_status="telegram_accepted"),"formal_alert_priority")
         sender.assert_not_called()
 
+    def test_early_review_delivery_dedupes_and_keeps_warning(self):
+        candidate = self.check(count=21)
+        sender = Mock(return_value=True)
+        with patch("lbank_opportunity_review.evaluate_review",
+                   return_value=candidate):
+            first = send_review(
+                self.ledger, self.bars[-21:], now=self.now,
+                started=self.now-1000, get_book=Mock(),
+                send=sender, enabled=True,
+                final_status="no_qualified_entry", clock=lambda:self.now)
+            again = send_review(
+                self.ledger, self.bars[-21:], now=self.now,
+                started=self.now-1000, get_book=Mock(),
+                send=sender, enabled=True,
+                final_status="no_qualified_entry", clock=lambda:self.now)
+        self.assertEqual(first, "B:accepted")
+        self.assertEqual(again, "cooldown")
+        sender.assert_called_once()
+        self.assertIn("상위봉 미확인", sender.call_args.args[0])
+        self.assertIn("정식 진입 승인 아님", sender.call_args.args[0])
+
     def test_release_notice_dedupes_across_restarts(self):
         sender=Mock(return_value=True)
         self.assertEqual(announce_release(self.ledger,revision="abc",
