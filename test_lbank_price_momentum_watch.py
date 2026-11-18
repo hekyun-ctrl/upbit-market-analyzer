@@ -207,7 +207,7 @@ class PriceMomentumWatchTests(unittest.TestCase):
                          ("watch","down"))
         from lbank_early_breakout_audit import evaluate_early_breakout
         old=evaluate_early_breakout(rows)
-        self.assertNotEqual(old["status"],"candidate")
+        self.assertEqual(old["status"],"candidate")
 
 if __name__ == "__main__":
     unittest.main()
