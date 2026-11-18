@@ -89,7 +89,23 @@ class NativeCandleStore:
         raw_rows = frame.get("d", [])
         if isinstance(raw_rows, dict):
             raw_rows = [raw_rows]
-        parsed = [(raw, parse_bar(raw)) for raw in raw_rows]
+        parsed = []
+        for raw in raw_rows:
+            try:
+                parsed.append((raw, parse_bar(raw)))
+            except ValueError:
+                # The exchange can resend a previously closed minute with a
+                # timestamp beyond its end. Do not restart the entire socket
+                # because of that late row. Other malformed rows still fail.
+                try:
+                    period = 60 if raw["b"] == "1m" else 300
+                    late = (raw["a"] == "BTCUSDT" and int(raw["c"]) % period == 0
+                            and int(raw["k"]) >= int(raw["c"]) + period)
+                except (KeyError, ValueError, TypeError):
+                    late = False
+                if not late:
+                    raise
+                LOG.info("NATIVE_CANDLES_LATE_ROW_SKIPPED period=%s", period)
         wall_received = int(time.time() if wall_received is None else wall_received)
         closed = []
         with self.db:
@@ -166,7 +182,9 @@ class NativeCandleStore:
                 gain = (13*gain + max(change, 0)) / 14
                 loss = (13*loss + max(-change, 0)) / 14
             rsi14 = 50. if gain == loss == 0 else 100. if loss == 0 else 100-100/(1+gain/loss)
-        return {"consecutive_closed_5m": count, "warmup_target": 250, "rsi14_wilder": rsi14,
+        total = self.db.execute("SELECT COUNT(*) FROM native_bars WHERE period=300 AND quality='stream_closed'").fetchone()[0]
+        return {"consecutive_closed_5m": count, "stored_closed_5m": total,
+                "warmup_target": 250, "rsi14_wilder": rsi14,
                 "native_history_ready": count >= 250, "entry_source_status": "see_NATIVE_ENTRY_STATUS",
                 "source": "lbank_native_1m_aggregated_5m",
                 "closure": "stream_inferred_not_rest_verified"}
