@@ -24,12 +24,15 @@ COOLDOWN = 30 * 60
 RETENTION = 7 * 86400
 COSTS = Costs(min_rr=2.0)
 NAMES = {"A": "저항 실패", "B": "지지 이탈", "C": "상방 돌파"}
+STRUCTURE_MIN_BARS = 21
+HIGHER_TIMEFRAME_MIN_BARS = 72
 
 
 def evaluate_review(bars, *, now, get_book, clock=time.time):
     """Fail closed on stale candles, unknown target, bad quote, or costs."""
-    if len(bars) < 72:
-        return {"status": "insufficient_history"}
+    if len(bars) < STRUCTURE_MIN_BARS:
+        return {"status": "insufficient_structure_history",
+                "required": STRUCTURE_MIN_BARS, "available": len(bars)}
     last = bars[-1]
     end = last.get("start", 0) + 300
     receipt = last.get("received_at")
@@ -39,9 +42,15 @@ def evaluate_review(bars, *, now, get_book, clock=time.time):
     observed = parallel_observation(bars)
     if observed.get("status") != "observed":
         return {"status": observed.get("status", "invalid_observation")}
-    rank = trend_priority(bars)
-    if rank.get("status") != "ready":
-        return {"status": "higher_timeframe_not_ready"}
+    # The independent 21-bar structure stage MUST NOT wait for 72 bars.
+    # No 15m/1h consensus is inferred from a short or recently restarted feed.
+    rank = (trend_priority(bars) if len(bars) >= HIGHER_TIMEFRAME_MIN_BARS
+            else {"status": "insufficient_history", "trend": "unknown",
+                  "directions": {}})
+    if rank.get("status") not in ("ready", "insufficient_history",
+                                   "insufficient_higher_timeframe"):
+        return {"status": "higher_timeframe_source_invalid"}
+    higher_ready = rank.get("status") == "ready"
     eligible = []
     for lane in ("B", "A", "C"):
         state = observed["lanes"].get(lane, {})
@@ -51,8 +60,9 @@ def evaluate_review(bars, *, now, get_book, clock=time.time):
             # An independently bearish structure may occur while the hourly
             # recovery is incomplete. Keep MIXED visible, but never assert
             # higher-timeframe confirmation. Opposite consensus is excluded.
-            if (direction == -1 and regime == "bullish" or
-                    direction == 1 and regime == "bearish"):
+            if (higher_ready and
+                    (direction == -1 and regime == "bullish" or
+                     direction == 1 and regime == "bearish")):
                 continue
             eligible.append((lane, direction))
     if not eligible:
@@ -102,8 +112,14 @@ def evaluate_review(bars, *, now, get_book, clock=time.time):
         if verdict != "qualified" or rr is None:
             rejected.append(verdict)
             continue
+        review_grade = ("early_structure_only" if not higher_ready else
+                        "higher_timeframe_mixed" if rank["trend"] == "mixed" else
+                        "higher_timeframe_aligned")
         return {"status": "review_candidate", "lane": lane,
                 "direction": direction, "start": last["start"],
+                "review_grade": review_grade, "bars_seen": len(bars),
+                "higher_timeframe_confirmed": bool(higher_ready and
+                    rank["trend"] not in ("mixed", "unknown")),
                 "close": float(last["close"]), "quote": quote,
                 "stop": stop, "target": target, "net_rr_assumed": rr,
                 "barrier": float(barrier["price"]),
@@ -119,15 +135,23 @@ def format_review(event):
     stamp = datetime.fromtimestamp(event["start"]+300, KST).strftime("%m-%d %H:%M KST")
     side = "롱" if event["direction"] == 1 else "숏"
     direction = {"bearish":"하락 우세", "bullish":"상승 우세",
-                 "mixed":"상위봉 충돌"}[event["trend"]]
+                 "mixed":"상위봉 충돌", "unknown":"확인 자료 부족"}[event["trend"]]
+    early = event["review_grade"] == "early_structure_only"
+    tier = ("조기 구조 후보 · 상위봉 미확인" if early else
+            "구조 후보 · 상위봉 충돌" if event["review_grade"] == "higher_timeframe_mixed"
+            else "고우선 구조 기회 검토")
+    caveat = ("주의: 5분봉 21개부터 조기 포착. 15분·1시간 합의는 미검증.\n"
+              if early else "")
     return (
-        f"[BTCUSDT 고우선 구조 기회 검토 · {stamp}]\n"
+        f"[BTCUSDT {tier} · {stamp}]\n"
+        f"{caveat}"
         f"{event['lane']}형 / {side} 관찰 · {NAMES[event['lane']]}\n"
         f"발송 전 확인 호가 {event['quote']:,.1f} USDT (5분 종가 {event['close']:,.1f})\n"
         f"무효화 기준 가설 {event['stop']:,.1f} / 확인된 구조 목표 {event['target']:,.1f}\n"
         f"가정 비용 차감 손익비 {event['net_rr_assumed']:.2f} "
         f"(호가 스프레드 {event['spread_pct']:.3f}%)\n"
-        f"거래량 {event['volume_multiple']:.2f}배 / 상위봉 {direction}\n"
+        f"거래량 {event['volume_multiple']:.2f}배 / 상위봉 {direction}"
+        f" / 연속 5분봉 {event['bars_seen']}개\n"
         f"구조 목표의 근거는 이전 완료봉의 확정 가격 장벽 {event['barrier']:,.1f}\n"
         "주의: 실거래 성과 검증 중. 정식 진입 승인 아님 · 자동주문 없음.\n"
         "호가 변화·급반등·수수료·50배 청산위험을 별도로 확인하세요.\n"
@@ -200,7 +224,9 @@ def announce_release(ledger, *, revision, now, send, enabled):
     try:
         accepted = bool(send(
             "[BTCUSDT 구조기회 자동 감시 활성화]\n"
-            "LBank 5분봉 A/B/C 고우선 구조 후보를 비용·호가·과거 가격 장벽으로 검사합니다.\n"
+            "LBank 5분봉 21개부터 A/B/C 구조를 조기 감지합니다.\n"
+            "상위 시간봉 검증 전에는 반드시 미확인 후보로 표시합니다.\n"
+            "호가·비용·과거 가격 장벽 검사는 계속 적용됩니다.\n"
             "기준을 충족한 경우에만 별도 후보 알림을 보냅니다.\n"
             "정식 진입 승인은 실거래 검증으로 잠긴 상태입니다. 자동주문 없음.\n"
             "이 메시지는 통신·배포 확인용이며 진입 신호가 아닙니다."
