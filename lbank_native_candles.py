@@ -121,10 +121,12 @@ class NativeCandleStore:
                 parsed.append((raw, parse_bar(raw, observed_end_by=observed_end_by if active else None)))
             except ValueError as exc:
                 if str(exc) in {"candle_update_after_end", "candle_update_at_end"}:
-                    # Relative timing only; no market prices or payload logged.
-                    LOG.info("NATIVE_CANDLES_LATE_ROW active=%s period=%s offset_s=%s receipt_offset_s=%s",
+                    # A late revision is unusable, but must not disconnect the
+                    # stream and destroy the continuity of later valid minutes.
+                    LOG.info("NATIVE_CANDLES_LATE_ROW_SKIPPED active=%s period=%s offset_s=%s receipt_offset_s=%s",
                              active, "1m" if raw.get("b") == "1m" else "5m",
                              int(raw["k"])-int(raw["c"]), wall_received-int(raw["c"]))
+                    continue
                 raise
         closed = []
         with self.db:
@@ -201,7 +203,9 @@ class NativeCandleStore:
                 gain = (13*gain + max(change, 0)) / 14
                 loss = (13*loss + max(-change, 0)) / 14
             rsi14 = 50. if gain == loss == 0 else 100. if loss == 0 else 100-100/(1+gain/loss)
-        return {"consecutive_closed_5m": count, "warmup_target": 250, "rsi14_wilder": rsi14,
+        total = self.db.execute("SELECT COUNT(*) FROM native_bars WHERE period=300 AND quality='stream_closed'").fetchone()[0]
+        return {"consecutive_closed_5m": count, "stored_closed_5m": total,
+                "warmup_target": 250, "rsi14_wilder": rsi14,
                 "native_history_ready": count >= 250, "entry_source_status": "see_NATIVE_ENTRY_STATUS",
                 "source": "lbank_native_1m_aggregated_5m",
                 "closure": "stream_inferred_not_rest_verified"}
