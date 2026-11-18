@@ -60,12 +60,34 @@ class NativeCandlesTests(unittest.TestCase):
         store.ingest(frame(raw(3000, volume=2, updated=3059)), 3)
         self.assertEqual(store.db.execute("SELECT volume FROM native_bars").fetchone()[0], 2)
 
-    def test_late_row_does_not_force_stream_restart(self):
+    def test_boundary_update_stays_forming_until_next_minute_and_retains_final_volume(self):
         store = self.make_store()
-        store.ingest(frame(raw(3000, updated=3059)), 3059)
+        for i in range(5):
+            t = 3000+i*60
+            store.ingest(frame(raw(t, updated=t+7, volume=1)), t+7, wall_received=t+8)
+            store.ingest(frame(raw(t, updated=t+58, volume=1)), t+58, wall_received=t+59)
+            update = t+60+i
+            result = store.ingest(frame(raw(t, updated=update, volume=3)), update, wall_received=update)
+            self.assertEqual(result, [])
+            row = store.db.execute("SELECT quality, updated FROM native_bars WHERE period=60 AND start=?",
+                                   (t,)).fetchone()
+            self.assertEqual(tuple(row), ("forming", update))
+        result, = store.ingest(frame(raw(3300, updated=3307)), 3307, wall_received=3308)
+        self.assertEqual((result["start"], result["volume"], result["updated"]), (3000, 15, 3304))
+        self.assertEqual(store.db.execute("SELECT received FROM native_arrivals WHERE period=300 AND start=3000").fetchone()[0], 3308)
+        self.assertEqual(store.ingest(frame(raw(3300, updated=3360)), 3360, wall_received=3359), [])
+        self.assertEqual(store.ingest(frame(raw(3300, updated=3376)), 3376, wall_received=3376), [])
+        self.assertEqual(store.current, 3300)  # late rows never force a reconnect
+        store.disconnected()
+        self.assertEqual(store.ingest(frame(raw(3300, updated=3361)), 3361, wall_received=3361), [])
+        self.assertIsNone(store.current)
+
+    def test_late_row_in_batch_does_not_discard_valid_new_minute(self):
+        store = self.make_store()
+        store.ingest(frame(raw(3000, updated=3059)), 3059, wall_received=3060)
         mixed = {"x": 2, "z": 4, "w": 3062000,
                  "d": [raw(3000, updated=3061), raw(3060, updated=3061)]}
-        self.assertEqual(store.ingest(mixed, 3061), [])
+        self.assertEqual(store.ingest(mixed, 3061, wall_received=3062), [])
         self.assertEqual(store.current, 3060)
         self.assertEqual(store.db.execute(
             "SELECT quality FROM native_bars WHERE period=60 AND start=3000"
@@ -102,14 +124,24 @@ class NativeCandlesTests(unittest.TestCase):
             finally:
                 again.db.close()
 
-    def test_persisted_history_is_not_mistaken_for_contiguous_history(self):
+    def test_stored_history_survives_new_gap(self):
         store = self.make_store()
         with store.db:
             store.db.execute("INSERT INTO native_bars VALUES(?,?,?,?,?,?,?,?,?,?)",
                              (300, 3000, 100, 103, 98, 101, 2, 200, 3299, "stream_closed"))
         store.server_time = 3900
-        self.assertEqual(store.status()["stored_closed_5m"], 1)
-        self.assertEqual(store.status()["consecutive_closed_5m"], 0)
+        status = store.status()
+        self.assertEqual(status["stored_closed_5m"], 1)
+        self.assertEqual(status["consecutive_closed_5m"], 0)
+
+    def test_late_revision_to_an_older_bar_is_ignored_without_resetting_stream(self):
+        store = self.make_store()
+        store.ingest(frame(raw(3000, updated=3059)), 3059, wall_received=3060)
+        store.ingest(frame(raw(3060, updated=3061)), 3061, wall_received=3062)
+        self.assertEqual(store.ingest(frame(raw(3000, updated=3067, close=102)), 3067, wall_received=3068), [])
+        row = store.db.execute("SELECT quality,close FROM native_bars WHERE period=60 AND start=3000").fetchone()
+        self.assertEqual(tuple(row), ("stream_closed", 101))
+        self.assertEqual(store.current, 3060)
 
     def test_gap_at_boundary_prevents_closure(self):
         store = self.make_store()
