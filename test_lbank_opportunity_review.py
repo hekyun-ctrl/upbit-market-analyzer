@@ -165,5 +165,131 @@ class OpportunityReviewTests(unittest.TestCase):
         self.assertIn("진입 신호가 아닙니다",sender.call_args.args[0])
 
 
+
+
+class FiveBarCheckinTests(unittest.TestCase):
+    def setUp(self):
+        from lbank_five_bar_checkin import _slot_end
+        from datetime import datetime, timezone
+        self.db = sqlite3.connect(":memory:")
+        self.addCleanup(self.db.close)
+        self.ledger = SimpleNamespace(db=self.db)
+        # 2026-11-18 13:20 KST is exactly a 25-minute boundary.
+        self.slot = int(datetime(2026,11,18,4,20,tzinfo=timezone.utc).timestamp())
+        self.assertEqual(_slot_end(self.slot+15), self.slot)
+        self.now = self.slot+15
+        self.bars = []
+        for i in range(21):
+            t = self.slot - 21*300 + i*300
+            self.bars.append(dict(start=t, period=300, open=64000.,
+                high=64020., low=63980., close=64000., volume=15.,
+                quality="stream_closed", received_at=t+302))
+
+    def send(self, bars=None, **opts):
+        from lbank_five_bar_checkin import send_five_bar_checkin
+        sender = opts.pop("sender", Mock(return_value=True))
+        now = opts.pop("now", self.now)
+        out = send_five_bar_checkin(
+            self.ledger, self.bars if bars is None else bars,
+            now=now, started=self.slot-1500,
+            get_book=Mock(return_value=(63999.9,64000.1)),
+            send=sender, enabled=True, clock=lambda:now, **opts)
+        return out,sender
+
+    def test_five_bar_checkin_sent_with_no_entry(self):
+        with patch("lbank_five_bar_checkin.parallel_observation",
+                   return_value={"status":"observed",
+                       "lanes":{a:{"status":"no_event"} for a in ("A","B","C")}}), \
+             patch("lbank_five_bar_checkin.evaluate_review",
+                   return_value={"status":"no_high_priority_structure"}):
+            result,sender=self.send()
+        self.assertEqual(result,"no_entry:accepted")
+        self.assertIn("진입 보류",sender.call_args.args[0])
+        self.assertIn("5분봉 5개",sender.call_args.args[0])
+        self.assertIn("64,000.0",sender.call_args.args[0])
+        self.assertIn("진입가·손절가·목표가",sender.call_args.args[0])
+
+    def test_no_five_closed_bars_wait_then_report_missing(self):
+        before,sender=self.send(bars=[],now=self.slot+15)
+        self.assertEqual(before,"waiting_for_fresh_bar")
+        sender.assert_not_called()
+        status,sender=self.send(bars=[],now=self.slot+45)
+        self.assertEqual(status,"source_unavailable:accepted")
+        self.assertIn("진입 금지",sender.call_args.args[0])
+        self.assertIn("시세 자료 부족",sender.call_args.args[0])
+
+    def test_25_minute_boundaries_not_hourly(self):
+        from lbank_five_bar_checkin import _slot_end
+        self.assertEqual(_slot_end(self.slot+1499),self.slot)
+        self.assertEqual(_slot_end(self.slot+1500),self.slot+1500)
+        result,sender=self.send(now=self.slot+150)
+        self.assertEqual(result,"not_due")
+        sender.assert_not_called()
+
+    def test_25m_reservation_stops_duplicate_after_restart(self):
+        with patch("lbank_five_bar_checkin.parallel_observation",
+                   return_value={"status":"observed",
+                       "lanes":{a:{"status":"no_event"} for a in ("A","B","C")}}), \
+             patch("lbank_five_bar_checkin.evaluate_review",
+                   return_value={"status":"no_high_priority_structure"}):
+            sender=Mock(return_value=True)
+            self.assertEqual(self.send(sender=sender)[0],"no_entry:accepted")
+            self.assertEqual(self.send(sender=sender)[0],"already_reserved")
+        sender.assert_called_once()
+
+    def test_25m_candidate_is_not_trade_approval(self):
+        event={"status":"review_candidate", "lane":"B", "direction":-1,
+             "quote":63999.9, "stop":64080., "target":63500.,
+             "net_rr_assumed":2.2}
+        observed={"status":"observed",
+                 "lanes":{a:{"status":"observed_not_entry" if a=="B" else "no_event"}
+                          for a in ("A","B","C")}}
+        with patch("lbank_five_bar_checkin.parallel_observation",
+                   return_value=observed), \
+             patch("lbank_five_bar_checkin.evaluate_review",return_value=event):
+            result,sender=self.send()
+        self.assertEqual(result,"candidate:accepted")
+        body=sender.call_args.args[0]
+        self.assertIn("숏 최우선 관찰",body)
+        self.assertIn("손절 가설",body)
+        self.assertIn("2.20:1",body)
+        self.assertIn("실전 진입 미승인",body)
+
+    def test_bars_with_gap_cannot_justify_entry(self):
+        from lbank_five_bar_checkin import _validate_five
+        wrong=[dict(x) for x in self.bars]
+        wrong[-3]["start"]+=300
+        self.assertFalse(_validate_five(wrong,self.slot,self.now))
+        out,sender=self.send(bars=wrong,now=self.slot+45)
+        self.assertEqual(out,"source_unavailable:accepted")
+        self.assertIn("진입 금지",sender.call_args.args[0])
+
+    def test_invalid_receipt_rejected(self):
+        from lbank_five_bar_checkin import _validate_five
+        x=[dict(a) for a in self.bars]
+        x[-1]["received_at"]-=400
+        self.assertFalse(_validate_five(x,self.slot,self.now))
+
+    def test_network_timeout_reserved_no_duplicate(self):
+        sender=Mock(side_effect=TimeoutError("network"))
+        with patch("lbank_five_bar_checkin.parallel_observation",
+                   return_value={"status":"observed",
+                       "lanes":{a:{"status":"no_event"} for a in ("A","B","C")}}), \
+             patch("lbank_five_bar_checkin.evaluate_review",
+                   return_value={"status":"no_high_priority_structure"}):
+            self.assertEqual(self.send(sender=sender)[0],"no_entry:unconfirmed_no_retry")
+            self.assertEqual(self.send(sender=sender)[0],"already_reserved")
+        sender.assert_called_once()
+
+    def test_not_enabled_cannot_send(self):
+        from lbank_five_bar_checkin import send_five_bar_checkin
+        sender=Mock()
+        result=send_five_bar_checkin(
+            self.ledger,self.bars,now=self.now,started=self.slot-1500,
+            get_book=Mock(),send=sender,enabled=False)
+        self.assertEqual(result,"disabled")
+        sender.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()

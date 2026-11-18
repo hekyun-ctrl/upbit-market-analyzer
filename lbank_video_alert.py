@@ -18,6 +18,7 @@ from lbank_early_breakout_audit import persist_early_audit
 from lbank_early_alert_delivery import activation_check, send_early_candidate, send_feed_warning
 from lbank_scenario_alerts import send_scenario_candidate
 from lbank_opportunity_review import send_review, announce_release
+from lbank_five_bar_checkin import send_five_bar_checkin
 from lbank_double_bottom_alerts import send_double_bottom_candidate
 from lbank_b_retest_research import persist_b_retest_shadow
 from lbank_b_early_1m_shadow import read_closed_1m_window, persist_first_minute_shadow
@@ -546,6 +547,7 @@ def run():
     # variables. Explicit reviewed code change required for resumption.
     formal_enabled = enabled and entry_delivery_allowed()
     opportunity_enabled = enabled and os.getenv("VIDEO_OPPORTUNITY_REVIEW_SEND_ENABLED", "0") == "1"
+    five_bar_checkin_enabled = enabled and os.getenv("VIDEO_FIVE_BAR_CHECKIN_ENABLED", "0") == "1"
     early_enabled = enabled and os.getenv("VIDEO_EARLY_ALERT_SEND_ENABLED", "0") == "1"
     minute_prealert_enabled = (early_enabled and
         os.getenv("VIDEO_ONE_MINUTE_PREALERT_SEND_ENABLED", "1") == "1")
@@ -582,6 +584,8 @@ def run():
              minute_prealert_enabled)
     LOG.info("VIDEO_FIXED_LEVEL_CONFIG enabled=%s down=62525 up=63060 periods=60,300 no_orders=true",
              fixed_level_enabled)
+    LOG.info("VIDEO_FIVE_BAR_CHECKIN_CONFIG enabled=%s interval=5x5m no_orders=true",
+             five_bar_checkin_enabled)
     if enabled:
         token_ok, chat_ok = telegram.health()
         LOG.info("VIDEO_ALERT_TELEGRAM_CHECK token_ok=%s chat_ok=%s no_test_message=true", token_ok, chat_ok)
@@ -607,6 +611,19 @@ def run():
             next_review = now+3600
         try:
             bars = read_window(source_path, now)
+            # Independent fixed-cadence five-closed-candle report; includes
+            # NO-ENTRY on a missing feed, rather than silently skipping a cycle.
+            try:
+                checkin = send_five_bar_checkin(
+                    ledger, bars, now=now, started=started, get_book=get_book,
+                    send=telegram.send if enabled else None,
+                    enabled=five_bar_checkin_enabled, clock=time.time)
+                if checkin not in ("disabled", "before_start", "not_due",
+                                   "waiting_for_fresh_bar", "already_reserved"):
+                    LOG.info("VIDEO_FIVE_BAR_CHECKIN status=%s", checkin)
+            except (sqlite3.Error, OSError, ValueError, TypeError,
+                    KeyError, ArithmeticError) as exc:
+                LOG.warning("VIDEO_FIVE_BAR_CHECKIN_FAILURE type=%s", type(exc).__name__)
             # B TEST only: preserve real older receipts across <=2 missing
             # 5m slots after deploy. Formal read_window stays fail-closed.
             b_context = read_b_5m_context(source_path, now)
