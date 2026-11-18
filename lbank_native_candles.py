@@ -74,6 +74,32 @@ class NativeCandleStore:
         self.current = None
         self.last_seen = None
         self.server_time = 0
+        self.recovered_derived_5m = self.repair_derived_history()
+
+    def repair_derived_history(self):
+        """Restore only complete groups of five previously certified 1m bars."""
+        recovered = 0
+        with self.db:
+            starts = self.db.execute("""
+                SELECT (start - start % 300) AS bucket
+                FROM native_bars
+                WHERE period=60 AND quality='stream_closed'
+                GROUP BY bucket
+                HAVING COUNT(*)=5
+                ORDER BY bucket
+            """).fetchall()
+            for row in starts:
+                start = row["bucket"]
+                exists = self.db.execute(
+                    "SELECT 1 FROM native_bars WHERE period=300 AND start=? AND quality='stream_closed'",
+                    (start,)).fetchone()
+                if exists:
+                    continue
+                if self._aggregate(start) is not None:
+                    recovered += 1
+        if recovered:
+            LOG.info("NATIVE_DERIVED_HISTORY_REPAIRED recovered=%d source=sealed_native_1m", recovered)
+        return recovered
 
     def disconnected(self):
         if self.current is not None:
@@ -183,7 +209,10 @@ class NativeCandleStore:
                 loss = (13*loss + max(-change, 0)) / 14
             rsi14 = 50. if gain == loss == 0 else 100. if loss == 0 else 100-100/(1+gain/loss)
         total = self.db.execute("SELECT COUNT(*) FROM native_bars WHERE period=300 AND quality='stream_closed'").fetchone()[0]
+        latest = self.db.execute("SELECT MAX(start) FROM native_bars WHERE period=300 AND quality='stream_closed'").fetchone()[0]
         return {"consecutive_closed_5m": count, "stored_closed_5m": total,
+                "latest_stored_5m": latest, "expected_latest_5m": int(self.server_time // 300) * 300 - 300,
+                "recovered_derived_5m": self.recovered_derived_5m,
                 "warmup_target": 250, "rsi14_wilder": rsi14,
                 "native_history_ready": count >= 250, "entry_source_status": "see_NATIVE_ENTRY_STATUS",
                 "source": "lbank_native_1m_aggregated_5m",
