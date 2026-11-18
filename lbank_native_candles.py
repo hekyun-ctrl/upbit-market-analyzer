@@ -20,6 +20,7 @@ import aiohttp
 
 LOG = logging.getLogger("lbank_native_candles")
 WS_URL = "wss://uuws.rerrkvifj.com/ws/v3"
+MAX_BOUNDARY_DELAY = 15
 
 
 def decode_frame(data):
@@ -35,18 +36,31 @@ def decode_frame(data):
     return json.loads(data)
 
 
-def parse_bar(raw):
+def parse_bar(raw, *, observed_end_by=None):
     if raw.get("a") != "BTCUSDT" or raw.get("b") not in ("1m", "5m"):
         raise ValueError("wrong instrument or period")
     period = 60 if raw["b"] == "1m" else 300
     start, updated = int(raw["c"]), int(raw["k"])
     values = [float(raw[k]) for k in ("d", "f", "g", "e", "h", "i")]
     o, h, l, c, v, turnover = values
-    if (start <= 0 or start % period or not start <= updated < start + period
-            or not all(math.isfinite(x) for x in values)
-            or min(o, h, l, c) <= 0 or min(v, turnover) < 0
-            or h < max(o, c, l) or l > min(o, c, h)):
-        raise ValueError("invalid candle geometry or timestamp")
+    if start <= 0 or start % period:
+        raise ValueError("candle_start_unaligned")
+    # A closing update of the minute already in flight can arrive just after
+    # the boundary. Retain its actual update timestamp; never close it here.
+    at_minute_end = (period == 60 and start+period <= updated <= start+period+MAX_BOUNDARY_DELAY
+                     and observed_end_by is not None and updated <= observed_end_by)
+    if not (start <= updated < start + period or at_minute_end):
+        if updated == start+period:
+            raise ValueError("candle_update_at_end")
+        if updated < start:
+            raise ValueError("candle_update_before_start")
+        raise ValueError("candle_update_after_end")
+    if not all(math.isfinite(x) for x in values):
+        raise ValueError("candle_nonfinite_values")
+    if min(o, h, l, c) <= 0 or min(v, turnover) < 0:
+        raise ValueError("candle_nonpositive_price_or_negative_volume")
+    if h < max(o, c, l) or l > min(o, c, h):
+        raise ValueError("candle_invalid_ohlc_geometry")
     return (period, start, o, h, l, c, v, turnover, updated)
 
 
@@ -77,7 +91,11 @@ class NativeCandleStore:
         self.recovered_derived_5m = self.repair_derived_history()
 
     def repair_derived_history(self):
-        """Restore only complete groups of five previously certified 1m bars."""
+        """Recover ONLY complete previously sealed native 1m groups.
+
+        Never infer missing 1m candles or promote forming/gap snapshots.
+        Existing valid 5m bars are left unchanged.
+        """
         recovered = 0
         with self.db:
             starts = self.db.execute("""
@@ -115,24 +133,31 @@ class NativeCandleStore:
         raw_rows = frame.get("d", [])
         if isinstance(raw_rows, dict):
             raw_rows = [raw_rows]
+        wall_received = int(time.time() if wall_received is None else wall_received)
+        observed_end_by = min(wall_received, int(frame["w"]) / 1000)
         parsed = []
         for raw in raw_rows:
+            active = False
+            if raw.get("a") == "BTCUSDT" and raw.get("b") == "1m":
+                start = int(raw["c"])
+                if self.current is not None and start < self.current:
+                    # A revision to an older minute cannot change a sealed bar.
+                    continue
+                if self.current is None and start+60 <= min(observed_end_by, int(raw["k"])):
+                    # A late row on reconnect is not a fresh contiguous start.
+                    continue
+                active = start == self.current
             try:
-                parsed.append((raw, parse_bar(raw)))
-            except ValueError:
-                # The exchange can resend a previously closed minute with a
-                # timestamp beyond its end. Do not restart the entire socket
-                # because of that late row. Other malformed rows still fail.
-                try:
-                    period = 60 if raw["b"] == "1m" else 300
-                    late = (raw["a"] == "BTCUSDT" and int(raw["c"]) % period == 0
-                            and int(raw["k"]) >= int(raw["c"]) + period)
-                except (KeyError, ValueError, TypeError):
-                    late = False
-                if not late:
-                    raise
-                LOG.info("NATIVE_CANDLES_LATE_ROW_SKIPPED period=%s", period)
-        wall_received = int(time.time() if wall_received is None else wall_received)
+                parsed.append((raw, parse_bar(raw, observed_end_by=observed_end_by if active else None)))
+            except ValueError as exc:
+                if str(exc) in {"candle_update_after_end", "candle_update_at_end"}:
+                    # A late revision is unusable, but must not disconnect the
+                    # stream and destroy the continuity of later valid minutes.
+                    LOG.info("NATIVE_CANDLES_LATE_ROW_SKIPPED active=%s period=%s offset_s=%s receipt_offset_s=%s",
+                             active, "1m" if raw.get("b") == "1m" else "5m",
+                             int(raw["k"])-int(raw["c"]), wall_received-int(raw["c"]))
+                    continue
+                raise
         closed = []
         with self.db:
             for raw, bar in parsed:
@@ -266,8 +291,15 @@ class NativeCandleThread(threading.Thread):
                             elif msg.type == aiohttp.WSMsgType.ERROR:
                                 raise RuntimeError("websocket error")
             except Exception as exc:
-                LOG.warning("NATIVE_CANDLES_RECONNECT exception=%s retry_seconds=%s",
-                            type(exc).__name__, delay)
+                safe_reason = str(exc) if str(exc) in (
+                    "oversized or incomplete compressed frame", "oversized frame",
+                    "wrong instrument or period", "candle_start_unaligned",
+                    "candle_update_at_end", "candle_update_before_start", "candle_update_after_end",
+                    "candle_nonfinite_values", "candle_nonpositive_price_or_negative_volume",
+                    "candle_invalid_ohlc_geometry",
+                    "candle ahead of server clock", "websocket error") else "unclassified"
+                LOG.warning("NATIVE_CANDLES_RECONNECT exception=%s reason=%s retry_seconds=%s",
+                            type(exc).__name__, safe_reason, delay)
             finally:
                 if heartbeat:
                     heartbeat.cancel()
