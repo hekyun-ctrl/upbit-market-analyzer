@@ -66,6 +66,7 @@ class OpportunityReviewTests(unittest.TestCase):
         conflict = dict(self.rank, trend="bullish")
         x = self.check(count=72, rank=conflict)
         self.assertEqual(x["status"], "no_high_priority_structure")
+        self.assertEqual(x["reasons"], ["B:opposite_higher_timeframe"])
         y = self.check(count=72)
         self.assertEqual(y["review_grade"], "higher_timeframe_aligned")
         self.assertTrue(y["higher_timeframe_confirmed"])
@@ -93,6 +94,13 @@ class OpportunityReviewTests(unittest.TestCase):
         obs = dict(self.obs, lanes={lane:{"status":"no_event"} for lane in ("A","B","C")})
         x, _, quote = self.check(count=21, obs=obs, return_quote=True)
         self.assertEqual(x["status"], "no_high_priority_structure")
+        quote.assert_not_called()
+
+    def test_low_volume_structure_is_distinct_from_no_structure(self):
+        obs = dict(self.obs, lanes={"B": {"status": "no_event", "structure_seen": True,
+                                        "phase": "structure_seen_low_volume"}})
+        result, _, quote = self.check(count=21, obs=obs, return_quote=True)
+        self.assertEqual(result["reasons"], ["B:structure_seen_low_volume"])
         quote.assert_not_called()
 
     def test_gap_in_21_structure_window_fails_closed(self):
