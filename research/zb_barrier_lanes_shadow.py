@@ -40,7 +40,7 @@ def evaluate_barrier_lanes(side, entry, stop, barrier, far_target,
     if (side not in (-1, 1) or not _valid(entry, stop, barrier, far_target)
             or not all(math.isfinite(v) and v >= 0 for v in (fee_rate, exit_slippage))
             or not math.isfinite(min_net_rr) or min_net_rr < 1
-            or side * (entry - stop) >= 0
+            or side * (stop - entry) >= 0
             or side * (barrier - entry) <= 0
             or side * (far_target - barrier) <= 0):
         return result
@@ -89,7 +89,7 @@ def evaluate_barrier_lanes(side, entry, stop, barrier, far_target,
     # the stop merely to make risk/reward look better.
     renewed_stop = (min(first["low"], second["low"]) - buffer if side == 1
                     else max(first["high"], second["high"]) + buffer)
-    if side * (renewed_entry - renewed_stop) >= 0:
+    if side * (renewed_stop - renewed_entry) >= 0:
         cont["status"] = "invalid_stop_geometry"
         return result
     rr2, gain2, loss2 = _net_rr(side, renewed_entry, renewed_stop,
