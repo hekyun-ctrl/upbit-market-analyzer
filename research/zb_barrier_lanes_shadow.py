@@ -60,7 +60,7 @@ def evaluate_barrier_lanes(side, entry, stop, barrier, far_target,
         if (not all(_valid(b["open"], b["high"], b["low"], b["close"])
                     and b["low"] <= min(b["open"], b["close"])
                     <= max(b["open"], b["close"]) <= b["high"]
-                    and isinstance(b["start"], int)
+                    and isinstance(b["start"], int) and b["start"] % 60 == 0
                     and isinstance(b["received_at"], (int, float))
                     and b.get("quality") == "stream_closed"
                     and b["start"] + 60 <= b["received_at"] <= observed_at
