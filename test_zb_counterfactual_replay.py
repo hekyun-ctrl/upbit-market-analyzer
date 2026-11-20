@@ -51,6 +51,24 @@ class CounterfactualTests(unittest.TestCase):
         self.assertEqual(out["classification"],"target_first")
         self.assertLess(out["net_usdt_per_btc"],0)
 
+    def test_recorded_signal13_fixture_cannot_fake_unseen_future_profit(self):
+        import json
+        from pathlib import Path
+        fixture=json.loads((Path(__file__).parent /
+            "research/fixtures/lbank_signal13_replay_inputs_20261020.json").read_text())
+        assert fixture["actual_account_data"] is False
+        columns=fixture["bar_columns"]
+        rows=[dict(zip(columns,row)) for row in fixture["native_rows"] if row[0]==60]
+        record=fixture["signal"]
+        plan=record["plan"]
+        signal=ReplaySignal(observed_at=int(record["opened"]),
+                            side=int(plan["direction"]),
+                            stop=plan["stop"],target=plan["target1"],
+                            strategy=plan["strategy"],why_blocked="fixture_only")
+        outcome=replay_one(signal,rows)
+        self.assertEqual(outcome["classification"],"no_future_bars")
+        self.assertNotIn("net_usdt_per_btc",outcome)
+
     def test_summary_excludes_untestable(self):
         sig=ReplaySignal(observed_at=61,side=1,stop=99,target=101)
         a=replay_one(sig,[minute(120,100,101.5,99.5,101)])
