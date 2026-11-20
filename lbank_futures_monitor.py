@@ -268,13 +268,15 @@ def fast_sample_rsi_gate(prices, direction):
     return True, "fast_rsi_ok", strength
 
 
-def telegram(message):
+def telegram(message, *, entry_reference=None):
     """Common, audited Telegram delivery; avoids logging credentials/messages.
 
     Caller-side acknowledgement/retry remains authoritative: ambiguous timeouts
     are never immediately resent as potentially duplicate entry alerts.
     """
-    return TELEGRAM_DELIVERY.send(message)
+    if entry_reference is None:
+        return TELEGRAM_DELIVERY.send(message)
+    return TELEGRAM_DELIVERY.send(message, entry_audit=("monitor", entry_reference))
 
 
 def get_perpetual_snapshot(exchange):
@@ -1392,7 +1394,7 @@ def run():
                                     plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat(),
                                     reference_number=risk_tracker.next_number)
                                 send_started_at = time.time()
-                                if telegram(message):
+                                if telegram(message, entry_reference=risk_tracker.next_number):
                                     acknowledged_at = time.time()
                                     plan["entry_timing"].update(send_started_at=send_started_at,
                                         telegram_acknowledged_at=acknowledged_at,

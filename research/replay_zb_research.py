@@ -16,7 +16,7 @@ from unittest.mock import patch
 from research.compare_entry_refinement import DATA, available_state, load_archives, make_feed, timestamp
 from research.compare_entry_refinement import monitor
 from research.zb_counterfactual_replay import ReplaySignal, replay_one
-from research.zb_signal_research import COSTS, MAIN_STOP_CAP, MAX_CHASE, MIN_NET_RR, STUDY_STOP_CAP
+from research.zb_signal_research import COSTS, MAIN_STOP_CAP, MAX_CHASE, MIN_NET_RR, PIVOT_BUFFER, STUDY_STOP_CAP
 from research.zb_signal_research import evaluate_snapshot
 
 DELAY_SECONDS = 15
@@ -143,9 +143,9 @@ def evaluate_window(feed, quotes):
                 trend_coverage={key:dict(value) for key,value in contexts.items()})
 
 
-def _simulate(row, bars, cap=None, rr=None):
+def _simulate(row, bars, cap=None, rr=None, *, target=None):
     plan = row["plan"]
-    signal = ReplaySignal(row["at"], row["direction"], plan["stop"], plan["target"],
+    signal = ReplaySignal(row["at"], row["direction"], plan["stop"], plan["target"] if target is None else target,
                           row["lane"], plan.get("status", ""), trigger=row.get("trigger"))
     outcome = replay_one(signal, bars, max_bars=HOLD_BARS, min_net_rr=rr, max_stop_fraction=cap,
                          max_chase_fraction=MAX_CHASE if row.get("basis") else None, **COSTS)
@@ -226,6 +226,9 @@ def measure(record, bars):
         plan = row["plan"]
         if row["basis"] == "1m" and plan.get("target") and plan.get("stop"):
             row["counterfactual"] = _simulate(row, bars)
+            if plan.get("far_target") is not None:
+                far_exit = plan["far_target"]*(1-row["direction"]*PIVOT_BUFFER)
+                row["extension_replay"] = _simulate(row, bars, target=far_exit)
     record["missed_by_existing"] = [
         r for r in record["policies"]["modified_060"]["accepted"]
         if r["outcome"]["classification"] == "target_first"

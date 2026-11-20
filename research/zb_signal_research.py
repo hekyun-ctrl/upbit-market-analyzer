@@ -8,7 +8,7 @@ from lbank_trend_runner import atr_wilder
 from research.zb_barrier_lanes_shadow import barrier_retest
 from research.zb_counterfactual_replay import assess_geometry
 
-POLICY = "zb_signal_research_v1"
+POLICY = "zb_signal_research_v2"
 COSTS = dict(fee_fraction=.0006, exit_slippage_fraction=.0003, funding_reserve_fraction=.0001)
 MAIN_STOP_CAP = .006
 STUDY_STOP_CAP = .008
@@ -46,6 +46,36 @@ def _targets(fives, minutes, side, price, known_by):
             continue
         targets.append((level, confirmed))
     return sorted(targets, key=lambda p: side*p[0])
+
+
+def _support_recovery(minutes, fives):
+    """Observe a closed one-minute recovery at previously tested 5m support."""
+    previous, latest = minutes[-2:]
+    if (latest["close"] <= max(latest["open"], previous["close"])
+            or (previous["close"] >= minutes[-6]["close"] and latest["low"] >= previous["low"])):
+        return None
+
+    # Freeze the support before the two minutes that are testing it.
+    known = [b for b in fives[-24:] if b["received_at"] <= previous["start"]]
+    tested_low = min(previous["low"], latest["low"])
+    for base in sorted(known, key=lambda b: (abs(b["low"]-tested_low), -b["start"])):
+        level = base["low"]
+        width = 2 * PIVOT_BUFFER * level
+        trigger = level+width
+        if (abs(tested_low-level) > width or latest["close"] <= trigger
+                or latest["close"]-latest["open"] < PIVOT_BUFFER*level):
+            continue
+        if (latest["low"] > trigger and previous["close"] > trigger
+                and previous["close"] > previous["open"]):
+            continue  # The preceding minute already recovered this level.
+        tests = [b for b in known if abs(b["low"]-level) <= width and b["close"] > trigger]
+        if len(tests) < 2 or any(b["close"] < level-width for b in known if b["start"] > tests[-1]["start"]):
+            continue
+        return dict(lane="C1", direction=1, level=level, trigger=trigger,
+                    signal_basis="closed_minute_support_recovery", tested_low=tested_low,
+                    support_five_starts=[b["start"] for b in tests],
+                    support_known_at=max(b["received_at"] for b in tests))
+    return None
 
 
 def _plan(candidate, quote, quote_time, now, minutes, fives, targets, stop_style):
@@ -144,6 +174,9 @@ def evaluate_snapshot(state, now):
             candidates.append(dict(lane="B2" if side == -1 else "C2", direction=side,
                 level=level, trigger=level, signal_basis="break_and_held_retest",
                 retest_status=retest["status"]))
+    support_recovery = _support_recovery(minutes, fives)
+    if support_recovery and not any(item["lane"] == "C1" for item in candidates):
+        candidates.append(support_recovery)
     for item in candidates:
         cutoff = previous["start"] if item["signal_basis"] == "break_and_held_retest" else now
         targets = _targets(fives, minutes, item["direction"], latest["close"], cutoff)
