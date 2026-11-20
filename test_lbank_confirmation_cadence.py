@@ -17,6 +17,7 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
               ready_at=None,qualify_at=None,stop_at=9075.,cancel_at=None,
               journal_open_failures=0,shadow_fails=False,low_storage=False):
     clock=SimpleNamespace(now=9000.);order=[];saved=[];sent=[];confirmed=[]
+    entry_references=[]
     state=structural_state();state['rsi5']['closes']=[b['close'] for b in state['five_bars']]
     p=state['quote'];plan=dict(direction=1,side='롱',strategy='breakout',price=p,
         stop=p-200,target1=p+600,target2=p+1000,rr1=1.5,m5=.2,m15=.3,
@@ -35,6 +36,10 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
         return None if clock.now==reject_at else copy.deepcopy(plan)
     def sample(now,*args,**kwargs):
         if now==journal_fails_at:raise OSError('journal unavailable')
+    def send(message, *, entry_reference=None):
+        sent.append((clock.now,message))
+        entry_references.append(entry_reference)
+        return True
     position=MagicMock();position.position=None
     position.risk.return_value=None;position.profit_check.return_value=None;position.target_reached.return_value=None
     risk=MagicMock();risk.signals=[];risk.next_number=1
@@ -85,7 +90,7 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
         for name in ('annotate_market_context','annotate_public_techniques','attach_thesis'):
             stack.enter_context(patch.object(monitor,name,side_effect=lambda p,*a:p))
         stack.enter_context(patch.object(monitor,'format_entry_alert',return_value='isolated test entry'))
-        stack.enter_context(patch.object(monitor,'telegram',side_effect=lambda message:sent.append((clock.now,message)) or True))
+        stack.enter_context(patch.object(monitor,'telegram',side_effect=send))
         stack.enter_context(patch.object(monitor,'LOG',log))
         try:monitor.run()
         except StopLoop:pass
@@ -93,7 +98,7 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
     if errors:raise AssertionError(errors)
     return dict(confirmed=confirmed,sent=sent,saved=saved,book=book,risk=risk,order=order,
                 classifier=classifier,classify_times=calls,open_attempts=attempts,
-                research=research,log=log)
+                research=research,log=log,entry_references=entry_references)
 
 
 class ConfirmationCadenceTests(unittest.TestCase):
@@ -143,6 +148,7 @@ class ConfirmationCadenceTests(unittest.TestCase):
         self.assertEqual([t for t,_,_ in r['confirmed']],[9030.])
         self.assertEqual(r['confirmed'][0][1],30.)
         self.assertEqual([t for t,_ in r['sent']],[9030.])
+        self.assertEqual(r['entry_references'],[1])
         self.assertEqual(r['risk'].add_sent_signal.call_count,1)
         self.assertEqual(r['classifier'].call_count,2)  # t=0,60; no fast setup scans
         samples=sorted({t for _,rows in r['saved'] for t,_ in rows})

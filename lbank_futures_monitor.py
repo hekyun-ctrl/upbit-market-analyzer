@@ -21,8 +21,7 @@ import ccxt
 from lbank_signal_risk import SignalRiskTracker, format_risk_alert, format_target_alert, format_target2_alert
 from lbank_telegram_positions import PositionState, TelegramBot, format_position_target_alert, format_position_management
 from lbank_sample_store import load_snapshots, save_snapshots
-from lbank_early_move_shadow import early_move_shadow, rejected_entry_review
-from lbank_five_timeframe_shadow import five_timeframe_shadow
+from lbank_early_move_shadow import rejected_entry_review
 from lbank_structure_patterns import detect_structure, detect_structures, confirm_structure
 from lbank_sampled_context import sampled_context_gate
 from lbank_rsi_research import ResearchTracker, NeutralExitStudy, neutral_stall
@@ -55,6 +54,7 @@ from lbank_breakout_freshness import (evidence as breakout_evidence,
     confirmation_allowed as breakout_confirmation_allowed, POLICY as BREAKOUT_CONFIRMATION_POLICY,
     REJECT_REASON as BREAKOUT_CONFIRMATION_REJECT)
 from lbank_entry_refinement import MODES as ENTRY_REFINEMENT_MODES, local_stop_floor, pullback_floor
+from research.zb_signal_research import evaluate_snapshot as evaluate_zb_research
 
 ENTRY_REFINEMENT_MODE = os.getenv('LBANK_ENTRY_REFINEMENT_MODE', 'legacy')
 if ENTRY_REFINEMENT_MODE not in ENTRY_REFINEMENT_MODES:
@@ -268,13 +268,15 @@ def fast_sample_rsi_gate(prices, direction):
     return True, "fast_rsi_ok", strength
 
 
-def telegram(message):
+def telegram(message, *, entry_reference=None):
     """Common, audited Telegram delivery; avoids logging credentials/messages.
 
     Caller-side acknowledgement/retry remains authoritative: ambiguous timeouts
     are never immediately resent as potentially duplicate entry alerts.
     """
-    return TELEGRAM_DELIVERY.send(message)
+    if entry_reference is None:
+        return TELEGRAM_DELIVERY.send(message)
+    return TELEGRAM_DELIVERY.send(message, entry_audit=("monitor", entry_reference))
 
 
 def get_perpetual_snapshot(exchange):
@@ -514,28 +516,21 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     }
 
 
-def _zb_early_bar(bar):
-    """Read-only adapter: writer-sealed native candle time is its observation time."""
-    return {k: bar[k] for k in ("start", "open", "high", "low", "close", "quality")} | {
-        "received_at": bar["updated"]}
-
-
-def _zb_early_shadow_observe(native_state, now):
-    """Internal diagnostic only: no Telegram and no entry gate side effects."""
-    if native_state is None or len(native_state.get("minute_bars", [])) < 9:
-        return
-    timeframe = five_timeframe_shadow(native_state, now)
-    LOG.info("ZB_FIVE_TIMEFRAME_SHADOW %s", json.dumps(timeframe, sort_keys=True))
-    minutes = [_zb_early_bar(b) for b in native_state["minute_bars"][-20:]]
-    dmap = {"up": 1, "down": -1}
-    for direction in (-1, 1):
-        result = early_move_shadow(
-            minutes, now, direction=direction,
-            trend15=dmap.get(timeframe["15m"]["direction"]),
-            trend60=dmap.get(timeframe["1h"]["direction"]))
-        if result["status"] in ("early_break_shadow", "late_move_chase_prohibited"):
-            result["4h_direction"] = timeframe["4h"]["direction"]
-            LOG.info("ZB_EARLY_MOVE_SHADOW %s", json.dumps(result, sort_keys=True))
+def _zb_shadow_observe(native_state, now, denied):
+    """Research snapshots are isolated from live classification and delivery."""
+    result = evaluate_zb_research(native_state, now)
+    LOG.info("ZB_NATIVE_RESEARCH_EVENT %s", json.dumps(result, sort_keys=True))
+    if denied is None:
+        return denied
+    review = rejected_entry_review(
+        "price_deviation", denied["basis_price"], native_state["quote"], observed_at=now,
+        latest_closed_bar=native_state["minute_bars"][-1], denied_minute_start=denied["minute_start"])
+    if review["status"] == "fresh_structure_reassessment_needed":
+        review.update(denied_at=denied["at"], fresh_quote=native_state["quote"],
+                      denied_stage=denied.get("stage"), reassessment=result)
+        LOG.info("ZB_FRESH_PRICE_SHADOW %s", json.dumps(review, sort_keys=True))
+        return None
+    return denied
 
 
 def classify(prices, observations=None, diagnostics=None, native_state=None):
@@ -553,11 +548,6 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
         if abs(native_state["quote"] / prices[-1] - 1) > ENTRY_MAX_CHASE_PCT:
             if diagnostics is not None:
                 diagnostics.update(reason="price_deviation", candidates=[])
-            research = rejected_entry_review(
-                "price_deviation", prices[-1], native_state["quote"],
-                observed_at=native_state["minute_bars"][-1]["updated"],
-                latest_closed_bar=_zb_early_bar(native_state["minute_bars"][-1]))
-            LOG.info("ZB_FRESH_PRICE_SHADOW %s", json.dumps(research, sort_keys=True))
             return None
         bars = native_state["minute_bars"]
         geometry = native_entry_geometry(native_state)
@@ -649,13 +639,6 @@ def assess_candidate(prices, direction, setup, observations=None, diagnostics=No
         if not context_ok:
             LOG.info("CLOSED-BUCKET watch BLOCKED side=%s reason=%s context=%s",
                      "LONG" if direction == 1 else "SHORT", context_reason, context)
-            if context_reason == "avoid_late_5m_impulse_chase":
-                review = rejected_entry_review(context_reason, curr, curr,
-                    observed_at=native_state["minute_bars"][-1]["updated"]
-                    if native_state is not None else 0,
-                    latest_closed_bar=None)
-                LOG.info("ZB_LATE_CHASE_REVIEW_SHADOW %s",
-                         json.dumps(review, sort_keys=True))
             mark("sampled_context")
             return None
         allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(
@@ -1080,6 +1063,7 @@ def run():
     pressure_observer = PressureObserver()
     observed_ready_key = None
     first_ready_observed_at = None
+    zb_price_rejection = None
     while True:
         try:
             # Inbound updates use the same authorized existing Telegram chat.
@@ -1099,9 +1083,12 @@ def run():
             if native_key is not None and native_key != observed_ready_key:
                 observed_ready_key, first_ready_observed_at = native_key, now
                 try:
-                    _zb_early_shadow_observe(native_state, now)
-                except (KeyError, ValueError, TypeError, OverflowError):
-                    LOG.warning("ZB_EARLY_MOVE_SHADOW invalid native candle; no entry change")
+                    if zb_price_rejection and now-zb_price_rejection["at"] > 120:
+                        LOG.info("ZB_FRESH_PRICE_SHADOW expired without a fresh minute")
+                        zb_price_rejection = None
+                    zb_price_rejection = _zb_shadow_observe(native_state, now, zb_price_rejection)
+                except Exception:
+                    LOG.exception("ZB_NATIVE_RESEARCH_EVENT failed")
             audit_ready = performance is not None
             if performance is not None:
                 try:
@@ -1348,6 +1335,10 @@ def run():
                                              diagnostics=confirm_diag)
                         if plan is None:
                             count_event("confirm_reject")
+                            if confirm_diag.get("reason") == "price_deviation" and zb_price_rejection is None:
+                                zb_price_rejection = dict(at=now, stage="confirmation",
+                                    basis_price=watch["plan"]["price"],
+                                    minute_start=native_state["minute_bars"][-1]["start"])
                             if confirm_diag.get("reason") == "await_two_post_watch_closed_minutes":
                                 count_event("quality_wait")
                             elif confirm_diag.get("reason") in {
@@ -1403,7 +1394,7 @@ def run():
                                     plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat(),
                                     reference_number=risk_tracker.next_number)
                                 send_started_at = time.time()
-                                if telegram(message):
+                                if telegram(message, entry_reference=risk_tracker.next_number):
                                     acknowledged_at = time.time()
                                     plan["entry_timing"].update(send_started_at=send_started_at,
                                         telegram_acknowledged_at=acknowledged_at,
@@ -1457,6 +1448,11 @@ def run():
                     rejection = {}
                     proposal = classify(prices, native_state=native_state,
                                         diagnostics=rejection)
+                    if (rejection.get("reason") == "price_deviation" and zb_price_rejection is None
+                            and native_state is not None):
+                        zb_price_rejection = dict(
+                            at=now, stage="setup", basis_price=prices[-1],
+                            minute_start=native_state["minute_bars"][-1]["start"])
                     timing = setup_evidence(native_state, now, time.time(),
                                             first_ready_observed_at,
                                             "periodic_and_new_bar" if sample_due and new_setup_bar

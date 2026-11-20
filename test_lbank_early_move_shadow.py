@@ -15,7 +15,7 @@ def bars(closes):
 
 class EarlyMoveTests(unittest.TestCase):
     def test_early_downside_break_and_time_integrity(self):
-        series=bars([1000,1000,1000,1001,999,997,996,996,994,991])
+        series=bars([1000,1000,1000,1001,999,997,996,996,996,991])
         event=early_move_shadow(series,605,direction=-1,
                                 trend15=-1,trend60=1)
         self.assertEqual(event["status"],"early_break_shadow")
@@ -25,8 +25,13 @@ class EarlyMoveTests(unittest.TestCase):
         future=early_move_shadow(series,601,direction=-1)
         self.assertEqual(future["status"],"invalid_or_gapped_native_minutes")
 
+    def test_first_completed_minute_can_break_with_preceding_up_candle(self):
+        series=bars([1000,1000,1000,1001,999,997,996,996,998,993])
+        event=early_move_shadow(series,605,direction=-1)
+        self.assertEqual(event["status"], "early_break_shadow")
+
     def test_no_early_chase_override_and_duplicate_cooldown(self):
-        series=bars([1000,1000,1000,1001,999,997,996,996,994,991])
+        series=bars([1000,1000,1000,1001,999,997,996,996,996,991])
         event=early_move_shadow(series,605,direction=-1,
                                 prior_notice_at=600,prior_notice_direction=-1)
         self.assertEqual(event["status"],"duplicate_suppressed")
@@ -47,13 +52,22 @@ class EarlyMoveTests(unittest.TestCase):
     def test_stale_price_is_rechecked_not_approved(self):
         row=bars([1000])[-1]
         test=rejected_entry_review("price_deviation",1000,996,
-                                   observed_at=65,latest_closed_bar=row)
+                                   observed_at=65,latest_closed_bar=row,
+                                   denied_minute_start=-60)
         self.assertEqual(test["status"],"fresh_structure_reassessment_needed")
         self.assertTrue(test["stale_entry_disallowed"])
         self.assertFalse(test["entry_approved"])
         self.assertFalse(test["telegram_send"])
         test=rejected_entry_review("price_deviation",1000,996,
-                                   observed_at=61,latest_closed_bar=row)
+                                   observed_at=61,latest_closed_bar=row,
+                                   denied_minute_start=-60)
+        self.assertEqual(test["status"],"await_fresh_closed_minute")
+
+    def test_same_closed_minute_is_not_a_fresh_reassessment(self):
+        row=bars([1000])[-1]
+        test=rejected_entry_review("price_deviation",1000,996,
+                                   observed_at=65,latest_closed_bar=row,
+                                   denied_minute_start=row["start"])
         self.assertEqual(test["status"],"await_fresh_closed_minute")
 
     def test_repeated_chase_is_research_only(self):

@@ -50,6 +50,25 @@ class CounterfactualTests(unittest.TestCase):
                        fee_fraction=.001,exit_slippage_fraction=.0003)
         self.assertEqual(out["classification"],"target_first")
         self.assertLess(out["net_usdt_per_btc"],0)
+        self.assertEqual(summarize_replays([out])["wins"], 0)
+        self.assertEqual(summarize_replays([out])["target_first"], 1)
+
+    def test_stop_gap_uses_worse_open_and_ignores_gaps_after_exit(self):
+        sig = ReplaySignal(observed_at=61, side=1, stop=98, target=103)
+        result = replay_one(sig, [minute(120,100,101,99,100),
+                                  minute(180,95,96,94,95),
+                                  minute(300,100,110,90,100)])
+        self.assertEqual(result["classification"], "stop_first")
+        self.assertAlmostEqual(result["exit"], 95*(1-.0003))
+
+    def test_next_open_rechecks_structure_and_risk(self):
+        row = minute(120,100,101,99,100)
+        lost = ReplaySignal(observed_at=61, side=1, stop=99, target=110, trigger=100.1)
+        self.assertEqual(replay_one(lost,[row])["classification"],
+                         "structure_lost_before_entry")
+        wide = ReplaySignal(observed_at=61, side=1, stop=99, target=110)
+        self.assertEqual(replay_one(wide,[row],max_stop_fraction=.006)["classification"],
+                         "stop_distance")
 
     def test_recorded_signal13_fixture_cannot_fake_unseen_future_profit(self):
         import json

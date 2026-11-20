@@ -64,6 +64,24 @@ class NativeEntryTests(unittest.TestCase):
         self.assertIsNotNone(state, diag)
         self.assertTrue(diag["entry_source_switched"])
 
+    def test_research_receipt_is_independent_of_exchange_revision(self):
+        latest_minute = int(self.now//60)*60-60
+        latest_five = int(self.now//300)*300-300
+        with self.writer.db:
+            self.writer.db.executemany("INSERT INTO native_arrivals VALUES(?,?,?,?)", [
+                (60, latest_minute, latest_minute+61, "lbank_native_stream_1m"),
+                (300, latest_five, latest_five+309, "lbank_native_1m_derived_5m"),
+            ])
+        state, _ = self.snapshot()
+        self.assertEqual(state["minute_bars"][-1]["received_at"], latest_minute+61)
+        self.assertEqual(state["five_bars"][-1]["received_at"], latest_five+309)
+        self.assertNotEqual(state["minute_bars"][-1]["updated"], latest_minute+61)
+        with self.writer.db:
+            self.writer.db.execute("DROP TABLE native_arrivals")
+        state, _ = self.snapshot()
+        self.assertIsNone(state["minute_bars"][-1]["received_at"])
+        self.assertIsNone(state["five_bars"][-1]["received_at"])
+
     def test_uncertified_or_excessive_boundary_revision_is_rejected(self):
         latest_minute = int(self.now // 60) * 60 - 60
         with self.writer.db:
