@@ -22,6 +22,7 @@ from lbank_signal_risk import SignalRiskTracker, format_risk_alert, format_targe
 from lbank_telegram_positions import PositionState, TelegramBot, format_position_target_alert, format_position_management
 from lbank_sample_store import load_snapshots, save_snapshots
 from lbank_early_move_shadow import early_move_shadow, rejected_entry_review
+from lbank_five_timeframe_shadow import five_timeframe_shadow
 from lbank_structure_patterns import detect_structure, detect_structures, confirm_structure
 from lbank_sampled_context import sampled_context_gate
 from lbank_rsi_research import ResearchTracker, NeutralExitStudy, neutral_stall
@@ -523,10 +524,17 @@ def _zb_early_shadow_observe(native_state, now):
     """Internal diagnostic only: no Telegram and no entry gate side effects."""
     if native_state is None or len(native_state.get("minute_bars", [])) < 9:
         return
+    timeframe = five_timeframe_shadow(native_state, now)
+    LOG.info("ZB_FIVE_TIMEFRAME_SHADOW %s", json.dumps(timeframe, sort_keys=True))
     minutes = [_zb_early_bar(b) for b in native_state["minute_bars"][-20:]]
+    dmap = {"up": 1, "down": -1}
     for direction in (-1, 1):
-        result = early_move_shadow(minutes, now, direction=direction)
+        result = early_move_shadow(
+            minutes, now, direction=direction,
+            trend15=dmap.get(timeframe["15m"]["direction"]),
+            trend60=dmap.get(timeframe["1h"]["direction"]))
         if result["status"] in ("early_break_shadow", "late_move_chase_prohibited"):
+            result["4h_direction"] = timeframe["4h"]["direction"]
             LOG.info("ZB_EARLY_MOVE_SHADOW %s", json.dumps(result, sort_keys=True))
 
 
