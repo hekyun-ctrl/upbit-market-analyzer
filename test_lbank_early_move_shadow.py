@@ -15,7 +15,7 @@ def bars(closes):
 
 class EarlyMoveTests(unittest.TestCase):
     def test_early_downside_break_and_time_integrity(self):
-        series=bars([1000,1000,1000,1001,999,997,996,996,991,986])
+        series=bars([1000,1000,1000,1001,999,997,996,996,994,991])
         event=early_move_shadow(series,605,direction=-1,
                                 trend15=-1,trend60=1)
         self.assertEqual(event["status"],"early_break_shadow")
@@ -26,7 +26,7 @@ class EarlyMoveTests(unittest.TestCase):
         self.assertEqual(future["status"],"invalid_or_gapped_native_minutes")
 
     def test_no_early_chase_override_and_duplicate_cooldown(self):
-        series=bars([1000,1000,1000,1001,999,997,996,996,991,986])
+        series=bars([1000,1000,1000,1001,999,997,996,996,994,991])
         event=early_move_shadow(series,605,direction=-1,
                                 prior_notice_at=600,prior_notice_direction=-1)
         self.assertEqual(event["status"],"duplicate_suppressed")
@@ -35,11 +35,11 @@ class EarlyMoveTests(unittest.TestCase):
         self.assertEqual(result["status"],"late_move_chase_prohibited")
 
     def test_native_gap_and_open_minute_are_rejected(self):
-        series=bars([1000,1000,1000,1001,999,997,996,996,991,986])
+        series=bars([1000,1000,1000,1001,999,997,996,996,994,991])
         series[-1]["start"]+=60
         self.assertEqual(early_move_shadow(series,700)["status"],
                          "invalid_or_gapped_native_minutes")
-        series=bars([1000,1000,1000,1001,999,997,996,996,991,986])
+        series=bars([1000,1000,1000,1001,999,997,996,996,994,991])
         series[-1]["quality"]="forming"
         self.assertEqual(early_move_shadow(series,700)["status"],
                          "invalid_or_gapped_native_minutes")
