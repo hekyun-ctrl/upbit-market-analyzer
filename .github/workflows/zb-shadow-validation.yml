@@ -1,0 +1,32 @@
+name: ZB Shadow Research Validation
+on:
+  pull_request:
+    paths:
+      - 'lbank_early_move_shadow.py'
+      - 'lbank_five_timeframe_shadow.py'
+      - 'lbank_futures_monitor.py'
+      - 'research/zb_barrier_lanes_shadow.py'
+      - 'research/zb_counterfactual_replay.py'
+      - 'test_lbank_early_move_shadow.py'
+      - 'test_lbank_five_timeframe_shadow.py'
+      - 'test_zb_barrier_lanes_shadow.py'
+      - 'test_zb_counterfactual_replay.py'
+      - '.github/workflows/zb-shadow-validation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  research-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Check syntax without secrets or exchange access
+        run: |
+          python -m py_compile lbank_early_move_shadow.py lbank_five_timeframe_shadow.py lbank_futures_monitor.py research/zb_barrier_lanes_shadow.py research/zb_counterfactual_replay.py
+      - name: Run isolated research tests
+        run: |
+          python -m unittest -v test_lbank_early_move_shadow test_lbank_five_timeframe_shadow test_zb_counterfactual_replay
