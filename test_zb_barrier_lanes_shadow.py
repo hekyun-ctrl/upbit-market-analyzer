@@ -32,7 +32,7 @@ class BarrierLanesShadowTests(unittest.TestCase):
         copy_bars = copy.deepcopy(bars)
         result = evaluate_barrier_lanes(
             -1, 100, 101, 95, 90, bars, observed_at=1141,
-            next_target=80)
+            next_target=80, next_target_known_at=1000)
         self.assertEqual(result["continuation"]["status"], "net_rr_pass_shadow")
         self.assertGreaterEqual(result["continuation"]["net_rr"], 2)
         self.assertFalse(result["entry_approved"])
@@ -46,6 +46,10 @@ class BarrierLanesShadowTests(unittest.TestCase):
             -1, 100, 101, 95, 90, bars, observed_at=1141)
         self.assertEqual(no_next["continuation"]["status"],
                          "missing_prior_structural_target")
+        future_target = evaluate_barrier_lanes(
+            -1, 100, 101, 95, 90, bars, observed_at=1141,
+            next_target=80, next_target_known_at=1080)
+        self.assertEqual(future_target["continuation"]["status"], "target_not_known_before_break")
 
     def test_incomplete_or_failed_retest_does_not_issue_signal(self):
         bars = [

@@ -5,12 +5,17 @@ on:
       - 'lbank_early_move_shadow.py'
       - 'lbank_five_timeframe_shadow.py'
       - 'lbank_futures_monitor.py'
+      - 'lbank_native_entry.py'
       - 'research/zb_barrier_lanes_shadow.py'
       - 'research/zb_counterfactual_replay.py'
+      - 'research/zb_signal_research.py'
+      - 'research/replay_zb_research.py'
       - 'test_lbank_early_move_shadow.py'
       - 'test_lbank_five_timeframe_shadow.py'
+      - 'test_lbank_native_entry.py'
       - 'test_zb_barrier_lanes_shadow.py'
       - 'test_zb_counterfactual_replay.py'
+      - 'test_zb_signal_research.py'
       - '.github/workflows/zb-shadow-validation.yml'
   workflow_dispatch:
 permissions:
@@ -26,7 +31,9 @@ jobs:
           python-version: '3.11'
       - name: Check syntax without secrets or exchange access
         run: |
-          python -m py_compile lbank_early_move_shadow.py lbank_five_timeframe_shadow.py lbank_futures_monitor.py research/zb_barrier_lanes_shadow.py research/zb_counterfactual_replay.py
+          python -m py_compile lbank_early_move_shadow.py lbank_five_timeframe_shadow.py lbank_futures_monitor.py lbank_native_entry.py research/zb_barrier_lanes_shadow.py research/zb_counterfactual_replay.py research/zb_signal_research.py research/replay_zb_research.py
+      - name: Install project dependencies
+        run: python -m pip install -r requirements.txt
       - name: Run isolated research tests
         run: |
-          python -m unittest -v test_lbank_early_move_shadow test_lbank_five_timeframe_shadow test_zb_counterfactual_replay test_zb_barrier_lanes_shadow
+          python -m unittest -v test_lbank_early_move_shadow test_lbank_five_timeframe_shadow test_lbank_native_entry test_lbank_confirmation_cadence test_zb_counterfactual_replay test_zb_barrier_lanes_shadow test_zb_signal_research

@@ -6,22 +6,25 @@ exchange-verified timeframe feeds. Never append the live quote as a candle.
 """
 import math
 
-POLICY = "native_1m_5m_15m_1h_4h_shadow_v1"
+POLICY = "native_1m_5m_15m_1h_4h_shadow_v2"
 
 
-def _valid_bar(b, period, evaluated_at):
+def valid_observed_bar(b, period, evaluated_at):
     try:
         values = [float(b[k]) for k in ("open", "high", "low", "close")]
-        start, updated = b["start"], b["updated"]
-        return (isinstance(start, int) and start % period == 0
+        start, receipt = b["start"], b["received_at"]
+        updated = b.get("updated", start)
+        return (type(start) is int and start % period == 0
+                and b.get("period", period) == period
                 and b.get("quality") == "stream_closed"
-                and isinstance(updated, (int,float)) and math.isfinite(updated)
+                and type(updated) in (int, float) and math.isfinite(updated)
+                and type(receipt) in (int, float) and math.isfinite(receipt)
                 and all(math.isfinite(v) and v > 0 for v in values)
                 and values[2] <= min(values[0], values[3])
                 <= max(values[0], values[3]) <= values[1]
-                and start + period <= evaluated_at
+                and start + period <= receipt <= evaluated_at
                 and start <= updated <= start + period + 15)
-    except (ValueError, KeyError, TypeError):
+    except (ValueError, KeyError, TypeError, OverflowError):
         return False
 
 
@@ -30,13 +33,17 @@ def _closes_for_period(bars, base, aggregate, now, required=3):
         return None
     count = aggregate // base
     latest_complete = int(now // aggregate) * aggregate - aggregate
-    index = {b["start"]: b for b in bars}
+    first = latest_complete-(required-1)*aggregate
+    relevant = [b for b in bars if first <= b["start"] < latest_complete+aggregate]
+    index = {b["start"]: b for b in relevant}
+    if len(index) != len(relevant):
+        return None
     closes = []
     for g in range(latest_complete-(required-1)*aggregate,
                    latest_complete+1, aggregate):
         window=[index.get(g + j*base) for j in range(count)]
         if (any(b is None for b in window)
-                or not all(_valid_bar(b,base,now) for b in window)):
+                or not all(valid_observed_bar(b,base,now) for b in window)):
             return None
         closes.append(window[-1]["close"])
     return closes
@@ -55,7 +62,7 @@ def five_timeframe_shadow(state, now):
     """Deterministic 1m/5m/15m/1h/4h snapshots, no future/quote leakage."""
     result=dict(policy=POLICY, shadow_only=True, entry_approved=False,
                 sources={"1m":"closed_native_1m",
-                         "5m":"closed_native_5m",
+                         "5m":"closed_5m_derived_from_native_1m",
                          "15m":"complete_5m_aggregates",
                          "1h":"complete_5m_aggregates",
                          "4h":"complete_5m_aggregates"})
@@ -72,14 +79,21 @@ def five_timeframe_shadow(state, now):
             result[name]=_label(closes,neutral)
         d15=result["15m"]["direction"]
         d60=result["1h"]["direction"]
-        d240=result["4h"]["direction"]
-        result["higher_conflict"]=(
-            "unverified" if "unverified" in (d15,d60,d240) else
-            "mixed" if len({x for x in (d15,d60,d240) if x!="flat"})>1 else
-            "not_opposed")
-        result["interpretation"]="not_trade_approval"
+        result["higher_conflict"] = _conflict(d15, d60)
+        result["four_hour_conflict"] = _conflict(d60, result["4h"]["direction"])
+        result["main_bias"] = {"up": "long", "down": "short", "flat": "neutral"}.get(
+            d60, "unverified")
     except (ValueError,KeyError,TypeError,IndexError,OverflowError):
         for name in ("1m","5m","15m","1h","4h"):
             result[name]=dict(direction="unverified",return_pct=None)
         result["higher_conflict"]="unverified"
+        result["four_hour_conflict"]="unverified"
+        result["main_bias"]="unverified"
+    result["interpretation"]="not_trade_approval"
     return result
+
+
+def _conflict(first, second):
+    if "unverified" in (first, second):
+        return "unverified"
+    return "mixed" if {first, second} == {"up", "down"} else "not_opposed"

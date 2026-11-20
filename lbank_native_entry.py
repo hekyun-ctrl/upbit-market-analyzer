@@ -73,8 +73,28 @@ class NativeEntryFeed:
                 db.execute("PRAGMA query_only=ON")
                 db.execute("BEGIN")
                 # Include gap/forming rows so a bad latest bar cannot be skipped.
-                rows1 = db.execute("SELECT * FROM native_bars WHERE period=60 AND start<=? ORDER BY start DESC LIMIT 360", (expected1,)).fetchall()
-                rows5 = db.execute("SELECT * FROM native_bars WHERE period=300 AND start<=? ORDER BY start DESC LIMIT 300", (expected5,)).fetchall()
+                has_arrivals = db.execute(
+                    "SELECT 1 FROM sqlite_master WHERE type='table' AND name='native_arrivals'"
+                ).fetchone() is not None
+                if has_arrivals:
+                    query = """
+                        SELECT b.*, a.received AS received_at FROM native_bars b
+                        LEFT JOIN native_arrivals a ON a.period=b.period AND a.start=b.start
+                            AND a.source=?
+                        WHERE b.period=? AND b.start<=?
+                        ORDER BY b.start DESC LIMIT ?
+                    """
+                    rows1 = db.execute(query, ("lbank_native_stream_1m", 60, expected1, 360)).fetchall()
+                    rows5 = db.execute(query, ("lbank_native_1m_derived_5m", 300, expected5, 300)).fetchall()
+                else:
+                    # Older stores can still feed the existing entry path. They
+                    # cannot certify the time a candle became observable.
+                    query = """
+                        SELECT *, NULL AS received_at FROM native_bars
+                        WHERE period=? AND start<=? ORDER BY start DESC LIMIT ?
+                    """
+                    rows1 = db.execute(query, (60, expected1, 360)).fetchall()
+                    rows5 = db.execute(query, (300, expected5, 300)).fetchall()
             finally:
                 db.close()
             minutes = recent_contiguous(rows1, expected1, 60)
@@ -115,7 +135,7 @@ class NativeEntryFeed:
                      "prices": [b["close"] for b in minutes], "quote": quote,
                      "closes15": fifteen, "last5_start": five[-1]["start"],
                      "rsi5": {"closes": closes5, "rsi": wilder_rsi_series(closes5)},
-                     "source": SOURCE}
+                     "source": SOURCE, "quote_observed_at": now}
             return state, dict(diag, reason="native_ready", entry_source_switched=True,
                                last5_start=five[-1]["start"], rsi14_wilder=state["rsi5"]["rsi"][-1])
         except (OSError, sqlite3.Error, ValueError, TypeError, KeyError, OverflowError):

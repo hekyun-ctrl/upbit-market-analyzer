@@ -10,7 +10,7 @@ def bars(period, count, end, step):
         start = end - (count-i)*period
         close = 10000.0+i*step
         o=close-step
-        out.append(dict(start=start,updated=start+period,
+        out.append(dict(start=start,updated=start+period,received_at=start+period,
                         quality="stream_closed",open=o,close=close,
                         high=max(o,close)+2,low=min(o,close)-2))
     return out
@@ -47,6 +47,17 @@ class FiveTimeframeTests(unittest.TestCase):
         out=five_timeframe_shadow(state,self.now)
         self.assertEqual(out["1m"]["direction"],"unverified")
         self.assertEqual(out["4h"]["direction"],"up")
+
+    def test_late_receipt_is_not_backdated_to_exchange_update(self):
+        self.state["minute_bars"][-1]["received_at"] = self.now + 1
+        out = five_timeframe_shadow(self.state, self.now)
+        self.assertEqual(out["1m"]["direction"], "unverified")
+        self.assertEqual(out["main_bias"], "long")
+
+    def test_duplicate_five_bar_cannot_replace_actual_observation(self):
+        self.state["five_bars"].append(copy.deepcopy(self.state["five_bars"][-1]))
+        self.assertEqual(five_timeframe_shadow(self.state, self.now)["5m"]["direction"],
+                         "unverified")
 
     def test_asof_4h_not_partial_4h(self):
         # One minute into a new 4h period: use last COMPLETE 4h, never form
