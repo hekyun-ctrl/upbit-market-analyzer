@@ -13,6 +13,7 @@ import sqlite3
 import sys
 import threading
 import time
+from functools import partial
 
 from lbank_early_breakout_audit import persist_early_audit
 from lbank_early_alert_delivery import activation_check, send_early_candidate, send_feed_warning
@@ -665,9 +666,11 @@ def run():
                     LOG.warning("VIDEO_FIXED_LEVEL_5M_FAILURE type=%s", type(exc).__name__)
                     fixed5 = "evaluation_failed"
                 LOG.info("VIDEO_FIXED_LEVEL_5M bar=%d status=%s", seen, fixed5)
+                formal_sender = (partial(telegram.send, entry_audit=("video_formal", seen))
+                                 if formal_enabled else None)
                 status, counts = process(bars, now=now, started=started, clock=time.time,
                                          get_book=get_book, ledger=ledger,
-                                         send=telegram.send if formal_enabled else None,
+                                         send=formal_sender,
                                          costs=Costs(min_rr=MIN_NET_RR), rsi_sequence=True,
                                          review_locked=not formal_enabled)
                 LOG.info("VIDEO_ALERT_DECISION bar=%d status=%s reasons=%s", seen, status, counts)

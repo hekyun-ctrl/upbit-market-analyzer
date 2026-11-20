@@ -27,6 +27,34 @@ class TelegramTransportTests(unittest.TestCase):
         self.assertTrue(transport.send("[LBank] test only"))
         self.assertEqual(transport.last_class, "success")
 
+    def test_entry_acceptance_logs_correlation_without_chat_ids_or_text(self):
+        payload = {"ok": True, "result": {"message_id": 41, "chat": {"id": 123456789, "type": "private"}}}
+        transport = TelegramTransport("secret_TOKEN", "123456789",
+            lambda request, timeout: io.BytesIO(json.dumps(payload).encode()))
+        with self.assertLogs("lbank_telegram_transport", "INFO") as cm:
+            self.assertTrue(transport.send("private content", entry_audit=("monitor", 58)))
+        logged = cm.output[0]
+        self.assertIn("reference=58 message_id=41 destination=match", logged)
+        self.assertIn("recipient_receipt_verified=false", logged)
+        for private in ("secret_TOKEN", "123456789", "private content"):
+            self.assertNotIn(private, logged)
+
+    def test_entry_ack_missing_or_mismatched_chat_keeps_no_retry_semantics(self):
+        payloads = (
+            ({"message_id": 0, "chat": {"id": -10011, "type": "channel", "username": "other"}},
+             "message_id=0 destination=mismatch"),
+            ({}, "message_id=None destination=unverified"),
+        )
+        for result, status in payloads:
+            with self.subTest(status=status):
+                transport = TelegramTransport("secret", "@expected",
+                    lambda request, timeout: io.BytesIO(json.dumps({"ok": True, "result": result}).encode()))
+                with self.assertLogs("lbank_telegram_transport", "INFO") as cm:
+                    self.assertTrue(transport.send("test", entry_audit=("video_formal", 180000)))
+                self.assertIn(status, cm.output[0])
+                self.assertNotIn("expected", cm.output[0])
+                self.assertNotIn("-10011", cm.output[0])
+
     def test_send_failure_401_identifies_token_without_exposing_secret(self):
         def opener(request, timeout):
             raise urllib.error.HTTPError(request.full_url, 401, "unauthorized", {}, None)
@@ -48,17 +76,19 @@ class TelegramTransportTests(unittest.TestCase):
             calls.append(request)
             raise TimeoutError("ambiguous send")
         transport = TelegramTransport("test", "test", opener)
-        with self.assertLogs("lbank_telegram_transport", "WARNING"):
-            self.assertFalse(transport.send("test"))
+        with self.assertLogs("lbank_telegram_transport", "WARNING") as cm:
+            self.assertFalse(transport.send("test", entry_audit=("monitor", 59)))
         self.assertEqual(len(calls), 1)
+        self.assertIn("reference=59 class=network_or_response_error", cm.output[-1])
 
     def test_missing_credentials_are_reported_without_calls(self):
         def no_call(*args, **kwargs):
             self.fail("must not call network")
         transport = TelegramTransport("", "", no_call)
-        with self.assertLogs("lbank_telegram_transport", "ERROR"):
+        with self.assertLogs("lbank_telegram_transport", "WARNING") as cm:
             self.assertEqual(transport.health(), (False, False))
-            self.assertFalse(transport.send("a"))
+            self.assertFalse(transport.send("a", entry_audit=("monitor", 59)))
+        self.assertIn("reference=59 class=missing_chat_id", cm.output[-1])
 
 
 
