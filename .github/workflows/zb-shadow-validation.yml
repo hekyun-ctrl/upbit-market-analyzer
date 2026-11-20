@@ -29,4 +29,4 @@ jobs:
           python -m py_compile lbank_early_move_shadow.py lbank_five_timeframe_shadow.py lbank_futures_monitor.py research/zb_barrier_lanes_shadow.py research/zb_counterfactual_replay.py
       - name: Run isolated research tests
         run: |
-          python -m unittest -v test_lbank_early_move_shadow test_lbank_five_timeframe_shadow test_zb_counterfactual_replay
+          python -m unittest -v test_lbank_early_move_shadow test_lbank_five_timeframe_shadow test_zb_counterfactual_replay test_zb_barrier_lanes_shadow
