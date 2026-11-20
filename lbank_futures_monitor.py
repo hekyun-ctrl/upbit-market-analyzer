@@ -21,6 +21,7 @@ import ccxt
 from lbank_signal_risk import SignalRiskTracker, format_risk_alert, format_target_alert, format_target2_alert
 from lbank_telegram_positions import PositionState, TelegramBot, format_position_target_alert, format_position_management
 from lbank_sample_store import load_snapshots, save_snapshots
+from lbank_early_move_shadow import early_move_shadow, rejected_entry_review
 from lbank_structure_patterns import detect_structure, detect_structures, confirm_structure
 from lbank_sampled_context import sampled_context_gate
 from lbank_rsi_research import ResearchTracker, NeutralExitStudy, neutral_stall
@@ -512,6 +513,23 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     }
 
 
+def _zb_early_bar(bar):
+    """Read-only adapter: writer-sealed native candle time is its observation time."""
+    return {k: bar[k] for k in ("start", "open", "high", "low", "close", "quality")} | {
+        "received_at": bar["updated"]}
+
+
+def _zb_early_shadow_observe(native_state, now):
+    """Internal diagnostic only: no Telegram and no entry gate side effects."""
+    if native_state is None or len(native_state.get("minute_bars", [])) < 9:
+        return
+    minutes = [_zb_early_bar(b) for b in native_state["minute_bars"][-20:]]
+    for direction in (-1, 1):
+        result = early_move_shadow(minutes, now, direction=direction)
+        if result["status"] in ("early_break_shadow", "late_move_chase_prohibited"):
+            LOG.info("ZB_EARLY_MOVE_SHADOW %s", json.dumps(result, sort_keys=True))
+
+
 def classify(prices, observations=None, diagnostics=None, native_state=None):
     """Evaluate strategies independently; rejected candidates cannot veto others.
 
@@ -527,6 +545,11 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
         if abs(native_state["quote"] / prices[-1] - 1) > ENTRY_MAX_CHASE_PCT:
             if diagnostics is not None:
                 diagnostics.update(reason="price_deviation", candidates=[])
+            research = rejected_entry_review(
+                "price_deviation", prices[-1], native_state["quote"],
+                observed_at=native_state["minute_bars"][-1]["updated"],
+                latest_closed_bar=_zb_early_bar(native_state["minute_bars"][-1]))
+            LOG.info("ZB_FRESH_PRICE_SHADOW %s", json.dumps(research, sort_keys=True))
             return None
         bars = native_state["minute_bars"]
         geometry = native_entry_geometry(native_state)
@@ -618,6 +641,13 @@ def assess_candidate(prices, direction, setup, observations=None, diagnostics=No
         if not context_ok:
             LOG.info("CLOSED-BUCKET watch BLOCKED side=%s reason=%s context=%s",
                      "LONG" if direction == 1 else "SHORT", context_reason, context)
+            if context_reason == "avoid_late_5m_impulse_chase":
+                review = rejected_entry_review(context_reason, curr, curr,
+                    observed_at=native_state["minute_bars"][-1]["updated"]
+                    if native_state is not None else 0,
+                    latest_closed_bar=None)
+                LOG.info("ZB_LATE_CHASE_REVIEW_SHADOW %s",
+                         json.dumps(review, sort_keys=True))
             mark("sampled_context")
             return None
         allowed, reason, sampled_rsi5 = five_minute_rsi_entry_gate(
@@ -1060,6 +1090,10 @@ def run():
                 LOG.exception("RESISTANCE_PRESSURE_OBSERVATION failed; live gates unchanged")
             if native_key is not None and native_key != observed_ready_key:
                 observed_ready_key, first_ready_observed_at = native_key, now
+                try:
+                    _zb_early_shadow_observe(native_state, now)
+                except (KeyError, ValueError, TypeError, OverflowError):
+                    LOG.warning("ZB_EARLY_MOVE_SHADOW invalid native candle; no entry change")
             audit_ready = performance is not None
             if performance is not None:
                 try:
