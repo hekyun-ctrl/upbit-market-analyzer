@@ -10,7 +10,9 @@ import json
 from pathlib import Path
 import sqlite3
 
-from research.zerobase.video_entry import Costs, _validate, judge_entry
+from research.zerobase.video_entry import (
+    Costs, QUOTE_RECHECK_POLICY, _validate, can_recheck_quote, judge_entry,
+)
 from research.zb_trade_review import load_native, model_summary
 
 POLICY = "locked_quote_forward_v1"
@@ -71,7 +73,9 @@ def summarize_forward(records, bars):
         costs = Costs(**e["costs"])
         expected_price = book.get("ask" if model["plan"]["direction"] == 1 else "bid")
         at = model["entered_at"]
-        if (model.get("policy") != POLICY or model.get("actual_fill") is not False
+        policy = model.get("policy")
+        rechecked = policy == QUOTE_RECHECK_POLICY and can_recheck_quote(model["plan"], costs)
+        if ((policy != POLICY and not rechecked) or model.get("actual_fill") is not False
                 or model.get("delivery_authorized") is not False
                 or book.get("status") != "usable" or book.get("source") not in ("rest","websocket")
                 or expected_price != model["entry"] or book.get("received_at") != at

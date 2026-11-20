@@ -2,7 +2,7 @@
 import sqlite3
 import json
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from tempfile import TemporaryDirectory
 from pathlib import Path
 from lbank_video_alert import process, DeliveryLedger
@@ -12,6 +12,7 @@ from types import SimpleNamespace
 from lbank_loss_review_guard import (
     entry_delivery_allowed,parallel_observation,persist_parallel_review,MIN_NET_RR,
 )
+from research.zerobase.video_entry import Costs, QUOTE_RECHECK_POLICY, judge_entry
 
 
 class LossReviewGuardTests(unittest.TestCase):
@@ -71,6 +72,53 @@ class LossReviewGuardTests(unittest.TestCase):
                 send.assert_not_called()
                 self.assertEqual(ledger.db.execute("SELECT count(*) FROM video_alert_delivery").fetchone()[0],0)
                 ledger.db.close()
+
+    def test_close_rejection_is_rechecked_at_execution_side_quote_only_in_research(self):
+        rows = [dict(x, received_at=x["start"]+301) for x in breakout()[:46]]
+        end = rows[-1]["start"] + 300
+        costs = Costs(min_rr=MIN_NET_RR)
+        plan = dict(lane="bb_cci_breakout", direction=1, trigger=9990.0,
+                    stop=9950.0, target=10150.0, entry_bound=10001.0,
+                    status="insufficient_net_rr", detected_at=end+1)
+        self.assertEqual(judge_entry(plan, 10008.0, costs)[0], plan["status"])
+        cases = (
+            (True, plan, (9999.9, 10000.0), "eligible_after_quote_recheck"),
+            (True, plan, (10004.9, 10005.0), "book_rejected"),
+            (True, dict(plan, trigger=10002.0), (9999.9, 10000.0), None),
+            (False, plan, (9999.9, 10000.0), None),
+        )
+        for locked, candidate, prices, expected in cases:
+            with self.subTest(locked=locked, prices=prices, trigger=candidate["trigger"]):
+                with TemporaryDirectory() as tmp:
+                    ledger = DeliveryLedger(Path(tmp) / "delivery.db")
+                    try:
+                        quote = Mock(return_value=prices)
+                        quote.last_source = "websocket"
+                        send = Mock(side_effect=AssertionError("unexpected delivery"))
+                        with patch("lbank_video_alert.evaluate_latest", return_value=([candidate], {})):
+                            process(rows, now=end+2, started=end-1, clock=lambda: end+2,
+                                    get_book=quote, ledger=ledger, send=send,
+                                    costs=costs, review_locked=locked)
+                        evidence = json.loads(ledger.db.execute(
+                            "SELECT evidence FROM video_alert_decisions"
+                        ).fetchone()[0])
+                        self.assertEqual(evidence.get("review_quote_status"), expected)
+                        self.assertEqual(quote.call_count, int(expected is not None))
+                        if expected == "eligible_after_quote_recheck":
+                            model = evidence["forward_model"]
+                            self.assertEqual(model["policy"], QUOTE_RECHECK_POLICY)
+                            self.assertEqual(model["entry"], prices[1])
+                            self.assertEqual(model["plan"], candidate)
+                            self.assertGreaterEqual(model["net_rr"], MIN_NET_RR)
+                            self.assertFalse(model["delivery_authorized"])
+                        else:
+                            self.assertNotIn("forward_model", evidence)
+                        send.assert_not_called()
+                        self.assertEqual(ledger.db.execute(
+                            "SELECT count(*) FROM video_alert_delivery"
+                        ).fetchone()[0], 0)
+                    finally:
+                        ledger.db.close()
 
     def test_b_support_break_not_gated_on_a_retest(self):
         rows=self.rows()

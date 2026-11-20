@@ -15,7 +15,7 @@ import math
 import sqlite3
 from statistics import median
 
-from lbank_b_early_1m_shadow import _valid_minutes
+from lbank_b_early_1m_shadow import _prior_fives, _valid_minutes
 from lbank_b_retest_research import _valid, trend_priority, MIN_HISTORY, _atr
 from lbank_structural_target_plan import available_barriers, rounded
 from lbank_b_target_projection import project_short_target
@@ -97,13 +97,6 @@ def _atr_minute(rows):
     return sum(trs)/len(trs)
 
 
-def _prior_five(minute, fives):
-    # A 5m candle overlapping the signal minute MUST NOT be historical input.
-    return [b for b in fives if b["start"]+300<=minute["start"] and
-            b.get("received_at",float("inf"))<=minute["received_at"]]
-
-
-
 def _known_support_target(price, stop, atr, support):
     """Try a nearer, *observed* pivot before discarding a projected 2R B.
 
@@ -135,7 +128,7 @@ def evaluate_trial(minutes, fives, *, allow_small_gaps=False):
     if len(minutes)<21 or not _valid_minutes(minutes[-61:]):
         return out
     curr=minutes[-1]
-    fives=_prior_five(curr,fives)
+    fives=_prior_fives(curr,fives)
     if len(fives)<MIN_HISTORY or not _valid(fives[-min(240,len(fives)):], allow_gaps=allow_small_gaps):
         return dict(out,status="insufficient_or_invalid_five_history")
     if not fives[-1]["start"]+300<=curr["start"]<fives[-1]["start"]+600:

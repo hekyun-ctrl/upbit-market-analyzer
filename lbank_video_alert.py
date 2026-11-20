@@ -13,6 +13,7 @@ import sqlite3
 import sys
 import threading
 import time
+from functools import partial
 
 from lbank_early_breakout_audit import persist_early_audit
 from lbank_early_alert_delivery import activation_check, send_early_candidate, send_feed_warning
@@ -34,7 +35,10 @@ from lbank_native_book import NativeBookError, fetch_native_book
 from lbank_native_candles import NativeCandleThread
 from lbank_telegram_transport import TelegramTransport
 from research.zerobase.rsi_sequence import POLICY as RSI_SEQUENCE_POLICY
-from research.zerobase.video_entry import Costs, WARMUP, evaluate_latest, evaluate_rsi_shadow, judge_entry
+from research.zerobase.video_entry import (
+    Costs, WARMUP, QUOTE_RECHECK_POLICY, can_recheck_quote, evaluate_latest,
+    evaluate_rsi_shadow, judge_entry,
+)
 
 LOG = logging.getLogger("lbank_video_alert")
 SYMBOL = "BTCUSDT"
@@ -347,30 +351,40 @@ def _live_decision(bars, *, now, end, clock, get_book, ledger, send, costs, evid
     evidence["events"] = events
     counts = dict(Counter(event["status"] for event in events) + Counter(rejected))
     qualified = [event for event in events if event["status"] == "qualified"]
-    if not qualified:
-        return "no_qualified_entry", counts
-    if len({event["direction"] for event in qualified}) != 1:
+    if len({event["direction"] for event in qualified}) > 1:
         return "conflicting_directions", counts
-    # Keep delivery locked, but collect the same fresh execution-side quote
-    # required by live screening. Otherwise validation cannot progress.
     if review_locked:
+        # A close-price rejection can still pass at the first available
+        # execution-side quote. Keep this comparison inside the delivery lock.
+        recheck = [event for event in events if can_recheck_quote(event, costs)]
+        if not qualified and not recheck:
+            return "no_qualified_entry", counts
         evidence["review_blocked"] = [
             dict(lane=e["lane"], direction=e["direction"], stop=e.get("stop"),
-                 target=e.get("target"), signal_start=e.get("signal_start"))
-            for e in qualified]
+                 target=e.get("target"), signal_start=e.get("signal_start"),
+                 close_status=e["status"])
+            for e in qualified + recheck]
         book = evidence["book"] = _read_quote(get_book, now, end, clock)
         evidence["review_quote_status"] = book["status"]
         if book["status"] == "usable":
-            valid, evidence["book_checks"] = _screen_quote(qualified, book, costs, counts)
-            evidence["review_quote_status"] = "eligible" if valid else "book_rejected"
-            if valid:
-                rr, event, price = max(valid, key=lambda item: item[0])
+            valid, evidence["book_checks"] = _screen_quote(qualified + recheck, book, costs, counts)
+            original = [item for item in valid if item[1]["status"] == "qualified"]
+            selected = original or valid
+            evidence["review_quote_status"] = "book_rejected"
+            if len({item[1]["direction"] for item in selected}) > 1:
+                evidence["review_quote_status"] = "conflicting_directions"
+            elif selected:
+                rr, event, price = max(selected, key=lambda item: item[0])
+                evidence["review_quote_status"] = "eligible" if original else "eligible_after_quote_recheck"
                 evidence["forward_model"] = dict(
-                    policy="locked_quote_forward_v1", plan=event, entry=price,
+                    policy="locked_quote_forward_v1" if original else QUOTE_RECHECK_POLICY,
+                    plan=event, entry=price,
                     entered_at=book["received_at"], net_rr=rr,
                     revision=os.getenv("RAILWAY_GIT_COMMIT_SHA", "local"),
                     actual_fill=False, delivery_authorized=False)
         return "review_lock_unverified_live_performance", counts
+    if not qualified:
+        return "no_qualified_entry", counts
     book = evidence["book"] = _read_quote(get_book, now, end, clock)
     if book["status"] != "usable":
         return book["status"], counts
@@ -652,9 +666,11 @@ def run():
                     LOG.warning("VIDEO_FIXED_LEVEL_5M_FAILURE type=%s", type(exc).__name__)
                     fixed5 = "evaluation_failed"
                 LOG.info("VIDEO_FIXED_LEVEL_5M bar=%d status=%s", seen, fixed5)
+                formal_sender = (partial(telegram.send, entry_audit=("video_formal", seen))
+                                 if formal_enabled else None)
                 status, counts = process(bars, now=now, started=started, clock=time.time,
                                          get_book=get_book, ledger=ledger,
-                                         send=telegram.send if formal_enabled else None,
+                                         send=formal_sender,
                                          costs=Costs(min_rr=MIN_NET_RR), rsi_sequence=True,
                                          review_locked=not formal_enabled)
                 LOG.info("VIDEO_ALERT_DECISION bar=%d status=%s reasons=%s", seen, status, counts)
@@ -841,15 +857,18 @@ def run():
                             LOG.warning("VIDEO_PRICE_MOMENTUM_1M_FAILURE type=%s",
                                         type(exc).__name__)
                         first = persist_first_minute_shadow(
-                            ledger, minutes, bars, now=now, started=started)
+                            ledger, minutes, bars, now=now, started=started,
+                            trend_context=b_context)
                         LOG.info(
                             "VIDEO_B_FIRST_MINUTE_SHADOW minute=%d status=%s trend=%s "
-                            "priority=%s support=%s observed_close=%s rr=%s",
+                            "priority=%s support=%s observed_close=%s rr=%s "
+                            "trend_context_missing=%s",
                             minute_seen, first["status"],
                             first.get("trend", "unknown"),
                             first.get("priority", "관망"),
                             first.get("broken_support"),
-                            first.get("close"), first.get("net_rr"))
+                            first.get("close"), first.get("net_rr"),
+                            first.get("observed_missing_five_bars"))
                         # Independent cost-checked 1m test-only entry candidate.
                         # A projected 2R exit is NOT a known market support:
                         # never describe this lane as historically verified.

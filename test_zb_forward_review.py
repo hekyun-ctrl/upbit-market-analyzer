@@ -6,7 +6,7 @@ import sqlite3
 from tempfile import TemporaryDirectory
 import unittest
 
-from research.zerobase.video_entry import Costs
+from research.zerobase.video_entry import Costs, QUOTE_RECHECK_POLICY
 from research.zb_forward_review import quote_outcome, summarize_forward, forward_report
 
 
@@ -82,6 +82,20 @@ class ForwardReviewTests(unittest.TestCase):
         other=deepcopy(self.record);other["evidence"]["forward_model"]["revision"]="r2"
         report=summarize_forward([self.record,other],self.bars())
         self.assertEqual(len(report["cohorts"]),2)
+
+    def test_quote_rechecks_have_separate_cohorts_and_require_valid_geometry(self):
+        rechecked = deepcopy(self.record)
+        model = rechecked["evidence"]["forward_model"]
+        model["policy"] = QUOTE_RECHECK_POLICY
+        model["plan"].update(status="insufficient_net_rr", entry_bound=10001.)
+        report = summarize_forward([self.record, rechecked], self.bars())
+        self.assertEqual({x["cohort"][0] for x in report["cohorts"]},
+                         {"locked_quote_forward_v1", QUOTE_RECHECK_POLICY})
+        self.assertFalse(report["unlock_authorized"])
+        model["plan"]["entry_bound"] = model["plan"]["trigger"]
+        report = summarize_forward([rechecked], self.bars())
+        self.assertEqual(report["excluded_records"], {"invalid_quote_provenance": 1})
+        self.assertFalse(report["cohorts"])
 
     def test_readonly_ledger_report_and_missing_db(self):
         with TemporaryDirectory() as tmp:
