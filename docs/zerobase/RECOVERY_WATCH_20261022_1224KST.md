@@ -1,0 +1,7 @@
+# Recovery checkpoint — 2026-10-22 12:24 KST
+
+Mandatory deployment retry/checkpoint documents and latest STOP_PAPER_NOTIFICATIONS.json read. Official https://status.railway.com/ latest2026-10-22 03:00UTC=12:00KST still explicitly says builds remain paused; Enterprise update expected, not restored. No build/redeploy attempt while outage persists. No configuration or production-source mutation, secrets access, warning suppression or unrelated-service change.
+
+Latest stop checkpoint unchanged: reconnect verified, two false switches saved with deploy skipped; runtime_applied=false. Existing paper process is not proven stopped. Previously observed live rollback/source remains deployment4bbda6c7-29e8-4811-8322-5f8d0574c1be/25388b431c9c9d38df6a434670586c65f382d604; not independently re-read this run. Configured06b88 source does not prove new build. No new runtime/ACK evidence.
+
+After official recovery: reconcile newest branch/concurrent work and credential-safety checkpoint without reading secret values; apply paper=false and ZB runtime=false to this LBank service only, verify reference/risk path and stopped paper outbound; build exact still-approved source if applicable. No ZB notice for obsolete ACK criterion, no old research resume or forced restart while paused. Credential rotation not assumed. Temporary platform incident retained, duplicate user update suppressed. Other-room usage-limit pause not resumed.

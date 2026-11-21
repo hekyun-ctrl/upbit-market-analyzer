@@ -1,0 +1,39 @@
+{
+  "window_kst": "2026-10-16 21:07:38 ~ 2026-10-17 21:07:38",
+  "diagnostic_records": 134,
+  "evaluation_counts_not_distinct_trades": {
+    "no_setup": 1230,
+    "data_gap": 1,
+    "retest_momentum": 3,
+    "sampled_context": 13,
+    "rsi_direction": 35,
+    "risk_or_target": 13,
+    "confirm_reject": 3,
+    "watched": 1,
+    "confirmed": 0,
+    "suppressed": 44
+  },
+  "native_bars": 94,
+  "native_total_range_pct": 0.30938074800736104,
+  "latest": {
+    "quote": 81550,
+    "atr5": 30.572467793045913,
+    "old_breakout_stop_floor_pct": 0.25,
+    "new_stop_floor_pct": 0.05623384633914024,
+    "old_minimum_breakout_tp1_pct": 0.7301201170702543,
+    "new_minimum_tp1_pct": 0.4395290164250441,
+    "new_minimum_range_width_pct": 0.4545290164250441
+  },
+  "necessary_cost_range_check": {
+    "closed_5m_checks": 74,
+    "passed": 0,
+    "latest": {
+      "start": 1792238400,
+      "hour_range_pct": 0.16149601471489528,
+      "minimum_tp1_pct": 0.43917275659247046,
+      "passes_necessary_range_check": false
+    }
+  },
+  "native_minute_history_available_for_replay": false,
+  "profitability_improvement_verified": false
+}

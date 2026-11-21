@@ -1,0 +1,14 @@
+[
+  {
+    "url": "https://lbkperp.lbank.com/cfd/query/v1.0/KLinelst?instrumentID=BTCUSDT&exchangeID=Exchange&startDatetime=1792733829171&count=10&type=1&isUsd=1",
+    "status": 200,
+    "body": "{\"error_code\":10006,\"msg\":\"not open path\",\"result\":\"false\",\"success\":false}",
+    "at": 1792733833
+  },
+  {
+    "url": "https://www.lbank.com/support/articles/21425760291097",
+    "status": 200,
+    "body": "official fee page read",
+    "at": 1792733834
+  }
+]

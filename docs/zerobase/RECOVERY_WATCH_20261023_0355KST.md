@@ -1,0 +1,9 @@
+# Recovery checkpoint — 2026-10-23 03:55 KST
+
+Required retry/checkpoint/STOP files freshly read; unchanged blobs 6a5c3254387602e916046f180c287f1950c61dbf / 324986077642a711532136e86c6b93ea7bf41e1e / c02580c2d50fc8cf97d6eed267ea88680ec1ead5.
+
+Fresh official https://status.railway.com/ latest 2026-10-22 18:49 UTC / 2026-10-23 03:49 KST: US West deployment failures fixed; redeploy guidance applies to deployments failing after successful build in that region. Pro/Enterprise normal, Hobby still not enabled (Free/Trial follow). Target tier unverified. No evidence target has a failed new-source build to which that retry guidance applies. Major Outage remains Identified.
+
+No mutation or outbound. No runtime re-read this run; latest direct service read 2026-10-22 23:09 KST showed old live SUCCESS deployment 4bbda6c7-29e8-4811-8322-5f8d0574c1be, no staged changes. Config source 06b88b94a6b5ff0ab5fda0ed0c08a03bc5faa03b is a pin, not a new running build. STOP runtime_applied=false remains, so no completed-stop claim. Rollback source 25388b431c9c9d38df6a434670586c65f382d604 / deployment above retained.
+
+Next: verify applicable build availability, latest production source/concurrent staged work, then one authorized exact-source build with both LBANK_PAPER_NOTIFICATIONS_ENABLED=false and LBANK_ZB_RUNTIME_ENABLED=false. Verify applied runtime while preserving existing reference/invalidation/risk paths. No paper or ZB-status sends for superseded ACK requirement; preserve pre-deploy tests. Recheck credential-safety checkpoint before broader deployment; Telegram rotation unconfirmed. No secret reads, account/orders, billing, unrelated service edits or research resumption. Temporary incident: recovery task retained; no actual deployment/stop/performance transition, suppress duplicate user notification.

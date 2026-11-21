@@ -1,0 +1,5 @@
+# Recovery checkpoint 2026-10-21 21:40 KST
+
+Both required deployment checkpoint documents were read from the remote feature branch. Official https://status.railway.com/ remains Identified with latest 2026-10-21 11:33 UTC update: builds remain paused; API restored with some features unavailable. No recovery announcement or new build evidence. No deployment mutation/restart performed during the ongoing pause. No new source/runtime/notification success claimed.
+
+Transient blocker: keep this recovery watch enabled and suppress unchanged user notifications. Next: verify official build recovery, inspect latest production branch plus pending changes before applying approved source 06b88b94a6b5ff0ab5fda0ed0c08a03bc5faa03b; avoid rollback/overwrite of follow-up work. Build exact source in existing authorized service, verify terminal SUCCESS/commit and actual native/runtime/notification path, preserve deployment and rollback evidence, then disable only this watch. Prior checkpoints retain IDs. Existing research automations remain paused. Past unrelated paper signal evidence is not new ZB deployment proof.

@@ -1,0 +1,83 @@
+{
+  "costs": {
+    "fee_entry": "0.0006",
+    "fee_exit": "0.0006",
+    "slip_bps": "2",
+    "tick": "0.1",
+    "step": "0.00010",
+    "minimum_notional": "8.175440",
+    "funding_per_btc": "6.570520758",
+    "status": "ASSUMED",
+    "version": "public_taker_6bp_forecast_funding_2bp_exit_slip_v1"
+  },
+  "metadata": {
+    "exchange": "lbank",
+    "market_type": "linear_usdt_perpetual",
+    "symbol": "BTCUSDT",
+    "settlement_asset": "USDT",
+    "price_basis": "LAST",
+    "volume_unit": "contracts",
+    "contract_multiplier": "1.0",
+    "source": "lbank_native_stream_with_public_instrument"
+  },
+  "settlement_schedule": [
+    1792742400
+  ],
+  "qualification": {
+    "product": true,
+    "fees": true,
+    "funding_plan": true,
+    "independent_5m": false
+  },
+  "record": {
+    "instrument": {
+      "priceLimitUpperValue": "0.05",
+      "symbol": "BTCUSDT",
+      "volumeTick": "0.0001",
+      "indexPrice": "81784.1",
+      "minOrderVolume": "0.0001",
+      "priceTick": "0.1",
+      "maxOrderVolume": "150.0",
+      "baseCurrency": "BTC",
+      "maxLeverage": 200,
+      "needSuspend": 0,
+      "volumeMultiple": "1.0",
+      "exchangeID": "Exchange",
+      "priceCurrency": "USDT",
+      "priceLimitLowerValue": "0.05",
+      "clearCurrency": "USDT",
+      "symbolAlias": "BTC",
+      "symbolName": "BTCUSDT",
+      "defaultLeverage": "20.0",
+      "minOrderCost": "1.0"
+    },
+    "market": {
+      "lastTime": 1792733914,
+      "symbol": "BTCUSDT",
+      "highestPrice": "82839.8",
+      "underlyingPrice": "81783.4",
+      "lowestPrice": "80898.1",
+      "openPrice": "82755",
+      "positionFeeRate": "0.00008037",
+      "volume": "9297.2162",
+      "instrumentStatus": "2",
+      "markedPrice": "81753.4",
+      "turnover": "758935141.89044967",
+      "positionFeeTime": 28800,
+      "lastPrice": "81754.4",
+      "nextFeeTime": 1792742400000,
+      "fundingRate": "0.00008037"
+    },
+    "received": 1792733915,
+    "instrument_url": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/instrument?productGroup=SwapU",
+    "market_url": "https://lbkperp.lbank.com/cfd/openApi/v1/pub/marketData?productGroup=SwapU",
+    "contract_documentation": "https://www.lbank.com/docs/contract.html",
+    "fee_source": "https://www.lbank.com/support/articles/21425760291097",
+    "fee_policy": "public base taker; personal tier not accessed",
+    "funding_history_days": 0,
+    "funding_settlements_verified": false,
+    "candle_volume_unit": "UNVERIFIED",
+    "depth_volume_unit": "contract_units_from_instrument",
+    "schedule_basis": "nextFeeTime + current positionFeeTime; future changes possible"
+  }
+}

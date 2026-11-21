@@ -1,0 +1,5 @@
+# Recovery checkpoint 2026-10-22 03:31 KST
+
+Read required DEPLOYMENT_RETRY_20261021.md and DEPLOYMENT_CHECKPOINT_20261021.md from remote branch. Official https://status.railway.com/ latest update 2026-10-21 18:15 UTC (2026-10-22 03:15 KST): Major Outage / Identified; builds/deployments paused, API/dashboard/support affected, no new information. Next official update announced for 18:45 UTC; this is not a restoration ETA. Recovery condition false; no deployment mutation/restart or new runtime/notification claim.
+
+Transient external incident: retain recovery watch, no unchanged user alert. Next run recheck build availability; after recovery inspect latest production branch and staged changes to avoid overwriting later work, create new exact approved-source build in authorized existing service, verify terminal SUCCESS/commitHash/runtime/native freshness/notification ACK/reference-risk path, preserve evidence and rollback IDs, then disable only this watch. Original checkpoint carries resource IDs. No other research resumed. Prior paper signal evidence is not proof of ZB deployment.

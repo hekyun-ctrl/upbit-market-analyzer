@@ -1,0 +1,256 @@
+{
+  "context_version": "ZB-CONTEXT-1.0",
+  "comparison": "SAME_ZB_RULES_OFF_VS_REFERENCE_RECORD",
+  "parameters": {
+    "cost_scenario": {
+      "fee_entry": "0.0001",
+      "fee_exit": "0.0001",
+      "slip_bps": "0",
+      "tick": "0.01",
+      "step": "0.00001",
+      "minimum_notional": "1",
+      "funding_per_btc": "0",
+      "status": "ASSUMED",
+      "version": "fixture"
+    },
+    "latency_seconds": 60,
+    "strategies": [
+      "BREAKOUT_RETEST",
+      "FAILED_BREAK_RECLAIM",
+      "TREND_PULLBACK"
+    ],
+    "config": {
+      "spec_version": "ZB-1.0",
+      "mode": "research_only",
+      "orders_enabled": false,
+      "outbound_notifications_enabled": false,
+      "heartbeat_notifications": false,
+      "reference_equity": "1000",
+      "risk_fraction": "0.0025",
+      "aggregate_risk_cap": "0.005",
+      "daily_loss_halt": "0.01",
+      "drawdown_review": "0.05",
+      "max_positions": 1,
+      "signal_ttl": 120,
+      "entry_band": "0.15",
+      "minimum_net_rr": "1.20",
+      "max_cost_fraction": "0.20",
+      "partial_fraction": "0.25",
+      "runner_atr": "2",
+      "quote_max_age": 5,
+      "bar_grace": 15,
+      "fee_entry": null,
+      "fee_exit": null,
+      "tick": null,
+      "step": null,
+      "minimum_notional": null,
+      "contract_multiplier": null,
+      "fee_source": null,
+      "funding_source": null,
+      "maximum_variants": 6,
+      "latency_seconds": [
+        60,
+        120
+      ],
+      "slippage_bps": [
+        2,
+        5,
+        10
+      ]
+    },
+    "context": {
+      "version": "ZB-CONTEXT-1.0",
+      "period_seconds": {
+        "1h": 3600,
+        "4h": 14400
+      },
+      "warmup_bars": 150,
+      "history_bars": 160,
+      "pivot_lookback_bars": 120,
+      "pivot_left_right_bars": 2,
+      "completion_grace_seconds": 15
+    }
+  },
+  "parameter_hash": "3ef6193c216da9a5100b03897a8628b8227b6e7cb81133b5176be4f686504d56",
+  "code_SHA256": {
+    "core.py": "e7607a1f191c3c7c622d466d472a1e99974383e4c4b67c9736889df0f78047ba",
+    "engine.py": "4c71e068cde311f779fa0c3fe046fe4ef1272ac4a229fd8321f618a96e01a3db",
+    "context.py": "ae96556d4d049299e8b3aa23ed4d2d2b8662e7b918a88195fa92f2d907f324aa",
+    "compare_context.py": "cac0a28e7c4bdd465272ec27a73e58feac2ccd409b3ab5c87ce35d631002f2e4"
+  },
+  "economic_events_identical": true,
+  "economic_event_hashes": {
+    "off": "35054a21801c8562ade1cbb600c80e2b7e7d3dd2e4e9932c6d3c7e30fdce6c02",
+    "record": "35054a21801c8562ade1cbb600c80e2b7e7d3dd2e4e9932c6d3c7e30fdce6c02"
+  },
+  "results": {
+    "off": {
+      "model_net_nav": "0.93279191934",
+      "model_max_sampled_nav_drawdown": "3.30085728126",
+      "model_max_sampled_nav_drawdown_fraction": "0.003286941523904901069795438457",
+      "candidates": 1,
+      "ready_signals": 1,
+      "paper_entries": 1,
+      "closed_trades": 1,
+      "unresolved_closed_trades": 0,
+      "open_at_cutoff": 0,
+      "calendar_days": 2,
+      "ready_per_calendar_day": "0.5",
+      "entries_per_calendar_day": "0.5",
+      "verified_net": null,
+      "health": []
+    },
+    "record": {
+      "model_net_nav": "0.93279191934",
+      "model_max_sampled_nav_drawdown": "3.30085728126",
+      "model_max_sampled_nav_drawdown_fraction": "0.003286941523904901069795438457",
+      "candidates": 1,
+      "ready_signals": 1,
+      "paper_entries": 1,
+      "closed_trades": 1,
+      "unresolved_closed_trades": 0,
+      "open_at_cutoff": 0,
+      "calendar_days": 2,
+      "ready_per_calendar_day": "0.5",
+      "entries_per_calendar_day": "0.5",
+      "verified_net": null,
+      "health": []
+    }
+  },
+  "delta_record_minus_off": {
+    "model_net_nav": "0E-11",
+    "model_max_sampled_nav_drawdown": "0E-11",
+    "model_max_sampled_nav_drawdown_fraction": "0E-30",
+    "candidates": 0,
+    "ready_signals": 0,
+    "paper_entries": 0,
+    "closed_trades": 0,
+    "open_at_cutoff": 0,
+    "ready_per_calendar_day": "0.0"
+  },
+  "cohorts": {
+    "1h": {
+      "UNKNOWN": {
+        "candidates": 1,
+        "ready_signals": 1,
+        "paper_entries": 1,
+        "closed_trades": 1,
+        "unresolved_closed_trades": 0,
+        "open_at_cutoff": 0,
+        "model_closed_net": "0.93279191934",
+        "model_sum_net_r": "0.3731174591077270282538742733",
+        "portfolio_drawdown": null,
+        "verified_net": null,
+        "model_mean_net_r": "0.3731174591077270282538742733"
+      }
+    },
+    "4h": {
+      "UNKNOWN": {
+        "candidates": 1,
+        "ready_signals": 1,
+        "paper_entries": 1,
+        "closed_trades": 1,
+        "unresolved_closed_trades": 0,
+        "open_at_cutoff": 0,
+        "model_closed_net": "0.93279191934",
+        "model_sum_net_r": "0.3731174591077270282538742733",
+        "portfolio_drawdown": null,
+        "verified_net": null,
+        "model_mean_net_r": "0.3731174591077270282538742733"
+      }
+    },
+    "1h_and_4h": {
+      "UNKNOWN|UNKNOWN": {
+        "candidates": 1,
+        "ready_signals": 1,
+        "paper_entries": 1,
+        "closed_trades": 1,
+        "unresolved_closed_trades": 0,
+        "open_at_cutoff": 0,
+        "model_closed_net": "0.93279191934",
+        "model_sum_net_r": "0.3731174591077270282538742733",
+        "portfolio_drawdown": null,
+        "verified_net": null,
+        "model_mean_net_r": "0.3731174591077270282538742733"
+      }
+    }
+  },
+  "signal_contexts": {
+    "ZB-1.0:BTCUSDT:BREAKOUT_RETEST:1:135000": {
+      "version": "ZB-CONTEXT-1.0",
+      "mode": "REFERENCE_ONLY",
+      "observed_at": 135300,
+      "reference_price": "103.8",
+      "signal_side": 1,
+      "frames": {
+        "1h": {
+          "period_seconds": 3600,
+          "state": "UNKNOWN",
+          "reason": "CONTEXT_WARMUP",
+          "complete_bars": 37,
+          "required_bars": 150,
+          "bar_end": 133200,
+          "known_at": 133200,
+          "support": null,
+          "resistance": null,
+          "atr": null,
+          "ema20": null,
+          "ema50": null,
+          "alignment": "UNKNOWN"
+        },
+        "4h": {
+          "period_seconds": 14400,
+          "state": "UNKNOWN",
+          "reason": "CONTEXT_WARMUP",
+          "complete_bars": 9,
+          "required_bars": 150,
+          "bar_end": 129600,
+          "known_at": 129600,
+          "support": null,
+          "resistance": null,
+          "atr": null,
+          "ema20": null,
+          "ema50": null,
+          "alignment": "UNKNOWN"
+        }
+      },
+      "relationship": "UNKNOWN"
+    }
+  },
+  "input_event_hash": "3d8a06cadd5839148a7fe4a490238deb42816b4f683b9a0333254ce34a1285d0",
+  "source_labels": [
+    "synthetic_fixture"
+  ],
+  "cutoff_mark": {
+    "bar_end": 136200,
+    "period_seconds": 60,
+    "price": "97"
+  },
+  "interval": {
+    "start": 0,
+    "end_exclusive": 136200,
+    "calendar_days": 2,
+    "includes_supplied_warmup": true
+  },
+  "strategy_changed": false,
+  "performance_claim": false,
+  "verified_net": null,
+  "limitations": [
+    "Reference annotations cannot change entries, exits, size, stops or targets.",
+    "Cohorts describe existing trades; do not sum them into hypothetical filtered portfolios.",
+    "Cohort portfolio drawdown is undefined; a changed policy requires a separately registered full replay.",
+    "NAV drawdown is sampled after received bar events, not tick/intrabar maximum drawdown.",
+    "Fees/slippage follow the supplied scenario; actual funding coverage remains unintegrated.",
+    "This compares context off/on within ZB, not the old production strategy against ZB.",
+    "Unknown context and unresolved trades stay in the report. Zero trades do not establish performance.",
+    "The observation span includes supplied warmup and no-trade days; absent data are not manufactured."
+  ],
+  "provenance": {
+    "classification": "SYNTHETIC_FUNCTIONAL_FIXTURE_NOT_MARKET_PERFORMANCE",
+    "fixture": "tests/zerobase/test_context.py:trading_fixture",
+    "costs": "tests/zerobase/test_core.py:C",
+    "base_commit": "dae23206536ae386494b76854da0590774f04256",
+    "actual_market_data": false,
+    "purpose": "Prove that reference recording preserves real engine decisions, partial exits and accounting on synthetic input."
+  }
+}

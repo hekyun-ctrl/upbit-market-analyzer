@@ -1,0 +1,36 @@
+test_conflict_and_overlap (test_core.Contract.test_conflict_and_overlap) ... ok
+test_ema_rsi_and_pivot_known (test_core.Contract.test_ema_rsi_and_pivot_known) ... ok
+test_expired_outbox_does_not_revive_emergency (test_core.Contract.test_expired_outbox_does_not_revive_emergency) ... ok
+test_freshness_arrival_deadline (test_core.Contract.test_freshness_arrival_deadline) ... ok
+test_funding_known_at (test_core.Contract.test_funding_known_at) ... ok
+test_funding_partial_sign_independent (test_core.Contract.test_funding_partial_sign_independent) ... ok
+test_gap_stop_price (test_core.Contract.test_gap_stop_price) ... ok
+test_intraminute_and_gap_censor (test_core.Contract.test_intraminute_and_gap_censor) ... ok
+test_live_quote_fail_closed (test_core.Contract.test_live_quote_fail_closed) ... ok
+test_mirror_strategies_and_prefix (test_core.Contract.test_mirror_strategies_and_prefix) ... ok
+test_missing_not_filled (test_core.Contract.test_missing_not_filled) ... ok
+test_no_net_pass_from_unknown_cost (test_core.Contract.test_no_net_pass_from_unknown_cost) ... ok
+test_no_preentry_extremes_for_runner (test_core.Contract.test_no_preentry_extremes_for_runner) ... ok
+test_partial_only_and_new_stop_not_retroactive (test_core.Contract.test_partial_only_and_new_stop_not_retroactive) ... ok
+test_product_and_closed (test_core.Contract.test_product_and_closed) ... ok
+test_quantity_rounding_risk (test_core.Contract.test_quantity_rounding_risk) ... ok
+test_restart_open_position_and_event_hash (test_core.Contract.test_restart_open_position_and_event_hash) ... ok
+test_stop_wins_and_stays (test_core.Contract.test_stop_wins_and_stays) ... ok
+test_store_idempotence_revision_restart (test_core.Contract.test_store_idempotence_revision_restart) ... ok
+test_structure_not_short_reversal (test_core.Contract.test_structure_not_short_reversal) ... ok
+test_time_review_no_forced_exit (test_core.Contract.test_time_review_no_forced_exit) ... ok
+test_transaction_rolls_back (test_core.Contract.test_transaction_rolls_back) ... ok
+test_unknown_costs (test_core.Contract.test_unknown_costs) ... ok
+test_long_and_short_partial_cash_exact (test_core.IndependentCash.test_long_and_short_partial_cash_exact) ... ok
+test_paired_blocks_no_trade_days (test_core.IndependentCash.test_paired_blocks_no_trade_days) ... ok
+test_quantity_depth_and_unconfirmed_units (test_core.IndependentCash.test_quantity_depth_and_unconfirmed_units) ... ok
+test_stop_before_scheduled_fill_cannot_revive (test_core.PreEntry.test_stop_before_scheduled_fill_cannot_revive) ... ok
+test_A_signal_and_original_ATR (test_core.StrategiesAndReplay.test_A_signal_and_original_ATR) ... ok
+test_B_fixed_breakout_range_and_three_bar_expiry (test_core.StrategiesAndReplay.test_B_fixed_breakout_range_and_three_bar_expiry) ... ok
+test_replay_restart_equivalence_and_unknown_cost (test_core.StrategiesAndReplay.test_replay_restart_equivalence_and_unknown_cost) ... ok
+test_risk_halt_does_not_stop_existing_stop (test_core.StrategiesAndReplay.test_risk_halt_does_not_stop_existing_stop) ... ok
+
+----------------------------------------------------------------------
+Ran 31 tests in 0.105s
+
+OK

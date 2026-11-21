@@ -1,0 +1,11 @@
+{
+  "spec_version":"ZB-1.0", "mode":"research_only", "orders_enabled":false,
+  "outbound_notifications_enabled":false,"heartbeat_notifications":false,
+  "reference_equity":"1000","risk_fraction":"0.0025","aggregate_risk_cap":"0.005",
+  "daily_loss_halt":"0.01","drawdown_review":"0.05","max_positions":1,
+  "signal_ttl":120,"entry_band":"0.15","minimum_net_rr":"1.20","max_cost_fraction":"0.20",
+  "partial_fraction":"0.25","runner_atr":"2","quote_max_age":5,"bar_grace":15,
+  "fee_entry":null,"fee_exit":null,"tick":null,"step":null,"minimum_notional":null,
+  "contract_multiplier":null,"fee_source":null,"funding_source":null,
+  "maximum_variants":6,"latency_seconds":[60,120],"slippage_bps":[2,5,10]
+}
