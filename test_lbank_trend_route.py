@@ -60,6 +60,52 @@ class TrendRouteShadowTests(unittest.TestCase):
         rank_entry_routes(x)
         self.assertEqual(x["five_bars"], original)
 
+    def _staircase_state(self, prices):
+        # Synthetic regression scenario modeled on the 2026-11-21 screenshot,
+        # NOT a replay of unprovided historical exchange candle data.
+        x = state(step5=0)
+        for i, close in enumerate(prices):
+            bar = x["five_bars"][-len(prices) + i]
+            bar["open"] = close - 20
+            bar["close"] = close
+            bar["high"] = close + 30
+            bar["low"] = close - 50
+        return x
+
+    def test_shallow_pullback_staircase_like_nov21_chart(self):
+        x = self._staircase_state(
+            [59200, 59310, 59450, 59530, 59650, 59790, 59900, 60100, 60374])
+        result = rank_entry_routes(x)
+        pattern = result["shallow_pullback_continuation"]
+        self.assertTrue(pattern["detected"])
+        self.assertEqual(pattern["reason"], "shallow_pullback_staircase")
+        self.assertEqual(result["routes"][0], "breakout")
+        self.assertTrue(pattern["completed_bar_breakout"])
+        self.assertFalse(result["approval"])
+        self.assertIsNone(result["entry_prices"])
+
+    def test_large_countertrend_candle_disqualifies_staircase(self):
+        x = self._staircase_state(
+            [59200, 59500, 59700, 59200, 59650, 59790, 59900, 60100, 60374])
+        self.assertFalse(rank_entry_routes(x)["shallow_pullback_continuation"]["detected"])
+
+    def test_no_auto_confirmation_from_unfinished_high_wick(self):
+        x = self._staircase_state(
+            [59200, 59310, 59450, 59530, 59650, 59790, 59900, 60100, 60374])
+        x["five_bars"][-1]["quality"] = "forming"
+        result = rank_entry_routes(x)
+        self.assertFalse(result["ready"])
+        self.assertEqual(result["reason"], "unverified_candle")
+
+    def test_shadow_never_approves_if_price_far_from_close(self):
+        x = self._staircase_state(
+            [59200, 59310, 59450, 59530, 59650, 59790, 59900, 60100, 60374])
+        x["quote"] = 65000.
+        result = rank_entry_routes(x)
+        self.assertFalse(result["approval"])
+        self.assertIsNone(result["entry_prices"])
+        self.assertFalse(result["shallow_pullback_continuation"]["uses_quote_for_trigger"])
+
     def test_four_hour_not_fabricated(self):
         x = rank_entry_routes(state(bars5=25))
         self.assertIsNone(x["momentum_pct"]["4h"])
