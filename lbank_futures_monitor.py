@@ -35,6 +35,7 @@ from lbank_operational_health import (JournalRecovery, OperationalNotices,
                                       StorageReserve, blocked_diagnostic)
 from lbank_native_candles import NativeCandleThread
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
+from lbank_trend_route import rank_entry_routes
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
 from lbank_entry_quality import (confirmation_quality, direction_priority,
                                  observed_target_room, POLICY as ENTRY_QUALITY_POLICY)
@@ -524,6 +525,10 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
             diagnostics.update(reason="insufficient_samples", candidates=[])
         return None
     if native_state is not None:
+        # Read-only trend route ranking: never feeds candidate approval,
+        # risk gates, cooldown, Telegram, or execution.
+        route_shadow = rank_entry_routes(native_state)
+        LOG.info("TREND_ROUTE_SHADOW %s", json.dumps(route_shadow, sort_keys=True))
         if abs(native_state["quote"] / prices[-1] - 1) > ENTRY_MAX_CHASE_PCT:
             if diagnostics is not None:
                 diagnostics.update(reason="price_deviation", candidates=[])
