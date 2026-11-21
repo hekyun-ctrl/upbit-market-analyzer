@@ -132,7 +132,7 @@ def rank_entry_routes(state):
     staircase = _staircase_evidence(five, direction)
     prior_high = max(float(b["high"]) for b in five[-7:-1])
     prior_low = min(float(b["low"]) for b in five[-7:-1])
-    return {"version": "trend_route_shadow_v1", "ready": True,
+    return {"version": "trend_route_shadow_v2", "ready": True,
             "direction": direction, "regime": regime, "routes": routes,
             "approval": False, "entry_prices": None,
             "higher_timeframes": "derived_5m_not_exchange_verified",
