@@ -63,6 +63,19 @@ class RefinementTests(unittest.TestCase):
                 self.assertLessEqual(new['margin'],m.REF_BALANCE*m.MAX_MARGIN_FRACTION)
                 self.assertGreaterEqual(new['rr1'],1.5-1e-7)
 
+    def test_fast_quote_gap_is_audited_without_unsafe_chase_permission(self):
+        valid = complete_minutes(geometry_state())
+        for delta in (.003,-.003):
+            s=copy.deepcopy(valid)
+            s['quote']=s['prices'][-1]*(1+delta)
+            d={}
+            self.assertIsNone(m.classify(s['prices'],native_state=s,diagnostics=d))
+            self.assertEqual(d['reason'],'price_deviation')
+            self.assertEqual(d['quote_gap_limit_pct'],.1)
+            self.assertAlmostEqual(d['quote_vs_closed_minute_pct'],100*delta)
+            self.assertTrue(d['observation_only'])
+            self.assertTrue(d['formal_entry_gate_unchanged'])
+
     def test_invalid_or_missing_actual_minute_data_has_no_substitute(self):
         valid = complete_minutes(geometry_state())
         self.assertIsNotNone(minute_atr(valid))

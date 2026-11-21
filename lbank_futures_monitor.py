@@ -525,9 +525,17 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
             diagnostics.update(reason="insufficient_samples", candidates=[])
         return None
     if native_state is not None:
-        if abs(native_state["quote"] / prices[-1] - 1) > ENTRY_MAX_CHASE_PCT:
+        # A live quote may race ahead of the last COMPLETED minute close during
+        # a genuine impulse. Preserve the trade-safety rejection but record the
+        # actual distance, so the event is not misreported as "no opportunity".
+        quote_gap = native_state["quote"] / prices[-1] - 1
+        if abs(quote_gap) > ENTRY_MAX_CHASE_PCT:
             if diagnostics is not None:
-                diagnostics.update(reason="price_deviation", candidates=[])
+                diagnostics.update(reason="price_deviation", candidates=[],
+                    quote_vs_closed_minute_pct=round(100*quote_gap, 5),
+                    quote_gap_limit_pct=round(100*ENTRY_MAX_CHASE_PCT, 5),
+                    observation_only=True,
+                    formal_entry_gate_unchanged=True)
             return None
         bars = native_state["minute_bars"]
         geometry = native_entry_geometry(native_state)
@@ -1419,6 +1427,12 @@ def run():
                         trend_route_shadow = rank_entry_routes(native_state)
                         LOG.info("TREND_ROUTE_SHADOW %s",
                                  json.dumps(trend_route_shadow, sort_keys=True))
+                        rejection["trend_route_observation"] = dict(
+                            regime=trend_route_shadow.get("regime"),
+                            direction=trend_route_shadow.get("direction"),
+                            priority_basis=trend_route_shadow.get("priority_basis"),
+                            approval=False,
+                            entry_permission="unchanged")
                     proposal = classify(prices, native_state=native_state,
                                         diagnostics=rejection)
                     timing = setup_evidence(native_state, now, time.time(),
