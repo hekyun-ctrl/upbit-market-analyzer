@@ -71,10 +71,12 @@ class RefinementTests(unittest.TestCase):
             d={}
             self.assertIsNone(m.classify(s['prices'],native_state=s,diagnostics=d))
             self.assertEqual(d['reason'],'price_deviation')
-            self.assertEqual(d['quote_gap_limit_pct'],.1)
-            self.assertAlmostEqual(d['quote_vs_closed_minute_pct'],100*delta)
-            self.assertTrue(d['observation_only'])
-            self.assertTrue(d['formal_entry_gate_unchanged'])
+            shadow=m.quote_gap_observation(s['prices'],s)
+            self.assertEqual(shadow['quote_gap_limit_pct'],.1)
+            self.assertAlmostEqual(shadow['quote_vs_closed_minute_pct'],100*delta)
+            self.assertTrue(shadow['exceeds_original_gate'])
+            self.assertTrue(shadow['observation_only'])
+            self.assertTrue(shadow['formal_entry_gate_unchanged'])
 
     def test_invalid_or_missing_actual_minute_data_has_no_substitute(self):
         valid = complete_minutes(geometry_state())

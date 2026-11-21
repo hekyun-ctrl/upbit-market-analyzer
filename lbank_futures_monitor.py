@@ -513,6 +513,17 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
     }
 
 
+def quote_gap_observation(prices, native_state):
+    """Observe fast quote/closed-minute divergence; NEVER approves an entry."""
+    if not prices or not native_state or prices[-1] <= 0:
+        return dict(available=False, formal_entry_gate_unchanged=True)
+    relative = native_state["quote"] / prices[-1] - 1
+    return dict(available=True, quote_vs_closed_minute_pct=round(100*relative,5),
+        quote_gap_limit_pct=round(100*ENTRY_MAX_CHASE_PCT,5),
+        exceeds_original_gate=abs(relative)>ENTRY_MAX_CHASE_PCT,
+        observation_only=True, formal_entry_gate_unchanged=True)
+
+
 def classify(prices, observations=None, diagnostics=None, native_state=None):
     """Evaluate strategies independently; rejected candidates cannot veto others.
 
@@ -525,17 +536,9 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
             diagnostics.update(reason="insufficient_samples", candidates=[])
         return None
     if native_state is not None:
-        # A live quote may race ahead of the last COMPLETED minute close during
-        # a genuine impulse. Preserve the trade-safety rejection but record the
-        # actual distance, so the event is not misreported as "no opportunity".
-        quote_gap = native_state["quote"] / prices[-1] - 1
-        if abs(quote_gap) > ENTRY_MAX_CHASE_PCT:
+        if abs(native_state["quote"] / prices[-1] - 1) > ENTRY_MAX_CHASE_PCT:
             if diagnostics is not None:
-                diagnostics.update(reason="price_deviation", candidates=[],
-                    quote_vs_closed_minute_pct=round(100*quote_gap, 5),
-                    quote_gap_limit_pct=round(100*ENTRY_MAX_CHASE_PCT, 5),
-                    observation_only=True,
-                    formal_entry_gate_unchanged=True)
+                diagnostics.update(reason="price_deviation", candidates=[])
             return None
         bars = native_state["minute_bars"]
         geometry = native_entry_geometry(native_state)
@@ -1435,6 +1438,8 @@ def run():
                             entry_permission="unchanged")
                     proposal = classify(prices, native_state=native_state,
                                         diagnostics=rejection)
+                    rejection["quote_gap_observation"] = quote_gap_observation(
+                        prices, native_state)
                     timing = setup_evidence(native_state, now, time.time(),
                                             first_ready_observed_at,
                                             "periodic_and_new_bar" if sample_due and new_setup_bar
