@@ -21,6 +21,49 @@ def _direction(move, threshold):
     return 1 if move > threshold else -1 if move < -threshold else 0
 
 
+def _staircase_evidence(five, direction):
+    """Completed-bar evidence for an impulse with only shallow counter-moves.
+
+    An observed pattern, NOT an entry signal or an invitation to chase.
+    All price comparisons use fully closed 5m candles, excluding live quotes.
+    """
+    if direction not in (-1, 1) or len(five) < 13:
+        return {"detected": False, "reason": "insufficient_or_neutral"}
+    closes = [float(b["close"]) for b in five[-13:]]
+    highs = [float(b["high"]) for b in five[-13:]]
+    lows = [float(b["low"]) for b in five[-13:]]
+    recent = closes[-9:]
+    signed_steps = [direction * (b / a - 1) * 100
+                    for a, b in zip(recent, recent[1:])]
+    directional_progress = direction * (recent[-1] / recent[0] - 1) * 100
+    adverse_steps = [abs(x) for x in signed_steps if x < 0]
+    max_adverse = max(adverse_steps, default=0.)
+    follow_steps = sum(step > 0 for step in signed_steps)
+    prior_extreme = max(highs[-7:-1]) if direction == 1 else min(lows[-7:-1])
+    last_close = closes[-1]
+    # An unfinished intrabar wick must not qualify as a breakout.
+    breakout_completed = direction * (last_close / prior_extreme - 1) > 0
+    # A completed candle just below a new extreme can still be a continuation
+    # candidate; the independent breakout route is not silently redefined.
+    distance_to_extreme_pct = (max(0., (prior_extreme / last_close - 1) * 100)
+                               if direction == 1 else
+                               max(0., (last_close / prior_extreme - 1) * 100))
+    detected = (directional_progress >= .65
+                and follow_steps >= 5
+                and max_adverse <= .35
+                and distance_to_extreme_pct <= .30)
+    return {
+        "detected": detected,
+        "reason": "shallow_pullback_staircase" if detected else "pattern_not_confirmed",
+        "directional_progress_pct": round(directional_progress, 4),
+        "positive_steps_8": follow_steps,
+        "max_adverse_closed_step_pct": round(max_adverse, 4),
+        "distance_to_prior_extreme_pct": round(distance_to_extreme_pct, 4),
+        "completed_bar_breakout": breakout_completed,
+        "uses_quote_for_trigger": False,
+    }
+
+
 def rank_entry_routes(state):
     """Return auditable, read-only priority from completed native bars.
 
@@ -28,7 +71,7 @@ def rank_entry_routes(state):
     A regime change never grants entry permission; existing independent
     plan/stop/target/context/confirmation gates remain authoritative.
     """
-    empty = {"version": "trend_route_shadow_v1", "ready": False,
+    empty = {"version": "trend_route_shadow_v2", "ready": False,
              "regime": "unverified", "direction": 0, "routes": [],
              "approval": False, "entry_prices": None,
              "higher_timeframes": "not_independently_verified"}
@@ -86,6 +129,7 @@ def rank_entry_routes(state):
         routes = ["pullback", "continuation", "breakout"]
     else:
         routes = ["pullback", "continuation", "breakout"]
+    staircase = _staircase_evidence(five, direction)
     prior_high = max(float(b["high"]) for b in five[-7:-1])
     prior_low = min(float(b["low"]) for b in five[-7:-1])
     return {"version": "trend_route_shadow_v1", "ready": True,
@@ -99,5 +143,6 @@ def rank_entry_routes(state):
                              "4h": round(move4h, 4) if move4h is not None else None},
             "reference_high_6x5m": round(prior_high, 2),
             "reference_low_6x5m": round(prior_low, 2),
+            "shallow_pullback_continuation": staircase,
             "risk_gate": "unchanged",
             "delivery_policy": "unchanged"}
