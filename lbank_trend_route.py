@@ -7,6 +7,7 @@ Only complete contiguous native candles supplied by NativeEntryFeed are used.
 import math
 
 ROUTES = ("breakout", "continuation", "pullback")
+VERSION = "trend_route_shadow_v3"
 
 
 def _finite(value):
@@ -71,7 +72,7 @@ def rank_entry_routes(state):
     A regime change never grants entry permission; existing independent
     plan/stop/target/context/confirmation gates remain authoritative.
     """
-    empty = {"version": "trend_route_shadow_v2", "ready": False,
+    empty = {"version": VERSION, "ready": False,
              "regime": "unverified", "direction": 0, "routes": [],
              "approval": False, "entry_prices": None,
              "higher_timeframes": "not_independently_verified"}
@@ -119,21 +120,22 @@ def rank_entry_routes(state):
         regime = "trend_pause"
     else:
         regime = "range_or_transition"
-    # Rank the fast routes FIRST in a strong impulse, without requiring
-    # a deep pullback. No signal is inferred from price touching a level.
-    if regime == "impulse":
-        routes = ["breakout", "continuation", "pullback"]
-    elif regime == "trend_pause":
+    staircase = _staircase_evidence(five, direction)
+    # A stair-step impulse can continue below the prior wick extreme.
+    # Give breakout priority again once the completed close clears that level.
+    staircase_continuation = (regime == "impulse" and staircase["detected"]
+                              and not staircase["completed_bar_breakout"])
+    if staircase_continuation or regime == "trend_pause":
         routes = ["continuation", "breakout", "pullback"]
-    elif regime == "conflicted":
-        routes = ["pullback", "continuation", "breakout"]
+    elif regime == "impulse":
+        routes = list(ROUTES)
     else:
         routes = ["pullback", "continuation", "breakout"]
-    staircase = _staircase_evidence(five, direction)
     prior_high = max(float(b["high"]) for b in five[-7:-1])
     prior_low = min(float(b["low"]) for b in five[-7:-1])
-    return {"version": "trend_route_shadow_v2", "ready": True,
+    return {"version": VERSION, "ready": True,
             "direction": direction, "regime": regime, "routes": routes,
+            "priority_basis": "shallow_pullback_staircase" if staircase_continuation else regime,
             "approval": False, "entry_prices": None,
             "higher_timeframes": "derived_5m_not_exchange_verified",
             "momentum_pct": {"1m_3close": round(move1, 4),
