@@ -66,6 +66,27 @@ class PriceMomentumWatchTests(unittest.TestCase):
         self.assertEqual(x["direction"],"up")
         self.assertTrue(x["volume_warning"])
 
+    def test_five_minute_staircase_after_early_impulse(self):
+        # Two strong minutes followed by three small positive closes.
+        # The last 3m move is too small for the previous impulse-only rule.
+        data=[]; p=64000.
+        for i in range(21):
+            t=self.base+i*60
+            change={16:80.,17:80.,18:4.,19:4.,20:4.}.get(i,0.)
+            op=p; p+=change
+            data.append(dict(period=60,start=t,open=op,high=max(op,p)+1.,
+                low=min(op,p)-1.,close=p,volume=1. if i==20 else 20.,
+                quality="stream_closed",received_at=t+62))
+        x=evaluate_minute_watch(data)
+        self.assertEqual((x["status"],x["direction"],x["trigger_type"]),
+                         ("watch","up","five_minute_staircase"))
+        self.assertEqual(x["movement"],172.)
+        sender=Mock(return_value=True); now=data[-1]["start"]+64
+        delivered=send_price_watch(self.ledger,data,period=60,now=now,
+                                    started=now-600,send=sender,enabled=True)
+        self.assertEqual(delivered,"up:accepted")
+        self.assertIn("five_minute_staircase",sender.call_args.args[0])
+
     def test_no_open_or_stale_candle_sent(self):
         rows=self.fives();sender=Mock()
         t=rows[-1]["start"]+304

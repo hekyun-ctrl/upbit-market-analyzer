@@ -8,6 +8,7 @@ from datetime import datetime, timedelta, timezone
 import logging
 import math
 import sqlite3
+import time
 from statistics import median
 
 from lbank_b_early_1m_shadow import _valid_minutes
@@ -52,11 +53,34 @@ def _candidate(bars, period):
         opening = float(rows[-3]["open"])
         threshold = max(close * .0012, 1.5 * atr)
         amount = close-opening
-        # Last minute must still be moving in the observed direction.
-        up = (amount >= threshold and close > float(last["open"])
+        # Last minute must still move in the observed direction.
+        impulse_up = (amount >= threshold and close > float(last["open"])
               and close > max(float(x["high"]) for x in lookback) + close*.00005)
-        down = (amount <= -threshold and close < float(last["open"])
+        impulse_down = (amount <= -threshold and close < float(last["open"])
                 and close < min(float(x["low"]) for x in lookback) - close*.00005)
+        # A sharp first/second minute followed by smaller but persistent closes
+        # can be missed by a 3-minute-only impulse test. Detect the COMPLETED
+        # five-minute staircase independently, never using an open candle.
+        # This lane is informational, not an entry approval or loss estimate.
+        recent = rows[-5:]
+        five_open = float(recent[0]["open"])
+        five_move = close - five_open
+        five_minimum = max(close*.0018, 2.0*atr)
+        positive = sum(float(x["close"]) > float(x["open"]) for x in recent)
+        negative = sum(float(x["close"]) < float(x["open"]) for x in recent)
+        prior_high_8 = max(float(x["high"]) for x in history[-8:])
+        prior_low_8 = min(float(x["low"]) for x in history[-8:])
+        staircase_up = (positive >= 4 and five_move >= five_minimum
+            and close > float(last["open"])
+            and close > prior_high_8 + close*.00005)
+        staircase_down = (negative >= 4 and -five_move >= five_minimum
+            and close < float(last["open"])
+            and close < prior_low_8 - close*.00005)
+        up, down = impulse_up or staircase_up, impulse_down or staircase_down
+        trigger_type = ("three_minute_impulse" if impulse_up or impulse_down
+            else "five_minute_staircase")
+        if (staircase_up or staircase_down) and not (impulse_up or impulse_down):
+            opening, amount = five_open, five_move
     else:
         # 5m fallback catches the 14:15 and 16:50 cases: a short-horizon
         # resistance break plus large candle body, independently of volume.
@@ -68,11 +92,13 @@ def _candidate(bars, period):
               and close > max(float(x["high"]) for x in lookback) + close*.00005)
         down = (amount <= -threshold
                 and close < min(float(x["low"]) for x in lookback) - close*.00005)
+        trigger_type = "five_minute_breakout"
     if not (up or down):
         return {"status": "no_fast_price_structure"}
     ratio = float(last["volume"])/baseline
     return {
         "status": "watch", "direction": "up" if up else "down",
+        "trigger_type": trigger_type,
         "start": int(last["start"]), "period": period, "close": close,
         "opening": opening, "reference": (
             max(float(x["high"]) for x in lookback) if up else
@@ -108,6 +134,7 @@ def format_watch(event):
         f" / 확인 종가 {event['close']:,.1f} USDT\n"
         f"최근 가속폭 {event['movement']:+,.1f} USDT"
         f" / 거래량 이전 기준 대비 {event['volume_multiple']:.2f}배\n"
+        f"감지 경로: {event.get('trigger_type', 'price_break')}\n"
         f"주의: {risk}\n"
         "진입가·손절·목표: 미승인 (호가·구조 목표·비용 차감 손익비 검증 전)\n"
         "이 경고는 ‘대기’보다 이른 관찰을 위한 별도 경로입니다.\n"
@@ -160,11 +187,17 @@ def send_price_watch(ledger, bars, *, period, now, started, send, enabled):
             VALUES(?,?,?,?,'reserved')""",(stamp,period,side,now)).rowcount:
             return "already_reserved"
     ok=False
+    send_started = time.monotonic()
     try:
         ok=bool(send(format_watch(event)))
     except Exception as exc:
         LOG.warning("VIDEO_PRICE_MOMENTUM_SEND_FAILURE type=%s",type(exc).__name__)
     status="accepted" if ok else "unconfirmed_no_retry"
+    LOG.info("VIDEO_PRICE_MOMENTUM_TIMING period=%d bar=%d direction=%s trigger=%s "
+             "close_to_check_s=%.2f send_to_api_response_s=%.2f api_accepted=%s "
+             "device_receipt_verified=false",
+             period, stamp, side, event["trigger_type"],
+             max(0., now-(stamp+period)), time.monotonic()-send_started, ok)
     try:
         with ledger.db:
             ledger.db.execute("""UPDATE video_price_momentum_notice SET status=?
