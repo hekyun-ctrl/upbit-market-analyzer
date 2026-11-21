@@ -112,6 +112,19 @@ class PriceMomentumWatchTests(unittest.TestCase):
         self.assertEqual(evaluate_minute_watch(rows)["status"],
                          "no_fast_price_structure")
 
+    def test_same_minute_prealert_suppresses_duplicate_watch(self):
+        rows=self.minutes(); now=rows[-1]["start"]+64
+        with self.db:
+            self.db.execute("""CREATE TABLE video_one_minute_notice
+                (bar_start INTEGER, direction TEXT, status TEXT)""")
+            self.db.execute("INSERT INTO video_one_minute_notice VALUES(?,?,?)",
+                            (rows[-1]["start"],"up","accepted"))
+        sender=Mock(return_value=True)
+        self.assertEqual(send_price_watch(self.ledger,rows,period=60,
+            now=now,started=now-600,send=sender,enabled=True),
+            "existing_minute_prealert")
+        sender.assert_not_called()
+
     def test_cooldown_shared_between_1m_and_5m(self):
         minutes=self.minutes();now=minutes[-1]["start"]+65
         sender=Mock(return_value=True)

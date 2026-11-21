@@ -173,8 +173,8 @@ def send_price_watch(ledger, bars, *, period, now, started, send, enabled):
         if previous:
             return "cooldown"
         # A conventional 1m prealert already carries the same direction;
-        # avoid sending the faster, weaker watch in addition.
-        if period == 300:
+        # avoid duplicate 1m OR 5m watch notices for that prealert.
+        if period in (60, 300):
             try:
                 previous=ledger.db.execute("""SELECT 1 FROM video_one_minute_notice
                     WHERE direction=? AND bar_start>? AND status IN ('reserved','accepted','unconfirmed')
