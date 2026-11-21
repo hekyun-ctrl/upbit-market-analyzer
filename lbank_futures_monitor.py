@@ -525,10 +525,6 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
             diagnostics.update(reason="insufficient_samples", candidates=[])
         return None
     if native_state is not None:
-        # Read-only trend route ranking: never feeds candidate approval,
-        # risk gates, cooldown, Telegram, or execution.
-        route_shadow = rank_entry_routes(native_state)
-        LOG.info("TREND_ROUTE_SHADOW %s", json.dumps(route_shadow, sort_keys=True))
         if abs(native_state["quote"] / prices[-1] - 1) > ENTRY_MAX_CHASE_PCT:
             if diagnostics is not None:
                 diagnostics.update(reason="price_deviation", candidates=[])
@@ -1418,6 +1414,11 @@ def run():
                 if setup_due and continuous and audit_ready and watch is None:
                     last_setup_key = native_key
                     rejection = {}
+                    # Research-only: classify() and all approval gates are unchanged.
+                    if native_state is not None:
+                        trend_route_shadow = rank_entry_routes(native_state)
+                        LOG.info("TREND_ROUTE_SHADOW %s",
+                                 json.dumps(trend_route_shadow, sort_keys=True))
                     proposal = classify(prices, native_state=native_state,
                                         diagnostics=rejection)
                     timing = setup_evidence(native_state, now, time.time(),
