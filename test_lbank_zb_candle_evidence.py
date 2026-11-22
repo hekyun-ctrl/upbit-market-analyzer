@@ -8,7 +8,8 @@ from unittest.mock import AsyncMock, patch
 
 from lbank_native_candles import WS_URL
 from lbank_zb.candle_evidence import (
-    REFERENCE_URL, WARMUP_BARS, audit_status, capture_reference, closed_reply, compare, read_derived,
+    REFERENCE_ROUTES, REFERENCE_URL, WARMUP_BARS, CandleAuditThread, ReferenceDisagreement,
+    audit_status, capture_reference, closed_reply, compare, read_derived,
 )
 from lbank_zb.service import EngineThread
 from lbank_zb.core import D, Costs, asdict
@@ -90,7 +91,9 @@ class CandleEvidenceTests(unittest.TestCase):
 
     def test_derived_comparison_requires_recorded_seal_and_source(self):
         native = self.audit.with_name('native.sqlite3')
-        with sqlite3.connect(native) as db:
+        db = sqlite3.connect(native)
+        self.addCleanup(db.close)
+        with db:
             db.execute('CREATE TABLE native_bars(period,start,quality)')
             db.execute('CREATE TABLE native_arrivals(period,start,received,source)')
             db.execute('INSERT INTO native_bars VALUES(300,?,?)', (END-300, 'stream_closed'))
@@ -126,11 +129,42 @@ class CandleEvidenceTests(unittest.TestCase):
 
 
 class CandleConnectionTests(unittest.IsolatedAsyncioTestCase):
-    async def test_retry_uses_the_second_published_websocket_route(self):
+    async def test_collects_a_close_when_either_published_route_misses_it(self):
         session = object()
         proof = closed_reply(FRAME, TICKET, END, END*1000+882, WS_URL)
-        capture = AsyncMock(side_effect=[TimeoutError(), proof])
-        with patch('lbank_zb.candle_evidence.capture_endpoint', capture):
-            self.assertEqual(await capture_reference(session, END), proof)
-        self.assertEqual([call.args for call in capture.await_args_list],
-                         [(session, REFERENCE_URL, END), (session, WS_URL, END)])
+        for missing in (None, TimeoutError()):
+            capture = AsyncMock(side_effect=[missing, proof])
+            with patch('lbank_zb.candle_evidence.capture_endpoint', capture):
+                self.assertEqual(await capture_reference(session, END), dict(proof, corroborated_routes=[WS_URL]))
+            self.assertEqual([call.args for call in capture.await_args_list],
+                             [(session, endpoint, END, lead) for endpoint, lead in REFERENCE_ROUTES])
+
+    async def test_two_agreeing_responses_are_one_candle(self):
+        first = closed_reply(FRAME, TICKET, END, END*1000+882)
+        second = dict(first, source=WS_URL, server_ms=first['server_ms']+1)
+        with patch('lbank_zb.candle_evidence.capture_endpoint', AsyncMock(side_effect=[first, second])):
+            self.assertEqual(await capture_reference(object(), END),
+                             dict(second, corroborated_routes=[REFERENCE_URL, WS_URL]))
+
+    async def test_disagreement_stays_out_of_the_consecutive_count(self):
+        first = closed_reply(FRAME, TICKET, END, END*1000+882)
+        second = dict(first, source=WS_URL, volume=D('1.5109'))
+        with patch('lbank_zb.candle_evidence.capture_endpoint', AsyncMock(side_effect=[first, second])):
+            with self.assertRaises(ReferenceDisagreement):
+                await capture_reference(object(), END)
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary)/'audit.sqlite3'
+            db = sqlite3.connect(path)
+            try:
+                db.execute('CREATE TABLE candle_checks(start INTEGER,status TEXT,volume_ok INTEGER,payload TEXT)')
+                db.execute('INSERT INTO candle_checks VALUES(?,?,?,?)', (END-600, 'matched', True, '{}'))
+                audit = CandleAuditThread(path.with_name('native.sqlite3'), path)
+                with patch('lbank_zb.candle_evidence.capture_reference', AsyncMock(side_effect=ReferenceDisagreement)):
+                    await audit.check_close(db, object(), END)
+                result = audit_status(path, END+1)
+                self.assertEqual(result['consecutive_matches'], 0)
+                self.assertEqual(result['matched_bars'], 1)
+                self.assertEqual(result['last_status'], 'reference_disagreement')
+                self.assertIsNone(result['last_volume_match_start'])
+            finally:
+                db.close()

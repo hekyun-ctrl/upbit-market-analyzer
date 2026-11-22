@@ -32,6 +32,11 @@ PRICE_TICK = D('.1')
 VOLUME_TICK = D('.0001')
 VOLUME_EPSILON = D('.00000001')
 TURNOVER_EPSILON = D('.000001')
+REFERENCE_ROUTES = ((REFERENCE_URL, .7), (WS_URL, .55))
+
+
+class ReferenceDisagreement(ValueError):
+    """Two independently requested LBank closes disagree at the same boundary."""
 
 
 def closed_reply(frame, ticket, end, received_ms, endpoint=REFERENCE_URL):
@@ -117,7 +122,8 @@ def audit_status(path, now):
     # capture neither confirms nor contradicts the published quantity scale.
     for start, status, volume_ok in rows:
         if latest-start >= 86400 or status in (
-            'ohlc_mismatch', 'volume_mismatch', 'turnover_mismatch', 'turnover_outside_trade_price_range'
+            'ohlc_mismatch', 'volume_mismatch', 'turnover_mismatch', 'turnover_outside_trade_price_range',
+            'reference_disagreement',
         ):
             break
         if volume_ok:
@@ -128,19 +134,29 @@ def audit_status(path, now):
 
 
 async def capture_reference(session, end):
-    try:
-        return await capture_endpoint(session, REFERENCE_URL, end)
-    except (OSError, TimeoutError, aiohttp.ClientError):
-        # The futures web app also uses this public route. Its 5m replies
-        # remain separate from the recorder's 1m stream and aggregation.
-        return await capture_endpoint(session, WS_URL, end)
+    # Both connections must be ready before rollover. Waiting for an empty
+    # response before opening the second connection can miss the same old bar.
+    results = await asyncio.gather(
+        *(capture_endpoint(session, endpoint, end, lead) for endpoint, lead in REFERENCE_ROUTES),
+        return_exceptions=True,
+    )
+    references = [result for result in results if isinstance(result, dict)]
+    errors = [result for result in results if isinstance(result, Exception)]
+    if not references:
+        if len(errors) == len(results):
+            raise errors[0]
+        return None
+    if len({tuple(reference[k] for k in FIELDS) for reference in references}) > 1:
+        raise ReferenceDisagreement
+    reference = max(references, key=lambda row: (row['updated'], row['server_ms']))
+    return dict(reference, corroborated_routes=[row['source'] for row in references])
 
 
-async def capture_endpoint(session, endpoint, end):
+async def capture_endpoint(session, endpoint, end, lead):
     latest = None
     deadline = end + EVIDENCE_GRACE
     async with session.ws_connect(endpoint, timeout=4, max_msg_size=1024*1024) as ws:
-        await asyncio.sleep(max(0, end-.7-time.time()))
+        await asyncio.sleep(max(0, end-lead-time.time()))
         for serial in range(24):
             if time.time() >= deadline:
                 break
@@ -191,7 +207,8 @@ class CandleAuditThread(threading.Thread):
             db.execute("""CREATE TABLE IF NOT EXISTS candle_checks(
                 start INTEGER PRIMARY KEY, status TEXT NOT NULL,
                 volume_ok INTEGER NOT NULL, payload TEXT NOT NULL)""")
-            LOG.info('ZB_CANDLE_AUDIT_STARTED source=%s required_consecutive=%d', REFERENCE_URL, WARMUP_BARS)
+            LOG.info('ZB_CANDLE_AUDIT_STARTED sources=%s required_consecutive=%d',
+                     ','.join(endpoint for endpoint, _ in REFERENCE_ROUTES), WARMUP_BARS)
             timeout = aiohttp.ClientTimeout(total=10, connect=8)
             async with aiohttp.ClientSession(trust_env=True, timeout=timeout,
                                              headers={'Origin': 'https://www.lbank.com'}) as session:
@@ -218,6 +235,8 @@ class CandleAuditThread(threading.Thread):
                         break
                     await asyncio.sleep(.5)
                 status, volume_ok = compare(reference, derived)
+        except ReferenceDisagreement:
+            status = 'reference_disagreement'
         except (OSError, TimeoutError, ValueError, KeyError, ArithmeticError, aiohttp.ClientError, sqlite3.Error) as exc:
             status = 'capture_failed'
             LOG.warning('ZB_CANDLE_AUDIT_CAPTURE_FAILURE exception=%s', type(exc).__name__)
