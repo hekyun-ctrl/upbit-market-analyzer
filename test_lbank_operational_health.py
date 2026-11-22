@@ -66,15 +66,32 @@ class OperationalHealthTests(unittest.TestCase):
         self.assertIn('보류',sender.call_args_list[0].args[0])
         self.assertIn('해소',sender.call_args_list[1].args[0])
 
-    def test_unacknowledged_notice_is_retried_without_false_recovery(self):
+    def test_native_history_warmup_and_recovery_never_spam_telegram(self):
+        sender=Mock(return_value=True);notices=OperationalNotices(sender)
+        for at,issue in [(0,'native'),(120,'native'),(300,'native'),
+                         (360,None),(480,None),(600,'native'),(900,'native'),
+                         (960,None),(1200,None)]:
+            notices.observe(at,issue)
+        sender.assert_not_called()
+        self.assertIsNone(notices.announced)
+        self.assertIsNone(notices.state)
+
+    def test_restart_during_native_warmup_stays_silent(self):
+        sender=Mock(return_value=True)
+        for _ in range(3):
+            notices=OperationalNotices(sender)
+            notices.observe(0,'native');notices.observe(120,'native')
+        sender.assert_not_called()
+
+    def test_unacknowledged_critical_notice_is_retried_without_false_recovery(self):
         sender=Mock(side_effect=[False,True]);notices=OperationalNotices(sender)
-        for at in (0,120,180,419,420,900):notices.observe(at,'native')
+        for at in (0,120,180,419,420,900):notices.observe(at,'journal')
         self.assertEqual(sender.call_count,2)
-        self.assertEqual(notices.announced,'native')
+        self.assertEqual(notices.announced,'journal')
 
     def test_delivery_exception_does_not_interrupt_monitor(self):
         notices=OperationalNotices(Mock(side_effect=OSError('network')))
-        notices.observe(0,'native');notices.observe(120,'native')
+        notices.observe(0,'journal');notices.observe(120,'journal')
         self.assertIsNone(notices.announced)
 
     def test_low_storage_notice_does_not_claim_entries_are_disabled(self):

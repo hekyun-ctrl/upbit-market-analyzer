@@ -5,6 +5,9 @@ import time
 
 LOG = logging.getLogger("lbank_operational_health")
 RESERVE_BYTES = 64 * 1024 * 1024
+# Routine native candle warm-up/gaps are non-actionable for the operator.
+# Keep full internal diagnostics; do not send repeated Telegram messages.
+SILENT_OPERATIONAL_ISSUES = frozenset({"native"})
 
 
 class StorageReserve:
@@ -97,6 +100,12 @@ class OperationalNotices:
             self.state, self.since = issue, now
             self.next_attempt = now
             LOG.info("ENTRY_OPERATIONAL_STATE issue=%s strategy_rejection=false", issue or "none")
+        if issue in SILENT_OPERATIONAL_ISSUES:
+            # Source readiness remains fail-closed in the entry engine; only
+            # redundant human-facing Telegram delivery is disabled.
+            # A silent native state must never become an announced status,
+            # preventing a misleading "recovery" notification afterwards.
+            return
         if issue == self.announced or now < self.next_attempt:
             return
         # Healthy startup and short reconnects create no messages. Recovery is
