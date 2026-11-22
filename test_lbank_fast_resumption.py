@@ -53,6 +53,23 @@ class FastResumptionTests(unittest.TestCase):
         self.assertEqual(detect_fast_resumption(s,route())["status"],
                          "one_minute_reacceleration_missing")
 
+    def test_one_closed_minute_can_reclaim_a_twice_tested_level(self):
+        # Synthetic sealed candles, separate from the two observed incident
+        # replays for which the full minute OHLCV was not available.
+        for d in (1, -1):
+            s = fixture(d)
+            closes = s["prices"]
+            base = closes[-16]
+            closes[-8:] = [base + d * delta for delta in (-80, -40, -20, -78, -60, -55, -70, -12)]
+            for i in range(len(closes) - 8, len(closes)):
+                o, c = closes[i - 1], closes[i]
+                s["minute_bars"][i].update(open=o, close=c, high=max(o, c)+4, low=min(o, c)-4)
+            event = detect_fast_resumption(s, route(d))
+            with self.subTest(direction=d):
+                self.assertEqual(event["status"], "early_reclaim", event)
+                self.assertEqual(event["reaction"], "repeated_level_reclaim")
+                self.assertFalse(event["approval"])
+
     def test_opposite_hour_or_neutral_regime_is_not_a_candidate(self):
         for v in (route(-1),route(1,"conflicted"),route(0,"range_or_transition")):
             self.assertNotEqual(detect_fast_resumption(fixture(),v)["status"],"candidate")

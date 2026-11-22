@@ -49,6 +49,7 @@ from lbank_market_context import MarketContextThread, annotate as annotate_marke
 from lbank_public_techniques import TechniqueStudy, annotate as annotate_public_techniques
 from lbank_entry_timing import (completed_key, setup_evidence, confirmation_evidence,
                                POLICY as ENTRY_TIMING_POLICY)
+from lbank_entry_reassessment import QuoteDeviation, crossed_completed_level
 from lbank_entry_replay_audit import audit_recent as audit_recent_entry
 from lbank_paper_notifications import PaperNotificationThread
 from lbank_breakout_freshness import (evidence as breakout_evidence,
@@ -282,7 +283,7 @@ def get_perpetual_snapshot(exchange):
     if not ticker or ticker.get("symbol") != SYMBOL:
         raise ValueError("LBank returned wrong futures ticker symbol")
     price = float(ticker["last"])
-    if not (price > 0):
+    if not (math.isfinite(price) and price > 0):
         raise ValueError("LBank returned invalid contract last price")
     timestamp = ticker.get("timestamp")
     if timestamp and abs(int(time.time() * 1000) - int(timestamp)) > MAX_AGE_MS:
@@ -675,6 +676,38 @@ def assess_candidate(prices, direction, setup, observations=None, diagnostics=No
     return plan
 
 
+def review_setup(prices, native_state, diagnostics, crossing=None):
+    """Apply the live screen and log the risk checks for earlier setups."""
+    plan = classify(prices, native_state=native_state, diagnostics=diagnostics)
+    if diagnostics.get("reason") in {"price_deviation", "strategy_conflict",
+                                    "insufficient_samples", "native_volatility_unavailable"}:
+        if crossing is not None:
+            diagnostics["completed_level_crossing"] = dict(crossing, quote=native_state["quote"], approval=False)
+        return plan
+
+    early_setups = []
+    if crossing is not None:
+        early_setups.append(("quote_crossed_completed_level", crossing))
+    resumption = diagnostics.get("fast_resumption", {})
+    if resumption.get("status") == "early_reclaim":
+        early_setups.append(("completed_minute_repeated_level_reclaim", resumption["setup"]))
+    for source, setup in early_setups:
+        detail = {}
+        review = dict(source=source, strategy=setup["strategy"], direction=setup["direction"],
+                      level=setup["level"], quote=native_state["quote"], approval=False)
+        try:
+            scenario = assess_candidate(prices, setup["direction"], setup,
+                                        native_state=native_state, diagnostics=detail)
+            review["reason"] = detail.get("reason", "unknown")
+            if scenario is not None:
+                review["risk_plan"] = {k: scenario[k] for k in (
+                    "price", "stop", "target1", "target2", "rr1", "rr2")}
+        except Exception as exc:
+            review.update(reason="early_review_unavailable", error=type(exc).__name__)
+        diagnostics.setdefault("early_candidate_reviews", []).append(review)
+    return plan
+
+
 def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=None, native_state=None):
     """Separate second-stage ENTRY REVIEW with fresh price confirmation.
 
@@ -1010,6 +1043,9 @@ def run():
     LOG.info("ENTRY_TIMING_POLICY policy=%s setup_on_new_completed_native_bar=true "
              "periodic_setup_fallback_seconds=%d minute_sample_cadence_unchanged=true "
              "minimum_confirmation_seconds=30 existing_risk_gates_unchanged=true", ENTRY_TIMING_POLICY, POLL)
+    LOG.info("ENTRY_REASSESSMENT_POLICY mode=%s quote_crossing_rescan=%s fresh_quote_retry=%s "
+             "early_candidate_risk_review_only=true", ENTRY_REFINEMENT_MODE,
+             ENTRY_REFINEMENT_MODE == "capture", ENTRY_REFINEMENT_MODE == "capture")
     LOG.info("BREAKOUT_CONFIRMATION_POLICY policy=%s original_trigger_or_existing_higher_priority=true "
              "lost_both_cancel_watch=true extra_wait_seconds=0 profitability_validated=false",
              BREAKOUT_CONFIRMATION_POLICY)
@@ -1068,6 +1104,13 @@ def run():
     pressure_observer = PressureObserver()
     observed_ready_key = None
     first_ready_observed_at = None
+    capture_entries = ENTRY_REFINEMENT_MODE == "capture"
+    previous_entry_quote = None
+    quote_deviation = None
+    route_key = None
+    trend_route_snapshot = None
+    crossing_bucket = None
+    reviewed_crossings = set()
     while True:
         try:
             # Inbound updates use the same authorized existing Telegram chat.
@@ -1213,6 +1256,32 @@ def run():
             confirm_due = watch is not None and now - watch["time"] >= 30
             new_setup_bar = native_key is not None and native_key != last_setup_key
             setup_due = sample_due or (watch is None and new_setup_bar)
+            crossing = None
+            crossing_key = None
+            retry_due = False
+            if quote_deviation is not None and now - quote_deviation.observed_at > ENTRY_CONFIRM_MAX_AGE_SECONDS:
+                quote_deviation = None
+            if capture_entries and native_key is not None:
+                if native_key != route_key:
+                    route_key = native_key
+                    trend_route_snapshot = rank_entry_routes(native_state)
+                if native_key[1] != crossing_bucket:
+                    crossing_bucket = native_key[1]
+                    reviewed_crossings.clear()
+                if watch is None:
+                    crossing = crossed_completed_level(native_state, trend_route_snapshot,
+                                                        previous_entry_quote)
+                    if crossing is not None:
+                        crossing_key = (crossing["direction"], crossing["level"])
+                        if crossing_key in reviewed_crossings:
+                            crossing = None
+                    if quote_deviation is not None:
+                        retry_due = quote_deviation.ready(native_state, native_key[0], ENTRY_MAX_CHASE_PCT)
+                    setup_due = (setup_due or crossing is not None or retry_due) and (
+                        quote_deviation is None or quote_deviation.allows_setup(native_key[0]))
+                previous_entry_quote = native_state["quote"]
+            else:
+                previous_entry_quote = None
             if sample_due:
                 last_sample = now
                 observations.append((now, price))
@@ -1302,7 +1371,7 @@ def run():
                     except Exception as exc:
                         audit_ready = False
                         LOG.error("PERFORMANCE_V2 sample_failed exception=%s", type(exc).__name__)
-                continuous = native_state is not None
+                continuous = native_key is not None
                 if not audit_ready:
                     watch = None
                     count_event("journal_unavailable")
@@ -1347,6 +1416,11 @@ def run():
                                 count_event('quality_reject')
                                 LOG.info("WATCH_CANCELLED reason=%s no_additional_wait=true", BREAKOUT_CONFIRMATION_REJECT)
                                 watch = None
+                            elif capture_entries and confirm_diag.get("reason") == "price_deviation":
+                                quote_deviation = QuoteDeviation("confirmation", now, native_key[0], price)
+                                LOG.info("WATCH_CANCELLED reason=price_deviation fresh_closed_minute_required=true")
+                                watch = None
+                                setup_due = False
                         if plan is not None:
                             plan["entry_timing"] = confirmation_evidence(
                                 watch, plan, native_state, now, time.time())
@@ -1439,9 +1513,9 @@ def run():
                 if setup_due and continuous and audit_ready and watch is None:
                     last_setup_key = native_key
                     rejection = {}
-                    # Research-only: classify() and all approval gates are unchanged.
                     if native_state is not None:
-                        trend_route_shadow = rank_entry_routes(native_state)
+                        trend_route_shadow = (trend_route_snapshot if capture_entries
+                                              else rank_entry_routes(native_state))
                         LOG.info("TREND_ROUTE_SHADOW %s",
                                  json.dumps(trend_route_shadow, sort_keys=True))
                         rejection["trend_route_observation"] = dict(
@@ -1450,14 +1524,25 @@ def run():
                             priority_basis=trend_route_shadow.get("priority_basis"),
                             approval=False,
                             entry_permission="unchanged")
-                    proposal = classify(prices, native_state=native_state,
-                                        diagnostics=rejection)
+                    if crossing is not None:
+                        reviewed_crossings.add(crossing_key)
+                    proposal = review_setup(prices, native_state, rejection, crossing)
+                    if capture_entries:
+                        if rejection.get("reason") == "price_deviation":
+                            if quote_deviation is None:
+                                quote_deviation = QuoteDeviation("setup", now, native_key[0], price)
+                        elif quote_deviation is not None:
+                            rejection["quote_reassessment"] = quote_deviation.evidence(
+                                native_state, native_key[0], now, rejection.get("reason"))
+                            quote_deviation = None
                     rejection["quote_gap_observation"] = quote_gap_observation(
                         prices, native_state)
+                    trigger = ("quote_crossed_completed_level" if crossing is not None
+                               else "fresh_quote_retry_after_deviation" if retry_due
+                               else "periodic_and_new_bar" if sample_due and new_setup_bar
+                               else "periodic" if sample_due else "new_completed_bar")
                     timing = setup_evidence(native_state, now, time.time(),
-                                            first_ready_observed_at,
-                                            "periodic_and_new_bar" if sample_due and new_setup_bar
-                                            else "periodic" if sample_due else "new_completed_bar")
+                                            first_ready_observed_at, trigger)
                     if proposal is not None:
                         proposal["entry_timing"] = timing
                     rejection["entry_timing"] = timing

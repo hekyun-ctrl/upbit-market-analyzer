@@ -1,5 +1,6 @@
 """Run the real monitor loop with an injected clock and no external I/O."""
 import copy
+import json
 import unittest
 from contextlib import ExitStack
 from types import SimpleNamespace
@@ -15,20 +16,36 @@ class StopLoop(BaseException):
 
 def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
               ready_at=None,qualify_at=None,stop_at=9075.,cancel_at=None,
-              journal_open_failures=0,shadow_fails=False,low_storage=False):
+              journal_open_failures=0,shadow_fails=False,low_storage=False,
+              price_gap_stage=None,crossing=False):
     clock=SimpleNamespace(now=9000.);order=[];saved=[];sent=[];confirmed=[]
     state=structural_state();state['rsi5']['closes']=[b['close'] for b in state['five_bars']]
     p=state['quote'];plan=dict(direction=1,side='롱',strategy='breakout',price=p,
         stop=p-200,target1=p+600,target2=p+1000,rr1=1.5,m5=.2,m15=.3,
         entry_quality={'priority':{}})
+    if crossing:
+        state['five_bars'][-1]['high']=p+20
     def sleep(_):
         clock.now+=15
         if clock.now>=stop_at:raise StopLoop()
     def snapshot(now,quote):
         fresh=copy.deepcopy(state);fresh['quote']=quote
+        if price_gap_stage and now>=9060.:
+            fresh['minute_bars'].append(dict(fresh['minute_bars'][-1], start=9000))
+            fresh['prices'].append(p)
         return (None if now==missing_at or ready_at is not None and now<ready_at else fresh),{}
+    def current_snapshot(_):
+        if crossing:
+            return p+(21. if clock.now>=9015. else 0.), None
+        gap_at = 9000. if price_gap_stage == 'setup' else 9030.
+        if price_gap_stage and clock.now == gap_at:
+            return p*1.003, None
+        return p+(clock.now-9000)/10, None
     def confirm(prices,watch,age,**kwargs):
         order.append((clock.now,'confirm'));confirmed.append((clock.now,age,kwargs['native_state']['quote']))
+        if price_gap_stage=='confirmation' and clock.now==9030.:
+            kwargs['diagnostics']['reason']='price_deviation'
+            return None
         if clock.now==cancel_at:
             kwargs['diagnostics']['reason']=monitor.BREAKOUT_CONFIRMATION_REJECT
             return None
@@ -49,6 +66,10 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
     calls=[]
     def classify(*args,**kwargs):
         calls.append(clock.now);order.append((clock.now,'classify'))
+        if price_gap_stage=='setup' or crossing:
+            reason = 'price_deviation' if clock.now==9000. else 'market_no_setup'
+            kwargs['diagnostics'].update(reason='market_no_setup' if crossing else reason, candidates=[])
+            return None
         if qualify_at is not None:return copy.deepcopy(plan) if clock.now>=qualify_at else None
         return copy.deepcopy(plan) if len(calls)==1 else None
     classifier=MagicMock(side_effect=classify)
@@ -60,6 +81,13 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
         return book
     with ExitStack() as stack:
         for name,value in dict(POLL=60,RISK_POLL=15,STARTUP_TEST_ENABLED=False).items():stack.enter_context(patch.object(monitor,name,value))
+        if price_gap_stage or crossing:
+            stack.enter_context(patch.object(monitor,'ENTRY_REFINEMENT_MODE','capture'))
+        if crossing:
+            stack.enter_context(patch.object(monitor,'rank_entry_routes',return_value=dict(
+                ready=True,regime='impulse',direction=1,momentum_pct={'1m_3close':.1},
+                shallow_pullback_continuation={'detected':True},reference_high_6x5m=p+15)))
+            stack.enter_context(patch.object(monitor,'assess_candidate',return_value=None))
         stack.enter_context(patch.object(monitor.time,'time',lambda:clock.now))
         stack.enter_context(patch.object(monitor.time,'sleep',sleep))
         stack.enter_context(patch.object(monitor.ccxt,'lbank',return_value=exchange))
@@ -77,7 +105,7 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
         stack.enter_context(patch.object(monitor,'load_snapshots',return_value=([],
             {'day':'1970-01-01','count':0,'last_time':None,'last_side':None})))
         stack.enter_context(patch.object(monitor,'save_snapshots',side_effect=lambda path,symbol,poll,observations,*a:saved.append((clock.now,list(observations)))))
-        stack.enter_context(patch.object(monitor,'get_perpetual_snapshot',side_effect=lambda _:(p+(clock.now-9000)/10,None)))
+        stack.enter_context(patch.object(monitor,'get_perpetual_snapshot',side_effect=current_snapshot))
         stack.enter_context(patch.object(monitor,'native_entry_geometry',return_value={}))
         stack.enter_context(patch.object(monitor,'classify',classifier))
         stack.enter_context(patch.object(monitor,'confirm_watch',side_effect=confirm))
@@ -97,6 +125,32 @@ def run_clock(*,missing_at=None,journal_fails_at=None,reject_at=None,
 
 
 class ConfirmationCadenceTests(unittest.TestCase):
+    def test_quote_crossing_requests_review_without_waiting_for_the_next_close(self):
+        r=run_clock(crossing=True,stop_at=9050.)
+        self.assertEqual(r['classify_times'],[9000.,9015.])
+        self.assertEqual(r['sent'],[])
+        evaluations=[json.loads(call.args[1]) for call in r['log'].info.call_args_list
+                     if call.args[0]=='ENTRY_SETUP_EVALUATED %s']
+        self.assertEqual(evaluations[1]['entry_timing']['trigger'],'quote_crossed_completed_level')
+        self.assertFalse(evaluations[1]['early_candidate_reviews'][0]['approval'])
+
+    def test_price_gap_retries_on_fresh_quote_before_periodic_setup(self):
+        r=run_clock(price_gap_stage='setup',stop_at=9050.)
+        self.assertEqual(r['classify_times'],[9000.,9015.])
+        self.assertEqual(r['sent'],[])
+        evaluations=[json.loads(call.args[1]) for call in r['log'].info.call_args_list
+                     if call.args[0]=='ENTRY_SETUP_EVALUATED %s']
+        self.assertEqual(evaluations[1]['entry_timing']['trigger'],'fresh_quote_retry_after_deviation')
+        evidence=evaluations[1]['quote_reassessment']
+        self.assertEqual(evidence['reassessed_at'],9015.)
+        self.assertNotEqual(evidence['rejected_quote'],evidence['reassessed_quote'])
+
+    def test_drifted_watch_cannot_confirm_or_restart_from_same_minute(self):
+        r=run_clock(price_gap_stage='confirmation',stop_at=9080.)
+        self.assertEqual(r['classify_times'],[9000.,9060.])
+        self.assertEqual([when for when,*_ in r['confirmed']],[9030.])
+        self.assertEqual(r['sent'],[])
+
     def test_startup_journal_failure_recovers_without_restart_and_keeps_risk_polling(self):
         r=run_clock(journal_open_failures=1,stop_at=9135.)
         self.assertEqual(r['open_attempts'],[9000.,9060.])

@@ -12,7 +12,7 @@ from lbank_entry_refinement import minute_atr
 
 
 def detect_fast_resumption(state, route):
-    result = {"status": "no_candidate", "policy": "closed_1m_trend_resumption_v1",
+    result = {"status": "no_candidate", "policy": "closed_1m_trend_resumption_v2",
               "approval": False}
     if not state or not route or not route.get("ready"):
         return dict(result, status="native_or_trend_unavailable")
@@ -44,19 +44,33 @@ def detect_fast_resumption(state, route):
     last, prev, before = minutes[-1], minutes[-2], minutes[-3]
     close = float(last["close"])
     d = direction
-    if not (d*(close-float(prev["close"])) >= max(.00010*close, .18*atr)
-            and d*(float(prev["close"])-float(before["close"])) > 0
-            and d*(close-float(last["open"])) >= max(.00010*close, .18*atr)
-            and d*(float(prev["close"])-float(prev["open"])) > 0):
+    minimum_reaction = max(.00010 * close, .18 * atr)
+    if min(d * (close - float(prev["close"])),
+           d * (close - float(last["open"]))) < minimum_reaction:
         return dict(result, status="one_minute_reacceleration_missing")
-    # Use a prior observed adverse excursion, never the current quote as support.
-    probe = minutes[-9:-2]
+    two_minute = (d * (float(prev["close"]) - float(before["close"])) > 0
+                  and d * (float(prev["close"]) - float(prev["open"])) > 0)
+    adverse, favorable = ("low", "high") if d == 1 else ("high", "low")
+    probe = minutes[-9:-2] if two_minute else minutes[-9:-1]
+    anchor = (min if d == 1 else max)(float(b[adverse]) for b in probe)
+    route_name = "two_minute_reacceleration"
+    if not two_minute:
+        # A single sealed reaction is useful after two distinct tests of the
+        # same area. The bounce between tests distinguishes two retests from
+        # adjacent bars sharing the same price at their boundary.
+        touches = [i for i, bar in enumerate(probe)
+                   if d * (float(bar[adverse]) - anchor) <= .25 * atr]
+        held_twice = (len(touches) >= 2 and touches[-1] - touches[0] >= 2
+                      and any(d * (float(bar["close"]) - anchor) >= .5 * atr
+                              for bar in probe[touches[0] + 1:touches[-1]]))
+        reclaim = (d * (float(last[adverse]) - anchor) >= 0
+                   and d * (close - float(prev[favorable])) > 0)
+        if not (held_twice and reclaim):
+            return dict(result, status="one_minute_reacceleration_missing")
+        route_name = "repeated_level_reclaim"
+
     earlier = minutes[-16:-9]
-    low = min(float(b["low"]) for b in probe)
-    high = max(float(b["high"]) for b in probe)
-    prior = (max(float(b["high"]) for b in earlier) if d == 1
-             else min(float(b["low"]) for b in earlier))
-    anchor = low if d == 1 else high
+    prior = (max if d == 1 else min)(float(b[favorable]) for b in earlier)
     pullback = d*(prior-anchor) / close
     recovery = d*(close-anchor)
     if not (.00065 <= pullback <= .008
@@ -69,7 +83,10 @@ def detect_fast_resumption(state, route):
         return dict(result, status="recovery_volume_insufficient")
     # A stop is anchored to this observed swing by the existing cost/risk planner.
     # Quote chase checks and the next confirmation occur in the existing pipeline.
-    return dict(result, status="candidate", direction=d,
+    # Only the existing two-candle pattern enters the standard approval path.
+    # A single reclaim is evaluated and recorded for prospective validation.
+    return dict(result, status="candidate" if two_minute else "early_reclaim", direction=d,
+                reaction=route_name,
                 setup={"strategy": "trend_retest", "direction": d,
                        "level": close, "structure_anchor": anchor,
                        "source": "closed_1m_fast_resumption"},

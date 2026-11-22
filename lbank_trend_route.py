@@ -22,6 +22,25 @@ def _direction(move, threshold):
     return 1 if move > threshold else -1 if move < -threshold else 0
 
 
+def _bar_error(bars, seconds):
+    previous = None
+    for bar in bars:
+        if not isinstance(bar, dict) or bar.get("quality") != "stream_closed":
+            return "unverified_candle"
+        try:
+            start = int(bar["start"])
+            o, h, l, c = (float(bar[k]) for k in ("open", "high", "low", "close"))
+        except (KeyError, TypeError, ValueError, OverflowError):
+            return "invalid_candle"
+        if (start % seconds or min(o, h, l, c) <= 0 or not all(
+                math.isfinite(x) for x in (o, h, l, c)) or h < max(o, c, l) or l > min(o, c, h)):
+            return "invalid_candle"
+        if previous is not None and start - previous != seconds:
+            return "gap_in_completed_bars"
+        previous = start
+    return None
+
+
 def _staircase_evidence(five, direction):
     """Completed-bar evidence for an impulse with only shallow counter-moves.
 
@@ -87,30 +106,21 @@ def rank_entry_routes(state):
         return dict(empty, reason="insufficient_completed_bars")
     # Reject gaps, forming, mislabeled, or malformed candles. Native feed
     # already certifies these, but fail closed if invoked on other inputs.
-    for bars, seconds in ((five, 300), (one, 60)):
-        tail = bars[-max(25 if seconds == 300 else 20, 2):]
-        for i, bar in enumerate(tail):
-            if not isinstance(bar, dict) or bar.get("quality") != "stream_closed":
-                return dict(empty, reason="unverified_candle")
-            try:
-                start = int(bar["start"])
-                o, h, l, c = (float(bar[k]) for k in ("open", "high", "low", "close"))
-            except (KeyError, TypeError, ValueError, OverflowError):
-                return dict(empty, reason="invalid_candle")
-            if start % seconds or min(o, h, l, c) <= 0 or not all(
-                    math.isfinite(x) for x in (o, h, l, c)) or h < max(o, c, l) or l > min(o, c, h):
-                return dict(empty, reason="invalid_candle")
-            if i and start - int(tail[i - 1]["start"]) != seconds:
-                return dict(empty, reason="gap_in_completed_bars")
-    close5 = [float(b["close"]) for b in five]
-    close1 = [float(b["close"]) for b in one]
+    for bars, seconds in ((five[-25:], 300), (one[-20:], 60)):
+        error = _bar_error(bars, seconds)
+        if error is not None:
+            return dict(empty, reason=error)
+    close5 = [float(b["close"]) for b in five[-25:]]
+    close1 = [float(b["close"]) for b in one[-20:]]
     move5 = (close5[-1] / close5[-2] - 1) * 100
     move15 = (close5[-1] / close5[-4] - 1) * 100
     move60 = (close5[-1] / close5[-13] - 1) * 100
     move1 = (close1[-1] / close1[-4] - 1) * 100
     # Longer horizons are descriptive context only. No 4h inference unless
     # enough finished contiguous native 5m candles exist.
-    move4h = (close5[-1] / close5[-49] - 1) * 100 if len(close5) >= 49 else None
+    move4h = None
+    if len(five) >= 49 and _bar_error(five[-49:], 300) is None:
+        move4h = (close5[-1] / float(five[-49]["close"]) - 1) * 100
     direction = _direction(move15, 0.12)
     if direction and _direction(move60, 0.20) == -direction:
         regime = "conflicted"

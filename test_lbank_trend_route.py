@@ -186,6 +186,14 @@ class TrendRouteShadowTests(unittest.TestCase):
         self.assertIsNone(x["momentum_pct"]["4h"])
         self.assertEqual(x["higher_timeframes"], "derived_5m_not_exchange_verified")
 
+    def test_gap_in_older_five_minute_bars_only_hides_four_hour_direction(self):
+        data = state()
+        del data["five_bars"][-40]
+        result = rank_entry_routes(data)
+        self.assertTrue(result["ready"])
+        self.assertGreater(result["momentum_pct"]["1h"], 0)
+        self.assertIsNone(result["momentum_pct"]["4h"])
+
 
 if __name__ == "__main__":
     unittest.main()
