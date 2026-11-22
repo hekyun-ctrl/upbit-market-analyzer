@@ -1,5 +1,6 @@
 """LBank observed 2026-11-22 23:45 forward 5m path, plus synthetic safety cases."""
 import unittest
+from threading import Thread
 from lbank_barrier_audit import BarrierAudit,evidence
 from lbank_native_entry import SOURCE
 
@@ -58,6 +59,19 @@ class BarrierAuditTests(unittest.TestCase):
         self.assertEqual(o["status"],"future_data_gap_unverified")
         s=snap([PRE]);s["source"]="ticker"
         self.assertIsNone(BarrierAudit().record(s,1,"breakout",60924,60680,61561,60941))
+
+    def test_startup_read_only_replay_never_records_live_event(self):
+        a=BarrierAudit()
+        output=[]
+        def replay_case():
+            output.append(a.record(snap([PRE]),1,"breakout",
+                                   60924.8,60680,61561,60941))
+        thread=Thread(target=replay_case,name="lbank-entry-replay-audit")
+        thread.start()
+        thread.join(timeout=2)
+        self.assertFalse(thread.is_alive())
+        self.assertEqual(output,[None])
+        self.assertEqual(a.events,{})
 
     def test_short_and_duplicate_registration(self):
         a=BarrierAudit()

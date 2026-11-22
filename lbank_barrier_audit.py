@@ -5,6 +5,7 @@ Neither order permissions nor original stop, cost or target gates are changed.
 Pending observations are lost on process restart; this is logged research.
 """
 import math
+import threading
 from lbank_native_entry import SOURCE
 
 POLICY = "barrier_rejection_30m_shadow_v1"
@@ -46,6 +47,10 @@ class BarrierAudit:
         self.events = {}
 
     def record(self, state, direction, strategy, entry, stop, target, pivot):
+        # A read-only startup replay runs classify() in another thread.
+        # Its historical decisions must never become live forward observations.
+        if threading.current_thread().name == "lbank-entry-replay-audit":
+            return None
         try:
             if (not state or state["source"] != SOURCE
                     or direction not in (-1, 1)
