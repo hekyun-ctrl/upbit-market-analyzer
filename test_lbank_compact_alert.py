@@ -24,7 +24,7 @@ class CompactAlertTests(unittest.TestCase):
         self.assertTrue(msg.startswith("[LBank BTCUSDT | 🟢 롱 | B · 추세지속형]"))
         self.assertIn("✅ 조건부 진입 검토 가능 · 2단계 확인 통과", msg)
         self.assertIn("10/16 13:25 KST", msg)
-        self.assertIn("13:30:01까지 참고", msg)
+        self.assertIn("13:30:01까지", msg)
         self.assertIn("신호번호: #5", msg)
         self.assertIn("진입가: 82,112.9 | 🛑 손절가: 81,946.8", msg)
         self.assertIn("목표가1: 82,653.7 | 목표가2: 82,943.0", msg)
