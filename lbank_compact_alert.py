@@ -77,5 +77,5 @@ def format_compact_entry_alert(plan, observed_at_utc, reference_number=None,
         f" | 예상 총손실 -{risk:,.2f} USDT (기준시드 {risk_pct:.2f}%)\n"
         f"⚡ 레버리지 {leverage:.0f}배 | 포지션 {plan['notional']:,.2f} USDT"
         f" | 기준시드 노출 {seed_exposure:.2f}배 | 증거금 상한 {max_margin_fraction*100:.0f}%\n"
-        f"⚠️ 관찰 신호(실전 진입 추천 아님)·{source}. 현재 호가·손절 주문 직접 확인. 자동주문 없음.{extra}"
+        f"⚠️ 관찰 신호(실전 진입 추천 아님)·{source}. 실전 주문 지시 아님. 현재 호가·손절 주문 직접 확인. 자동주문 없음.{extra}"
     )
