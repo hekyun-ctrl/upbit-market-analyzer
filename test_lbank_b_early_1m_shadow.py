@@ -53,6 +53,34 @@ class FirstMinuteTests(unittest.TestCase):
         self.assertEqual(evaluate_first_minute_break(one,five)["status"],
                          "not_first_break_minute")
 
+    def test_restart_gap_recovers_bias_without_using_it_for_entry_geometry(self):
+        five = self.five()
+        one = self.one(five)
+        tail = five[-40:]
+        archive = five[:-41] + tail
+        self.assertEqual(evaluate_first_minute_break(one, tail)["status"],
+                         "insufficient_5m_history")
+        result = evaluate_first_minute_break(one, tail, trend_context=archive)
+        intact = evaluate_first_minute_break(one, five)
+        self.assertTrue(result["early_candidate"])
+        self.assertEqual(result["observed_missing_five_bars"], 1)
+        self.assertEqual(result["broken_support"], intact["broken_support"])
+        self.assertEqual(result["provisional_stop"], intact["provisional_stop"])
+        self.assertEqual(result["status"], intact["status"])
+
+    def test_gap_inside_atr_window_and_mismatching_archive_fail_closed(self):
+        five = self.five()
+        one = self.one(five)
+        for tail, archive in (
+            (five[-10:], five[:-11] + five[-10:]),
+            (five[-40:], five[:-43] + five[-40:]),
+            (five[-40:], five[:-41] + five[-40:-1] + [dict(five[-1], volume=99.)]),
+        ):
+            with self.subTest(tail=len(tail), missing=len(five) - len(archive)):
+                result = evaluate_first_minute_break(one, tail, trend_context=archive)
+                self.assertEqual(result["status"], "insufficient_5m_history")
+                self.assertFalse(result.get("early_candidate", False))
+
     def test_unsupported_direction_does_not_emit_short_candidate(self):
         five=self.five(drift=.8)
         out=evaluate_first_minute_break(self.one(five),five)

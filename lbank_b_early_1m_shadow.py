@@ -12,7 +12,7 @@ from pathlib import Path
 import sqlite3
 from statistics import median
 
-from lbank_b_retest_research import _atr, trend_priority, MIN_HISTORY
+from lbank_b_retest_research import _atr, _valid, trend_priority, MIN_HISTORY
 from lbank_structural_target_plan import available_barriers, entry_bound, rounded
 from research.zerobase.video_entry import Costs, judge_entry
 
@@ -72,33 +72,50 @@ def _valid_minutes(rows):
     return True
 
 
-def evaluate_first_minute_break(minute_bars,five_bars):
-    """Require prior 5m regime and first 1m support breach; no second retest.
+def _prior_fives(minute, five_bars):
+    # A just-sealed 5m candle may contain the 1m decision candle itself
+    # at xx:00/05/10. Only earlier completed, received bars are inputs.
+    return [b for b in five_bars if b["start"]+300<=minute["start"]
+            and b.get("received_at",float("inf"))<=minute["received_at"]]
 
-    No unverified trading claim is inferred from a price-path observation.
-    """
-    out=dict(policy=POLICY,status="insufficient_minute_history")
+
+def completed_five_context(minute, five_bars, trend_context=None):
+    """Use a strict recent tail for geometry and a bounded archive for regime."""
+    recent = _prior_fives(minute, five_bars)[-240:]
+    # Keep the ATR and the regime's 20-bar structure baseline on contiguous data.
+    minimum = MIN_HISTORY if trend_context is None else 21
+    if len(recent) < minimum:
+        return recent, None, "insufficient_5m_history"
+    if not _valid(recent):
+        return recent, None, "invalid_5m_source"
+    if not recent[-1]["start"]+300 <= minute["start"] < recent[-1]["start"]+600:
+        return recent, None, "misaligned_5m_clock"
+    if len(recent) >= MIN_HISTORY:
+        return recent, trend_priority(recent), None
+    archive = _prior_fives(minute, trend_context)[-240:]
+    if (len(archive) < MIN_HISTORY or archive[-len(recent):] != recent or
+            not _valid(archive, allow_gaps=True) or
+            any(b["received_at"] > b["start"]+330 for b in archive)):
+        return recent, None, "insufficient_5m_history"
+    # The shared regime evaluator caps missing slots at two and aggregates
+    # only fully observed, aligned 15m and 1h groups.
+    rank = trend_priority(archive, allow_small_gaps=True)
+    if rank["status"] != "ready":
+        return recent, None, "insufficient_5m_history"
+    return recent, rank, None
+
+
+def evaluate_first_minute_break(minute_bars, five_bars, *, trend_context=None):
+    """Require prior 5m regime and first 1m support breach; no second retest."""
+    out = dict(policy=POLICY, status="insufficient_minute_history")
     if not _valid_minutes(minute_bars[-HISTORY:]):
         return out
-    now_bar=minute_bars[-1]
-    # A just-sealed 5m candle may contain the 1m decision candle itself
-    # (especially at xx:00/05/10 boundaries). It is NOT historical evidence
-    # until after that minute opened. Trim by candle close AND arrival time,
-    # rather than incorrectly rejecting every fifth minute or leaking future
-    # information into the support/target calculations.
-    prior_fives=[b for b in five_bars
-                 if b["start"]+300<=now_bar["start"]
-                 and b.get("received_at",float("inf"))<=now_bar["received_at"]]
-    if len(prior_fives)<MIN_HISTORY:
-        return dict(out,status="insufficient_5m_history")
-    from lbank_b_retest_research import _valid
-    if not _valid(prior_fives[-min(240,len(prior_fives)):]):
-        return dict(out,status="invalid_5m_source")
-    if not prior_fives[-1]["start"]+300<=now_bar["start"]<prior_fives[-1]["start"]+600:
-        return dict(out,status="misaligned_5m_clock")
-    five_bars=prior_fives
-    rank=trend_priority(five_bars)
-    out.update(trend=rank["trend"],priority=(rank["priorities"] or ["관망"])[0])
+    now_bar = minute_bars[-1]
+    five_bars, rank, problem = completed_five_context(now_bar, five_bars, trend_context)
+    if problem:
+        return dict(out, status=problem)
+    out.update(trend=rank["trend"], priority=(rank["priorities"] or ["관망"])[0],
+               observed_missing_five_bars=rank.get("observed_missing_five_bars", 0))
     if rank["trend"]!="bearish":
         return dict(out,status="not_bearish")
     baseline=median(float(b["volume"]) for b in minute_bars[-21:-1])
@@ -151,14 +168,14 @@ def evaluate_first_minute_break(minute_bars,five_bars):
     return dict(out,status="qualified_shadow" if verdict=="qualified" else verdict)
 
 
-def persist_first_minute_shadow(ledger,minutes,fives,*,now,started):
+def persist_first_minute_shadow(ledger,minutes,fives,*,now,started,trend_context=None):
     """Keep immutable one-per-minute audit, no Telegram or broker actions."""
     if not minutes:
         return dict(status="no_minute_data")
     last=minutes[-1];start=last["start"]
     if not start+60<=now<=start+60+MAX_MINUTE_AGE or start+60<=started:
         return dict(status="stale_or_before_start")
-    result=evaluate_first_minute_break(minutes,fives)
+    result=evaluate_first_minute_break(minutes,fives,trend_context=trend_context)
     fingerprint=sha256(json.dumps(
         [{"start":b["start"],"o":b["open"],"h":b["high"],"l":b["low"],
           "c":b["close"],"v":b["volume"],"quality":b["quality"]}

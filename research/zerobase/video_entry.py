@@ -20,6 +20,8 @@ BAR_SECONDS = 300
 WARMUP = 40
 HORIZON = 12
 SOURCES = ("lxz7Csyg9bk", "tQadAOEVbFA")
+QUOTE_RECHECK_POLICY = "locked_quote_recheck_v1"
+CLOSE_PRICE_REJECTIONS = frozenset(("insufficient_net_rr", "stop_too_far"))
 
 
 @dataclass(frozen=True)
@@ -169,6 +171,16 @@ def judge_entry(plan, price, costs):
     rr = gain/loss if loss > 0 else None
     return ("qualified" if rr is not None and rr >= costs.min_rr else
             "insufficient_net_rr"), rr
+
+
+def can_recheck_quote(plan, costs):
+    """A different entry price can pass without moving the stop or target."""
+    if plan.get("status") not in CLOSE_PRICE_REJECTIONS:
+        return False
+    bound = plan.get("entry_bound")
+    # The bound already includes both the required net RR and maximum stop
+    # distance. Breakouts must still be on the valid side of the trigger.
+    return bound is not None and judge_entry(plan, bound, costs)[0] == "qualified"
 
 
 def _plan(setup, bars, series, ready, i, costs, nominal):

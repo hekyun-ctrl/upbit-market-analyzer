@@ -2,7 +2,9 @@
 
 No bot tokens, chat IDs, message text, Telegram response bodies or URLs are
 ever logged. Chat lookup tests credentials and access, NOT delivery of a real
-message; delivery is only confirmed by successful sendMessage API response.
+message. A successful sendMessage response proves API acceptance. An entry
+audit records the message identifier and whether Telegram echoed the expected
+destination, while leaving recipient receipt unverified.
 Ambiguous network timeouts are NOT immediately replayed to avoid duplicate
 trade alerts. Existing caller-specific retries remain responsible for retries.
 """
@@ -76,17 +78,52 @@ class TelegramTransport:
                         method, self.last_class, type(exc).__name__)
         return None
 
-    def send(self, message, buttons=None):
+    def send(self, message, buttons=None, *, entry_audit=None):
         if not self.chat_id:
             self.last_class = "missing_chat_id"
             self.failures += 1
             LOG.error("TELEGRAM_TRANSPORT_FAILURE method=sendMessage class=%s",
                       self.last_class)
+            if entry_audit is not None:
+                self._log_entry_response(*entry_audit, None)
             return False
         args = {"chat_id": self.chat_id, "text": message}
         if buttons is not None:
             args["reply_markup"] = {"inline_keyboard": buttons}
-        return self._post("sendMessage", args) is not None
+        response = self._post("sendMessage", args)
+        if entry_audit is not None:
+            self._log_entry_response(*entry_audit, response)
+        return response is not None
+
+    def _log_entry_response(self, stream, reference, response):
+        if response is None:
+            LOG.warning("TELEGRAM_ENTRY_UNCONFIRMED stream=%s reference=%d class=%s",
+                        stream, reference, self.last_class)
+            return
+        message = response.get("result")
+        message = message if isinstance(message, dict) else {}
+        chat = message.get("chat")
+        chat = chat if isinstance(chat, dict) else {}
+        message_id = message.get("message_id")
+        if type(message_id) is not int or message_id < 0:
+            message_id = None
+        chat_type = chat.get("type")
+        if chat_type not in ("private", "group", "supergroup", "channel"):
+            chat_type = "unverified"
+        destination = "unverified"
+        expected = str(self.chat_id).strip()
+        if expected.startswith("@"):
+            username = chat.get("username")
+            if isinstance(username, str):
+                destination = "match" if username.casefold() == expected[1:].casefold() else "mismatch"
+        elif type(chat.get("id")) is int:
+            try:
+                destination = "match" if chat["id"] == int(expected) else "mismatch"
+            except ValueError:
+                pass
+        LOG.info("TELEGRAM_ENTRY_ACCEPTED stream=%s reference=%d message_id=%s "
+                 "destination=%s chat_type=%s recipient_receipt_verified=false",
+                 stream, reference, message_id, destination, chat_type)
 
     def startup_probe_once(self, marker_path="/data/lbank_telegram_transport_probe_v1"):
         """Health-check and send ONE clearly labeled non-trade message.

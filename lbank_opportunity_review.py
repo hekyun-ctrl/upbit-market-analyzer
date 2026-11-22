@@ -52,21 +52,21 @@ def evaluate_review(bars, *, now, get_book, clock=time.time):
         return {"status": "higher_timeframe_source_invalid"}
     higher_ready = rank.get("status") == "ready"
     eligible = []
+    structural_rejections = []
     for lane in ("B", "A", "C"):
         state = observed["lanes"].get(lane, {})
-        if state.get("status") == "observed_not_entry":
-            direction = 1 if lane == "C" else -1
-            regime = rank["trend"]
-            # An independently bearish structure may occur while the hourly
-            # recovery is incomplete. Keep MIXED visible, but never assert
-            # higher-timeframe confirmation. Opposite consensus is excluded.
-            if (higher_ready and
-                    (direction == -1 and regime == "bullish" or
-                     direction == 1 and regime == "bearish")):
-                continue
-            eligible.append((lane, direction))
+        if state.get("status") != "observed_not_entry":
+            if state.get("structure_seen"):
+                structural_rejections.append(f"{lane}:{state['phase']}")
+            continue
+        direction = 1 if lane == "C" else -1
+        regime = rank["trend"]
+        if higher_ready and regime == ("bullish" if direction == -1 else "bearish"):
+            structural_rejections.append(f"{lane}:opposite_higher_timeframe")
+            continue
+        eligible.append((lane, direction))
     if not eligible:
-        return {"status": "no_high_priority_structure"}
+        return {"status": "no_high_priority_structure", "reasons": structural_rejections}
     try:
         start = clock()
         bid, ask = get_book()
