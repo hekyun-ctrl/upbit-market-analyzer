@@ -24,8 +24,25 @@ class TelegramTransportTests(unittest.TestCase):
             self.assertEqual(request.full_url.rsplit("/", 1)[-1], "sendMessage")
             return io.BytesIO(b'{"ok":true,"result":{"message_id":5}}')
         transport = TelegramTransport("valid", "chat", opener)
-        self.assertTrue(transport.send("[LBank] test only"))
+        with self.assertLogs("lbank_telegram_transport", "INFO") as ack:
+            self.assertTrue(transport.send("[LBank] test only"))
         self.assertEqual(transport.last_class, "success")
+        record = " ".join(ack.output)
+        self.assertIn("TELEGRAM_SEND_ACK", record)
+        self.assertIn("message_id=5", record)
+        self.assertIn("handset_delivery_unverified=true", record)
+        self.assertNotIn("valid", record)
+        self.assertNotIn("[LBank] test only", record)
+
+    def test_api_success_without_message_id_is_marked_unverifiable(self):
+        def opener(request, timeout):
+            return io.BytesIO(b'{"ok":true,"result":{}}')
+        transport = TelegramTransport("SECRET", "PRIVATE", opener)
+        with self.assertLogs("lbank_telegram_transport", "INFO") as ack:
+            self.assertTrue(transport.send("PRIVATE_MESSAGE"))
+        self.assertIn("message_id_unavailable=true", " ".join(ack.output))
+        self.assertNotIn("SECRET", " ".join(ack.output))
+        self.assertNotIn("PRIVATE_MESSAGE", " ".join(ack.output))
 
     def test_send_failure_401_identifies_token_without_exposing_secret(self):
         def opener(request, timeout):
