@@ -13,6 +13,7 @@ class Engine:
         self.equity=D(1000);self.peak=D(1000);self.day=None;self.day_start=D(1000);self.review=False;self.health=set()
         self.events=[];self.seen=set();self.last_exit=0;self.counts={};self.daily={};self.clock=0
         self.daily_halted=False;self.daily_halt_at=None;self.daily_halt_received_at=None
+        self.day_accounting_history_unresolved = False
         self.data_issues=set();self.crosscheck_failures=set();self.market_asof=None;self.last_mark=None
         self.context_mode=context_mode;self.higher_timeframes=HigherTimeframes();self.signal_contexts={}
         self.execution_mode='minute'
@@ -28,16 +29,31 @@ class Engine:
         day=(market_time+9*3600)//86400;nav=self.nav(price)
         if self.day is None:self.day=day;self.day_start=nav
         if day<self.day:
-            self.health.add('DAY_ACCOUNTING_UNRESOLVED');return
+            self.health.add('DAY_ACCOUNTING_UNRESOLVED')
+            self.day_accounting_history_unresolved = True
+            return
         self.peak=max(self.peak,nav)
         if nav<=self.peak*D('.95'):self.review=True
         if nav<=self.day_start*D('.99') and not self.daily_halted:
             self.daily_halted=True;self.daily_halt_at=market_time;self.daily_halt_received_at=received
         if self.day!=day:
+            verified_boundary = day == self.day + 1 and market_time == day * 86400 - 9 * 3600
             self.daily[str(self.day)]={'start':str(self.day_start),'end':str(nav),'return':str((nav-self.day_start)/self.day_start),
                 'halted':self.daily_halted,'halt_at':self.daily_halt_at,'halt_received_at':self.daily_halt_received_at,
-                'market_cutoff':market_time,'received_at':received,'boundary_verified':market_time==day*86400-9*3600}
-            if day!=self.day+1 or market_time!=day*86400-9*3600:self.health.add('DAY_ACCOUNTING_UNRESOLVED')
+                'market_cutoff':market_time,'received_at':received,'boundary_verified':verified_boundary}
+            if not verified_boundary:
+                self.health.add('DAY_ACCOUNTING_UNRESOLVED')
+                self.day_accounting_history_unresolved = True
+            elif ('DAY_ACCOUNTING_UNRESOLVED' in self.health
+                  and self.market_asof == market_time - 60
+                  and self.position is None and not self.pending):
+                # A fresh flat-day risk baseline is possible at a contiguous
+                # midnight boundary. Keep any earlier evidence gap on record,
+                # including when restoring a pre-existing engine snapshot.
+                self.day_accounting_history_unresolved = True
+                self.health.remove('DAY_ACCOUNTING_UNRESOLVED')
+                self.emit('DAY_ACCOUNTING_RECOVERED', received if received is not None else market_time,
+                          day=day, market_cutoff=market_time, historical_coverage_verified=False)
             self.day=day;self.day_start=nav;self.daily_halted=False;self.daily_halt_at=None;self.daily_halt_received_at=None
         self.market_asof=market_time;self.last_mark=price
     def recover_data_health(self,now,crosscheck_ok):
@@ -169,5 +185,8 @@ class Engine:
     def report(self):
         results=[p for p in self.closed if not p.health];unknown=[p for p in self.closed if p.health]
         nets=[p.cash for p in results];wins=sum((max(x,ZERO) for x in nets),ZERO);loss=-sum((min(x,ZERO) for x in nets),ZERO)
-        blocked=bool(unknown or self.health or (self.position and self.position.health) or self.costs.status!='VERIFIED')
-        return {'spec_version':'ZB-1.0','counts':self.counts,'closed':len(self.closed),'verified_closed':len(results) if not blocked else 0,'unresolved_closed':len(unknown),'open_at_cutoff':int(self.position is not None),'model_net_excluding_unresolved':sum(nets,ZERO),'model_net_all_closed':sum((p.cash for p in self.closed),ZERO),'model_nav':self.nav(),'verified_net':None,'PF_model':wins/loss if loss else None,'funding_status':self.costs.status,'classification':'EVIDENCE_INSUFFICIENT','health':sorted(self.health),'performance_claim':False,'baseline_comparison':None,'daily':self.daily_at_cutoff(),'limitations':['Native cost provenance/funding coverage required for verified performance.','No sealed historical data or normalized existing-baseline comparison automatically implied.','Funding coverage certification is not yet wired: verified_net stays NULL even when a scenario is labelled VERIFIED.','Favorable intrabar bound and grouped-block uncertainty report remain separate unfinished evaluation work.']}
+        blocked = bool(unknown or self.health or self.day_accounting_history_unresolved
+                       or (self.position and self.position.health) or self.costs.status != 'VERIFIED')
+        result = {'spec_version':'ZB-1.0','counts':self.counts,'closed':len(self.closed),'verified_closed':len(results) if not blocked else 0,'unresolved_closed':len(unknown),'open_at_cutoff':int(self.position is not None),'model_net_excluding_unresolved':sum(nets,ZERO),'model_net_all_closed':sum((p.cash for p in self.closed),ZERO),'model_nav':self.nav(),'verified_net':None,'PF_model':wins/loss if loss else None,'funding_status':self.costs.status,'classification':'EVIDENCE_INSUFFICIENT','health':sorted(self.health),'performance_claim':False,'baseline_comparison':None,'daily':self.daily_at_cutoff(),'limitations':['Native cost provenance/funding coverage required for verified performance.','No sealed historical data or normalized existing-baseline comparison automatically implied.','Funding coverage certification is not yet wired: verified_net stays NULL even when a scenario is labelled VERIFIED.','Favorable intrabar bound and grouped-block uncertainty report remain separate unfinished evaluation work.']}
+        result['day_accounting_history_unresolved'] = self.day_accounting_history_unresolved
+        return result

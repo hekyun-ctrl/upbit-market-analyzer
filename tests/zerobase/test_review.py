@@ -78,4 +78,31 @@ class ReviewFixes(unittest.TestCase):
    b=bar(53940,o='100',h='107' if partial else '105',l='99',c='106' if partial else '104')
    e.ingest(b,54000);self.assertEqual(D(e.daily['0']['end']),e.nav());self.assertEqual(e.day_start,e.nav());self.assertEqual(e.position.partial,partial)
    e.ingest(bar(54000,o=b.c,h=b.c+1,l=b.c-1,c=b.c),54060);end=e.daily_at_cutoff()['1'];self.assertTrue(end['partial_observation_day']);self.assertEqual(D(end['end']),e.nav());self.assertEqual(D(end['start']),D(e.daily['0']['end']))
+
+ def test_next_complete_flat_day_recovers_live_accounting_without_certifying_history(self):
+  engine = Engine(C)
+  engine.day_update(53940, D(100))
+  engine.day_update(54060, D(100))
+  engine = restore(snapshot(engine))
+  self.assertIn('DAY_ACCOUNTING_UNRESOLVED', engine.health)
+  self.assertFalse(engine.daily['0']['boundary_verified'])
+  engine.health.add('DATA_DEGRADED')
+  engine.ingest(bar(140280), 140340)
+  engine.ingest(bar(140340), 140400)
+  self.assertNotIn('DAY_ACCOUNTING_UNRESOLVED', engine.health)
+  self.assertIn('DATA_DEGRADED', engine.health)
+  self.assertFalse(engine.daily['0']['boundary_verified'])
+  self.assertEqual(engine.events[-1]['kind'], 'DAY_ACCOUNTING_RECOVERED')
+  self.assertTrue(restore(snapshot(engine)).report()['day_accounting_history_unresolved'])
+
+ def test_day_recovery_requires_flat_exposure_and_contiguous_cutoff(self):
+  for market_asof, active in ((140280, False), (140340, True)):
+   engine = Engine(C)
+   engine.day_update(53940, D(100))
+   engine.day_update(54060, D(100))
+   engine.day_update(market_asof, D(100))
+   if active:
+    engine.position = position()
+   engine.day_update(140400, D(100))
+   self.assertIn('DAY_ACCOUNTING_UNRESOLVED', engine.health)
 if __name__=='__main__':unittest.main()
