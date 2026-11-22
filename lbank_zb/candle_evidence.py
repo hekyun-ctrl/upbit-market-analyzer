@@ -16,7 +16,7 @@ import time
 
 import aiohttp
 
-from lbank_native_candles import decode_frame
+from lbank_native_candles import WS_URL, decode_frame
 from .core import D, dec, dumps
 
 LOG = logging.getLogger('lbank_zb_candle_evidence')
@@ -26,6 +26,7 @@ DERIVED_SOURCE = 'lbank_native_1m_derived_5m'
 PERIOD = 300
 WARMUP_BARS = 450
 EVIDENCE_GRACE = 15
+CONNECTION_LEAD = 18
 FIELDS = ('open', 'high', 'low', 'close', 'volume', 'turnover')
 PRICE_TICK = D('.1')
 VOLUME_TICK = D('.0001')
@@ -33,7 +34,7 @@ VOLUME_EPSILON = D('.00000001')
 TURNOVER_EPSILON = D('.000001')
 
 
-def closed_reply(frame, ticket, end, received_ms):
+def closed_reply(frame, ticket, end, received_ms, endpoint=REFERENCE_URL):
     if (frame.get('x'), frame.get('z'), frame.get('y')) != (2, 3, ticket):
         return None
     server_ms, rows = frame.get('w'), frame.get('d')
@@ -55,7 +56,7 @@ def closed_reply(frame, ticket, end, received_ms):
             or volume < 0 or volume % VOLUME_TICK or turnover < 0):
         return None
     return {'start': raw['c'], 'updated': raw['k'], 'server_ms': server_ms,
-            'received_ms': received_ms, 'ticket': ticket, 'source': REFERENCE_URL,
+            'received_ms': received_ms, 'ticket': ticket, 'source': endpoint,
             **dict(zip(FIELDS, values))}
 
 
@@ -127,9 +128,18 @@ def audit_status(path, now):
 
 
 async def capture_reference(session, end):
+    try:
+        return await capture_endpoint(session, REFERENCE_URL, end)
+    except (OSError, TimeoutError, aiohttp.ClientError):
+        # The futures web app also uses this public route. Its 5m replies
+        # remain separate from the recorder's 1m stream and aggregation.
+        return await capture_endpoint(session, WS_URL, end)
+
+
+async def capture_endpoint(session, endpoint, end):
     latest = None
     deadline = end + EVIDENCE_GRACE
-    async with session.ws_connect(REFERENCE_URL, timeout=4, max_msg_size=1024*1024) as ws:
+    async with session.ws_connect(endpoint, timeout=4, max_msg_size=1024*1024) as ws:
         await asyncio.sleep(max(0, end-.7-time.time()))
         for serial in range(24):
             if time.time() >= deadline:
@@ -148,7 +158,7 @@ async def capture_reference(session, end):
                 frame = decode_frame(msg.data)
                 if not isinstance(frame, dict) or (frame.get('x'), frame.get('z'), frame.get('y')) != (2, 3, ticket):
                     continue
-                candidate = closed_reply(frame, ticket, end, int(time.time()*1000))
+                candidate = closed_reply(frame, ticket, end, int(time.time()*1000), endpoint)
                 if candidate and (not latest or (candidate['updated'], candidate['server_ms'])
                                   >= (latest['updated'], latest['server_ms'])):
                     latest = candidate
@@ -182,12 +192,12 @@ class CandleAuditThread(threading.Thread):
                 start INTEGER PRIMARY KEY, status TEXT NOT NULL,
                 volume_ok INTEGER NOT NULL, payload TEXT NOT NULL)""")
             LOG.info('ZB_CANDLE_AUDIT_STARTED source=%s required_consecutive=%d', REFERENCE_URL, WARMUP_BARS)
-            timeout = aiohttp.ClientTimeout(total=4, connect=3)
+            timeout = aiohttp.ClientTimeout(total=10, connect=8)
             async with aiohttp.ClientSession(trust_env=True, timeout=timeout,
                                              headers={'Origin': 'https://www.lbank.com'}) as session:
                 while True:
                     end = (int(time.time())//PERIOD+1)*PERIOD
-                    await asyncio.sleep(max(0, end-3-time.time()))
+                    await asyncio.sleep(max(0, end-CONNECTION_LEAD-time.time()))
                     try:
                         await self.check_close(db, session, end)
                     except sqlite3.Error as exc:

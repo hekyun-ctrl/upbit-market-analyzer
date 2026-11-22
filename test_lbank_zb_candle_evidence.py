@@ -4,10 +4,11 @@ import sqlite3
 import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
+from lbank_native_candles import WS_URL
 from lbank_zb.candle_evidence import (
-    WARMUP_BARS, audit_status, closed_reply, compare, read_derived,
+    REFERENCE_URL, WARMUP_BARS, audit_status, capture_reference, closed_reply, compare, read_derived,
 )
 from lbank_zb.service import EngineThread
 from lbank_zb.core import D, Costs, asdict
@@ -122,3 +123,14 @@ class CandleEvidenceTests(unittest.TestCase):
         self.assertIn('RAW5M_INDEPENDENCE_UNVERIFIED', store.engine.entry_blocks)
         self.assertIn('CANDLE_VOLUME_UNIT_UNVERIFIED', store.engine.entry_blocks)
         self.assertEqual(store.report()['outbox'], {})
+
+
+class CandleConnectionTests(unittest.IsolatedAsyncioTestCase):
+    async def test_retry_uses_the_second_published_websocket_route(self):
+        session = object()
+        proof = closed_reply(FRAME, TICKET, END, END*1000+882, WS_URL)
+        capture = AsyncMock(side_effect=[TimeoutError(), proof])
+        with patch('lbank_zb.candle_evidence.capture_endpoint', capture):
+            self.assertEqual(await capture_reference(session, END), proof)
+        self.assertEqual([call.args for call in capture.await_args_list],
+                         [(session, REFERENCE_URL, END), (session, WS_URL, END)])
