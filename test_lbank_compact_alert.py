@@ -13,6 +13,7 @@ class CompactAlertTests(unittest.TestCase):
                          net_gain1=16.00, net_gain2=18.22)
         self.kw = dict(reference_balance=1871.9017, leverage=30,
                        max_margin_fraction=.15)
+        self.args = self.kw  # Existing profit-protection integration fixture.
 
     def render(self, p=None):
         return format_compact_entry_alert(p or self.plan, "2026-10-16T04:25:01Z",
@@ -21,14 +22,14 @@ class CompactAlertTests(unittest.TestCase):
     def test_one_direction_one_route_and_clear_prices(self):
         msg = self.render()
         self.assertTrue(msg.startswith("[LBank BTCUSDT | 🟢 롱 | B · 추세지속형]"))
-        self.assertIn("✅ 진입 검토 가능 · 2단계 확인 통과", msg)
+        self.assertIn("✅ 조건부 진입 검토 가능 · 2단계 확인 통과", msg)
         self.assertIn("10/16 13:25 KST", msg)
         self.assertIn("13:30:01까지 참고", msg)
         self.assertIn("신호 #5", msg)
-        self.assertIn("진입 82,112.9 | 🛑 손절 81,946.8", msg)
-        self.assertIn("목표1 82,653.7 | 목표2 82,943.0", msg)
+        self.assertIn("진입가: 82,112.9 | 🛑 손절가: 81,946.8", msg)
+        self.assertIn("목표가1: 82,653.7 | 목표가2: 82,943.0", msg)
         self.assertIn("1차 순RR 1.71 | 분할 순RR 1.83", msg)
-        self.assertIn("손절 시 예상 -9.35 USDT", msg)
+        self.assertIn("예상 총손실 -9.35 USDT", msg)
         self.assertIn("실전 주문 지시 아님", msg)
         self.assertIn("자동주문 없음", msg)
         self.assertLessEqual(len(msg.splitlines()), 10)
@@ -49,7 +50,7 @@ class CompactAlertTests(unittest.TestCase):
     def test_countertrend_warning_appears_above_entry(self):
         msg=self.render(dict(self.plan, sampled_context={
             "trend15_pct":-.12, "reversal_confirmed":False}))
-        self.assertLess(msg.index("역추세·반전 미확인"),msg.index("📍 진입"))
+        self.assertLess(msg.index("역추세·반전 미확인"),msg.index("📍 진입가:"))
         self.assertLessEqual(len(msg.splitlines()),10)
 
     def test_risk_engine_policy_unchanged(self):
@@ -64,7 +65,7 @@ class CompactAlertTests(unittest.TestCase):
         self.assertAlmostEqual(p["margin"]*30,p["notional"],places=6)
         msg=monitor.format_entry_alert(p,"2026-10-16T04:25:01Z",reference_number=99)
         self.assertIn(f"{p['margin']:,.2f} USDT",msg)
-        self.assertIn("신호 #99",msg)
+        self.assertIn("신호번호: #99",msg)
 
 
 if __name__=="__main__":
