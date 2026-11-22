@@ -5,7 +5,7 @@ a closed-body impulse route, shared at discovery and confirmation. A lost trigge
 be supported by the already-existing larger-direction priority, not time alone.
 This consistency guard is not a profitability-certified replacement strategy.
 """
-POLICY = "native_breakout_trigger_or_higher_priority_v1"
+POLICY = "native_breakout_trigger_or_higher_priority_v2_sealed_quote_crossing"
 REJECT_REASON = "breakout_trigger_lost_without_higher_priority"
 
 
@@ -35,7 +35,12 @@ def confirmation_allowed(plan, fresh):
     trigger=fresh['breakout_long' if plan['direction']==1 else 'breakout_short']
     higher=bool((quality.get('priority') or {}).get('dominant_intact')
                 or ranked.get('may_override_minor_reaction'))
+    crossed = (plan.get("entry_route") == "quote_crossing"
+               and plan.get("quote_crossing_level") is not None
+               and plan.get("level") == plan.get("quote_crossing_level")
+               and plan["direction"] * (plan["price"] - plan["level"]) > 0)
     quality['breakout_confirmation']=dict(policy=POLICY,original_trigger_current=trigger,
         existing_higher_priority_support=higher,priority_override_used=not trigger and higher,
+        held_qualified_quote_crossing=bool(crossed),
         original_predicate=fresh,extra_wait_seconds=0)
-    return trigger or higher
+    return trigger or higher or crossed

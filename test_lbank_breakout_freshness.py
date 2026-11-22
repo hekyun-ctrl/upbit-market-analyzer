@@ -35,6 +35,22 @@ class BreakoutFreshnessTests(unittest.TestCase):
                 self.assertTrue(confirmation_allowed(p,dict(breakout_long=False,breakout_short=False)))
                 self.assertTrue(p['entry_quality']['breakout_confirmation']['priority_override_used'])
 
+    def test_sealed_quote_crossing_must_still_hold_at_confirmation(self):
+        fresh=dict(breakout_long=False, breakout_short=False)
+        plan=self.plan(1)
+        plan.update(entry_route="quote_crossing", quote_crossing_level=60290.,
+                    level=60290., price=60301.)
+        self.assertTrue(confirmation_allowed(plan,fresh))
+        self.assertTrue(plan["entry_quality"]["breakout_confirmation"]["held_qualified_quote_crossing"])
+        plan["price"]=60289.
+        self.assertFalse(confirmation_allowed(plan,fresh))
+        plan["price"]=60301.
+        plan["quote_crossing_level"]=60291.
+        self.assertFalse(confirmation_allowed(plan,fresh))
+        plan["quote_crossing_level"]=60290.
+        plan["entry_route"]="pullback"
+        self.assertFalse(confirmation_allowed(plan,fresh))
+
     def test_opposite_fresh_breakout_is_not_same_direction_evidence(self):
         p=self.plan(-1)
         self.assertFalse(confirmation_allowed(p,dict(breakout_long=True,breakout_short=False)))

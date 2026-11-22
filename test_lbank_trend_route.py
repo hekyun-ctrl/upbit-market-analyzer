@@ -79,6 +79,12 @@ class TrendRouteShadowTests(unittest.TestCase):
         for x in (None, {}, state(bars5=10)):
             self.assertFalse(rank_entry_routes(x)["ready"])
 
+    def test_route_available_at_twenty_sealed_five_minute_bars(self):
+        self.assertFalse(rank_entry_routes(state(bars5=19))["ready"])
+        ready=rank_entry_routes(state(bars5=20))
+        self.assertTrue(ready["ready"])
+        self.assertIsNone(ready["entry_prices"])
+
     def test_gap_does_not_synthesize_bars(self):
         x = state()
         x["five_bars"][-2]["start"] += 300

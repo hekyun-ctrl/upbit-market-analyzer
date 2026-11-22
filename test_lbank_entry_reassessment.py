@@ -41,6 +41,44 @@ class EntryReassessmentTests(unittest.TestCase):
             self.assertIs(monitor.review_setup([], state, {}, crossing), baseline.return_value)
             self.assertEqual(assess.call_count, 2)
 
+    def test_full_qualified_crossing_promotes_only_in_capture(self):
+        state={"quote": 60301.}
+        crossing={"strategy":"breakout","direction":1,"level":60290.}
+        candidate=dict(price=60301.,stop=60100.,target1=60800.,target2=61100.,
+                       rr1=1.7,rr2=2.8,direction=1,strategy="breakout")
+        with patch.object(monitor,"classify") as baseline, patch.object(
+                monitor,"assess_candidate",return_value=dict(candidate)), patch.object(
+                monitor,"ENTRY_REFINEMENT_MODE","capture"):
+            baseline.side_effect=lambda *args,diagnostics,**kw: diagnostics.update(
+                reason="market_no_setup",candidates=[])
+            d={}
+            approved=monitor.review_setup([],state,d,crossing)
+            self.assertEqual(approved["entry_route"],"quote_crossing")
+            self.assertEqual(approved["quote_crossing_level"],60290.)
+            self.assertTrue(d["early_candidate_reviews"][0]["approval"])
+            baseline.side_effect=lambda *args,diagnostics,**kw: diagnostics.update(
+                reason="strategy_conflict",candidates=[])
+            self.assertIsNone(monitor.review_setup([],state,{},crossing))
+        with patch.object(monitor,"classify") as baseline, patch.object(
+                monitor,"assess_candidate",return_value=dict(candidate)), patch.object(
+                monitor,"ENTRY_REFINEMENT_MODE","legacy"):
+            baseline.side_effect=lambda *args,diagnostics,**kw: diagnostics.update(
+                reason="market_no_setup",candidates=[])
+            self.assertIsNone(monitor.review_setup([],state,{},crossing))
+
+    def test_impulse_crosses_without_staircase_only_with_sealed_hour(self):
+        state=dict(quote=60301.,prices=[60270.],
+                   five_bars=[dict(start=1795340700,high=60290.,low=60150.)],
+                   minute_bars=[dict(start=1795340940,high=60280.,close=60270.)])
+        route=dict(ready=True,direction=1,regime="impulse",
+                   momentum_pct={"1m_3close":.12,"15m":.32,"1h":.55},
+                   reference_high_6x5m=60290.,
+                   shallow_pullback_continuation={"detected":False})
+        self.assertEqual(crossed_completed_level(state,route,60280.),
+                         dict(strategy="breakout",direction=1,level=60290.))
+        route["momentum_pct"]["1h"]=-.30
+        self.assertIsNone(crossed_completed_level(state,route,60280.))
+
     def test_a_qualified_early_review_cannot_create_a_live_watch(self):
         state = {"quote": 60849.9}
         setup = dict(strategy="trend_retest", direction=1, level=60825., structure_anchor=60800.)

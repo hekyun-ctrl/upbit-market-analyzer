@@ -10,10 +10,17 @@ def crossed_completed_level(state, route, previous_quote):
         return None
     if route.get("regime") not in ("impulse", "trend_pause"):
         return None
-    if not route.get("shallow_pullback_continuation", {}).get("detected"):
-        return None
     direction = route.get("direction")
     if direction not in (1, -1):
+        return None
+    momentum = route.get("momentum_pct") or {}
+    staircase = bool(route.get("shallow_pullback_continuation", {}).get("detected"))
+    # A real impulse may break without a staircase pullback. Require sealed
+    # 15-minute and hourly direction; no quote-only trend inference.
+    impulse = (route.get("regime") == "impulse"
+               and direction * momentum.get("15m", 0) > .12
+               and direction * momentum.get("1h", 0) > .20)
+    if not (staircase or impulse):
         return None
     momentum = route.get("momentum_pct", {}).get("1m_3close")
     if momentum is None or direction * momentum <= 0:

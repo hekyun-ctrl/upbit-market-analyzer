@@ -751,6 +751,17 @@ def review_setup(prices, native_state, diagnostics, crossing=None):
             if scenario is not None:
                 review["risk_plan"] = {k: scenario[k] for k in (
                     "price", "stop", "target1", "target2", "rr1", "rr2")}
+                # The fully risk/context/RSI-qualified quote crossing may
+                # open the standard 30-second stage-two WATCH in capture mode.
+                # A repeated-level reclaim stays read-only research.
+                if (plan is None and source == "quote_crossed_completed_level"
+                        and ENTRY_REFINEMENT_MODE == "capture"):
+                    scenario["entry_route"] = "quote_crossing"
+                    scenario["quote_crossing_level"] = setup["level"]
+                    plan = scenario
+                    review["approval"] = True  # Watch only; never an order.
+                    diagnostics["reason"] = "qualified"
+                    diagnostics["quote_crossing_promoted"] = True
         except Exception as exc:
             review.update(reason="early_review_unavailable", error=type(exc).__name__)
         diagnostics.setdefault("early_candidate_reviews", []).append(review)
@@ -860,6 +871,12 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
                 native_state,direction,current,plan['target1'],
                 native_state['minute_bars'][-1]['start']+60)
             plan['entry_quality']['ranked_entry'] = plan['entry_decision_priority']
+            # Preserve the frozen sealed-level crossing evidence at stage two.
+            # Confirmation still enforces the original data, cost, stop, RSI,
+            # <=0.1% quote drift, minimum age and structural level hold.
+            if watch.get("entry_route") == "quote_crossing":
+                plan["entry_route"] = "quote_crossing"
+                plan["quote_crossing_level"] = watch.get("quote_crossing_level")
             if watch.get('strategy','breakout') == 'breakout' and not breakout_confirmation_allowed(
                     plan, breakout_evidence(prices,native_state,ema,
                         adaptive=ENTRY_REFINEMENT_MODE == 'capture')):

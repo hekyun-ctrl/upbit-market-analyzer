@@ -102,15 +102,16 @@ def rank_entry_routes(state):
     quote = _finite(state.get("quote"))
     if not isinstance(five, list) or not isinstance(one, list) or quote is None:
         return dict(empty, reason="missing_bars_or_quote")
-    if len(five) < 25 or len(one) < 20:
+    # A 1h trend uses 13 sealed bars; align route readiness with the entry feed's 20.
+    if len(five) < 20 or len(one) < 20:
         return dict(empty, reason="insufficient_completed_bars")
     # Reject gaps, forming, mislabeled, or malformed candles. Native feed
     # already certifies these, but fail closed if invoked on other inputs.
-    for bars, seconds in ((five[-25:], 300), (one[-20:], 60)):
+    for bars, seconds in ((five[-20:], 300), (one[-20:], 60)):
         error = _bar_error(bars, seconds)
         if error is not None:
             return dict(empty, reason=error)
-    close5 = [float(b["close"]) for b in five[-25:]]
+    close5 = [float(b["close"]) for b in five[-20:]]
     close1 = [float(b["close"]) for b in one[-20:]]
     move5 = (close5[-1] / close5[-2] - 1) * 100
     move15 = (close5[-1] / close5[-4] - 1) * 100
