@@ -11,6 +11,41 @@ from statistics import median
 from lbank_entry_refinement import minute_atr
 
 
+
+def confirmed_recent_retest_anchor(minutes, direction, old_anchor, atr):
+    """Later verified higher-low/lower-high, not a tighter arbitrary wick.
+
+    Only a completed two-sided 1m pivot, formed AFTER the older swing, can
+    replace that swing for a continuation. Every candle after the pivot must
+    respect it. On uncertainty preserve the original, more distant anchor.
+    This never approves an entry or alters monetary/cost/target gates.
+    """
+    window = minutes[-9:]
+    if len(window) != 9 or direction not in (-1, 1) or atr <= 0:
+        return None
+    d = direction
+    key = "low" if d == 1 else "high"
+    older_i = min(range(7), key=lambda i: d * float(window[i][key]))
+    # Two completed bars on EACH side, excluding the two recovery candles
+    # as possible pivot locations. The recovered level must remain intact.
+    for i in range(5, 1, -1):
+        if i <= older_i:
+            continue
+        pivot = float(window[i][key])
+        if d * (pivot - old_anchor) < max(.30 * atr, .00015 * float(window[-1]["close"])):
+            continue
+        neighbors = window[i-2:i] + window[i+1:i+3]
+        if any(d * (float(bar[key]) - pivot) < -.05 * atr for bar in neighbors):
+            continue
+        if min(d * (float(window[i-2][key]) - pivot),
+               d * (float(window[i+2][key]) - pivot)) < .20 * atr:
+            continue
+        if any(d * (float(bar[key]) - pivot) < -.05 * atr for bar in window[i+3:]):
+            continue
+        return pivot
+    return None
+
+
 def detect_fast_resumption(state, route):
     result = {"status": "no_candidate", "policy": "closed_1m_trend_resumption_v2",
               "approval": False}
@@ -71,6 +106,13 @@ def detect_fast_resumption(state, route):
     adverse, favorable = ("low", "high") if d == 1 else ("high", "low")
     probe = minutes[-9:-2] if two_minute else minutes[-9:-1]
     anchor = (min if d == 1 else max)(float(b[adverse]) for b in probe)
+    original_anchor = anchor
+    anchor_policy = "older_completed_swing"
+    if two_minute and not conflict_recovery:
+        later = confirmed_recent_retest_anchor(minutes, d, anchor, atr)
+        if later is not None:
+            anchor = later
+            anchor_policy = "two_sided_closed_1m_higher_low_or_lower_high"
     route_name = "two_minute_reacceleration"
     if not two_minute:
         # A single sealed reaction is useful after two distinct tests of the
@@ -121,6 +163,8 @@ def detect_fast_resumption(state, route):
                        "level": close, "structure_anchor": anchor,
                        "source": "closed_1m_fast_resumption"},
                 last_closed_1m_start=last["start"],
+                anchor_policy=anchor_policy,
+                original_structure_anchor=original_anchor,
                 pullback_pct=round(100*pullback, 4),
                 recovery_atr=round(recovery/atr, 3),
                 volume_multiple=round(float(last["volume"])/baseline, 3))

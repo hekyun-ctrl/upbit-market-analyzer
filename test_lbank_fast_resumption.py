@@ -47,6 +47,51 @@ class FastResumptionTests(unittest.TestCase):
                                  if direction==1 else
                                  max(x["high"] for x in s["minute_bars"][-9:-2]))
 
+
+    def test_verified_later_pivot_can_shorter_stop_both_sides(self):
+        # Synthetic completed minute sequence: an older deep swing is followed
+        # by a confirmed (two bars on either side) higher low / lower high.
+        # The continuation is evaluated by the UNCHANGED planner, not approved.
+        for d in (1, -1):
+            s = fixture(d)
+            closes = s["prices"]
+            baseline = closes[-16]
+            displacements = (-130, -180, -90, -70, -105, -118, -75, 20, 65)
+            closes[-9:] = [baseline + d * x for x in displacements]
+            for i in range(len(closes)-9, len(closes)):
+                opening = closes[i-1]
+                close = closes[i]
+                s["minute_bars"][i].update(
+                    open=opening, high=max(opening,close)+4,
+                    low=min(opening,close)-4, close=close,
+                    volume=20. if i==len(closes)-1 else 10.)
+            s["quote"] = closes[-1]
+            with self.subTest(direction=d):
+                result = detect_fast_resumption(s,route(d))
+                self.assertEqual(result["status"],"candidate",result)
+                self.assertEqual(result["anchor_policy"],
+                                 "two_sided_closed_1m_higher_low_or_lower_high")
+                new = result["setup"]["structure_anchor"]
+                old = result["original_structure_anchor"]
+                self.assertGreater(d*(new-old),0)
+                self.assertFalse(result["approval"])
+                # If a later completed wick actually broke the new level,
+                # never pretend it still offers a structural stop.
+                broken = copy.deepcopy(s)
+                broken["minute_bars"][-2]["low" if d==1 else "high"] = new-d*15
+                later = detect_fast_resumption(broken,route(d))
+                self.assertNotEqual(later.get("anchor_policy"),
+                                    "two_sided_closed_1m_higher_low_or_lower_high")
+
+    def test_recent_pivot_is_not_inferred_from_missing_or_forming_data(self):
+        s=fixture()
+        for kind in ("gap","forming","bad_wick"):
+            v=copy.deepcopy(s)
+            if kind=="gap": v["minute_bars"][-4]["start"]+=60
+            if kind=="forming": v["minute_bars"][-4]["quality"]="forming"
+            if kind=="bad_wick": v["minute_bars"][-4]["low"]=v["minute_bars"][-4]["high"]+1
+            self.assertNotEqual(detect_fast_resumption(v,route()).get("status"),"candidate")
+
     def test_reversal_without_second_closed_minute_is_not_a_candidate(self):
         s=fixture()
         s["minute_bars"][-2].update(open=s["prices"][-2],close=s["prices"][-2])
