@@ -41,6 +41,7 @@ from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
 from lbank_entry_quality import (confirmation_quality, direction_priority,
                                  observed_target_room, POLICY as ENTRY_QUALITY_POLICY)
 from lbank_entry_priority import ranked_entry_evidence, POLICY as ENTRY_PRIORITY_POLICY
+from lbank_barrier_audit import BarrierAudit
 from lbank_resistance_pressure import PressureObserver
 from lbank_signal_thesis import attach_thesis, POLICY as FOLLOWUP_POLICY
 from lbank_profit_protection import new_policy, format_notice as format_profit_notice, POLICY as PROFIT_POLICY
@@ -62,6 +63,7 @@ if ENTRY_REFINEMENT_MODE not in ENTRY_REFINEMENT_MODES:
     raise ValueError('Unknown LBANK_ENTRY_REFINEMENT_MODE')
 
 LOG = logging.getLogger("lbank_monitor")
+BARRIER_AUDIT = BarrierAudit()  # Read-only shadow, never changes permissions.
 TELEGRAM_DELIVERY = TelegramTransport()
 SYMBOL = "BTC/USDT:USDT"
 POLL = max(30, int(os.getenv("LBANK_POLL_SECONDS", "60")))
@@ -463,6 +465,18 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
         native_target_room = observed_target_room(native_state['five_bars'], direction, curr, t1)
         if (native_target_room['target_room'] == 'conflict'
                 and not ranked['may_override_single_pivots']):
+            # Follow rejected plans without changing the original hard veto.
+            if ENTRY_REFINEMENT_MODE == 'capture':
+                try:
+                    audit = BARRIER_AUDIT.record(
+                        native_state, direction, strategy, curr, stop, t1,
+                        native_target_room['observed_barrier'])
+                    if audit is not None:
+                        LOG.info("TARGET_BARRIER_REJECTION_TRACKED %s",
+                                 json.dumps(audit, sort_keys=True))
+                except Exception as exc:
+                    LOG.warning("TARGET_BARRIER_SHADOW_FAILED exception=%s "
+                                "live_gates_unchanged=true", type(exc).__name__)
             LOG.info("PLAN REJECT reason=native_target_barrier_conflict strategy=%s direction=%s "
                      "price=%.1f target1=%.1f barrier=%.1f",
                      strategy, direction, curr, t1, native_target_room['observed_barrier'])
@@ -1157,6 +1171,14 @@ def run():
             storage_status = storage_reserve.check()
             native_state, native_diag = native_feed.snapshot(now, price)
             native_key = completed_key(native_state)
+            if capture_entries:
+                try:
+                    for outcome in BARRIER_AUDIT.observe(native_state):
+                        LOG.info("TARGET_BARRIER_FORWARD_AUDIT %s",
+                                 json.dumps(outcome, sort_keys=True))
+                except Exception as exc:
+                    LOG.warning("TARGET_BARRIER_FORWARD_SHADOW_FAILED exception=%s "
+                                "live_gates_unchanged=true", type(exc).__name__)
             try:
                 for pressure in pressure_observer.step(native_state, now):
                     LOG.info("RESISTANCE_PRESSURE_OBSERVATION %s", json.dumps(pressure,sort_keys=True))
