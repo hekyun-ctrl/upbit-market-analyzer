@@ -36,6 +36,7 @@ from lbank_operational_health import (JournalRecovery, OperationalNotices,
 from lbank_native_candles import NativeCandleThread
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
 from lbank_trend_route import rank_entry_routes
+from lbank_fast_resumption import detect_fast_resumption
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
 from lbank_entry_quality import (confirmation_quality, direction_priority,
                                  observed_target_room, POLICY as ENTRY_QUALITY_POLICY)
@@ -535,6 +536,11 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
         if diagnostics is not None:
             diagnostics.update(reason="insufficient_samples", candidates=[])
         return None
+    fast_resumption = (detect_fast_resumption(native_state, rank_entry_routes(native_state))
+                       if native_state is not None and ENTRY_REFINEMENT_MODE == 'capture'
+                       else {"status": "disabled", "approval": False})
+    if diagnostics is not None:
+        diagnostics["fast_resumption"] = fast_resumption
     if native_state is not None:
         if abs(native_state["quote"] / prices[-1] - 1) > ENTRY_MAX_CHASE_PCT:
             if diagnostics is not None:
@@ -574,6 +580,14 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
         setups.append({"direction": 1, "strategy": "breakout", "level": fresh['prior_high']})
     if fresh['breakout_short']:
         setups.append({"direction": -1, "strategy": "breakout", "level": fresh['prior_low']})
+    # A 1m recovery candidate may arise while the most recent 5m candle is
+    # still in a broader pause. It joins the normal screen; it does NOT send
+    # an early alert, bypass confirmation or relax fee/stop/target checks.
+    if fast_resumption.get("status") == "candidate":
+        candidate = fast_resumption["setup"]
+        if not any(p["strategy"] == candidate["strategy"] and
+                   p["direction"] == candidate["direction"] for p in setups):
+            setups.append(candidate)
     seen, decisions, qualified = set(), [], []
     for setup in setups:
         key = setup["strategy"], setup["direction"]
