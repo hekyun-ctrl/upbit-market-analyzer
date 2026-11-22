@@ -41,6 +41,20 @@ class EntryTimingTests(unittest.TestCase):
         self.assertFalse(e['minute_followthrough']);self.assertFalse(e['dominant_intact'])
         self.assertFalse(e['profitability_verified']);self.assertEqual(e['watch_age_at_confirmation_seconds'],30.)
 
+    def test_first_qualified_candidate_latency_is_not_recipient_delivery(self):
+        watch={"time":200.,"plan":{
+            "price":100.,"entry_timing":{
+                "first_qualified_candidate_detected_at":201.,
+                "nominal_1m_close_at":190.,"selected_route":"continuation"}}}
+        plan={"price":100.2,"direction":1,
+              "entry_quality":{"minute_followthrough":True,
+                               "priority":{},"ranked_entry":{}}}
+        result=confirmation_evidence(watch,plan,None,230.,233.)
+        self.assertEqual(result["first_qualified_candidate_to_confirmation_seconds"],32.)
+        self.assertEqual(result["nominal_close_to_confirmation_seconds"],43.)
+        self.assertEqual(result["selected_route"],"continuation")
+        self.assertFalse(result["profitability_verified"])
+
     def test_signal_journal_preserves_timing_without_new_account_or_order_data(self):
         book=PerformanceBook(':memory:',1000);self.addCleanup(book.db.close)
         p=dict(direction=1,price=80000,stop=79800,target1=80600,target2=81000,

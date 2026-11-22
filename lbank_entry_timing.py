@@ -45,8 +45,18 @@ def confirmation_evidence(watch, plan, state, quote_at, evaluated_at):
     quality = plan.get("entry_quality") or {}
     priority = quality.get("priority") or {}
     ranked = quality.get("ranked_entry") or {}
+    first_qualified_at = evidence.get("first_qualified_candidate_detected_at")
+    if type(first_qualified_at) not in (int, float) or not math.isfinite(first_qualified_at):
+        first_qualified_at = None
+    nominal_close_at = evidence.get("nominal_1m_close_at")
+    if type(nominal_close_at) not in (int, float) or not math.isfinite(nominal_close_at):
+        nominal_close_at = None
     evidence.update(policy=POLICY, watch_quote_at=watch["time"],
                     confirmation_quote_at=quote_at, confirmation_evaluated_at=evaluated_at,
+                    first_qualified_candidate_to_confirmation_seconds=(
+                        evaluated_at-first_qualified_at if first_qualified_at is not None else None),
+                    nominal_close_to_confirmation_seconds=(
+                        evaluated_at-nominal_close_at if nominal_close_at is not None else None),
                     watch_age_at_confirmation_seconds=quote_at-watch["time"],
                     watch_quote=initial, confirmation_quote=current,
                     side_adjusted_quote_change_pct=signed,

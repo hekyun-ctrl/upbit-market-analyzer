@@ -17,7 +17,25 @@ def detect_fast_resumption(state, route):
     if not state or not route or not route.get("ready"):
         return dict(result, status="native_or_trend_unavailable")
     direction = route.get("direction")
-    if direction not in (-1, 1) or route.get("regime") not in ("impulse", "trend_pause"):
+    regime = route.get("regime")
+    conflict_recovery = False
+    if regime == "conflicted":
+        # 15m and 1h disagree. A completed, strong 1m recovery aligned
+        # with the verified 1h move can be SCREENED, not automatically approved.
+        # The normal 5m/15m context, RSI, costs and risk rules still decide.
+        momentum = route.get("momentum_pct") or {}
+        try:
+            hourly = float(momentum["1h"])
+            if not math.isfinite(hourly) or abs(hourly) < .35:
+                return dict(result, status="conflict_hourly_direction_unproven")
+            hourly_direction = 1 if hourly > 0 else -1
+            if direction != -hourly_direction:
+                return dict(result, status="conflict_hourly_direction_unproven")
+            direction = hourly_direction
+            conflict_recovery = True
+        except (KeyError, ValueError, TypeError):
+            return dict(result, status="conflict_hourly_direction_unproven")
+    elif direction not in (-1, 1) or regime not in ("impulse", "trend_pause"):
         return dict(result, status="trend_conflicted_or_neutral")
     minutes = state.get("minute_bars")
     closes = state.get("prices")
@@ -77,16 +95,28 @@ def detect_fast_resumption(state, route):
             and recovery >= max(.00055*close, .65*atr)
             and recovery <= max(.008*close, 4.0*atr)):
         return dict(result, status="pullback_or_recovery_outside_structure")
+    # A conflicted 15m/1h recovery must break actual completed minute wicks;
+    # a two-candle bounce without that structural reclaim remains observation.
+    if conflict_recovery:
+        if not two_minute:
+            return dict(result, status="conflict_requires_two_closed_recovery_minutes")
+        prior_wick = (max if d == 1 else min)(
+            float(b[favorable]) for b in minutes[-4:-1])
+        if d * (close - prior_wick) < max(.00005 * close, .12 * atr):
+            return dict(result, status="conflict_wick_reclaim_missing")
     # Relative traded volume is a research criterion, not a promise of execution.
     baseline = median(float(b["volume"]) for b in minutes[-12:-2])
-    if baseline <= 0 or float(last["volume"]) < baseline*1.1:
+    min_multiple = 1.30 if conflict_recovery else 1.10
+    if baseline <= 0 or float(last["volume"]) < baseline*min_multiple:
         return dict(result, status="recovery_volume_insufficient")
     # A stop is anchored to this observed swing by the existing cost/risk planner.
     # Quote chase checks and the next confirmation occur in the existing pipeline.
     # Only the existing two-candle pattern enters the standard approval path.
     # A single reclaim is evaluated and recorded for prospective validation.
     return dict(result, status="candidate" if two_minute else "early_reclaim", direction=d,
-                reaction=route_name,
+                higher_timeframe_conflict=conflict_recovery,
+                confirmation_policy="existing_full_qualification_and_stage_two",
+                reaction="hour_aligned_conflict_recovery" if conflict_recovery else route_name,
                 setup={"strategy": "trend_retest", "direction": d,
                        "level": close, "structure_anchor": anchor,
                        "source": "closed_1m_fast_resumption"},

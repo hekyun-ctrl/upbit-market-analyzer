@@ -537,8 +537,11 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
         if diagnostics is not None:
             diagnostics.update(reason="insufficient_samples", candidates=[])
         return None
-    fast_resumption = (detect_fast_resumption(native_state, rank_entry_routes(native_state))
-                       if native_state is not None and ENTRY_REFINEMENT_MODE == 'capture'
+    route_snapshot = (rank_entry_routes(native_state)
+                      if native_state is not None and ENTRY_REFINEMENT_MODE == 'capture'
+                      else None)
+    fast_resumption = (detect_fast_resumption(native_state, route_snapshot)
+                       if route_snapshot is not None
                        else {"status": "disabled", "approval": False})
     if diagnostics is not None:
         diagnostics["fast_resumption"] = fast_resumption
@@ -570,6 +573,10 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
                 continuation_geometry=native_entry_geometry(native_state, 'trend_retest'))
         if diagnostics is not None:
             diagnostics["market"] = setup_diag
+        if route_snapshot is not None:
+            # A pullback route must not mask a separate 1m continuation.
+            for candidate in setups:
+                candidate["entry_route"] = "pullback"
     else:
         first = detect_structure(prices, ema, rsi)
         setups = ([first] if first is not None else []) + detect_structures(prices, ema, rsi)
@@ -578,20 +585,24 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
         diagnostics["market"].update(
             **{k:fresh[k] for k in ('momentum5_pct','momentum15_pct','breakout_long','breakout_short')})
     if fresh['breakout_long']:
-        setups.append({"direction": 1, "strategy": "breakout", "level": fresh['prior_high']})
+        setups.append({"direction": 1, "strategy": "breakout", "level": fresh['prior_high'],
+                       "entry_route": "breakout"})
     if fresh['breakout_short']:
-        setups.append({"direction": -1, "strategy": "breakout", "level": fresh['prior_low']})
-    # A 1m recovery candidate may arise while the most recent 5m candle is
-    # still in a broader pause. It joins the normal screen; it does NOT send
-    # an early alert, bypass confirmation or relax fee/stop/target checks.
+        setups.append({"direction": -1, "strategy": "breakout", "level": fresh['prior_low'],
+                       "entry_route": "breakout"})
+    # Independent route: a continuation may share the trend_retest planner
+    # with pullback, yet has different 1m evidence and anchor. Do not collapse
+    # either source before applying the same original risk/context screens.
     if fast_resumption.get("status") == "candidate":
-        candidate = fast_resumption["setup"]
-        if not any(p["strategy"] == candidate["strategy"] and
-                   p["direction"] == candidate["direction"] for p in setups):
-            setups.append(candidate)
+        candidate = dict(fast_resumption["setup"], entry_route="continuation",
+                         higher_timeframe_conflict=fast_resumption.get(
+                             "higher_timeframe_conflict", False))
+        setups.append(candidate)
     seen, decisions, qualified = set(), [], []
     for setup in setups:
-        key = setup["strategy"], setup["direction"]
+        route = setup.get("entry_route", "pullback")
+        key = (setup["strategy"], setup["direction"], route
+               if ENTRY_REFINEMENT_MODE == 'capture' else "legacy")
         if key in seen:
             continue
         seen.add(key)
@@ -600,14 +611,38 @@ def classify(prices, observations=None, diagnostics=None, native_state=None):
                                 observations=observations, diagnostics=detail,
                                 native_state=native_state)
         decisions.append({"strategy": key[0], "direction": key[1],
-                          "reason": detail.get("reason", "unknown")})
+                          "route": route, "source": setup.get("source", "native_structure"),
+                          "reason": detail.get("reason", "unknown"),
+                          "higher_timeframe_conflict": bool(
+                              setup.get("higher_timeframe_conflict", False))})
         if plan is not None:
+            if ENTRY_REFINEMENT_MODE == 'capture':
+                plan["entry_route"] = route
+                plan["route_source"] = setup.get("source", "native_structure")
+                plan["higher_timeframe_conflict_observed"] = bool(
+                    setup.get("higher_timeframe_conflict", False))
             qualified.append(plan)
     conflict = len({p["direction"] for p in qualified}) > 1
     reason = ("strategy_conflict" if conflict else "qualified" if qualified else
               decisions[0]["reason"] if decisions else "market_no_setup")
     if diagnostics is not None:
         diagnostics.update(reason=reason, candidates=decisions)
+        if route_snapshot is not None:
+            diagnostics["route_funnel"] = {
+                "policy": "independent_three_route_screen_v1",
+                "priority": route_snapshot.get("routes", []),
+                "checks": {route: [d for d in decisions if d["route"] == route]
+                           for route in ("breakout", "continuation", "pullback")},
+                "candidate_counts": {route: sum(d["route"] == route for d in decisions)
+                                     for route in ("breakout", "continuation", "pullback")},
+                "opposite_qualified_directions_abstain": conflict,
+                "live_risk_and_confirmation_gates": "unchanged"}
+    if qualified and not conflict and route_snapshot is not None:
+        priority = route_snapshot.get("routes") or [
+            "breakout", "continuation", "pullback"]
+        qualified.sort(key=lambda p: (
+            priority.index(p["entry_route"]) if p.get("entry_route") in priority
+            else len(priority)))
     return qualified[0] if qualified and not conflict else None
 
 
@@ -1467,7 +1502,34 @@ def run():
                                         telegram_acknowledged_at=acknowledged_at,
                                         quote_age_when_send_started_seconds=send_started_at-now,
                                         telegram_elapsed_seconds=acknowledged_at-send_started_at,
+                                        candidate_to_send_seconds=(
+                                            send_started_at - plan["entry_timing"][
+                                                "first_qualified_candidate_detected_at"])
+                                        if plan["entry_timing"].get(
+                                            "first_qualified_candidate_detected_at") is not None
+                                        else None,
+                                        candidate_to_telegram_ack_seconds=(
+                                            acknowledged_at - plan["entry_timing"][
+                                                "first_qualified_candidate_detected_at"])
+                                        if plan["entry_timing"].get(
+                                            "first_qualified_candidate_detected_at") is not None
+                                        else None,
+                                        nominal_close_to_telegram_ack_seconds=(
+                                            acknowledged_at - plan["entry_timing"]["nominal_1m_close_at"])
+                                        if plan["entry_timing"].get("nominal_1m_close_at") is not None
+                                        else None,
                                         recipient_receipt_verified=False)
+                                    LOG.info("ENTRY_DELIVERY_LATENCY %s", json.dumps({
+                                        "strategy": plan.get("strategy"),
+                                        "route": plan.get("entry_route", "legacy"),
+                                        "direction": plan.get("direction"),
+                                        "watch_to_ack_seconds": acknowledged_at - watch["time"],
+                                        "candidate_to_ack_seconds": plan["entry_timing"].get(
+                                            "candidate_to_telegram_ack_seconds"),
+                                        "nominal_close_to_ack_seconds": plan["entry_timing"].get(
+                                            "nominal_close_to_telegram_ack_seconds"),
+                                        "telegram_transport_accepted": True,
+                                        "recipient_receipt_verified": False}, sort_keys=True))
                                     reverse_exception = verified_reversal_exception(
                                         now, side, alert_state, plan)
                                     record_alert(now, side, alert_state, plan=plan)
@@ -1504,6 +1566,19 @@ def run():
                                              plan["rr1"], reverse_exception)
                                 else:
                                     LOG.warning("ENTRY REVIEW SEND FAILED")
+                                    LOG.info("ENTRY_DELIVERY_LATENCY %s", json.dumps({
+                                        "strategy": plan.get("strategy"),
+                                        "route": plan.get("entry_route", "legacy"),
+                                        "direction": plan.get("direction"),
+                                        "watch_to_send_seconds": send_started_at - watch["time"],
+                                        "candidate_to_send_seconds": (
+                                            send_started_at - plan["entry_timing"][
+                                                "first_qualified_candidate_detected_at"])
+                                            if plan["entry_timing"].get(
+                                                "first_qualified_candidate_detected_at") is not None
+                                            else None,
+                                        "telegram_transport_accepted": False,
+                                        "recipient_receipt_verified": False}, sort_keys=True))
                             else:
                                 count_event("suppressed")
                                 LOG.info("ENTRY REVIEW SUPPRESSED side=%s reason=%s strategy=%s price=%.1f",
@@ -1544,12 +1619,27 @@ def run():
                     timing = setup_evidence(native_state, now, time.time(),
                                             first_ready_observed_at, trigger)
                     if proposal is not None:
-                        proposal["entry_timing"] = timing
+                        proposal["entry_timing"] = dict(
+                            timing,
+                            first_qualified_candidate_detected_at=timing["candidate_evaluated_at"],
+                            selected_route=proposal.get("entry_route", "legacy"),
+                            bar_close_to_first_qualification_seconds=timing[
+                                "evaluation_after_nominal_close_seconds"])
                     rejection["entry_timing"] = timing
                     rejection["data_source"] = NATIVE_SOURCE
                     last_entry_diagnostics = rejection
                     performance.sample(now, price, decision=rejection)
                     LOG.info("ENTRY_SETUP_EVALUATED %s", json.dumps(rejection, sort_keys=True))
+                    if capture_entries:
+                        LOG.info("ENTRY_ROUTE_FUNNEL %s", json.dumps({
+                            "bar": native_key[0], "at": now,
+                            "quote_observed_at": now, "reason": rejection.get("reason"),
+                            "routes": (rejection.get("route_funnel") or {}).get("checks"),
+                            "fast_resumption": (rejection.get("fast_resumption") or {}).get("status"),
+                            "after_nominal_close_seconds": timing.get(
+                                "evaluation_after_nominal_close_seconds"),
+                            "first_qualified_candidate": proposal is not None,
+                            "telegram_sent": False}, sort_keys=True))
                     if proposal is not None:
                         side = proposal["side"]
                         gate_reason = alert_gate(now, side, alert_state, plan=proposal)

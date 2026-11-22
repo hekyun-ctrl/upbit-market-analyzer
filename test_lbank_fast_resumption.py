@@ -116,6 +116,60 @@ class FastResumptionTests(unittest.TestCase):
             self.assertEqual(assess.call_args.args[2]["source"],
                              "closed_1m_fast_resumption")
 
+    def test_conflict_hourly_recovery_is_individually_screened_both_sides(self):
+        for d in (1, -1):
+            s=fixture(d)
+            conflict=dict(ready=True, direction=-d, regime="conflicted",
+                          momentum_pct={"1h": 1.2*d, "15m": -.5*d})
+            event=detect_fast_resumption(s,conflict)
+            with self.subTest(d=d):
+                self.assertEqual(event["status"],"candidate",event)
+                self.assertEqual(event["direction"],d)
+                self.assertTrue(event["higher_timeframe_conflict"])
+                self.assertFalse(event["approval"])
+                self.assertEqual(event["confirmation_policy"],
+                                 "existing_full_qualification_and_stage_two")
+
+    def test_conflict_without_valid_hour_or_closed_recovery_is_not_approved(self):
+        s=fixture()
+        conflict=dict(ready=True,direction=-1,regime="conflicted",
+                      momentum_pct={"1h":0.10,"15m":-0.6})
+        self.assertNotEqual(detect_fast_resumption(s,conflict)["status"],"candidate")
+        conflict["momentum_pct"]["1h"]=1.2
+        s["minute_bars"][-1]["quality"]="forming"
+        self.assertEqual(detect_fast_resumption(s,conflict)["status"],
+                         "minute_source_invalid")
+        s=fixture()
+        s["minute_bars"][-1]["volume"]=11.
+        self.assertEqual(detect_fast_resumption(s,conflict)["status"],
+                         "recovery_volume_insufficient")
+
+    def test_continuation_and_pullback_are_both_evaluated_even_same_strategy(self):
+        s=fixture()
+        geometry={"atr5":30.,"stop_floor_fraction":.002,
+                  "minimum_target_fraction":.006,"min_range_fraction":.006}
+        fresh={"momentum5_pct":0.1,"momentum15_pct":0.2,
+               "breakout_long":False,"breakout_short":False}
+        pullback=dict(strategy="trend_retest", direction=1, level=60000.,
+                      structure_anchor=59920.)
+        reviewed=[]
+        def record(prices, direction, setup, **kwargs):
+            reviewed.append((setup.get("entry_route"),setup.get("source","structure")))
+            kwargs["diagnostics"]["reason"]="risk_or_target"
+            return None
+        with patch.object(m,"ENTRY_REFINEMENT_MODE","capture"), \
+             patch.object(m,"rank_entry_routes",return_value=route()), \
+             patch.object(m,"detect_structures",return_value=[pullback]), \
+             patch.object(m,"native_entry_geometry",return_value=geometry), \
+             patch.object(m,"breakout_evidence",return_value=fresh), \
+             patch.object(m,"assess_candidate",side_effect=record):
+            d={}
+            self.assertIsNone(m.classify(s["prices"],native_state=s,diagnostics=d))
+            self.assertEqual([p[0] for p in reviewed],["pullback","continuation"])
+            self.assertEqual(d["route_funnel"]["candidate_counts"]["pullback"],1)
+            self.assertEqual(d["route_funnel"]["candidate_counts"]["continuation"],1)
+            self.assertEqual(len(d["candidates"]),2)
+
     def test_fast_quote_jump_cannot_bypass_original_chase_limit(self):
         s=fixture()
         s["quote"]*=1.003
