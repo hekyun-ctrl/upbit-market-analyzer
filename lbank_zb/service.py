@@ -2,7 +2,7 @@
 
 Runs independently of legacy entry/risk paths. Native stream arrivals are read
 only; missing arrival provenance is never invented for old database rows.
-Derived5m is recorded but cannot qualify as independent raw5m. No sender here.
+Derived 5m is cross-checked against a separate same-venue close audit. No sender.
 """
 import json
 import logging
@@ -13,7 +13,8 @@ import threading
 import time
 from pathlib import Path
 from .adapter import normalize_native
-from .core import Costs, D, dumps, digest
+from .candle_evidence import CandleAuditThread, PRICE_TICK, VOLUME_TICK, audit_status
+from .core import Costs, D, dec, dumps, digest
 from .journal import EventStore
 from .live import LiveEngine
 from .public import PublicClient
@@ -38,9 +39,6 @@ def native_inputs(path, metadata, after=None, limit=100):
                           (*after, limit) if after else (0, 0, 0, limit)).fetchall()
         result = []
         for row in rows:
-            # Candle volume semantics have not been independently established.
-            # Keep it explicitly as a research assumption; qualification blocks
-            # all READY events until a genuine independent 5m source is supplied.
             b = normalize_native(dict(row), row['received'], {**metadata, 'source': row['source']})
             result.append(b)
         return result
@@ -49,10 +47,11 @@ def native_inputs(path, metadata, after=None, limit=100):
 
 
 class EngineThread(threading.Thread):
-    def __init__(self, native_path=None, state_path=None, client=None, interval=3):
+    def __init__(self, native_path=None, state_path=None, client=None, interval=3, audit_path=None):
         super().__init__(name='lbank-zb-computation', daemon=True)
         self.native_path = native_path or os.getenv('LBANK_NATIVE_CANDLE_DB', '/data/lbank_native_candles.sqlite3')
         self.state_path = state_path or os.getenv('LBANK_ZB_ENGINE_DB', '/data/lbank_zb_engine.sqlite3')
+        self.audit_path = audit_path or str(Path(self.state_path).with_name('lbank_zb_candle_evidence.sqlite3'))
         self.client = client or PublicClient()
         self.interval = max(3, interval)
         self.evidence = None
@@ -60,11 +59,26 @@ class EngineThread(threading.Thread):
         self.last_log = 0
 
     def poll(self, store, now):
-        if self.evidence is None or now - self.last_evidence >= 300:
+        refresh = self.evidence is None or now - self.last_evidence >= 300
+        if refresh:
             self.evidence = self.client.evidence()
-            now=int(time.time())
-            store.consume('evidence:' + digest(self.evidence), 'evidence', self.evidence, now)
+            now = int(time.time())
             self.last_evidence = now
+        try:
+            candles = audit_status(self.audit_path, now)
+        except sqlite3.Error:
+            candles = {'last_status': 'audit_db_unavailable', 'independent_5m': False}
+        instrument = self.evidence['record']['instrument']
+        volume_verified = (candles.get('last_volume_match_start') is not None
+                           and dec(instrument['volumeMultiple']) == D(1)
+                           and dec(instrument['priceTick']) == PRICE_TICK
+                           and dec(instrument['volumeTick']) == VOLUME_TICK)
+        qualification = dict(self.evidence['qualification'], candle_units=volume_verified,
+                             independent_5m=volume_verified and candles['independent_5m'])
+        if refresh or qualification != store.engine.qualification:
+            evidence = dict(self.evidence, qualification=qualification,
+                            candle_audit=candles, qualification_observed_at=now)
+            store.consume('evidence:' + digest(evidence), 'evidence', evidence, now)
         e = store.engine
         # Snapshot stores the cursor atomically with the input it describes.
         after = getattr(e, 'native_cursor', None)
@@ -83,11 +97,13 @@ class EngineThread(threading.Thread):
         if now - self.last_log >= 60:
             store.consume('clock:' + str(int(now) // 60), 'clock', {}, now)
             report = store.report()
+            units_status = 'VERIFIED_BTCUSDT_MULTIPLIER_1' if volume_verified else 'UNVERIFIED_RESEARCH_ONLY'
             report.update({'paper_outbound_enabled': False, 'orders_enabled': False,
-                           'cost_evidence': self.evidence['record'],
+                           'cost_evidence': dict(self.evidence['record'], candle_volume_unit=units_status),
+                           'candle_independence_audit': candles,
                            'native_1m': len(store.engine.one), 'native_5m': len(store.engine.five),
                            'native_cursor': getattr(store.engine, 'native_cursor', None),
-                           'candle_volume_unit_status': 'UNVERIFIED_RESEARCH_ONLY'})
+                           'candle_volume_unit_status': units_status})
             store.observe(now, report)
             LOG.info('ZB_ENGINE_STATUS %s', dumps(report))
             self.last_log = now
@@ -99,6 +115,7 @@ class EngineThread(threading.Thread):
         try:
             unknown = Costs(None, None, D(2), None, None, None, None)
             store = EventStore(self.state_path, LiveEngine(unknown))
+            CandleAuditThread(self.native_path, self.audit_path).start()
             LOG.info('ZB_ENGINE_STARTED commit=%s paper_outbound=false orders=false', os.getenv('RAILWAY_GIT_COMMIT_SHA', 'unknown'))
             failures = 0
             while True:
