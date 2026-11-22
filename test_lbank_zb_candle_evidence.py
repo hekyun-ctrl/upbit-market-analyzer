@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, patch
 
 from lbank_native_candles import WS_URL
 from lbank_zb.candle_evidence import (
-    REFERENCE_ROUTES, REFERENCE_URL, WARMUP_BARS, CandleAuditThread, ReferenceDisagreement,
+    REFERENCE_ROUTES, REFERENCE_URL, CandleAuditThread, ReferenceDisagreement,
     audit_status, capture_reference, closed_reply, compare, read_derived,
 )
 from lbank_zb.service import EngineThread
@@ -77,10 +77,12 @@ class CandleEvidenceTests(unittest.TestCase):
                          ('matched', False))
 
     def test_progress_counts_only_consecutive_matches_through_latest_close(self):
-        for i in range(1, WARMUP_BARS+1):
+        for i in range(1, 6):
             self.insert(END-i*300)
         status = audit_status(self.audit, END+8)
-        self.assertEqual(status['consecutive_matches'], WARMUP_BARS)
+        self.assertEqual(status['consecutive_matches'], 5)
+        self.assertEqual(status['required_consecutive'], 0)
+        self.assertEqual(status['verification_policy'], 'latest_independent_closed_ohlcv_exact_match')
         self.assertTrue(status['independent_5m'])
         self.assertFalse(audit_status(self.audit, END+300)['independent_5m'])
         self.insert(END, 'closed_reference_missing', False)
@@ -88,6 +90,18 @@ class CandleEvidenceTests(unittest.TestCase):
         self.assertEqual(audit_status(self.audit, END+301)['last_volume_match_start'], END-300)
         self.insert(END+300, 'volume_mismatch', False)
         self.assertIsNone(audit_status(self.audit, END+601)['last_volume_match_start'])
+
+    def test_one_latest_matching_close_needs_no_long_streak(self):
+        self.insert(END-600, 'volume_mismatch', False)
+        self.insert(END-300)
+        status = audit_status(self.audit, END+8)
+        self.assertEqual(status['matched_bars'], 1)
+        self.assertEqual(status['consecutive_matches'], 1)
+        self.assertTrue(status['independent_5m'])
+        self.insert(END, 'volume_mismatch', False)
+        self.assertFalse(audit_status(self.audit, END+301)['independent_5m'])
+        self.insert(END+300, 'ohlc_mismatch', False)
+        self.assertFalse(audit_status(self.audit, END+601)['independent_5m'])
 
     def test_derived_comparison_requires_recorded_seal_and_source(self):
         native = self.audit.with_name('native.sqlite3')
@@ -119,7 +133,8 @@ class CandleEvidenceTests(unittest.TestCase):
         with patch.object(engine.client, 'evidence', side_effect=AssertionError('offline')):
             engine.poll(store, start)
             self.assertTrue(store.engine.qualification['candle_units'])
-            self.assertFalse(store.engine.qualification['independent_5m'])
+            self.assertTrue(store.engine.qualification['independent_5m'])
+            self.assertIn('FEES_UNVERIFIED', store.engine.entry_blocks)
             engine.evidence['record']['instrument']['volumeMultiple'] = '.01'
             engine.poll(store, start+1)
             self.assertFalse(store.engine.qualification['candle_units'])

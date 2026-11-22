@@ -24,7 +24,6 @@ REFERENCE_URL = 'wss://uuws.lbank.com/ws/v3'
 CHART_URL = 'https://www.lbank.com/futures/btcusdt'
 DERIVED_SOURCE = 'lbank_native_1m_derived_5m'
 PERIOD = 300
-WARMUP_BARS = 450
 EVIDENCE_GRACE = 15
 CONNECTION_LEAD = 18
 FIELDS = ('open', 'high', 'low', 'close', 'volume', 'turnover')
@@ -97,7 +96,8 @@ def read_derived(path, start):
 
 def audit_status(path, now):
     latest = int(now//PERIOD)*PERIOD-PERIOD
-    result = {'required_consecutive': WARMUP_BARS, 'consecutive_matches': 0, 'matched_bars': 0,
+    result = {'required_consecutive': 0, 'verification_policy': 'latest_independent_closed_ohlcv_exact_match',
+              'consecutive_matches': 0, 'matched_bars': 0,
               'last_checked_start': None, 'last_status': 'awaiting_capture',
               'last_volume_match_start': None, 'independent_5m': False}
     if not Path(path).is_file():
@@ -129,7 +129,12 @@ def audit_status(path, now):
         if volume_ok:
             result['last_volume_match_start'] = start
             break
-    result['independent_5m'] = result['consecutive_matches'] >= WARMUP_BARS
+    # The latest sealed native-derived candle must match a separately obtained
+    # completed 5m OHLCV candle. Historical streaks are diagnostic only;
+    # they never gate qualification or require a 450-bar wait.
+    result['independent_5m'] = (result['last_checked_start'] == latest
+                                and result['last_status'] == 'matched'
+                                and bool(rows[0][2]))
     return result
 
 
@@ -207,8 +212,8 @@ class CandleAuditThread(threading.Thread):
             db.execute("""CREATE TABLE IF NOT EXISTS candle_checks(
                 start INTEGER PRIMARY KEY, status TEXT NOT NULL,
                 volume_ok INTEGER NOT NULL, payload TEXT NOT NULL)""")
-            LOG.info('ZB_CANDLE_AUDIT_STARTED sources=%s required_consecutive=%d',
-                     ','.join(endpoint for endpoint, _ in REFERENCE_ROUTES), WARMUP_BARS)
+            LOG.info('ZB_CANDLE_AUDIT_STARTED sources=%s verification=latest_closed_ohlcv_exact_match continuous_quota=none',
+                     ','.join(endpoint for endpoint, _ in REFERENCE_ROUTES))
             timeout = aiohttp.ClientTimeout(total=10, connect=8)
             async with aiohttp.ClientSession(trust_env=True, timeout=timeout,
                                              headers={'Origin': 'https://www.lbank.com'}) as session:
