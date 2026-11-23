@@ -203,8 +203,10 @@ def capture_context_window(performance_path, native_path, now):
              int(lower//300)*300-250*300, int(now//300)*300))]
         arrivals = [list(r) for r in native.execute(
             "SELECT period,start,received,source FROM native_arrivals "
-            "WHERE start>=? AND start<? ORDER BY period,start",
-            (int(lower//300)*300-250*300, int(now//60)*60))]
+            "WHERE (period=60 AND start>=? AND start<?) OR "
+            "(period=300 AND start>=? AND start<?) ORDER BY period,start",
+            (lower-360*60, int(now//60)*60,
+             int(lower//300)*300-250*300, int(now//300)*300))]
     finally:
         native.close()
     perf = readonly(performance_path)

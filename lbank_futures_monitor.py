@@ -331,7 +331,8 @@ def native_entry_geometry(native_state, strategy=None):
     """Volatility-scaled lower stop bound, not a substitute for swing anchors.
 
 Default: 1.5 completed 5m ATR, with a 0.05% noise floor. The opt-in research
-variant uses 1m ATR for breakout/pullback only; range geometry stays original.
+structure_cost uses 1m ATR for breakout/pullback only. Capture uses the larger
+of 2 completed 1m ATR and 1 completed 5m ATR. Range geometry stays original.
 The actual stop remains
 beyond the structural extreme plus its existing buffer, and never exceeds
 the existing 0.60% distance/risk/margin caps. No missing-data fallback.
@@ -347,7 +348,8 @@ not the old unconditional 0.60%. Real remaining room is checked in the plan.
         floor = max(.0005, 1.5 * atr / curr)
         local = None
         if ENTRY_REFINEMENT_MODE != 'legacy' and strategy in ('breakout', 'trend_retest'):
-            local = local_stop_floor(native_state, floor)
+            local = local_stop_floor(native_state, floor,
+                                     timeframe_noise=ENTRY_REFINEMENT_MODE == 'capture')
             if local is None:
                 return None
             floor = local['floor']
@@ -1136,6 +1138,10 @@ def run():
     LOG.info("SEALED_BREAKOUT_POLICY policy=%s enabled=%s flat_close_veto_only=true "
              "post_stop_new_breakout_retry_limit=1 daily_cap=%d monetary_risk_unchanged=true",
              SEALED_BREAKOUT_POLICY, ENTRY_REFINEMENT_MODE == "capture", MAX_DAILY_ALERTS)
+    LOG.info("STOP_NOISE_POLICY policy=max_2atr1_1atr5_closed_native_v1 enabled=%s "
+             "capture_only=true existing_sent_stops_frozen=true risk_budget_unchanged=true "
+             "stop_cap_pct=0.60 size_recomputed=true",
+             ENTRY_REFINEMENT_MODE == "capture")
     LOG.info("BREAKOUT_CONFIRMATION_POLICY policy=%s original_trigger_or_existing_higher_priority=true "
              "lost_both_cancel_watch=true extra_wait_seconds=0 profitability_validated=false",
              BREAKOUT_CONFIRMATION_POLICY)
@@ -1165,6 +1171,7 @@ def run():
              "continuation_stop_floor=%s "
              "structural_stop_preserved=true range_floor=cost_solved_TP1 "
              "net_rr1=1.5 risk_limit_unchanged=true",
+             "max(0.05pct,2ATR1,1ATR5)" if ENTRY_REFINEMENT_MODE == 'capture' else
              "min(legacy,max(0.05pct,1.5ATR1))" if ENTRY_REFINEMENT_MODE != 'legacy'
              else "max(0.05pct,1.5ATR5)")
     watch = None

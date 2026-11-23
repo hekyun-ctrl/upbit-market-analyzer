@@ -23,6 +23,12 @@ from lbank_signal_thesis import observed_stop_touch
 
 
 def run(window, corrected):
+    config_keys = dict(fee="TAKER_FEE", slippage="STOP_SLIPPAGE", funding_buffer="FUNDING_BUFFER",
+                       reference_balance="REF_BALANCE", risk_fraction="RISK_FRACTION",
+                       leverage="LEVERAGE", max_margin_fraction="MAX_MARGIN_FRACTION")
+    for key, variable in config_keys.items():
+        if key in window.get("model_config", {}):
+            setattr(m, variable, float(window["model_config"][key]))
     bars = window["native_rows"]
     columns = window["bar_columns"]
     arrivals = {(r[0], r[1]): r[2] for r in window["arrivals"]}
@@ -42,8 +48,13 @@ def run(window, corrected):
         def context(state, d, strategy, **kwargs):
             return native_context_gate(state, d, strategy,
                 **(kwargs if corrected else {}))
+        local_floor = m.local_stop_floor
+        def stop_floor(state, legacy, **kwargs):
+            return local_floor(state, legacy,
+                timeframe_noise=corrected and kwargs.get("timeframe_noise", False))
         with patch.object(m, "ENTRY_REFINEMENT_MODE", "capture"), \
              patch.object(m, "native_context_gate", side_effect=context), \
+             patch.object(m, "local_stop_floor", side_effect=stop_floor), \
              patch.object(m, "stopped_retry_allowed", wraps=m.stopped_retry_allowed) as retry:
             if not corrected:
                 retry.return_value = False

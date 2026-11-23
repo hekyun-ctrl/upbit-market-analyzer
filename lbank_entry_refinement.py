@@ -29,7 +29,7 @@ def minute_atr(state):
         return None
 
 
-def local_stop_floor(state, legacy_floor):
+def local_stop_floor(state, legacy_floor, *, timeframe_noise=False):
     """Noise floor for a 1m setup; the caller still places stops beyond anchors."""
     atr = minute_atr(state)
     try:
@@ -37,6 +37,15 @@ def local_stop_floor(state, legacy_floor):
         if (atr is None or not math.isfinite(quote) or quote <= 0
                 or not math.isfinite(legacy_floor) or legacy_floor <= 0):
             return None
+        if timeframe_noise:
+            # Quiet 1m candles must not compress a stop inside ordinary 5m
+            # movement. Use only completed native bars; no future rebound is
+            # used to choose the floor. Monetary risk remains size-controlled.
+            atr5 = atr_wilder(state['five_bars'])
+            if atr5 is None or not math.isfinite(atr5) or atr5 <= 0:
+                return None
+            return dict(floor=max(.0005, 2.0 * atr / quote, atr5 / quote),
+                        atr1=atr, atr5=atr5, basis='max_2atr1_1atr5_closed_native_v1')
         return dict(floor=min(legacy_floor, max(.0005, 1.5 * atr / quote)),
                     atr1=atr, basis='1m_structure_with_1_5atr_noise_floor')
     except (KeyError, TypeError, ValueError, OverflowError):

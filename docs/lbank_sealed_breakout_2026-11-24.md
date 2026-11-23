@@ -32,6 +32,22 @@ Existing risk, fees, stop distance, target-room checks, minimum net RR,
 position sizing, reverse-direction limits and stage-two confirmation remain.
 Stops are not widened to turn an earlier stop-out into a win.
 
+## Stop-noise correction after reference 76
+
+Reference 76 was sent at 61,406.3 with stop 61,487.0744, a distance of
+80.7744 (0.13154%). Recorded completed 5m ATR was 184.1704. The old
+capture policy could use only 1.5 times the shorter 1m ATR as its noise floor.
+New capture-mode breakout/trend-retest stops use a floor of
+max(0.05% of entry, 2 times completed 1m ATR, 1 times completed 5m ATR),
+and remain beyond the original observed structural anchor and buffer.
+This does not depend on the later 61,505.4 rebound. On the recorded 5m ATR
+alone, the hypothetical minimum short stop would be 61,590.4704; the full
+planner may place it farther or reject it for risk/target constraints.
+No previously sent stop is changed. Position size is recomputed from the
+same fee-inclusive loss budget; target room and net RR are recalculated.
+The 0.60% stop cap, daily cap, margin cap and monetary loss budget remain.
+The experimental structure_cost mode and the legacy/range policy remain.
+
 ## Verification and limits
 
 Nine focused regressions cover both directions, false intrabar breaks,
