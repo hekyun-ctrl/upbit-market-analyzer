@@ -11,6 +11,7 @@ import sqlite3
 from pathlib import Path
 
 from lbank_sampled_context import closed_context_gate
+from lbank_sealed_breakout import sealed_breakout
 
 SOURCE = "lbank_native_1m_aggregated_5m"
 MIN_FIVE_BARS = 20  # Existing sampled RSI required at least 20 closed 5m buckets.
@@ -115,7 +116,7 @@ class NativeEntryFeed:
                      "prices": [b["close"] for b in minutes], "quote": quote,
                      "closes15": fifteen, "last5_start": five[-1]["start"],
                      "rsi5": {"closes": closes5, "rsi": wilder_rsi_series(closes5)},
-                     "source": SOURCE}
+                     "source": SOURCE, "observed_at": now}
             return state, dict(diag, reason="native_ready", entry_source_switched=True,
                                last5_start=five[-1]["start"], rsi14_wilder=state["rsi5"]["rsi"][-1])
         except (OSError, sqlite3.Error, ValueError, TypeError, KeyError, OverflowError):
@@ -123,8 +124,17 @@ class NativeEntryFeed:
                           "entry_source_switched": False}
 
 
-def native_context_gate(state, direction, strategy):
+def native_context_gate(state, direction, strategy, *, breakout_level=None, allow_sealed_breakout=False):
     if not state:
         return False, "native_data_unavailable", None
-    return closed_context_gate(state["rsi5"]["closes"][-8:], state["closes15"],
-                               direction, strategy, context_type=SOURCE)
+    args = (state["rsi5"]["closes"][-8:], state["closes15"], direction, strategy)
+    result = closed_context_gate(*args, context_type=SOURCE)
+    if result[0] or result[1] != "flat_sampled_market" or not allow_sealed_breakout or strategy != "breakout":
+        return result
+    proof = sealed_breakout(state, direction, breakout_level)
+    if not proof["detected"]:
+        return result
+    # Re-evaluate every other veto, rather than returning an unconditional pass.
+    allowed, reason, context = closed_context_gate(*args, context_type=SOURCE, sealed_flat_break=True)
+    context = dict(context, sealed_flat_breakout=proof, original_flat_close_veto=True)
+    return allowed, "context_sealed_breakout" if allowed else reason, context

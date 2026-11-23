@@ -70,6 +70,10 @@ class PaperNotificationsTests(unittest.TestCase):
         self.assertNotIn('모의 진입 ·',self.messages[-1])
 
     def test_live_gates_and_study_rules_unchanged(self):
+        # 2026-11-24: sealed 1m flat-context override and one post-stop breakout
+        # retry are intentional capture-mode changes; covered by
+        # test_lbank_sealed_breakout. Monetary sizing and research accounting
+        # are unchanged. Fingerprints below pin this explicitly reviewed revision.
         # 2026-11-22 three-route revision: explicitly distinguish breakout,
         # continuation and pullback candidates; unchanged monetary/context,
         # RSI and two-stage confirmation functions remain fingerprint-guarded.
@@ -82,7 +86,7 @@ class PaperNotificationsTests(unittest.TestCase):
         # research accounting and default activation remain unchanged.
         # confirm_watch deliberately carries frozen quote-crossing evidence;
         # its new behavior is covered by entry reassessment/freshness tests.
-        expected={'calculate_plan': '530f3212d23a83d40ed17589377735e12031772680eefbf4fa60e01dc6c1c13d', 'classify': 'e3b5adafce1c7683c26c975e31eb5c3cb6db1b50775f6dd8f71d02aac46de9a5', 'assess_candidate': 'b91c60a36a148544cedd4612469f97ca2089b6670c367bc0a4e23d60857f2c14', 'alert_gate': 'e047eeeb07dd40558cd745dea5e3731c2c177cde127a7137c37fd14a3213ffab', 'record_alert': '89147d99872cc78f1b8f8b4e6d86660806736030e335bf732f2975de24f3e04b'}
+        expected={'calculate_plan': '4f5c259210303188377d6a30ffc8bc4caf0d701fb14cf120175c749e41520398', 'classify': 'e3b5adafce1c7683c26c975e31eb5c3cb6db1b50775f6dd8f71d02aac46de9a5', 'assess_candidate': '40d92add4e1b2681bf787b6ef4deedc79f7f56ea2d474385732b942c2a464ef6', 'alert_gate': '7acc5aea139cc7239616caf74e48fb7bdad06e79ec608afac8c0b64c3b9ed48b', 'record_alert': '7b0ddd57e17180fc5228cfc5aeb7dcb65777644aeadb919e514da800610cb300'}
         src=Path('lbank_futures_monitor.py').read_text()
         current={n.name:hashlib.sha256(ast.get_source_segment(src,n).encode()).hexdigest()
                  for n in ast.parse(src).body

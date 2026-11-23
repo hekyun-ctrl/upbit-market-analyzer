@@ -11,6 +11,7 @@ import math
 import os
 import tempfile
 import time
+from lbank_sealed_breakout import restore_retry
 
 LOG = logging.getLogger("lbank_sample_store")
 DEFAULT_ALERT = {"day": None, "count": 0, "last_time": None,
@@ -64,6 +65,9 @@ def _read_one(path, symbol, poll, current):
                 alert["trend_preview_last_bar"] = early_bar
             if early_dir in (-1, 1):
                 alert["trend_preview_last_direction"] = early_dir
+            retry = restore_retry(gate.get("entry_retry"), current)
+            if retry is not None and retry["sent_at"] == alert["last_time"]:
+                alert["entry_retry"] = retry
         raw = data.get("samples", [])
         if not isinstance(raw, list):
             return None

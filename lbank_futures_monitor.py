@@ -58,6 +58,8 @@ from lbank_breakout_freshness import (evidence as breakout_evidence,
     confirmation_allowed as breakout_confirmation_allowed, POLICY as BREAKOUT_CONFIRMATION_POLICY,
     REJECT_REASON as BREAKOUT_CONFIRMATION_REJECT)
 from lbank_entry_refinement import MODES as ENTRY_REFINEMENT_MODES, local_stop_floor, pullback_floor
+from lbank_sealed_breakout import (sealed_breakout, arm_stopped_retry,
+    stopped_retry_allowed, record_retry_state, POLICY as SEALED_BREAKOUT_POLICY)
 
 ENTRY_REFINEMENT_MODE = os.getenv('LBANK_ENTRY_REFINEMENT_MODE', 'legacy')
 if ENTRY_REFINEMENT_MODE not in ENTRY_REFINEMENT_MODES:
@@ -527,6 +529,9 @@ def calculate_plan(prices, direction, setup=None, native_state=None):
         "native_entry_geometry": geometry,
         "native_target_room": native_target_room,
         "entry_decision_priority": ranked,
+        "sealed_breakout_evidence": (sealed_breakout(native_state, direction, setup.get("level"))
+            if native_state is not None and ENTRY_REFINEMENT_MODE == "capture" and strategy == "breakout"
+            else None),
     }
 
 
@@ -689,10 +694,14 @@ def assess_candidate(prices, direction, setup, observations=None, diagnostics=No
     context = None
     if native_state is not None or observations is not None:
         context_ok, context_reason, context = (
-            native_context_gate(native_state, direction, (setup or {}).get("strategy", "breakout"))
+            native_context_gate(native_state, direction, (setup or {}).get("strategy", "breakout"),
+                breakout_level=(setup or {}).get("level"),
+                allow_sealed_breakout=ENTRY_REFINEMENT_MODE == "capture")
             if native_state is not None else sampled_context_gate(
                 observations, direction, (setup or {}).get("strategy", "breakout")))
         if not context_ok:
+            if diagnostics is not None:
+                diagnostics["context_reason"] = context_reason
             LOG.info("CLOSED-BUCKET watch BLOCKED side=%s reason=%s context=%s",
                      "LONG" if direction == 1 else "SHORT", context_reason, context)
             mark("sampled_context")
@@ -838,10 +847,14 @@ def confirm_watch(prices, watch, age_seconds, observations=None, diagnostics=Non
     context = None
     if native_state is not None or observations is not None:
         context_ok, context_reason, context = (
-            native_context_gate(native_state, direction, watch.get("strategy", "breakout"))
+            native_context_gate(native_state, direction, watch.get("strategy", "breakout"),
+                breakout_level=watch.get("level"),
+                allow_sealed_breakout=ENTRY_REFINEMENT_MODE == "capture")
             if native_state is not None else sampled_context_gate(
                 observations, direction, watch.get("strategy", "breakout")))
         if not context_ok:
+            if diagnostics is not None:
+                diagnostics["context_reason"] = context_reason
             LOG.info("CLOSED-BUCKET confirm BLOCKED side=%s reason=%s context=%s",
                      "LONG" if direction == 1 else "SHORT", context_reason, context)
             mark("sampled_context")
@@ -964,7 +977,8 @@ def alert_gate(now, side, state, plan=None):
         return "daily_cap"
     if state["last_time"] is not None:
         elapsed = now - state["last_time"]
-        if elapsed < COOLDOWN:
+        if elapsed < COOLDOWN and not (ENTRY_REFINEMENT_MODE == "capture"
+                and stopped_retry_allowed(now, side, state, plan)):
             return "global_cooldown"
         if side != state["last_side"] and elapsed < REVERSAL_COOLDOWN:
             if not verified_reversal_exception(now, side, state, plan):
@@ -975,6 +989,12 @@ def alert_gate(now, side, state, plan=None):
 def record_alert(now, side, state, plan=None):
     if alert_gate(now, side, state, plan=plan) != "ok":
         raise ValueError("alert gate disallowed sending")
+    used_retry = (ENTRY_REFINEMENT_MODE == "capture"
+                  and stopped_retry_allowed(now, side, state, plan))
+    record_retry_state(now, state, plan, used_retry)
+    if used_retry:
+        LOG.info("STOPPED_SIGNAL_REENTRY_SENT policy=%s direction=%s used=1 max_retries=1",
+                 SEALED_BREAKOUT_POLICY, plan["direction"])
     state["last_time"], state["last_side"] = now, side
     state["count"] += 1
 
@@ -1113,6 +1133,9 @@ def run():
     LOG.info("ENTRY_REASSESSMENT_POLICY mode=%s quote_crossing_rescan=%s fresh_quote_retry=%s "
              "early_candidate_risk_review_only=true", ENTRY_REFINEMENT_MODE,
              ENTRY_REFINEMENT_MODE == "capture", ENTRY_REFINEMENT_MODE == "capture")
+    LOG.info("SEALED_BREAKOUT_POLICY policy=%s enabled=%s flat_close_veto_only=true "
+             "post_stop_new_breakout_retry_limit=1 daily_cap=%d monetary_risk_unchanged=true",
+             SEALED_BREAKOUT_POLICY, ENTRY_REFINEMENT_MODE == "capture", MAX_DAILY_ALERTS)
     LOG.info("BREAKOUT_CONFIRMATION_POLICY policy=%s original_trigger_or_existing_higher_priority=true "
              "lost_both_cancel_watch=true extra_wait_seconds=0 profitability_validated=false",
              BREAKOUT_CONFIRMATION_POLICY)
@@ -1293,6 +1316,12 @@ def run():
                     else format_risk_alert(tracked, reason, observed_price, observed_kst)
                 )
                 if telegram(notice):
+                    if ENTRY_REFINEMENT_MODE == "capture" and arm_stopped_retry(
+                            alert_state, tracked, reason, now):
+                        save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL, observations, alert_state)
+                        LOG.info("STOPPED_SIGNAL_REENTRY_ARMED reference=%d policy=%s "
+                                 "requires_new_post_stop_closed_breakout=true", tracked.number,
+                                 SEALED_BREAKOUT_POLICY)
                     if reason == "risk_caution" and performance is not None:
                         try:
                             performance.record_caution(tracked.number,tracked.sent_at,

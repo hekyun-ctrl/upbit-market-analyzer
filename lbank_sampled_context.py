@@ -91,7 +91,7 @@ def sampled_context_gate(observations, direction, strategy):
                                context_type="sampled_perpetual_ticker_not_exchange_ohlcv")
 
 
-def closed_context_gate(b5, b15, direction, strategy, *, context_type):
+def closed_context_gate(b5, b15, direction, strategy, *, context_type, sealed_flat_break=False):
     """Same context thresholds for explicitly identified closed-bar inputs."""
     if direction not in (-1, 1) or len(b5) < 8 or len(b15) < 5:
         return False, "context_missing_closed_buckets", None
@@ -109,7 +109,7 @@ def closed_context_gate(b5, b15, direction, strategy, *, context_type):
            "reversal_10m_pct": signed_recovery_pct,
            "reversal_last5_pct": last_leg_pct,
            "context_type": context_type}
-    if range5 < .0012:
+    if range5 < .0012 and not sealed_flat_break:
         return False, "flat_sampled_market", ctx
     if direction * trend5 > .007:
         return False, "avoid_late_5m_impulse_chase", ctx

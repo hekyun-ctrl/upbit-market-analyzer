@@ -143,6 +143,26 @@ def audit_recent(classify, confirm_watch, model_config):
     monitor_log = logging.getLogger("lbank_monitor")
     monitor_log.addFilter(marker)
     try:
+        # A bounded public-data checkpoint for paired incident validation.
+        # Unlike the older latest-signal archive, include the post-signal
+        # breakdown and the recorder's actual first-arrival timestamps.
+        try:
+            window = capture_context_window(
+                os.getenv("LBANK_PERFORMANCE_DB", "/data/lbank_performance.sqlite3"),
+                os.getenv("LBANK_NATIVE_CANDLE_DB", "/data/lbank_native_candles.sqlite3"),
+                time.time())
+            window["model_config"] = model_config
+            window["runtime_source_commit"] = os.getenv("RAILWAY_GIT_COMMIT_SHA")
+            raw_window = json.dumps(window, sort_keys=True, allow_nan=False).encode()
+            digest_window = hashlib.sha256(raw_window).hexdigest()
+            encoded_window = base64.b64encode(zlib.compress(raw_window)).decode("ascii")
+            pieces = [encoded_window[i:i+2400] for i in range(0, len(encoded_window), 2400)]
+            for index, payload in enumerate(pieces):
+                LOG.info("ENTRY_CONTEXT_WINDOW_ARCHIVE %s", json.dumps(dict(
+                    sha256=digest_window, codec="zlib+base64", index=index,
+                    chunks=len(pieces), payload=payload), sort_keys=True))
+        except Exception as exc:
+            LOG.warning("ENTRY_CONTEXT_WINDOW_FAILED exception=%s", type(exc).__name__)
         bundle = capture(os.getenv("LBANK_PERFORMANCE_DB", "/data/lbank_performance.sqlite3"),
                          os.getenv("LBANK_NATIVE_CANDLE_DB", "/data/lbank_native_candles.sqlite3"), time.time())
         if bundle is None:
@@ -167,3 +187,36 @@ def audit_recent(classify, confirm_watch, model_config):
         LOG.warning("ENTRY_REPLAY_FAILED exception=%s live_gates_unchanged=true", type(exc).__name__)
     finally:
         monitor_log.removeFilter(marker)
+
+
+def capture_context_window(performance_path, native_path, now):
+    """Read public prices/candles only; no plans, account data, writes or sender."""
+    lower = int(now // 60) * 60 - 180 * 60
+    native = readonly(native_path)
+    try:
+        native.execute("BEGIN")
+        rows = [list(r) for r in native.execute(
+            f"SELECT {BAR_COLUMNS} FROM native_bars WHERE "
+            "(period=60 AND start>=? AND start<?) OR "
+            "(period=300 AND start>=? AND start<?) ORDER BY period,start",
+            (lower-360*60, int(now//60)*60,
+             int(lower//300)*300-250*300, int(now//300)*300))]
+        arrivals = [list(r) for r in native.execute(
+            "SELECT period,start,received,source FROM native_arrivals "
+            "WHERE start>=? AND start<? ORDER BY period,start",
+            (int(lower//300)*300-250*300, int(now//60)*60))]
+    finally:
+        native.close()
+    perf = readonly(performance_path)
+    try:
+        samples = [list(r) for r in perf.execute(
+            "SELECT ts,price FROM samples WHERE ts>=? AND ts<=? ORDER BY ts LIMIT 400",
+            (lower, now))]
+    finally:
+        perf.close()
+    if len(rows) > 900 or len(arrivals) > 900:
+        raise ValueError("public context archive exceeds bound")
+    return dict(version="native_context_window_v1", captured_at=now,
+                lower=lower, bar_columns=BAR_COLUMNS.split(","), native_rows=rows,
+                arrival_columns=["period", "start", "received", "source"],
+                arrivals=arrivals, samples=samples, actual_account_data=False)
