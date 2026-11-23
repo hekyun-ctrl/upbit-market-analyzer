@@ -36,6 +36,7 @@ from lbank_operational_health import (JournalRecovery, OperationalNotices,
 from lbank_native_candles import NativeCandleThread
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
 from lbank_trend_route import rank_entry_routes
+from lbank_trend_early_notice import trend_onset_preview, record_delivered_preview
 from lbank_fast_resumption import detect_fast_resumption
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
 from lbank_entry_quality import (confirmation_quality, direction_priority,
@@ -1177,6 +1178,7 @@ def run():
     trend_route_snapshot = None
     crossing_bucket = None
     reviewed_crossings = set()
+    last_early_preview_bar = None
     while True:
         try:
             # Inbound updates use the same authorized existing Telegram chat.
@@ -1339,6 +1341,25 @@ def run():
                 if native_key != route_key:
                     route_key = native_key
                     trend_route_snapshot = rank_entry_routes(native_state)
+                    # Independently notify on first completed 5m trend onset.
+                    # This informational preview NEVER authorizes an entry or
+                    # changes any 2-stage, stop, target, risk or daily entry gate.
+                    latest_bar = native_state["last5_start"]
+                    if latest_bar != last_early_preview_bar:
+                        last_early_preview_bar = latest_bar
+                        preview = trend_onset_preview(
+                            trend_route_snapshot, native_state, now, alert_state)
+                        if preview is not None:
+                            if telegram(preview["message"]):
+                                record_delivered_preview(alert_state, preview)
+                                save_snapshots(SAMPLE_STORE_PATH, SYMBOL, POLL,
+                                               observations, alert_state)
+                                LOG.info("TREND_EARLY_NOTICE_SENT direction=%d "
+                                         "bar=%d formal_entry_approved=false",
+                                         preview["direction"], preview["bar"])
+                            else:
+                                LOG.warning("TREND_EARLY_NOTICE_SEND_FAILED "
+                                            "formal_entry_approved=false")
                 if native_key[1] != crossing_bucket:
                     crossing_bucket = native_key[1]
                     reviewed_crossings.clear()

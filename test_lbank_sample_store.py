@@ -133,5 +133,19 @@ class CachedSampleTests(unittest.TestCase):
         self.assertEqual(observed, observations[-3:])
 
 
+    def test_native_early_notice_rate_limit_survives_restart(self):
+        now = 2000000000
+        alert = {"day": "2026-10-13", "count": 2,
+                 "last_time": now-30, "last_side": "숏",
+                 "trend_preview_day": "2033-05-18",
+                 "trend_preview_count": 3,
+                 "trend_preview_last_at": now-40,
+                 "trend_preview_last_bar": now//300*300-300,
+                 "trend_preview_last_direction": 1}
+        save_snapshots(self.path, SYMBOL, 60, [(now, 83300.)], alert)
+        _, recovered = load_snapshots(self.path, SYMBOL, 60, now=now+10)
+        self.assertEqual(recovered, alert)
+
+
 if __name__ == "__main__":
     unittest.main()

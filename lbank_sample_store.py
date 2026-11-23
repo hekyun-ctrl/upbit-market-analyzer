@@ -46,6 +46,24 @@ def _read_one(path, symbol, poll, current):
                     type(preview) in (int, float) and math.isfinite(preview)
                     and 0 <= preview <= current + 30):
                 alert["last_reversal_preview"] = preview
+            # Keep early-notice rate limits after a Railway restart, while
+            # preserving the original formal-entry cooldown/count unchanged.
+            early_day = gate.get("trend_preview_day")
+            early_count = gate.get("trend_preview_count")
+            early_time = gate.get("trend_preview_last_at")
+            early_bar = gate.get("trend_preview_last_bar")
+            early_dir = gate.get("trend_preview_last_direction")
+            if isinstance(early_day, str) and len(early_day) == 10:
+                alert["trend_preview_day"] = early_day
+            if type(early_count) is int and 0 <= early_count <= 8:
+                alert["trend_preview_count"] = early_count
+            if (type(early_time) in (int, float) and math.isfinite(early_time)
+                    and 0 <= early_time <= current + 30):
+                alert["trend_preview_last_at"] = early_time
+            if type(early_bar) is int and early_bar >= 0 and early_bar <= current:
+                alert["trend_preview_last_bar"] = early_bar
+            if early_dir in (-1, 1):
+                alert["trend_preview_last_direction"] = early_dir
         raw = data.get("samples", [])
         if not isinstance(raw, list):
             return None
