@@ -4,6 +4,7 @@ These are hypothetical signals, not confirmed positions or exchange orders.
 No private credentials, orders, or authenticated position tracking.
 """
 import json
+from lbank_capture_risk_guard import caution_kind
 import logging
 import math
 import os
@@ -252,6 +253,17 @@ class SignalRiskTracker:
                 survivors.append(item)
                 continue
 
+            if coherent and not item.target1_hit and not item.caution_notified:
+                capture_caution = caution_kind(
+                    item.profit_policy, item.profit_state, direction=item.direction,
+                    entry=item.entry, stop=item.stop, current=current,
+                    thesis_status=evidence['status'])
+                if capture_caution:
+                    item.priority_evidence = dict(evidence, capture_caution=capture_caution)
+                    events.append((item, 'risk_caution', current))
+                    survivors.append(item)
+                    continue
+
             adverse = -item.direction * (current - item.entry)
             stop_gap = abs(item.entry - item.stop)
             against_5m = len(prices) >= 6 and (
@@ -399,6 +411,15 @@ def format_risk_alert(signal, reason, price, time_kst):
                 f'판단: {status}\n현재 {price:,.1f} USDT | 보호 손절 {signal.stop:,.1f} USDT\n'
                 f'{action}\n실제 보유·체결 미확인, 자동 주문 없음.')
     if coherent and reason=='risk_caution':
+        capture_caution = evidence.get('capture_caution')
+        if capture_caution in ('pre_stop_risk', 'pre_target_profit_giveback'):
+            title = ('손절 전 위험 확대' if capture_caution == 'pre_stop_risk'
+                     else '목표 전 수익 반납 경계')
+            return (f'[LBank BTCUSDT | {title} - {side}]\n신호 #{signal.number} | {time_kst} KST\n'
+                    f'현재 {price:,.1f} USDT | 원래 보호 손절 {signal.stop:,.1f} USDT\n'
+                    '실제 보유 중이면 위험 축소·부분 청산 여부를 즉시 점검하세요. '
+                    '손절 주문을 해제하거나 확대하지 마세요.\n'
+                    '참고 신호 추적 중이며 새 진입 지시가 아닙니다. 실제 체결 미확인, 자동 주문 없음.')
         why=('원본 자료 부족으로 방향을 재판정할 수 없음' if evidence.get('status')=='unknown'
              else '단기 역행과 근거 혼재, 진입 당시 구조의 확정 이탈은 미확인')
         return (f'[LBank BTCUSDT | 근거 재점검 · 추적 유지 - {side}]\n신호 #{signal.number} | {time_kst} KST\n'
