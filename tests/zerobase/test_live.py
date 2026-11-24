@@ -88,6 +88,31 @@ class LiveTests(unittest.TestCase):
         self.assertEqual(e.closed[0].events[-1]['kind'], 'HARD_STOP')
         self.assertEqual(e.closed[0].events[-1]['price'], '89.9')
 
+    def test_missing_latest_candle_audit_does_not_delay_open_risk(self):
+        e = engine()
+        e.quote(quote(), T+60)
+        self.assertIsNotNone(e.position)
+        now = T+302
+        with tempfile.TemporaryDirectory() as tmp:
+            worker = EngineThread(Path(tmp)/'native.sqlite')
+            worker.evidence = {
+                'qualification': {}, 'metadata': {}, 'costs': asdict(C),
+                'settlement_schedule': [],
+                'record': {'instrument': {'volumeMultiple': '1', 'priceTick': '.1', 'volumeTick': '.0001'}},
+            }
+            worker.last_evidence = now
+            store = EventStore(':memory:', e)
+            self.addCleanup(store.close)
+            close = bar(T, 300, v='5', received=now-1)
+            with patch('lbank_zb.service.native_inputs', return_value=[close]), \
+                 patch('lbank_zb.service.time.time', return_value=now), \
+                 patch.object(worker.client, 'quote', return_value=quote(now, '90', '89.9', '90')):
+                worker.poll(store, now)
+            self.assertEqual(store.engine.five[-1], close)
+            self.assertIsNone(store.engine.position)
+            self.assertEqual(store.report()['archived_closed'], 1)
+            self.assertFalse(store.engine.qualification['independent_5m'])
+
     def test_partial_uses_actual_depth_quantity_then_funding_remaining(self):
         e = engine()
         e.quote(quote(), T+60)

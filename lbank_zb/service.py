@@ -13,7 +13,9 @@ import threading
 import time
 from pathlib import Path
 from .adapter import normalize_native
-from .candle_evidence import CandleAuditThread, PRICE_TICK, VOLUME_TICK, audit_status
+from .candle_evidence import (
+    CandleAuditThread, EVIDENCE_GRACE, PERIOD, PRICE_TICK, VOLUME_TICK, audit_status,
+)
 from .core import Costs, D, dec, dumps, digest
 from .journal import EventStore
 from .live import LiveEngine
@@ -83,17 +85,36 @@ class EngineThread(threading.Thread):
         # Snapshot stores the cursor atomically with the input it describes.
         after = getattr(e, 'native_cursor', None)
         for b in native_inputs(self.native_path, self.evidence['metadata'], after):
+            if b.received > now:
+                break
+            latest_close = b.period == PERIOD and b.end == now // PERIOD * PERIOD
+            # The independent checker reads the sealed derived bar first. Hold
+            # only the new flat-state evaluation while that check is in flight.
+            # A known mismatch, an expired wait, and open risk use the normal path.
+            if (latest_close and not e.position and not e.pending
+                    and candles.get('last_checked_start') != b.start
+                    and now <= b.end + EVIDENCE_GRACE):
+                break
             saved = getattr(store.engine, 'native_cursor', None)
             store.engine.native_cursor = [b.received, b.end, b.period]
             try:
-                store.consume('native:' + str(b.period) + ':' + str(b.start), 'bar', json.loads(dumps(b)), b.received)
+                # Receipt remains in the bar. The journal event records when
+                # evidence was actually available to this evaluation.
+                store.consume('native:' + str(b.period) + ':' + str(b.start),
+                              'bar', json.loads(dumps(b)), now)
             except Exception:
                 store.engine.native_cursor = saved
                 raise
+            if latest_close:
+                LOG.info('ZB_5M_INPUT start=%d received=%d evaluated=%d audit=%s independent_5m=%s',
+                         b.start, b.received, now,
+                         candles.get('last_status') if candles.get('last_checked_start') == b.start
+                         else 'unavailable', qualification['independent_5m'])
         if store.engine.position or store.engine.pending:
             store.consume('clock-active:'+str(int(now)),'clock',{},now)
             q = self.client.quote(self.evidence)
-            store.consume('quote:' + digest(q), 'quote', q, int(time.time()))
+            now = int(time.time())
+            store.consume('quote:' + digest(q), 'quote', q, now)
         if now - self.last_log >= 60:
             store.consume('clock:' + str(int(now) // 60), 'clock', {}, now)
             report = store.report()

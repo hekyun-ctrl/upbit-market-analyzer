@@ -123,12 +123,15 @@ class Engine:
             # Native five minute bars cross-checked against complete one minute group.
             minutes=[x for x in self.one if b.start<=x.start<b.end]
             agg=aggregate(minutes,300) if contiguous(minutes) else []
-            if not agg or not self.costs.tick or any(abs(getattr(agg[0],k)-getattr(b,k))>self.costs.tick for k in ('o','h','l','c')):
+            ohlc_ok = bool(agg) and bool(self.costs.tick) and all(
+                abs(getattr(agg[0], key) - getattr(b, key)) <= self.costs.tick
+                for key in ('o', 'h', 'l', 'c'))
+            volume_ok = bool(agg) and abs(agg[0].v - b.v) <= VOLUME_EPSILON
+            if not ohlc_ok:
                 self.health.add('DATA_DEGRADED');self.crosscheck_failures.add(b.start);self.emit('BAR_MISMATCH_OR_UNIT_UNKNOWN',now,bar=b.start)
-            elif abs(agg[0].v-b.v)>D('.00000001'):
+            elif not volume_ok:
                 self.health.add('DATA_DEGRADED');self.crosscheck_failures.add(b.start);self.emit('VOLUME_MISMATCH',now,bar=b.start)
-            crosscheck_ok=(len(agg)==1 and self.costs.tick is not None and
-                all(abs(getattr(agg[0],k)-getattr(b,k))<=self.costs.tick for k in ('o','h','l','c')) and agg[0].v==b.v)
+            crosscheck_ok = ohlc_ok and volume_ok
             if self.context_mode=='record':self.higher_timeframes.ingest(b,now,crosscheck_ok)
             self.fifteen=aggregate(self.five,900)[-160:]
             state=regime(self.fifteen) if contiguous(self.fifteen) else 'UNKNOWN'

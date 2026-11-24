@@ -8,6 +8,9 @@ import hashlib,json
 
 D=Decimal
 ZERO=D(0)
+# SQLite sums native quantities as floats. Use the same tolerance in both the
+# derived-bar check and the independent venue check, well below one BTC tick.
+VOLUME_EPSILON = D('.00000001')
 def dec(x):
     v=D(str(x))
     if not v.is_finite(): raise ValueError('nonfinite')
