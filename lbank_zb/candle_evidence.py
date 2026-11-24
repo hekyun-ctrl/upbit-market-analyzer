@@ -17,7 +17,7 @@ import time
 import aiohttp
 
 from lbank_native_candles import WS_URL, decode_frame
-from .core import D, dec, dumps
+from .core import D, VOLUME_EPSILON, dec, dumps
 
 LOG = logging.getLogger('lbank_zb_candle_evidence')
 REFERENCE_URL = 'wss://uuws.lbank.com/ws/v3'
@@ -29,7 +29,6 @@ CONNECTION_LEAD = 18
 FIELDS = ('open', 'high', 'low', 'close', 'volume', 'turnover')
 PRICE_TICK = D('.1')
 VOLUME_TICK = D('.0001')
-VOLUME_EPSILON = D('.00000001')
 TURNOVER_EPSILON = D('.000001')
 REFERENCE_ROUTES = ((REFERENCE_URL, .7), (WS_URL, .55))
 

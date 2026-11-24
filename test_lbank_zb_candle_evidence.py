@@ -3,16 +3,18 @@ import copy
 import sqlite3
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 from lbank_native_candles import WS_URL
 from lbank_zb.candle_evidence import (
-    REFERENCE_ROUTES, REFERENCE_URL, CandleAuditThread, ReferenceDisagreement,
+    EVIDENCE_GRACE, REFERENCE_ROUTES, REFERENCE_URL, CandleAuditThread, ReferenceDisagreement,
     audit_status, capture_reference, closed_reply, compare, read_derived,
 )
 from lbank_zb.service import EngineThread
-from lbank_zb.core import D, Costs, asdict
+from lbank_zb.core import Bar, D, Costs, asdict
+from lbank_zb.engine import Engine
 from lbank_zb.journal import EventStore
 from lbank_zb.live import LiveEngine
 
@@ -141,6 +143,68 @@ class CandleEvidenceTests(unittest.TestCase):
         self.assertIn('RAW5M_INDEPENDENCE_UNVERIFIED', store.engine.entry_blocks)
         self.assertIn('CANDLE_VOLUME_UNIT_UNVERIFIED', store.engine.entry_blocks)
         self.assertEqual(store.report()['outbox'], {})
+
+    def test_latest_close_waits_for_its_own_audit_without_backdating(self):
+        engine = EngineThread(self.audit.with_name('native.sqlite3'), audit_path=self.audit)
+        costs = replace(COSTS, tick=D('.1'))
+        engine.evidence = {'qualification': {'product': True, 'fees': True, 'funding_plan': True},
+                           'metadata': {}, 'costs': asdict(costs), 'settlement_schedule': [],
+                           'record': {'instrument': {'volumeMultiple': '1', 'priceTick': '.1', 'volumeTick': '.0001'}}}
+        engine.last_evidence = END
+        store = EventStore(':memory:', LiveEngine(costs))
+        self.addCleanup(store.close)
+        close = Bar(END-300, 300, D(100), D(101), D(99), D(100), D(5), END+1)
+        # A match on the preceding bar does not authorize this one.
+        self.insert(END-600)
+        with patch('lbank_zb.service.native_inputs', return_value=[close]) as reads:
+            engine.poll(store, END+2)
+            self.assertEqual(store.engine.five, [])
+            self.assertIsNone(getattr(store.engine, 'native_cursor', None))
+            self.insert(END-300)
+            engine.poll(store, END+5)
+            self.assertIsNone(reads.call_args.args[2])
+        self.assertEqual(store.engine.five, [close])
+        self.assertTrue(store.engine.qualification['independent_5m'])
+        self.assertEqual(store.engine.native_cursor, [END+1, END, 300])
+        rows = store.db.execute(
+            'SELECT kind,received FROM external_inputs ORDER BY rowid'
+        ).fetchall()
+        self.assertEqual([t for _, t in rows], sorted(t for _, t in rows))
+        self.assertEqual([t for kind, t in rows if kind == 'bar'], [END+5])
+
+    def test_pending_audit_has_a_deadline_and_mismatch_is_not_authorized(self):
+        for status, offset in ((None, EVIDENCE_GRACE+1), ('volume_mismatch', 2)):
+            with self.subTest(status=status):
+                with self.db:
+                    self.db.execute('DELETE FROM candle_checks')
+                if status:
+                    self.insert(END-300, status, False)
+                engine = EngineThread(self.audit.with_name('native.sqlite3'), audit_path=self.audit)
+                engine.evidence = {'qualification': {}, 'metadata': {}, 'costs': asdict(COSTS),
+                                   'settlement_schedule': [], 'record': {'instrument': {
+                                       'volumeMultiple': '1', 'priceTick': '.1', 'volumeTick': '.0001'}}}
+                engine.last_evidence = END
+                store = EventStore(':memory:', LiveEngine(COSTS))
+                self.addCleanup(store.close)
+                close = Bar(END-300, 300, D(100), D(101), D(99), D(100), D(5), END+1)
+                with patch('lbank_zb.service.native_inputs', return_value=[close]):
+                    engine.poll(store, END+offset)
+                self.assertEqual(store.engine.five, [close])
+                self.assertIn('RAW5M_INDEPENDENCE_UNVERIFIED', store.engine.entry_blocks)
+
+    def test_research_crosscheck_uses_the_same_volume_tolerance_as_the_venue_audit(self):
+        costs = replace(COSTS, tick=D('.1'))
+        for volume, matched in ((DERIVED['volume'], True), (1.5109, False)):
+            with self.subTest(volume=volume):
+                engine = Engine(costs)
+                for start, qty in zip(range(END-300, END, 60), ('.2', '.3', '.4', '.5', '.1108')):
+                    engine.ingest(Bar(start, 60, D(100), D(101), D(99), D(100), D(qty),
+                                      start+60), start+60)
+                close = Bar(END-300, 300, D(100), D(101), D(99), D(100), D(str(volume)), END)
+                with patch.object(engine.higher_timeframes, 'ingest') as context:
+                    engine.ingest(close, END)
+                context.assert_called_once_with(close, END, matched)
+                self.assertEqual(END-300 in engine.crosscheck_failures, not matched)
 
 
 class CandleConnectionTests(unittest.IsolatedAsyncioTestCase):
