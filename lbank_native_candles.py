@@ -5,6 +5,8 @@ The 5m subscription replies with a 5m snapshot, then PUSHES 1m candles.
 Never relabel those pushes as 5m. Closed 5m bars require five consecutive
 native 1m bars, closed by a continuous stream advancing to the next minute.
 Stream closure is inferred, NOT a REST-verified final-candle flag.
+The live recorder holds a just-ended minute briefly for late updates and
+separately requested exchange snapshots before publishing it.
 """
 import asyncio
 import json
@@ -21,6 +23,20 @@ import aiohttp
 LOG = logging.getLogger("lbank_native_candles")
 WS_URL = "wss://uuws.rerrkvifj.com/ws/v3"
 MAX_BOUNDARY_DELAY = 15
+MINUTE_REFERENCE_GRACE = 2
+
+
+def consistent_final_minute(stream, final):
+    """A finalized exchange snapshot must contain all observed trades."""
+    extra_volume = final["volume"] - stream["volume"]
+    extra_turnover = final["turnover"] - stream["turnover"]
+    if (final["open"] != stream["open"] or final["high"] < stream["high"]
+            or final["low"] > stream["low"] or extra_volume < 0):
+        return False
+    if extra_volume == 0:
+        return all(final[key] == stream[key] for key in ("high", "low", "close", "turnover"))
+    return (final["low"] * extra_volume - .000001 <= extra_turnover
+            <= final["high"] * extra_volume + .000001)
 
 
 def decode_frame(data):
@@ -65,7 +81,7 @@ def parse_bar(raw, *, observed_end_by=None):
 
 
 class NativeCandleStore:
-    def __init__(self, path):
+    def __init__(self, path, *, reconcile_closes=False):
         if path != ":memory:":
             os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
         self.db = sqlite3.connect(path, timeout=2)
@@ -87,6 +103,9 @@ class NativeCandleStore:
             self.db.execute("UPDATE native_bars SET quality='gap' WHERE quality='forming'")
         self.current = None
         self.last_seen = None
+        self.reconcile_closes = reconcile_closes
+        self.pending_close = None
+        self.close_reference = None
         self.server_time = 0
         self.recovered_derived_5m = self.repair_derived_history()
 
@@ -120,11 +139,76 @@ class NativeCandleStore:
         return recovered
 
     def disconnected(self):
-        if self.current is not None:
-            with self.db:
-                self.db.execute("UPDATE native_bars SET quality='gap' WHERE period=60 AND start=?",
-                                (self.current,))
+        with self.db:
+            self.db.execute("UPDATE native_bars SET quality='gap' WHERE period=60 AND start IN (?,?) "
+                            "AND quality='forming'", (self.current, self.pending_close))
         self.current, self.last_seen = None, None
+        self.pending_close, self.close_reference = None, None
+
+    def reference_minute(self, reference, wall_received):
+        """Use both ticketed replies only while the corresponding minute is mutable."""
+        start = reference["start"]
+        if (not self.reconcile_closes or start not in (self.current, self.pending_close)
+                or wall_received < start + 60 or wall_received > start + 60 + MINUTE_REFERENCE_GRACE
+                or len(set(reference.get("corroborated_routes", ()))) != 2):
+            return
+        self.close_reference = reference
+
+    def flush_minute(self, wall_received):
+        with self.db:
+            return self._publish_pending(wall_received)
+
+    def _publish_pending(self, wall_received):
+        start = self.pending_close
+        if start is None:
+            return []
+        reference = self.close_reference
+        if reference is not None and reference["start"] != start:
+            reference = None
+        # A successor and two identical early replies can precede the last
+        # update to the prior minute. Do not publish before this deadline.
+        if self.reconcile_closes and wall_received < start + 60 + MINUTE_REFERENCE_GRACE:
+            return []
+        source = 'lbank_native_stream_1m'
+        if reference is not None:
+            prior = self.db.execute("SELECT * FROM native_bars WHERE period=60 AND start=?", (start,)).fetchone()
+            fields = ("open", "high", "low", "close", "volume", "turnover")
+            final = {k: float(reference[k]) for k in fields}
+            if reference["updated"] < prior["updated"]:
+                LOG.info("NATIVE_MINUTE_CLOSE_REFERENCE start=%d status=stream_newer", start)
+            elif consistent_final_minute(prior, final):
+                source = 'lbank_native_stream_1m_with_final_reply'
+                self.db.execute("UPDATE native_bars SET open=?,high=?,low=?,close=?,volume=?,turnover=?,"
+                                "updated=? WHERE period=60 AND start=?",
+                                (*(final[k] for k in fields), reference["updated"], start))
+                LOG.info("NATIVE_MINUTE_CLOSE_REFERENCE start=%d status=%s stream_volume=%.4f final_volume=%.4f",
+                         start, "reconciled" if final["volume"] > prior["volume"] else "matched",
+                         prior["volume"], final["volume"])
+            else:
+                LOG.warning("NATIVE_MINUTE_CLOSE_REFERENCE start=%d status=conflict", start)
+            self.close_reference = None
+        self.pending_close = None
+        self.db.execute("UPDATE native_bars SET quality='stream_closed' WHERE period=60 AND start=?",
+                        (start,))
+        self.db.execute("INSERT OR IGNORE INTO native_arrivals VALUES(?,?,?,?)",
+                        (60, start, int(wall_received), source))
+        finished = self._aggregate(start // 300 * 300)
+        if finished is None:
+            return []
+        self.db.execute("INSERT OR IGNORE INTO native_arrivals VALUES(?,?,?,?)",
+                        (300, finished['start'], int(wall_received), 'lbank_native_1m_derived_5m'))
+        cutoff = self.server_time - 32 * 86400
+        self.db.execute("DELETE FROM native_bars WHERE start<?", (cutoff,))
+        self.db.execute("DELETE FROM native_snapshots WHERE start<?", (cutoff,))
+        self.db.execute("DELETE FROM native_arrivals WHERE start<?", (cutoff,))
+        return [finished]
+
+    def _write_forming(self, bar):
+        self.db.execute('''INSERT INTO native_bars VALUES(?,?,?,?,?,?,?,?,?,?)
+            ON CONFLICT(period,start) DO UPDATE SET
+            open=excluded.open,high=excluded.high,low=excluded.low,close=excluded.close,
+            volume=excluded.volume,turnover=excluded.turnover,updated=excluded.updated,
+            quality=excluded.quality''', (*bar, "forming"))
 
     def ingest(self, frame, received, wall_received=None):
         if frame.get("x") != 2 or frame.get("z") not in (3, 4):
@@ -133,20 +217,20 @@ class NativeCandleStore:
         raw_rows = frame.get("d", [])
         if isinstance(raw_rows, dict):
             raw_rows = [raw_rows]
-        wall_received = int(time.time() if wall_received is None else wall_received)
+        wall_received = time.time() if wall_received is None else wall_received
         observed_end_by = min(wall_received, int(frame["w"]) / 1000)
         parsed = []
         for raw in raw_rows:
             active = False
             if raw.get("a") == "BTCUSDT" and raw.get("b") == "1m":
                 start = int(raw["c"])
-                if self.current is not None and start < self.current:
+                if self.current is not None and start < self.current and start != self.pending_close:
                     # A revision to an older minute cannot change a sealed bar.
                     continue
                 if self.current is None and start+60 <= min(observed_end_by, int(raw["k"])):
                     # A late row on reconnect is not a fresh contiguous start.
                     continue
-                active = start == self.current
+                active = start in (self.current, self.pending_close)
             try:
                 parsed.append((raw, parse_bar(raw, observed_end_by=observed_end_by if active else None)))
             except ValueError as exc:
@@ -160,6 +244,7 @@ class NativeCandleStore:
                 raise
         closed = []
         with self.db:
+            closed.extend(self._publish_pending(wall_received))
             for raw, bar in parsed:
                 period, start, o, h, l, c, v, turnover, updated = bar
                 if updated > self.server_time + 2:
@@ -168,6 +253,15 @@ class NativeCandleStore:
                     self.db.execute("INSERT OR REPLACE INTO native_snapshots VALUES(?,?,?)",
                                     (start, json.dumps(raw), int(frame["w"])))
                     continue  # Snapshot is still forming, never usable as a close.
+                if start == self.pending_close:
+                    prior = self.db.execute("SELECT * FROM native_bars WHERE period=60 AND start=?",
+                                            (start,)).fetchone()
+                    later = dict(open=o, high=h, low=l, close=c, volume=v, turnover=turnover)
+                    if updated >= prior["updated"] and consistent_final_minute(prior, later):
+                        self._write_forming(bar)
+                        LOG.info("NATIVE_MINUTE_LATE_UPDATE start=%d stream_volume=%.4f late_volume=%.4f",
+                                 start, prior["volume"], v)
+                    continue  # Do not change the newer minute or its continuity clock.
                 previous = self.db.execute("SELECT * FROM native_bars WHERE period=60 AND start=?",
                                            (self.current,)).fetchone()
                 if self.current is not None and start < self.current:
@@ -177,27 +271,15 @@ class NativeCandleStore:
                 if previous and start > self.current:
                     clean = (start == self.current + 60 and self.last_seen is not None
                              and 0 <= received - self.last_seen <= 15)
-                    self.db.execute("UPDATE native_bars SET quality=? WHERE period=60 AND start=?",
-                                    ("stream_closed" if clean else "gap", self.current))
                     if clean:
-                        self.db.execute("INSERT OR IGNORE INTO native_arrivals VALUES(?,?,?,?)",
-                                        (60, self.current, wall_received, 'lbank_native_stream_1m'))
-                    finished = self._aggregate(self.current // 300 * 300)
-                    if finished is not None:
-                        closed.append(finished)
-                        self.db.execute("INSERT OR IGNORE INTO native_arrivals VALUES(?,?,?,?)",
-                                        (300, finished['start'], wall_received, 'lbank_native_1m_derived_5m'))
-                self.db.execute('''INSERT INTO native_bars VALUES(?,?,?,?,?,?,?,?,?,?)
-                    ON CONFLICT(period,start) DO UPDATE SET
-                    open=excluded.open,high=excluded.high,low=excluded.low,close=excluded.close,
-                    volume=excluded.volume,turnover=excluded.turnover,updated=excluded.updated,
-                    quality=excluded.quality''', (*bar, "forming"))
+                        self.pending_close = self.current
+                        closed.extend(self._publish_pending(wall_received))
+                    else:
+                        self.db.execute("UPDATE native_bars SET quality='gap' WHERE period=60 AND start=?",
+                                        (self.current,))
+                        self.close_reference = None
+                self._write_forming(bar)
                 self.current, self.last_seen = start, received
-            if closed:
-                cutoff = self.server_time - 32 * 86400
-                self.db.execute("DELETE FROM native_bars WHERE start<?", (cutoff,))
-                self.db.execute("DELETE FROM native_snapshots WHERE start<?", (cutoff,))
-                self.db.execute("DELETE FROM native_arrivals WHERE start<?", (cutoff,))
         return closed
 
     def _aggregate(self, start):
@@ -263,19 +345,45 @@ class NativeCandleThread(threading.Thread):
             await asyncio.sleep(6)
             await ws.send_json({"action": "ping", "ping": str(int(time.time()*1000))})
 
+    async def _final_minutes(self, session, store):
+        # candle_evidence also decodes the native recorder's wire format.
+        from lbank_zb.candle_evidence import ReferenceDisagreement, capture_reference
+
+        while True:
+            end = (int(time.time()) // 60 + 1) * 60
+            await asyncio.sleep(max(0, end - 6 - time.time()))
+            deadline = end + MINUTE_REFERENCE_GRACE
+            try:
+                reference = await asyncio.wait_for(
+                    capture_reference(session, end, period=60, grace=MINUTE_REFERENCE_GRACE),
+                    timeout=max(0, deadline - time.time()))
+            except (ReferenceDisagreement, OSError, TimeoutError, ValueError, aiohttp.ClientError):
+                reference = None
+            if reference:
+                store.reference_minute(reference, time.time())
+            await asyncio.sleep(max(0, deadline - time.time()))
+            try:
+                for bar in store.flush_minute(time.time()):
+                    LOG.info("NATIVE_CANDLE_CLOSED %s", json.dumps(bar))
+            except sqlite3.Error as exc:
+                LOG.warning("NATIVE_MINUTE_CLOSE_STORAGE_FAILURE exception=%s", type(exc).__name__)
+
     async def _run(self):
-        store = NativeCandleStore(self.path)
+        store = NativeCandleStore(self.path, reconcile_closes=True)
         delay = 2
         while True:
-            heartbeat = None
+            heartbeat = finalizer = None
             try:
-                async with aiohttp.ClientSession(trust_env=True) as session:
+                async with aiohttp.ClientSession(
+                    trust_env=True, headers={"Origin": "https://www.lbank.com"}
+                ) as session:
                     async with session.ws_connect(WS_URL, timeout=12, receive_timeout=20,
                                                   max_msg_size=1024*1024) as ws:
                         await ws.send_json({"x": 2, "y": "2000000001", "z": 1,
                             "a": {"i": "BTCUSDT_5m"},
                             "e": json.dumps({"bvc": "202", "isUsd": 1})})
                         heartbeat = asyncio.create_task(self._heartbeat(ws))
+                        finalizer = asyncio.create_task(self._final_minutes(session, store))
                         LOG.info("NATIVE_CANDLES_CONNECTED entry_readiness=see_NATIVE_ENTRY_STATUS")
                         next_log = 0
                         async for msg in ws:
@@ -301,9 +409,10 @@ class NativeCandleThread(threading.Thread):
                 LOG.warning("NATIVE_CANDLES_RECONNECT exception=%s reason=%s retry_seconds=%s",
                             type(exc).__name__, safe_reason, delay)
             finally:
-                if heartbeat:
-                    heartbeat.cancel()
-                    await asyncio.gather(heartbeat, return_exceptions=True)
+                tasks = [task for task in (heartbeat, finalizer) if task is not None]
+                for task in tasks:
+                    task.cancel()
+                await asyncio.gather(*tasks, return_exceptions=True)
                 store.disconnected()
             await asyncio.sleep(delay)
             delay = min(delay * 2, 60)

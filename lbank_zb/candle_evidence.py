@@ -37,16 +37,18 @@ class ReferenceDisagreement(ValueError):
     """Two independently requested LBank closes disagree at the same boundary."""
 
 
-def closed_reply(frame, ticket, end, received_ms, endpoint=REFERENCE_URL):
+def closed_reply(frame, ticket, end, received_ms, endpoint=REFERENCE_URL, *,
+                 period=PERIOD, grace=EVIDENCE_GRACE):
     if (frame.get('x'), frame.get('z'), frame.get('y')) != (2, 3, ticket):
         return None
     server_ms, rows = frame.get('w'), frame.get('d')
-    if (type(server_ms) is not int or not end*1000 <= server_ms <= (end+EVIDENCE_GRACE)*1000
-            or not 0 <= received_ms-server_ms <= EVIDENCE_GRACE*1000
+    if (type(server_ms) is not int or not end*1000 <= server_ms <= (end+grace)*1000
+            or not 0 <= received_ms-server_ms <= grace*1000
             or not isinstance(rows, list) or len(rows) != 1):
         return None
     raw = rows[0]
-    if (not isinstance(raw, dict) or (raw.get('a'), raw.get('b'), raw.get('c')) != ('BTCUSDT', '5m', end-PERIOD)
+    if (not isinstance(raw, dict) or (raw.get('a'), raw.get('b'), raw.get('c'))
+            != ('BTCUSDT', f'{period // 60}m', end-period)
             or type(raw.get('k')) is not int or not end <= raw['k'] <= server_ms//1000):
         return None
     try:
@@ -137,11 +139,12 @@ def audit_status(path, now):
     return result
 
 
-async def capture_reference(session, end):
+async def capture_reference(session, end, *, period=PERIOD, grace=EVIDENCE_GRACE):
     # Both connections must be ready before rollover. Waiting for an empty
     # response before opening the second connection can miss the same old bar.
     results = await asyncio.gather(
-        *(capture_endpoint(session, endpoint, end, lead) for endpoint, lead in REFERENCE_ROUTES),
+        *(capture_endpoint(session, endpoint, end, lead, period=period, grace=grace)
+          for endpoint, lead in REFERENCE_ROUTES),
         return_exceptions=True,
     )
     references = [result for result in results if isinstance(result, dict)]
@@ -156,16 +159,17 @@ async def capture_reference(session, end):
     return dict(reference, corroborated_routes=[row['source'] for row in references])
 
 
-async def capture_endpoint(session, endpoint, end, lead):
+async def capture_endpoint(session, endpoint, end, lead, *, period=PERIOD, grace=EVIDENCE_GRACE):
     latest = None
-    deadline = end + EVIDENCE_GRACE
+    deadline = end + grace
+    interval = f'{period // 60}m'
     async with session.ws_connect(endpoint, timeout=4, max_msg_size=1024*1024) as ws:
         await asyncio.sleep(max(0, end-lead-time.time()))
         for serial in range(24):
             if time.time() >= deadline:
                 break
             ticket = str(2000000001+serial)
-            await ws.send_json({'x': 2, 'y': ticket, 'z': 1, 'a': {'i': 'BTCUSDT_5m'},
+            await ws.send_json({'x': 2, 'y': ticket, 'z': 1, 'a': {'i': f'BTCUSDT_{interval}'},
                                 'e': json.dumps({'bvc': '202', 'isUsd': 1})})
             until = min(time.time()+.8, deadline)
             while time.time() < until:
@@ -178,13 +182,14 @@ async def capture_endpoint(session, endpoint, end, lead):
                 frame = decode_frame(msg.data)
                 if not isinstance(frame, dict) or (frame.get('x'), frame.get('z'), frame.get('y')) != (2, 3, ticket):
                     continue
-                candidate = closed_reply(frame, ticket, end, int(time.time()*1000), endpoint)
+                candidate = closed_reply(frame, ticket, end, int(time.time()*1000), endpoint,
+                                         period=period, grace=grace)
                 if candidate and (not latest or (candidate['updated'], candidate['server_ms'])
                                   >= (latest['updated'], latest['server_ms'])):
                     latest = candidate
                 rows = frame.get('d')
                 if (isinstance(rows, list) and len(rows) == 1 and isinstance(rows[0], dict)
-                        and (rows[0].get('a'), rows[0].get('b'), rows[0].get('c')) == ('BTCUSDT', '5m', end)):
+                        and (rows[0].get('a'), rows[0].get('b'), rows[0].get('c')) == ('BTCUSDT', interval, end)):
                     return latest
                 break
             await asyncio.sleep(.22 if time.time() < end+2 else .5)

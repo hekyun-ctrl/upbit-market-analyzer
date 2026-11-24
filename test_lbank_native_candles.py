@@ -18,8 +18,8 @@ def frame(bar):
 
 
 class NativeCandlesTests(unittest.TestCase):
-    def make_store(self, path=":memory:"):
-        store = NativeCandleStore(path)
+    def make_store(self, path=":memory:", **kwargs):
+        store = NativeCandleStore(path, **kwargs)
         self.addCleanup(store.db.close)
         return store
 
@@ -142,6 +142,62 @@ class NativeCandlesTests(unittest.TestCase):
         row = store.db.execute("SELECT quality,close FROM native_bars WHERE period=60 AND start=3000").fetchone()
         self.assertEqual(tuple(row), ("stream_closed", 101))
         self.assertEqual(store.current, 3060)
+
+    def test_real_lbank_rollover_retains_the_late_update_before_publication(self):
+        # Public BTCUSDT frames observed 2026-11-25 07:14 KST. The
+        # second update to the old minute followed the first new-minute frame.
+        end = 1795558440
+        prior = dict(raw(end-60, updated=end), d="59939.8", e="59928.4",
+                     f="59951.4", g="59923.9", h="0.2835", i="16991.25361")
+        successor = dict(raw(end, updated=end), d="59928.5", e="59928.5",
+                         f="59928.5", g="59928.4", h="0.0010", i="59.92843")
+        revised = dict(prior, k=end+1, e="59928.5", h="0.2837", i="17003.23931")
+        active = dict(prior, k=end-1, h="0.2814", i="16865.40087")
+        store = self.make_store(reconcile_closes=True)
+        for candle, at in ((active, -.711), (prior, .098), (successor, .874), (revised, 1.910)):
+            store.ingest(frame(candle), end+at, wall_received=end+at)
+        row = store.db.execute("SELECT volume,quality FROM native_bars WHERE period=60 AND start=?",
+                               (end-60,)).fetchone()
+        self.assertEqual(tuple(row), (0.2837, "forming"))
+        self.assertEqual(store.db.execute("SELECT COUNT(*) FROM native_arrivals").fetchone()[0], 0)
+        store.flush_minute(end+2.01)
+        row = store.db.execute("SELECT volume,turnover,quality FROM native_bars WHERE period=60 AND start=?",
+                               (end-60,)).fetchone()
+        self.assertEqual(tuple(row), (0.2837, 17003.23931, "stream_closed"))
+        self.assertEqual(store.db.execute("SELECT received FROM native_arrivals WHERE start=?",
+                                          (end-60,)).fetchone()[0], end+2)
+        store.ingest(frame(dict(revised, k=end+2, h="0.2838")), end+2.1, wall_received=end+2.1)
+        self.assertEqual(store.db.execute("SELECT volume FROM native_bars WHERE start=?",
+                                         (end-60,)).fetchone()[0], 0.2837)
+        self.assertEqual(store.current, end)
+
+    def test_final_reference_applies_only_with_continuity_and_two_matching_routes(self):
+        for routes, high, final_volume, expected in (
+                (("route-a", "route-b"), 103, 3, 3),
+                (("route-a",), 103, 3, 2),
+                (("route-a", "route-b"), 102, 3, 2),
+                (("route-a", "route-b"), 103, 1, 2)):
+            with self.subTest(routes=routes, high=high, final_volume=final_volume):
+                store = self.make_store(reconcile_closes=True)
+                store.ingest(frame(raw(3000, volume=2)), 3059, wall_received=3059.2)
+                store.ingest(frame(raw(3060, updated=3060)), 3060.6, wall_received=3060.6)
+                store.reference_minute(dict(start=3000, updated=3060, corroborated_routes=routes,
+                    open=100, high=high, low=98, close=101, volume=final_volume,
+                    turnover=final_volume*100), 3061.0)
+                store.flush_minute(3062.1)
+                row = store.db.execute("SELECT volume,quality FROM native_bars WHERE start=3000").fetchone()
+                self.assertEqual(tuple(row), (expected, "stream_closed"))
+                arrival = store.db.execute("SELECT source FROM native_arrivals WHERE start=3000").fetchone()[0]
+                self.assertEqual(arrival.endswith("_with_final_reply"), expected != 2)
+
+    def test_disconnect_while_final_update_is_pending_does_not_certify_either_minute(self):
+        store = self.make_store(reconcile_closes=True)
+        store.ingest(frame(raw(3000)), 3059, wall_received=3059.2)
+        store.ingest(frame(raw(3060, updated=3060)), 3060.7, wall_received=3060.7)
+        store.disconnected()
+        self.assertEqual(store.flush_minute(3062), [])
+        self.assertEqual(store.db.execute("SELECT COUNT(*) FROM native_arrivals").fetchone()[0], 0)
+        self.assertEqual(store.db.execute("SELECT COUNT(*) FROM native_bars WHERE quality='gap'").fetchone()[0], 2)
 
     def test_gap_at_boundary_prevents_closure(self):
         store = self.make_store()

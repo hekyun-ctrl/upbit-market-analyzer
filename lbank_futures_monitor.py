@@ -1542,6 +1542,13 @@ def run():
                                 plan = None
                             else:
                                 plan["entry_quality"]["capture_guard"] = guard_evidence
+                                if plan["strategy"] == "breakout":
+                                    shadow_ok, shadow_reason, _ = capture_entry_guard(
+                                        plan, watch["plan"], native_state, stopped_retry=retry,
+                                        breakout_followthrough=True)
+                                    LOG.info("CAPTURE_BREAKOUT_FOLLOWTHROUGH_SHADOW allowed=%s reason=%s "
+                                             "direction=%d price=%.1f live_gate=false",
+                                             shadow_ok, shadow_reason, plan["direction"], plan["price"])
                         if plan is None:
                             count_event("confirm_reject")
                             if confirm_diag.get("reason") == "await_two_post_watch_closed_minutes":

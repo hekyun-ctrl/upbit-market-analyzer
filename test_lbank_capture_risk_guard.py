@@ -4,7 +4,8 @@ from lbank_capture_risk_guard import POLICY, entry_guard, caution_kind
 
 
 def case(entry, stop, *, higher=True, room="unknown", barrier=None,
-         direction=-1, retry=False, fresh=False, strategy="trend_retest"):
+         direction=-1, retry=False, fresh=False, strategy="trend_retest",
+         dominant=False, breakout_followthrough=False):
     d = direction
     watch = dict(native_watch_1m_start=60, price=entry-d*20, strategy=strategy,
                  level=(entry-d*40 if strategy=="breakout" else None))
@@ -12,11 +13,12 @@ def case(entry, stop, *, higher=True, room="unknown", barrier=None,
                  close=entry-d*5)] if fresh else []
     plan = dict(direction=d, price=entry, stop=stop, net_loss=abs(entry-stop)+90,
                 quantity_btc=1,
-                entry_quality=dict(priority=dict(ready=True, target_room=room,
+                entry_quality=dict(priority=dict(ready=True, dominant_intact=dominant, target_room=room,
                     observed_barrier=barrier), confirmed_1m_starts=[180] if fresh else []),
                 entry_decision_priority=dict(ready=True, higher_direction_intact=higher))
     native = dict(quote=entry, minute_bars=rows)
-    return entry_guard(plan, watch, native, stopped_retry=retry)
+    return entry_guard(plan, watch, native, stopped_retry=retry,
+                       breakout_followthrough=breakout_followthrough)
 
 
 class CaptureRiskGuardTests(unittest.TestCase):
@@ -36,6 +38,16 @@ class CaptureRiskGuardTests(unittest.TestCase):
         self.assertEqual(case(59285.6,59632.98453,retry=True,strategy="breakout")[1],
                          "capture_guard_retry_wait_fresh_minute")
         self.assertTrue(case(59285.6,59632.98453,retry=True,strategy="breakout",fresh=True)[0])
+
+    def test_shadow_84_as_new_breakout_checks_the_same_unfinished_structure(self):
+        kwargs = dict(strategy="breakout", higher=True, dominant=False)
+        self.assertTrue(case(59285.6,59632.98453, **kwargs)[0])
+        self.assertEqual(case(59285.6,59632.98453, **kwargs, breakout_followthrough=True)[1],
+                         "capture_shadow_breakout_wait_fresh_minute")
+        self.assertTrue(case(59285.6,59632.98453, **kwargs,
+                             fresh=True, breakout_followthrough=True)[0])
+        self.assertTrue(case(60000,59800,direction=1,strategy="breakout",
+                             dominant=True,breakout_followthrough=True)[0])
 
     def test_aligned_nonretry_not_universally_delayed(self):
         self.assertTrue(case(60000,60200)[0])

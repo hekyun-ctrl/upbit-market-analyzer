@@ -8,7 +8,7 @@ import math
 POLICY = "capture_entry_risk_v1"
 
 
-def entry_guard(plan, watch, native_state, *, stopped_retry=False):
+def entry_guard(plan, watch, native_state, *, stopped_retry=False, breakout_followthrough=False):
     """Return (allowed, reason, evidence); no universal extra wait.
 
     A nearby observed obstacle cannot be waived by higher trend ranking.
@@ -39,7 +39,8 @@ def entry_guard(plan, watch, native_state, *, stopped_retry=False):
         start = watch["native_watch_1m_start"]
         quote = float(native_state["quote"])
         watch_price = float(watch["price"])
-        level = watch.get("level") if watch.get("strategy") == "breakout" else None
+        is_breakout = watch.get("strategy") == "breakout"
+        level = watch.get("level") if is_breakout else None
         rows = [b for b in native_state["minute_bars"]
                 if b["start"] in starts and b["start"] >= start+120]
         fresh = False
@@ -60,6 +61,10 @@ def entry_guard(plan, watch, native_state, *, stopped_retry=False):
             return False, "capture_guard_retry_wait_fresh_minute", evidence
         if (not higher or room == "conflict") and not fresh:
             return False, "capture_guard_wait_fresh_minute", evidence
+        # This stricter research check depends on the observed structure, not
+        # on whether a preceding setup happened to produce a sent alert.
+        if breakout_followthrough and is_breakout and priority.get("dominant_intact") is not True and not fresh:
+            return False, "capture_shadow_breakout_wait_fresh_minute", evidence
         return True, "capture_guard_pass", evidence
     except (KeyError, TypeError, ValueError, IndexError, ZeroDivisionError, OverflowError):
         return False, "capture_guard_evidence_missing", {}

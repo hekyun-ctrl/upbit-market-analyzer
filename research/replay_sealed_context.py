@@ -26,7 +26,7 @@ from lbank_sealed_breakout import arm_stopped_retry
 from lbank_signal_thesis import observed_stop_touch
 
 
-def run(window, corrected, *, capture_guard=False):
+def run(window, corrected, *, capture_guard=False, breakout_followthrough=False):
     config_keys = dict(fee="TAKER_FEE", slippage="STOP_SLIPPAGE", funding_buffer="FUNDING_BUFFER",
                        reference_balance="REF_BALANCE", risk_fraction="RISK_FRACTION",
                        leverage="LEVERAGE", max_margin_fraction="MAX_MARGIN_FRACTION")
@@ -96,7 +96,8 @@ def run(window, corrected, *, capture_guard=False):
                         if capture_guard and confirmed:
                             stopped_retry = m.stopped_retry_allowed(ts, confirmed["side"], alert, confirmed)
                             allowed, reason, evidence = m.capture_entry_guard(
-                                confirmed, p, state, stopped_retry=stopped_retry)
+                                confirmed, p, state, stopped_retry=stopped_retry,
+                                breakout_followthrough=breakout_followthrough)
                             if not allowed:
                                 result["guard_rejections"].append(dict(
                                     at=ts, price=confirmed["price"], direction=confirmed["direction"],
@@ -139,5 +140,7 @@ if __name__ == "__main__":
     logging.disable(logging.CRITICAL)
     window = json.loads(Path(sys.argv[1]).read_text())
     print(json.dumps({"before": run(window, False), "after": run(window, True),
-                      "with_capture_guard": run(window, True, capture_guard=True)},
+                      "with_capture_guard": run(window, True, capture_guard=True),
+                      "with_breakout_followthrough": run(window, True, capture_guard=True,
+                                                        breakout_followthrough=True)},
                      ensure_ascii=False, indent=2))
