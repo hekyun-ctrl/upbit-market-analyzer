@@ -58,6 +58,7 @@ from lbank_breakout_freshness import (evidence as breakout_evidence,
     confirmation_allowed as breakout_confirmation_allowed, POLICY as BREAKOUT_CONFIRMATION_POLICY,
     REJECT_REASON as BREAKOUT_CONFIRMATION_REJECT)
 from lbank_entry_refinement import MODES as ENTRY_REFINEMENT_MODES, local_stop_floor, pullback_floor
+from lbank_capture_risk_guard import entry_guard as capture_entry_guard, POLICY as CAPTURE_GUARD_POLICY
 from lbank_sealed_breakout import (sealed_breakout, arm_stopped_retry,
     stopped_retry_allowed, record_retry_state, POLICY as SEALED_BREAKOUT_POLICY)
 
@@ -1530,6 +1531,17 @@ def run():
                         plan = confirm_watch(prices, watch["plan"], age,
                                              native_state=native_state,
                                              diagnostics=confirm_diag)
+                        if plan is not None and capture_entries:
+                            retry = stopped_retry_allowed(now, plan["side"], alert_state, plan)
+                            guard_ok, guard_reason, guard_evidence = capture_entry_guard(
+                                plan, watch["plan"], native_state, stopped_retry=retry)
+                            LOG.info("CAPTURE_ENTRY_RISK_GUARD allowed=%s reason=%s evidence=%s",
+                                     guard_ok, guard_reason, json.dumps(guard_evidence, sort_keys=True))
+                            if not guard_ok:
+                                confirm_diag["reason"] = guard_reason
+                                plan = None
+                            else:
+                                plan["entry_quality"]["capture_guard"] = guard_evidence
                         if plan is None:
                             count_event("confirm_reject")
                             if confirm_diag.get("reason") == "await_two_post_watch_closed_minutes":
@@ -1588,6 +1600,8 @@ def run():
                                 plan = attach_thesis(plan,native_state,now)
                                 plan['profit_policy']=new_policy(plan['direction'],plan['price'],plan['stop'],
                                     TAKER_FEE,STOP_SLIPPAGE,FUNDING_BUFFER)
+                                if capture_entries:
+                                    plan['profit_policy']['capture_guard_policy'] = CAPTURE_GUARD_POLICY
                                 message = format_entry_alert(
                                     plan, datetime.fromtimestamp(now, tz=timezone.utc).isoformat(),
                                     reference_number=risk_tracker.next_number)
