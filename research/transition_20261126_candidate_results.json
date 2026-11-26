@@ -1,0 +1,612 @@
+{
+  "model": "research only; first fully subsequent 5m bar, excludes partial candidate bar, fixed costs 0.06% each leg, 0.02% exit slippage except TP, 0.01% reserve, funding crossing excluded; overlapping candidates are not portfolio returns; post-feature-freeze not independent policy holdout",
+  "summary": {
+    "incident": {
+      "n": 10,
+      "baseline30": {
+        "stop": 4,
+        "timeout": 6,
+        "cost_model_count": 10,
+        "net_positive": 0,
+        "net_negative": 10,
+        "net_sum_per_btc_candidate_arithmetic": -1545.66
+      },
+      "protection30": {
+        "stop": 4,
+        "timeout": 6,
+        "cost_model_count": 10,
+        "net_positive": 0,
+        "net_negative": 10,
+        "net_sum_per_btc_candidate_arithmetic": -1545.66
+      },
+      "baseline90": {
+        "stop": 4,
+        "target": 3,
+        "incomplete": 3,
+        "cost_model_count": 6,
+        "net_positive": 2,
+        "net_negative": 4,
+        "net_sum_per_btc_candidate_arithmetic": -372.35
+      }
+    },
+    "post_feature_freeze": {
+      "n": 6,
+      "baseline30": {
+        "stop": 1,
+        "incomplete": 5,
+        "cost_model_count": 1,
+        "net_positive": 0,
+        "net_negative": 1,
+        "net_sum_per_btc_candidate_arithmetic": -280.68
+      },
+      "protection30": {
+        "stop": 1,
+        "incomplete": 5,
+        "cost_model_count": 1,
+        "net_positive": 0,
+        "net_negative": 1,
+        "net_sum_per_btc_candidate_arithmetic": -280.68
+      },
+      "baseline90": {
+        "stop": 1,
+        "incomplete": 5,
+        "cost_model_count": 1,
+        "net_positive": 0,
+        "net_negative": 1,
+        "net_sum_per_btc_candidate_arithmetic": -280.68
+      }
+    }
+  },
+  "rows": [
+    {
+      "id": "1795677000:-1:trend_retest:60437.9",
+      "observed_at": "2026-11-26T07:09:10.895103930Z",
+      "split": "incident",
+      "direction": -1,
+      "entry": 60450.8,
+      "stop": 60559.003304467835,
+      "target": 60073.98005068188,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "stop",
+        "bars": 3,
+        "exit": 60559.003304467835,
+        "net_per_btc": -198.97333419180498,
+        "rr": 1.5000000000000357,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "protection30": {
+        "status": "stop",
+        "bars": 3,
+        "exit": 60559.003304467835,
+        "net_per_btc": -198.97333419180498,
+        "rr": 1.5000000000000357,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "baseline90": {
+        "status": "stop",
+        "bars": 3,
+        "exit": 60559.003304467835,
+        "net_per_btc": -198.97333419180498,
+        "rr": 1.5000000000000357,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      }
+    },
+    {
+      "id": "1795677000:-1:breakout:60437.9",
+      "observed_at": "2026-11-26T07:09:10.896786122Z",
+      "split": "incident",
+      "direction": -1,
+      "entry": 60450.8,
+      "stop": 60601.1749,
+      "target": 60010.71000590498,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "stop",
+        "bars": 3,
+        "exit": 60601.1749,
+        "net_per_btc": -241.17867206098379,
+        "rr": 1.5000000000000295,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "protection30": {
+        "status": "stop",
+        "bars": 3,
+        "exit": 60601.1749,
+        "net_per_btc": -241.17867206098379,
+        "rr": 1.5000000000000295,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "baseline90": {
+        "status": "stop",
+        "bars": 3,
+        "exit": 60601.1749,
+        "net_per_btc": -241.17867206098379,
+        "rr": 1.5000000000000295,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      }
+    },
+    {
+      "id": "1795677000:-1:trend_retest:60356.4",
+      "observed_at": "2026-11-26T07:09:54.309377653Z",
+      "split": "incident",
+      "direction": -1,
+      "entry": 60400,
+      "stop": 60557.58,
+      "target": 59949.28043537437,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "stop",
+        "bars": 3,
+        "exit": 60557.58,
+        "net_per_btc": -248.31333090959893,
+        "rr": 1.5000000000000264,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "protection30": {
+        "status": "stop",
+        "bars": 3,
+        "exit": 60557.58,
+        "net_per_btc": -248.31333090959893,
+        "rr": 1.5000000000000264,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "baseline90": {
+        "status": "stop",
+        "bars": 3,
+        "exit": 60557.58,
+        "net_per_btc": -248.31333090959893,
+        "rr": 1.5000000000000264,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      }
+    },
+    {
+      "id": "1795677000:-1:breakout:60356.4",
+      "observed_at": "2026-11-26T07:10:10.107746319Z",
+      "split": "incident",
+      "direction": -1,
+      "entry": 60409.4,
+      "stop": 60563.663649999995,
+      "target": 59963.62260359839,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "stop",
+        "bars": 2,
+        "exit": 60563.663649999995,
+        "net_per_btc": -245.00842855962972,
+        "rr": 1.5000000000000209,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "protection30": {
+        "status": "stop",
+        "bars": 2,
+        "exit": 60563.663649999995,
+        "net_per_btc": -245.00842855962972,
+        "rr": 1.5000000000000209,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "baseline90": {
+        "status": "stop",
+        "bars": 2,
+        "exit": 60563.663649999995,
+        "net_per_btc": -245.00842855962972,
+        "rr": 1.5000000000000209,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      }
+    },
+    {
+      "id": "1795677900:1:breakout:60612.3",
+      "observed_at": "2026-11-26T07:24:47.135613789Z",
+      "split": "incident",
+      "direction": 1,
+      "entry": 60562,
+      "stop": 60441.961970000004,
+      "target": 60957.13430039107,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "timeout",
+        "bars": 6,
+        "exit": 60556.4,
+        "net_per_btc": -96.4312532319959,
+        "rr": 1.500000000000009,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "protection30": {
+        "status": "timeout",
+        "bars": 6,
+        "exit": 60556.4,
+        "net_per_btc": -96.4312532319959,
+        "rr": 1.500000000000009,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "baseline90": {
+        "status": "target",
+        "bars": 17,
+        "exit": 60957.13430039107,
+        "net_per_btc": null,
+        "rr": 1.500000000000009,
+        "peak_close_net": 75.33124739600096,
+        "trigger": null,
+        "fundingCrossed": true
+      }
+    },
+    {
+      "id": "1795680600:1:trend_retest:60644.0",
+      "observed_at": "2026-11-26T08:08:09.458343824Z",
+      "split": "incident",
+      "direction": 1,
+      "entry": 60626.8,
+      "stop": 60530.47464,
+      "target": 60986.60257562795,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "timeout",
+        "bars": 6,
+        "exit": 60684.1,
+        "net_per_btc": -33.67875790800409,
+        "rr": 1.5000000000000024,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "protection30": {
+        "status": "timeout",
+        "bars": 6,
+        "exit": 60684.1,
+        "net_per_btc": -33.67875790800409,
+        "rr": 1.5000000000000024,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "baseline90": {
+        "status": "target",
+        "bars": 8,
+        "exit": 60986.60257562795,
+        "net_per_btc": 280.771854082569,
+        "rr": 1.5000000000000024,
+        "peak_close_net": 10.485887395998049,
+        "trigger": null,
+        "fundingCrossed": false
+      }
+    },
+    {
+      "id": "1795680600:1:trend_retest:60612.3",
+      "observed_at": "2026-11-26T08:08:52.469106337Z",
+      "split": "incident",
+      "direction": 1,
+      "entry": 60610.4,
+      "stop": 60514.33095855973,
+      "target": 60969.759922684716,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "timeout",
+        "bars": 6,
+        "exit": 60684.1,
+        "net_per_btc": -17.26727790800262,
+        "rr": 1.500000000000024,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "protection30": {
+        "status": "timeout",
+        "bars": 6,
+        "exit": 60684.1,
+        "net_per_btc": -17.26727790800262,
+        "rr": 1.500000000000024,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "baseline90": {
+        "status": "target",
+        "bars": 8,
+        "exit": 60969.759922684716,
+        "net_per_btc": 280.3507867311037,
+        "rr": 1.500000000000024,
+        "peak_close_net": 26.897367395999503,
+        "trigger": null,
+        "fundingCrossed": false
+      }
+    },
+    {
+      "id": "1795683000:1:breakout:60842.2",
+      "observed_at": "2026-11-26T08:47:06.937534836Z",
+      "split": "incident",
+      "direction": 1,
+      "entry": 60839.4,
+      "stop": 60650.59936000001,
+      "target": 61338.642897862825,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "timeout",
+        "bars": 6,
+        "exit": 60843.1,
+        "net_per_btc": -87.55475882799963,
+        "rr": 1.5000000000000204,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "protection30": {
+        "status": "timeout",
+        "bars": 6,
+        "exit": 60843.1,
+        "net_per_btc": -87.55475882799963,
+        "rr": 1.5000000000000204,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "bars": 12,
+        "rr": 1.5000000000000204
+      }
+    },
+    {
+      "id": "1795683000:1:breakout:60890.8",
+      "observed_at": "2026-11-26T08:47:59.486899972Z",
+      "split": "incident",
+      "direction": 1,
+      "entry": 60859.5,
+      "stop": 60650.59936000001,
+      "target": 61388.95826208135,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "timeout",
+        "bars": 6,
+        "exit": 60843.1,
+        "net_per_btc": -107.66882882799818,
+        "rr": 1.5000000000000204,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "protection30": {
+        "status": "timeout",
+        "bars": 6,
+        "exit": 60843.1,
+        "net_per_btc": -107.66882882799818,
+        "rr": 1.5000000000000204,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "bars": 12,
+        "rr": 1.5000000000000204
+      }
+    },
+    {
+      "id": "1795683000:1:breakout:61017.2",
+      "observed_at": "2026-11-26T08:50:59.218767344Z",
+      "split": "incident",
+      "direction": 1,
+      "entry": 60954.2,
+      "stop": 60650.59936000001,
+      "target": 61626.01622185721,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "timeout",
+        "bars": 6,
+        "exit": 60775.9,
+        "net_per_btc": -269.58136689199716,
+        "rr": 1.5000000000000078,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "protection30": {
+        "status": "timeout",
+        "bars": 6,
+        "exit": 60775.9,
+        "net_per_btc": -269.58136689199716,
+        "rr": 1.5000000000000078,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "bars": 11,
+        "rr": 1.5000000000000078
+      }
+    },
+    {
+      "id": "1795685100:-1:breakout:60699.5",
+      "observed_at": "2026-11-26T09:23:03.090968911Z",
+      "split": "post_feature_freeze",
+      "direction": -1,
+      "entry": 60760.1,
+      "stop": 60949.47936,
+      "target": 60260.394202340314,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "stop",
+        "bars": 4,
+        "exit": 60949.47936,
+        "net_per_btc": -280.6783274255198,
+        "rr": 1.5000000000000016,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "protection30": {
+        "status": "stop",
+        "bars": 4,
+        "exit": 60949.47936,
+        "net_per_btc": -280.6783274255198,
+        "rr": 1.5000000000000016,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      },
+      "baseline90": {
+        "status": "stop",
+        "bars": 4,
+        "exit": 60949.47936,
+        "net_per_btc": -280.6783274255198,
+        "rr": 1.5000000000000016,
+        "peak_close_net": 0,
+        "trigger": null,
+        "fundingCrossed": false
+      }
+    },
+    {
+      "id": "1795686000:1:breakout:60932.8",
+      "observed_at": "2026-11-26T09:37:24.153157859Z",
+      "split": "post_feature_freeze",
+      "direction": 1,
+      "entry": 60897,
+      "stop": 60708.681930000006,
+      "target": 61395.72378002126,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "incomplete",
+        "bars": 2,
+        "rr": 1.500000000000006
+      },
+      "protection30": {
+        "status": "incomplete",
+        "bars": 2,
+        "rr": 1.500000000000006
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "bars": 2,
+        "rr": 1.500000000000006
+      }
+    },
+    {
+      "id": "1795686000:1:trend_retest:60953.7",
+      "observed_at": "2026-11-26T09:39:09.457236296Z",
+      "split": "post_feature_freeze",
+      "direction": 1,
+      "entry": 60935.2,
+      "stop": 60752.212960000004,
+      "target": 61426.06451886497,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "incomplete",
+        "bars": 2,
+        "rr": 1.5000000000000038
+      },
+      "protection30": {
+        "status": "incomplete",
+        "bars": 2,
+        "rr": 1.5000000000000038
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "bars": 2,
+        "rr": 1.5000000000000038
+      }
+    },
+    {
+      "id": "1795686000:1:breakout:60953.7",
+      "observed_at": "2026-11-26T09:39:09.459220705Z",
+      "split": "post_feature_freeze",
+      "direction": 1,
+      "entry": 60935.2,
+      "stop": 60716.87947,
+      "target": 61479.054153817975,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "incomplete",
+        "bars": 2,
+        "rr": 1.5000000000000033
+      },
+      "protection30": {
+        "status": "incomplete",
+        "bars": 2,
+        "rr": 1.5000000000000033
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "bars": 2,
+        "rr": 1.5000000000000033
+      }
+    },
+    {
+      "id": "1795686000:1:trend_retest:60932.8",
+      "observed_at": "2026-11-26T09:39:29.552841145Z",
+      "split": "post_feature_freeze",
+      "direction": 1,
+      "entry": 60918.7,
+      "stop": 60752.21626,
+      "target": 61384.755912660665,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "incomplete",
+        "bars": 2,
+        "rr": 1.5000000000000073
+      },
+      "protection30": {
+        "status": "incomplete",
+        "bars": 2,
+        "rr": 1.5000000000000073
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "bars": 2,
+        "rr": 1.5000000000000073
+      }
+    },
+    {
+      "id": "1795686300:1:breakout:61017.2",
+      "observed_at": "2026-11-26T09:45:45.815844745Z",
+      "split": "post_feature_freeze",
+      "direction": 1,
+      "entry": 60960.2,
+      "stop": 60851.26023584166,
+      "target": 61340.104618064506,
+      "actual": "rejected",
+      "baseline30": {
+        "status": "incomplete",
+        "bars": 0,
+        "rr": 1.5000000000000202
+      },
+      "protection30": {
+        "status": "incomplete",
+        "bars": 0,
+        "rr": 1.5000000000000202
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "bars": 0,
+        "rr": 1.5000000000000202
+      }
+    }
+  ]
+}
