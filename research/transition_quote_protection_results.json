@@ -1,0 +1,578 @@
+{
+  "assumptions": "Quote samples only, skip candidate instant, no assumed fills, stop/TP evaluated on observed quotes, gap >120s unresolved, proxy uses 50% modeled net peak giveback and next observed quote exit; cannot reconstruct native profit guard or actual execution. No funding-crossing net. Overlapping candidate arithmetic, not portfolio.",
+  "comparisons": {
+    "30": {
+      "paired": 11,
+      "improved": 2,
+      "worse": 1,
+      "unchanged": 8,
+      "delta_arithmetic_per_btc": 177.75770134799808,
+      "baselineStops": 5,
+      "protectionStops": 5
+    },
+    "90": {
+      "paired": 7,
+      "improved": 0,
+      "worse": 1,
+      "unchanged": 6,
+      "delta_arithmetic_per_btc": -340.42748088400134,
+      "baselineStops": 5,
+      "protectionStops": 5
+    }
+  },
+  "planned_rr_below_2": 16,
+  "rows": [
+    {
+      "id": "1795677000:-1:trend_retest:60437.9",
+      "observed_at": "2026-11-26T07:09:10.895103930Z",
+      "entry": 60450.8,
+      "direction": -1,
+      "planned_net_rr": 1.5000000000000357,
+      "baseline30": {
+        "status": "stop",
+        "at": "2026-11-26T07:23:35.615977409Z",
+        "price": 60592.7,
+        "net_per_btc": -232.69699112399005,
+        "peak": 0,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "stop",
+        "at": "2026-11-26T07:23:35.615977409Z",
+        "price": 60592.7,
+        "net_per_btc": -232.69699112399005,
+        "peak": 0,
+        "trigger": null
+      },
+      "baseline90": {
+        "status": "stop",
+        "at": "2026-11-26T07:23:35.615977409Z",
+        "price": 60592.7,
+        "net_per_btc": -232.69699112399005,
+        "peak": 0,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "stop",
+        "at": "2026-11-26T07:23:35.615977409Z",
+        "price": 60592.7,
+        "net_per_btc": -232.69699112399005,
+        "peak": 0,
+        "trigger": null
+      }
+    },
+    {
+      "id": "1795677000:-1:breakout:60437.9",
+      "observed_at": "2026-11-26T07:09:10.896786122Z",
+      "entry": 60450.8,
+      "direction": -1,
+      "planned_net_rr": 1.5000000000000295,
+      "baseline30": {
+        "status": "stop",
+        "at": "2026-11-26T07:38:18.832048378Z",
+        "price": 60627.1,
+        "net_per_btc": -267.1245152519923,
+        "peak": 0,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "stop",
+        "at": "2026-11-26T07:38:18.832048378Z",
+        "price": 60627.1,
+        "net_per_btc": -267.1245152519923,
+        "peak": 0,
+        "trigger": null
+      },
+      "baseline90": {
+        "status": "stop",
+        "at": "2026-11-26T07:38:18.832048378Z",
+        "price": 60627.1,
+        "net_per_btc": -267.1245152519923,
+        "peak": 0,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "stop",
+        "at": "2026-11-26T07:38:18.832048378Z",
+        "price": 60627.1,
+        "net_per_btc": -267.1245152519923,
+        "peak": 0,
+        "trigger": null
+      }
+    },
+    {
+      "id": "1795677000:-1:trend_retest:60356.4",
+      "observed_at": "2026-11-26T07:09:54.309377653Z",
+      "entry": 60400,
+      "direction": -1,
+      "planned_net_rr": 1.5000000000000264,
+      "baseline30": {
+        "status": "stop",
+        "at": "2026-11-26T07:23:35.615977409Z",
+        "price": 60592.7,
+        "net_per_btc": -283.46143112399295,
+        "peak": 0,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "stop",
+        "at": "2026-11-26T07:23:35.615977409Z",
+        "price": 60592.7,
+        "net_per_btc": -283.46143112399295,
+        "peak": 0,
+        "trigger": null
+      },
+      "baseline90": {
+        "status": "stop",
+        "at": "2026-11-26T07:23:35.615977409Z",
+        "price": 60592.7,
+        "net_per_btc": -283.46143112399295,
+        "peak": 0,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "stop",
+        "at": "2026-11-26T07:23:35.615977409Z",
+        "price": 60592.7,
+        "net_per_btc": -283.46143112399295,
+        "peak": 0,
+        "trigger": null
+      }
+    },
+    {
+      "id": "1795677000:-1:breakout:60356.4",
+      "observed_at": "2026-11-26T07:10:10.107746319Z",
+      "entry": 60409.4,
+      "direction": -1,
+      "planned_net_rr": 1.5000000000000209,
+      "baseline30": {
+        "status": "stop",
+        "at": "2026-11-26T07:23:35.615977409Z",
+        "price": 60592.7,
+        "net_per_btc": -274.0680111239915,
+        "peak": 0,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "stop",
+        "at": "2026-11-26T07:23:35.615977409Z",
+        "price": 60592.7,
+        "net_per_btc": -274.0680111239915,
+        "peak": 0,
+        "trigger": null
+      },
+      "baseline90": {
+        "status": "stop",
+        "at": "2026-11-26T07:23:35.615977409Z",
+        "price": 60592.7,
+        "net_per_btc": -274.0680111239915,
+        "peak": 0,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "stop",
+        "at": "2026-11-26T07:23:35.615977409Z",
+        "price": 60592.7,
+        "net_per_btc": -274.0680111239915,
+        "peak": 0,
+        "trigger": null
+      }
+    },
+    {
+      "id": "1795677900:1:breakout:60612.3",
+      "observed_at": "2026-11-26T07:24:47.135613789Z",
+      "entry": 60562,
+      "direction": 1,
+      "planned_net_rr": 1.500000000000009,
+      "baseline30": {
+        "status": "timeout",
+        "at": "2026-11-26T07:55:08.471710893Z",
+        "price": 60566.2,
+        "net_per_btc": -86.63909205600169,
+        "peak": 0,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "timeout",
+        "at": "2026-11-26T07:55:08.471710893Z",
+        "price": 60566.2,
+        "net_per_btc": -86.63909205600169,
+        "peak": 0,
+        "trigger": null
+      },
+      "baseline90": {
+        "status": "target",
+        "at": "2026-11-26T08:49:58.535344507Z",
+        "price": 60998.3,
+        "net_per_btc": null,
+        "peak": 292.25759344800497,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "protect_next_quote",
+        "at": "2026-11-26T08:12:04.560241038Z",
+        "price": 60622.3,
+        "net_per_btc": null,
+        "peak": 1.0906784800010065,
+        "trigger": "2026-11-26T08:10:58.677849518Z"
+      }
+    },
+    {
+      "id": "1795680600:1:trend_retest:60644.0",
+      "observed_at": "2026-11-26T08:08:09.458343824Z",
+      "entry": 60626.8,
+      "direction": 1,
+      "planned_net_rr": 1.5000000000000024,
+      "baseline30": {
+        "status": "timeout",
+        "at": "2026-11-26T08:38:27.022209223Z",
+        "price": 60703.3,
+        "net_per_btc": -14.494115603997287,
+        "peak": 0,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "timeout",
+        "at": "2026-11-26T08:38:27.022209223Z",
+        "price": 60703.3,
+        "net_per_btc": -14.494115603997287,
+        "peak": 0,
+        "trigger": null
+      },
+      "baseline90": {
+        "status": "target",
+        "at": "2026-11-26T08:49:58.535344507Z",
+        "price": 60998.3,
+        "net_per_btc": 280.2699197960016,
+        "peak": 227.4122334480021,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "target",
+        "at": "2026-11-26T08:49:58.535344507Z",
+        "price": 60998.3,
+        "net_per_btc": 280.2699197960016,
+        "peak": 227.4122334480021,
+        "trigger": null
+      }
+    },
+    {
+      "id": "1795680600:1:trend_retest:60612.3",
+      "observed_at": "2026-11-26T08:08:52.469106337Z",
+      "entry": 60610.4,
+      "direction": 1,
+      "planned_net_rr": 1.500000000000024,
+      "baseline30": {
+        "status": "timeout",
+        "at": "2026-11-26T08:39:29.778284832Z",
+        "price": 60714,
+        "net_per_btc": 12.60880567999711,
+        "peak": 4.415364696002234,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "protect_next_quote",
+        "at": "2026-11-26T08:24:40.125358426Z",
+        "price": 60657.6,
+        "net_per_btc": -43.74608108799827,
+        "peak": 4.415364696002234,
+        "trigger": "2026-11-26T08:23:44.096185130Z"
+      },
+      "baseline90": {
+        "status": "target",
+        "at": "2026-11-26T08:49:58.535344507Z",
+        "price": 60998.3,
+        "net_per_btc": 296.68139979600306,
+        "peak": 243.82371344800356,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "protect_next_quote",
+        "at": "2026-11-26T08:24:40.125358426Z",
+        "price": 60657.6,
+        "net_per_btc": -43.74608108799827,
+        "peak": 4.415364696002234,
+        "trigger": "2026-11-26T08:23:44.096185130Z"
+      }
+    },
+    {
+      "id": "1795683000:1:breakout:60842.2",
+      "observed_at": "2026-11-26T08:47:06.937534836Z",
+      "entry": 60839.4,
+      "direction": 1,
+      "planned_net_rr": 1.5000000000000204,
+      "baseline30": {
+        "status": "timeout",
+        "at": "2026-11-26T09:17:22.107199636Z",
+        "price": 60851.8,
+        "net_per_btc": -78.86171778399498,
+        "peak": 67.52109979600306,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "protect_next_quote",
+        "at": "2026-11-26T08:52:09.684705054Z",
+        "price": 60972,
+        "net_per_btc": 41.242136639998236,
+        "peak": 67.52109979600306,
+        "trigger": "2026-11-26T08:50:59.220433801Z"
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "peak": 67.52109979600306,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "protect_next_quote",
+        "at": "2026-11-26T08:52:09.684705054Z",
+        "price": 60972,
+        "net_per_btc": 41.242136639998236,
+        "peak": 67.52109979600306,
+        "trigger": "2026-11-26T08:50:59.220433801Z"
+      }
+    },
+    {
+      "id": "1795683000:1:breakout:60890.8",
+      "observed_at": "2026-11-26T08:47:59.486899972Z",
+      "entry": 60859.5,
+      "direction": 1,
+      "planned_net_rr": 1.5000000000000204,
+      "baseline30": {
+        "status": "timeout",
+        "at": "2026-11-26T09:18:19.664651894Z",
+        "price": 60857.9,
+        "net_per_btc": -92.88066705200053,
+        "peak": 47.40702979600451,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "protect_next_quote",
+        "at": "2026-11-26T08:52:09.684705054Z",
+        "price": 60972,
+        "net_per_btc": 21.128066639999698,
+        "peak": 47.40702979600451,
+        "trigger": "2026-11-26T08:50:59.220433801Z"
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "peak": 47.40702979600451,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "protect_next_quote",
+        "at": "2026-11-26T08:52:09.684705054Z",
+        "price": 60972,
+        "net_per_btc": 21.128066639999698,
+        "peak": 47.40702979600451,
+        "trigger": "2026-11-26T08:50:59.220433801Z"
+      }
+    },
+    {
+      "id": "1795683000:1:breakout:61017.2",
+      "observed_at": "2026-11-26T08:50:59.218767344Z",
+      "entry": 60954.2,
+      "direction": 1,
+      "planned_net_rr": 1.5000000000000078,
+      "baseline30": {
+        "status": "timeout",
+        "at": "2026-11-26T09:21:29.041806064Z",
+        "price": 60823.1,
+        "net_per_btc": -222.41912122799442,
+        "peak": 0,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "timeout",
+        "at": "2026-11-26T09:21:29.041806064Z",
+        "price": 60823.1,
+        "net_per_btc": -222.41912122799442,
+        "peak": 0,
+        "trigger": null
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      }
+    },
+    {
+      "id": "1795685100:-1:breakout:60699.5",
+      "observed_at": "2026-11-26T09:23:03.090968911Z",
+      "entry": 60760.1,
+      "direction": -1,
+      "planned_net_rr": 1.5000000000000016,
+      "baseline30": {
+        "status": "stop",
+        "at": "2026-11-26T09:45:45.824350318Z",
+        "price": 60960.2,
+        "net_per_btc": -291.4075452240003,
+        "peak": 0,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "stop",
+        "at": "2026-11-26T09:45:45.824350318Z",
+        "price": 60960.2,
+        "net_per_btc": -291.4075452240003,
+        "peak": 0,
+        "trigger": null
+      },
+      "baseline90": {
+        "status": "stop",
+        "at": "2026-11-26T09:45:45.824350318Z",
+        "price": 60960.2,
+        "net_per_btc": -291.4075452240003,
+        "peak": 0,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "stop",
+        "at": "2026-11-26T09:45:45.824350318Z",
+        "price": 60960.2,
+        "net_per_btc": -291.4075452240003,
+        "peak": 0,
+        "trigger": null
+      }
+    },
+    {
+      "id": "1795686000:1:breakout:60932.8",
+      "observed_at": "2026-11-26T09:37:24.153157859Z",
+      "entry": 60897,
+      "direction": 1,
+      "planned_net_rr": 1.500000000000006,
+      "baseline30": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      }
+    },
+    {
+      "id": "1795686000:1:trend_retest:60953.7",
+      "observed_at": "2026-11-26T09:39:09.457236296Z",
+      "entry": 60935.2,
+      "direction": 1,
+      "planned_net_rr": 1.5000000000000038,
+      "baseline30": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      }
+    },
+    {
+      "id": "1795686000:1:breakout:60953.7",
+      "observed_at": "2026-11-26T09:39:09.459220705Z",
+      "entry": 60935.2,
+      "direction": 1,
+      "planned_net_rr": 1.5000000000000033,
+      "baseline30": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      }
+    },
+    {
+      "id": "1795686000:1:trend_retest:60932.8",
+      "observed_at": "2026-11-26T09:39:29.552841145Z",
+      "entry": 60918.7,
+      "direction": 1,
+      "planned_net_rr": 1.5000000000000073,
+      "baseline30": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      }
+    },
+    {
+      "id": "1795686300:1:breakout:61017.2",
+      "observed_at": "2026-11-26T09:45:45.815844745Z",
+      "entry": 60960.2,
+      "direction": 1,
+      "planned_net_rr": 1.5000000000000202,
+      "baseline30": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "protect30": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "baseline90": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      },
+      "protect90": {
+        "status": "incomplete",
+        "peak": 0,
+        "trigger": null
+      }
+    }
+  ]
+}
