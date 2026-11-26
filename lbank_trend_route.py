@@ -5,6 +5,7 @@ Only complete contiguous native candles supplied by NativeEntryFeed are used.
 1h/4h are derived from complete 5m candles, NOT exchange-verified candles.
 """
 import math
+from lbank_transition_shadow import transition_evidence
 
 ROUTES = ("breakout", "continuation", "pullback")
 VERSION = "trend_route_shadow_v3"
@@ -157,5 +158,6 @@ def rank_entry_routes(state):
             "reference_high_6x5m": round(prior_high, 2),
             "reference_low_6x5m": round(prior_low, 2),
             "shallow_pullback_continuation": staircase,
+            "structural_transition": transition_evidence(five, state.get("observed_at")),
             "risk_gate": "unchanged",
             "delivery_policy": "unchanged"}
