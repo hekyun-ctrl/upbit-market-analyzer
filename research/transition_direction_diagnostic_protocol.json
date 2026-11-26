@@ -1,0 +1,13 @@
+{
+  "source": "Railway historical runtime logs",
+  "window_start": "2026-11-25T17:00:00Z",
+  "window_end": "2026-11-25T20:00:00Z",
+  "description": "KST 02:00–05:00 on Nov 26; selected before retrieving results; not used in PR65 structural detector's 21-bar incident fixture. Unknown if used elsewhere in prior ZB research.",
+  "warmup_start": "2026-11-25T16:40:00Z",
+  "outcome_end": "2026-11-25T20:40:00Z",
+  "base": "First original TREND_ROUTE_SHADOW emitted after each completed five-minute candle; must be within 90 seconds and before next bar close.",
+  "new": "Only when original direction is neutral, use the frozen PR65 structural break direction; otherwise preserve original direction.",
+  "outcome": "Use first full five-minute bar starting strictly after both recorded observations; compare its open with close of sixth contiguous full bar. Directional diagnostic only, no stop or target, no executable fill. Fee proxy 0.15% of entry, no funding crossing at KST 01/09/17 in this window.",
+  "paired": true,
+  "production_changes": false
+}
