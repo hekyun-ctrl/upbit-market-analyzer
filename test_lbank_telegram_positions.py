@@ -69,8 +69,10 @@ class PositionLedgerTests(unittest.TestCase):
         note = mod.format_position_target_alert(
             self.ledger.position, price, "2026-10-15 22:29")
         self.assertIn("현재 1차 목표 80,262.0 USDT", note)
-        self.assertIn("50% 익절", note)
-        self.assertIn("손절가는 진입가", note)
+        self.assertIn("50% 부분 익절", note)
+        self.assertIn("잔여 보호 기준 80,757.8 USDT", note)
+        self.assertIn("전량 청산 신호가 아닙니다", note)
+        self.assertIn("수익 보호 감시는 계속됩니다", note)
         self.assertIn("80,757.8", note)
         self.assertIn("수수료", note)
         # Simulate Telegram delivery failure by not acknowledging; retry.
@@ -125,7 +127,11 @@ class PositionLedgerTests(unittest.TestCase):
         note = mod.format_position_target_alert(
             self.ledger.position, 82254.6, "2026-10-16 00:05")
         self.assertIn("2차 목표 82,177.2 USDT", note)
-        self.assertIn("남은 50%", note)
+        self.assertIn("추세 종료 확정이 아닙니다", note)
+        self.assertIn("잔여 보호 기준 81,213.6 USDT", note)
+        self.assertIn("수익 보호 감시는 계속됩니다", note)
+        self.assertIn("/partial", note)
+        self.assertEqual(self.ledger.position["quantity"], "0.0200")
         self.assertNotIn("50% 익절 후", note)
         # A dropped Telegram send must not erase the reached-price event.
         restarted = mod.PositionState(self.path)
