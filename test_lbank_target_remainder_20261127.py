@@ -1,4 +1,5 @@
 """Regression: target observation is not liquidation or permission to loosen a guard."""
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -58,6 +59,30 @@ class TargetRemainderTests(unittest.TestCase):
             tracker.signals=[sig]
             tracker.acknowledge(sig,"target1_reached",now=123)
             self.assertEqual(sig.stop,60000+d*100)
+
+    def test_public_incident_fixed_stop_partial_replay(self):
+        source=Path(__file__).resolve().parent / "research" / "target_remainder_incident_20261127.json"
+        data=json.loads(source.read_text(encoding="utf-8"))
+        b=data["bars"]
+        self.assertEqual(len(b),19)
+        first, second = None,None
+        t1,t2,stop=(data["levels"][k] for k in ("target1","target2","stop"))
+        for i,row in enumerate(b):
+            self.assertEqual(row["start"],1795740000+300*i)
+            self.assertEqual(row["quality"],"stream_closed")
+            self.assertGreater(row["low"],stop)
+            if first is None and row["high"]>=t1:
+                first=row["start"]
+                continue
+            if first is not None and second is None and row["high"]>=t2:
+                second=row["start"]
+        self.assertEqual(first,data["results"]["first_contact_bar"])
+        self.assertEqual(second,data["results"]["second_contact_bar"])
+        gross=.5*t1+.3*t2+.2*b[-1]["close"]
+        modeled=.5*t1+.3*t2+.2*b[-1]["close"]*(1-.0002)
+        self.assertAlmostEqual(gross,data["results"]["gross_weighted_exit"])
+        self.assertAlmostEqual((modeled-t1)*(1-.0006),
+                               data["results"]["incremental_net_usdt_per_btc"])
 
 
 if __name__ == "__main__":
