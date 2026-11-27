@@ -338,7 +338,7 @@ class SignalRiskTracker:
             # Model the user's remaining-half reference stop after the TP1
             # notification. This changes reference monitoring, NOT venue orders.
             guard=(signal.profit_state or {}).get('guard',signal.entry)
-            signal.stop = (max(signal.entry,guard) if signal.direction==1 else min(signal.entry,guard))
+            signal.stop = (max(signal.stop,signal.entry,guard) if signal.direction==1 else min(signal.stop,signal.entry,guard))
             signal.stop_active_since=now if now is not None else signal.last_checked_at or signal.sent_at
             signal.bad_samples = 0
             if signal.target2 is None:
@@ -354,10 +354,10 @@ def format_target_alert(signal, price, time_kst):
     side = "롱" if signal.direction == 1 else "숏"
     move_pct = signal.direction * (signal.target1 / signal.entry - 1) * 100
     guard=(signal.profit_state or {}).get('guard',signal.entry)
-    protection=max(signal.entry,guard) if signal.direction==1 else min(signal.entry,guard)
+    protection=max(signal.stop,signal.entry,guard) if signal.direction==1 else min(signal.stop,signal.entry,guard)
     protection_line=(f"남은 포지션 보호 손절은 {protection:,.1f} USDT를 기준으로 유지하고, 기존 보호보다 불리하게 변경하지 마세요.\n"
                      if profit_enabled(signal.profit_policy) else
-                     f"남은 포지션 손절가는 진입가 {signal.entry:,.1f} USDT로 조정 검토 요함.\n")
+                     f"남은 포지션 손절가는 {protection:,.1f} USDT 기준으로 조정 검토 요함. 기존 보호를 불리하게 바꾸지 마세요.\n")
     return (
         f"[LBank BTCUSDT | 1차 목표 도달 - {side}]\n"
         f"기존 진입 알람: #{signal.number}\n"
@@ -367,6 +367,7 @@ def format_target_alert(signal, price, time_kst):
         f"알람 기준 진입 참고가: {signal.entry:,.1f} USDT\n"
         f"실제 포지션 보유 중이라면 50% 익절 후 "
         f"{protection_line}"
+        "※ 1차 목표 접촉은 전량 청산 신호가 아닙니다. 추세 추종 기능이 활성화된 신호는 잔여 목표와 보호선을 계속 평가합니다.\n"
         "※ LBank에서 실제 익절 체결 후 잔여 수량과 손절 주문을 직접 확인하세요.\n"
         "※ 진입가 손절은 수수료·슬리피지 차감 후 완전한 손익분기점이 아닙니다.\n"
         "※ 미진입·기청산 상태라면 관찰 참고용 알림입니다. "
