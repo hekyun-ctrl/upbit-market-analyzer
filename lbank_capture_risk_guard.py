@@ -52,7 +52,13 @@ def entry_guard(plan, watch, native_state, *, stopped_retry=False, breakout_foll
                      and d*(c-o) > 0 and d*(c-watch_price) > 0
                      and d*(quote-c) >= 0
                      and (level is None or (d*(c-float(level)) > 0 and d*(quote-float(level)) > 0)))
+        dominant = priority.get("dominant_intact") is True
+        # Do not accept a stalled or adverse quote in unproven swing context.
+        signed_progress = d * (quote - watch_price)
+        if not all(math.isfinite(x) and x > 0 for x in (quote, watch_price)):
+            return False, "capture_guard_evidence_missing", {}
         evidence = dict(policy=POLICY, higher_direction_intact=higher,
+                        dominant_intact=dominant, signed_quote_progress=signed_progress,
                         target_room=room, barrier_distance=distance, unit_risk=risk,
                         fresh_completed_minute=bool(fresh), stopped_retry=bool(stopped_retry))
         if room == "conflict" and (distance is None or distance <= risk):
@@ -61,6 +67,10 @@ def entry_guard(plan, watch, native_state, *, stopped_retry=False, breakout_foll
             return False, "capture_guard_retry_wait_fresh_minute", evidence
         if (not higher or room == "conflict") and not fresh:
             return False, "capture_guard_wait_fresh_minute", evidence
+        # Incident 92: aligned EMA/15m alone allowed a falling LONG quote,
+        # with no dominant structure, known target room or fresh minute.
+        if not dominant and room == "unknown" and signed_progress <= 0 and not fresh:
+            return False, "capture_guard_unproven_room_wait_progress", evidence
         # This stricter research check depends on the observed structure, not
         # on whether a preceding setup happened to produce a sent alert.
         if breakout_followthrough and is_breakout and priority.get("dominant_intact") is not True and not fresh:
