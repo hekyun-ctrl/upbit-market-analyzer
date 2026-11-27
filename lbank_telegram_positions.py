@@ -161,8 +161,8 @@ class PositionState:
                 if not p.get('management_pending'):p['management_pending']=evidence
                 self.save()
                 return 'position_reversal'
-        if p.get('target_notice'):
-            return None
+        # A delivered target notice is not an execution or a reason to stop
+        # watching the reported remainder. Keep the same monotonic guard.
         p['profit_state'], reason=profit_observe(p['profit_policy'],p.get('profit_state'),
             direction=1 if p['side']=='LONG' else -1,entry=float(p['entry']),
             price=price,now=now,native_state=native_state,minimum_guard=float(p['stop']))
@@ -270,11 +270,22 @@ def format_position_target_alert(position, price, time_kst):
     target = float(position["target"])
     delta = direction * (target / entry - 1) * 100
     stage = 2 if position.get("target_stage") == 2 else 1
+    # Target contact alone is not a confirmed trend reversal. Do not
+    # assert a partial fill or loosen an already reported protection level.
+    guard = (position.get("profit_state") or {}).get("guard")
+    levels = [entry, float(position["stop"])]
+    if guard is not None:
+        levels.append(float(guard))
+    protection = max(levels) if direction == 1 else min(levels)
     action = (
-        "실제 보유 중이라면 남은 50% 익절과 잔여 포지션 정리를 검토하세요.\n"
+        "2차 목표 접촉은 추세 종료 확정이 아닙니다. 일부 익절 또는 잔여 청산을 검토하세요.\n"
         if stage == 2 else
-        f"실제 보유 중이라면 50% 익절 후 "
-        f"잔여 손절가는 진입가 {entry:,.1f} USDT로 조정 요함.\n"
+        "1차 목표 접촉은 전량 청산 신호가 아닙니다. 실제 보유 중이면 50% 부분 익절을 검토하세요.\n"
+    )
+    action += (
+        f"잔여 보호 기준 {protection:,.1f} USDT (현재가가 이미 이탈했다면 청산 여부 확인).\n"
+        "기존 손절을 불리하게 변경하지 마세요. 잔여 수량의 수익 보호 감시는 계속됩니다.\n"
+        "실제 부분청산 후 /partial 수량, 다음 목표 변경 시 /tp 가격으로 신고하세요.\n"
     )
     return (
         f"[LBank BTCUSDT | 신고 {side} 포지션 {stage}차 목표 도달]\n"
