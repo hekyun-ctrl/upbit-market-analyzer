@@ -440,7 +440,9 @@ class SignalFollowupRiskTests(unittest.TestCase):
         notice = format_target_alert(sig, 80400., "2026-10-15 22:00")
         self.assertIn("현재 1차 목표 80,450.0 USDT", notice)
         self.assertIn("50% 익절", notice)
-        self.assertIn("손절가는 진입가", notice)
+        self.assertIn("손절가는 81,000.0 USDT", notice)
+        self.assertIn("기존 보호를 불리하게 바꾸지 마세요", notice)
+        self.assertIn("전량 청산 신호가 아닙니다", notice)
         self.assertIn("미진입", notice)
         self.assertIn("수수료", notice)
         # A failed Telegram send must NOT mark the event as delivered.
