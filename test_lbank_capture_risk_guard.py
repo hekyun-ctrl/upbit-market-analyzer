@@ -57,6 +57,43 @@ class CaptureRiskGuardTests(unittest.TestCase):
         self.assertEqual(case(60000,59800,direction=1,room="conflict",barrier=60024.2)[1],
                          "capture_guard_near_target_barrier")
 
+    def test_92_actual_adverse_quote_no_target_evidence(self):
+        # Recorded watch 17:20:13, confirmation 17:20:45 KST.
+        plan = dict(direction=1, price=62060.7, stop=61765.38786,
+                    net_loss=388.15952844145056, quantity_btc=1,
+                    entry_quality=dict(priority=dict(ready=True, dominant_intact=False,
+                        target_room="unknown", observed_barrier=None), confirmed_1m_starts=[]),
+                    entry_decision_priority=dict(ready=True, higher_direction_intact=True))
+        watch = dict(native_watch_1m_start=1795767540, price=62079.1, strategy="trend_retest")
+        native = dict(quote=62060.7, minute_bars=[])
+        allowed, reason, evidence = entry_guard(plan, watch, native)
+        self.assertFalse(allowed)
+        self.assertEqual(reason, "capture_guard_unproven_room_wait_progress")
+        self.assertAlmostEqual(evidence["signed_quote_progress"], -18.4)
+        self.assertFalse(evidence["fresh_completed_minute"])
+
+    def test_stalled_or_adverse_progress_symmetric_and_bounded(self):
+        for d in (-1, 1):
+            entry = 60000
+            plan = dict(direction=d, price=entry, stop=entry-d*200,
+                        net_loss=290, quantity_btc=1,
+                        entry_quality=dict(priority=dict(ready=True, dominant_intact=False,
+                            target_room="unknown", observed_barrier=None), confirmed_1m_starts=[]),
+                        entry_decision_priority=dict(ready=True, higher_direction_intact=True))
+            watch = dict(native_watch_1m_start=60, price=entry+d*10, strategy="trend_retest")
+            native = dict(quote=entry, minute_bars=[])
+            self.assertFalse(entry_guard(plan, watch, native)[0])
+            watch["price"] = entry
+            self.assertFalse(entry_guard(plan, watch, native)[0])
+            watch["price"] = entry-d*10
+            self.assertTrue(entry_guard(plan, watch, native)[0])
+            watch["price"] = entry+d*10
+            plan["entry_quality"]["priority"]["dominant_intact"] = True
+            self.assertTrue(entry_guard(plan, watch, native)[0])
+            plan["entry_quality"]["priority"]["dominant_intact"] = False
+            plan["entry_quality"]["priority"]["target_room"] = "clear"
+            self.assertTrue(entry_guard(plan, watch, native)[0])
+
     def test_bad_proof_fails_closed(self):
         self.assertFalse(entry_guard({}, {}, {})[0])
 
