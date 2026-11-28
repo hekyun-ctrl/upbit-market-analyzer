@@ -21,6 +21,28 @@ class IntegratedShadowTests(unittest.TestCase):
         engine._advance(rows)
         self.assertEqual((engine.direction,engine.phase),(-1,"transition"))
 
+    def test_nov28_completed_5m_incident_retains_uptrend_after_pause(self):
+        # Actual 10:00--10:40 KST completed five-minute bars from Railway.
+        # Only direction-state reconstruction, not a fill or trade backtest.
+        raw=[(59912.9,59917.6,59870,59870.1),
+             (59870.1,60010,59808,59972.1),
+             (59972.1,60044.3,59940,60039.9),
+             (60039.9,60117.3,60024,60041.4),
+             (60041.4,60184.8,60041.3,60167.6),
+             (60167.6,60167.7,60100,60110.8),
+             (60110.8,60121.3,60079.3,60090.5),
+             (60090.5,60201.8,60090.4,60195.5),
+             (60195.5,60195.5,60158.2,60174)]
+        bars=[bar(1795827300+i*300,*r) for i,r in enumerate(raw)]
+        engine=IntegratedShadow()
+        states=[]
+        for i in range(3,len(bars)+1):
+            engine._trend(bars[:i])
+            states.append((engine.direction,engine.phase))
+        self.assertEqual(states,[ (1,"transition"), (1,"continuation"),
+            (1,"acceleration"),(1,"pullback"),(1,"pullback"),
+            (1,"acceleration"),(1,"pullback") ])
+
     def test_structure_first_and_cost_threshold(self):
         engine=IntegratedShadow()
         one=[bar(60*i,60000,60005,59995,60000) for i in range(1,5)]
