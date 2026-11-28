@@ -4,6 +4,7 @@ the decision; 30-minute first-touch outcomes exclude the partial entry minute.
 """
 import math
 from lbank_entry_quality import confirmed_pivot_barriers
+from lbank_native_entry import SOURCE
 from lbank_trend_runner import atr_wilder
 
 POLICY = "integrated_structure_shadow_v1"
@@ -73,7 +74,7 @@ class IntegratedShadow:
         self.last5=b["start"]
 
     def _trend(self, five):
-        if self.last5 is None or self.last5<five[0]["start"]:
+        if self.last5 is None or self.last5<five[0]["start"] or self.last5>five[-1]["start"]:
             self.direction=0
             self.anchor=None
             self.phase="range"
@@ -150,6 +151,8 @@ class IntegratedShadow:
         base=dict(policy=POLICY,approval=False,delivery="unchanged",ready=False)
         if not state:
             return dict(base,reason="missing_state"),[]
+        if state.get("source")!=SOURCE:
+            return dict(base,reason="unverified_source"),[]
         try:
             at=float(state["observed_at"]); quote=float(state["quote"])
             one=state["minute_bars"]; five=state["five_bars"]
@@ -165,8 +168,14 @@ class IntegratedShadow:
             # recovery with a bearish minute break. B and C follow structure.
             recent=five[-3:]
             fade=(recent[-1]["high"]<recent[-2]["high"] and recent[-1]["close"]<recent[-2]["close"])
+            # Independent early transition hypothesis: latest completed 5m
+            # reclaims the preceding close after a new adverse extreme;
+            # a separate closed 1m break is still required by _plan.
+            last,prev=five[-1],five[-2]
+            early_up=last["low"]<prev["low"] and last["close"]>prev["close"] and last["close"]>last["open"]
+            early_down=last["high"]>prev["high"] and last["close"]<prev["close"] and last["close"]<last["open"]
             plans=[]
-            for name,d,allowed in (("A",-1,fade),("B",-1,self.direction==-1),("C",1,self.direction==1)):
+            for name,d,allowed in (("A",-1,fade),("B",-1,self.direction==-1 or early_down),("C",1,self.direction==1 or early_up)):
                 plan=self._plan(name,d,quote,one,five,atr1,atr5) if allowed else dict(
                     strategy=name,direction=d,trigger=False,eligible=False,approval=False,reason="structure_not_aligned")
                 plans.append(plan)
@@ -183,6 +192,6 @@ class IntegratedShadow:
             order=["C","A","B"] if self.direction==1 else ["B","A","C"] if self.direction==-1 else ["A","B","C"]
             return dict(base,ready=True,direction=self.direction,phase=self.phase,anchor=self.anchor,
                         bar=five[-1]["start"],minute=self.last_minute,quote=quote,
-                        priority=order,plans=plans,pending=len(self.pending),reason="research_only"),outcomes
+                        priority=order,early_transition={"long":early_up,"short":early_down},plans=plans,pending=len(self.pending),reason="research_only"),outcomes
         except (KeyError,TypeError,ValueError,IndexError,OverflowError,ZeroDivisionError):
             return dict(base,reason="invalid_evidence"),[]
