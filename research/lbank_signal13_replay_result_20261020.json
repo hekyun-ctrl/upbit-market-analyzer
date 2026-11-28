@@ -1,0 +1,218 @@
+{
+  "archive_sha256": "cee6a09c95cbc9e34a62c74d48fed4dcde33e793908bf2964565e3905edcc861",
+  "gate_source": "f6a727b6e5397995c2e57837d3dcd623a2fdc619",
+  "gate_source_sha256": "376484fa03f7e24a1bfc6e031042669c2a67e0bfdecffe39b15ef09315b313be",
+  "matches_archived_result": true,
+  "policy_comparison": false,
+  "result": {
+    "actual_confirmation_replay": {
+      "accepted": true,
+      "age_seconds": 31.47756028175354,
+      "entry_quality": {
+        "confirmation_quote": 81369.8,
+        "confirmed_1m_closes": [],
+        "confirmed_1m_starts": [],
+        "frozen_breakout_level": 81443.0,
+        "minute_followthrough": false,
+        "policy": "native_structure_priority_v2",
+        "priority": {
+          "bar_start": 1792458300,
+          "dominant_intact": false,
+          "ema_aligned": true,
+          "observed_barrier": null,
+          "order": [
+            "hard_risk",
+            "higher_structure",
+            "target_room",
+            "minute_reaction"
+          ],
+          "policy": "native_structure_priority_v2",
+          "ready": true,
+          "support": 81714.0,
+          "support_intact": true,
+          "swing_structure": true,
+          "target_room": "unknown",
+          "trend15_aligned": false
+        },
+        "ranked_entry": {
+          "atr5": 123.16887457448169,
+          "atr_target_exception": false,
+          "bar_start": 1792458300,
+          "barrier_groups": [],
+          "ema9": 81563.91379221278,
+          "extension_atr": 1.5759971249505809,
+          "higher_direction_intact": false,
+          "location_ok": true,
+          "max_extension_atr": 2.5,
+          "max_trend_target_atr": 6.0,
+          "may_override_minor_reaction": false,
+          "may_override_single_pivots": false,
+          "overrides": [],
+          "policy": "native_ranked_entry_v1",
+          "ready": true,
+          "repeated_barrier": false,
+          "target_distance_atr": 5.93234734953037,
+          "upper_evidence": {
+            "bar_start": 1792458300,
+            "dominant_intact": false,
+            "ema_aligned": true,
+            "observed_barrier": null,
+            "order": [
+              "hard_risk",
+              "higher_structure",
+              "target_room",
+              "minute_reaction"
+            ],
+            "policy": "native_structure_priority_v2",
+            "ready": true,
+            "support": 81714.0,
+            "support_intact": true,
+            "swing_structure": true,
+            "target_room": "unknown",
+            "trend15_aligned": false
+          }
+        },
+        "requires_two_minute_wait": false,
+        "signed_progress_pct": -0.06160868768576577,
+        "watch_last_closed_1m": 1792458540,
+        "watch_price": 81319.7
+      },
+      "price_matches": true,
+      "reason": "qualified",
+      "recomputed_price": 81369.8,
+      "stop_matches": true,
+      "target1_matches": true,
+      "watch_at": 1792458643.0965466,
+      "watch_price": 81319.7
+    },
+    "actual_fills_verified": false,
+    "actual_quote": 81369.8,
+    "actual_signal_at": 1792458674.574107,
+    "alert_cooldown_replayed": false,
+    "complete_tick_replay": false,
+    "first_live_qualification_known": false,
+    "first_qualified_recorded_quote": {
+      "at": 1792458643.0965466,
+      "direction": -1,
+      "native_ready": true,
+      "quote": 81319.7,
+      "reason": "qualified",
+      "same_family_qualified": true,
+      "strategy": "breakout"
+    },
+    "interpretation": "conditions at recorded quotes only; not an earlier-send or profit claim",
+    "pnl_computed": false,
+    "points": [
+      {
+        "at": 1792457824.391836,
+        "native_ready": true,
+        "quote": 81630.1,
+        "reason": "market_no_setup",
+        "same_family_qualified": false
+      },
+      {
+        "at": 1792457887.0225708,
+        "native_ready": true,
+        "quote": 81604.7,
+        "reason": "market_no_setup",
+        "same_family_qualified": false
+      },
+      {
+        "at": 1792457949.9809694,
+        "native_ready": true,
+        "quote": 81689.8,
+        "reason": "market_no_setup",
+        "same_family_qualified": false
+      },
+      {
+        "at": 1792458012.897176,
+        "native_ready": true,
+        "quote": 81700.7,
+        "reason": "market_no_setup",
+        "same_family_qualified": false
+      },
+      {
+        "at": 1792458075.7572122,
+        "native_ready": true,
+        "quote": 81698.1,
+        "reason": "market_no_setup",
+        "same_family_qualified": false
+      },
+      {
+        "at": 1792458139.3008943,
+        "native_ready": true,
+        "quote": 81644.7,
+        "reason": "market_no_setup",
+        "same_family_qualified": false
+      },
+      {
+        "at": 1792458202.6348178,
+        "native_ready": true,
+        "quote": 81621.9,
+        "reason": "market_no_setup",
+        "same_family_qualified": false
+      },
+      {
+        "at": 1792458265.48268,
+        "native_ready": true,
+        "quote": 81550.2,
+        "reason": "market_no_setup",
+        "same_family_qualified": false
+      },
+      {
+        "at": 1792458328.6331644,
+        "native_ready": true,
+        "quote": 81550.0,
+        "reason": "market_no_setup",
+        "same_family_qualified": false
+      },
+      {
+        "at": 1792458391.3473043,
+        "native_ready": true,
+        "quote": 81559.3,
+        "reason": "market_no_setup",
+        "same_family_qualified": false
+      },
+      {
+        "at": 1792458454.1712902,
+        "native_ready": true,
+        "quote": 81525.1,
+        "reason": "market_no_setup",
+        "same_family_qualified": false
+      },
+      {
+        "at": 1792458516.8775165,
+        "native_ready": true,
+        "quote": 81450.2,
+        "reason": "market_no_setup",
+        "same_family_qualified": false
+      },
+      {
+        "at": 1792458579.9771678,
+        "native_ready": true,
+        "quote": 81343.2,
+        "reason": "price_deviation",
+        "same_family_qualified": false
+      },
+      {
+        "at": 1792458643.0965466,
+        "direction": -1,
+        "native_ready": true,
+        "quote": 81319.7,
+        "reason": "qualified",
+        "same_family_qualified": true,
+        "strategy": "breakout"
+      },
+      {
+        "at": 1792458674.574107,
+        "native_ready": true,
+        "quote": 81369.8,
+        "reason": "market_no_setup",
+        "same_family_qualified": false
+      }
+    ],
+    "signal_id": "1792458674574:13",
+    "source_publication_times_missing": true,
+    "version": "recorded_quote_native_entry_replay_v1"
+  }
+}

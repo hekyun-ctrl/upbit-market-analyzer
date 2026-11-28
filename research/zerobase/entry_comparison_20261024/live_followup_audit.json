@@ -1,0 +1,213 @@
+{
+  "checked_at": "2026-10-24T10:07:57.147Z",
+  "source": "Railway bounded service deployment logs",
+  "service_id": "8edd0d1a-3f5e-47fb-8e01-a0cc57935c34",
+  "active_commit": "4217f2047119fae96bca796f818c363594884bd9",
+  "from": "2026-10-22T00:00:00Z",
+  "actual_fills_verified": false,
+  "ref_numbers_reused_across_deployments": true,
+  "queries": [
+    {
+      "kind": "entries",
+      "limit": 500,
+      "logs": [
+        {
+          "at": "2026-10-22T02:45:46.013217518Z",
+          "message": "INFO:lbank_monitor:ENTRY REVIEW SENT strategy=trend_retest side=숏 entry=82891.4 stop=83160.5 t1=82193.5 t2=81800.0 net_rr=1.50 reverse_exception=False"
+        },
+        {
+          "at": "2026-10-22T06:32:03.973821393Z",
+          "message": "INFO:lbank_monitor:ENTRY REVIEW SENT strategy=breakout side=숏 entry=82544.9 stop=82707.0 t1=82008.8 t2=81722.9 net_rr=1.50 reverse_exception=False"
+        },
+        {
+          "at": "2026-10-23T15:17:46.294339421Z",
+          "message": "INFO:lbank_monitor:ENTRY REVIEW SENT strategy=breakout side=숏 entry=81403.1 stop=81680.3 t1=80698.4 t2=80299.1 net_rr=1.50 reverse_exception=False"
+        },
+        {
+          "at": "2026-10-24T00:36:44.117439293Z",
+          "message": "INFO:lbank_monitor:ENTRY REVIEW SENT strategy=trend_retest side=숏 entry=80680.3 stop=80867.4 t1=80113.3 t2=79805.1 net_rr=1.50 reverse_exception=False"
+        }
+      ]
+    },
+    {
+      "kind": "followups",
+      "limit": 500,
+      "logs": [
+        {
+          "at": "2026-10-22T06:26:36.489527132Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=25 side=SHORT reason=profit_guard_armed price=82621.2"
+        },
+        {
+          "at": "2026-10-22T06:30:11.663672859Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=25 side=SHORT reason=profit_guard_updated price=82516.9"
+        },
+        {
+          "at": "2026-10-22T07:50:25.779152144Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=25 side=SHORT reason=target1_reached price=82151.6"
+        },
+        {
+          "at": "2026-10-22T08:20:55.993769906Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=26 side=SHORT reason=target1_reached price=82000.0"
+        },
+        {
+          "at": "2026-10-22T08:45:55.952466198Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=25 side=SHORT reason=time_review price=81935.4"
+        },
+        {
+          "at": "2026-10-22T09:00:34.971756128Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=25 side=SHORT reason=target2_reached price=81787.9"
+        },
+        {
+          "at": "2026-10-22T09:09:26.109659175Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=26 side=SHORT reason=target2_reached price=81721.2"
+        },
+        {
+          "at": "2026-10-23T04:27:01.444137317Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=25 side=SHORT reason=tracking_expired price=81723.1"
+        },
+        {
+          "at": "2026-10-23T04:37:06.077534417Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=25 side=SHORT reason=tracking_expired price=81695.0"
+        },
+        {
+          "at": "2026-10-23T15:50:15.493046471Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=26 side=SHORT reason=risk_caution price=81570.2"
+        },
+        {
+          "at": "2026-10-23T16:04:51.939526760Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=26 side=SHORT reason=stop_breached price=81682.0"
+        },
+        {
+          "at": "2026-10-24T01:18:03.790273764Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=27 side=SHORT reason=risk_caution price=80807.3"
+        },
+        {
+          "at": "2026-10-24T01:50:09.474892535Z",
+          "message": "INFO:lbank_monitor:SIGNAL FOLLOWUP SENT reference=27 side=SHORT reason=early_invalidation price=80866.2"
+        }
+      ]
+    },
+    {
+      "kind": "followup_evidence",
+      "limit": 500,
+      "logs": [
+        {
+          "at": "2026-10-22T06:26:36.489520771Z",
+          "message": "INFO:lbank_monitor:SIGNAL_FOLLOWUP_EVIDENCE reference=25 reason=profit_guard_armed evidence={\"profit_policy\": {\"arm_distance\": 269.1477205657575, \"breakeven\": 82767.15236604889, \"fee\": 0.0006, \"funding\": 0.0001, \"initial_risk\": 269.1477205657575, \"policy\": \"native_pre_tp_profit_v1\", \"slippage\": 0.0002}, \"profit_state\": {\"active_since\": 1792650388.1991644, \"atr\": 87.21894143743545, \"bar_start\": 1792650000, \"best\": 82621.2, \"guard\": 82730.66427453667, \"last_at\": 1792650388.1991644, \"pending\": \"profit_guard_armed\"}}"
+        },
+        {
+          "at": "2026-10-22T06:30:11.663663651Z",
+          "message": "INFO:lbank_monitor:SIGNAL_FOLLOWUP_EVIDENCE reference=25 reason=profit_guard_updated evidence={\"profit_policy\": {\"arm_distance\": 269.1477205657575, \"breakeven\": 82767.15236604889, \"fee\": 0.0006, \"funding\": 0.0001, \"initial_risk\": 269.1477205657575, \"policy\": \"native_pre_tp_profit_v1\", \"slippage\": 0.0002}, \"profit_state\": {\"active_since\": 1792650611.0110388, \"atr\": 90.99615990619047, \"bar_start\": 1792650300, \"best\": 82516.9, \"guard\": 82704.58927453667, \"last_at\": 1792650611.0110388, \"pending\": \"profit_guard_updated\"}}"
+        },
+        {
+          "at": "2026-10-22T07:50:25.779142035Z",
+          "message": "INFO:lbank_monitor:SIGNAL_FOLLOWUP_EVIDENCE reference=25 reason=target1_reached evidence={\"anchor\": 82954.3, \"evaluated_at\": 1792655424.6538517, \"invalidated\": false, \"policy\": \"native_frozen_thesis_v3\", \"reason\": \"native_evidence_unavailable\", \"status\": \"unknown\"}"
+        },
+        {
+          "at": "2026-10-22T08:20:55.993762994Z",
+          "message": "INFO:lbank_monitor:SIGNAL_FOLLOWUP_EVIDENCE reference=26 reason=target1_reached evidence={\"anchor\": null, \"evaluated_at\": 1792657246.5862699, \"invalidated\": false, \"policy\": \"native_frozen_thesis_v3\", \"reason\": \"native_evidence_unavailable\", \"status\": \"unknown\"}"
+        },
+        {
+          "at": "2026-10-22T08:45:55.952458199Z",
+          "message": "INFO:lbank_monitor:SIGNAL_FOLLOWUP_EVIDENCE reference=25 reason=time_review evidence={\"anchor\": 82954.3, \"evaluated_at\": 1792658748.577027, \"invalidated\": false, \"policy\": \"native_frozen_thesis_v3\", \"reason\": \"native_evidence_unavailable\", \"status\": \"unknown\"}"
+        },
+        {
+          "at": "2026-10-22T09:00:34.971746908Z",
+          "message": "INFO:lbank_monitor:SIGNAL_FOLLOWUP_EVIDENCE reference=25 reason=target2_reached evidence={\"anchor\": 82954.3, \"evaluated_at\": 1792659634.0047624, \"invalidated\": false, \"policy\": \"native_frozen_thesis_v3\", \"reason\": \"native_evidence_unavailable\", \"status\": \"unknown\"}"
+        },
+        {
+          "at": "2026-10-22T09:09:26.109652147Z",
+          "message": "INFO:lbank_monitor:SIGNAL_FOLLOWUP_EVIDENCE reference=26 reason=target2_reached evidence={\"anchor\": null, \"evaluated_at\": 1792660159.62558, \"invalidated\": false, \"policy\": \"native_frozen_thesis_v3\", \"reason\": \"native_evidence_unavailable\", \"status\": \"unknown\"}"
+        },
+        {
+          "at": "2026-10-23T04:27:01.444130583Z",
+          "message": "INFO:lbank_monitor:SIGNAL_FOLLOWUP_EVIDENCE reference=25 reason=tracking_expired evidence={\"anchor\": 82954.3, \"evaluated_at\": 1792729620.6278179, \"invalidated\": false, \"policy\": \"native_frozen_thesis_v3\", \"reason\": \"native_evidence_unavailable\", \"status\": \"unknown\"}"
+        },
+        {
+          "at": "2026-10-23T04:37:06.077530902Z",
+          "message": "INFO:lbank_monitor:SIGNAL_FOLLOWUP_EVIDENCE reference=25 reason=tracking_expired evidence={\"anchor\": 82954.3, \"evaluated_at\": 1792730225.1848114, \"invalidated\": false, \"policy\": \"native_frozen_thesis_v3\", \"reason\": \"native_evidence_unavailable\", \"status\": \"unknown\"}"
+        },
+        {
+          "at": "2026-10-23T15:50:15.493042254Z",
+          "message": "INFO:lbank_monitor:SIGNAL_FOLLOWUP_EVIDENCE reference=26 reason=risk_caution evidence={\"anchor\": null, \"bar_start\": 1792770300, \"evaluated_at\": 1792770614.5946655, \"invalidated\": false, \"last_close\": 81581.9, \"opposite15\": false, \"opposite_ema\": false, \"opposite_swings\": false, \"policy\": \"native_frozen_thesis_v3\", \"reason\": \"mixed_evidence_not_reversal\", \"reversal_since\": 1792767600, \"status\": \"weakened\"}"
+        },
+        {
+          "at": "2026-10-23T16:04:51.939521704Z",
+          "message": "INFO:lbank_monitor:SIGNAL_FOLLOWUP_EVIDENCE reference=26 reason=stop_breached evidence={\"observed_at\": 1792771489.2848654, \"observed_price\": 81682.0, \"reason\": \"observed_stop_quote\", \"stop\": 81680.30831675165}"
+        },
+        {
+          "at": "2026-10-24T01:18:03.785590156Z",
+          "message": "INFO:lbank_monitor:SIGNAL_FOLLOWUP_EVIDENCE reference=27 reason=risk_caution evidence={\"anchor\": 80826.8, \"bar_start\": 1792804200, \"evaluated_at\": 1792804682.9525056, \"invalidated\": false, \"last_close\": 80733.0, \"opposite15\": false, \"opposite_ema\": false, \"opposite_swings\": true, \"policy\": \"native_frozen_thesis_v3\", \"reason\": \"mixed_evidence_not_reversal\", \"reversal_since\": 1792801800, \"status\": \"weakened\"}"
+        },
+        {
+          "at": "2026-10-24T01:50:09.474881054Z",
+          "message": "INFO:lbank_monitor:SIGNAL_FOLLOWUP_EVIDENCE reference=27 reason=early_invalidation evidence={\"anchor\": 80826.8, \"bar_start\": 1792806300, \"evaluated_at\": 1792806608.8008745, \"invalidated\": true, \"last_close\": 80866.1, \"policy\": \"native_frozen_thesis_v3\", \"reason\": \"frozen_structure_close_break\", \"status\": \"invalid\"}"
+        }
+      ]
+    },
+    {
+      "kind": "manual_risk",
+      "limit": 500,
+      "logs": []
+    },
+    {
+      "kind": "entry_thesis",
+      "limit": 100,
+      "from": "2026-10-23T10:58:52Z",
+      "logs": [
+        {
+          "at": "2026-10-23T15:17:46.292686843Z",
+          "message": "INFO:lbank_monitor:ENTRY_THESIS_SENT reference=26 evidence={\"anchor\": null, \"anchor_source\": \"hard_stop_and_confirmed_reversal\", \"entry\": 81403.1, \"entry_bar_start\": 1792768200, \"frozen_at\": 1792768665.318083, \"initial_stop\": 81680.30831675165, \"policy\": \"native_frozen_thesis_v3\", \"review_seconds\": 21600, \"tracking_seconds\": 86400}"
+        },
+        {
+          "at": "2026-10-24T00:36:44.115840480Z",
+          "message": "INFO:lbank_monitor:ENTRY_THESIS_SENT reference=27 evidence={\"anchor\": 80826.8, \"anchor_source\": \"setup_anchor\", \"entry\": 80680.3, \"entry_bar_start\": 1792801800, \"frozen_at\": 1792802195.5665035, \"initial_stop\": 80867.43985924065, \"policy\": \"native_frozen_thesis_v3\", \"review_seconds\": 21600, \"tracking_seconds\": 86400}"
+        }
+      ]
+    },
+    {
+      "kind": "entry_progress",
+      "limit": 100,
+      "from": "2026-10-23T10:58:52Z",
+      "logs": [
+        {
+          "at": "2026-10-23T15:17:45.329002201Z",
+          "message": "WARNING:lbank_monitor:ENTRY_EVIDENCE_AUDIT strategy=breakout side=숏 stage2_signed_progress_pct=0.02690 native_1m_to_quote_move5_pct=-0.1648 native_1m_to_quote_move15_pct=-0.3675 native_15m_45m_signed_pct=-0.0230 confirmed_reversal=False read_only_no_quality_gate_change=true"
+        },
+        {
+          "at": "2026-10-24T00:36:44.114588387Z",
+          "message": "WARNING:lbank_monitor:ENTRY_EVIDENCE_AUDIT strategy=trend_retest side=숏 stage2_signed_progress_pct=-0.00025 native_1m_to_quote_move5_pct=-0.1605 native_1m_to_quote_move15_pct=-0.1402 native_15m_45m_signed_pct=0.2326 confirmed_reversal=False read_only_no_quality_gate_change=true"
+        }
+      ]
+    },
+    {
+      "kind": "entry_quality",
+      "limit": 100,
+      "from": "2026-10-23T10:58:52Z",
+      "logs": [
+        {
+          "at": "2026-10-23T15:17:46.291637383Z",
+          "message": "INFO:lbank_monitor:ENTRY_QUALITY_SENT reference=26 evidence={\"breakout_confirmation\": {\"existing_higher_priority_support\": true, \"extra_wait_seconds\": 0, \"original_predicate\": {\"breakout_long\": false, \"breakout_short\": true, \"momentum15_pct\": -0.35800223736098813, \"momentum5_pct\": -0.15526598191016872, \"prior_high\": 81728.0, \"prior_low\": 81442.8}, \"original_trigger_current\": true, \"policy\": \"native_breakout_trigger_or_higher_priority_v1\", \"priority_override_used\": false}, \"confirmation_quote\": 81403.1, \"confirmed_1m_closes\": [], \"confirmed_1m_starts\": [], \"frozen_breakout_level\": 81442.8, \"minute_followthrough\": false, \"policy\": \"native_structure_priority_v2\", \"priority\": {\"bar_start\": 1792768200, \"dominant_intact\": false, \"ema_aligned\": true, \"observed_barrier\": 81055.5, \"order\": [\"hard_risk\", \"higher_structure\", \"target_room\", \"minute_reaction\"], \"policy\": \"native_structure_priority_v2\", \"ready\": true, \"support\": 81785.0, \"support_intact\": true, \"swing_structure\": true, \"target_room\": \"conflict\", \"trend15_aligned\": true}, \"ranked_entry\": {\"atr5\": 184.8055445010934, \"atr_target_exception\": true, \"bar_start\": 1792768200, \"barrier_groups\": [{\"price\": 81055.5, \"starts\": [1792765200], \"touches\": 1}], \"ema9\": 81597.7605592784, \"extension_atr\": 1.0533264021049826, \"higher_direction_intact\": true, \"location_ok\": true, \"max_extension_atr\": 2.5, \"max_trend_target_atr\": 6.0, \"may_override_minor_reaction\": true, \"may_override_single_pivots\": true, \"overrides\": [\"single_pivots_under_aligned_15m_5m\"], \"policy\": \"native_ranked_entry_v1\", \"ready\": true, \"repeated_barrier\": false, \"target_distance_atr\": 3.813294691263054, \"upper_evidence\": {\"bar_start\": 1792768200, \"dominant_intact\": false, \"ema_aligned\": true, \"observed_barrier\": 81055.5, \"order\": [\"hard_risk\", \"higher_structure\", \"target_room\", \"minute_reaction\"], \"policy\": \"native_structure_priority_v2\", \"ready\": true, \"support\": 81785.0, \"support_intact\": true, \"swing_structure\": true, \"target_room\": \"conflict\", \"trend15_aligned\": true}}, \"requires_two_minute_wait\": false, \"signed_progress_pct\": 0.02689591648755707, \"watch_last_closed_1m\": 1792768560, \"watch_price\": 81425.0}"
+        },
+        {
+          "at": "2026-10-24T00:36:44.114593088Z",
+          "message": "INFO:lbank_monitor:ENTRY_QUALITY_SENT reference=27 evidence={\"confirmation_quote\": 80680.3, \"confirmed_1m_closes\": [], \"confirmed_1m_starts\": [], \"frozen_breakout_level\": null, \"minute_followthrough\": false, \"policy\": \"native_structure_priority_v2\", \"priority\": {\"bar_start\": 1792801800, \"dominant_intact\": false, \"ema_aligned\": true, \"observed_barrier\": 80680.0, \"order\": [\"hard_risk\", \"higher_structure\", \"target_room\", \"minute_reaction\"], \"policy\": \"native_structure_priority_v2\", \"ready\": true, \"support\": 80869.8, \"support_intact\": true, \"swing_structure\": false, \"target_room\": \"conflict\", \"trend15_aligned\": true}, \"ranked_entry\": {\"atr5\": 124.75990616042681, \"atr_target_exception\": true, \"bar_start\": 1792801800, \"barrier_groups\": [{\"price\": 80680.0, \"starts\": [1792801200], \"touches\": 1}, {\"price\": 80517.8, \"starts\": [1792796100], \"touches\": 1}, {\"price\": 80466.6, \"starts\": [1792797000], \"touches\": 1}], \"ema9\": 80858.96978577125, \"extension_atr\": 1.4321090105782364, \"higher_direction_intact\": true, \"location_ok\": true, \"max_extension_atr\": 2.5, \"max_trend_target_atr\": 6.0, \"may_override_minor_reaction\": true, \"may_override_single_pivots\": true, \"overrides\": [\"single_pivots_under_aligned_15m_5m\"], \"policy\": \"native_ranked_entry_v1\", \"ready\": true, \"repeated_barrier\": false, \"target_distance_atr\": 4.544919766483002, \"upper_evidence\": {\"bar_start\": 1792801800, \"dominant_intact\": false, \"ema_aligned\": true, \"observed_barrier\": 80680.0, \"order\": [\"hard_risk\", \"higher_structure\", \"target_room\", \"minute_reaction\"], \"policy\": \"native_structure_priority_v2\", \"ready\": true, \"support\": 80869.8, \"support_intact\": true, \"swing_structure\": false, \"target_room\": \"conflict\", \"trend15_aligned\": true}}, \"requires_two_minute_wait\": false, \"signed_progress_pct\": -0.00024789260300028815, \"watch_last_closed_1m\": 1792802100, \"watch_price\": 80680.1}"
+        }
+      ]
+    },
+    {
+      "kind": "entry_timing",
+      "limit": 100,
+      "logs": [
+        {
+          "at": "2026-10-23T15:17:46.292690558Z",
+          "message": "INFO:lbank_monitor:ENTRY_TIMING_SENT reference=26 evidence={\"breakout_confirmation\": {\"existing_higher_priority_support\": true, \"extra_wait_seconds\": 0, \"original_predicate\": {\"breakout_long\": false, \"breakout_short\": true, \"momentum15_pct\": -0.35800223736098813, \"momentum5_pct\": -0.15526598191016872, \"prior_high\": 81728.0, \"prior_low\": 81442.8}, \"original_trigger_current\": true, \"policy\": \"native_breakout_trigger_or_higher_priority_v1\", \"priority_override_used\": false}, \"candidate_evaluated_at\": 1792768633.7801476, \"confirmation_evaluated_at\": 1792768665.3274047, \"confirmation_quote\": 81403.1, \"confirmation_quote_at\": 1792768665.318083, \"dominant_intact\": false, \"entry_quote_improved_for_side\": false, \"evaluation_after_first_ready_observation_seconds\": 0.0227200984954834, \"evaluation_after_nominal_close_seconds\": 13.780147552490234, \"existing_risk_gates_changed\": false, \"extension_atr\": 1.0533264021049826, \"first_ready_observed_at\": 1792768633.7574275, \"higher_direction_intact\": true, \"last_closed_1m_start\": 1792768560, \"last_closed_5m_start\": 1792768200, \"minute_followthrough\": false, \"nominal_1m_close_at\": 1792768620, \"orderbook_verified\": false, \"policy\": \"native_completed_bar_schedule_v1\", \"profitability_verified\": false, \"publication_note\": \"nominal_close_is_not_actual_publication_time\", \"quote_age_when_send_started_seconds\": 0.014701128005981445, \"quote_observed_at\": 1792768633.7574275, \"recipient_receipt_verified\": false, \"send_started_at\": 1792768665.3327842, \"side_adjusted_quote_change_pct\": 0.02689591648755707, \"source_publication_at\": null, \"strategy_gate_changed\": true, \"target_distance_atr\": 3.813294691263054, \"telegram_acknowledged_at\": 1792768666.210361, \"telegram_elapsed_seconds\": 0.8775768280029297, \"trigger\": \"periodic_and_new_bar\", \"watch_age_at_confirmation_seconds\": 31.56065559387207, \"watch_quote\": 81425.0, \"watch_quote_at\": 1792768633.7574275}"
+        },
+        {
+          "at": "2026-10-24T00:36:44.115843897Z",
+          "message": "INFO:lbank_monitor:ENTRY_TIMING_SENT reference=27 evidence={\"breakout_confirmation\": null, \"candidate_evaluated_at\": 1792802164.2955835, \"confirmation_evaluated_at\": 1792802195.5880003, \"confirmation_quote\": 80680.3, \"confirmation_quote_at\": 1792802195.5665035, \"dominant_intact\": false, \"entry_quote_improved_for_side\": true, \"evaluation_after_first_ready_observation_seconds\": 0.010116815567016602, \"evaluation_after_nominal_close_seconds\": 4.295583486557007, \"existing_risk_gates_changed\": false, \"extension_atr\": 1.4321090105782364, \"first_ready_observed_at\": 1792802164.2854667, \"higher_direction_intact\": true, \"last_closed_1m_start\": 1792802100, \"last_closed_5m_start\": 1792801800, \"minute_followthrough\": false, \"nominal_1m_close_at\": 1792802160, \"orderbook_verified\": false, \"policy\": \"native_completed_bar_schedule_v1\", \"profitability_verified\": false, \"publication_note\": \"nominal_close_is_not_actual_publication_time\", \"quote_age_when_send_started_seconds\": 0.022588253021240234, \"quote_observed_at\": 1792802164.2854667, \"recipient_receipt_verified\": false, \"send_started_at\": 1792802195.5890918, \"side_adjusted_quote_change_pct\": -0.00024789260300028815, \"source_publication_at\": null, \"strategy_gate_changed\": false, \"target_distance_atr\": 4.544919766483002, \"telegram_acknowledged_at\": 1792802196.357514, \"telegram_elapsed_seconds\": 0.7684221267700195, \"trigger\": \"new_completed_bar\", \"watch_age_at_confirmation_seconds\": 31.281036853790283, \"watch_quote\": 80680.1, \"watch_quote_at\": 1792802164.2854667}"
+        }
+      ]
+    }
+  ]
+}

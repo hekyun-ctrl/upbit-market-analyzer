@@ -1,0 +1,1929 @@
+{
+  "window_kst": "2026-10-16 21:07:38 ~ 2026-10-17 21:07:38",
+  "diagnostics": [
+    {
+      "timestamp": "2026-10-16T12:17:00.710194472Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=6 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=4 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T12:27:37.800713249Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=5 data_gap=0 retest_momentum=1 sampled_context=4 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T12:38:05.120714314Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T12:48:37.903727486Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=5 data_gap=0 retest_momentum=1 sampled_context=0 rsi_direction=4 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T12:59:15.422640419Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=9 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=1 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T13:09:47.074805962Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T13:20:18.641922320Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=9 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=1 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T13:30:58.532722621Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T13:41:38.758688919Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=6 data_gap=0 retest_momentum=0 sampled_context=1 rsi_direction=2 risk_or_target=1 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T13:52:04.091635743Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=5 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=1 confirm_reject=3 watched=1 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T14:02:38.445602441Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T14:13:13.397635421Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T14:23:47.740594509Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=5 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=1 risk_or_target=2 confirm_reject=0 watched=0 confirmed=0 suppressed=2 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T14:34:18.719730360Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=9 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=1 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T14:44:58.103296050Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=8 data_gap=0 retest_momentum=1 sampled_context=0 rsi_direction=1 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T14:55:28.255092256Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=7 data_gap=0 retest_momentum=0 sampled_context=2 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=1 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T15:06:03.839167177Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=5 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=2 confirm_reject=0 watched=0 confirmed=0 suppressed=3 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T15:16:48.363899547Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=6 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=2 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=2 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T15:27:18.460395454Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=5 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=2 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=3 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T15:37:58.325919604Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=9 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=1 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T15:48:28.471369844Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T15:58:59.192198974Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=6 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=4 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T16:09:29.209661929Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=6 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=2 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=2 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T16:19:58.686321103Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=7 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=2 confirm_reject=0 watched=0 confirmed=0 suppressed=1 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T16:30:30.916356514Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=9 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=1 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T16:41:03.461371722Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T16:51:34.243064420Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=9 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=1 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T17:02:12.107460920Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T17:12:35.802446407Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=8 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=2 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T17:23:06.207094322Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=6 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=4 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T17:33:38.368942896Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=7 data_gap=0 retest_momentum=0 sampled_context=2 rsi_direction=1 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T17:44:06.910385614Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=7 data_gap=0 retest_momentum=0 sampled_context=3 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T17:54:47.685133989Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=7 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=3 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T18:05:16.206657245Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=7 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=3 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T18:15:39.435046701Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T18:26:18.281385072Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=9 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=1 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T18:36:52.628924117Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T18:47:18.186947184Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=9 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=1 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T18:57:52.772219935Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=6 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=2 risk_or_target=1 confirm_reject=0 watched=0 confirmed=0 suppressed=1 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T19:08:28.701018633Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=9 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=1 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T19:18:58.687295245Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=6 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=2 confirm_reject=0 watched=0 confirmed=0 suppressed=2 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T19:29:27.811538102Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=7 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=1 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=2 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T19:39:58.487518815Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=9 data_gap=0 retest_momentum=0 sampled_context=1 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T19:50:38.333782384Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T20:00:59.107381262Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=5 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=1 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=4 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T20:11:34.205583667Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=5 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=5 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T20:22:08.635939636Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=6 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=3 risk_or_target=1 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T20:32:32.086667060Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T20:43:10.452634321Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T20:53:37.903040361Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T21:04:06.436257560Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T21:14:45.331420753Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T21:25:11.676631385Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T21:35:48.867157317Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T21:46:18.305731832Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T21:56:53.314305886Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T22:07:28.537971094Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T22:17:59.241192471Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T22:28:39.108907234Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T22:39:15.783839723Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T22:49:46.882336682Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T23:00:18.808913391Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T23:10:55.734653796Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T23:21:28.967864840Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T23:31:59.190583981Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T23:42:28.686527946Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-16T23:53:08.707232773Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T00:03:33.423201334Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T00:14:04.887714398Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T00:24:37.584184589Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T00:35:15.940189252Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T00:45:47.044287373Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T00:56:09.081913784Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T01:06:44.620264007Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T01:17:42.960579657Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T01:28:16.958594950Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T01:38:40.672026705Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T01:49:15.528086510Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T01:59:42.734088027Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T02:10:20.186465484Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T02:20:50.915862414Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T02:31:18.263318287Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=9 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=1 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T02:41:43.911325598Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T02:52:20.843471534Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T03:02:51.027912333Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T03:13:18.614689091Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T03:23:57.955867917Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T03:34:28.699097050Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T03:54:22.622457578Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=11 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T04:04:55.917249711Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T04:15:24.012033966Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T04:27:00.832262066Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=11 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T04:37:31.468405397Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T04:47:59.756410469Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T04:58:26.591016469Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T05:08:58.318859188Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T05:19:32.567471803Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T05:30:00.373275098Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T05:40:33.173583447Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T05:51:02.572414944Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T06:01:41.206184955Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T06:12:15.331486191Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T06:22:46.238687055Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T06:33:09.861819196Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T06:43:51.885736895Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T06:54:13.322606453Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T07:04:51.781093161Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T07:15:16.441958515Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T07:25:48.602419975Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T07:36:19.998283004Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T07:46:53.825766248Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T07:57:28.678083280Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T08:14:31.145553800Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=11 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T08:24:56.374093706Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T08:35:30.128746689Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T08:46:00.591513091Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T08:59:43.165059238Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T09:10:09.530190063Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T09:20:49.728039806Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T09:31:13.114253150Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T09:41:47.257666938Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T09:52:22.336489186Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T10:02:49.620604147Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T10:13:16.947612176Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=9 data_gap=1 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T10:23:52.288460050Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T10:34:30.400794180Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T10:44:55.955095430Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T10:55:23.155853813Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T11:05:59.230559896Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T11:16:29.927038184Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T11:26:59.649827625Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T11:37:28.293325187Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T11:48:09.241775219Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    },
+    {
+      "timestamp": "2026-10-17T11:58:39.403507451Z",
+      "message": "INFO:lbank_monitor:ALERT_DIAGNOSTICS_10M no_setup=10 data_gap=0 retest_momentum=0 sampled_context=0 rsi_direction=0 risk_or_target=0 confirm_reject=0 watched=0 confirmed=0 suppressed=0 (no_setup != rejected trade)"
+    }
+  ],
+  "plan_rejections": [
+    {
+      "timestamp": "2026-10-16T13:40:28.993243420Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_barrier_conflict strategy=range_rebound direction=1 price=81929.6 target1=82439.1 barrier=82390.1"
+    },
+    {
+      "timestamp": "2026-10-16T13:43:43.314953771Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_barrier_conflict strategy=range_rebound direction=1 price=81916.6 target1=82386.8 barrier=82390.1"
+    },
+    {
+      "timestamp": "2026-10-16T13:44:48.315917326Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_barrier_conflict strategy=range_rebound direction=1 price=81932.4 target1=82426.3 barrier=82390.1"
+    },
+    {
+      "timestamp": "2026-10-16T13:45:48.094737967Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_barrier_conflict strategy=range_rebound direction=1 price=81964.4 target1=82506.4 barrier=82390.1"
+    },
+    {
+      "timestamp": "2026-10-16T13:51:00.431276867Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_outside_sampled_range strategy=trend_retest direction=-1 price=81685.7 target1=80953.2 sampled_range=403.4"
+    },
+    {
+      "timestamp": "2026-10-16T14:16:28.048125811Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_outside_sampled_range strategy=breakout direction=1 price=82234.3 target1=83139.3 sampled_range=548.6"
+    },
+    {
+      "timestamp": "2026-10-16T14:17:28.166897684Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_outside_sampled_range strategy=breakout direction=1 price=82313.3 target1=83337.0 sampled_range=627.6"
+    },
+    {
+      "timestamp": "2026-10-16T14:58:37.785648675Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_outside_sampled_range strategy=breakout direction=-1 price=81942.1 target1=81050.4 sampled_range=588.2"
+    },
+    {
+      "timestamp": "2026-10-16T15:06:03.839155897Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=stop_distance strategy=breakout direction=-1 price=81508.0 stop=82004.8 dist_pct=0.610 min_pct=0.250 max_pct=0.600"
+    },
+    {
+      "timestamp": "2026-10-16T16:10:29.098973579Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_barrier_conflict strategy=range_rebound direction=1 price=81398.2 target1=81837.9 barrier=81838.8"
+    },
+    {
+      "timestamp": "2026-10-16T16:11:39.148207236Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_barrier_conflict strategy=range_rebound direction=1 price=81435.0 target1=81892.8 barrier=81838.8"
+    },
+    {
+      "timestamp": "2026-10-16T18:50:28.647583324Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_barrier_conflict strategy=range_rebound direction=1 price=81153.7 target1=81662.0 barrier=81556.7"
+    },
+    {
+      "timestamp": "2026-10-16T19:15:50.088355665Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_outside_sampled_range strategy=breakout direction=1 price=81362.6 target1=82193.3 sampled_range=542.4"
+    },
+    {
+      "timestamp": "2026-10-16T19:16:58.833792470Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_outside_sampled_range strategy=breakout direction=1 price=81369.9 target1=82211.6 sampled_range=542.4"
+    },
+    {
+      "timestamp": "2026-10-16T20:16:50.207598340Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_barrier_conflict strategy=range_rebound direction=-1 price=81556.3 target1=81120.1 barrier=81158.9"
+    },
+    {
+      "timestamp": "2026-10-17T02:29:08.482580766Z",
+      "message": "INFO:lbank_monitor:PLAN REJECT reason=target_outside_sampled_range strategy=breakout direction=-1 price=81385.8 target1=80791.8 sampled_range=253.7"
+    }
+  ],
+  "confirm_rejections": [
+    {
+      "timestamp": "2026-10-16T13:43:43.314961349Z",
+      "message": "INFO:lbank_monitor:ALERT_CONFIRM_REJECT reason=risk_or_target age_seconds=64.2 strategy=range_rebound"
+    },
+    {
+      "timestamp": "2026-10-16T13:44:48.315924866Z",
+      "message": "INFO:lbank_monitor:ALERT_CONFIRM_REJECT reason=risk_or_target age_seconds=127.9 strategy=range_rebound"
+    },
+    {
+      "timestamp": "2026-10-16T13:45:48.094744688Z",
+      "message": "INFO:lbank_monitor:ALERT_CONFIRM_REJECT reason=risk_or_target age_seconds=191.5 strategy=range_rebound"
+    }
+  ],
+  "suppressed": [
+    {
+      "timestamp": "2026-10-16T12:08:38.644804063Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=global_cooldown strategy=breakout price=82317.4"
+    },
+    {
+      "timestamp": "2026-10-16T12:11:51.764783588Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=reverse_cooldown strategy=breakout price=82290.2"
+    },
+    {
+      "timestamp": "2026-10-16T12:14:58.793907110Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=reverse_cooldown strategy=breakout price=82211.0"
+    },
+    {
+      "timestamp": "2026-10-16T12:15:58.728738150Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=reverse_cooldown strategy=breakout price=82157.0"
+    },
+    {
+      "timestamp": "2026-10-16T12:51:55.309902781Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=reverse_cooldown strategy=breakout price=82051.7"
+    },
+    {
+      "timestamp": "2026-10-16T14:20:38.455301554Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=롱 reason=sleep_hours strategy=breakout price=82335.0"
+    },
+    {
+      "timestamp": "2026-10-16T14:23:47.740584075Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=롱 reason=sleep_hours strategy=breakout price=82395.5"
+    },
+    {
+      "timestamp": "2026-10-16T14:30:09.698438649Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=range_rebound price=82315.1"
+    },
+    {
+      "timestamp": "2026-10-16T14:55:28.255082717Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81961.3"
+    },
+    {
+      "timestamp": "2026-10-16T15:01:51.764964651Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81869.4"
+    },
+    {
+      "timestamp": "2026-10-16T15:02:51.784520825Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81823.6"
+    },
+    {
+      "timestamp": "2026-10-16T15:05:01.807823688Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81818.3"
+    },
+    {
+      "timestamp": "2026-10-16T15:07:08.055249534Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81501.3"
+    },
+    {
+      "timestamp": "2026-10-16T15:09:28.306282767Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81492.3"
+    },
+    {
+      "timestamp": "2026-10-16T15:20:58.338164487Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=trend_retest price=81597.4"
+    },
+    {
+      "timestamp": "2026-10-16T15:22:08.147916028Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=trend_retest price=81550.2"
+    },
+    {
+      "timestamp": "2026-10-16T15:23:07.886300317Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=trend_retest price=81499.9"
+    },
+    {
+      "timestamp": "2026-10-16T15:29:28.601010644Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=trend_retest price=81579.9"
+    },
+    {
+      "timestamp": "2026-10-16T15:51:38.564717247Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=trend_retest price=81409.5"
+    },
+    {
+      "timestamp": "2026-10-16T15:53:37.341729918Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=trend_retest price=81415.1"
+    },
+    {
+      "timestamp": "2026-10-16T15:54:49.146311155Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81404.3"
+    },
+    {
+      "timestamp": "2026-10-16T15:55:49.011055793Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81381.4"
+    },
+    {
+      "timestamp": "2026-10-16T16:02:03.285205432Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81278.1"
+    },
+    {
+      "timestamp": "2026-10-16T16:03:13.281813609Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81276.0"
+    },
+    {
+      "timestamp": "2026-10-16T16:15:48.321113285Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=롱 reason=sleep_hours strategy=breakout price=81608.0"
+    },
+    {
+      "timestamp": "2026-10-16T17:07:28.946711047Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81164.1"
+    },
+    {
+      "timestamp": "2026-10-16T17:08:28.822228002Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81112.5"
+    },
+    {
+      "timestamp": "2026-10-16T17:16:51.697057523Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=80988.7"
+    },
+    {
+      "timestamp": "2026-10-16T17:17:51.489460144Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=80916.9"
+    },
+    {
+      "timestamp": "2026-10-16T17:19:01.432556158Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=80868.1"
+    },
+    {
+      "timestamp": "2026-10-16T17:20:01.498420715Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=80807.9"
+    },
+    {
+      "timestamp": "2026-10-16T17:56:51.151778865Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81239.9"
+    },
+    {
+      "timestamp": "2026-10-16T17:57:48.695920555Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81198.2"
+    },
+    {
+      "timestamp": "2026-10-16T17:58:58.573602267Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=breakout price=81169.3"
+    },
+    {
+      "timestamp": "2026-10-16T18:16:49.663860219Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=롱 reason=sleep_hours strategy=trend_retest price=81350.1"
+    },
+    {
+      "timestamp": "2026-10-16T18:55:43.068783071Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=숏 reason=sleep_hours strategy=trend_retest price=80904.2"
+    },
+    {
+      "timestamp": "2026-10-16T19:12:40.830504102Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=롱 reason=sleep_hours strategy=breakout price=81302.8"
+    },
+    {
+      "timestamp": "2026-10-16T19:13:35.432265717Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=롱 reason=sleep_hours strategy=breakout price=81349.4"
+    },
+    {
+      "timestamp": "2026-10-16T19:26:28.230124457Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=롱 reason=sleep_hours strategy=breakout price=81560.1"
+    },
+    {
+      "timestamp": "2026-10-16T19:27:29.122985602Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=롱 reason=sleep_hours strategy=breakout price=81702.8"
+    },
+    {
+      "timestamp": "2026-10-16T19:53:38.509532842Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=롱 reason=sleep_hours strategy=trend_retest price=81497.3"
+    },
+    {
+      "timestamp": "2026-10-16T19:54:48.461502339Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=롱 reason=sleep_hours strategy=trend_retest price=81517.2"
+    },
+    {
+      "timestamp": "2026-10-16T19:55:48.211713854Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=롱 reason=sleep_hours strategy=trend_retest price=81573.8"
+    },
+    {
+      "timestamp": "2026-10-16T19:56:46.876156491Z",
+      "message": "INFO:lbank_monitor:WATCH SUPPRESSED side=롱 reason=sleep_hours strategy=trend_retest price=81618.4"
+    }
+  ],
+  "native_five": [
+    {
+      "period": 300,
+      "start": 1792210500,
+      "open": 81516.7,
+      "high": 81516.8,
+      "low": 81490,
+      "close": 81491.8,
+      "volume": 5.5384,
+      "turnover": 451393.67204,
+      "updated": 1792210799,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792210800,
+      "open": 81491.8,
+      "high": 81503.6,
+      "low": 81491.7,
+      "close": 81500,
+      "volume": 5.4872000000000005,
+      "turnover": 447179.07614,
+      "updated": 1792211099,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792211100,
+      "open": 81500,
+      "high": 81506.2,
+      "low": 81499,
+      "close": 81499,
+      "volume": 5.4376,
+      "turnover": 443185.68692,
+      "updated": 1792211399,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792211400,
+      "open": 81499,
+      "high": 81520.9,
+      "low": 81480.7,
+      "close": 81520.9,
+      "volume": 5.7878,
+      "turnover": 471666.86296,
+      "updated": 1792211699,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792211700,
+      "open": 81520.9,
+      "high": 81558.2,
+      "low": 81520.7,
+      "close": 81524.7,
+      "volume": 6.4879999999999995,
+      "turnover": 529034.88724,
+      "updated": 1792211999,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792212000,
+      "open": 81524.7,
+      "high": 81547.1,
+      "low": 81515.2,
+      "close": 81522.9,
+      "volume": 5.514,
+      "turnover": 449543.24212,
+      "updated": 1792212299,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792212300,
+      "open": 81522.9,
+      "high": 81532.2,
+      "low": 81485.7,
+      "close": 81522.8,
+      "volume": 5.6566,
+      "turnover": 461058.0719,
+      "updated": 1792212599,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792212600,
+      "open": 81522.8,
+      "high": 81522.8,
+      "low": 81499.4,
+      "close": 81499.5,
+      "volume": 6.864,
+      "turnover": 559458.29884,
+      "updated": 1792212899,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792212900,
+      "open": 81499.5,
+      "high": 81500.6,
+      "low": 81487.6,
+      "close": 81500.5,
+      "volume": 6.4292,
+      "turnover": 523920.41418,
+      "updated": 1792213199,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792213200,
+      "open": 81500.5,
+      "high": 81589,
+      "low": 81500.5,
+      "close": 81574.2,
+      "volume": 7.6896,
+      "turnover": 627120.3203199999,
+      "updated": 1792213499,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792213500,
+      "open": 81574.2,
+      "high": 81600,
+      "low": 81551.8,
+      "close": 81600,
+      "volume": 5.9544,
+      "turnover": 485757.69044000003,
+      "updated": 1792213799,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792213800,
+      "open": 81600,
+      "high": 81601,
+      "low": 81584.5,
+      "close": 81600,
+      "volume": 5.8580000000000005,
+      "turnover": 477982.55662,
+      "updated": 1792214099,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792214100,
+      "open": 81600,
+      "high": 81600,
+      "low": 81583.4,
+      "close": 81583.5,
+      "volume": 5.5786,
+      "turnover": 455189.94224,
+      "updated": 1792214399,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792214400,
+      "open": 81583.5,
+      "high": 81595,
+      "low": 81569.9,
+      "close": 81569.9,
+      "volume": 6.1536,
+      "turnover": 502020.94166,
+      "updated": 1792214699,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792214700,
+      "open": 81569.9,
+      "high": 81573.7,
+      "low": 81554.6,
+      "close": 81570,
+      "volume": 6.8458000000000006,
+      "turnover": 558389.6839,
+      "updated": 1792214999,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792215000,
+      "open": 81570,
+      "high": 81571.5,
+      "low": 81562.4,
+      "close": 81565,
+      "volume": 5.4988,
+      "turnover": 448503.78858,
+      "updated": 1792215299,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792215300,
+      "open": 81565,
+      "high": 81568.9,
+      "low": 81527.4,
+      "close": 81568.9,
+      "volume": 5.2592,
+      "turnover": 428894.9594,
+      "updated": 1792215599,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792215600,
+      "open": 81568.9,
+      "high": 81568.9,
+      "low": 81538.6,
+      "close": 81563.8,
+      "volume": 6.2661999999999995,
+      "turnover": 511017.68444,
+      "updated": 1792215899,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792215900,
+      "open": 81563.8,
+      "high": 81564.4,
+      "low": 81530,
+      "close": 81541.1,
+      "volume": 5.4986,
+      "turnover": 448345.74846000003,
+      "updated": 1792216199,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792216200,
+      "open": 81541.1,
+      "high": 81550,
+      "low": 81533,
+      "close": 81536.1,
+      "volume": 5.406,
+      "turnover": 440835.63336,
+      "updated": 1792216499,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792216500,
+      "open": 81536.1,
+      "high": 81556.6,
+      "low": 81532,
+      "close": 81540.7,
+      "volume": 5.7146,
+      "turnover": 466008.70676000003,
+      "updated": 1792216799,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792216800,
+      "open": 81540.7,
+      "high": 81540.7,
+      "low": 81515.5,
+      "close": 81515.5,
+      "volume": 7.7826,
+      "turnover": 634442.36616,
+      "updated": 1792217099,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792217100,
+      "open": 81515.5,
+      "high": 81549.9,
+      "low": 81515.5,
+      "close": 81549.8,
+      "volume": 30.2334,
+      "turnover": 2464680.24522,
+      "updated": 1792217399,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792217400,
+      "open": 81549.8,
+      "high": 81581.2,
+      "low": 81535.6,
+      "close": 81581.2,
+      "volume": 6.98,
+      "turnover": 569208.08812,
+      "updated": 1792217699,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792217700,
+      "open": 81581.2,
+      "high": 81590.7,
+      "low": 81558.7,
+      "close": 81565.6,
+      "volume": 5.6594,
+      "turnover": 461611.74062,
+      "updated": 1792217999,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792218000,
+      "open": 81565.6,
+      "high": 81580.2,
+      "low": 81537.6,
+      "close": 81537.7,
+      "volume": 6.3914,
+      "turnover": 521300.43460000004,
+      "updated": 1792218299,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792218300,
+      "open": 81537.7,
+      "high": 81582,
+      "low": 81537.6,
+      "close": 81582,
+      "volume": 54.8654,
+      "turnover": 4474264.24728,
+      "updated": 1792218599,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792218600,
+      "open": 81582,
+      "high": 81582,
+      "low": 81550,
+      "close": 81559.9,
+      "volume": 5.7236,
+      "turnover": 466804.58788,
+      "updated": 1792218899,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792218900,
+      "open": 81559.9,
+      "high": 81568.2,
+      "low": 81556.8,
+      "close": 81568.2,
+      "volume": 6.118399999999999,
+      "turnover": 499014.1615,
+      "updated": 1792219199,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792219200,
+      "open": 81568.2,
+      "high": 81581.3,
+      "low": 81556.8,
+      "close": 81581.3,
+      "volume": 5.6701999999999995,
+      "turnover": 462521.53804,
+      "updated": 1792219499,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792219500,
+      "open": 81581.3,
+      "high": 81590.2,
+      "low": 81562.5,
+      "close": 81562.6,
+      "volume": 54.9026,
+      "turnover": 4479234.75234,
+      "updated": 1792219799,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792219800,
+      "open": 81562.6,
+      "high": 81602.4,
+      "low": 81559.5,
+      "close": 81567.5,
+      "volume": 6.559200000000001,
+      "turnover": 535112.3454999999,
+      "updated": 1792220099,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792220100,
+      "open": 81567.5,
+      "high": 81593.4,
+      "low": 81567.5,
+      "close": 81593.4,
+      "volume": 43.8418,
+      "turnover": 3576145.3598999996,
+      "updated": 1792220399,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792220400,
+      "open": 81593.4,
+      "high": 81603,
+      "low": 81581.7,
+      "close": 81602.9,
+      "volume": 5.8726,
+      "turnover": 479172.9425,
+      "updated": 1792220699,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792220700,
+      "open": 81602.9,
+      "high": 81615.4,
+      "low": 81594,
+      "close": 81594.1,
+      "volume": 42.9304,
+      "turnover": 3503623.5779000004,
+      "updated": 1792220999,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792221000,
+      "open": 81594.1,
+      "high": 81619.5,
+      "low": 81594,
+      "close": 81613.9,
+      "volume": 6.148000000000001,
+      "turnover": 501726.06117999996,
+      "updated": 1792221299,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792221300,
+      "open": 81613.9,
+      "high": 81614,
+      "low": 81541.9,
+      "close": 81569.7,
+      "volume": 10.5032,
+      "turnover": 856671.17778,
+      "updated": 1792221599,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792221600,
+      "open": 81569.7,
+      "high": 81615.4,
+      "low": 81569.7,
+      "close": 81586.6,
+      "volume": 5.7866,
+      "turnover": 472133.14908,
+      "updated": 1792221899,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792221900,
+      "open": 81586.6,
+      "high": 81614.2,
+      "low": 81586.5,
+      "close": 81614.1,
+      "volume": 8.5658,
+      "turnover": 698936.93328,
+      "updated": 1792222199,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792222200,
+      "open": 81614.1,
+      "high": 81733,
+      "low": 81614.1,
+      "close": 81674.4,
+      "volume": 45.4644,
+      "turnover": 3714291.10712,
+      "updated": 1792222499,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792222500,
+      "open": 81674.4,
+      "high": 81708.6,
+      "low": 81660.5,
+      "close": 81671.3,
+      "volume": 5.931,
+      "turnover": 484451.18668,
+      "updated": 1792222799,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792222800,
+      "open": 81671.3,
+      "high": 81694.8,
+      "low": 81658.3,
+      "close": 81658.3,
+      "volume": 5.4954,
+      "turnover": 448855.59304,
+      "updated": 1792223099,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792223100,
+      "open": 81658.3,
+      "high": 81665.6,
+      "low": 81631.3,
+      "close": 81663.4,
+      "volume": 6.616,
+      "turnover": 540175.03066,
+      "updated": 1792223399,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792223400,
+      "open": 81663.4,
+      "high": 81668.3,
+      "low": 81646,
+      "close": 81648.9,
+      "volume": 53.8194,
+      "turnover": 4394262.58355999,
+      "updated": 1792223699,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792223700,
+      "open": 81648.9,
+      "high": 81697,
+      "low": 81648.8,
+      "close": 81696.9,
+      "volume": 6.4246,
+      "turnover": 524660.25652,
+      "updated": 1792223999,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792224000,
+      "open": 81696.9,
+      "high": 81724.8,
+      "low": 81672.4,
+      "close": 81699.9,
+      "volume": 7.5604000000000005,
+      "turnover": 617644.8597,
+      "updated": 1792224299,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792224300,
+      "open": 81699.9,
+      "high": 81707.8,
+      "low": 81676.2,
+      "close": 81676.3,
+      "volume": 5.9792,
+      "turnover": 488426.35876,
+      "updated": 1792224599,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792224600,
+      "open": 81676.3,
+      "high": 81695.6,
+      "low": 81676.2,
+      "close": 81686.9,
+      "volume": 29.779200000000003,
+      "turnover": 2432579.59134,
+      "updated": 1792224899,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792224900,
+      "open": 81686.9,
+      "high": 81710,
+      "low": 81686.9,
+      "close": 81706,
+      "volume": 21.811999999999998,
+      "turnover": 1782183.36458,
+      "updated": 1792225199,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792225200,
+      "open": 81706,
+      "high": 81706,
+      "low": 81685.4,
+      "close": 81685.4,
+      "volume": 37.182,
+      "turnover": 3037270.51418,
+      "updated": 1792225499,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792225500,
+      "open": 81685.4,
+      "high": 81700.7,
+      "low": 81678.3,
+      "close": 81686.6,
+      "volume": 6.0354,
+      "turnover": 492991.37566,
+      "updated": 1792225799,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792225800,
+      "open": 81686.6,
+      "high": 81686.7,
+      "low": 81640,
+      "close": 81656.1,
+      "volume": 5.8846,
+      "turnover": 480554.66544,
+      "updated": 1792226099,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792226100,
+      "open": 81656.1,
+      "high": 81664.4,
+      "low": 81650.4,
+      "close": 81650.5,
+      "volume": 21.7708,
+      "turnover": 1777797.4002,
+      "updated": 1792226399,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792226400,
+      "open": 81650.5,
+      "high": 81658.7,
+      "low": 81639.5,
+      "close": 81639.5,
+      "volume": 19.0764,
+      "turnover": 1557464.0675000001,
+      "updated": 1792226699,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792226700,
+      "open": 81639.5,
+      "high": 81659.8,
+      "low": 81639.5,
+      "close": 81639.5,
+      "volume": 37.7086,
+      "turnover": 3078641.74878,
+      "updated": 1792226999,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792227000,
+      "open": 81639.5,
+      "high": 81667.2,
+      "low": 81628,
+      "close": 81667.2,
+      "volume": 16.999,
+      "turnover": 1387695.1362,
+      "updated": 1792227299,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792227300,
+      "open": 81667.2,
+      "high": 81682.8,
+      "low": 81667.1,
+      "close": 81682.7,
+      "volume": 5.6006,
+      "turnover": 457434.3553,
+      "updated": 1792227599,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792227600,
+      "open": 81682.7,
+      "high": 81683.6,
+      "low": 81659.7,
+      "close": 81683.5,
+      "volume": 6.0192,
+      "turnover": 491619.2128,
+      "updated": 1792227899,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792227900,
+      "open": 81683.5,
+      "high": 81696.6,
+      "low": 81683.5,
+      "close": 81696.6,
+      "volume": 9.3316,
+      "turnover": 762257.84264,
+      "updated": 1792228199,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792228200,
+      "open": 81696.6,
+      "high": 81696.6,
+      "low": 81671.8,
+      "close": 81685.1,
+      "volume": 6.129,
+      "turnover": 500698.28368,
+      "updated": 1792228499,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792228500,
+      "open": 81685.1,
+      "high": 81687.1,
+      "low": 81685.1,
+      "close": 81687,
+      "volume": 7.3696,
+      "turnover": 602000.47042,
+      "updated": 1792228799,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792228800,
+      "open": 81687,
+      "high": 81700,
+      "low": 81677,
+      "close": 81678.3,
+      "volume": 5.5666,
+      "turnover": 454691.38306,
+      "updated": 1792229099,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792229100,
+      "open": 81678.3,
+      "high": 81678.3,
+      "low": 81608.1,
+      "close": 81630.1,
+      "volume": 5.676,
+      "turnover": 463386.87526,
+      "updated": 1792229399,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792229400,
+      "open": 81630.1,
+      "high": 81646.6,
+      "low": 81626.8,
+      "close": 81638.3,
+      "volume": 6.104,
+      "turnover": 498317.4559,
+      "updated": 1792229699,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792229700,
+      "open": 81638.3,
+      "high": 81638.4,
+      "low": 81619.6,
+      "close": 81633.9,
+      "volume": 7.344799999999999,
+      "turnover": 599576.1684600001,
+      "updated": 1792229999,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792230000,
+      "open": 81633.9,
+      "high": 81646.6,
+      "low": 81605.2,
+      "close": 81636.5,
+      "volume": 5.8266,
+      "turnover": 475663.88824,
+      "updated": 1792230299,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792230300,
+      "open": 81636.5,
+      "high": 81663.5,
+      "low": 81626.4,
+      "close": 81663.4,
+      "volume": 5.6736,
+      "turnover": 463195.58358,
+      "updated": 1792230599,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792230600,
+      "open": 81663.4,
+      "high": 81707.8,
+      "low": 81663.4,
+      "close": 81701.6,
+      "volume": 5.8128,
+      "turnover": 474788.9878,
+      "updated": 1792230899,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792230900,
+      "open": 81701.6,
+      "high": 81701.7,
+      "low": 81550,
+      "close": 81570.8,
+      "volume": 12.4908,
+      "turnover": 1019873.0928999999,
+      "updated": 1792231199,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792231200,
+      "open": 81570.8,
+      "high": 81584.8,
+      "low": 81528.1,
+      "close": 81576.8,
+      "volume": 9.2246,
+      "turnover": 752320.54972,
+      "updated": 1792231499,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792231500,
+      "open": 81576.8,
+      "high": 81582,
+      "low": 81560.1,
+      "close": 81572.7,
+      "volume": 12.1418,
+      "turnover": 990396.1169200001,
+      "updated": 1792231799,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792231800,
+      "open": 81572.7,
+      "high": 81572.8,
+      "low": 81521.6,
+      "close": 81550.8,
+      "volume": 6.1136,
+      "turnover": 498536.1566,
+      "updated": 1792232099,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792232100,
+      "open": 81550.8,
+      "high": 81582.2,
+      "low": 81544,
+      "close": 81582.1,
+      "volume": 6.5628,
+      "turnover": 535272.64958,
+      "updated": 1792232399,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792232400,
+      "open": 81582.1,
+      "high": 81609,
+      "low": 81560,
+      "close": 81560.1,
+      "volume": 7.3344000000000005,
+      "turnover": 598391.02688,
+      "updated": 1792232699,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792232700,
+      "open": 81560.1,
+      "high": 81615.5,
+      "low": 81560,
+      "close": 81615.5,
+      "volume": 5.789199999999999,
+      "turnover": 472346.3471,
+      "updated": 1792232999,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792233000,
+      "open": 81615.5,
+      "high": 81615.5,
+      "low": 81596.5,
+      "close": 81611,
+      "volume": 14.833,
+      "turnover": 1210380.88218,
+      "updated": 1792233299,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792233300,
+      "open": 81611,
+      "high": 81619.3,
+      "low": 81610.9,
+      "close": 81610.9,
+      "volume": 5.7042,
+      "turnover": 465534.79323999997,
+      "updated": 1792233599,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792233600,
+      "open": 81610.9,
+      "high": 81636,
+      "low": 81610,
+      "close": 81610.1,
+      "volume": 7.992,
+      "turnover": 652316.98544,
+      "updated": 1792233899,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792233900,
+      "open": 81610.1,
+      "high": 81636.4,
+      "low": 81610,
+      "close": 81616.4,
+      "volume": 5.6686,
+      "turnover": 462681.10094,
+      "updated": 1792234199,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792234200,
+      "open": 81616.4,
+      "high": 81636.4,
+      "low": 81616.4,
+      "close": 81636.4,
+      "volume": 5.792199999999999,
+      "turnover": 472800.91466,
+      "updated": 1792234499,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792234500,
+      "open": 81636.4,
+      "high": 81636.4,
+      "low": 81609,
+      "close": 81614.2,
+      "volume": 5.8494,
+      "turnover": 477469.30358,
+      "updated": 1792234799,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792234800,
+      "open": 81614.2,
+      "high": 81659.5,
+      "low": 81614.2,
+      "close": 81614.2,
+      "volume": 7.8072,
+      "turnover": 637378.1462,
+      "updated": 1792235099,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792235100,
+      "open": 81614.2,
+      "high": 81642.4,
+      "low": 81594.3,
+      "close": 81616.5,
+      "volume": 5.8138000000000005,
+      "turnover": 474547.90344,
+      "updated": 1792235399,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792235400,
+      "open": 81616.5,
+      "high": 81616.5,
+      "low": 81612.1,
+      "close": 81612.7,
+      "volume": 5.618399999999999,
+      "turnover": 458535.25334,
+      "updated": 1792235699,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792235700,
+      "open": 81612.7,
+      "high": 81612.7,
+      "low": 81556.6,
+      "close": 81556.6,
+      "volume": 9.319600000000001,
+      "turnover": 760428.91716,
+      "updated": 1792235999,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792236000,
+      "open": 81556.6,
+      "high": 81556.7,
+      "low": 81547.6,
+      "close": 81555.5,
+      "volume": 5.8602,
+      "turnover": 477907.57612,
+      "updated": 1792236299,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792236300,
+      "open": 81555.5,
+      "high": 81556.7,
+      "low": 81525.9,
+      "close": 81525.9,
+      "volume": 8.0448,
+      "turnover": 656006.9276,
+      "updated": 1792236599,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792236600,
+      "open": 81525.9,
+      "high": 81573.1,
+      "low": 81517.5,
+      "close": 81550.1,
+      "volume": 10.4096,
+      "turnover": 848871.45808,
+      "updated": 1792236899,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792236900,
+      "open": 81550.1,
+      "high": 81552,
+      "low": 81548,
+      "close": 81552,
+      "volume": 5.7504,
+      "turnover": 468944.66046000004,
+      "updated": 1792237199,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792237200,
+      "open": 81552,
+      "high": 81555.3,
+      "low": 81510.7,
+      "close": 81555.2,
+      "volume": 9.6786,
+      "turnover": 789147.8437600001,
+      "updated": 1792237499,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792237500,
+      "open": 81555.2,
+      "high": 81555.3,
+      "low": 81555.2,
+      "close": 81555.2,
+      "volume": 8.2334,
+      "turnover": 671476.86042,
+      "updated": 1792237799,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792237800,
+      "open": 81555.2,
+      "high": 81590.9,
+      "low": 81551.6,
+      "close": 81554.1,
+      "volume": 7.4052,
+      "turnover": 603960.41908,
+      "updated": 1792238099,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792238100,
+      "open": 81554.1,
+      "high": 81555.7,
+      "low": 81528.5,
+      "close": 81538,
+      "volume": 6.3626000000000005,
+      "turnover": 518835.01686,
+      "updated": 1792238399,
+      "quality": "stream_closed"
+    },
+    {
+      "period": 300,
+      "start": 1792238400,
+      "open": 81538,
+      "high": 81556.2,
+      "low": 81538,
+      "close": 81550,
+      "volume": 6.0522,
+      "turnover": 493557.39158,
+      "updated": 1792238699,
+      "quality": "stream_closed"
+    }
+  ]
+}

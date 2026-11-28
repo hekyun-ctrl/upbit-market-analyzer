@@ -1,0 +1,11 @@
+# Recovery checkpoint — 2026-10-23 06:26 KST
+
+Required retry/checkpoint/STOP read fresh; unchanged blobs 6a5c3254387602e916046f180c287f1950c61dbf / 324986077642a711532136e86c6b93ea7bf41e1e / c02580c2d50fc8cf97d6eed267ea88680ec1ead5.
+
+Official https://status.railway.com/ 2026-10-22 21:08 UTC / 2026-10-23 06:08 KST: Hobby builds enabled, delays expected; Free/Trial still pending. Pro/Enterprise operational with possible completion delays. Partial recovery, not all tiers restored.
+
+Fresh describe_service succeeded: target live, no staged changes, latest deployment still 4bbda6c7-29e8-4811-8322-5f8d0574c1be SUCCESS created 2026-10-20T15:21:53.430Z. Config pinned 06b88b94a6b5ff0ab5fda0ed0c08a03bc5faa03b, tests retained, /data50MB sfo. No secrets read. GitHub compare approved SHA versus latest production feature/lbank-futures-monitor returned identical, ahead=behind=0, no files changed.
+
+Attempted environment-scoped staged connect_service_source for exact approved source. Result successful NO-OP: Nothing staged; service already sourced from exact repo/branch/SHA. staged=null. This is a change from earlier paused-error response, but does NOT start a build or apply saved flags. Do not call accept_deploy with nothing staged; do not assume old-build redeploy builds pinned source. No deployment/restart/outbound occurred. STOP runtime_applied=false unchanged.
+
+Concrete next step: use a documented existing-service exact-source new-build operation (CLI/API fallback if necessary), after checking credential-safety checkpoint and explicitly ensuring both false switches. Do not unpin/repoint source just to force a diff; do not create another service. Tool discovery so far exposes connect-source no-op and old-build redeploy, insufficient evidence of a fresh source build. Verify terminal SUCCESS plus actual commit and applied runtime. Preserve reference/invalidation/risk and pre-deploy tests, never send paper/ZB-status for superseded ACK criterion. Telegram rotation remains unconfirmed; no secret inspection. Rollback source25388b431c9c9d38df6a434670586c65f382d604 / old deployment above retained. Recovery task remains incomplete and enabled; research stopped. No user-action request or completed deployment/stop transition to report.

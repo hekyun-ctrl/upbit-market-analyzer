@@ -1,0 +1,9 @@
+# Recovery checkpoint — 2026-10-23 03:18 KST
+
+Fresh required retry/checkpoint/STOP reads succeeded; blobs unchanged: 6a5c3254387602e916046f180c287f1950c61dbf, 324986077642a711532136e86c6b93ea7bf41e1e, c02580c2d50fc8cf97d6eed267ea88680ec1ead5.
+
+Official https://status.railway.com/ latest 2026-10-22 17:43 UTC / 2026-10-23 02:43 KST: Pro/Enterprise builds and deployments normal, Hobby next followed by Free/Trial, none yet announced enabled. At 17:00 UTC / 02:00 KST API fully restored; pre-incident API/project tokens remain invalid. API restoration does not establish target build availability. Target tier not verified; no billing change authorized. One retry guidance only applies to a build failing shortly after starting. No duplicate trigger.
+
+No deployment, restart, secrets inspection, outbound or unrelated mutation. Runtime not re-read this run; last direct service read 2026-10-22 23:09 KST showed live old SUCCESS 4bbda6c7-29e8-4811-8322-5f8d0574c1be, no staged changes, config pin 06b88b94a6b5ff0ab5fda0ed0c08a03bc5faa03b (not evidence of new runtime). STOP runtime_applied=false remains; do not claim stopped. Rollback source 25388b431c9c9d38df6a434670586c65f382d604 and deployment above retained.
+
+Next: verify applicable build availability and latest production/concurrent staged work before one exact approved-source build. Apply both LBANK_PAPER_NOTIFICATIONS_ENABLED=false and LBANK_ZB_RUNTIME_ENABLED=false; verify runtime with existing reference/invalidation/risk routes preserved. Do not send paper/ZB-status messages for superseded ACK checks. Retain pre-deploy tests. Recheck credential-safety checkpoint before broader deployment; Telegram rotation not confirmed. Temporary incident, recovery task retained, research remains stopped. No actual deployment/stop/performance transition to report; suppress duplicate notification.

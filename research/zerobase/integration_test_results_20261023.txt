@@ -1,0 +1,7 @@
+Command: python -m unittest discover -p test_lbank*.py
+----------------------------------------------------------------------
+Ran 425 tests in 1.997s
+
+OK
+
+Public forward acceptance is recorded separately and did not pass due public API timeout.

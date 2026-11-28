@@ -1,0 +1,5 @@
+# Recovery checkpoint 2026-10-21 23:48 KST
+
+Read required DEPLOYMENT_RETRY_20261021.md and DEPLOYMENT_CHECKPOINT_20261021.md from remote branch. Official https://status.railway.com/ latest update remains 2026-10-21 13:40 UTC (22:40 KST), Identified: builds paused, some API features unavailable, support platform down; no change since preceding update. New-build recovery condition not satisfied. No deployment mutation/restart, no claim of new SUCCESS/runtime/source/notification ACK.
+
+Transient platform blocker: keep only existing recovery watch active; no duplicate user notification. Next run: check official builds recovery, inspect latest production branch and staged changes, avoid overwriting later work, build approved exact commit on authorized existing LBank service only, then verify terminal SUCCESS plus source/runtime/native freshness/notification ACK/reference-risk path and preserve deployment/rollback evidence. Disable this task only when completed. Existing research tasks remain paused. Prior deployment checkpoint holds all resource and rollback IDs.

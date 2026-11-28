@@ -1,0 +1,11 @@
+# Recovery checkpoint — 2026-10-23 07:21 KST
+
+Mandatory retry/checkpoint/STOP files freshly read, unchanged blobs 6a5c3254387602e916046f180c287f1950c61dbf / 324986077642a711532136e86c6b93ea7bf41e1e / c02580c2d50fc8cf97d6eed267ea88680ec1ead5.
+
+Official https://status.railway.com/ latest 2026-10-22 21:59 UTC / 2026-10-23 06:59 KST: Hobby/Pro/Enterprise builds enabled, completion delays remain; Free/Trial still pending. Thus do not describe all builds as paused. Target tier remains unverified.
+
+Continued 06:26 checkpoint: audited current exposed deployment tools. create_deployment explicitly CREATES A NEW SERVICE, so not applicable. redeploy explicitly REUSES EXISTING BUILD, so cannot establish new approved source. restart_service explicitly restarts same containers without new deployment. connect_service_source already returned exact-source no-op in prior run. No arbitrary source churn introduced. CLI availability actually checked via command -v railway: exit1, unavailable. Read Railway skill request reference: GraphQL helper depends on local ~/.railway/config.json token; plugin OAuth cannot be assumed to supply CLI/API credentials. No tokens inspected or extracted. Next concrete route to investigate: official documented fresh-build action for existing pinned service and permitted authenticated transport, rather than another no-op or a new service. Browser fallback may require approval under tool policy; do not fabricate CLI auth.
+
+No mutation/restart/outbound this run. Last direct service state at 06:26 KST: live old SUCCESS 4bbda6c7-29e8-4811-8322-5f8d0574c1be, no staged changes; GitHub production identical to approved06b88b94a6b5ff0ab5fda0ed0c08a03bc5faa03b. STOP runtime_applied=false. Do not claim stopped/new deployed. Rollback source25388b431c9c9d38df6a434670586c65f382d604/deployment above.
+
+Retain both false switches, pre-deploy tests, existing reference/invalidation/risk paths; no paper/ZB sends for old ACK checks. Credential safety must be rechecked before broader deployment; Telegram rotation remains unconfirmed. No account/orders, secrets, billing, unrelated service edits or research resumption. Recovery incomplete; keep task while remaining platform restrictions are transient. No completed deployment/stop/performance transition to notify.
