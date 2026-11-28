@@ -36,6 +36,7 @@ from lbank_operational_health import (JournalRecovery, OperationalNotices,
 from lbank_native_candles import NativeCandleThread
 from lbank_native_entry import NativeEntryFeed, native_context_gate, SOURCE as NATIVE_SOURCE
 from lbank_trend_route import rank_entry_routes
+from lbank_integrated_shadow import IntegratedShadow
 from lbank_trend_early_notice import trend_onset_preview, record_delivered_preview
 from lbank_fast_resumption import detect_fast_resumption
 from lbank_trend_runner import format_runner_alert, POLICY_VERSION, atr_wilder
@@ -1200,6 +1201,8 @@ def run():
     last_entry_diagnostics = {}
     last_setup_key = None
     pressure_observer = PressureObserver()
+    integrated_shadow = IntegratedShadow()
+    integrated_last_key = None
     observed_ready_key = None
     first_ready_observed_at = None
     capture_entries = ENTRY_REFINEMENT_MODE == "capture"
@@ -1221,6 +1224,17 @@ def run():
             storage_status = storage_reserve.check()
             native_state, native_diag = native_feed.snapshot(now, price)
             native_key = completed_key(native_state)
+            # Independent research engine: no new live permissions or sends.
+            if native_key is not None and native_key != integrated_last_key:
+                try:
+                    integrated, integrated_outcomes = integrated_shadow.step(native_state)
+                    LOG.info("INTEGRATED_STRUCTURE_SHADOW %s", json.dumps(integrated, sort_keys=True))
+                    for outcome in integrated_outcomes:
+                        LOG.info("INTEGRATED_STRUCTURE_OUTCOME %s", json.dumps(outcome, sort_keys=True))
+                    integrated_last_key = native_key
+                except Exception as exc:
+                    LOG.warning("INTEGRATED_STRUCTURE_SHADOW_FAILED exception=%s live_gates_unchanged=true",
+                                type(exc).__name__)
             if capture_entries:
                 try:
                     for outcome in BARRIER_AUDIT.observe(native_state):
